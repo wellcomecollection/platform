@@ -1,12 +1,16 @@
 package uk.ac.wellcome.test
 
-package object fixtures {
+package object fixtures extends FixtureComposers {
 
   type TestWith[T, R] = T => R
 
-  type Fixture[T, R] = () => TestWith[T, R] => R
+  type Fixture[L, R] = TestWith[L, R] => R
 
-  def composeFixtures[T1, T2, R](fixture1: Fixture[T1, R], fixture2: Fixture[T2, R]): Fixture[(T1, T2), R] =
-    ???
+  implicit class ComposableFixture[L1, R](private val thisFixture: Fixture[L1, R]) {
+
+    def and[T, L2](that: T)(implicit fc: FixtureComposer[L1, L2, T, R]): Fixture[L2, R] =
+      fc.compose(thisFixture, that)
+
+  }
 
 }

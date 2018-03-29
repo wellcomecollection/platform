@@ -91,26 +91,25 @@ class SQSWorkerToDynamoTest
       }
     }
 
-  def withTestWorker[R](testWorkFactory: TestWorkerFactory =
-                          defaultTestWorkerFactory)(
-    testWith: TestWith[(TestWorker, String), R]) = {
-    withActorSystem { system =>
-      withLocalSqsQueue { queueUrl =>
-        val worker = testWorkFactory(queueUrl, system)
+  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(system: ActorSystem, queueUrl: String)(
+    testWith: TestWith[TestWorker, R]) = {
+      val worker = testWorkFactory(queueUrl, system)
 
-        try {
-          testWith((worker, queueUrl))
-        } finally {
-          worker.stop()
-        }
-
+      try {
+        testWith(worker)
+      } finally {
+        worker.stop()
       }
-    }
   }
 
+  def withFixtures[R](testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
+    withActorSystem[R] _ and
+    withLocalSqsQueue[R] _ and
+    withTestWorker[R](testWorkFactory) _
+
   it("processes messages") {
-    withTestWorker() {
-      case (worker, queueUrl) =>
+    withFixtures() {
+      case (_, queueUrl, worker) =>
         sqsClient.sendMessage(queueUrl, testMessageJson)
 
         eventually {
@@ -121,8 +120,8 @@ class SQSWorkerToDynamoTest
   }
 
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
-    withTestWorker(conditionalCheckFailingTestWorkerFactory) {
-      case (worker, queueUrl) =>
+    withFixtures(conditionalCheckFailingTestWorkerFactory) {
+      case (_, queueUrl, worker) =>
         sqsClient.sendMessage(queueUrl, testMessageJson)
 
         eventually {
@@ -132,8 +131,8 @@ class SQSWorkerToDynamoTest
   }
 
   it("fails gracefully when a conversion fails") {
-    withTestWorker(terminalTestWorkerFactory) {
-      case (worker, queueUrl) =>
+    withFixtures(terminalTestWorkerFactory) {
+      case (_, queueUrl, worker) =>
         val invalidBodyTestMessage = SQSMessage(
           subject = Some("subject"),
           messageType = "messageType",
@@ -154,8 +153,8 @@ class SQSWorkerToDynamoTest
 
   it(
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
-    withTestWorker(terminalTestWorkerFactory) {
-      case (worker, queueUrl) =>
+    withFixtures(terminalTestWorkerFactory) {
+      case (_, queueUrl, worker) =>
         sqsClient.sendMessage(queueUrl, testMessageJson)
 
         eventually {
