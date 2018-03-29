@@ -26,88 +26,83 @@ class ElasticsearchHitToDisplayWorkFlowTest
     with ExtendedPatience {
 
   it("creates a DisplayWork from a single hit") {
-    withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
-      withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+    withFlow { flow =>
+      val work = IdentifiedWork(
+        canonicalId = "t83tggem",
+        title = Some("Tired of troubling tests"),
+        sourceIdentifier = SourceIdentifier(
+          identifierScheme = IdentifierSchemes.miroImageNumber,
+          ontologyType = "work",
+          value = "T0083000"
+        ),
+        version = 1
+      )
 
-        val work = IdentifiedWork(
-          canonicalId = "t83tggem",
-          title = Some("Tired of troubling tests"),
-          sourceIdentifier = SourceIdentifier(
-            identifierScheme = IdentifierSchemes.miroImageNumber,
-            ontologyType = "work",
-            value = "T0083000"
-          ),
-          version = 1
-        )
+      val elasticsearchHitJson = s"""{
+        "_index": "zagbdjgf",
+        "_type": "work",
+        "_id": "${work.canonicalId}",
+        "_score": 1,
+        "_source": ${toJson(work).get}
+      }"""
 
-        val elasticsearchHitJson = s"""{
-          "_index": "zagbdjgf",
-          "_type": "work",
-          "_id": "${work.canonicalId}",
-          "_score": 1,
-          "_source": ${toJson(work).get}
-        }"""
+      val futureDisplayWork: Future[DisplayWork] = Source
+        .single(elasticsearchHitJson)
+        .via(flow)
+        .runWith(Sink.head)
 
-        val futureDisplayWork: Future[DisplayWork] = Source
-          .single(elasticsearchHitJson)
-          .via(flow)
-          .runWith(Sink.head)
-
-        whenReady(futureDisplayWork) { displayWork =>
-          displayWork shouldBe DisplayWork(work, includes = includes)
-        }
+      whenReady(futureDisplayWork) { displayWork =>
+        displayWork shouldBe DisplayWork(work, includes = includes)
       }
     }
   }
 
   it("returns a failed Future if it gets invalid JSON") {
-    withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
-      withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+    withFlow { flow =>
+      val elasticsearchHitJson = s"""MARC?XML RAARGH NOTJSON"""
 
-        val elasticsearchHitJson = s"""MARC?XML RAARGH NOTJSON"""
+      val future = Source
+        .single(elasticsearchHitJson)
+        .via(flow)
+        .runWith(Sink.head)
 
-        val future = Source
-          .single(elasticsearchHitJson)
-          .via(flow)
-          .runWith(Sink.head)
-
-        whenReady(future.failed) { result =>
-          result shouldBe a[GracefulFailureException]
-        }
+      whenReady(future.failed) { result =>
+        result shouldBe a[GracefulFailureException]
       }
     }
   }
 
   it("returns a failed Future if it gets valid JSON but _source isn't a Work") {
-    withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
-      withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+    withFlow { flow =>
+      val elasticsearchHitJson = s"""{
+        "_index": "rd8a35zw",
+        "_type": "work",
+        "_id": "ndpwrqer",
+        "_score": 1,
+        "_source": {"foo": "bar", "baz": "bat"}
+      }"""
 
-        val elasticsearchHitJson = s"""{
-          "_index": "rd8a35zw",
-          "_type": "work",
-          "_id": "ndpwrqer",
-          "_score": 1,
-          "_source": {"foo": "bar", "baz": "bat"}
-        }"""
+      val future = Source
+        .single(elasticsearchHitJson)
+        .via(flow)
+        .runWith(Sink.head)
 
-        val future = Source
-          .single(elasticsearchHitJson)
-          .via(flow)
-          .runWith(Sink.head)
-
-        whenReady(future.failed) { result =>
-          result shouldBe a[GracefulFailureException]
-        }
+      whenReady(future.failed) { result =>
+        result shouldBe a[GracefulFailureException]
       }
     }
   }
+
+  private def withFlow(
+    testWith: TestWith[Flow[String, DisplayWork, NotUsed], Assertion]) = {
+      withActorSystem { actorSystem =>
+        implicit val executionContext: ExecutionContextExecutor =
+          actorSystem.dispatcher
+        withMaterializer(actorSystem) { materializer =>
+          val flow = ElasticsearchHitToDisplayWorkFlow()
+
+          testWith(flow)
+        }
+      }
+    }
 }
