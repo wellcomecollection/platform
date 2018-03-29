@@ -43,8 +43,10 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       key = conversionJob.objectKey
     )
 
-    val source = s3source
+    val displayWorks = s3source
       .via(ElasticsearchHitToDisplayWorkFlow())
+
+    val jsonStrings = displayWorks
       .map { displayWork: DisplayWork => toJson(displayWork) }
       .map {
         case Success(jsonString) => jsonString
@@ -53,6 +55,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
           throw encodeError
         }
       }
+
+    val gzipContent = jsonStrings
       .via{ StringToGzipFlow(_) }
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
@@ -61,7 +65,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
         key = targetObjectKey
       )
 
-    val future = source.runWith(s3Sink)(ActorMaterializer()(actorSystem))
+    val future = gzipContent.runWith(s3Sink)(ActorMaterializer()(actorSystem))
 
     future.map { result =>
       val targetLocation =
