@@ -51,6 +51,18 @@ case object WorksIncludes {
     }
 }
 
+/** Convenience wrapper that has every field on WorksIncludes set to true.
+  *
+  * We're piggybacking the string-parsing logic used for parsing includes from
+  * a URL query string.  This isn't especially neat, but it means it always
+  * stays up-to-date if/when we add new includes, and avoids the messiness of
+  * doing reflection.
+  */
+object AllWorksIncludes {
+  def apply(): WorksIncludes =
+    WorksIncludes(queryParam = WorksIncludes.recognisedIncludes.mkString(","))
+}
+
 class WorksIncludesDeserializer extends JsonDeserializer[WorksIncludes] {
   override def deserialize(p: JsonParser,
                            ctxt: DeserializationContext): WorksIncludes =
