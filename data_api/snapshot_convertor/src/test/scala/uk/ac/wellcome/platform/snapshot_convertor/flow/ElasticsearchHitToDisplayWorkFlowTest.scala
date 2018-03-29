@@ -58,7 +58,7 @@ class ElasticsearchHitToDisplayWorkFlowTest
           .runWith(Sink.head)(materializer)
 
         whenReady(futureDisplayWork) { displayWork =>
-          displayWork shouldBe DisplayWork(work, includes = includes)
+          displayWork shouldBe DisplayWork(work, includes = AllWorksIncludes())
         }
       }
     }
