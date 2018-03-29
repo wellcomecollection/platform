@@ -11,7 +11,7 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
 
 import scala.collection.JavaConversions._
-import scala.util.Random
+import scala.util.{Random, Try}
 
 trait S3 extends Logging with Eventually {
 
