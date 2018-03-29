@@ -4,6 +4,7 @@ object Dependencies {
 
   lazy val versions = new {
     val akka = "2.4.17"
+    val akkaStreamAlpakkaS3 = "0.17"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
     val finatra = "2.8.0"
@@ -114,7 +115,9 @@ object Dependencies {
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
-  val snapshotConvertorDependencies: Seq[ModuleID] = commonDependencies
+  val snapshotConvertorDependencies = commonDependencies ++ Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+  )
 
   val recorderDependencies: Seq[ModuleID] = Seq()
 
