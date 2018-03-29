@@ -14,16 +14,19 @@ import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.aws.AWSConfig
 
 import scala.concurrent.Future
-import akka.stream.scaladsl.{Compression, Sink}
-import com.twitter.finatra.json.FinatraObjectMapper
+import akka.stream.scaladsl.Sink
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.platform.snapshot_convertor.flow.ElasticsearchHitToDisplayWorkFlow
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{
+  ElasticsearchHitToDisplayWorkFlow,
+  StringToGzipFlow
+}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
+
+import scala.util.{Success, Failure}
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  awsConfig: AWSConfig,
                                  s3Client: S3Client,
-                                 mapper: FinatraObjectMapper,
                                  @Flag("aws.s3.endpoint") s3Endpoint: String)
     extends Logging {
 
@@ -42,9 +45,15 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     val source = s3source
       .via(ElasticsearchHitToDisplayWorkFlow())
-      .map { mapper.writeValueAsString(_) }
-      .map { ByteString(_) }
-      .via(Compression.gzip)
+      .map { displayWork: DisplayWork => toJson(displayWork) }
+      .map {
+        case Success(jsonString) => jsonString
+        case Failure(encodeError) => {
+          warn("Failed to convert $displayWork to string!", encodeError)
+          throw encodeError
+        }
+      }
+      .via{ StringToGzipFlow(_) }
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
       s3Client.multipartUpload(
