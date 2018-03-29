@@ -1,10 +1,14 @@
 package uk.ac.wellcome.platform.snapshot_convertor.services
 
+import java.io.File
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
+import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
@@ -70,6 +74,18 @@ class ConvertorServiceTest
               val future = convertorService.runConversion(conversionJob)
 
               whenReady(future) { result =>
+
+                val downloadFile = File.createTempFile("convertorServiceTest", ".txt.gz")
+                s3Client.getObject(new GetObjectRequest(bucketName, "target.txt.gz"), downloadFile)
+
+                val contents = readGzipFile(downloadFile.getPath)
+                val expectedContents = works
+                  .map { DisplayWork(_) }
+                  .map { toJson(_).get }
+                  .mkString("\n") + "\n"
+
+                contents shouldBe expectedContents
+
                 result shouldBe CompletedConversionJob(
                   conversionJob = conversionJob,
                   targetLocation = s"http://localhost:33333/$bucketName/target.txt.gz"
