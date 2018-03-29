@@ -105,8 +105,8 @@ class SQSWorkerToDynamoTest
 
   def withFixtures[R](
     testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
-    withActorSystem[R] _ and
-      withLocalSqsQueue[R] _ and
+    withActorSystem[R] and
+      withLocalSqsQueue[R] and
       withTestWorker[R](testWorkFactory) _
 
   it("processes messages") {
