@@ -11,7 +11,6 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.util.ByteString
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.models.aws.AWSConfig
 
 import scala.concurrent.Future
 import akka.stream.scaladsl.Sink
@@ -25,7 +24,6 @@ import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import scala.util.{Success, Failure}
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
-                                 awsConfig: AWSConfig,
                                  s3Client: S3Client,
                                  @Flag("aws.s3.endpoint") s3Endpoint: String)
     extends Logging {
