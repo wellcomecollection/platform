@@ -1,16 +1,6 @@
 package uk.ac.wellcome.test.fixtures
 
-import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
-import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{
-  AWSStaticCredentialsProvider,
-  BasicAWSCredentials,
-  DefaultAWSCredentialsProviderChain
-}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.regions.AwsRegionProvider
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.twitter.inject.Logging
@@ -103,32 +93,5 @@ trait S3 extends Logging with Eventually {
 
   def getJsonFromS3(bucketName: String, key: String): Json = {
     parse(getContentFromS3(bucketName, key)).right.get
-  }
-
-}
-
-trait S3AkkaClient extends S3 with AkkaFixtures {
-  def withS3AkkaClient[R](
-    actorSystem: ActorSystem,
-    materializer: Materializer)(testWith: TestWith[S3Client, R]): R = {
-
-    logger.debug(s"creating S3 Akka client pointing to=[$localS3EndpointUrl]")
-    val s3AkkaClient = new S3Client(
-      new S3Settings(
-        bufferType = MemoryBufferType,
-        proxy = None,
-        credentialsProvider = new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)
-        ),
-        s3RegionProvider = new AwsRegionProvider {
-          def getRegion: String = regionName
-        },
-        pathStyleAccess = true,
-        endpointUrl = Some(localS3EndpointUrl)
-      )
-    )(actorSystem, materializer)
-
-    testWith(s3AkkaClient)
-
   }
 }
