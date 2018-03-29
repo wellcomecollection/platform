@@ -28,11 +28,6 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
 
-  val akkaStreamDependencies = Seq(
-    "com.typesafe.akka" %% "akka-stream" % versions.akka,
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
-  )
-
   val awsDependencies: Seq[ModuleID] = Seq(
     "com.amazonaws" % "aws-java-sdk" % versions.aws
   )
@@ -120,7 +115,9 @@ object Dependencies {
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
-  val snapshotConvertorDependencies = commonDependencies ++ akkaStreamDependencies
+  val snapshotConvertorDependencies = commonDependencies ++ Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+  )
 
   val recorderDependencies: Seq[ModuleID] = Seq()
 
