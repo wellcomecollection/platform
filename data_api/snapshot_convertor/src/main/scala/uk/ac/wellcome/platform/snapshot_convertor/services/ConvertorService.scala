@@ -22,9 +22,11 @@ import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
-class ConvertorService @Inject()(actorSystem: ActorSystem, s3Client: S3Client, @Flag("aws.s3.endpoint") extends Logging {
+class ConvertorService @Inject()(actorSystem: ActorSystem,
+                                 s3Client: S3Client,
+                                 @Flag("aws.s3.endpoint") s3Endpoint: String) extends Logging {
 
-  implicit val materializer = ActorMaterializer()
+  implicit val materializer = ActorMaterializer()(actorSystem)
 
   def runConversion(conversionJob: ConversionJob): Future[CompletedConversionJob] = {
     info(s"ConvertorService running $conversionJob")
