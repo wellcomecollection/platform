@@ -9,6 +9,10 @@ import uk.ac.wellcome.models.{
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -41,7 +45,7 @@ class ConvertorServiceTest
 
   it("completes a conversion successfully") {
     withLocalS3Bucket { bucketName =>
-      withConvertorService { convertorService =>
+      withConvertorService(bucketName) { convertorService =>
 
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
@@ -62,7 +66,25 @@ class ConvertorServiceTest
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(work).get}}"""
         }
         val content = elasticsearchJsons.mkString("\n")
-        val gzipContent = createGzipFile(content)
+
+        withGzipCompressedS3Key(bucketName, content) { objectKey =>
+          val conversionJob = ConversionJob(
+            bucketName = bucketName,
+            objectKey = objectKey
+          )
+
+          val future = convertorService.runConversion(conversionJob)
+
+          whenReady(future) { result =>
+
+
+
+            result shouldBe CompletedConversionJob(
+              conversionJob = conversionJob,
+              targetLocation = s"http://localhost:33333/$bucketName/target.txt.gz"
+            )
+          }
+        }
       }
     }
   }
