@@ -45,16 +45,21 @@ class ConvertorServiceTest
         // if not anything more interesting!
         val works = (1 to 3).map { version =>
           IdentifiedWork(
-            canonicalId = "t83tggem",
-            title = Some("Tired of troubling tests"),
+            canonicalId = "rbfhv6b4",
+            title = Some("Rumblings from a rambunctious rodent"),
             sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.miroImageNumber,
               ontologyType = "work",
-              value = "T0083000"
+              value = "R0060400"
             ),
             version = version
           )
         }
+
+        val elasticsearchJsons = works.map { work =>
+          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(work).get}}"""
+        }
+        contents = elasticsearchJsons.mkString("\n")
       }
     }
   }
