@@ -10,7 +10,10 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.snapshot_convertor.modules.SnapshotConvertorWorkerModule
+import uk.ac.wellcome.platform.snapshot_convertor.modules.{
+  AkkaS3ClientModule,
+  SnapshotConvertorWorkerModule
+}
 
 object ServerMain extends Server
 
@@ -25,7 +28,7 @@ class Server extends HttpServer {
     SQSConfigModule,
     SNSClientModule,
     SNSConfigModule,
-    S3ClientModule,
+    AkkaS3ClientModule,
     S3ConfigModule,
     SnapshotConvertorWorkerModule,
     AkkaModule
