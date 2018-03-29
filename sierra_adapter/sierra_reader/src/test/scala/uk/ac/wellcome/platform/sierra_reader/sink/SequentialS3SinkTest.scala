@@ -115,7 +115,8 @@ class SequentialS3SinkTest
         withSink(
           actorSystem = actorSystem,
           bucketName = bucketName,
-          keyPrefix = "testC_") { sink =>
+          keyPrefix = "testC_",
+          offset = 3) { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
               .runWith(sink)(materializer)
