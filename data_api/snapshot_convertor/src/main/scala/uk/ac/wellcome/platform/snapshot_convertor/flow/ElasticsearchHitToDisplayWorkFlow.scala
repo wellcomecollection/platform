@@ -6,7 +6,7 @@ import com.twitter.inject.Logging
 import io.circe.Decoder
 import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.models.{IdentifiedWork, WorksIncludes}
+import uk.ac.wellcome.models.{AllWorksIncludes, IdentifiedWork}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
@@ -28,14 +28,6 @@ case class ElasticsearchHit(
   */
 object ElasticsearchHitToDisplayWorkFlow extends Logging {
 
-  // TODO: Can we get a convenience wrapper for WorksIncludes that just
-  // fills in everything?
-  val includes = WorksIncludes(
-    identifiers = true,
-    thumbnail = true,
-    items = true
-  )
-
   def apply()(implicit executionContext: ExecutionContext)
     : Flow[String, DisplayWork, NotUsed] =
     Flow.fromFunction({ line =>
@@ -48,6 +40,6 @@ object ElasticsearchHitToDisplayWorkFlow extends Logging {
       }
 
       val internalWork = hit.source
-      DisplayWork(internalWork, includes = includes)
+      DisplayWork(internalWork, includes = AllWorksIncludes())
     })
 }
