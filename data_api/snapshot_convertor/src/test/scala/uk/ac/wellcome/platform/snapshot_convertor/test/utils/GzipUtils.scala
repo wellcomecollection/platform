@@ -9,7 +9,7 @@ import org.scalatest.Assertion
 
 import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 
-trait GzipUtils with S3 {
+trait GzipUtils extends S3 {
   def withGzipCompressedS3Key(bucketName: String, content: String)(
     testWith: TestWith[String, Assertion]) = {
     val gzipContent = createGzipFile(content)
