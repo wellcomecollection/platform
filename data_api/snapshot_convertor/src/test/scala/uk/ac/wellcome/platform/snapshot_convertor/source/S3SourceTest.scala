@@ -53,6 +53,53 @@ class S3SourceTest
     }
   }
 
+  it("returns a failed future if it the S3 file is not gzip-compressed") {
+    withActorSystem { actorSystem =>
+      implicit val system = actorSystem
+      implicit val materializer = ActorMaterializer()
+
+      withLocalS3Bucket { bucketName =>
+        withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
+          val key = "example.txt.gz"
+          s3Client.putObject(bucketName, key, "NotAGzipCompressedFile")
+
+          val source = S3Source(
+            s3client = akkaS3client,
+            bucketName = bucketName,
+            key = key
+          )
+
+          val future = source.runWith(Sink.seq)
+          whenReady(future.failed) { exception =>
+            exception shouldBe a[RuntimeException]
+          }
+        }
+      }
+    }
+  }
+
+  it("returns a failed future if asked to fetch a non-existent file") {
+    withActorSystem { actorSystem =>
+      implicit val system = actorSystem
+      implicit val materializer = ActorMaterializer()
+
+      withLocalS3Bucket { bucketName =>
+        withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
+          val source = S3Source(
+            s3client = akkaS3client,
+            bucketName = bucketName,
+            key = "doesnotexist.txt.gz"
+          )
+
+          val future = source.runWith(Sink.seq)
+          whenReady(future.failed) { exception =>
+            exception shouldBe a[RuntimeException]
+          }
+        }
+      }
+    }
+  }
+
   private def createGzipFile(content: String): File = {
     val tmpfile = File.createTempFile("s3sourcetest", ".txt")
 
