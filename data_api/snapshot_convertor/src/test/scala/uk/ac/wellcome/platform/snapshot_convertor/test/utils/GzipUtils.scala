@@ -2,9 +2,23 @@ package uk.ac.wellcome.platform.snapshot_convertor.test.utils
 
 import java.io.{BufferedWriter, File, FileWriter}
 import scala.sys.process._
+import scala.util.Random
 
-trait GzipUtils {
-  def createGzipFile(content: String): File = {
+import org.scalatest.Assertion
+
+import uk.ac.wellcome.test.fixtures.{S3, TestWith}
+
+trait GzipUtils extends S3 {
+  def withGzipCompressedS3Key(bucketName: String, content: String)(
+    testWith: TestWith[String, Assertion]) = {
+    val gzipContent = createGzipFile(content)
+    val key = (Random.alphanumeric take 10 mkString).toLowerCase
+    s3Client.putObject(bucketName, key, gzipFile)
+
+    testWith(key)
+  }
+
+  private def createGzipFile(content: String): File = {
     val tmpfile = File.createTempFile("s3sourcetest", ".txt")
 
     // Create a gzip-compressed file.  This is based on the shell commands
