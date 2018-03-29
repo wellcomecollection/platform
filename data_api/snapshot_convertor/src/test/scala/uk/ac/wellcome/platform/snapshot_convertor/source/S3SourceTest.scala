@@ -34,19 +34,17 @@ class S3SourceTest
             "Cor! Countless copies of crying camels"
           )
 
-          val gzipFile = createGzipFile(expectedLines.mkString("\n"))
-          val key = "test001.txt.gz"
-          s3Client.putObject(bucketName, key, gzipFile)
+          withGzipCompressedS3Key(expectedLines.mkString("\n")) { key =>
+            val source = S3Source(
+              s3client = akkaS3client,
+              bucketName = bucketName,
+              key = key
+            )
 
-          val source = S3Source(
-            s3client = akkaS3client,
-            bucketName = bucketName,
-            key = key
-          )
-
-          val future = source.runWith(Sink.seq)
-          whenReady(future) { result =>
-            result.toList shouldBe expectedLines
+            val future = source.runWith(Sink.seq)
+            whenReady(future) { result =>
+              result.toList shouldBe expectedLines
+            }
           }
         }
       }
