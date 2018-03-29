@@ -9,9 +9,16 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures._
@@ -39,7 +46,6 @@ class SnapshotConvertorFeatureTest
             bucketName)
 
           withServer(flags) { _ =>
-
             // Create a collection of works.  These three differ by version,
             // if not anything more interesting!
             val works = (1 to 3).map { version =>
@@ -56,7 +62,8 @@ class SnapshotConvertorFeatureTest
             }
 
             val elasticsearchJsons = works.map { work =>
-              s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(work).get}}"""
+              s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+                work).get}}"""
             }
             val content = elasticsearchJsons.mkString("\n")
 
@@ -78,8 +85,11 @@ class SnapshotConvertorFeatureTest
 
               eventually {
 
-                val downloadFile = File.createTempFile("convertorServiceTest", ".txt.gz")
-                s3Client.getObject(new GetObjectRequest(bucketName, "target.txt.gz"), downloadFile)
+                val downloadFile =
+                  File.createTempFile("convertorServiceTest", ".txt.gz")
+                s3Client.getObject(
+                  new GetObjectRequest(bucketName, "target.txt.gz"),
+                  downloadFile)
 
                 val contents = readGzipFile(downloadFile.getPath)
                 val expectedContents = works
@@ -92,7 +102,8 @@ class SnapshotConvertorFeatureTest
                 listMessagesReceivedFromSNS(topicArn) shouldBe List(
                   CompletedConversionJob(
                     conversionJob = conversionJob,
-                    targetLocation = s"http://localhost:33333/$bucketName/target.txt.gz"
+                    targetLocation =
+                      s"http://localhost:33333/$bucketName/target.txt.gz"
                   )
                 )
               }

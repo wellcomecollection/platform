@@ -26,7 +26,8 @@ class SnapshotConvertorWorkerService @Inject()(
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       conversionJob <- Future.fromTry(fromJson[ConversionJob](message.body))
-      completedConversionJob <- convertorService.runConversion(conversionJob = conversionJob)
+      completedConversionJob <- convertorService.runConversion(
+        conversionJob = conversionJob)
       message <- Future.fromTry(toJson(completedConversionJob))
       _ <- snsWriter.writeMessage(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage",
