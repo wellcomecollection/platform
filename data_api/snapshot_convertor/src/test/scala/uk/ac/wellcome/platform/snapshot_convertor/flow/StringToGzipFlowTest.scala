@@ -9,16 +9,16 @@ import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import scala.io.Source.fromFile
+import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.Akka
 
-import scala.sys.process._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class StringToGzipFlowTest
     extends FunSpec
     with Matchers
     with Akka
+    with GzipUtils
     with ScalaFutures {
 
   it("produces a gzip-compressed file from the lines") {
@@ -39,12 +39,7 @@ class StringToGzipFlowTest
 
       val source = Source(expectedLines)
 
-      // This code dumps the gzip contents to a gzip file, then unpacks them
-      // using a shell command.
-      //
-      // The intention here isn't to read a gzip-compressed file in the most
-      // "Scala-like" way, it's to open the file in a way similar to the
-      // way our users are likely to use.
+      // This code dumps the gzip contents to a gzip file.
       val tmpfile = File.createTempFile("stringToGzipFlowTest", ".txt.gz")
       val fileSink: Sink[ByteString, Future[IOResult]] = Flow[ByteString]
         .toMat(FileIO.toPath(Paths.get(tmpfile.getPath)))(Keep.right)
@@ -55,14 +50,8 @@ class StringToGzipFlowTest
 
       whenReady(future) { _ =>
         // Unzip the file, then open it and check it contains the strings
-        // we'd expect.  This is the Busybox version of gzip, which strips
-        // the .gz from the filename.
-        s"gunzip ${tmpfile.getPath}" !!
-
-        val fileContents =
-          fromFile(tmpfile.getPath.replace(".txt.gz", ".txt")).mkString
-
-        // Files have a trailing newline
+        // we'd expect.  Note that files have a trailing newline.
+        val fileContents = readGzipFile(tmpfile.getPath)
         val expectedContents = expectedLines.mkString("\n") + "\n"
 
         fileContents shouldBe expectedContents
