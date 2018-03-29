@@ -40,7 +40,8 @@ class VersionedDaoTest
 
   override lazy val evidence = DynamoFormat[TestVersioned]
 
-  def withVersionedDao[R](tableName: String)(testWith: TestWith[VersionedDao, R]): R = {
+  def withVersionedDao[R](tableName: String)(
+    testWith: TestWith[VersionedDao, R]): R = {
     val config = DynamoConfig(tableName)
     val dao = new VersionedDao(dynamoDbClient, config)
     testWith(dao)

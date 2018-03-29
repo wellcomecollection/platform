@@ -23,8 +23,9 @@ trait LocalVersionedHybridStore extends LocalDynamoDb[HybridRecord] with S3 {
     testWith(dao)
   }
 
-  def withVersionedHybridStore[T <: Id, R](bucketName: String, tableName: String)(
-    testWith: TestWith[VersionedHybridStore[T], R]): R = {
+  def withVersionedHybridStore[T <: Id, R](
+    bucketName: String,
+    tableName: String)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
     withVersionedDao(tableName) { dao =>
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
