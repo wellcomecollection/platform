@@ -12,12 +12,12 @@ module "elasticdump" {
 
     sqs_queue_url = "${module.elasticdump_queue.id}"
     upload_bucket = "${aws_s3_bucket.private_data.id}"
-    es_username   = "${local.es_index}"
-    es_password   = "${local.es_port}"
+    es_username   = "${local.es_username}"
+    es_password   = "${local.es_name}"
     es_name       = "${local.es_name}"
     es_region     = "${local.es_region}"
-    es_port       = "${local.es_password}"
-    es_index      = "${local.es_username}"
+    es_port       = "${local.es_port}"
+    es_index      = "${local.es_index}"
   }
 
   env_vars_length = 9
