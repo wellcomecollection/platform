@@ -33,8 +33,9 @@ class S3SourceTest
             "Blimey! Blue bonobos with beachballs",
             "Cor! Countless copies of crying camels"
           )
+          val content = expectedLines.mkString("\n")
 
-          withGzipCompressedS3Key(expectedLines.mkString("\n")) { key =>
+          withGzipCompressedS3Key(bucketName, content) { key =>
             val source = S3Source(
               s3client = akkaS3client,
               bucketName = bucketName,

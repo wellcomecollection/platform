@@ -5,6 +5,7 @@ import scala.concurrent.Future
 import scala.util.{Success, Failure}
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.Sink
@@ -17,7 +18,10 @@ import uk.ac.wellcome.platform.snapshot_convertor.flow.{
   ElasticsearchHitToDisplayWorkFlow,
   StringToGzipFlow
 }
-import uk.ac.wellcome.platform.snapshot_convertor.models.ConversionJob
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
@@ -51,7 +55,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       }
 
     val gzipContent = jsonStrings
-      .via{ StringToGzipFlow(_) }
+      .via(StringToGzipFlow())
 
     val targetObjectKey = "target.txt.gz"
 
@@ -65,7 +69,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       .runWith(s3Sink)
 
     future.map { _ =>
-      val targetLocation = Uri(s"$s3endpoint/${conversionJob.bucketName}/$targetObjectKey")
+      val targetLocation = Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
 
       CompletedConversionJob(
         conversionJob = conversionJob,
