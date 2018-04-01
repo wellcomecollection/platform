@@ -8,8 +8,11 @@ import uk.ac.wellcome.platform.api.fixtures.{
   ElasticsearchServiceFixture,
   WorksServiceFixture
 }
-import uk.ac.wellcome.models.WorksIncludes
-import uk.ac.wellcome.display.models.{DisplayIdentifier, DisplayWork}
+import uk.ac.wellcome.display.models.{
+  DisplayIdentifier,
+  DisplayWork,
+  WorksIncludes
+}
 import uk.ac.wellcome.platform.api.models.DisplayResultList
 import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 

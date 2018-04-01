@@ -4,8 +4,8 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.models.{AllWorksIncludes, IdentifiedWork}
+import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
