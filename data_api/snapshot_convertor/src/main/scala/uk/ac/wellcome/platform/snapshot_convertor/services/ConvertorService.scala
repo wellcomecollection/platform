@@ -4,7 +4,10 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
@@ -21,7 +24,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.flow.{
 }
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 
-import scala.util.{Success, Failure}
+import scala.util.{Failure, Success}
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  s3Client: S3Client,
@@ -45,7 +48,9 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       .via(ElasticsearchHitToDisplayWorkFlow())
 
     val jsonStrings = displayWorks
-      .map { displayWork: DisplayWork => toJson(displayWork) }
+      .map { displayWork: DisplayWork =>
+        toJson(displayWork)
+      }
       .map {
         case Success(jsonString) => jsonString
         case Failure(encodeError) => {
@@ -55,7 +60,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       }
 
     val gzipContent = jsonStrings
-      .via{ StringToGzipFlow(_) }
+      .via { StringToGzipFlow(_) }
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
       s3Client.multipartUpload(
