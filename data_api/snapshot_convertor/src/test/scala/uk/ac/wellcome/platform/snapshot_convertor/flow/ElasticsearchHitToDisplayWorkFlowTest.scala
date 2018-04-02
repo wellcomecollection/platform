@@ -5,13 +5,12 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.DisplayWork
+import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
   IdentifierSchemes,
-  SourceIdentifier,
-  WorksIncludes
+  SourceIdentifier
 }
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -25,12 +24,6 @@ class ElasticsearchHitToDisplayWorkFlowTest
     with Akka
     with ScalaFutures
     with ExtendedPatience {
-
-  val includes = WorksIncludes(
-    identifiers = true,
-    thumbnail = true,
-    items = true
-  )
 
   it("creates a DisplayWork from a single hit") {
     withActorSystem { actorSystem =>
@@ -67,7 +60,7 @@ class ElasticsearchHitToDisplayWorkFlowTest
         .runWith(Sink.head)
 
       whenReady(futureDisplayWork) { displayWork =>
-        displayWork shouldBe DisplayWork(work, includes = includes)
+        displayWork shouldBe DisplayWork(work, includes = AllWorksIncludes())
       }
     }
   }
