@@ -4,14 +4,16 @@ import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
+import org.scalatest.concurrent.Eventually
 
 import scala.collection.JavaConversions._
-import scala.util.Random
+import scala.util.{Random, Try}
 
-trait S3 {
+trait S3 extends Logging with Eventually {
 
   protected val localS3EndpointUrl = "http://localhost:33333"
   protected val regionName = "localhost"
@@ -35,24 +37,37 @@ trait S3 {
     .withPathStyleAccessEnabled(true)
     .withCredentials(credentials)
     .withEndpointConfiguration(
-      new EndpointConfiguration(localS3EndpointUrl, "localhost"))
+      new EndpointConfiguration(localS3EndpointUrl, regionName))
     .build()
 
   def withLocalS3Bucket[R](testWith: TestWith[String, R]) = {
     val bucketName: String = (Random.alphanumeric take 10 mkString).toLowerCase
 
     val bucket = s3Client.createBucket(bucketName)
+    eventually { s3Client.doesBucketExistV2(bucketName) }
 
     try {
       testWith(bucket.getName)
     } finally {
 
-      s3Client.listObjects(bucket.getName).getObjectSummaries.foreach {
-        obj: S3ObjectSummary =>
-          s3Client.deleteObject(bucket.getName, obj.getKey)
+      safeCleanup(s3Client) {
+        _.listObjects(bucket.getName).getObjectSummaries.foreach { obj =>
+          safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.getName, _) }
+        }
       }
 
-      s3Client.deleteBucket(bucket.getName)
+      safeCleanup(bucket.getName) { s3Client.deleteBucket(_) }
+    }
+  }
+
+  def safeCleanup[T](resource: T)(f: T => Unit): Unit = {
+    Try {
+      logger.debug(s"cleaning up resource=[$resource]")
+      f(resource)
+    } recover {
+      case e =>
+        logger.warn(s"error cleaning up resource=[$resource]")
+        e.printStackTrace()
     }
   }
 
