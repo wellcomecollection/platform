@@ -3,8 +3,12 @@
 
 import collections
 import datetime as dt
+import json
+
+import boto3
 
 from build_windows import generate_windows
+from report_adapter_progress import BUCKET, build_report
 
 
 def sliding_window(iterable):
@@ -36,3 +40,16 @@ def get_missing_windows(report):
             end=missing_end,
             minutes=5
         )
+
+
+if __name__ == '__main__':
+    client = boto3.client('s3')
+
+    for resource_type in ('bibs', 'items'):
+        report = build_report(bucket=BUCKET, resource_type=resource_type)
+        for missing_window in get_missing_windows(report):
+            client.publish(
+                TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource}_windows',
+                Message=json.dumps(window),
+                Subject=f'Window sent by {__file__}'
+            )
