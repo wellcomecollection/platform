@@ -1,16 +1,13 @@
 package uk.ac.wellcome.platform.idminter.database
 
-import java.sql.SQLIntegrityConstraintViolationException
-
-import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.{Failure, Success}
 
@@ -25,7 +22,7 @@ class IdentifiersDaoTest
     with fixtures.IdentifiersDatabase
     with Matchers {
 
-  def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]) =
+  def withIdentifiersDao[R](testWith: TestWith[IdentifiersDaoFixtures, R]): R =
     withIdentifiersDatabase { dbConfig =>
       val identifiersTable: IdentifiersTable =
         new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
@@ -50,8 +47,7 @@ class IdentifiersDaoTest
           SourceSystem = IdentifierSchemes.miroImageNumber.toString,
           OntologyType = "t-t-t-turtles"
         )
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -77,8 +73,7 @@ class IdentifiersDaoTest
           OntologyType = "t-t-t-turtles"
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -93,30 +88,6 @@ class IdentifiersDaoTest
         triedLookup shouldBe Success(None)
       }
     }
-  }
-
-  private def assertLookupIDFindsMatch(identifiersDao: IdentifiersDao,
-                                       sourceIdentifier: SourceIdentifier,
-                                       ontologyType: String = "TestWork") = {
-
-    val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier
-    )
-
-    val identifier = triedLookup.get.get
-    identifier shouldBe identifier
-  }
-
-  private def assertLookupIDFindsNothing(identifiersDao: IdentifiersDao,
-                                         sourceIdentifier: SourceIdentifier,
-                                         ontologyType: String = "TestWork") {
-
-    val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier
-    )
-
-    val identifier = triedLookup.get
-    identifier shouldBe None
   }
 
   describe("saveIdentifier") {
@@ -164,15 +135,13 @@ class IdentifiersDaoTest
           OntologyType = "Fuels"
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val triedSave =
           fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
 
         triedSave shouldBe a[Failure[_]]
-        triedSave.failed.get shouldBe a[
-          SQLIntegrityConstraintViolationException]
+        triedSave.failed.get shouldBe a[GracefulFailureException]
       }
     }
 
@@ -193,10 +162,8 @@ class IdentifiersDaoTest
           OntologyType = "Fruits"
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(1)
       }
     }
 
@@ -216,10 +183,8 @@ class IdentifiersDaoTest
           OntologyType = identifier.OntologyType
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(1)
       }
     }
 
@@ -239,15 +204,13 @@ class IdentifiersDaoTest
           OntologyType = identifier.OntologyType
         )
 
-        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe (Success(
-          1))
+        fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val triedSave =
           fixtures.identifiersDao.saveIdentifier(duplicateIdentifier)
 
         triedSave shouldBe a[Failure[_]]
-        triedSave.failed.get shouldBe a[
-          SQLIntegrityConstraintViolationException]
+        triedSave.failed.get shouldBe a[GracefulFailureException]
       }
     }
   }

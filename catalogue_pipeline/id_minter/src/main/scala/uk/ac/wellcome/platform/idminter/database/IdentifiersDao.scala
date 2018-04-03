@@ -1,11 +1,13 @@
 package uk.ac.wellcome.platform.idminter.database
 
-import javax.inject.Singleton
+import java.sql.SQLIntegrityConstraintViolationException
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import javax.inject.Singleton
 import scalikejdbc._
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking
@@ -56,8 +58,8 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
    * Note that this will copy _all_ the fields on `Identifier`, nulling any
    * fields which aren't set on `Identifier`.
    */
-  def saveIdentifier(identifier: Identifier): Try[Int] = {
-    val insertIntoDbFuture = Try {
+  def saveIdentifier(identifier: Identifier): Try[Any] = {
+    Try {
       blocking {
         info(s"putting new identifier $identifier")
         withSQL {
@@ -71,11 +73,13 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
             )
         }.update().apply()
       }
+    } recover {
+      case e: SQLIntegrityConstraintViolationException =>
+        warn(s"Failed inserting identifier $identifier", e)
+        throw GracefulFailureException(e)
+      case e =>
+        error(s"Failed inserting identifier $identifier in database", e)
+        throw e
     }
-    if (insertIntoDbFuture.isFailure) {
-      insertIntoDbFuture.failed.foreach(e =>
-        error(s"Failed inserting identifier $identifier in database", e))
-    }
-    insertIntoDbFuture
   }
 }
