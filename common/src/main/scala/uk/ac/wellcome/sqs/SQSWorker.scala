@@ -37,11 +37,10 @@ abstract class SQSWorker(sqsReader: SQSReader,
     }
   }
 
-  def terminalFailureHook(throwable: Throwable): Unit =
-    {
-      logger.error(s"${workerName}_TerminalFailure!", throwable)
-      metricsSender.incrementCount(s"${workerName}_TerminalFailure")
-    }
+  def terminalFailureHook(throwable: Throwable): Unit = {
+    logger.error(s"${workerName}_TerminalFailure!", throwable)
+    metricsSender.incrementCount(s"${workerName}_TerminalFailure")
+  }
 
   def stop(): Boolean = actor.cancel()
 
