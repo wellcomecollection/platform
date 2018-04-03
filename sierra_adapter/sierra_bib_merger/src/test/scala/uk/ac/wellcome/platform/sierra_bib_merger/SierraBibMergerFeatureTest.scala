@@ -11,7 +11,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -22,7 +22,7 @@ class SierraBibMergerFeatureTest
     with MockitoSugar
     with ExtendedPatience
     with ScalaFutures
-    with SqsFixtures
+    with SQS
     with fixtures.Server
     with LocalVersionedHybridStore {
 
