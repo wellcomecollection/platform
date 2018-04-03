@@ -21,11 +21,7 @@ import org.mockito.Matchers._
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
-import uk.ac.wellcome.test.fixtures.{
-  LocalVersionedHybridStore,
-  SqsFixtures,
-  TestWith
-}
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerUpdaterServiceTest
@@ -35,7 +31,7 @@ class SierraItemMergerUpdaterServiceTest
     with MockitoSugar
     with ScalaFutures
     with LocalVersionedHybridStore
-    with SqsFixtures
+    with SQS
     with SierraItemMergerTestUtil {
 
   val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =

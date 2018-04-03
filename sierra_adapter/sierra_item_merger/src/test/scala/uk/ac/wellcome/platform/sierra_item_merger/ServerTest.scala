@@ -4,14 +4,14 @@ import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, S3, SqsFixtures}
+import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, S3, SQS}
 
 class ServerTest
     extends FunSpec
     with LocalDynamoDb[HybridRecord]
     with fixtures.Server
     with S3
-    with SqsFixtures {
+    with SQS {
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
