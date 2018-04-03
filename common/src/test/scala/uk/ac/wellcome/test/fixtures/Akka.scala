@@ -1,6 +1,7 @@
 package uk.ac.wellcome.test.fixtures
 
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, Materializer}
 import org.scalatest.concurrent.Eventually
 
 trait Akka extends Eventually {
@@ -13,6 +14,17 @@ trait Akka extends Eventually {
     } finally {
       actorSystem.terminate()
       eventually { actorSystem.whenTerminated }
+    }
+  }
+
+  def withMaterializer[R](actorSystem: ActorSystem)(
+    testWith: TestWith[Materializer, R]): R = {
+    val materializer = ActorMaterializer()(actorSystem)
+
+    try {
+      testWith(materializer)
+    } finally {
+      materializer.shutdown()
     }
   }
 

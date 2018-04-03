@@ -1,6 +1,5 @@
 package uk.ac.wellcome.test.fixtures
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
@@ -9,9 +8,12 @@ import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
+import com.amazonaws.services.s3.model.ObjectMetadata
 
 import scala.collection.JavaConversions._
 import scala.util.{Random, Try}
+import java.nio.file.Paths
+import java.net.URL
 
 trait S3 extends Logging with Eventually {
 
@@ -60,6 +62,20 @@ trait S3 extends Logging with Eventually {
     }
   }
 
+  def withLocalS3ObjectFromResource[R](bucketName: String, resource: URL)(
+    testWith: TestWith[String, R]) = {
+    val metadata = new ObjectMetadata()
+    val key = Paths.get(resource.toURI).getFileName.toString
+
+    s3Client.putObject(bucketName, key, resource.openStream(), metadata)
+
+    try {
+      testWith(key)
+    } finally {
+      safeCleanup(key) { s3Client.deleteObject(bucketName, _) }
+    }
+  }
+
   def safeCleanup[T](resource: T)(f: T => Unit): Unit = {
     Try {
       logger.debug(s"cleaning up resource=[$resource]")
@@ -78,5 +94,4 @@ trait S3 extends Logging with Eventually {
   def getJsonFromS3(bucketName: String, key: String): Json = {
     parse(getContentFromS3(bucketName, key)).right.get
   }
-
 }
