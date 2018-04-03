@@ -108,7 +108,8 @@ class SnapshotConvertorFeatureTest
                   targetLocation =
                     s"http://localhost:33333/$bucketName/target.txt.gz"
                 )
-                val actualJob = fromJson[CompletedConversionJob](receivedMessages.head.message).get
+                val actualJob = fromJson[CompletedConversionJob](
+                  receivedMessages.head.message).get
                 actualJob shouldBe expectedJob
               }
             }
