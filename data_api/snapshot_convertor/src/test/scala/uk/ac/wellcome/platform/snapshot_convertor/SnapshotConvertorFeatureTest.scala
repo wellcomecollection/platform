@@ -101,7 +101,7 @@ class SnapshotConvertorFeatureTest
                 contents shouldBe expectedContents
 
                 val receivedMessages = listMessagesReceivedFromSNS(topicArn)
-                receivedMessages should have size 1
+                receivedMessages.size should be >= 1
 
                 val expectedJob = CompletedConversionJob(
                   conversionJob = conversionJob,
