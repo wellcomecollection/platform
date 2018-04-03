@@ -365,30 +365,29 @@ class SierraItemMergerUpdaterServiceTest
                 itemRecord.id -> unlinkItemRecord
               )
 
-             whenReady(Future.sequence(List(f1, f2))) { _ =>
-              whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+              whenReady(Future.sequence(List(f1, f2))) { _ =>
+                whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
+                  val expectedSierraRecord1 = sierraTransformable1.copy(
+                    itemData = Map.empty
+                  )
 
-                val expectedSierraRecord1 = sierraTransformable1.copy(
-                  itemData = Map.empty
-                )
+                  // In this situation the item was already linked to sierraTransformable2
+                  // but the modified date is updated in line with the item update
+                  val expectedSierraRecord2 = sierraTransformable2.copy(
+                    itemData = expectedItemData
+                  )
 
-                // In this situation the item was already linked to sierraTransformable2
-                // but the modified date is updated in line with the item update
-                val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemData = expectedItemData
-                )
-
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  expectedSierraRecord1)
-                assertStored[SierraTransformable](
-                  bucketName,
-                  tableName,
-                  expectedSierraRecord2)
+                  assertStored[SierraTransformable](
+                    bucketName,
+                    tableName,
+                    expectedSierraRecord1)
+                  assertStored[SierraTransformable](
+                    bucketName,
+                    tableName,
+                    expectedSierraRecord2)
+                }
               }
             }
-          }
         }
       }
     }
