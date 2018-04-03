@@ -1,32 +1,31 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import com.gu.scanamo.DynamoFormat
+import org.mockito.Matchers._
+import org.mockito.Mockito._
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.{SourceMetadata, Sourced}
+import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.s3.{
   KeyPrefixGenerator,
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import org.mockito.Mockito._
-import org.mockito.Matchers._
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
-    with Eventually
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
@@ -266,12 +265,12 @@ class SierraItemMergerUpdaterServiceTest
                 sourceId = bibId2
               )
 
-              hybridStore.updateRecord(sierraTransformable1.id)(
+              val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
                 sierraTransformable1
               )(_ => sierraTransformable1)(
                 SourceMetadata(sierraTransformable1.sourceName))
 
-              hybridStore.updateRecord(sierraTransformable2.id)(
+              val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
                 sierraTransformable2
               )(identity)(SourceMetadata(sierraTransformable2.sourceName))
 
@@ -289,17 +288,20 @@ class SierraItemMergerUpdaterServiceTest
                 )
               )
 
-              sierraUpdaterService.update(unlinkItemRecord)
+              val unlinkItemRecordFuture = for {
+                _ <- Future.sequence(List(f1, f2))
+                _ <- sierraUpdaterService.update(unlinkItemRecord)
+              } yield {}
 
-              val expectedSierraRecord1 = sierraTransformable1.copy(
-                itemData = Map.empty
-              )
+              whenReady(unlinkItemRecordFuture) { _ =>
+                val expectedSierraRecord1 = sierraTransformable1.copy(
+                  itemData = Map.empty
+                )
 
-              val expectedSierraRecord2 = sierraTransformable2.copy(
-                itemData = expectedItemData
-              )
+                val expectedSierraRecord2 = sierraTransformable2.copy(
+                  itemData = expectedItemData
+                )
 
-              eventually {
                 assertStored[SierraTransformable](
                   bucketName,
                   tableName,
