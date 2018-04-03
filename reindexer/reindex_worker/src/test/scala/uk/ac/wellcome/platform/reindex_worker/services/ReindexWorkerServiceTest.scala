@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.Assertion
@@ -38,9 +38,6 @@ class ReindexWorkerServiceTest
     with SNS
     with SQS
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[TestRecord] =
-    DynamoFormat[TestRecord]
 
   def withReindexWorkerService(tableName: String, indexName: String)(
     testWith: TestWith[ReindexWorkerService, Assertion]) = {
