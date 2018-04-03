@@ -12,6 +12,7 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
@@ -22,6 +23,7 @@ class IdMinterWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
+  override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"
 
   override def processMessage(message: SQSMessage): Future[Unit] =
