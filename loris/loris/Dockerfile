@@ -17,7 +17,7 @@ RUN apt-get update && \
 
 
 ENV LORIS_GITHUB_USER loris-imageserver
-ENV LORIS_COMMIT 841383810cdd62ae591f532fd89330bb0be06565
+ENV LORIS_COMMIT 27f0344217d75eb58693fc99c352eb89bafb9a43
 
 COPY requirements.txt /
 COPY install_loris.sh /install_loris.sh
