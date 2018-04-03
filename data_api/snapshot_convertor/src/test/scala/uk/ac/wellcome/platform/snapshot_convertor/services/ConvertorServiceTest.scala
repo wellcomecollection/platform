@@ -9,6 +9,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
   IdentifierSchemes,
@@ -153,7 +154,7 @@ class ConvertorServiceTest
                   val future = convertorService.runConversion(conversionJob)
 
                   whenReady(future.failed) { result =>
-                    result shouldBe a[RuntimeException]
+                    result shouldBe a[GracefulFailureException]
                   }
               }
           }
