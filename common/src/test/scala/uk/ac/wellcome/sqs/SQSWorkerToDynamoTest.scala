@@ -66,7 +66,7 @@ class SQSWorkerToDynamoTest
       processCalled = true
     }
 
-    override def terminalFailureHook(): Unit = {
+    override def terminalFailureHook(exception: Throwable): Unit = {
       terminalFailure = true
     }
   }
