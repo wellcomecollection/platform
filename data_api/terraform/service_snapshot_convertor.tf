@@ -5,16 +5,12 @@ module "snapshot_convertor_job_generator" {
   infra_bucket           = "${var.infra_bucket}"
 }
 
-data "aws_sns_topic" "snapshot_convertor_topic" {
-  name = "${module.snapshot_convertor_job_generator.topic_name}"
-}
-
 module "snapshot_convertor" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.0.0"
   name   = "snapshot_convertor"
 
-  source_queue_name = "${data.aws_sns_topic.snapshot_convertor_topic.name}"
-  source_queue_arn  = "${data.aws_sns_topic.snapshot_convertor_topic.arn}"
+  source_queue_name = "${module.snapshot_convertor_queue.name}"
+  source_queue_arn  = "${module.snapshot_convertor_queue.arn}"
 
   ecr_repository_url = "${module.ecr_repository_snapshot_convertor.repository_url}"
   release_id         = "${var.release_ids["snapshot_convertor"]}"
