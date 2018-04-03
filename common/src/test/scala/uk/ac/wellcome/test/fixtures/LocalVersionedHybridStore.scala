@@ -18,9 +18,6 @@ trait LocalVersionedHybridStore
     with JsonTestUtil
     with Matchers {
 
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
-
   def withVersionedDao(tableName: String)(
     testWith: TestWith[VersionedDao, Assertion]) {
     val dao = new VersionedDao(

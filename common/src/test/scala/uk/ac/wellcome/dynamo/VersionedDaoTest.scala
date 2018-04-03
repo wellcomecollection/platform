@@ -38,8 +38,6 @@ class VersionedDaoTest
     with MockitoSugar
     with Matchers {
 
-  override lazy val evidence = DynamoFormat[TestVersioned]
-
   def withVersionedDao[R](testWith: TestWith[(VersionedDao, String), R]) {
     withLocalDynamoDbTable { tableName =>
       val config = DynamoConfig(tableName)
