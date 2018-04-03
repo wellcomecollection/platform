@@ -8,7 +8,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
-import akka.stream.scaladsl.Sink
+import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
@@ -43,10 +43,13 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       key = conversionJob.objectKey
     )
 
-    val displayWorks = s3source
+    // This source generates instances of DisplayWork from the source snapshot.
+    val displayWorks: Source[DisplayWork, Any] = s3source
       .via(ElasticsearchHitToDisplayWorkFlow())
 
-    val jsonStrings = displayWorks
+    // This source generates JSON strings of DisplayWork instances, which
+    // should be written to the destination snapshot.
+    val jsonStrings: Source[String, Any] = displayWorks
       .map { displayWork: DisplayWork =>
         toJson(displayWork)
       }
@@ -58,7 +61,9 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
         }
       }
 
-    val gzipContent = jsonStrings
+    // This source generates gzip-compressed JSON strings, corresponding to
+    // the DisplayWork instances from the source snapshot.
+    val gzipContent: Source[ByteString, Any] = jsonStrings
       .via(StringToGzipFlow())
 
     val targetObjectKey = "target.txt.gz"
