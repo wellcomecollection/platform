@@ -29,7 +29,7 @@ trait S3 extends Logging with Eventually {
     "aws.s3.bucketName" -> bucketName
   )
 
-  val credentials = new AWSStaticCredentialsProvider(
+  private val credentials = new AWSStaticCredentialsProvider(
     new BasicAWSCredentials(accessKey, secretKey))
 
   val s3Client: AmazonS3 = AmazonS3ClientBuilder
