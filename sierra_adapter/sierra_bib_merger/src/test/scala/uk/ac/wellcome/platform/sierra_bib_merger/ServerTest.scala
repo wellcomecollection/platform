@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
-import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.storage.HybridRecord
@@ -12,9 +11,6 @@ class ServerTest
     with fixtures.Server
     with S3
     with SQS {
-
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queueUrl =>
