@@ -8,18 +8,19 @@ module "id_minter" {
   release_id         = "${var.release_ids["id_minter"]}"
 
   env_vars = {
-    cluster_url = "${module.identifiers_rds_cluster.host}"
-    db_port     = "${module.identifiers_rds_cluster.port}"
-    db_username = "${module.identifiers_rds_cluster.username}"
-    db_password = "${module.identifiers_rds_cluster.password}"
-    queue_url   = "${module.id_minter_queue.id}"
-    topic_arn   = "${module.es_ingest_topic.arn}"
+    cluster_url      = "${module.identifiers_rds_cluster.host}"
+    db_port          = "${module.identifiers_rds_cluster.port}"
+    db_username      = "${module.identifiers_rds_cluster.username}"
+    db_password      = "${module.identifiers_rds_cluster.password}"
+    queue_url        = "${module.id_minter_queue.id}"
+    topic_arn        = "${module.es_ingest_topic.arn}"
+    sqs_max_messages = 10
   }
 
   memory = 2048
   cpu    = 512
 
-  env_vars_length = 6
+  env_vars_length = 7
 
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"

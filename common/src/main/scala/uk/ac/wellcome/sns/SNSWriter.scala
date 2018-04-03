@@ -17,7 +17,7 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =
     Future {
       blocking {
-        info(
+        debug(
           s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
         snsClient.publish(
           toPublishRequest(message = message, subject = subject))
