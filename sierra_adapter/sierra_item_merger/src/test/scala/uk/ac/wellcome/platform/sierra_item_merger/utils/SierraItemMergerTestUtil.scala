@@ -1,16 +1,9 @@
 package uk.ac.wellcome.platform.sierra_item_merger.utils
 
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.test_utils.SourceDataVHSLocal
-import uk.ac.wellcome.test.utils.{ExtendedPatience, SQSLocal}
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait SierraItemMergerTestUtil
-    extends ExtendedPatience
-    with SourceDataVHSLocal { this: Suite =>
+trait SierraItemMergerTestUtil {
 
   private def itemRecordString(id: String,
                                updatedDate: String,
@@ -62,8 +55,4 @@ trait SierraItemMergerTestUtil
       bibIds = bibIds,
       modifiedDate = updatedDate
     )
-
-  protected def sendItemRecordToSQS(record: SierraItemRecord) =
-    sendMessageToSQS(toJson(record).get)
-
 }
