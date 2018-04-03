@@ -65,7 +65,7 @@ class S3SourceTest
   // an 8MB file from S3.  This test deliberately creates a very large file,
   // and tries to stream it back out.
   //
-  it("reads files that are larger than 8MB large from S3") {
+  it("reads files that are larger than 8MB from S3") {
     withActorSystem { actorSystem =>
       implicit val system = actorSystem
       implicit val materializer = ActorMaterializer()
