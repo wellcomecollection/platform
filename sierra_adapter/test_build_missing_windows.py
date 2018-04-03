@@ -24,38 +24,38 @@ def test_sliding_window():
 def test_missing_windows():
     report = [
         Interval(
-            start = dt.datetime(2000, 1, 1, 12, 0, 0),
-            end   = dt.datetime(2000, 1, 1, 13, 0, 0),
-            key   = 'report1.txt'
+            start = dt.datetime(2000, 1, 1, 12, 0, 0),   # noqa
+            end   = dt.datetime(2000, 1, 1, 13, 0, 0),   # noqa
+            key='report1.txt'
         ),
         Interval(
-            start = dt.datetime(2000, 1, 1, 13, 7, 0),
-            end   = dt.datetime(2000, 1, 1, 13, 18, 0),
-            key   = 'report1.txt'
+            start = dt.datetime(2000, 1, 1, 13, 7, 0),   # noqa
+            end   = dt.datetime(2000, 1, 1, 13, 18, 0),  # noqa
+            key='report2.txt'
         ),
         Interval(
-            start = dt.datetime(2000, 1, 1, 13, 25, 0),
-            end   = dt.datetime(2000, 1, 1, 13, 40, 0),
-            key   = 'report1.txt'
+            start = dt.datetime(2000, 1, 1, 13, 25, 0),  # noqa
+            end   = dt.datetime(2000, 1, 1, 13, 40, 0),  # noqa
+            key='report3.txt'
         ),
-    ]
+    ]  # noqa
 
     res = get_missing_windows(report)
     assert list(res) == [
         {
             'start': dt.datetime(2000, 1, 1, 12, 59, 59).isoformat(),
-            'end':   dt.datetime(2000, 1, 1, 13, 4, 59).isoformat(),
+            'end':   dt.datetime(2000, 1, 1, 13, 4, 59).isoformat(),  # noqa
         },
         {
             'start': dt.datetime(2000, 1, 1, 13, 3, 59).isoformat(),
-            'end':   dt.datetime(2000, 1, 1, 13, 8, 59).isoformat(),
+            'end':   dt.datetime(2000, 1, 1, 13, 8, 59).isoformat(),  # noqa
         },
         {
             'start': dt.datetime(2000, 1, 1, 13, 17, 59).isoformat(),
-            'end':   dt.datetime(2000, 1, 1, 13, 22, 59).isoformat(),
+            'end':   dt.datetime(2000, 1, 1, 13, 22, 59).isoformat(),  # noqa
         },
         {
             'start': dt.datetime(2000, 1, 1, 13, 21, 59).isoformat(),
-            'end':   dt.datetime(2000, 1, 1, 13, 26, 59).isoformat(),
+            'end':   dt.datetime(2000, 1, 1, 13, 26, 59).isoformat(),  # noqa
         },
     ]

@@ -49,7 +49,7 @@ if __name__ == '__main__':
         report = build_report(bucket=BUCKET, resource_type=resource_type)
         for missing_window in get_missing_windows(report):
             client.publish(
-                TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource}_windows',
-                Message=json.dumps(window),
+                TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource_type}_windows',
+                Message=json.dumps(missing_window),
                 Subject=f'Window sent by {__file__}'
             )
