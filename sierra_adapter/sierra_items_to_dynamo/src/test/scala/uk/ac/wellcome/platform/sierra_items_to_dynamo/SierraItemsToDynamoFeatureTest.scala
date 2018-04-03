@@ -10,11 +10,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{
-  AmazonCloudWatchFlag,
-  ExtendedPatience,
-  SQSLocal
-}
+import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
 import uk.ac.wellcome.dynamo._
 import io.circe.generic.extras.semiauto._
 import uk.ac.wellcome.models.transformable.sierra.{
