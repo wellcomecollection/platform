@@ -6,6 +6,7 @@ Report the progress of the Sierra adapter.
 
 import datetime as dt
 import os
+import sys
 
 import attr
 import boto3
@@ -193,3 +194,10 @@ if __name__ == '__main__':
             print(f'{iv.start.isoformat()} -- {iv.end.isoformat()}')
 
         print('')
+
+    print('')
+    print('-' * 79)
+    print('')
+    print('If there are gaps in the report, you can build new windows for the readers:')
+    print('')
+    print(f'$ python {sys.argv[0].replace("report_adapter_progress.py", "build_missing_windows.py")}')
