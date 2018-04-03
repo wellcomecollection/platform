@@ -49,11 +49,22 @@ def get_matching_s3_keys(bucket, prefix=''):
             break
 
 
-@attr.s
+@attr.s(repr=False)
 class Interval:
     start = attr.ib()
     end = attr.ib()
     key = attr.ib()
+
+    def __repr__(self):
+        return f'%s(start=%r, end=%r, key=%r)' % (
+            type(self).__name__,
+            self.start.isoformat(),
+            self.end.isoformat(),
+            self.key
+        )
+
+    def __str__(self):
+        return repr(self)
 
 
 def get_intervals(keys):
