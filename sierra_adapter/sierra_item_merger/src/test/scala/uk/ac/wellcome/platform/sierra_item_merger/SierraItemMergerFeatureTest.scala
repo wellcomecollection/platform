@@ -7,11 +7,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.{
-  LocalVersionedHybridStore,
-  S3,
-  SqsFixtures
-}
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerFeatureTest
@@ -20,7 +16,7 @@ class SierraItemMergerFeatureTest
     with Eventually
     with ExtendedPatience
     with fixtures.Server
-    with SqsFixtures
+    with SQS
     with S3
     with LocalVersionedHybridStore
     with SierraItemMergerTestUtil {
