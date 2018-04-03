@@ -33,12 +33,15 @@ abstract class SQSWorker(sqsReader: SQSReader,
         _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
       } yield ()
     } recover {
-      case _: Throwable => terminalFailureHook()
+      case exception: Throwable => terminalFailureHook(exception)
     }
   }
 
-  def terminalFailureHook(): Unit =
-    metricsSender.incrementCount(s"${workerName}_TerminalFailure")
+  def terminalFailureHook(throwable: Throwable): Unit =
+    {
+      logger.error(s"${workerName}_TerminalFailure!", throwable)
+      metricsSender.incrementCount(s"${workerName}_TerminalFailure")
+    }
 
   def stop(): Boolean = actor.cancel()
 
