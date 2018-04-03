@@ -4,7 +4,7 @@ import java.time.Instant
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -36,9 +36,6 @@ class SierraItemsToDynamoWorkerServiceTest
     with MockitoSugar
     with Akka
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[SierraItemRecord] =
-    DynamoFormat[SierraItemRecord]
 
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,
