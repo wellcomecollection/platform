@@ -72,11 +72,10 @@ class S3SourceTest
 
       withLocalS3Bucket { bucketName =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
-
           // The aim here is to increase entropy in the source file, as a
           // way to increase the gzip-compressed size.
-          val expectedLines = (1 to 1000000).map {
-            idx => s"${idx} ${100 - idx} ${1000 - idx} ${10000 - idx} ${100000 - idx}"
+          val expectedLines = (1 to 1000000).map { idx =>
+            s"${idx} ${100 - idx} ${1000 - idx} ${10000 - idx} ${100000 - idx}"
           }
 
           val content = expectedLines.mkString("\n")
