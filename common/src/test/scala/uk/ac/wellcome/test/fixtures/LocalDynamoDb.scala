@@ -11,6 +11,31 @@ import scala.collection.JavaConversions._
 
 trait LocalDynamoDb[T <: Versioned with Id] extends DynamoDBLocalClients {
 
+  private val port = 45678
+  private val dynamoDBEndPoint = "http://localhost:" + port
+
+  private val accessKey = "access"
+  private val secretKey = "secret"
+
+  def dynamoDbLocalEndpointFlags(tableName: String) =
+    Map(
+      "aws.region" -> "localhost",
+      "aws.dynamo.tableName" -> tableName,
+      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
+      "aws.dynamoDb.accessKey" -> accessKey,
+      "aws.dynamoDb.secretKey" -> secretKey
+    )
+
+  private val credentials = new AWSStaticCredentialsProvider(
+    new BasicAWSCredentials(accessKey, secretKey))
+
+  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+    .standard()
+    .withCredentials(credentials)
+    .withEndpointConfiguration(
+      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
+    .build()
+
   implicit val evidence: DynamoFormat[T]
 
   case class FixtureParams(tableName: String, indexName: String)
