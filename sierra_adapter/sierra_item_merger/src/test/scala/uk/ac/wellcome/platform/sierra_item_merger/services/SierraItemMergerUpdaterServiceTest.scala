@@ -11,7 +11,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, SourcedKeyPrefixGenerator}
+import uk.ac.wellcome.s3.{
+  KeyPrefixGenerator,
+  S3ObjectStore,
+  SourcedKeyPrefixGenerator
+}
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
