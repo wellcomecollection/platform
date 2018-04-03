@@ -56,7 +56,7 @@ class MiroTransformerFeatureTest
           withServer(flags) { _ =>
             eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages.length shouldBe >= (2)
+              snsMessages.length shouldBe >=(2)
 
               assertSNSMessageContains(
                 snsMessages.head,
