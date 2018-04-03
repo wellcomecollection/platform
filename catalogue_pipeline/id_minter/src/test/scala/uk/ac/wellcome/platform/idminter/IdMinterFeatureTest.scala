@@ -105,7 +105,7 @@ class IdMinterFeatureTest
 
             eventually {
               val messages = listMessagesReceivedFromSNS(topicArn)
-              messages.length shouldBe >= (messageCount)
+              messages.length shouldBe >=(messageCount)
 
               getWorksFromMessages(messages).foreach { work =>
                 work.identifiers.head.value shouldBe miroID
