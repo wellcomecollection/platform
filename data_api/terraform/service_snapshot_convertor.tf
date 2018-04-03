@@ -3,8 +3,6 @@ module "snapshot_convertor_job_generator" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   infra_bucket           = "${var.infra_bucket}"
-
-  bucket_name = "${aws_s3_bucket.private_data.id}"
 }
 
 data "aws_sns_topic" "snapshot_convertor_topic" {
