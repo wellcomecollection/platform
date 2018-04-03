@@ -163,7 +163,8 @@ class IdentifiersDaoTest
         )
 
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(1)
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(
+          1)
       }
     }
 
@@ -184,7 +185,8 @@ class IdentifiersDaoTest
         )
 
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
-        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(1)
+        fixtures.identifiersDao.saveIdentifier(secondIdentifier) shouldBe Success(
+          1)
       }
     }
 
