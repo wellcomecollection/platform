@@ -8,22 +8,30 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{SourceMetadata, UnidentifiedWork}
 import uk.ac.wellcome.models.aws.{S3Config, SQSMessage}
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSMessageReceiver @Inject()(
-  snsWriter: SNSWriter,
-  s3Client: AmazonS3,
-  s3Config: S3Config,
-  metricsSender: MetricsSender)
+class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
+                                   s3Client: AmazonS3,
+                                   s3Config: S3Config,
+                                   metricsSender: MetricsSender)
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {

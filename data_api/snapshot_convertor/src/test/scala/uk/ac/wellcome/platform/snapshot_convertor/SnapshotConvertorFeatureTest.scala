@@ -11,9 +11,16 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils

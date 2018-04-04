@@ -9,7 +9,7 @@ import uk.ac.wellcome.models.aws.S3Config
 object S3ConfigModule extends TwitterModule {
 
   private val bucketName =
-      flag[String]("aws.s3.bucketName", "", "Name of the S3 bucket")
+    flag[String]("aws.s3.bucketName", "", "Name of the S3 bucket")
   private val endpoint = flag[String](
     "aws.s3.endpoint",
     "",
