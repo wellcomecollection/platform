@@ -3,11 +3,12 @@ package uk.ac.wellcome.platform.snapshot_convertor.source
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Compression, Sink, Source}
 import akka.util.ByteString
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
-import uk.ac.wellcome.test.fixtures.Akka
+import uk.ac.wellcome.test.fixtures.{Akka, S3}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
@@ -18,6 +19,7 @@ class S3SourceTest
     with ScalaFutures
     with ExtendedPatience
     with Akka
+    with S3
     with AkkaS3
     with GzipUtils {
 
@@ -37,7 +39,7 @@ class S3SourceTest
 
           withGzipCompressedS3Key(bucketName, content) { key =>
             val source = S3Source(
-              s3client = akkaS3client,
+              s3client = s3Client,
               bucketName = bucketName,
               key = key
             )
@@ -82,7 +84,7 @@ class S3SourceTest
 
           withGzipCompressedS3Key(bucketName, content) { key =>
             val source = S3Source(
-              s3client = akkaS3client,
+              s3client = s3Client,
               bucketName = bucketName,
               key = key
             )
@@ -108,7 +110,7 @@ class S3SourceTest
           s3Client.putObject(bucketName, key, "NotAGzipCompressedFile")
 
           val source = S3Source(
-            s3client = akkaS3client,
+            s3client = s3Client,
             bucketName = bucketName,
             key = key
           )
@@ -130,14 +132,14 @@ class S3SourceTest
       withLocalS3Bucket { bucketName =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
           val source = S3Source(
-            s3client = akkaS3client,
+            s3client = s3Client,
             bucketName = bucketName,
             key = "doesnotexist.txt.gz"
           )
 
           val future = source.runWith(Sink.seq)
           whenReady(future.failed) { exception =>
-            exception shouldBe a[RuntimeException]
+            exception shouldBe a[AmazonS3Exception]
           }
         }
       }

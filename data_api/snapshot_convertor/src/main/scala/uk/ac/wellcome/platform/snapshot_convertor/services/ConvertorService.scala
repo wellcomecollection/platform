@@ -1,33 +1,28 @@
 package uk.ac.wellcome.platform.snapshot_convertor.services
 
 import javax.inject.Inject
+
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
+import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{
-  ElasticsearchHitToDisplayWorkFlow,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{ElasticsearchHitToDisplayWorkFlow, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
-                                 s3Client: S3Client,
+                                 s3Client: AmazonS3,
+                                 akkaS3Client: S3Client,
                                  @Flag("aws.s3.endpoint") s3Endpoint: String)
     extends Logging {
 
@@ -69,7 +64,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val targetObjectKey = "target.txt.gz"
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
-      s3Client.multipartUpload(
+      akkaS3Client.multipartUpload(
         bucket = conversionJob.bucketName,
         key = targetObjectKey
       )

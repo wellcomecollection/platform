@@ -28,8 +28,9 @@ class Server extends HttpServer {
     SQSConfigModule,
     SNSClientModule,
     SNSConfigModule,
-    AkkaS3ClientModule,
     S3ConfigModule,
+    S3ClientModule,
+    AkkaS3ClientModule,
     SnapshotConvertorWorkerModule,
     AkkaModule
   )
