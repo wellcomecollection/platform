@@ -8,6 +8,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
@@ -581,7 +582,7 @@ class SierraItemMergerUpdaterServiceTest
                 new VersionedHybridStore[SierraTransformable](
                   sourcedObjectStore = new S3ObjectStore(
                     s3Client = s3Client,
-                    bucketName = bucketName,
+                    s3Config = S3Config(bucketName = bucketName),
                     new SourcedKeyPrefixGenerator),
                   versionedDao = failingVersionedDao
                 )
