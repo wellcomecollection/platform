@@ -30,9 +30,7 @@ trait SierraCreators extends MarcUtils {
           val prefixes = subfields.collect {
             case MarcSubfield("c", content) => content
           }
-          val codes = subfields.collect {
-            case MarcSubfield("0", content) => content
-          }
+          val codes = getIdentifierCodes(subfields)
           val prefixString =
             if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
@@ -49,14 +47,18 @@ trait SierraCreators extends MarcUtils {
         val name = subfields.collectFirst {
           case MarcSubfield("a", content) => content
         }
-        val codes = subfields.collect {
-          case MarcSubfield("0", content) => content
-        }
+        val codes = getIdentifierCodes(subfields)
         val organisation = Organisation(name.get)
         identify(codes, organisation, "Organisation")
       }
 
     persons ++ organisations
+  }
+
+  private def getIdentifierCodes(subfields: List[MarcSubfield]) = {
+    subfields.collect {
+      case MarcSubfield("0", content) => content.replaceAll("\\s", "")
+    }
   }
 
   private def identify(codes: List[String],
@@ -68,7 +70,7 @@ trait SierraCreators extends MarcUtils {
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.libraryOfCongressNames,
           ontologyType = ontologyType,
-          value = code.trim)
+          value = code)
         Identifiable(agent, sourceIdentifier, List(sourceIdentifier))
       case _ =>
         throw new RuntimeException(
