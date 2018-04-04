@@ -45,7 +45,10 @@ trait GzipUtils extends S3 {
     // This performs "gzip foo.txt > foo.txt.gz" in a roundabout way.
     // Because we're using the busybox version of gzip, it actually cleans
     // up the old file and appends the .gz suffix for us.
-    s"gzip ${tmpfile.getPath}" !!
+    //
+    // We set the gzip compression level to the lowest possible (-1),
+    // so we can use smaller data sets in tests (and thus use less memory).
+    s"gzip -1 ${tmpfile.getPath}" !!
 
     new File(s"${tmpfile.getPath}.gz")
   }
