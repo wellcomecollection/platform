@@ -100,6 +100,11 @@ case class DisplayWork(
 case object DisplayWork {
 
   def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWork = {
+
+    if (!work.visible) {
+      throw new RuntimeException(s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork")
+    }
+
     DisplayWork(
       id = work.canonicalId,
       title = work.title.get,
