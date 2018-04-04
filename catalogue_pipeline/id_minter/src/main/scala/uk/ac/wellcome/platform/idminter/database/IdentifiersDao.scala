@@ -75,7 +75,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
       }
     } recover {
       case e: SQLIntegrityConstraintViolationException =>
-        warn(s"Failed inserting identifier $identifier", e)
+        warn(s"Unable to insert $identifier because of integrity constraints", e)
         throw GracefulFailureException(e)
       case e =>
         error(s"Failed inserting identifier $identifier in database", e)
