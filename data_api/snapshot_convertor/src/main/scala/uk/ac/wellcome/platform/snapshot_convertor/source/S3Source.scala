@@ -13,7 +13,9 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream
 object S3Source {
   def apply(s3inputStream: S3ObjectInputStream): Source[String, Any] = {
     val s3source: Source[ByteString, Any] = fromInputStream(
-      in = {() => s3inputStream},
+      in = { () =>
+        s3inputStream
+      },
       chunkSize = 1024
     )
 

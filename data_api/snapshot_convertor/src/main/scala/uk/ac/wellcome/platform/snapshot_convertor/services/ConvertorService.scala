@@ -15,8 +15,14 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{ElasticsearchHitToDisplayWorkFlow, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{
+  ElasticsearchHitToDisplayWorkFlow,
+  StringToGzipFlow
+}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
@@ -29,7 +35,10 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
   implicit val materializer = ActorMaterializer()(actorSystem)
 
-  private def runStream(targetBucketName: String, targetObjectKey: String, s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
+  private def runStream(
+    targetBucketName: String,
+    targetObjectKey: String,
+    s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
     val s3source = S3Source(s3inputStream = s3inputStream)
 
     // This source generates instances of DisplayWork from the source snapshot.
@@ -72,9 +81,10 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val targetObjectKey = "target.txt.gz"
 
     val uploadResult = for {
-      s3inputStream <- Future { s3Client
-        .getObject(conversionJob.bucketName, conversionJob.objectKey)
-        .getObjectContent()
+      s3inputStream <- Future {
+        s3Client
+          .getObject(conversionJob.bucketName, conversionJob.objectKey)
+          .getObjectContent()
       }
 
       gzipStream <- runStream(

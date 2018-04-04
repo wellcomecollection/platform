@@ -10,9 +10,17 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  Period,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -127,7 +135,6 @@ class ConvertorServiceTest
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
           withConvertorService(bucketName, actorSystem, s3AkkaClient) {
             convertorService =>
-
               // Create a collection of works.  The use of Random is meant
               // to increase the entropy of works, and thus the degree to
               // which they can be gzip-compressed -- so we can cross the
@@ -155,7 +162,7 @@ class ConvertorServiceTest
 
               // We want to ensure the source snapshot is at least 8MB in size.
               val gzipFileSize = createGzipFile(content).length.toInt
-              gzipFileSize shouldBe >= (8 * 1024 * 1024)
+              gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
               withGzipCompressedS3Key(bucketName, content) { objectKey =>
                 val conversionJob = ConversionJob(
