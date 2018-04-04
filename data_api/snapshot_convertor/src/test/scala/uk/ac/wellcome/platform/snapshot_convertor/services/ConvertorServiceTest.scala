@@ -10,13 +10,14 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+import scala.util.Random
 
 class ConvertorServiceTest
     extends FunSpec
@@ -126,17 +127,22 @@ class ConvertorServiceTest
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
           withConvertorService(bucketName, actorSystem, s3AkkaClient) {
             convertorService =>
-              // Create a collection of works.  These three differ by version,
-              // if not anything more interesting!
-              val works = (1 to 100000).map { version =>
+
+              // Create a collection of works.  The use of Random is meant
+              // to increase the entropy of works, and thus the degree to
+              // which they can be gzip-compressed -- so we can cross the
+              // 8MB boundary with a shorter list!
+              val works = (1 to 5000).map { version =>
                 IdentifiedWork(
-                  canonicalId = "rbfhv6b4",
-                  title = Some("Rumblings from a rambunctious rodent"),
+                  canonicalId = Random.alphanumeric.take(7).mkString,
+                  title = Some(Random.alphanumeric.take(1500).mkString),
                   sourceIdentifier = SourceIdentifier(
                     identifierScheme = IdentifierSchemes.miroImageNumber,
                     ontologyType = "work",
-                    value = "R0060400"
+                    value = Random.alphanumeric.take(10).mkString
                   ),
+                  description = Some(Random.alphanumeric.take(2500).mkString),
+                  publicationDate = Some(Period(label = version.toString)),
                   version = version
                 )
               }
@@ -148,8 +154,8 @@ class ConvertorServiceTest
               val content = elasticsearchJsons.mkString("\n")
 
               // We want to ensure the source snapshot is at least 8MB in size.
-              val gzipFile = createGzipFile(content)
-              gzipFile.length shouldBe >= (8 * 1024 * 1024)
+              val gzipFileSize = createGzipFile(content).length.toInt
+              gzipFileSize shouldBe >= (8 * 1024 * 1024)
 
               withGzipCompressedS3Key(bucketName, content) { objectKey =>
                 val conversionJob = ConversionJob(
