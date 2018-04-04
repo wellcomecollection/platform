@@ -8,19 +8,19 @@ import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import scala.util.{Failure, Success}
 
 case class WindowStatus(id: Option[String], offset: Int)
 
 class WindowManager @Inject()(
   s3client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String,
+  s3Config: S3Config,
   @Flag("sierra.fields") fields: String,
   resourceType: SierraResourceTypes.Value
 ) extends Logging {
@@ -30,7 +30,7 @@ class WindowManager @Inject()(
       s"Searching for existing records in prefix ${buildWindowShard(window)}")
 
     val lastExistingKey = s3client
-      .listObjects(bucketName, buildWindowShard(window))
+      .listObjects(s3Config.bucketName, buildWindowShard(window))
       .getObjectSummaries
       .map { _.getKey() }
       .sorted
@@ -52,7 +52,7 @@ class WindowManager @Inject()(
         }
 
         val lastBody = IOUtils.toString(
-          s3client.getObject(bucketName, key).getObjectContent)
+          s3client.getObject(s3Config.bucketName, key).getObjectContent)
         val triedMaybeLastId =
           JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
             r.map { _.id }.sorted.lastOption

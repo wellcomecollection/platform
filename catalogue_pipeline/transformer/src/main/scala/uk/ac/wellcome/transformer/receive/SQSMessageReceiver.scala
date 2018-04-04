@@ -3,27 +3,16 @@ package uk.ac.wellcome.transformer.receive
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{SourceMetadata, UnidentifiedWork, Work}
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.{SourceMetadata, UnidentifiedWork}
+import uk.ac.wellcome.models.aws.{S3Config, SQSMessage}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer,
-  TransformableTransformer
-}
+import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -33,7 +22,7 @@ import scala.util.Try
 class SQSMessageReceiver @Inject()(
   snsWriter: SNSWriter,
   s3Client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String,
+  s3Config: S3Config,
   metricsSender: MetricsSender)
     extends Logging {
 
@@ -69,13 +58,13 @@ class SQSMessageReceiver @Inject()(
   ) = {
     sourceMetadata.sourceName match {
       case "miro" =>
-        S3ObjectStore.get[MiroTransformable](s3Client, bucketName)(
+        S3ObjectStore.get[MiroTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
       case "calm" =>
-        S3ObjectStore.get[CalmTransformable](s3Client, bucketName)(
+        S3ObjectStore.get[CalmTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
       case "sierra" =>
-        S3ObjectStore.get[SierraTransformable](s3Client, bucketName)(
+        S3ObjectStore.get[SierraTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
     }
   }
