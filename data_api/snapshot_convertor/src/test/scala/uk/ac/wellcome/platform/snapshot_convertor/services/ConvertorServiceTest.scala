@@ -60,7 +60,7 @@ class ConvertorServiceTest
             convertorService =>
               // Create a collection of works.  These three differ by version,
               // if not anything more interesting!
-              val works = (1 to 3).map { version =>
+              val visibleWorks = (1 to 3).map { version =>
                 IdentifiedWork(
                   canonicalId = "rbfhv6b4",
                   title = Some("Rumblings from a rambunctious rodent"),
@@ -72,6 +72,20 @@ class ConvertorServiceTest
                   version = version
                 )
               }
+
+              val notVisibleWork = IdentifiedWork(
+                canonicalId = "rbfhv6b4",
+                title = Some("Rumblings from a rambunctious rodent"),
+                sourceIdentifier = SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.miroImageNumber,
+                  ontologyType = "work",
+                  value = "R0060400"
+                ),
+                visible = false,
+                version = 1
+              )
+
+              val works = visibleWorks :+ notVisibleWork
 
               val elasticsearchJsons = works.map { work =>
                 s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
@@ -95,7 +109,7 @@ class ConvertorServiceTest
                     downloadFile)
 
                   val contents = readGzipFile(downloadFile.getPath)
-                  val expectedContents = works
+                  val expectedContents = visibleWorks
                     .map { DisplayWork(_, includes = AllWorksIncludes()) }
                     .map { toJson(_).get }
                     .mkString("\n") + "\n"

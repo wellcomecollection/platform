@@ -19,19 +19,19 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ElasticsearchHitToDisplayWorkFlowTest
+class ElasticsearchHitToIdentifiedWorkFlowTest
     extends FunSpec
     with Matchers
     with Akka
     with ScalaFutures
     with ExtendedPatience {
 
-  it("creates a DisplayWork from a single hit") {
+  it("creates an IdentifiedWork from a single hit") {
     withActorSystem { actorSystem =>
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+        val flow = ElasticsearchHitToIdentifiedWorkFlow()
 
         val work = IdentifiedWork(
           canonicalId = "t83tggem",
@@ -52,13 +52,13 @@ class ElasticsearchHitToDisplayWorkFlowTest
           "_source": ${toJson(work).get}
         }"""
 
-        val futureDisplayWork: Future[DisplayWork] = Source
+        val futureIdentifiedWork: Future[IdentifiedWork] = Source
           .single(elasticsearchHitJson)
           .via(flow)
           .runWith(Sink.head)(materializer)
 
-        whenReady(futureDisplayWork) { displayWork =>
-          displayWork shouldBe DisplayWork(work, includes = AllWorksIncludes())
+        whenReady(futureIdentifiedWork) { identifiedWork =>
+          identifiedWork shouldBe work
         }
       }
     }
@@ -69,7 +69,7 @@ class ElasticsearchHitToDisplayWorkFlowTest
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+        val flow = ElasticsearchHitToIdentifiedWorkFlow()
 
         val elasticsearchHitJson = s"""MARC?XML RAARGH NOTJSON"""
 
@@ -90,7 +90,7 @@ class ElasticsearchHitToDisplayWorkFlowTest
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = ElasticsearchHitToDisplayWorkFlow()
+        val flow = ElasticsearchHitToIdentifiedWorkFlow()
 
         val elasticsearchHitJson = s"""{
           "_index": "rd8a35zw",

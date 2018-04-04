@@ -15,14 +15,8 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{
-  ElasticsearchHitToDisplayWorkFlow,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{ElasticsearchHitToIdentifiedWorkFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
@@ -43,7 +37,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     // This source generates instances of DisplayWork from the source snapshot.
     val displayWorks: Source[DisplayWork, Any] = s3source
-      .via(ElasticsearchHitToDisplayWorkFlow())
+      .via(ElasticsearchHitToIdentifiedWorkFlow()).via(IdentifiedWorkToVisibleDisplayWork())
 
     // This source generates JSON strings of DisplayWork instances, which
     // should be written to the destination snapshot.
