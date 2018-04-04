@@ -38,11 +38,11 @@ class S3SourceTest
           val content = expectedLines.mkString("\n")
 
           withGzipCompressedS3Key(bucketName, content) { key =>
-            val source = S3Source(
-              s3client = s3Client,
-              bucketName = bucketName,
-              key = key
-            )
+            val s3inputStream = s3Client
+              .getObject(bucketName, key)
+              .getObjectContent()
+
+            val source = S3Source(s3inputStream = s3inputStream)
 
             val future = source.runWith(Sink.seq)
             whenReady(future) { result =>
@@ -83,11 +83,11 @@ class S3SourceTest
           val content = expectedLines.mkString("\n")
 
           withGzipCompressedS3Key(bucketName, content) { key =>
-            val source = S3Source(
-              s3client = s3Client,
-              bucketName = bucketName,
-              key = key
-            )
+            val s3inputStream = s3Client
+              .getObject(bucketName, key)
+              .getObjectContent()
+
+            val source = S3Source(s3inputStream = s3inputStream)
 
             val future = source.runWith(Sink.seq)
             whenReady(future) { result =>
@@ -109,37 +109,15 @@ class S3SourceTest
           val key = "example.txt.gz"
           s3Client.putObject(bucketName, key, "NotAGzipCompressedFile")
 
-          val source = S3Source(
-            s3client = s3Client,
-            bucketName = bucketName,
-            key = key
-          )
+          val s3inputStream = s3Client
+            .getObject(bucketName, key)
+            .getObjectContent()
+
+          val source = S3Source(s3inputStream = s3inputStream)
 
           val future = source.runWith(Sink.seq)
           whenReady(future.failed) { exception =>
             exception shouldBe a[RuntimeException]
-          }
-        }
-      }
-    }
-  }
-
-  it("returns a failed future if asked to fetch a non-existent file") {
-    withActorSystem { actorSystem =>
-      implicit val system = actorSystem
-      implicit val materializer = ActorMaterializer()
-
-      withLocalS3Bucket { bucketName =>
-        withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
-          val source = S3Source(
-            s3client = s3Client,
-            bucketName = bucketName,
-            key = "doesnotexist.txt.gz"
-          )
-
-          val future = source.runWith(Sink.seq)
-          whenReady(future.failed) { exception =>
-            exception shouldBe a[AmazonS3Exception]
           }
         }
       }

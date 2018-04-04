@@ -11,6 +11,7 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.display.models.DisplayWork
@@ -28,15 +29,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
   implicit val materializer = ActorMaterializer()(actorSystem)
 
-  def runConversion(
-    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
-    info(s"ConvertorService running $conversionJob")
-
-    val s3source = S3Source(
-      s3client = s3Client,
-      bucketName = conversionJob.bucketName,
-      key = conversionJob.objectKey
-    )
+  private def runStream(targetBucketName: String, targetObjectKey: String, s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
+    val s3source = S3Source(s3inputStream = s3inputStream)
 
     // This source generates instances of DisplayWork from the source snapshot.
     val displayWorks: Source[DisplayWork, Any] = s3source
@@ -61,18 +55,36 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val gzipContent: Source[ByteString, Any] = jsonStrings
       .via(StringToGzipFlow())
 
-    val targetObjectKey = "target.txt.gz"
-
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
       akkaS3Client.multipartUpload(
-        bucket = conversionJob.bucketName,
+        bucket = targetBucketName,
         key = targetObjectKey
       )
 
-    val future = gzipContent
-      .runWith(s3Sink)
+    gzipContent.runWith(s3Sink)
+  }
 
-    future.map { _ =>
+  def runConversion(
+    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
+    info(s"ConvertorService running $conversionJob")
+
+    val targetBucketName = conversionJob.bucketName
+    val targetObjectKey = "target.txt.gz"
+
+    val uploadResult = for {
+      s3inputStream <- Future { s3Client
+        .getObject(conversionJob.bucketName, conversionJob.objectKey)
+        .getObjectContent()
+      }
+
+      gzipStream <- runStream(
+        targetBucketName = targetBucketName,
+        targetObjectKey = targetObjectKey,
+        s3inputStream = s3inputStream
+      )
+    } yield gzipStream
+
+    uploadResult.map { _ =>
       val targetLocation =
         Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
 

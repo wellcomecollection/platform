@@ -4,21 +4,14 @@ import java.io.InputStream
 
 import akka.stream.scaladsl.{Compression, Framing, Source}
 import akka.util.ByteString
-import com.amazonaws.services.s3.AmazonS3
 import akka.stream.scaladsl.StreamConverters.fromInputStream
+import com.amazonaws.services.s3.model.S3ObjectInputStream
 
 /** Given an S3 bucket and key that point to a gzip-compressed file, this
   * source emits the (uncompressed) lines from that file, one line at a time.
   */
 object S3Source {
-  def apply(s3client: AmazonS3,
-            bucketName: String,
-            key: String): Source[String, Any] = {
-
-    val s3inputStream: InputStream = s3client
-      .getObject(bucketName, key)
-      .getObjectContent()
-
+  def apply(s3inputStream: S3ObjectInputStream): Source[String, Any] = {
     val s3source: Source[ByteString, Any] = fromInputStream(
       in = {() => s3inputStream},
       chunkSize = 1024
