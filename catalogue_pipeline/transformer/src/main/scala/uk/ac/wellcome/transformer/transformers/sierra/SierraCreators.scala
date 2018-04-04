@@ -12,8 +12,6 @@ trait SierraCreators extends MarcUtils {
    * . For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b
    * . For "110" type as "Organisation"
    * . If subfield 0 contains a value use it to populate "identifiers". The "identifierScheme" will be lc-names.
-   * For now we are only removing leading and trailing spaces in identifiers.
-   * TODO: Figure out if we have to normalise further.
    */
   def getCreators(
     bibData: SierraBibData): List[MaybeDisplayable[AbstractAgent]] = {
@@ -30,9 +28,7 @@ trait SierraCreators extends MarcUtils {
           val prefixes = subfields.collect {
             case MarcSubfield("c", content) => content
           }
-          val codes = subfields.collect {
-            case MarcSubfield("0", content) => content
-          }
+          val codes = getIdentifierCodes(subfields)
           val prefixString =
             if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
@@ -49,14 +45,22 @@ trait SierraCreators extends MarcUtils {
         val name = subfields.collectFirst {
           case MarcSubfield("a", content) => content
         }
-        val codes = subfields.collect {
-          case MarcSubfield("0", content) => content
-        }
+        val codes = getIdentifierCodes(subfields)
         val organisation = Organisation(name.get)
         identify(codes, organisation, "Organisation")
       }
 
     persons ++ organisations
+  }
+
+  /**
+    * Identifier codes contain inconsistent spacing as in " nr 82270463" vs "nr 82270463"
+    * vs " nr82270463" and so on. We remove all spaces so that all of the above reduce to "nr82270463"
+    */
+  private def getIdentifierCodes(subfields: List[MarcSubfield]) = {
+    subfields.collect {
+      case MarcSubfield("0", content) => content.replaceAll("\\s", "")
+    }
   }
 
   private def identify(codes: List[String],
@@ -68,7 +72,7 @@ trait SierraCreators extends MarcUtils {
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.libraryOfCongressNames,
           ontologyType = ontologyType,
-          value = code.trim)
+          value = code)
         Identifiable(agent, sourceIdentifier, List(sourceIdentifier))
       case _ =>
         throw new RuntimeException(

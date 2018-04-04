@@ -149,13 +149,10 @@ class SierraCreatorsTest extends FunSpec with Matchers {
       List(sourceIdentifier))
   }
 
-  // TODO: find out the identifiers normalisation rules
-  // This is ignored until we get better information as to
-  // how we want to clean the identifiers data
-  ignore("normalises the creator identifier marcTag 100 0") {
+  it("removes spaces from the creator identifier marcTag 100 0") {
     val name = "The Luggage"
     val code = "n 123456"
-    val cleanedCode = "123456"
+    val cleanedCode = "n123456"
 
     val bibData = SierraBibData(
       id = "1234567",
@@ -176,7 +173,7 @@ class SierraCreatorsTest extends FunSpec with Matchers {
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.libraryOfCongressNames,
       "Person",
-      code.trim)
+      cleanedCode)
     creators should contain only Identifiable(
       Person(label = name),
       sourceIdentifier = sourceIdentifier,
