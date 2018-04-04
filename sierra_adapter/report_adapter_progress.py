@@ -6,6 +6,7 @@ Report the progress of the Sierra adapter.
 
 import datetime as dt
 import os
+import sys
 
 import attr
 import boto3
@@ -48,11 +49,22 @@ def get_matching_s3_keys(bucket, prefix=''):
             break
 
 
-@attr.s
+@attr.s(repr=False)
 class Interval:
     start = attr.ib()
     end = attr.ib()
     key = attr.ib()
+
+    def __repr__(self):
+        return f'%s(start=%r, end=%r, key=%r)' % (
+            type(self).__name__,
+            self.start.isoformat(),
+            self.end.isoformat(),
+            self.key
+        )
+
+    def __str__(self):
+        return repr(self)
 
 
 def get_intervals(keys):
@@ -193,3 +205,10 @@ if __name__ == '__main__':
             print(f'{iv.start.isoformat()} -- {iv.end.isoformat()}')
 
         print('')
+
+    print('')
+    print('-' * 79)
+    print('')
+    print('If there are gaps in the report, you can build new windows for the readers:')
+    print('')
+    print(f'$ python {sys.argv[0].replace("report_adapter_progress.py", "build_missing_windows.py")}')
