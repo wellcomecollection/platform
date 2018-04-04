@@ -7,7 +7,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.{S3Config, SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
@@ -65,7 +65,7 @@ class SierraReaderWorkerServiceTest
             reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
             s3client = s3Client,
             windowManager =
-              new WindowManager(s3Client, bucketName, fields, resourceType),
+              new WindowManager(s3Client, S3Config(bucketName), fields, resourceType),
             batchSize = batchSize,
             resourceType = resourceType,
             bucketName = bucketName,
