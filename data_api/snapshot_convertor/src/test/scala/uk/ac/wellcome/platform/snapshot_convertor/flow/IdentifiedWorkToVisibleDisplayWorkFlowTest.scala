@@ -4,7 +4,11 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -71,16 +75,16 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
           )
         }
         val notVisibleWork = IdentifiedWork(
-            canonicalId = "rbfhv6b4",
-            title = Some("Rumblings from a rambunctious rodent"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            visible = false,
-            version = 1
-          )
+          canonicalId = "rbfhv6b4",
+          title = Some("Rumblings from a rambunctious rodent"),
+          sourceIdentifier = SourceIdentifier(
+            identifierScheme = IdentifierSchemes.miroImageNumber,
+            ontologyType = "work",
+            value = "R0060400"
+          ),
+          visible = false,
+          version = 1
+        )
 
         val eventualDisplayWorks = Source(visibleWorks :+ notVisibleWork)
           .via(flow)
