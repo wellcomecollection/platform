@@ -1,13 +1,11 @@
 package uk.ac.wellcome.s3
 
-import java.security.MessageDigest
-
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -56,16 +54,16 @@ class SourcedKeyPrefixGenerator @Inject() extends KeyPrefixGenerator[Sourced] {
 
 class S3ObjectStore[T] @Inject()(
   s3Client: AmazonS3,
-  @Flag("aws.s3.bucketName") bucketName: String,
+  s3Config: S3Config,
   keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
   def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
     val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
-    S3ObjectStore.put[T](s3Client, bucketName)(keyPrefix)(sourcedObject)
+    S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(sourcedObject)
   }
 
   def get(key: String)(implicit decoder: Decoder[T]): Future[T] = {
-    S3ObjectStore.get[T](s3Client, bucketName)(key)
+    S3ObjectStore.get[T](s3Client, s3Config.bucketName)(key)
   }
 }
 
