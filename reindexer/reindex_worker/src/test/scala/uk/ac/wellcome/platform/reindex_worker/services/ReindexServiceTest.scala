@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex_worker.services
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -25,9 +25,6 @@ class ReindexServiceTest
     with LocalDynamoDb[TestRecord]
     with MockitoSugar
     with ExtendedPatience {
-
-  override lazy val evidence: DynamoFormat[TestRecord] =
-    DynamoFormat[TestRecord]
 
   val shardName = "shard"
   val currentVersion = 1

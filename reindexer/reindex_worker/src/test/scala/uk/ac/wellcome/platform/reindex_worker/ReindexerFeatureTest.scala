@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.reindex_worker
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
@@ -36,9 +36,6 @@ class ReindexerFeatureTest
     with SNS
     with SQS
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[TestRecord] =
-    DynamoFormat[TestRecord]
 
   val currentVersion = 1
   val desiredVersion = 5
