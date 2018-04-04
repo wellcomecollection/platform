@@ -34,19 +34,6 @@ class SnapshotConvertorFeatureTest
     with fixtures.Server
     with ExtendedPatience {
 
-  // This test is meant to catch an error we saw when we first turned on
-  // the snapshot convertor:
-  //
-  //    akka.http.scaladsl.model.EntityStreamSizeException:
-  //    EntityStreamSizeException: actual entity size (Some(19403836)) exceeded
-  //    content length limit (8388608 bytes)! You can configure this by setting
-  //    `akka.http.[server|client].parsing.max-content-length` or calling
-  //    `HttpEntity.withSizeLimit` before materializing the dataBytes stream.
-  //
-  // With the original code, we were unable to read anything more than
-  // an 8MB file from S3.  This test deliberately creates a very large file,
-  // and tries to stream it back out.
-  //
   it("completes a conversion successfully") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
@@ -57,7 +44,7 @@ class SnapshotConvertorFeatureTest
           withServer(flags) { _ =>
             // Create a collection of works.  These three differ by version,
             // if not anything more interesting!
-            val works = (1 to 5).map { version =>
+            val works = (1 to 3).map { version =>
               IdentifiedWork(
                 canonicalId = "rbfhv6b4",
                 title = Some("Rumblings from a rambunctious rodent"),
