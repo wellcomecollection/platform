@@ -29,7 +29,7 @@ trait GzipUtils extends S3 {
     fromFile(path.replace(".gz", "")).mkString
   }
 
-  private def createGzipFile(content: String): File = {
+  def createGzipFile(content: String): File = {
     val tmpfile = File.createTempFile("s3sourcetest", ".txt")
 
     // Create a gzip-compressed file.  This is based on the shell commands

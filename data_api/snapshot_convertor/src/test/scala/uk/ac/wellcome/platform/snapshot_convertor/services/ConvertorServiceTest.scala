@@ -147,6 +147,10 @@ class ConvertorServiceTest
               }
               val content = elasticsearchJsons.mkString("\n")
 
+              // We want to ensure the source snapshot is at least 8MB in size.
+              val gzipFile = createGzipFile(content)
+              gzipFile.length shouldBe >= (8 * 1024 * 1024)
+
               withGzipCompressedS3Key(bucketName, content) { objectKey =>
                 val conversionJob = ConversionJob(
                   bucketName = bucketName,
