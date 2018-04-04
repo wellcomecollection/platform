@@ -64,6 +64,7 @@ class SierraReaderWorkerServiceTest
           val worker = new SierraReaderWorkerService(
             reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
             s3client = s3Client,
+            s3Config = S3Config(bucketName),
             windowManager = new WindowManager(
               s3Client,
               S3Config(bucketName),
@@ -71,7 +72,6 @@ class SierraReaderWorkerServiceTest
               resourceType),
             batchSize = batchSize,
             resourceType = resourceType,
-            bucketName = bucketName,
             system = actorSystem,
             metrics = mockMetrics,
             apiUrl = apiUrl,
