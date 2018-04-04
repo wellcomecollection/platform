@@ -1,15 +1,17 @@
 package uk.ac.wellcome.test.fixtures
 
-import scala.util.{Random, Try}
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
+
+import scala.util.Random
 import uk.ac.wellcome.models.{Id, Versioned}
-import uk.ac.wellcome.test.utils.DynamoDBLocalClients
 import com.amazonaws.services.dynamodbv2.model._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import com.gu.scanamo.query.UniqueKey
+import com.gu.scanamo.DynamoFormat
 
 import scala.collection.JavaConversions._
 
-trait LocalDynamoDb[T <: Versioned with Id] extends DynamoDBLocalClients {
+trait LocalDynamoDb[T <: Versioned with Id] {
 
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
