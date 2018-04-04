@@ -46,15 +46,6 @@ import docopt
 import maya
 import tqdm
 
-args = docopt.docopt(__doc__)
-
-start = maya.parse(args['--start']).datetime()
-end = maya.parse(args['--end']).datetime()
-minutes = int(args['--window_length'] or 30)
-resource = args['--resource']
-
-assert resource in ('bibs', 'items')
-
 
 def generate_windows(start, end, minutes):
     current = start
@@ -66,14 +57,24 @@ def generate_windows(start, end, minutes):
         current += dt.timedelta(minutes=minutes - 1)
 
 
-client = boto3.client('sns')
+if __name__ == '__main__':
+    args = docopt.docopt(__doc__)
 
-for window in tqdm.tqdm(
-    generate_windows(start, end, minutes),
-    total=math.ceil((end - start).total_seconds() / 60 / (minutes - 1))
-):
-    client.publish(
-        TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource}_windows',
-        Message=json.dumps(window),
-        Subject=f'Window sent by {__file__}'
-    )
+    start = maya.parse(args['--start']).datetime()
+    end = maya.parse(args['--end']).datetime()
+    minutes = int(args['--window_length'] or 30)
+    resource = args['--resource']
+
+    assert resource in ('bibs', 'items')
+
+    client = boto3.client('sns')
+
+    for window in tqdm.tqdm(
+        generate_windows(start, end, minutes),
+        total=math.ceil((end - start).total_seconds() / 60 / (minutes - 1))
+    ):
+        client.publish(
+            TopicArn=f'arn:aws:sns:eu-west-1:760097843905:sierra_{resource}_windows',
+            Message=json.dumps(window),
+            Subject=f'Window sent by {__file__}'
+        )
