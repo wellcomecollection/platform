@@ -8,6 +8,9 @@ import uk.ac.wellcome.models.IdentifiedWork
 import scala.concurrent.ExecutionContext
 
 object IdentifiedWorkToVisibleDisplayWork {
-  def apply()(implicit executionContext: ExecutionContext): Flow[IdentifiedWork, DisplayWork, NotUsed] = Flow[IdentifiedWork].filter(_.visible)
-    .map { DisplayWork(_, includes = AllWorksIncludes()) }
+  def apply()(implicit executionContext: ExecutionContext)
+    : Flow[IdentifiedWork, DisplayWork, NotUsed] =
+    Flow[IdentifiedWork]
+      .filter(_.visible)
+      .map { DisplayWork(_, includes = AllWorksIncludes()) }
 }
