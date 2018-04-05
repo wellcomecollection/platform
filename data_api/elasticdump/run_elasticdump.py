@@ -90,8 +90,6 @@ def run():
         with gzip.open('index.txt.gz', 'wb') as gzip_file:
             gzip_file.writelines(index_file)
 
-    print('*** Uploading gzip file to S3')
-
     # This creates keys of the form
     #
     #   2018/03/2018-03-13_myindexname.txt.gz
@@ -99,6 +97,8 @@ def run():
     # which are human-readable, unambiguous, and easy to browse in the
     # S3 Console.
     key = dt.datetime.now().strftime('%Y/%m/%Y-%m-%d') + f'_{es_index}.txt.gz'
+    print(f'*** Uploading gzip file to S3 with key {key}')
+
     s3_client.upload_file(
         Bucket=target_bucket,
         Key=key,
