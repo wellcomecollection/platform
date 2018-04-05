@@ -286,4 +286,20 @@ class DisplayWorkTest extends FunSpec with Matchers {
     displayLanguage.id shouldBe language.id
     displayLanguage.label shouldBe language.label
   }
+
+  it("gives a helpful error if you try to convert a work with visible=False") {
+    val work = IdentifiedWork(
+      canonicalId = "xpudrscx",
+      title = Some("Invisible igloos improve iguanas"),
+      sourceIdentifier = sourceIdentifier,
+      visible = false,
+      version = 1
+    )
+
+    val caught = intercept[RuntimeException] {
+      DisplayWork(work)
+    }
+
+    caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
+  }
 }
