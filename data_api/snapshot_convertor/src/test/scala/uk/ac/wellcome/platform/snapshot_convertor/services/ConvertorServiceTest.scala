@@ -32,6 +32,8 @@ class ConvertorServiceTest
     with GzipUtils
     with ExtendedPatience {
 
+  val mapper = new ObjectMapper with ScalaObjectMapper
+
   private def withConvertorService(bucketName: String,
                                    actorSystem: ActorSystem,
                                    s3AkkaClient: S3Client)(
@@ -41,7 +43,7 @@ class ConvertorServiceTest
       s3Client = s3Client,
       akkaS3Client = s3AkkaClient,
       s3Endpoint = localS3EndpointUrl,
-      objectMapper = new ObjectMapper with ScalaObjectMapper
+      objectMapper = mapper
     )
 
     testWith(convertorService)
@@ -107,7 +109,7 @@ class ConvertorServiceTest
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = visibleWorks
                     .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { toJson(_).get }
+                    .map { mapper.writeValueAsString(_) }
                     .mkString("\n") + "\n"
 
                   contents shouldBe expectedContents
@@ -192,7 +194,7 @@ class ConvertorServiceTest
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = works
                     .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { toJson(_).get }
+                    .map { mapper.writeValueAsString(_) }
                     .mkString("\n") + "\n"
 
                   contents shouldBe expectedContents
