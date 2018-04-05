@@ -8,6 +8,7 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
+import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.platform.snapshot_convertor.modules.{
@@ -34,6 +35,8 @@ class Server extends HttpServer {
     SnapshotConvertorWorkerModule,
     AkkaModule
   )
+
+  override def jacksonModule = DisplayJacksonModule
 
   override def configureHttp(router: HttpRouter) {
     router
