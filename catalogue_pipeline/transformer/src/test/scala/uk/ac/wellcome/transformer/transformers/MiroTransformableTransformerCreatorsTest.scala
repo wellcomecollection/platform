@@ -3,7 +3,9 @@ package uk.ac.wellcome.transformer.transformers
 import org.scalatest.{FunSpec, FunSuite}
 import uk.ac.wellcome.models.{Agent, Unidentifiable}
 
-class MiroTransformableTransformerCreatorsTest extends FunSpec with MiroTransformableWrapper{
+class MiroTransformableTransformerCreatorsTest
+    extends FunSpec
+    with MiroTransformableWrapper {
   it("if not image_creator field is present") {
     transformRecordAndCheckCreators(
       data = s""""image_title": "A guide to giraffes"""",
@@ -117,11 +119,10 @@ class MiroTransformableTransformerCreatorsTest extends FunSpec with MiroTransfor
     )
   }
 
-
   private def transformRecordAndCheckCreators(
-                                               data: String,
-                                               expectedCreators: List[String]
-                                             ) = {
+    data: String,
+    expectedCreators: List[String]
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.creators shouldBe expectedCreators.map { creator =>
       Unidentifiable(Agent(creator))
