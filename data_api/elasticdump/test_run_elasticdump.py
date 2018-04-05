@@ -1,9 +1,9 @@
 # -*- encoding: utf-8
 
+import gzip
 import json
 import os
 import subprocess
-import time
 
 import requests
 
@@ -41,6 +41,7 @@ def test_end_to_end(
         'docker', 'run', '--net', 'host',
         '--env', f'sqs_queue_url={queue_url}',
         '--env', f'upload_bucket={bucket}',
+        '--env', f'target_key=dump.txt.gz',
 
         '--env', 'AWS_DEFAULT_REGION=localhost',
         '--env', 'AWS_ACCESS_KEY_ID=accessKey1',
@@ -57,22 +58,21 @@ def test_end_to_end(
         'elasticdump'
     ])
 
-    i = 0
-    while True:
-        try:
-            obj = s3_client.get_object(
-                Bucket=bucket,
-                Key='dump.txt.gz'
-            )
-            body = obj['Body'].read()
-            assert body == ''
+    obj = s3_client.get_object(
+        Bucket=bucket,
+        Key='dump.txt.gz'
+    )
+    body = obj['Body'].read()
 
-        except Exception:
-            if i < 15:
-                time.sleep(1)
-                i += 1
-                continue
-            else:
-                print('Ran out of time!  Re-raising last exception...')
-                raise
-
+    lines = [json.loads(l) for l in gzip.decompress(body).splitlines()]
+    documents = sorted(lines, key=lambda s: s['_id'])
+    assert documents == [
+        {
+            '_index': elasticsearch_index,
+            '_type': 'doc',
+            '_id': str(i),
+            '_score': 1,
+            '_source': {'user': f'user_{i}'}
+        }
+        for i in range(10)
+    ]
