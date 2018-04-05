@@ -2,30 +2,16 @@ package uk.ac.wellcome.platform.snapshot_convertor
 
 import java.io.File
 
-import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
-import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.Sink
 import com.amazonaws.services.s3.model.GetObjectRequest
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import org.scalatest.concurrent.Eventually
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
-import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
-import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SnapshotConvertorFeatureTest
@@ -39,6 +25,7 @@ class SnapshotConvertorFeatureTest
     with SQS
     with GzipUtils
     with fixtures.Server
+    with JsonTestUtil
     with ExtendedPatience {
 
   it("completes a conversion successfully") {
@@ -94,13 +81,26 @@ class SnapshotConvertorFeatureTest
                   new GetObjectRequest(bucketName, "target.txt.gz"),
                   downloadFile)
 
-                val contents = readGzipFile(downloadFile.getPath)
-                val expectedContents = works
-                  .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                  .map { toJson(_).get }
-                  .mkString("\n") + "\n"
+                val actualJsonLines: List[String] = readGzipFile(downloadFile.getPath).split("\n").toList
 
-                contents shouldBe expectedContents
+                val expectedJsonLines = works.map { work =>
+                  s"""{
+                     |  "id": "${work.canonicalId}",
+                     |  "title": "${work.title.get}",
+                     |  "identifiers": [ ],
+                     |  "creators": [ ],
+                     |  "genres": [ ],
+                     |  "subjects": [ ],
+                     |  "items": [ ],
+                     |  "publishers": [ ],
+                     |  "placesOfPublication": [ ],
+                     |  "type": "Work"
+                   }""".stripMargin
+                }
+
+                actualJsonLines.zip(expectedJsonLines).foreach { case (actualLine, expectedLine) =>
+                  assertJsonStringsAreEqual(actualLine, expectedLine)
+                }
 
                 val receivedMessages = listMessagesReceivedFromSNS(topicArn)
                 receivedMessages.size should be >= 1
