@@ -224,16 +224,27 @@ def bucket(s3_client):
 
 
 @pytest.fixture
-def elasticsearch_index(docker_services, docker_ip):
-    index_name = random_alpha()
+def elasticsearch_hostname(docker_services, docker_ip):
+    return f'{docker_ip}:{docker_services.port_for("elasticsearch", 9300)}'
 
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("elasticsearch", 9200)}'
-    )
 
+@pytest.fixture
+def elasticsearch_url(elasticsearch_hostname):
+    return f'https://{elasticsearch_hostname}'
+
+
+@pytest.fixture
+def elasticsearch_index(docker_services, elasticsearch_url):
     docker_services.wait_until_responsive(
         timeout=60.0, pause=0.1,
-        check=_is_responsive(endpoint_url, lambda r: r.status_code == 401)
+        check=_is_responsive(elasticsearch_url, lambda r: r.status_code == 401)
     )
+
+    index_name = random_alpha()
+    resp = requests.put(
+        f'{elasticsearch_url}/{index_name}',
+        auth=('elastic', 'changeme')
+    )
+    resp.raise_for_status()
 
     yield index_name
