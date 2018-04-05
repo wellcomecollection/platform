@@ -6,6 +6,8 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
@@ -25,6 +27,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+
 import scala.util.Random
 
 class ConvertorServiceTest
@@ -37,6 +40,8 @@ class ConvertorServiceTest
     with GzipUtils
     with ExtendedPatience {
 
+  val mapper = new ObjectMapper with ScalaObjectMapper
+
   private def withConvertorService(bucketName: String,
                                    actorSystem: ActorSystem,
                                    s3AkkaClient: S3Client)(
@@ -45,7 +50,8 @@ class ConvertorServiceTest
       actorSystem = actorSystem,
       s3Client = s3Client,
       akkaS3Client = s3AkkaClient,
-      s3Endpoint = localS3EndpointUrl
+      s3Endpoint = localS3EndpointUrl,
+      objectMapper = mapper
     )
 
     testWith(convertorService)
@@ -111,7 +117,7 @@ class ConvertorServiceTest
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = visibleWorks
                     .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { toJson(_).get }
+                    .map { mapper.writeValueAsString(_) }
                     .mkString("\n") + "\n"
 
                   contents shouldBe expectedContents
@@ -196,7 +202,7 @@ class ConvertorServiceTest
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = works
                     .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { toJson(_).get }
+                    .map { mapper.writeValueAsString(_) }
                     .mkString("\n") + "\n"
 
                   contents shouldBe expectedContents

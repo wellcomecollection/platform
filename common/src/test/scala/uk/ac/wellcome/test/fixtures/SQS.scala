@@ -2,14 +2,8 @@ package uk.ac.wellcome.test.fixtures
 
 import com.amazonaws.auth._
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
 import scala.util.Random
 import scala.collection.JavaConversions._

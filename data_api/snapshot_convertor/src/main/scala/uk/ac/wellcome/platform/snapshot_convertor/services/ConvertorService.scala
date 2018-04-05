@@ -12,10 +12,12 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.S3ObjectInputStream
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.platform.snapshot_convertor.flow.{
+  DisplayWorkToJsonStringFlow,
   ElasticsearchHitToIdentifiedWorkFlow,
   IdentifiedWorkToVisibleDisplayWork,
   StringToGzipFlow
@@ -31,7 +33,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  s3Client: AmazonS3,
                                  akkaS3Client: S3Client,
-                                 @Flag("aws.s3.endpoint") s3Endpoint: String)
+                                 @Flag("aws.s3.endpoint") s3Endpoint: String,
+                                 objectMapper: ObjectMapper)
     extends Logging {
 
   implicit val materializer = ActorMaterializer()(actorSystem)
@@ -50,16 +53,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     // This source generates JSON strings of DisplayWork instances, which
     // should be written to the destination snapshot.
     val jsonStrings: Source[String, Any] = displayWorks
-      .map { displayWork: DisplayWork =>
-        toJson(displayWork)
-      }
-      .map {
-        case Success(jsonString) => jsonString
-        case Failure(encodeError) => {
-          warn("Failed to convert $displayWork to string!", encodeError)
-          throw encodeError
-        }
-      }
+      .via(DisplayWorkToJsonStringFlow(mapper = objectMapper))
 
     // This source generates gzip-compressed JSON strings, corresponding to
     // the DisplayWork instances from the source snapshot.
