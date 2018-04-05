@@ -34,12 +34,13 @@ def build_elasticsearch_url(index):
     password = os.environ['es_password']
     hostname = os.environ['es_hostname']
     port = os.environ['es_port']
+    scheme = os.environ.get('es_scheme', 'http://')
 
-    return f'https://{username}:{password}@{hostname}:{port}/{index}'
+    return f'{scheme}{username}:{password}@{hostname}:{port}/{index}'
 
 
 @service
-def run(sqs_client=None, s3_client=None):
+def run():
     print(os.environ)
     sqs_queue_url = os.environ['sqs_queue_url']
 
@@ -48,8 +49,15 @@ def run(sqs_client=None, s3_client=None):
     # the SQS message.
     target_bucket = os.environ['upload_bucket']
 
-    sqs_client = sqs_client or boto3.client('sqs')
-    s3_client = s3_client or boto3.client('s3')
+    if 'local_s3_endpoint' in os.environ:
+        s3_client = boto3.client('s3', endpoint_url=os.environ['local_s3_endpoint'])
+    else:
+        s3_client = boto3.client('s3')
+
+    if 'local_sqs_endpoint' in os.environ:
+        sqs_client = boto3.client('sqs', endpoint_url=os.environ['local_sqs_endpoint'])
+    else:
+        sqs_client = boto3.client('sqs')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
@@ -64,14 +72,17 @@ def run(sqs_client=None, s3_client=None):
     es_url = build_elasticsearch_url(index=es_index)
 
     print('*** Running Elasticdump task')
-    subprocess.check_call([
-        'elasticdump',
-        '--input', es_url,
-        '--output', 'index.txt',
+    try:
+        subprocess.check_call([
+            'elasticdump',
+            '--input', es_url,
+            '--output', 'index.txt',
 
-        # How many records to fetch in each request
-        '--limit', '1000',
-    ])
+            # How many records to fetch in each request
+            '--limit', '1000',
+        ])
+    except subprocess.CalledProcessError:
+        sys.exit(1)
     assert os.path.exists('index.txt')
 
     print('*** Created index file; compressing as gzip')
