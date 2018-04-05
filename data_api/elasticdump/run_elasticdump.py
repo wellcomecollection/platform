@@ -32,11 +32,10 @@ def build_elasticsearch_url(index):
     # We read the Elasticsearch auth information from the environment variables
     username = os.environ['es_username']
     password = os.environ['es_password']
-    name = os.environ['es_name']
-    region = os.environ['es_region']
+    hostname = os.environ['es_hostname']
     port = os.environ['es_port']
 
-    return f'https://{username}:{password}@{name}.{region}.aws.found.io:{port}/{index}'
+    return f'https://{username}:{password}@{hostname}:{port}/{index}'
 
 
 @service

@@ -5,7 +5,7 @@ RUN npm install -g elasticdump
 
 RUN pip3 install --upgrade pip
 
-COPY requirements.txt /
+COPY src/requirements.txt /
 RUN pip3 install -r /requirements.txt
 
 ENV PYTHONUNBUFFERED=x
