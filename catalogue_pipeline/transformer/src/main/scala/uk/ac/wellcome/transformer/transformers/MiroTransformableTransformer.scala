@@ -239,9 +239,9 @@ class MiroTransformableTransformer
   private def getCreators(
     miroData: MiroTransformableData): List[Unidentifiable[Agent]] = {
     val primaryCreators = miroData.creator match {
-      case Some(creator) =>
-        creator.map { c =>
-          Unidentifiable(Agent(c))
+      case Some(maybeCreators) =>
+        maybeCreators.collect {
+          case Some(c) => Unidentifiable(Agent(c))
         }
       case None => List()
     }
