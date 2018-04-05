@@ -93,15 +93,16 @@ def dynamodb_resource(docker_services, docker_ip):
 
 
 @pytest.fixture(scope='session')
-def s3_client(docker_services, docker_ip):
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("s3", 8000)}'
-    )
+def s3_endpoint_url(docker_services, docker_ip):
+    return f'http://{docker_ip}:{docker_services.port_for("s3", 8000)}'
 
+
+@pytest.fixture(scope='session')
+def s3_client(s3_endpoint_url, docker_services):
     docker_services.wait_until_responsive(
         timeout=10.0, pause=0.1,
         check=_is_responsive(
-            endpoint_url, lambda r: (
+            s3_endpoint_url, lambda r: (
                     r.status_code == 403 and
                     '<Code>AccessDenied</Code>' in r.text)
         )
@@ -112,22 +113,23 @@ def s3_client(docker_services, docker_ip):
         's3',
         aws_access_key_id='accessKey1',
         aws_secret_access_key='verySecretKey1',
-        endpoint_url=endpoint_url
+        endpoint_url=s3_endpoint_url
     )
 
 
 @pytest.fixture(scope='session')
-def sqs_client(docker_services, docker_ip):
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("sqs", 9324)}'
-    )
+def sqs_endpoint_url(docker_services, docker_ip):
+    return f'http://{docker_ip}:{docker_services.port_for("sqs", 9324)}'
 
+
+@pytest.fixture(scope='session')
+def sqs_client(sqs_endpoint_url, docker_services, docker_ip):
     docker_services.wait_until_responsive(
         timeout=10.0, pause=0.1,
-        check=_is_responsive(endpoint_url, lambda r: r.status_code == 404)
+        check=_is_responsive(sqs_endpoint_url, lambda r: r.status_code == 404)
     )
 
-    yield boto3.client('sqs', endpoint_url=endpoint_url)
+    yield boto3.client('sqs', endpoint_url=sqs_endpoint_url)
 
 
 @pytest.fixture(scope='session')
@@ -224,13 +226,13 @@ def bucket(s3_client):
 
 
 @pytest.fixture
-def elasticsearch_hostname(docker_services, docker_ip):
-    return f'{docker_ip}:{docker_services.port_for("elasticsearch", 9300)}'
+def elasticsearch_hostname(docker_ip):
+    return docker_ip
 
 
 @pytest.fixture
-def elasticsearch_url(elasticsearch_hostname):
-    return f'https://{elasticsearch_hostname}'
+def elasticsearch_url(docker_services, elasticsearch_hostname):
+    return f'http://{elasticsearch_hostname}:{docker_services.port_for("elasticsearch", 9200)}'
 
 
 @pytest.fixture
