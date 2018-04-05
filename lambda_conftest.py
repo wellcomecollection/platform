@@ -117,7 +117,7 @@ def sqs_client(docker_services, docker_ip):
     )
 
     docker_services.wait_until_responsive(
-        timeout=5.0, pause=0.1,
+        timeout=10.0, pause=0.1,
         check=_is_responsive(endpoint_url, lambda r: r.status_code == 404)
     )
 
@@ -178,7 +178,7 @@ def sns_client(docker_services, docker_ip):
 
 @pytest.fixture
 def topic_arn(sns_client, docker_services, docker_ip):
-    """Creates an SNS topic in moto, and yields the new topic ARN."""
+    """Creates an SNS topic, and yields the new topic ARN."""
     topic_name = 'test-lambda-topic'
 
     resp = sns_client.create_topic(Name=topic_name)
@@ -201,7 +201,7 @@ def topic_arn(sns_client, docker_services, docker_ip):
 @pytest.fixture
 def queue_url(sns_client, sqs_client, topic_arn):
     """
-    Creates an SQS queue in moto, subscribes it to an SNS topic, and
+    Creates an SQS queue, subscribes it to an SNS topic, and
     yields the new queue URL.
     """
     queue_name = 'test-lambda-queue'
@@ -215,3 +215,23 @@ def queue_url(sns_client, sqs_client, topic_arn):
         Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
     )
     yield queue_url
+
+
+@pytest.fixture
+def simple_queue_url(sqs_client):
+    """
+    Creates an SQS queue and
+    yields the new queue URL.
+    """
+    queue_name = 'test-lambda-queue'
+
+    resp = sqs_client.create_queue(QueueName=queue_name)
+    yield resp['QueueUrl']
+
+
+@pytest.fixture
+def bucket(s3_client):
+    bucket_name = 'test-python-bucket'
+
+    resp = s3_client.create_bucket(Bucket=bucket_name)
+    yield bucket_name
