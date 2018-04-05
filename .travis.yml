@@ -50,60 +50,62 @@ env:
 
 jobs:
   include:
-    - env: TASK=travis-format
-      stage: format
-
-    - stage: test
-      env: TASK=sbt-common-test
-    - env: TASK=sbt-display-test
-    - env: TASK=sbt-elasticsearch-test
-
-    # Catalogue pipeline stack
-    - env: TASK=transformer-test
-    - env: TASK=ingestor-test
-    - env: TASK=recorder-test
-    - env: TASK=id_minter-test
-
-    # Data API stack
-    - env: TASK=snapshot_scheduler-test
-    - env: TASK=snapshot_convertor_job_generator-test
-    - env: TASK=snapshot_convertor-test
     - env: TASK=elasticdump-test
 
-    # Reindexer stack
-    - env: TASK=reindex_worker-test
-    - env: TASK=reindex_job_creator-test
-    - env: TASK=complete_reindex-test
-    - env: TASK=reindex_shard_generator-test
-
-    # Sierra adapter stack
-    - env: TASK=sierra_common-test
-    - env: TASK=sierra_window_generator-test
-    - env: TASK=sierra_reader-test
-    - env: TASK=sierra_items_to_dynamo-test
-    - env: TASK=sierra_bib_merger-test
-    - env: TASK=sierra_item_merger-test
-    - env: TASK=s3_demultiplexer-test
-
-    # Catalogue API stack
-    - env: TASK=api-test
-    # (not under active development)
-    # - env: TASK=api_docs-build
-
-    # Shared infra stack
-    - env: TASK=shared_infra-test
-
-    # (not under active development)
-
-    # nginx stack
-    # - env: TASK=nginx-build
-
-    # Loris stack
-    # - env: TASK=loris-build
-    # - env: TASK=cache_cleaner-build
-
-    # Monitoring stack
-    # - env: TASK=monitoring-test
+    # - env: TASK=travis-format
+    #   stage: format
+    #
+    # - stage: test
+    #   env: TASK=sbt-common-test
+    # - env: TASK=sbt-display-test
+    # - env: TASK=sbt-elasticsearch-test
+    #
+    # # Catalogue pipeline stack
+    # - env: TASK=transformer-test
+    # - env: TASK=ingestor-test
+    # - env: TASK=recorder-test
+    # - env: TASK=id_minter-test
+    #
+    # # Data API stack
+    # - env: TASK=snapshot_scheduler-test
+    # - env: TASK=snapshot_convertor_job_generator-test
+    # - env: TASK=snapshot_convertor-test
+    # - env: TASK=elasticdump-test
+    #
+    # # Reindexer stack
+    # - env: TASK=reindex_worker-test
+    # - env: TASK=reindex_job_creator-test
+    # - env: TASK=complete_reindex-test
+    # - env: TASK=reindex_shard_generator-test
+    #
+    # # Sierra adapter stack
+    # - env: TASK=sierra_common-test
+    # - env: TASK=sierra_window_generator-test
+    # - env: TASK=sierra_reader-test
+    # - env: TASK=sierra_items_to_dynamo-test
+    # - env: TASK=sierra_bib_merger-test
+    # - env: TASK=sierra_item_merger-test
+    # - env: TASK=s3_demultiplexer-test
+    #
+    # # Catalogue API stack
+    # - env: TASK=api-test
+    # # (not under active development)
+    # # - env: TASK=api_docs-build
+    #
+    # # Shared infra stack
+    # - env: TASK=shared_infra-test
+    #
+    # # (not under active development)
+    #
+    # # nginx stack
+    # # - env: TASK=nginx-build
+    #
+    # # Loris stack
+    # # - env: TASK=loris-build
+    # # - env: TASK=cache_cleaner-build
+    #
+    # # Monitoring stack
+    # # - env: TASK=monitoring-test
 
 stages:
   - format
