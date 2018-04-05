@@ -5,6 +5,7 @@ import java.io.File
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
+import akka.stream.scaladsl.Sink
 import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -21,6 +22,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
   ConversionJob
 }
 import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
+import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -101,7 +103,7 @@ class SnapshotConvertorFeatureTest
                 contents shouldBe expectedContents
 
                 val receivedMessages = listMessagesReceivedFromSNS(topicArn)
-                receivedMessages should have size 1
+                receivedMessages.size should be >= 1
 
                 val expectedJob = CompletedConversionJob(
                   conversionJob = conversionJob,

@@ -28,7 +28,7 @@ def createS3Event(bucket_name, object_key, event_name):
 def test_snapshot_convertor_job_generator_sends_message_for_object_created_event(sns_client, topic_arn):
     bucket_name = "bukkit"
     object_key = "test0001.json"
-    event_name = "s3:ObjectCreated:Any"
+    event_name = "ObjectCreated:CompleteMultipartUpload"
 
     event = createS3Event(
         bucket_name=bucket_name,
@@ -55,7 +55,7 @@ def test_snapshot_convertor_job_generator_sends_message_for_object_created_event
 def test_snapshot_convertor_job_generator_does_not__send_message_for_any_other_event(sns_client, topic_arn):
     bucket_name = "bukkit"
     object_key = "test0001.json"
-    event_name = "s3:SomethingElse:Any"
+    event_name = "ObjectDeleted:Any"
 
     event = createS3Event(
         bucket_name=bucket_name,

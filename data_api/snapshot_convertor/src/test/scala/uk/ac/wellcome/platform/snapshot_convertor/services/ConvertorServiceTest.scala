@@ -5,7 +5,7 @@ import java.io.File
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.services.s3.model.GetObjectRequest
+import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
@@ -13,6 +13,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
   IdentifierSchemes,
+  Period,
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
@@ -24,6 +25,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+import scala.util.Random
 
 class ConvertorServiceTest
     extends FunSpec
@@ -41,7 +43,8 @@ class ConvertorServiceTest
     testWith: TestWith[ConvertorService, Assertion]) = {
     val convertorService = new ConvertorService(
       actorSystem = actorSystem,
-      s3Client = s3AkkaClient,
+      s3Client = s3Client,
+      akkaS3Client = s3AkkaClient,
       s3Endpoint = localS3EndpointUrl
     )
 
@@ -57,7 +60,7 @@ class ConvertorServiceTest
             convertorService =>
               // Create a collection of works.  These three differ by version,
               // if not anything more interesting!
-              val works = (1 to 3).map { version =>
+              val visibleWorks = (1 to 3).map { version =>
                 IdentifiedWork(
                   canonicalId = "rbfhv6b4",
                   title = Some("Rumblings from a rambunctious rodent"),
@@ -70,11 +73,110 @@ class ConvertorServiceTest
                 )
               }
 
+              val notVisibleWork = IdentifiedWork(
+                canonicalId = "rbfhv6b4",
+                title = Some("Rumblings from a rambunctious rodent"),
+                sourceIdentifier = SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.miroImageNumber,
+                  ontologyType = "work",
+                  value = "R0060400"
+                ),
+                visible = false,
+                version = 1
+              )
+
+              val works = visibleWorks :+ notVisibleWork
+
               val elasticsearchJsons = works.map { work =>
                 s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
                   work).get}}"""
               }
               val content = elasticsearchJsons.mkString("\n")
+
+              withGzipCompressedS3Key(bucketName, content) { objectKey =>
+                val conversionJob = ConversionJob(
+                  bucketName = bucketName,
+                  objectKey = objectKey
+                )
+
+                val future = convertorService.runConversion(conversionJob)
+
+                whenReady(future) { result =>
+                  val downloadFile =
+                    File.createTempFile("convertorServiceTest", ".txt.gz")
+                  s3Client.getObject(
+                    new GetObjectRequest(bucketName, "target.txt.gz"),
+                    downloadFile)
+
+                  val contents = readGzipFile(downloadFile.getPath)
+                  val expectedContents = visibleWorks
+                    .map { DisplayWork(_, includes = AllWorksIncludes()) }
+                    .map { toJson(_).get }
+                    .mkString("\n") + "\n"
+
+                  contents shouldBe expectedContents
+
+                  result shouldBe CompletedConversionJob(
+                    conversionJob = conversionJob,
+                    targetLocation =
+                      s"http://localhost:33333/$bucketName/target.txt.gz"
+                  )
+                }
+              }
+          }
+        }
+      }
+    }
+  }
+
+  // This test is meant to catch an error we saw when we first turned on
+  // the snapshot convertor:
+  //
+  //    akka.http.scaladsl.model.EntityStreamSizeException:
+  //    EntityStreamSizeException: actual entity size (Some(19403836)) exceeded
+  //    content length limit (8388608 bytes)! You can configure this by setting
+  //    `akka.http.[server|client].parsing.max-content-length` or calling
+  //    `HttpEntity.withSizeLimit` before materializing the dataBytes stream.
+  //
+  // With the original code, we were unable to read anything more than
+  // an 8MB file from S3.  This test deliberately creates a very large file,
+  // and tries to stream it back out.
+  //
+  it("completes a very large conversion successfully") {
+    withLocalS3Bucket { bucketName =>
+      withActorSystem { actorSystem =>
+        implicit val materializer = ActorMaterializer()(actorSystem)
+        withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
+          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
+            convertorService =>
+              // Create a collection of works.  The use of Random is meant
+              // to increase the entropy of works, and thus the degree to
+              // which they can be gzip-compressed -- so we can cross the
+              // 8MB boundary with a shorter list!
+              val works = (1 to 5000).map { version =>
+                IdentifiedWork(
+                  canonicalId = Random.alphanumeric.take(7).mkString,
+                  title = Some(Random.alphanumeric.take(1500).mkString),
+                  sourceIdentifier = SourceIdentifier(
+                    identifierScheme = IdentifierSchemes.miroImageNumber,
+                    ontologyType = "work",
+                    value = Random.alphanumeric.take(10).mkString
+                  ),
+                  description = Some(Random.alphanumeric.take(2500).mkString),
+                  publicationDate = Some(Period(label = version.toString)),
+                  version = version
+                )
+              }
+
+              val elasticsearchJsons = works.map { work =>
+                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+                  work).get}}"""
+              }
+              val content = elasticsearchJsons.mkString("\n")
+
+              // We want to ensure the source snapshot is at least 8MB in size.
+              val gzipFileSize = createGzipFile(content).length.toInt
+              gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
               withGzipCompressedS3Key(bucketName, content) { objectKey =>
                 val conversionJob = ConversionJob(
@@ -127,7 +229,7 @@ class ConvertorServiceTest
               val future = convertorService.runConversion(conversionJob)
 
               whenReady(future.failed) { result =>
-                result shouldBe a[RuntimeException]
+                result shouldBe a[AmazonS3Exception]
               }
           }
         }
@@ -200,7 +302,7 @@ class ConvertorServiceTest
                 val future = convertorService.runConversion(conversionJob)
 
                 whenReady(future.failed) { result =>
-                  result shouldBe a[RuntimeException]
+                  result shouldBe a[AmazonS3Exception]
                 }
               }
           }

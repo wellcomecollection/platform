@@ -8,20 +8,22 @@ module "elasticdump" {
   release_id         = "${var.release_ids["elasticdump"]}"
 
   env_vars = {
+    AWS_DEFAULT_REGION = "${var.aws_region}"
+
     sqs_queue_url = "${module.elasticdump_queue.id}"
     upload_bucket = "${aws_s3_bucket.private_data.id}"
-    es_username   = "${local.es_index}"
-    es_password   = "${local.es_port}"
-    es_name       = "${local.es_region}"
-    es_region     = "${local.es_name}"
-    es_port       = "${local.es_password}"
-    es_index      = "${local.es_username}"
+    es_username   = "${local.es_username}"
+    es_password   = "${local.es_password}"
+    es_name       = "${local.es_name}"
+    es_region     = "${local.es_region}"
+    es_port       = "${local.es_port}"
+    es_index      = "${local.es_index}"
   }
+
+  env_vars_length = 9
 
   memory = 1024
   cpu    = 512
-
-  env_vars_length = 8
 
   cluster_name = "${module.data_api_cluster.cluster_name}"
   vpc_id       = "${module.vpc_data_api.vpc_id}"

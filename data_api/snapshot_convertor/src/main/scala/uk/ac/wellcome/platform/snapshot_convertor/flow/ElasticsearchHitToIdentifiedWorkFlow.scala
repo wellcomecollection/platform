@@ -4,7 +4,6 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.generic.extras.JsonKey
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -19,16 +18,16 @@ case class ElasticsearchHit(
   @JsonKey("_source") source: IdentifiedWork
 )
 
-/** Converts lines from an Elasticsearch snapshot into DisplayWorks.
+/** Converts lines from an Elasticsearch snapshot into IdentifiedWork.
   *
   * The Elasticsearch snapshot in S3 has JSON blobs, one per line, which
   * contain the internal Elasticsearch results.  This flow receives a line
-  * at a time, and converts it to the corresponding DisplayWork.
+  * at a time, and converts it to the corresponding IdentifiedWork.
   */
-object ElasticsearchHitToDisplayWorkFlow extends Logging {
+object ElasticsearchHitToIdentifiedWorkFlow extends Logging {
 
   def apply()(implicit executionContext: ExecutionContext)
-    : Flow[String, DisplayWork, NotUsed] =
+    : Flow[String, IdentifiedWork, NotUsed] =
     Flow.fromFunction({ line =>
       val hit = fromJson[ElasticsearchHit](line) match {
         case Success(h: ElasticsearchHit) => h
@@ -38,7 +37,6 @@ object ElasticsearchHitToDisplayWorkFlow extends Logging {
         }
       }
 
-      val internalWork = hit.source
-      DisplayWork(internalWork, includes = AllWorksIncludes())
+      hit.source
     })
 }

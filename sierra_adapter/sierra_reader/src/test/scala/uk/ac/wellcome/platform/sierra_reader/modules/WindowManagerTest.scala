@@ -6,6 +6,7 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.test.fixtures.{S3, TestWith}
@@ -23,7 +24,7 @@ class WindowManagerTest
     testWith: TestWith[WindowManager, Assertion]) = {
     val windowManager = new WindowManager(
       s3client = s3Client,
-      bucketName = bucketName,
+      s3Config = S3Config(bucketName),
       fields = "title",
       resourceType = SierraResourceTypes.bibs
     )
