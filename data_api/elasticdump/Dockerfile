@@ -1,8 +1,15 @@
 FROM alpine
 
-RUN apk update && apk add bash jq nodejs python3
-RUN pip3 install awscli
+RUN apk update && apk add nodejs python3
 RUN npm install -g elasticdump
 
-COPY run_elasticdump.sh /
-CMD ["/run_elasticdump.sh"]
+RUN pip3 install --upgrade pip
+
+COPY requirements.txt /
+RUN pip3 install -r /requirements.txt
+
+ENV PYTHONUNBUFFERED=x
+
+COPY service_utils.py /
+COPY run_elasticdump.py /
+CMD ["python3", "/run_elasticdump.py"]
