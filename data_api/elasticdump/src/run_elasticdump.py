@@ -40,7 +40,7 @@ def build_elasticsearch_url(index):
 
 
 @service
-def run():
+def run(sqs_client=None, s3_client=None):
     print(os.environ)
     sqs_queue_url = os.environ['sqs_queue_url']
 
@@ -49,8 +49,8 @@ def run():
     # the SQS message.
     target_bucket = os.environ['upload_bucket']
 
-    sqs_client = boto3.client('sqs')
-    s3_client = boto3.client('s3')
+    sqs_client = sqs_client or boto3.client('sqs')
+    s3_client = s3_client or boto3.client('s3')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)

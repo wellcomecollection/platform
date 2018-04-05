@@ -18,13 +18,13 @@ def healthcheck():
 def service(handler):
 
     @functools.wraps(handler)
-    def wrapper():
+    def wrapper(*args, **kwargs):
         proc = multiprocessing.Process(
             target=app.run,
             kwargs={'host': '0.0.0.0', 'port': 9000},
             daemon=True
         )
         proc.start()
-        handler()
+        handler(*args, **kwargs)
 
     return wrapper
