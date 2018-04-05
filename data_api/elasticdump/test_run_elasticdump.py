@@ -37,13 +37,6 @@ def test_end_to_end(
         )
         resp.raise_for_status()
 
-    resp = requests.get(
-        f'{elasticsearch_url}/{elasticsearch_index}',
-        auth=('elastic', 'changeme')
-    )
-    from pprint import pprint
-    pprint(resp.json())
-
     subprocess.check_call([
         'docker', 'run', '--net', 'host',
         '--env', f'sqs_queue_url={queue_url}',
@@ -64,21 +57,22 @@ def test_end_to_end(
         'elasticdump'
     ])
 
-    for _ in range(60):
+    i = 0
+    while True:
         try:
             obj = s3_client.get_object(
-                Bucket=target_bucket,
+                Bucket=bucket,
                 Key='dump.txt.gz'
             )
             body = obj['Body'].read()
             assert body == ''
 
-
         except Exception:
-            time.sleep(1)
-            continue
-        else:
-            break
+            if i < 15:
+                time.sleep(1)
+                i += 1
+                continue
+            else:
+                print('Ran out of time!  Re-raising last exception...')
+                raise
 
-    else:  # no break
-        assert False, "Never completed successfully"
