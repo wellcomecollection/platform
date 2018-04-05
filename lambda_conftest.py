@@ -199,29 +199,9 @@ def topic_arn(sns_client, docker_services, docker_ip):
 
 
 @pytest.fixture
-def queue_url(sns_client, sqs_client, topic_arn):
+def queue_url(sqs_client):
     """
-    Creates an SQS queue, subscribes it to an SNS topic, and
-    yields the new queue URL.
-    """
-    queue_name = 'test-lambda-queue'
-
-    resp = sqs_client.create_queue(QueueName=queue_name)
-    queue_url = resp['QueueUrl']
-
-    sns_client.subscribe(
-        TopicArn=topic_arn,
-        Protocol='sqs',
-        Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
-    )
-    yield queue_url
-
-
-@pytest.fixture
-def simple_queue_url(sqs_client):
-    """
-    Creates an SQS queue and
-    yields the new queue URL.
+    Creates an SQS queue and yields the new queue URL.
     """
     queue_name = 'test-lambda-queue'
 
