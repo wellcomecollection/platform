@@ -33,10 +33,12 @@ trait SQS {
     "aws.sqs.waitTime" -> "1"
   )
 
+  private val credentials = new AWSStaticCredentialsProvider(
+    new BasicAWSCredentials(accessKey, secretKey))
+
   val sqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
-    .withCredentials(new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials(accessKey, secretKey)))
+    .withCredentials(credentials)
     .withEndpointConfiguration(
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()

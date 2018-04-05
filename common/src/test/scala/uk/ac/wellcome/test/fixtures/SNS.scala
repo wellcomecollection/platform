@@ -28,10 +28,12 @@ trait SNS {
     "aws.sns.topic.arn" -> topicArn
   )
 
+  private val credentials = new AWSStaticCredentialsProvider(
+    new BasicAWSCredentials(accessKey, secretKey))
+
   val snsClient: AmazonSNS = AmazonSNSClientBuilder
     .standard()
-    .withCredentials(new AWSStaticCredentialsProvider(
-      new BasicAWSCredentials(accessKey, secretKey)))
+    .withCredentials(credentials)
     .withEndpointConfiguration(
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
