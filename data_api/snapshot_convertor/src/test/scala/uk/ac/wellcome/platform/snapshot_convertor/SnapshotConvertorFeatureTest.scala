@@ -6,9 +6,16 @@ import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -81,7 +88,8 @@ class SnapshotConvertorFeatureTest
                   new GetObjectRequest(bucketName, "target.txt.gz"),
                   downloadFile)
 
-                val actualJsonLines: List[String] = readGzipFile(downloadFile.getPath).split("\n").toList
+                val actualJsonLines: List[String] =
+                  readGzipFile(downloadFile.getPath).split("\n").toList
 
                 val expectedJsonLines = works.map { work =>
                   s"""{
@@ -98,8 +106,9 @@ class SnapshotConvertorFeatureTest
                    }""".stripMargin
                 }
 
-                actualJsonLines.zip(expectedJsonLines).foreach { case (actualLine, expectedLine) =>
-                  assertJsonStringsAreEqual(actualLine, expectedLine)
+                actualJsonLines.zip(expectedJsonLines).foreach {
+                  case (actualLine, expectedLine) =>
+                    assertJsonStringsAreEqual(actualLine, expectedLine)
                 }
 
                 val receivedMessages = listMessagesReceivedFromSNS(topicArn)
