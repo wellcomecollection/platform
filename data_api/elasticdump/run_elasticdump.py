@@ -34,7 +34,7 @@ def build_elasticsearch_url(index):
     password = os.environ['es_password']
     hostname = os.environ['es_hostname']
     port = os.environ['es_port']
-    scheme = os.environ.get('es_scheme', 'http://')
+    scheme = os.environ.get('es_scheme', 'https://')
 
     return f'{scheme}{username}:{password}@{hostname}:{port}/{index}'
 
