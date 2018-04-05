@@ -4,6 +4,8 @@ Global py.test configuration for our Lambdas.
 """
 
 import os
+import random
+import string
 
 import boto3
 import pytest
@@ -17,6 +19,10 @@ def pytest_runtest_setup(item):
     # (despite one being passed in the Travis env variables/local config).
     # TODO: Investigate this properly.
     boto3.setup_default_session(region_name='eu-west-1')
+
+
+def random_alpha():
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
 
 
 @pytest.fixture(scope='session')
@@ -215,3 +221,19 @@ def bucket(s3_client):
 
     resp = s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
+
+
+@pytest.fixture
+def elasticsearch_index(docker_services, docker_ip):
+    index_name = random_alpha()
+
+    endpoint_url = (
+        f'http://{docker_ip}:{docker_services.port_for("elasticsearch", 9200)}'
+    )
+
+    docker_services.wait_until_responsive(
+        timeout=60.0, pause=0.1,
+        check=_is_responsive(endpoint_url, lambda r: r.status_code == 401)
+    )
+
+    yield index_name
