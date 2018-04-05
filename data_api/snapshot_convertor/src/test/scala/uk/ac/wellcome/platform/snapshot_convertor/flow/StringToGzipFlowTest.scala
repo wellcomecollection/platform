@@ -11,6 +11,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.Akka
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -19,6 +20,7 @@ class StringToGzipFlowTest
     with Matchers
     with Akka
     with GzipUtils
+    with ExtendedPatience
     with ScalaFutures {
 
   it("produces a gzip-compressed file from the lines") {

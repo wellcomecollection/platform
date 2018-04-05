@@ -5,7 +5,7 @@ import com.gu.scanamo.syntax._
 import io.circe.Encoder
 import org.scalatest.{Assertion, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
-import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.models.aws.{DynamoConfig, S3Config}
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
@@ -36,7 +36,7 @@ trait LocalVersionedHybridStore
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
           s3Client = s3Client,
-          bucketName = bucketName,
+          s3Config = S3Config(bucketName = bucketName),
           keyPrefixGenerator = new KeyPrefixGenerator[T] {
             override def generate(obj: T): String = "/"
           }

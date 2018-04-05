@@ -1,5 +1,3 @@
--aws.s3.sourceBucketName=${source_bucket_name}
--aws.s3.targetBucketName=${target_bucket_name}
 -aws.sns.topic.arn=${topic_arn}
 -aws.sqs.queue.url=${queue_url}
 -aws.metrics.namespace=${metrics_namespace}

@@ -12,7 +12,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SNSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.{S3Config, SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.{
@@ -71,8 +71,12 @@ class SQSMessageReceiverTest
 
     val snsWriter =
       maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topicArn)))
-    val recordReceiver =
-      new SQSMessageReceiver(snsWriter, s3Client, bucketName, metricsSender)
+    val recordReceiver = new SQSMessageReceiver(
+      snsWriter = snsWriter,
+      s3Client = s3Client,
+      s3Config = S3Config(bucketName),
+      metricsSender = metricsSender
+    )
 
     testWith(recordReceiver)
   }

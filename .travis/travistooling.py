@@ -166,7 +166,7 @@ def are_there_job_relevant_changes(changed_files, task):
     if task in [
         'travis-format'
     ]:
-        reasons.append('We always run the %s task' % task)
+        return ['We always run the %s task' % task]
 
     # These files are so fundamental to the build process that if they change,
     # we should do a complete rebuild just to be safe.

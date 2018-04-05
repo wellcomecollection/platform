@@ -17,7 +17,8 @@ def _run(event, sns_client, topic_arn):
 
         event_type = s3_event['event_name']
 
-        if "s3:ObjectCreated" not in event_type:
+        if not event_type.startswith('ObjectCreated:'):
+            print(f'event_type={event_type!r}, so nothing to do')
             continue
 
         # This is the job format accepted by the snapshot_convertor
