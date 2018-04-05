@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
 
 case class MiroTransformableData(
   @JsonKey("image_title") title: Option[String],
-  @JsonKey("image_creator") creator: Option[List[String]],
+  @JsonKey("image_creator") creator: Option[List[Option[String]]],
   @JsonKey("image_image_desc") description: Option[String],
   @JsonKey("image_image_desc_academic") academicDescription: Option[String],
   @JsonKey("image_secondary_creator") secondaryCreator: Option[List[String]],
