@@ -18,7 +18,7 @@ resource "aws_s3_bucket" "private_data" {
     id      = "expire_old_elasticdumps"
     enabled = true
 
-    prefix  = "elasticdump/"
+    prefix = "elasticdump/"
 
     expiration {
       days = 30
