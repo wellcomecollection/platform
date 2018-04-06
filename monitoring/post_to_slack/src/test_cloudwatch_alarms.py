@@ -21,6 +21,7 @@ class TestThresholdMessage:
         ('Threshold Crossed: 1 datapoint [1.0 (05/02/18 06:28:00)] was greater than the threshold (1.0).', 1),
         ('Threshold Crossed: 1 datapoint [1.0 (05/02/18 06:28:00)] was greater than the threshold (12.0).', 12),
         ('Threshold Crossed: 1 datapoint [1.0 (05/02/18 06:28:00)] was greater than the threshold (0.0).', 0),
+        ('Threshold Crossed: 1 datapoint [1.0 (06/04/18 13:26:00)] was less than the threshold (1.5).', 1.5),
     ])
     def test_desired_value(self, message, desired_value):
         t = ThresholdMessage.from_message(message)
