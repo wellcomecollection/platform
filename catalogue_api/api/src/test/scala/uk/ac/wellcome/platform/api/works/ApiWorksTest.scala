@@ -990,7 +990,8 @@ class ApiWorksTest extends ApiWorksTestBase {
       server.httpGet(
         path = s"/$apiPrefix/works/zd224ncv]",
         andExpect = Status.BadRequest,
-        withJsonBody = badRequest("Unrecognised character in identifier zd224ncv]")
+        withJsonBody =
+          badRequest("Unrecognised character in identifier zd224ncv]")
       )
     }
   }
