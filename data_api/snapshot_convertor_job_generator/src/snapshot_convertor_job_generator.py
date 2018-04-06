@@ -25,8 +25,8 @@ def _run(event, sns_client, topic_arn):
         message = {
             "sourceBucketName": s3_event['bucket_name'],
             "sourceObjectKey": s3_event['object_key'],
-            "targetBucketName": os.environ['target_bucket_name'],
-            "targetObjectKey": os.environ['target_object_key'],
+            "targetBucketName": os.environ['TARGET_BUCKET_NAME'],
+            "targetObjectKey": os.environ['TARGET_OBJECT_KEY'],
         }
 
         print(f'Publishing message {message} to SNS')
