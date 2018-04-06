@@ -9,10 +9,14 @@ going up.  This file contains the logic for answering the question:
 
 """
 
-from travistooling.decisions import UnrecognisedFile
+from travistooling.decisions import IgnoredFileFormat, UnrecognisedFile
 
 
 def does_file_affect_build_job(path, job_name):
+    # These extensions and paths never have an effect on tests.
+    if path.endswith(('.md', '.png', '.graffle')) or path == 'LICENSE':
+        raise IgnoredFileFormat(path)
+
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
-    raise UnrecognisedFile(path=path)
+    raise UnrecognisedFile(path)
