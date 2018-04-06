@@ -40,18 +40,19 @@ class VersionedDaoTest
 
   override lazy val evidence = DynamoFormat[TestVersioned]
 
-  def withVersionedDao[R](testWith: TestWith[(VersionedDao, String), R]) {
-    withLocalDynamoDbTable { tableName =>
-      val config = DynamoConfig(tableName)
-      val dao = new VersionedDao(dynamoDbClient, config)
-      testWith((dao, tableName))
-    }
+  def withVersionedDao[R](tableName: String)(
+    testWith: TestWith[VersionedDao, R]): R = {
+    val config = DynamoConfig(tableName)
+    val dao = new VersionedDao(dynamoDbClient, config)
+    testWith(dao)
   }
+
+  def withFixtures[R] = withLocalDynamoDbTable[R] _ and withVersionedDao[R] _
 
   describe("get a record") {
     it("returns a future of a record if its in dynamo") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val testVersioned = TestVersioned(
             id = "testSource/b110101001",
             data = "whatever",
@@ -68,8 +69,8 @@ class VersionedDaoTest
     }
 
     it("returns a future of None if the record isn't in dynamo") {
-      withVersionedDao {
-        case (versionedDao, _) =>
+      withFixtures {
+        case (_, versionedDao) =>
           whenReady(versionedDao.getRecord[TestVersioned]("testSource/b88888")) {
             record =>
               record shouldBe None
@@ -100,8 +101,8 @@ class VersionedDaoTest
 
   describe("update a record") {
     it("inserts a new record if it doesn't already exist") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val testVersioned = TestVersioned(
             id = "testSource/b1111",
             data = "whatever",
@@ -120,8 +121,8 @@ class VersionedDaoTest
     }
 
     it("updates an existing record if the update has a higher version") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val testVersioned = TestVersioned(
             id = "testSource/b1111",
             data = "whatever",
@@ -146,8 +147,8 @@ class VersionedDaoTest
     }
 
     it("updates a record if it already exists and has the same version") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val testVersioned = TestVersioned(
             id = "testSource/b1111",
             data = "whatever",
@@ -168,8 +169,8 @@ class VersionedDaoTest
     }
 
     it("does not update an existing record if the update has a lower version") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val testVersioned = TestVersioned(
             id = "testSource/b1111",
             data = "whatever",
@@ -199,8 +200,8 @@ class VersionedDaoTest
     }
 
     it("inserts an HList into dynamoDB") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val id = "111"
           val version = 3
           val testVersioned = TestVersioned(
@@ -226,8 +227,8 @@ class VersionedDaoTest
 
     it(
       "does not remove fields from a record if updating only a subset of fields in a record") {
-      withVersionedDao {
-        case (versionedDao, tableName) =>
+      withFixtures {
+        case (tableName, versionedDao) =>
           val id = "111"
           val version = 3
 
