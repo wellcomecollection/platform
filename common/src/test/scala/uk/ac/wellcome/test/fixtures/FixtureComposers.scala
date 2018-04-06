@@ -73,7 +73,7 @@ trait FixtureComposers {
 
     }
 
-  implicit def XThreeArgFixtureComposer[L1, L2, L3, L4, R] =
+  implicit def FlattenedThreeArgFixtureComposer[L1, L2, L3, L4, R] =
     new FixtureComposer[
       (L1, L2, L3),
       (L1, L2, L3, L4),
