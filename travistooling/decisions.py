@@ -32,16 +32,16 @@ class UnrecognisedFile(SignificantFile):
     pass
 
 
-class IgnoredFileFormat(InsignificantFile):
+class IgnoredPath(InsignificantFile):
     """
-    This file format never has an effect on build jobs.
+    This path never has an effect on build jobs.
     """
     pass
 
 
-class IgnoredPath(InsignificantFile):
+class IgnoredFileFormat(IgnoredPath):
     """
-    This path never has an effect on build jobs.
+    This file format never has an effect on build jobs.
     """
     pass
 
