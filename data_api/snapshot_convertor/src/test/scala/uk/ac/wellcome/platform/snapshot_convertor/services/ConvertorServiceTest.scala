@@ -42,8 +42,7 @@ class ConvertorServiceTest
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
-  private def withConvertorService(bucketName: String,
-                                   actorSystem: ActorSystem,
+  private def withConvertorService(actorSystem: ActorSystem,
                                    s3AkkaClient: S3Client)(
     testWith: TestWith[ConvertorService, Assertion]) = {
     val convertorService = new ConvertorService(
@@ -58,11 +57,12 @@ class ConvertorServiceTest
   }
 
   it("completes a conversion successfully") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { sourceBucketName =>
+      withLocalS3Bucket { targetBucketName =>
       withActorSystem { actorSystem =>
         implicit val materializer = ActorMaterializer()(actorSystem)
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
+          withConvertorService(actorSystem, s3AkkaClient) {
             convertorService =>
               // Create a collection of works.  These three differ by version,
               // if not anything more interesting!
@@ -94,15 +94,22 @@ class ConvertorServiceTest
               val works = visibleWorks :+ notVisibleWork
 
               val elasticsearchJsons = works.map { work =>
-                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-                  work).get}}"""
+                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${
+                  toJson(
+                    work).get
+                }}"""
               }
               val content = elasticsearchJsons.mkString("\n")
 
-              withGzipCompressedS3Key(bucketName, content) { objectKey =>
+              withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+
+                val targetObjectKey = "target.txt.gz"
+
                 val conversionJob = ConversionJob(
-                  bucketName = bucketName,
-                  objectKey = objectKey
+                  sourceBucketName = sourceBucketName,
+                  sourceObjectKey = objectKey,
+                  targetBucketName = targetBucketName,
+                  targetObjectKey = targetObjectKey
                 )
 
                 val future = convertorService.runConversion(conversionJob)
@@ -111,13 +118,17 @@ class ConvertorServiceTest
                   val downloadFile =
                     File.createTempFile("convertorServiceTest", ".txt.gz")
                   s3Client.getObject(
-                    new GetObjectRequest(bucketName, "target.txt.gz"),
+                    new GetObjectRequest(sourceBucketName, targetObjectKey),
                     downloadFile)
 
                   val contents = readGzipFile(downloadFile.getPath)
                   val expectedContents = visibleWorks
-                    .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { mapper.writeValueAsString(_) }
+                    .map {
+                      DisplayWork(_, includes = AllWorksIncludes())
+                    }
+                    .map {
+                      mapper.writeValueAsString(_)
+                    }
                     .mkString("\n") + "\n"
 
                   contents shouldBe expectedContents
@@ -125,12 +136,13 @@ class ConvertorServiceTest
                   result shouldBe CompletedConversionJob(
                     conversionJob = conversionJob,
                     targetLocation =
-                      s"http://localhost:33333/$bucketName/target.txt.gz"
+                      s"http://localhost:33333/$sourceBucketName/target.txt.gz"
                   )
                 }
               }
           }
         }
+      }
       }
     }
   }
@@ -149,71 +161,83 @@ class ConvertorServiceTest
   // and tries to stream it back out.
   //
   it("completes a very large conversion successfully") {
-    withLocalS3Bucket { bucketName =>
-      withActorSystem { actorSystem =>
-        implicit val materializer = ActorMaterializer()(actorSystem)
-        withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
-            convertorService =>
-              // Create a collection of works.  The use of Random is meant
-              // to increase the entropy of works, and thus the degree to
-              // which they can be gzip-compressed -- so we can cross the
-              // 8MB boundary with a shorter list!
-              val works = (1 to 5000).map { version =>
-                IdentifiedWork(
-                  canonicalId = Random.alphanumeric.take(7).mkString,
-                  title = Some(Random.alphanumeric.take(1500).mkString),
-                  sourceIdentifier = SourceIdentifier(
-                    identifierScheme = IdentifierSchemes.miroImageNumber,
-                    ontologyType = "work",
-                    value = Random.alphanumeric.take(10).mkString
-                  ),
-                  description = Some(Random.alphanumeric.take(2500).mkString),
-                  publicationDate = Some(Period(label = version.toString)),
-                  version = version
-                )
-              }
-
-              val elasticsearchJsons = works.map { work =>
-                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-                  work).get}}"""
-              }
-              val content = elasticsearchJsons.mkString("\n")
-
-              // We want to ensure the source snapshot is at least 8MB in size.
-              val gzipFileSize = createGzipFile(content).length.toInt
-              gzipFileSize shouldBe >=(8 * 1024 * 1024)
-
-              withGzipCompressedS3Key(bucketName, content) { objectKey =>
-                val conversionJob = ConversionJob(
-                  bucketName = bucketName,
-                  objectKey = objectKey
-                )
-
-                val future = convertorService.runConversion(conversionJob)
-
-                whenReady(future) { result =>
-                  val downloadFile =
-                    File.createTempFile("convertorServiceTest", ".txt.gz")
-                  s3Client.getObject(
-                    new GetObjectRequest(bucketName, "target.txt.gz"),
-                    downloadFile)
-
-                  val contents = readGzipFile(downloadFile.getPath)
-                  val expectedContents = works
-                    .map { DisplayWork(_, includes = AllWorksIncludes()) }
-                    .map { mapper.writeValueAsString(_) }
-                    .mkString("\n") + "\n"
-
-                  contents shouldBe expectedContents
-
-                  result shouldBe CompletedConversionJob(
-                    conversionJob = conversionJob,
-                    targetLocation =
-                      s"http://localhost:33333/$bucketName/target.txt.gz"
+    withLocalS3Bucket { sourceBucketName =>
+      withLocalS3Bucket { targetBucketName =>
+        withActorSystem { actorSystem =>
+          implicit val materializer = ActorMaterializer()(actorSystem)
+          withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
+            withConvertorService(actorSystem, s3AkkaClient) {
+              convertorService =>
+                // Create a collection of works.  The use of Random is meant
+                // to increase the entropy of works, and thus the degree to
+                // which they can be gzip-compressed -- so we can cross the
+                // 8MB boundary with a shorter list!
+                val works = (1 to 5000).map { version =>
+                  IdentifiedWork(
+                    canonicalId = Random.alphanumeric.take(7).mkString,
+                    title = Some(Random.alphanumeric.take(1500).mkString),
+                    sourceIdentifier = SourceIdentifier(
+                      identifierScheme = IdentifierSchemes.miroImageNumber,
+                      ontologyType = "work",
+                      value = Random.alphanumeric.take(10).mkString
+                    ),
+                    description = Some(Random.alphanumeric.take(2500).mkString),
+                    publicationDate = Some(Period(label = version.toString)),
+                    version = version
                   )
                 }
-              }
+
+                val elasticsearchJsons = works.map { work =>
+                  s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${
+                    toJson(
+                      work).get
+                  }}"""
+                }
+                val content = elasticsearchJsons.mkString("\n")
+
+                // We want to ensure the source snapshot is at least 8MB in size.
+                val gzipFileSize = createGzipFile(content).length.toInt
+                gzipFileSize shouldBe >=(8 * 1024 * 1024)
+
+                withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+
+                  val targetObjectKey = "target.txt.gz"
+                  val conversionJob = ConversionJob(
+                    sourceBucketName = sourceBucketName,
+                    sourceObjectKey = objectKey,
+                    targetBucketName = targetBucketName,
+                    targetObjectKey = targetObjectKey
+                  )
+
+                  val future = convertorService.runConversion(conversionJob)
+
+                  whenReady(future) { result =>
+                    val downloadFile =
+                      File.createTempFile("convertorServiceTest", ".txt.gz")
+                    s3Client.getObject(
+                      new GetObjectRequest(sourceBucketName, targetObjectKey),
+                      downloadFile)
+
+                    val contents = readGzipFile(downloadFile.getPath)
+                    val expectedContents = works
+                      .map {
+                        DisplayWork(_, includes = AllWorksIncludes())
+                      }
+                      .map {
+                        mapper.writeValueAsString(_)
+                      }
+                      .mkString("\n") + "\n"
+
+                    contents shouldBe expectedContents
+
+                    result shouldBe CompletedConversionJob(
+                      conversionJob = conversionJob,
+                      targetLocation =
+                        s"http://localhost:33333/$sourceBucketName/target.txt.gz"
+                    )
+                  }
+                }
+            }
           }
         }
       }
@@ -225,11 +249,13 @@ class ConvertorServiceTest
       withActorSystem { actorSystem =>
         implicit val materializer = ActorMaterializer()(actorSystem)
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
+          withConvertorService(actorSystem, s3AkkaClient) {
             convertorService =>
               val conversionJob = ConversionJob(
-                bucketName = bucketName,
-                objectKey = "doesnotexist.txt.gz"
+                sourceBucketName = bucketName,
+                sourceObjectKey = "doesnotexist.txt.gz",
+                targetBucketName = bucketName,
+                targetObjectKey = "target.txt.gz"
               )
 
               val future = convertorService.runConversion(conversionJob)
@@ -248,15 +274,17 @@ class ConvertorServiceTest
       withActorSystem { actorSystem =>
         implicit val materializer = ActorMaterializer()(actorSystem)
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
+          withConvertorService(actorSystem, s3AkkaClient) {
             convertorService =>
               withGzipCompressedS3Key(
                 bucketName,
                 content = "This is not what snapshots look like") {
                 objectKey =>
                   val conversionJob = ConversionJob(
-                    bucketName = bucketName,
-                    objectKey = objectKey
+                    sourceBucketName = bucketName,
+                    sourceObjectKey = objectKey,
+                    targetBucketName = bucketName,
+                    targetObjectKey = "target.txt.gz"
                   )
 
                   val future = convertorService.runConversion(conversionJob)
@@ -272,11 +300,10 @@ class ConvertorServiceTest
   }
 
   it("returns a failed future if the S3 upload fails") {
-    withLocalS3Bucket { bucketName =>
-      withActorSystem { actorSystem =>
+    withActorSystem { actorSystem =>
         implicit val materializer = ActorMaterializer()(actorSystem)
         withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(bucketName, actorSystem, s3AkkaClient) {
+          withConvertorService(actorSystem, s3AkkaClient) {
             convertorService =>
               // Create a collection of works.  These three differ by version,
               // if not anything more interesting!
@@ -299,10 +326,13 @@ class ConvertorServiceTest
               }
               val content = elasticsearchJsons.mkString("\n")
 
-              withGzipCompressedS3Key(bucketName, content) { objectKey =>
-                val conversionJob = ConversionJob(
-                  bucketName = "wrongBukkit",
-                  objectKey = objectKey
+
+              val bucketName = "wrongBukkit"
+              val conversionJob = ConversionJob(
+                  sourceBucketName = bucketName,
+                  sourceObjectKey = "wrongKey",
+                  targetBucketName = bucketName,
+                  targetObjectKey = "target.json.gz"
                 )
 
                 val future = convertorService.runConversion(conversionJob)
@@ -310,9 +340,9 @@ class ConvertorServiceTest
                 whenReady(future.failed) { result =>
                   result shouldBe a[AmazonS3Exception]
                 }
-              }
+
           }
-        }
+
       }
     }
   }
