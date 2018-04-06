@@ -2,7 +2,6 @@
 
 import gzip
 import json
-import os
 import subprocess
 
 import requests

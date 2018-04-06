@@ -220,8 +220,7 @@ def queue_url(sqs_client):
 @pytest.fixture
 def bucket(s3_client):
     bucket_name = 'test-python-bucket'
-
-    resp = s3_client.create_bucket(Bucket=bucket_name)
+    s3_client.create_bucket(Bucket=bucket_name)
     yield bucket_name
 
 
