@@ -57,7 +57,7 @@ class TestThresholdMessage:
         ('Threshold Crossed: 1 datapoint [1.0 (05/02/18 06:28:00)] was greater than the threshold (1.0).', False),
         ('Threshold Crossed: no datapoints were received for 1 period and 1 missing datapoint was treated as [Breaching].', True),
     ])
-    def test_is_breaking(self, message, is_breaching):
+    def test_is_breaching(self, message, is_breaching):
         t = ThresholdMessage.from_message(message)
         assert t.is_breaching == is_breaching
 
