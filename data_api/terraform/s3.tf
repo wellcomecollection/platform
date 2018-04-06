@@ -13,6 +13,17 @@ resource "aws_s3_bucket" "private_data" {
   lifecycle {
     prevent_destroy = true
   }
+
+  lifecycle_rule {
+    id      = "expire_old_elasticdumps"
+    enabled = true
+
+    prefix  = "elasticdump/"
+
+    expiration {
+      days = 30
+    }
+  }
 }
 
 # Note: I was unable to actually create this resource using Terraform.
