@@ -9,12 +9,19 @@ going up.  This file contains the logic for answering the question:
 
 """
 
+from travistooling import ROOT
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
     KnownAffectsTask,
     UnrecognisedFile
 )
+from travistooling.parse_makefiles import get_projects
+
+
+# Cache the Makefile information in a global variable, so we only have to
+# load it once.
+PROJECTS = list(get_projects(ROOT))
 
 
 def does_file_affect_build_job(path, job_name):
