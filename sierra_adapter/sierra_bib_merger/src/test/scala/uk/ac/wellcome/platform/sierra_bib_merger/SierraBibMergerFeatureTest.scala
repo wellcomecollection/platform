@@ -68,7 +68,7 @@ class SierraBibMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id = "1000001"
@@ -107,7 +107,7 @@ class SierraBibMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id1 = "1000001"
@@ -166,7 +166,7 @@ class SierraBibMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id = "3000003"
@@ -224,7 +224,7 @@ class SierraBibMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id = "6000006"
@@ -283,7 +283,7 @@ class SierraBibMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id = "7000007"
