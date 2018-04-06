@@ -37,3 +37,10 @@ class IgnoredFileFormat(InsignificantFile):
     This file format never has an effect on build jobs.
     """
     pass
+
+
+class IgnoredPath(InsignificantFile):
+    """
+    This path never has an effect on build jobs.
+    """
+    pass
