@@ -52,8 +52,9 @@ env:
 
 jobs:
   include:
-    - env: TASK=travis-format
-      stage: format
+    - stage: quicktest
+      env: TASK=travis-format
+    - env: TASK=travistooling-test
 
     - stage: test
       env: TASK=sbt-common-test
@@ -108,7 +109,7 @@ jobs:
     # - env: TASK=monitoring-test
 
 stages:
-  - format
+  - quicktest
   - test
 
 # This has a Slack API token for posting messages about build failures to
