@@ -8,6 +8,9 @@ import scala.util.{Failure, Success, Try}
 
 case class MiroTransformableData(
   @JsonKey("image_title") title: Option[String],
+  // Miro data has null json values scattered a bit everywhere.
+  // If the type is not Option, circe decoding fails when it
+  // encounters a null. Hence this weird type signature
   @JsonKey("image_creator") creator: Option[List[Option[String]]],
   @JsonKey("image_image_desc") description: Option[String],
   @JsonKey("image_image_desc_academic") academicDescription: Option[String],
