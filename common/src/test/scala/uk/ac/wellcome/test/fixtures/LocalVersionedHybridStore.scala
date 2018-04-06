@@ -21,8 +21,8 @@ trait LocalVersionedHybridStore
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  def withVersionedDao(tableName: String)(
-    testWith: TestWith[VersionedDao, Assertion]) {
+  def withVersionedDao[R](tableName: String)(
+    testWith: TestWith[VersionedDao, R]): R = {
     val dao = new VersionedDao(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(tableName)
@@ -30,8 +30,9 @@ trait LocalVersionedHybridStore
     testWith(dao)
   }
 
-  def withVersionedHybridStore[T <: Id](bucketName: String, tableName: String)(
-    testWith: TestWith[VersionedHybridStore[T], Assertion]) = {
+  def withVersionedHybridStore[T <: Id, R](
+    bucketName: String,
+    tableName: String)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
     withVersionedDao(tableName) { dao =>
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
