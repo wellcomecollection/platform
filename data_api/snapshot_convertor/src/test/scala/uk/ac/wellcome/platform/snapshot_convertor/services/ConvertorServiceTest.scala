@@ -8,23 +8,15 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
-import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith, _}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -42,9 +34,10 @@ class ConvertorServiceTest
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
-  private def withConvertorService(actorSystem: ActorSystem,
+  private def withConvertorService[R](actorSystem: ActorSystem,
+                                      materializer: ActorMaterializer,
                                    s3AkkaClient: S3Client)(
-    testWith: TestWith[ConvertorService, Assertion]) = {
+    testWith: TestWith[ConvertorService, R]) = {
     val convertorService = new ConvertorService(
       actorSystem = actorSystem,
       s3Client = s3Client,
@@ -56,30 +49,21 @@ class ConvertorServiceTest
     testWith(convertorService)
   }
 
-  it("completes a conversion successfully") {
-    withLocalS3Bucket { sourceBucketName =>
-      withLocalS3Bucket { targetBucketName =>
-        withActorSystem { actorSystem =>
-          implicit val materializer = ActorMaterializer()(actorSystem)
-          withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-            withConvertorService(actorSystem, s3AkkaClient) {
-              convertorService =>
-                // Create a collection of works.  These three differ by version,
-                // if not anything more interesting!
-                val visibleWorks = (1 to 3).map { version =>
-                  IdentifiedWork(
-                    canonicalId = "rbfhv6b4",
-                    title = Some("Rumblings from a rambunctious rodent"),
-                    sourceIdentifier = SourceIdentifier(
-                      identifierScheme = IdentifierSchemes.miroImageNumber,
-                      ontologyType = "work",
-                      value = "R0060400"
-                    ),
-                    version = version
-                  )
-                }
+  def withFixtures[R] =
+      withActorSystem[R] _ and
+      withMaterializer[R] _ and
+      withS3AkkaClient[R] _ and
+      withConvertorService[R] _ and
+      withLocalS3Bucket[R] _ and
+        withLocalS3Bucket[R] _
 
-                val notVisibleWork = IdentifiedWork(
+  it("completes a conversion successfully") {
+    withFixtures { case (((_, _, _, convertorService: ConvertorService), sourceBucketName), targetBucketName) =>
+
+              // Create a collection of works.  These three differ by version,
+              // if not anything more interesting!
+              val visibleWorks = (1 to 3).map { version =>
+                IdentifiedWork(
                   canonicalId = "rbfhv6b4",
                   title = Some("Rumblings from a rambunctious rodent"),
                   sourceIdentifier = SourceIdentifier(
@@ -87,64 +71,72 @@ class ConvertorServiceTest
                     ontologyType = "work",
                     value = "R0060400"
                   ),
-                  visible = false,
-                  version = 1
+                  version = version
+                )
+              }
+
+              val notVisibleWork = IdentifiedWork(
+                canonicalId = "rbfhv6b4",
+                title = Some("Rumblings from a rambunctious rodent"),
+                sourceIdentifier = SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.miroImageNumber,
+                  ontologyType = "work",
+                  value = "R0060400"
+                ),
+                visible = false,
+                version = 1
+              )
+
+              val works = visibleWorks :+ notVisibleWork
+
+              val elasticsearchJsons = works.map { work =>
+                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${
+                  toJson(
+                    work).get
+                }}"""
+              }
+              val content = elasticsearchJsons.mkString("\n")
+
+              withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+
+                val targetObjectKey = "target.txt.gz"
+
+                val conversionJob = ConversionJob(
+                  sourceBucketName = sourceBucketName,
+                  sourceObjectKey = objectKey,
+                  targetBucketName = targetBucketName,
+                  targetObjectKey = targetObjectKey
                 )
 
-                val works = visibleWorks :+ notVisibleWork
+                val future = convertorService.runConversion(conversionJob)
 
-                val elasticsearchJsons = works.map { work =>
-                  s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-                    work).get}}"""
-                }
-                val content = elasticsearchJsons.mkString("\n")
+                whenReady(future) { result =>
+                  val downloadFile =
+                    File.createTempFile("convertorServiceTest", ".txt.gz")
+                  s3Client.getObject(
+                    new GetObjectRequest(sourceBucketName, targetObjectKey),
+                    downloadFile)
 
-                withGzipCompressedS3Key(sourceBucketName, content) {
-                  objectKey =>
-                    val targetObjectKey = "target.txt.gz"
-
-                    val conversionJob = ConversionJob(
-                      sourceBucketName = sourceBucketName,
-                      sourceObjectKey = objectKey,
-                      targetBucketName = targetBucketName,
-                      targetObjectKey = targetObjectKey
-                    )
-
-                    val future = convertorService.runConversion(conversionJob)
-
-                    whenReady(future) { result =>
-                      val downloadFile =
-                        File.createTempFile("convertorServiceTest", ".txt.gz")
-                      s3Client.getObject(
-                        new GetObjectRequest(
-                          sourceBucketName,
-                          targetObjectKey),
-                        downloadFile)
-
-                      val contents = readGzipFile(downloadFile.getPath)
-                      val expectedContents = visibleWorks
-                        .map {
-                          DisplayWork(_, includes = AllWorksIncludes())
-                        }
-                        .map {
-                          mapper.writeValueAsString(_)
-                        }
-                        .mkString("\n") + "\n"
-
-                      contents shouldBe expectedContents
-
-                      result shouldBe CompletedConversionJob(
-                        conversionJob = conversionJob,
-                        targetLocation =
-                          s"http://localhost:33333/$sourceBucketName/target.txt.gz"
-                      )
+                  val contents = readGzipFile(downloadFile.getPath)
+                  val expectedContents = visibleWorks
+                    .map {
+                      DisplayWork(_, includes = AllWorksIncludes())
                     }
+                    .map {
+                      mapper.writeValueAsString(_)
+                    }
+                    .mkString("\n") + "\n"
+
+                  contents shouldBe expectedContents
+
+                  result shouldBe CompletedConversionJob(
+                    conversionJob = conversionJob,
+                    targetLocation =
+                      s"http://localhost:33333/$sourceBucketName/target.txt.gz"
+                  )
                 }
-            }
+              }
           }
-        }
-      }
-    }
   }
 
   // This test is meant to catch an error we saw when we first turned on
@@ -161,13 +153,7 @@ class ConvertorServiceTest
   // and tries to stream it back out.
   //
   it("completes a very large conversion successfully") {
-    withLocalS3Bucket { sourceBucketName =>
-      withLocalS3Bucket { targetBucketName =>
-        withActorSystem { actorSystem =>
-          implicit val materializer = ActorMaterializer()(actorSystem)
-          withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-            withConvertorService(actorSystem, s3AkkaClient) {
-              convertorService =>
+    withFixtures { case (((_, _, _, convertorService: ConvertorService), sourceBucketName), targetBucketName) =>
                 // Create a collection of works.  The use of Random is meant
                 // to increase the entropy of works, and thus the degree to
                 // which they can be gzip-compressed -- so we can cross the
@@ -188,8 +174,10 @@ class ConvertorServiceTest
                 }
 
                 val elasticsearchJsons = works.map { work =>
-                  s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-                    work).get}}"""
+                  s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${
+                    toJson(
+                      work).get
+                  }}"""
                 }
                 val content = elasticsearchJsons.mkString("\n")
 
@@ -197,148 +185,125 @@ class ConvertorServiceTest
                 val gzipFileSize = createGzipFile(content).length.toInt
                 gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
-                withGzipCompressedS3Key(sourceBucketName, content) {
-                  objectKey =>
-                    val targetObjectKey = "target.txt.gz"
-                    val conversionJob = ConversionJob(
-                      sourceBucketName = sourceBucketName,
-                      sourceObjectKey = objectKey,
-                      targetBucketName = targetBucketName,
-                      targetObjectKey = targetObjectKey
+                withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+
+                  val targetObjectKey = "target.txt.gz"
+                  val conversionJob = ConversionJob(
+                    sourceBucketName = sourceBucketName,
+                    sourceObjectKey = objectKey,
+                    targetBucketName = targetBucketName,
+                    targetObjectKey = targetObjectKey
+                  )
+
+                  val future = convertorService.runConversion(conversionJob)
+
+                  whenReady(future) { result =>
+                    val downloadFile =
+                      File.createTempFile("convertorServiceTest", ".txt.gz")
+                    s3Client.getObject(
+                      new GetObjectRequest(sourceBucketName, targetObjectKey),
+                      downloadFile)
+
+                    val contents = readGzipFile(downloadFile.getPath)
+                    val expectedContents = works
+                      .map {
+                        DisplayWork(_, includes = AllWorksIncludes())
+                      }
+                      .map {
+                        mapper.writeValueAsString(_)
+                      }
+                      .mkString("\n") + "\n"
+
+                    contents shouldBe expectedContents
+
+                    result shouldBe CompletedConversionJob(
+                      conversionJob = conversionJob,
+                      targetLocation =
+                        s"http://localhost:33333/$sourceBucketName/target.txt.gz"
                     )
-
-                    val future = convertorService.runConversion(conversionJob)
-
-                    whenReady(future) { result =>
-                      val downloadFile =
-                        File.createTempFile("convertorServiceTest", ".txt.gz")
-                      s3Client.getObject(
-                        new GetObjectRequest(
-                          sourceBucketName,
-                          targetObjectKey),
-                        downloadFile)
-
-                      val contents = readGzipFile(downloadFile.getPath)
-                      val expectedContents = works
-                        .map {
-                          DisplayWork(_, includes = AllWorksIncludes())
-                        }
-                        .map {
-                          mapper.writeValueAsString(_)
-                        }
-                        .mkString("\n") + "\n"
-
-                      contents shouldBe expectedContents
-
-                      result shouldBe CompletedConversionJob(
-                        conversionJob = conversionJob,
-                        targetLocation =
-                          s"http://localhost:33333/$sourceBucketName/target.txt.gz"
-                      )
-                    }
+                  }
                 }
             }
           }
-        }
-      }
-    }
-  }
 
   it("returns a failed future if asked to convert a non-existent snapshot") {
-    withLocalS3Bucket { bucketName =>
-      withActorSystem { actorSystem =>
-        implicit val materializer = ActorMaterializer()(actorSystem)
-        withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(actorSystem, s3AkkaClient) { convertorService =>
-            val conversionJob = ConversionJob(
-              sourceBucketName = bucketName,
-              sourceObjectKey = "doesnotexist.txt.gz",
-              targetBucketName = bucketName,
-              targetObjectKey = "target.txt.gz"
-            )
-
-            val future = convertorService.runConversion(conversionJob)
-
-            whenReady(future.failed) { result =>
-              result shouldBe a[AmazonS3Exception]
-            }
-          }
-        }
-      }
-    }
-  }
-
-  it("returns a failed future if asked to convert a malformed snapshot") {
-    withLocalS3Bucket { bucketName =>
-      withActorSystem { actorSystem =>
-        implicit val materializer = ActorMaterializer()(actorSystem)
-        withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-          withConvertorService(actorSystem, s3AkkaClient) { convertorService =>
-            withGzipCompressedS3Key(
-              bucketName,
-              content = "This is not what snapshots look like") { objectKey =>
+    withFixtures { case (((_, _, _, convertorService: ConvertorService), sourceBucketName), targetBucketName) =>
               val conversionJob = ConversionJob(
-                sourceBucketName = bucketName,
-                sourceObjectKey = objectKey,
-                targetBucketName = bucketName,
+                sourceBucketName = sourceBucketName,
+                sourceObjectKey = "doesnotexist.txt.gz",
+                targetBucketName = targetBucketName,
                 targetObjectKey = "target.txt.gz"
               )
 
               val future = convertorService.runConversion(conversionJob)
 
               whenReady(future.failed) { result =>
-                result shouldBe a[GracefulFailureException]
+                result shouldBe a[AmazonS3Exception]
               }
-            }
           }
         }
-      }
-    }
-  }
+
+  it("returns a failed future if asked to convert a malformed snapshot") {
+    withFixtures { case (((_, _, _, convertorService: ConvertorService), sourceBucketName), targetBucketName) =>
+              withGzipCompressedS3Key(
+                sourceBucketName,
+                content = "This is not what snapshots look like") {
+                objectKey =>
+                  val conversionJob = ConversionJob(
+                    sourceBucketName = sourceBucketName,
+                    sourceObjectKey = objectKey,
+                    targetBucketName = targetBucketName,
+                    targetObjectKey = "target.txt.gz"
+                  )
+
+                  val future = convertorService.runConversion(conversionJob)
+
+                  whenReady(future.failed) { result =>
+                    result shouldBe a[GracefulFailureException]
+                  }
+              }
+          }
+        }
 
   it("returns a failed future if the S3 upload fails") {
-    withActorSystem { actorSystem =>
-      implicit val materializer = ActorMaterializer()(actorSystem)
-      withS3AkkaClient(actorSystem, materializer) { s3AkkaClient =>
-        withConvertorService(actorSystem, s3AkkaClient) { convertorService =>
-          // Create a collection of works.  These three differ by version,
-          // if not anything more interesting!
-          val works = (1 to 3).map { version =>
-            IdentifiedWork(
-              canonicalId = "h4dh3esm",
-              title = Some("Harrowing Henry is hardly heard from"),
-              sourceIdentifier = SourceIdentifier(
-                identifierScheme = IdentifierSchemes.miroImageNumber,
-                ontologyType = "work",
-                value = "r4f2t3bf"
-              ),
-              version = version
-            )
+    withFixtures { case (((_, _, _, convertorService: ConvertorService), sourceBucketName), targetBucketName) =>
+              // Create a collection of works.  These three differ by version,
+              // if not anything more interesting!
+              val works = (1 to 3).map { version =>
+                IdentifiedWork(
+                  canonicalId = "h4dh3esm",
+                  title = Some("Harrowing Henry is hardly heard from"),
+                  sourceIdentifier = SourceIdentifier(
+                    identifierScheme = IdentifierSchemes.miroImageNumber,
+                    ontologyType = "work",
+                    value = "r4f2t3bf"
+                  ),
+                  version = version
+                )
+              }
+
+              val elasticsearchJsons = works.map { work =>
+                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+                  work).get}}"""
+              }
+              val content = elasticsearchJsons.mkString("\n")
+
+
+              val bucketName = "wrongBukkit"
+              val conversionJob = ConversionJob(
+                  sourceBucketName = bucketName,
+                  sourceObjectKey = "wrongKey",
+                  targetBucketName = bucketName,
+                  targetObjectKey = "target.json.gz"
+                )
+
+                val future = convertorService.runConversion(conversionJob)
+
+                whenReady(future.failed) { result =>
+                  result shouldBe a[AmazonS3Exception]
+                }
+
           }
-
-          val elasticsearchJsons = works.map { work =>
-            s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-              work).get}}"""
-          }
-          val content = elasticsearchJsons.mkString("\n")
-
-          val bucketName = "wrongBukkit"
-          val conversionJob = ConversionJob(
-            sourceBucketName = bucketName,
-            sourceObjectKey = "wrongKey",
-            targetBucketName = bucketName,
-            targetObjectKey = "target.json.gz"
-          )
-
-          val future = convertorService.runConversion(conversionJob)
-
-          whenReady(future.failed) { result =>
-            result shouldBe a[AmazonS3Exception]
-          }
-
-        }
 
       }
-    }
-  }
 }

@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.snapshot_convertor.fixtures
 
 import akka.actor.ActorSystem
-import akka.stream.Materializer
-import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
+import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.regions.AwsRegionProvider
@@ -13,7 +12,7 @@ trait AkkaS3 extends S3 {
 
   def withS3AkkaClient[R](
     actorSystem: ActorSystem,
-    materializer: Materializer)(testWith: TestWith[S3Client, R]): R = {
+    materializer: ActorMaterializer)(testWith: TestWith[S3Client, R]): R = {
 
     val s3Settings = AkkaS3ClientModule.akkaS3Settings(
       credentialsProvider = new AWSStaticCredentialsProvider(
