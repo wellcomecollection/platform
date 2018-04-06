@@ -18,7 +18,7 @@ THRESHOLD_RE = re.compile(
     r'\[(?P<actual_value>\d+)\.0 \((?P<date>\d{2}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})\)\] '
     r'was '
     r'(?P<operator>(?:greater|less) than(?: or equal to)?) '
-    r'the threshold \((?P<desired_value>\d+)\.0\).'
+    r'the threshold \((?P<desired_value>\d+\.\d+)\).'
 )
 
 # We may also get a message of the form:
@@ -32,13 +32,24 @@ MISSING_DATE_RE = re.compile(
 )
 
 
+def _parse_numeral(xs):
+    if xs is None:
+        return None
+
+    value = float(xs)
+    if value.is_integer():
+        return int(value)
+    else:
+        return value
+
+
 @attr.s
 class ThresholdMessage:
     """Holds information about a "threshold crossed" message."""
     is_breaching = attr.ib()
 
-    actual_value = attr.ib(converter=lambda v: int(v) if v is not None else None)
-    desired_value = attr.ib(converter=lambda v: int(v) if v is not None else None)
+    actual_value = attr.ib(converter=_parse_numeral)
+    desired_value = attr.ib(converter=_parse_numeral)
 
     # Datetime strings in alarms are of the form DD/MM/YY HH:MM:SS.
     # For example: "03/02/18 16:13:00" or "05/02/18 06:38:00".
