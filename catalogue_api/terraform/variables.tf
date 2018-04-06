@@ -31,27 +31,27 @@ variable "release_ids" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "3343b5d106c0313833abde716766d7fcb6e632db"
+  default     = ""
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "8363d5b3fe03ecede7905df3b8953b3f5d785f7c"
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 # These variables change less frequently -- the service blocks in services.tf
