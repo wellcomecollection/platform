@@ -29,6 +29,8 @@ def _run(event, sns_client, topic_arn):
             "targetObjectKey": os.environ['target_object_key'],
         }
 
+        print(f'Publishing message {message} to SNS')
+
         sns_utils.publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
