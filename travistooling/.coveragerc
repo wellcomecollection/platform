@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = travistooling
+
+[report]
+fail_under = 100
+show_missing = True
