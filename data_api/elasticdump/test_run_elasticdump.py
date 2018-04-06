@@ -5,6 +5,40 @@ import json
 import subprocess
 
 import requests
+import pytest
+
+import run_elasticdump
+
+
+@pytest.mark.parametrize('environ_config, index, expected_url', [
+    (
+        {
+            'es_username': 'elastic',
+            'es_password': 'changeme',
+            'es_hostname': 'example.org',
+            'es_port': 9200,
+        },
+        'index_with_no_scheme',
+        'https://elastic:changeme@example.org:9200/index_with_no_scheme'
+    ),
+    (
+        {
+            'es_username': 'elastic',
+            'es_password': 'changeme',
+            'es_hostname': 'example.org',
+            'es_port': 9200,
+            'es_scheme': 'http://',
+        },
+        'index_with_http_scheme',
+        'http://elastic:changeme@example.org:9200/index_with_http_scheme'
+    ),
+])
+def test_build_elasticsearch_url(environ_config, index, expected_url):
+    actual_url = run_elasticdump.build_elasticsearch_url(
+        environ_config=environ_config,
+        index=index
+    )
+    assert actual_url == expected_url
 
 
 def test_end_to_end(
