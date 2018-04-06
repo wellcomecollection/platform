@@ -191,10 +191,12 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           // In this case, we return a 400 Bad Request exception rather than bubbling
           // up as a 500 error.
           case exception: IllegalArgumentException =>
-            if (exception.getMessage.startsWith("Illegal character in path at index ")) {
+            if (exception.getMessage.startsWith(
+                  "Illegal character in path at index ")) {
               val result = Error(
                 variant = "http-400",
-                description = Some(s"Unrecognised character in identifier ${request.id}")
+                description =
+                  Some(s"Unrecognised character in identifier ${request.id}")
               )
               response.badRequest.json(
                 ResultResponse(
