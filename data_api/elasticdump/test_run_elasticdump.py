@@ -94,6 +94,13 @@ def test_end_to_end(
         )
         resp.raise_for_status()
 
+    # Unlike our Scala applications, elasticdump only reads a single SQS
+    # message from the queue, then exits when processed.  It relies on ECS to
+    # reschedule it if there are more messages to be read.
+    #
+    # This means the Docker container exits as soon as it completes the task,
+    # so the completion of the 'docker run' command means we can get straight
+    # to inspecting the file in S3.
     subprocess.check_call([
         'docker', 'run', '--net', 'host',
         '--env', f'sqs_queue_url={queue_url}',
