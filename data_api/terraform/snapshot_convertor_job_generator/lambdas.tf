@@ -11,8 +11,8 @@ module "snapshot_convertor_job_generator_lambda" {
   timeout         = 10
 
   environment_variables = {
-    "TOPIC_ARN" = "${module.snapshot_convertor_topic.arn}"
+    "TOPIC_ARN"          = "${module.snapshot_convertor_topic.arn}"
     "TARGET_BUCKET_NAME" = "${var.target_bucket_name}"
-    "TARGET_OBJECT_KEY" = "${var.target_object_key}"
+    "TARGET_OBJECT_KEY"  = "${var.target_object_key}"
   }
 }
