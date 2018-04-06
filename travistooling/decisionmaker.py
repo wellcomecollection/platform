@@ -9,11 +9,14 @@ going up.  This file contains the logic for answering the question:
 
 """
 
+import os
+
 from travistooling import ROOT
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
-    KnownAffectsTask,
+    KnownAffectsThisJob,
+    KnownDoesNotAffectThisJob,
     UnrecognisedFile
 )
 from travistooling.parse_makefiles import get_projects
@@ -30,7 +33,7 @@ def does_file_affect_build_job(path, job_name):
         job_name == 'travis-format' and
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
-        raise KnownAffectsTask(path)
+        raise KnownAffectsThisJob(path)
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(('.md', '.png', '.graffle', '.tf')):
@@ -39,6 +42,38 @@ def does_file_affect_build_job(path, job_name):
     # These paths never have an effect on tests.
     if path in ['LICENSE',] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath(path)
+
+    # Some directories only affect one task.
+    #
+    # For example, the ``catalogue_api/api`` directory only contains code
+    # for the api Scala app, so changes in this directory cannot affect
+    # any other task.
+    exclusive_directories = {
+        os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
+    }
+
+    for dir_name, job_name_prefix in exclusive_directories.items():
+        if path.startswith(dir_name):
+            if job_name.startswith(job_name_prefix):
+                raise KnownAffectsThisJob(path)
+            else:
+                raise KnownDoesNotAffectThisJob(path)
+
+    # We have a couple of sbt common libs and files scattered around the
+    # repository; changes to any of these don't affect non-sbt applications.
+    if path.startswith((
+        'sierra_adapter/common',
+        'common/',
+        'project/',
+        'build.sbt',
+        'sbt_common/'
+    )):
+        for project in PROJECTS:
+            if job_name.startswith(project.name):
+                if project.type == 'sbt_app':
+                    raise KnownAffectsThisJob(path)
+                else:
+                    raise KnownDoesNotAffectThisJob(path)
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.

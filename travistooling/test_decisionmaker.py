@@ -6,17 +6,18 @@ from travistooling.decisionmaker import does_file_affect_build_job
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
-    KnownAffectsTask,
+    KnownAffectsThisJob,
+    KnownDoesNotAffectThisJob,
     UnrecognisedFile
 )
 
 
 @pytest.mark.parametrize('path, job_name, exc_class, is_significant', [
     # Travis format task
-    ('misc/myscript.py', 'travis-format', KnownAffectsTask, True),
-    ('ontologies/item.ttl', 'travis-format', KnownAffectsTask, True),
-    ('main.tf', 'travis-format', KnownAffectsTask, True),
-    ('example.json', 'travis-format', KnownAffectsTask, True),
+    ('misc/myscript.py', 'travis-format', KnownAffectsThisJob, True),
+    ('ontologies/item.ttl', 'travis-format', KnownAffectsThisJob, True),
+    ('main.tf', 'travis-format', KnownAffectsThisJob, True),
+    ('example.json', 'travis-format', KnownAffectsThisJob, True),
     ('README.md', 'travis-format', IgnoredFileFormat, False),
 
     # Unrecognised filenames fall through to being significant, regardless
@@ -39,6 +40,20 @@ from travistooling.decisions import (
     # Ontology/misc are significant, but only in the travis-format task
     ('misc/myscript.py', 'sierra_reader-build', IgnoredPath, False),
     ('ontologies/work.ttl', 'monitoring-publish', IgnoredPath, False),
+
+    # Changes that belong exclusively to a single task
+    ('loris/loris/Dockerfile', 'loris-build', KnownAffectsThisJob, True),
+    ('loris/loris/Dockerfile', 'ingestor-test', KnownDoesNotAffectThisJob, False),
+    ('sierra_adapter/sierra_reader/foo.scala', 'sierra_reader-publish', KnownAffectsThisJob, True),
+    ('catalogue_pipeline/ingestor/bar.scala', 'api-test', KnownDoesNotAffectThisJob, False),
+
+    # Anything in the sierra_adapter directory/common lib
+    ('sierra_adapter/common/main.scala', 'loris-test', KnownDoesNotAffectThisJob, False),
+    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', KnownDoesNotAffectThisJob, False),
+    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', KnownDoesNotAffectThisJob, False),
+    ('sbt_common/display/model.scala', 'id_minter-test', KnownAffectsThisJob, True),
+    ('sbt_common/display/model.scala', 'loris-publish', KnownDoesNotAffectThisJob, False),
+    ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
 ])
 def test_does_file_affect_build_job(path, job_name, exc_class, is_significant):
     with pytest.raises(exc_class) as err:

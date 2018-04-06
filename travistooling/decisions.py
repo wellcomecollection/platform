@@ -46,8 +46,15 @@ class IgnoredFileFormat(IgnoredPath):
     pass
 
 
-class KnownAffectsTask(SignificantFile):
+class KnownAffectsThisJob(SignificantFile):
     """
-    This file has a known effect on the outcome of the current build job.
+    This file has a known effect on this build job.
+    """
+    pass
+
+
+class KnownDoesNotAffectThisJob(InsignificantFile):
+    """
+    This file is known not to affect this build job.
     """
     pass
