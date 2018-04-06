@@ -41,6 +41,30 @@ def test_build_elasticsearch_url(environ_config, index, expected_url):
     assert actual_url == expected_url
 
 
+def test_getting_no_messages_from_sqs_is_sysexit(sqs_client, queue_url):
+    with pytest.raises(SystemExit):
+        run_elasticdump.get_message(
+            sqs_client=sqs_client,
+            sqs_queue_url=queue_url
+        )
+
+
+def test_getting_only_one_message_from_sqs(sqs_client, queue_url):
+    messages = [
+        {'message': f'Hello {name}'}
+        for name in ('cat', 'dog')
+    ]
+    for m in messages:
+        sqs_client.send_message(QueueUrl=queue_url, MessageBody=json.dumps(m))
+
+    received_message = run_elasticdump.get_message(
+        sqs_client=sqs_client,
+        sqs_queue_url=queue_url
+    )
+    received_body = json.loads(received_message['Body'])
+    assert received_body in messages
+
+
 def test_end_to_end(
     sqs_client,
     queue_url,
