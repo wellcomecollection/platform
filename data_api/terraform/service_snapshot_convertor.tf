@@ -3,8 +3,8 @@ module "snapshot_convertor_job_generator" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   infra_bucket           = "${var.infra_bucket}"
-  target_object_key = "target.json.gz"
-  target_bucket_name = "${aws_s3_bucket.public_data.id}"
+  target_object_key      = "target.json.gz"
+  target_bucket_name     = "${aws_s3_bucket.public_data.id}"
 }
 
 module "snapshot_convertor" {
