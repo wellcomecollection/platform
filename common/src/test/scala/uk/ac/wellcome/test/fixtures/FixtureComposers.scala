@@ -34,15 +34,11 @@ trait FixtureComposers {
     }
 
   implicit def TwoArgFixtureComposer[L1, L2, L3, R] =
-    new FixtureComposer[
-      (L1, L2),
-      (L1, L2, L3),
-      (L1, L2) => Fixture[L3, R],
-      R] {
+    new FixtureComposer[(L1, L2), (L1, L2, L3), (L1, L2) => Fixture[L3, R], R] {
 
-      override def compose(fixture1: Fixture[(L1, L2), R],
-                           function: (L1, L2) => Fixture[L3, R])
-        : Fixture[(L1, L2, L3), R] =
+      override def compose(
+        fixture1: Fixture[(L1, L2), R],
+        function: (L1, L2) => Fixture[L3, R]): Fixture[(L1, L2, L3), R] =
         (testWith: TestWith[(L1, L2, L3), R]) =>
           fixture1 {
             case (loan1, loan2) =>
@@ -78,9 +74,15 @@ trait FixtureComposers {
     }
 
   implicit def XThreeArgFixtureComposer[L1, L2, L3, L4, R] =
-    new FixtureComposer[(L1, L2, L3), (L1, L2, L3, L4), (L1, L2, L3) => Fixture[L4, R], R] {
+    new FixtureComposer[
+      (L1, L2, L3),
+      (L1, L2, L3, L4),
+      (L1, L2, L3) => Fixture[L4, R],
+      R] {
 
-      override def compose(fixture1: Fixture[(L1, L2, L3), R], function: (L1, L2, L3) => Fixture[L4, R]): Fixture[(L1, L2, L3, L4), R] =
+      override def compose(fixture1: Fixture[(L1, L2, L3), R],
+                           function: (L1, L2, L3) => Fixture[L4, R])
+        : Fixture[(L1, L2, L3, L4), R] =
         (testWith: TestWith[(L1, L2, L3, L4), R]) =>
           fixture1 {
             case (loan1, loan2, loan3) =>
