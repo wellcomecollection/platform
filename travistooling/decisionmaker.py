@@ -40,7 +40,7 @@ def does_file_affect_build_job(path, job_name):
         raise IgnoredFileFormat(path)
 
     # These paths never have an effect on tests.
-    if path in ['LICENSE',] or path.startswith(('misc/', 'ontologies/')):
+    if path in ['LICENSE', ] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath(path)
 
     # Some directories only affect one task.
