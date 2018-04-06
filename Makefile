@@ -21,3 +21,17 @@ sbt-common-test:
 
 sbt-common-publish:
 	echo "Nothing to do!"
+
+
+travistooling-test:
+	$(ROOT)/docker_run.py -- \
+		--volume $(ROOT):/data \
+		wellcome/build_tooling \
+		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/test_*.py
+	$(ROOT)/docker_run.py -- \
+		--volume $(ROOT):/data \
+		wellcome/build_tooling \
+		coverage report --rcfile=travistooling/.coveragerc
+
+travistooling-publish:
+	echo "nothing to do!"
