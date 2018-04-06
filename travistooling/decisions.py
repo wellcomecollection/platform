@@ -29,32 +29,27 @@ class UnrecognisedFile(SignificantFile):
     """
     We cannot determine if this file has an effect on the current build job.
     """
-    pass
 
 
 class IgnoredPath(InsignificantFile):
     """
     This path never has an effect on build jobs.
     """
-    pass
 
 
 class IgnoredFileFormat(IgnoredPath):
     """
     This file format never has an effect on build jobs.
     """
-    pass
 
 
 class KnownAffectsThisJob(SignificantFile):
     """
     This file has a known effect on this build job.
     """
-    pass
 
 
 class KnownDoesNotAffectThisJob(InsignificantFile):
     """
     This file is known not to affect this build job.
     """
-    pass
