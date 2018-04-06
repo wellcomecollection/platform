@@ -11,7 +11,7 @@ module "elasticdump" {
     AWS_DEFAULT_REGION = "${var.aws_region}"
 
     sqs_queue_url = "${module.elasticdump_queue.id}"
-    key_prefix = "elasticdump/"
+    key_prefix    = "elasticdump/"
     upload_bucket = "${aws_s3_bucket.private_data.id}"
     es_username   = "${local.es_username}"
     es_password   = "${local.es_password}"
