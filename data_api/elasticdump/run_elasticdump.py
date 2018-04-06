@@ -28,13 +28,18 @@ def get_message(sqs_client, sqs_queue_url):
         return message
 
 
-def build_elasticsearch_url(index):
-    # We read the Elasticsearch auth information from the environment variables
-    username = os.environ['es_username']
-    password = os.environ['es_password']
-    hostname = os.environ['es_hostname']
-    port = os.environ['es_port']
-    scheme = os.environ.get('es_scheme', 'https://')
+def build_elasticsearch_url(environ_config, index):
+    """
+    Build an Elasticsearch URL from environment variables and index name.
+    """
+    username = environ_config['es_username']
+    password = environ_config['es_password']
+    hostname = environ_config['es_hostname']
+    port = environ_config['es_port']
+
+    # The production scheme should always be HTTPS, but we need to be able
+    # to use HTTP with our Docker image in tests.
+    scheme = environ_config.get('es_scheme', 'https://')
 
     return f'{scheme}{username}:{password}@{hostname}:{port}/{index}'
 
@@ -69,7 +74,7 @@ def run():
     # the SQS message.
     es_index = os.environ['es_index']
 
-    es_url = build_elasticsearch_url(index=es_index)
+    es_url = build_elasticsearch_url(environ_config=os.environ, index=es_index)
 
     print('*** Running Elasticdump task')
     try:
