@@ -18,25 +18,20 @@ from travistooling.decisions import (
 
 
 def does_file_affect_build_job(path, job_name):
+    # Catch all the common file types that we care about for travis-format.
+    if (
+        job_name == 'travis-format' and
+        path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
+    ):
+        raise KnownAffectsTask(path)
+
     # These extensions and paths never have an effect on tests.
-    if path.endswith(('.md', '.png', '.graffle')):
+    if path.endswith(('.md', '.png', '.graffle', '.tf')):
         raise IgnoredFileFormat(path)
 
-    if path.endswith('.tf'):
-        if job_name != 'travis-format':
-            raise IgnoredFileFormat(path)
-        else:
-            raise KnownAffectsTask(path)
-
     # These paths never have an effect on tests.
-    if path in ['LICENSE',] or path.startswith('misc/'):
+    if path in ['LICENSE',] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath(path)
-
-    if path.startswith('ontologies/'):
-        if job_name != 'travis-format':
-            raise IgnoredPath(path)
-        else:
-            raise KnownAffectsTask(path)
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
