@@ -44,3 +44,10 @@ class IgnoredPath(InsignificantFile):
     This path never has an effect on build jobs.
     """
     pass
+
+
+class KnownAffectsTask(SignificantFile):
+    """
+    This file has a known effect on the outcome of the current build job.
+    """
+    pass

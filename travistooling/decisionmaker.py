@@ -12,6 +12,7 @@ going up.  This file contains the logic for answering the question:
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
+    KnownAffectsTask,
     UnrecognisedFile
 )
 
@@ -21,9 +22,21 @@ def does_file_affect_build_job(path, job_name):
     if path.endswith(('.md', '.png', '.graffle')):
         raise IgnoredFileFormat(path)
 
+    if path.endswith('.tf'):
+        if job_name != 'travis-format':
+            raise IgnoredFileFormat(path)
+        else:
+            raise KnownAffectsTask(path)
+
     # These paths never have an effect on tests.
-    if path in ['LICENSE',]:
+    if path in ['LICENSE',] or path.startswith('misc/'):
         raise IgnoredPath(path)
+
+    if path.startswith('ontologies/'):
+        if job_name != 'travis-format':
+            raise IgnoredPath(path)
+        else:
+            raise KnownAffectsTask(path)
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.

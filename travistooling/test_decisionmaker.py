@@ -6,6 +6,7 @@ from travistooling.decisionmaker import does_file_affect_build_job
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
+    KnownAffectsTask,
     UnrecognisedFile
 )
 
@@ -22,9 +23,17 @@ from travistooling.decisions import (
     ('image.png', 'reindex_worker-test', IgnoredFileFormat, False),
     ('ontology.graffle', 'nginx-test', IgnoredFileFormat, False),
 
+    # Terraform files are significant, but only in the travis-format task
+    ('main.tf', 'travis-format', KnownAffectsTask, True),
+    ('s3.tf', 'elasticdump-test', IgnoredFileFormat, False),
+
     # Certain paths are always insignificant.
     ('LICENSE', 'travistooling-test', IgnoredPath, False),
+
+    # Ontology/misc are significant, but only in the travis-format task
+    ('misc/myscript.py', 'travis-format', KnownAffectsTask, True),
     ('misc/myscript.py', 'sierra_reader-build', IgnoredPath, False),
+    ('ontologies/item.ttl', 'travis-format', KnownAffectsTask, True),
     ('ontologies/work.ttl', 'monitoring-publish', IgnoredPath, False),
 ])
 def test_does_file_affect_build_job(path, job_name, exc_class, is_significant):
