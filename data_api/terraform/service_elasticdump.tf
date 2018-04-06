@@ -14,13 +14,12 @@ module "elasticdump" {
     upload_bucket = "${aws_s3_bucket.private_data.id}"
     es_username   = "${local.es_username}"
     es_password   = "${local.es_password}"
-    es_name       = "${local.es_name}"
-    es_region     = "${local.es_region}"
+    es_hostname   = "${local.es_name}.${local.es_region}.aws.found.io"
     es_port       = "${local.es_port}"
     es_index      = "${local.es_index}"
   }
 
-  env_vars_length = 9
+  env_vars_length = 8
 
   memory = 1024
   cpu    = 512

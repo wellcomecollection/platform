@@ -4,6 +4,8 @@ Global py.test configuration for our Lambdas.
 """
 
 import os
+import random
+import string
 
 import boto3
 import pytest
@@ -17,6 +19,10 @@ def pytest_runtest_setup(item):
     # (despite one being passed in the Travis env variables/local config).
     # TODO: Investigate this properly.
     boto3.setup_default_session(region_name='eu-west-1')
+
+
+def random_alpha():
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
 
 
 @pytest.fixture(scope='session')
@@ -87,15 +93,16 @@ def dynamodb_resource(docker_services, docker_ip):
 
 
 @pytest.fixture(scope='session')
-def s3_client(docker_services, docker_ip):
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("s3", 8000)}'
-    )
+def s3_endpoint_url(docker_services, docker_ip):
+    return f'http://{docker_ip}:{docker_services.port_for("s3", 8000)}'
 
+
+@pytest.fixture(scope='session')
+def s3_client(s3_endpoint_url, docker_services):
     docker_services.wait_until_responsive(
         timeout=10.0, pause=0.1,
         check=_is_responsive(
-            endpoint_url, lambda r: (
+            s3_endpoint_url, lambda r: (
                     r.status_code == 403 and
                     '<Code>AccessDenied</Code>' in r.text)
         )
@@ -106,22 +113,23 @@ def s3_client(docker_services, docker_ip):
         's3',
         aws_access_key_id='accessKey1',
         aws_secret_access_key='verySecretKey1',
-        endpoint_url=endpoint_url
+        endpoint_url=s3_endpoint_url
     )
 
 
 @pytest.fixture(scope='session')
-def sqs_client(docker_services, docker_ip):
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("sqs", 9324)}'
-    )
+def sqs_endpoint_url(docker_services, docker_ip):
+    return f'http://{docker_ip}:{docker_services.port_for("sqs", 9324)}'
 
+
+@pytest.fixture(scope='session')
+def sqs_client(sqs_endpoint_url, docker_services, docker_ip):
     docker_services.wait_until_responsive(
-        timeout=5.0, pause=0.1,
-        check=_is_responsive(endpoint_url, lambda r: r.status_code == 404)
+        timeout=10.0, pause=0.1,
+        check=_is_responsive(sqs_endpoint_url, lambda r: r.status_code == 404)
     )
 
-    yield boto3.client('sqs', endpoint_url=endpoint_url)
+    yield boto3.client('sqs', endpoint_url=sqs_endpoint_url)
 
 
 @pytest.fixture(scope='session')
@@ -178,7 +186,7 @@ def sns_client(docker_services, docker_ip):
 
 @pytest.fixture
 def topic_arn(sns_client, docker_services, docker_ip):
-    """Creates an SNS topic in moto, and yields the new topic ARN."""
+    """Creates an SNS topic, and yields the new topic ARN."""
     topic_name = 'test-lambda-topic'
 
     resp = sns_client.create_topic(Name=topic_name)
@@ -199,19 +207,45 @@ def topic_arn(sns_client, docker_services, docker_ip):
 
 
 @pytest.fixture
-def queue_url(sns_client, sqs_client, topic_arn):
+def queue_url(sqs_client):
     """
-    Creates an SQS queue in moto, subscribes it to an SNS topic, and
-    yields the new queue URL.
+    Creates an SQS queue and yields the new queue URL.
     """
     queue_name = 'test-lambda-queue'
 
     resp = sqs_client.create_queue(QueueName=queue_name)
-    queue_url = resp['QueueUrl']
+    yield resp['QueueUrl']
 
-    sns_client.subscribe(
-        TopicArn=topic_arn,
-        Protocol='sqs',
-        Endpoint=f'arn:aws:sqs:eu-west-1:123456789012:{queue_name}'
+
+@pytest.fixture
+def bucket(s3_client):
+    bucket_name = 'test-python-bucket'
+    s3_client.create_bucket(Bucket=bucket_name)
+    yield bucket_name
+
+
+@pytest.fixture
+def elasticsearch_hostname(docker_ip):
+    return docker_ip
+
+
+@pytest.fixture
+def elasticsearch_url(docker_services, elasticsearch_hostname):
+    return f'http://{elasticsearch_hostname}:{docker_services.port_for("elasticsearch", 9200)}'
+
+
+@pytest.fixture
+def elasticsearch_index(docker_services, elasticsearch_url):
+    docker_services.wait_until_responsive(
+        timeout=60.0, pause=0.1,
+        check=_is_responsive(elasticsearch_url, lambda r: r.status_code == 401)
     )
-    yield queue_url
+
+    index_name = random_alpha()
+    resp = requests.put(
+        f'{elasticsearch_url}/{index_name}',
+        auth=('elastic', 'changeme')
+    )
+    resp.raise_for_status()
+
+    yield index_name
