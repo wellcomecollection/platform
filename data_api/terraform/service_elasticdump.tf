@@ -20,7 +20,7 @@ module "elasticdump" {
     es_index      = "${local.es_index}"
   }
 
-  env_vars_length = 8
+  env_vars_length = 9
 
   memory = 1024
   cpu    = 512
