@@ -44,6 +44,20 @@ def build_elasticsearch_url(environ_config, index):
     return f'{scheme}{username}:{password}@{hostname}:{port}/{index}'
 
 
+def aws_client(service_name):
+    """
+    Helper method for getting AWS clients.  In particular, this looks for
+    environment variables which let us overwrite the endpoint URLs.
+    """
+    try:
+        return boto3.client(
+            service_name,
+            endpoint_url=os.environ[f'local_{service_name}_endpoint']
+        )
+    except KeyError:
+        return boto3.client(service_name)
+
+
 @service
 def run():
     print(os.environ)
@@ -54,15 +68,8 @@ def run():
     # the SQS message.
     target_bucket = os.environ['upload_bucket']
 
-    if 'local_s3_endpoint' in os.environ:
-        s3_client = boto3.client('s3', endpoint_url=os.environ['local_s3_endpoint'])
-    else:
-        s3_client = boto3.client('s3')
-
-    if 'local_sqs_endpoint' in os.environ:
-        sqs_client = boto3.client('sqs', endpoint_url=os.environ['local_sqs_endpoint'])
-    else:
-        sqs_client = boto3.client('sqs')
+    s3_client = aws_client('s3')
+    sqs_client = aws_client('sqs')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
