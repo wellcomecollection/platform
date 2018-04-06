@@ -1,5 +1,6 @@
 # -*- encoding: utf-8
 
+
 class Decision(Exception):
     """
     The base class for all decisions.
