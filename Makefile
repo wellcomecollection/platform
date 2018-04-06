@@ -32,3 +32,6 @@ travistooling-test:
 		--volume $(ROOT):/data \
 		wellcome/build_tooling \
 		coverage report --rcfile=travistooling/.coveragerc
+
+travistooling-publish:
+	echo "nothing to do!"
