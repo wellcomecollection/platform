@@ -10,8 +10,8 @@ SBT_APPS    = sierra_bib_merger \
 ECS_TASKS   =
 LAMBDAS     = s3_demultiplexer sierra_window_generator
 
-TF_NAME     =
-TF_PATH     =
+TF_NAME     = sierra_adapter
+TF_PATH     = $(STACK_ROOT)/terraform
 TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))
@@ -21,14 +21,6 @@ $(ROOT)/.docker/sierra_adapter_progress:
 	echo "FROM python:3-alpine\nRUN pip3 install attrs boto3" | docker build --tag sierra_adapter_progress -
 	mkdir -p $(ROOT)/.docker
 	touch $(ROOT)/.docker/sierra_adapter_progress
-
-sierra_adapter-terraform-plan:
-	@echo "*** Please don't. We're reindexing Miro"
-	@exit 1
-
-sierra_adapter-terraform-apply:
-	@echo "*** Please don't. We're reindexing Miro"
-	@exit 1
 
 sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress
 	$(ROOT)/docker_run.py --aws -- \
