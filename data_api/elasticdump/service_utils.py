@@ -10,6 +10,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
+
 @app.route('/management/healthcheck')
 def healthcheck():
     return json.dumps({'ok': True})
