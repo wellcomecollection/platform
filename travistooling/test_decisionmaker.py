@@ -16,4 +16,4 @@ from travistooling.decisions import UnrecognisedFile
 def test_does_file_affect_build_job(path, job_name, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
         does_file_affect_build_job(path=path, job_name=job_name)
-        assert err.is_significant == is_significant
+    assert err.value.is_significant == is_significant
