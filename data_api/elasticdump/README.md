@@ -24,3 +24,8 @@ $ ./docker_run.py --aws --\
     --e upload_bucket={bucket} \
     elasticdump
 ```
+
+## Implementation note
+
+Unlike our Scala applications, elasticdump only reads a single SQS message from the queue, then exits when processed.
+It relies on ECS to reschedule it if there are more messages to be read.
