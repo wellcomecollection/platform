@@ -28,7 +28,7 @@ class SierraItemMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val id = "i1000001"
@@ -67,7 +67,7 @@ class SierraItemMergerFeatureTest
           val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable](
+            withVersionedHybridStore[SierraTransformable, Unit](
               bucketName,
               tableName) { hybridStore =>
               val bibId1 = "b1000001"
