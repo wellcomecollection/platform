@@ -129,7 +129,7 @@ class SnapshotConvertorFeatureTest
             val expectedJob = CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/$sourceBucketName/target.txt.gz"
+                s"http://localhost:33333/$targetBucketName/$targetObjectKey"
             )
             val actualJob = fromJson[CompletedConversionJob](
               receivedMessages.head.message).get

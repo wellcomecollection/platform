@@ -121,7 +121,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(sourceBucketName, targetObjectKey),
+              new GetObjectRequest(targetBucketName, targetObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -139,7 +139,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/$sourceBucketName/target.txt.gz"
+                s"http://localhost:33333/$targetBucketName/$targetObjectKey"
             )
           }
         }
@@ -208,7 +208,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(sourceBucketName, targetObjectKey),
+              new GetObjectRequest(targetBucketName, targetObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -226,7 +226,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/$sourceBucketName/target.txt.gz"
+                s"http://localhost:33333/$targetBucketName/$targetObjectKey"
             )
           }
         }

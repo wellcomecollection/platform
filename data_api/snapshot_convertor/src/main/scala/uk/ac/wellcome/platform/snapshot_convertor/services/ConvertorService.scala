@@ -42,8 +42,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     conversionJob: ConversionJob): Future[CompletedConversionJob] = {
     info(s"ConvertorService running $conversionJob")
 
-    val targetBucketName = conversionJob.sourceBucketName
-    val targetObjectKey = "target.txt.gz"
+    val targetBucketName = conversionJob.targetBucketName
+    val targetObjectKey = conversionJob.targetObjectKey
 
     val uploadResult = for {
       s3inputStream <- Future {
@@ -63,7 +63,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     uploadResult.map { _ =>
       val targetLocation =
-        Uri(s"$s3Endpoint/${conversionJob.sourceBucketName}/$targetObjectKey")
+        Uri(s"$s3Endpoint/$targetBucketName/$targetObjectKey")
 
       CompletedConversionJob(
         conversionJob = conversionJob,
