@@ -13,8 +13,16 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import javax.inject.Inject
 import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{DisplayWorkToJsonStringFlow, ElasticsearchHitToIdentifiedWorkFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{
+  DisplayWorkToJsonStringFlow,
+  ElasticsearchHitToIdentifiedWorkFlow,
+  IdentifiedWorkToVisibleDisplayWork,
+  StringToGzipFlow
+}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{
+  CompletedConversionJob,
+  ConversionJob
+}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -27,7 +35,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  objectMapper: ObjectMapper)
     extends Logging {
 
-  implicit val materializer: ActorMaterializer = ActorMaterializer()(actorSystem)
+  implicit val materializer: ActorMaterializer =
+    ActorMaterializer()(actorSystem)
 
   def runConversion(
     conversionJob: ConversionJob): Future[CompletedConversionJob] = {
@@ -39,7 +48,9 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val uploadResult = for {
       s3inputStream <- Future {
         s3Client
-          .getObject(conversionJob.sourceBucketName, conversionJob.sourceObjectKey)
+          .getObject(
+            conversionJob.sourceBucketName,
+            conversionJob.sourceObjectKey)
           .getObjectContent
       }
 

@@ -60,10 +60,8 @@ class SnapshotConvertorFeatureTest
               }
 
               val elasticsearchJsons = works.map { work =>
-                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${
-                  toJson(
-                    work).get
-                }}"""
+                s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+                  work).get}}"""
               }
               val content = elasticsearchJsons.mkString("\n")
 
