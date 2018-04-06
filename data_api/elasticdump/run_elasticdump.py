@@ -102,6 +102,7 @@ def run():
         with gzip.open('index.txt.gz', 'wb') as gzip_file:
             gzip_file.writelines(index_file)
 
+    prefix = os.environ['key_prefix']
     # This creates keys of the form
     #
     #   2018/03/2018-03-13_myindexname.txt.gz
@@ -116,7 +117,7 @@ def run():
 
     s3_client.upload_file(
         Bucket=target_bucket,
-        Key=key,
+        Key=prefix + key,
         Filename='index.txt.gz'
     )
 

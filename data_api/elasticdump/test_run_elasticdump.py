@@ -106,6 +106,7 @@ def test_end_to_end(
         '--env', f'sqs_queue_url={queue_url}',
         '--env', f'upload_bucket={bucket}',
         '--env', f'target_key=dump.txt.gz',
+        '--env', f'key_prefix=blah/',
 
         '--env', 'AWS_DEFAULT_REGION=localhost',
         '--env', 'AWS_ACCESS_KEY_ID=accessKey1',
@@ -124,7 +125,7 @@ def test_end_to_end(
 
     obj = s3_client.get_object(
         Bucket=bucket,
-        Key='dump.txt.gz'
+        Key='blah/dump.txt.gz'
     )
     body = obj['Body'].read()
 
