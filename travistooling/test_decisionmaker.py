@@ -15,7 +15,7 @@ from travistooling.decisions import (
 )
 
 
-@pytest.mark.parametrize('path, job_name, exc_class, is_significant', [
+@pytest.mark.parametrize('path, task_name, exc_class, is_significant', [
     # Travis format task
     ('misc/myscript.py', 'travis-format', KnownAffectsThisJob, True),
     ('ontologies/item.ttl', 'travis-format', KnownAffectsThisJob, True),
@@ -58,21 +58,21 @@ from travistooling.decisions import (
     ('sbt_common/display/model.scala', 'loris-publish', KnownDoesNotAffectThisJob, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
 ])
-def test_does_file_affect_build_job(path, job_name, exc_class, is_significant):
+def test_does_file_affect_build_job(path, task_name, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
-        does_file_affect_build_job(path=path, job_name=job_name)
+        does_file_affect_build_job(path=path, task_name=task_name)
     assert err.value.is_significant == is_significant
 
 
 def test_should_run_job_with_no_important_changes():
-    result = should_run_job(changed_paths=[], job_name='loris-test')
+    result = should_run_job(changed_paths=[], task_name='loris-test')
     assert result == (False, {False: {}, True: {}})
 
 
 def test_should_not_run_job_with_no_relevant_changes():
     result = should_run_job(
         changed_paths=['sierra_adapter/common/main.scala'],
-        job_name='loris-test'
+        task_name='loris-test'
     )
     assert result == (False, {
         False: {KnownDoesNotAffectThisJob: set(['sierra_adapter/common/main.scala'])},
@@ -86,7 +86,7 @@ def test_should_run_job_with_relevant_changes():
             'sierra_adapter/common/main.scala',
             'loris/loris/Dockerfile',
         ],
-        job_name='loris-test'
+        task_name='loris-test'
     )
     assert result == (True, {
         False: {KnownDoesNotAffectThisJob: set(['sierra_adapter/common/main.scala'])},
