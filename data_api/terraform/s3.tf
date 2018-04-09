@@ -2,6 +2,18 @@ resource "aws_s3_bucket" "public_data" {
   bucket = "wellcomecollection-data-public"
   acl    = "public-read"
 
+  website {
+    index_document = "index.html"
+  }
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["https://data.wellcomecollection.org"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+
   lifecycle {
     prevent_destroy = true
   }
