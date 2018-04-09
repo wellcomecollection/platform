@@ -49,6 +49,15 @@ script:
 env:
   global:
     - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
+
+    # This forces Python to print everything to stdout/stderr immediately.
+    # Otherwise, we've seen issues where all the output from our Travis scripts
+    # gets buffered, and only gets printed at the end of the test...
+    #
+    # ... out of order from the rest of the rest of the output!
+    #
+    # See also: https://docs.python.org/3/using/cmdline.html#cmdoption-u
+    #
     - PYTHONUNBUFFERED=x
 
 jobs:
