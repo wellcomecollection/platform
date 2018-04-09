@@ -12,3 +12,7 @@ variable "release_ids" {
 variable "key_name" {
   description = "Name of AWS key pair"
 }
+
+variable "data_acm_cert_arn" {
+  description = "ARN for the data ssl cert"
+}
