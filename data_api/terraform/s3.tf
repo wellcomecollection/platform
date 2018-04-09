@@ -1,22 +1,20 @@
+locals {
+  public_data_bucket_name = "wellcomecollection-data-public"
+}
+
 resource "aws_s3_bucket" "public_data" {
-  bucket = "wellcomecollection-data-public"
+  bucket = "${local.public_data_bucket_name}"
   acl    = "public-read"
 
   website {
     index_document = "index.html"
   }
 
-  cors_rule {
-    allowed_headers = ["*"]
-    allowed_methods = ["GET", "HEAD"]
-    allowed_origins = ["https://data.wellcomecollection.org"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3000
-  }
-
   lifecycle {
     prevent_destroy = true
   }
+
+  policy = "${data.aws_iam_policy_document.public_data_bucket_get_access_policy.json}"
 }
 
 resource "aws_s3_bucket" "private_data" {
