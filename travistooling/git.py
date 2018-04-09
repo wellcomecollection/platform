@@ -28,7 +28,6 @@ def get_changed_paths(*args):
 
     :param commit_range: Arguments to pass to ``git diff``.
     """
-    files = set()
     diff_output = git('diff', '--name-only', *args)
 
     return set([
