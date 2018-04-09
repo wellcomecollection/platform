@@ -1,9 +1,5 @@
 package uk.ac.wellcome.platform.snapshot_convertor.services
 
-import javax.inject.Inject
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
@@ -15,6 +11,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import javax.inject.Inject
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.platform.snapshot_convertor.flow.{
   DisplayWorkToJsonStringFlow,
@@ -28,7 +25,8 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
 }
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.Future
 
 class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  s3Client: AmazonS3,
@@ -37,7 +35,42 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
                                  objectMapper: ObjectMapper)
     extends Logging {
 
-  implicit val materializer = ActorMaterializer()(actorSystem)
+  implicit val materializer: ActorMaterializer =
+    ActorMaterializer()(actorSystem)
+
+  def runConversion(
+    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
+    info(s"ConvertorService running $conversionJob")
+
+    val targetBucketName = conversionJob.targetBucketName
+    val targetObjectKey = conversionJob.targetObjectKey
+
+    val uploadResult = for {
+      s3inputStream <- Future {
+        s3Client
+          .getObject(
+            conversionJob.sourceBucketName,
+            conversionJob.sourceObjectKey)
+          .getObjectContent
+      }
+
+      gzipStream <- runStream(
+        targetBucketName = targetBucketName,
+        targetObjectKey = targetObjectKey,
+        s3inputStream = s3inputStream
+      )
+    } yield gzipStream
+
+    uploadResult.map { _ =>
+      val targetLocation =
+        Uri(s"$s3Endpoint/$targetBucketName/$targetObjectKey")
+
+      CompletedConversionJob(
+        conversionJob = conversionJob,
+        targetLocation = targetLocation
+      )
+    }
+  }
 
   private def runStream(
     targetBucketName: String,
@@ -67,37 +100,5 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       )
 
     gzipContent.runWith(s3Sink)
-  }
-
-  def runConversion(
-    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
-    info(s"ConvertorService running $conversionJob")
-
-    val targetBucketName = conversionJob.bucketName
-    val targetObjectKey = "target.txt.gz"
-
-    val uploadResult = for {
-      s3inputStream <- Future {
-        s3Client
-          .getObject(conversionJob.bucketName, conversionJob.objectKey)
-          .getObjectContent()
-      }
-
-      gzipStream <- runStream(
-        targetBucketName = targetBucketName,
-        targetObjectKey = targetObjectKey,
-        s3inputStream = s3inputStream
-      )
-    } yield gzipStream
-
-    uploadResult.map { _ =>
-      val targetLocation =
-        Uri(s"$s3Endpoint/${conversionJob.bucketName}/$targetObjectKey")
-
-      CompletedConversionJob(
-        conversionJob = conversionJob,
-        targetLocation = targetLocation
-      )
-    }
   }
 }

@@ -35,98 +35,106 @@ class SnapshotConvertorFeatureTest
     with JsonTestUtil
     with ExtendedPatience {
 
+  def withFixtures[R] =
+    withLocalSqsQueue[R] _ and
+      withLocalSnsTopic[R] _ and
+      withLocalS3Bucket[R] _ and
+      withLocalS3Bucket[R] _
+
   it("completes a conversion successfully") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalS3Bucket { bucketName =>
-          val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-            bucketName)
+    withFixtures {
+      case (((queueUrl, topicArn), sourceBucketName), targetBucketName) =>
+        val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
+          sourceBucketName)
 
-          withServer(flags) { _ =>
-            // Create a collection of works.  These three differ by version,
-            // if not anything more interesting!
-            val works = (1 to 3).map { version =>
-              IdentifiedWork(
-                canonicalId = "rbfhv6b4",
-                title = Some("Rumblings from a rambunctious rodent"),
-                sourceIdentifier = SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.miroImageNumber,
-                  ontologyType = "work",
-                  value = "R0060400"
-                ),
-                version = version
-              )
-            }
+        withServer(flags) { _ =>
+          // Create a collection of works.  These three differ by version,
+          // if not anything more interesting!
+          val works = (1 to 3).map { version =>
+            IdentifiedWork(
+              canonicalId = "rbfhv6b4",
+              title = Some("Rumblings from a rambunctious rodent"),
+              sourceIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.miroImageNumber,
+                ontologyType = "work",
+                value = "R0060400"
+              ),
+              version = version
+            )
+          }
 
-            val elasticsearchJsons = works.map { work =>
-              s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-                work).get}}"""
-            }
-            val content = elasticsearchJsons.mkString("\n")
+          val elasticsearchJsons = works.map { work =>
+            s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+              work).get}}"""
+          }
+          val content = elasticsearchJsons.mkString("\n")
 
-            withGzipCompressedS3Key(bucketName, content) { objectKey =>
-              val conversionJob = ConversionJob(
-                bucketName = bucketName,
-                objectKey = objectKey
-              )
+          val targetObjectKey = "target.txt.gz"
 
-              val message = SQSMessage(
-                subject = Some("Sent from SnapshotConvertorFeatureTest"),
-                body = toJson(conversionJob).get,
-                messageType = "json",
-                topic = topicArn,
-                timestamp = "now"
-              )
+          withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+            val conversionJob = ConversionJob(
+              sourceBucketName = sourceBucketName,
+              sourceObjectKey = objectKey,
+              targetBucketName = targetBucketName,
+              targetObjectKey = targetObjectKey
+            )
 
-              sqsClient.sendMessage(queueUrl, toJson(message).get)
+            val message = SQSMessage(
+              subject = Some("Sent from SnapshotConvertorFeatureTest"),
+              body = toJson(conversionJob).get,
+              messageType = "json",
+              topic = topicArn,
+              timestamp = "now"
+            )
 
-              eventually {
+            sqsClient.sendMessage(queueUrl, toJson(message).get)
 
-                val downloadFile =
-                  File.createTempFile("convertorServiceTest", ".txt.gz")
-                s3Client.getObject(
-                  new GetObjectRequest(bucketName, "target.txt.gz"),
-                  downloadFile)
+            eventually {
 
-                val actualJsonLines: List[String] =
-                  readGzipFile(downloadFile.getPath).split("\n").toList
+              val downloadFile =
+                File.createTempFile("convertorServiceTest", ".txt.gz")
 
-                val expectedJsonLines = works.map { work =>
-                  s"""{
-                     |  "id": "${work.canonicalId}",
-                     |  "title": "${work.title.get}",
-                     |  "identifiers": [ ],
-                     |  "creators": [ ],
-                     |  "genres": [ ],
-                     |  "subjects": [ ],
-                     |  "items": [ ],
-                     |  "publishers": [ ],
-                     |  "placesOfPublication": [ ],
-                     |  "type": "Work"
+              s3Client.getObject(
+                new GetObjectRequest(targetBucketName, targetObjectKey),
+                downloadFile)
+
+              val actualJsonLines: List[String] =
+                readGzipFile(downloadFile.getPath).split("\n").toList
+
+              val expectedJsonLines = works.map { work =>
+                s"""{
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title.get}",
+                 |  "identifiers": [ ],
+                 |  "creators": [ ],
+                 |  "genres": [ ],
+                 |  "subjects": [ ],
+                 |  "items": [ ],
+                 |  "publishers": [ ],
+                 |  "placesOfPublication": [ ],
+                 |  "type": "Work"
                    }""".stripMargin
-                }
-
-                actualJsonLines.zip(expectedJsonLines).foreach {
-                  case (actualLine, expectedLine) =>
-                    assertJsonStringsAreEqual(actualLine, expectedLine)
-                }
-
-                val receivedMessages = listMessagesReceivedFromSNS(topicArn)
-                receivedMessages.size should be >= 1
-
-                val expectedJob = CompletedConversionJob(
-                  conversionJob = conversionJob,
-                  targetLocation =
-                    s"http://localhost:33333/$bucketName/target.txt.gz"
-                )
-                val actualJob = fromJson[CompletedConversionJob](
-                  receivedMessages.head.message).get
-                actualJob shouldBe expectedJob
               }
+
+              actualJsonLines.zip(expectedJsonLines).foreach {
+                case (actualLine, expectedLine) =>
+                  assertJsonStringsAreEqual(actualLine, expectedLine)
+              }
+
+              val receivedMessages = listMessagesReceivedFromSNS(topicArn)
+              receivedMessages.size should be >= 1
+
+              val expectedJob = CompletedConversionJob(
+                conversionJob = conversionJob,
+                targetLocation =
+                  s"http://localhost:33333/$targetBucketName/$targetObjectKey"
+              )
+              val actualJob = fromJson[CompletedConversionJob](
+                receivedMessages.head.message).get
+              actualJob shouldBe expectedJob
             }
           }
         }
-      }
     }
   }
 }
