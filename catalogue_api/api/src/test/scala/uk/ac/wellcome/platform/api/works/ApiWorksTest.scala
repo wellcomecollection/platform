@@ -975,6 +975,27 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
+  it("returns Not Found if you ask for a non-existent work") {
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/xhu96f9j",
+        andExpect = Status.NotFound,
+        withJsonBody = notFound("Work not found for identifier xhu96f9j")
+      )
+    }
+  }
+
+  it("returns Bad Request if you ask for a malformed identifier") {
+    eventually {
+      server.httpGet(
+        path = s"/$apiPrefix/works/zd224ncv]",
+        andExpect = Status.BadRequest,
+        withJsonBody =
+          badRequest("Unrecognised character in identifier zd224ncv]")
+      )
+    }
+  }
+
   it("returns an Internal Server error if you try to search a malformed index") {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
