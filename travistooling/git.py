@@ -5,16 +5,21 @@ Git-related utilities used in our Travis scripts.
 
 
 import subprocess
+import sys
 
 
-def git(*args):
+def git_cmd(*args):
     """Run a Git command and return its output."""
     cmd = ['git'] + list(args)
-    return subprocess.check_output(cmd).decode('ascii').strip()
+    try:
+        return subprocess.check_output(cmd).decode('ascii').strip()
+    except subprocess.CalledProcessError as err:
+        print(err)
+        sys.exit(err.returncode)
 
 
 # Root of the Git repository
-ROOT = git('rev-parse', '--show-toplevel')
+ROOT = git_cmd('rev-parse', '--show-toplevel')
 
 
 def changed_files(*args):
@@ -24,7 +29,7 @@ def changed_files(*args):
     :param commit_range: Arguments to pass to ``git diff``.
     """
     files = set()
-    diff_output = git('diff', '--name-only', *args)
+    diff_output = git_cmd('diff', '--name-only', *args)
 
     return set([
         line.strip()
