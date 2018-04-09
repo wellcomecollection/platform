@@ -26,11 +26,6 @@ def check_call(command):
         sys.exit(rc)
 
 
-def fprint(*args, **kwargs):
-    kwargs['flush'] = True
-    print(*args, **kwargs)
-
-
 def changed_files(*args):
     """
     Returns a set of changed files in a given commit range.
