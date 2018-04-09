@@ -9,13 +9,16 @@ going up.  This file contains the logic for answering the question:
 
 """
 
+import collections
 import os
 
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
+    InsignificantFile,
     KnownAffectsThisJob,
     KnownDoesNotAffectThisJob,
+    SignificantFile,
     UnrecognisedFile
 )
 from travistooling.git import ROOT
@@ -78,3 +81,28 @@ def does_file_affect_build_job(path, job_name):
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
     raise UnrecognisedFile(path)
+
+
+def should_run_job(changed_paths, job_name):
+    """
+    Should we run this build job?  Returns a tuple (result, report).
+    """
+    # True/False is whether this path is significant to the current test job.
+    # Within each map, we're recording the type of the exception and the
+    # files associated with it.
+    report = {
+        True: collections.defaultdict(set),
+        False: collections.defaultdict(set),
+    }
+    for path in sorted(changed_paths):
+        try:
+            does_file_affect_build_job(path=path, job_name=job_name)
+        except InsignificantFile as err:
+            report[False][type(err)].add(path)
+        except SignificantFile as err:
+            report[True][type(err)].add(path)
+
+    return (
+        bool(report[True]),
+        {True: dict(report[True]), False: dict(report[False])}
+    )
