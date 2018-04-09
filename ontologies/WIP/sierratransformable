@@ -224,10 +224,9 @@
    * 
    * 1. For all bibliographic records use "marcTag": "655".
    * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- ' and type as "Genre".
-   * 3. If only "a" subfield is populated type as "Concept". 
-   * 4. Populate platform "concept" "label" with subfield "a".
-   * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 6. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period" and "z" as "Place") and populate "qualifierType" with v=form-subdivision, x=general-subdivision, y=chronological-subdivsion, z=geographic-subdivision.
+   * 3. Populate platform "primaryConcept" "label" with subfield "a".
+   * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
+   * 5. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period", "v" as "Form" and "z" as "Place").
    * 
    *
    *
@@ -266,11 +265,10 @@
    /* Populate wwork:subjects. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650".
-   * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- '  and type as "QualifiedConcept".
-   * 3. If only "a" subfield is populated type as "Concept". 
-   * 4. Populate platform "concept" "label" with subfield "a".
-   * 5. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 6. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period" and "z" as "Place") and populate "qualifierType" with v=form-subdivision, x=general-subdivision, y=chronological-subdivsion, z=geographic-subdivision.
+   * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- '  and type as "Subject".
+   * 3. Populate platform "primaryConcept" "label" with subfield "a".
+   * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
+   * 5. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period", "v" as "Form" and "z" as "Place").
    * 
    *
    *
