@@ -2,7 +2,10 @@
 
 import pytest
 
-from travistooling.decisionmaker import does_file_affect_build_job
+from travistooling.decisionmaker import (
+    does_file_affect_build_job,
+    should_run_job
+)
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
@@ -59,3 +62,33 @@ def test_does_file_affect_build_job(path, job_name, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
         does_file_affect_build_job(path=path, job_name=job_name)
     assert err.value.is_significant == is_significant
+
+
+def test_should_run_job_with_no_important_changes():
+    result = should_run_job(changed_paths=[], job_name='loris-test')
+    assert result == (False, {False: {}, True: {}})
+
+
+def test_should_not_run_job_with_no_relevant_changes():
+    result = should_run_job(
+        changed_paths=['sierra_adapter/common/main.scala'],
+        job_name='loris-test'
+    )
+    assert result == (False, {
+        False: {KnownDoesNotAffectThisJob: set(['sierra_adapter/common/main.scala'])},
+        True: {}
+    })
+
+
+def test_should_run_job_with_relevant_changes():
+    result = should_run_job(
+        changed_paths=[
+            'sierra_adapter/common/main.scala',
+            'loris/loris/Dockerfile',
+        ],
+        job_name='loris-test'
+    )
+    assert result == (True, {
+        False: {KnownDoesNotAffectThisJob: set(['sierra_adapter/common/main.scala'])},
+        True: {KnownAffectsThisJob: set(['loris/loris/Dockerfile'])}
+    })
