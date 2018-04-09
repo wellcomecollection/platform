@@ -232,28 +232,32 @@
    *
    *
    *
-   *"genres": [
-   * {
-   *   "label": "Caricatures 1952",
-   *   "type": "Genre",
-   *   "primaryConcept" : {
-   *      "id": "a24s7qf3" ,
-   *      "label": "Caricatures" ,
-   *       "type": "Concept" , 
-   *      "identifiers": [
-   *        {
-   *         "type": "Identifier",
-   *         "identifierScheme": "lctgm",
-   *         "value": "tgm001698"
-   *        }
-   *      ] ,
+   *{
+   *  "genres": [
+   *    {
+   *      "label": "Caricatures 1952",
+   *      "type": "Genre",
+   *      "primaryConcept": {
+   *       "id": "a24s7qf3",
+   *        "label": "Caricatures",
+   *        "type": "Concept",
+   *        "identifiers": [
+   *          {
+   *            "type": "Identifier",
+   *            "identifierScheme": "lctgm",
+   *            "value": "tgm001698"
+   *          }
+   *        ],
    *        "secondaryConcepts": [
    *          {
    *            "label": "bibliography",
    *            "type": "Form"
    *          }
-   *   ]
-   *],
+   *        ]
+   *      }
+   *    }
+   *  ]
+   *}
    *
    */
 
@@ -272,6 +276,7 @@
    *
    *
    *
+   *{
    *  "subjects": [
    *    {
    *      "label": "Tuberculosis - prevention & control.",
@@ -286,34 +291,29 @@
    *            "identifierScheme": "mesh",
    *            "value": "D014376Q000517"
    *          }
-   *        ],
-   *        "secondaryConcepts": [
-   *          {
-   *            "label": "prevention & control",
-   *            "type": "Place"
-   *          }
-   *        ] ,
-   *        "secondaryConcepts": [
-   *          {
-   *            "label": "prevention & control",
-   *            "type": "Period"
-   *          }
-   *        ] ,
-   *        "secondaryConcepts": [
-   *          {
-   *            "label": "prevention & control",
-   *            "type": "Concept"
-   *          }
    *        ]
-   *        "secondaryConcepts": [
-   *          {
-   *            "label": "bibliography",
-   *            "type": "Form"
-   *          }
-   *        ]
-   *      }
-   *    },
+   *      },
+   *      "secondaryConcepts": [
+   *        {
+   *          "label": "prevention & control",
+   *          "type": "Place"
+   *        },
+   *        {
+   *          "label": "prevention & control",
+   *          "type": "Period"
+   *        },
+   *        {
+   *          "label": "prevention & control",
+   *          "type": "Concept"
+   *        },
+   *        {
+   *          "label": "bibliography",
+   *          "type": "Form"
+   *        }
+   *      ]
+   *    }
    *  ]
+   *}
    *
    */
 
