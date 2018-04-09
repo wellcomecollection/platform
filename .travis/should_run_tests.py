@@ -4,9 +4,7 @@ from __future__ import print_function
 
 import os
 
-from travistooling import (
-    changed_files, check_call, fprint as print, make_decision
-)
+from travistooling import changed_files, check_call, make_decision
 
 
 def should_run_tests(task, travis_event_type):
