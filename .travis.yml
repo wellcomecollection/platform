@@ -49,6 +49,7 @@ script:
 env:
   global:
     - AWS_ECR_REPO=760097843905.dkr.ecr.eu-west-1.amazonaws.com
+    - PYTHONUNBUFFERED=x
 
 jobs:
   include:
