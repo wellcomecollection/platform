@@ -44,7 +44,7 @@ data "aws_iam_policy_document" "public_data_bucket_get_access_policy" {
 
     principals {
       identifiers = ["*"]
-      type = "AWS"
+      type        = "AWS"
     }
 
     resources = [
