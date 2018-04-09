@@ -20,6 +20,7 @@ object Dependencies {
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
     val sierraStreamsSourceVersion = "0.2"
+    val jaxbVersion = "2.2.11"
   }
 
   val akkaDependencies: Seq[ModuleID] = Seq(
@@ -87,6 +88,7 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
+    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
