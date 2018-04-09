@@ -14,43 +14,43 @@ class Decision(Exception):
 
 class SignificantFile(Decision):
     """
-    This file might an effect on the outcome of the current build job.
+    This file might an effect on the outcome of the current build task.
     """
     is_significant = True
 
 
 class InsignificantFile(Decision):
     """
-    This file does not have an effect on the outcome of the current build job.
+    This file does not have an effect on the outcome of the current build task.
     """
     is_significant = False
 
 
 class UnrecognisedFile(SignificantFile):
     """
-    We cannot determine if this file has an effect on the current build job.
+    We cannot determine if this file has an effect on the current build task.
     """
 
 
 class IgnoredPath(InsignificantFile):
     """
-    This path never has an effect on build jobs.
+    This path never has an effect on build tasks.
     """
 
 
 class IgnoredFileFormat(IgnoredPath):
     """
-    This file format never has an effect on build jobs.
+    This file format never has an effect on build tasks.
     """
 
 
-class KnownAffectsThisJob(SignificantFile):
+class KnownAffectsThisTask(SignificantFile):
     """
-    This file has a known effect on this build job.
+    This file has a known effect on this build task.
     """
 
 
-class KnownDoesNotAffectThisJob(InsignificantFile):
+class KnownDoesNotAffectThisTask(InsignificantFile):
     """
-    This file is known not to affect this build job.
+    This file is known not to affect this build task.
     """

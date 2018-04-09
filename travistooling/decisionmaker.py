@@ -9,16 +9,19 @@ going up.  This file contains the logic for answering the question:
 
 """
 
+import collections
 import os
 
-from travistooling import ROOT
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
-    KnownAffectsThisJob,
-    KnownDoesNotAffectThisJob,
+    InsignificantFile,
+    KnownAffectsThisTask,
+    KnownDoesNotAffectThisTask,
+    SignificantFile,
     UnrecognisedFile
 )
+from travistooling.git import ROOT
 from travistooling.parse_makefiles import get_projects
 
 
@@ -27,13 +30,13 @@ from travistooling.parse_makefiles import get_projects
 PROJECTS = list(get_projects(ROOT))
 
 
-def does_file_affect_build_job(path, job_name):
+def does_file_affect_build_job(path, task_name):
     # Catch all the common file types that we care about for travis-format.
     if (
-        job_name == 'travis-format' and
+        task_name == 'travis-format' and
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
-        raise KnownAffectsThisJob(path)
+        raise KnownAffectsThisTask(path)
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(('.md', '.png', '.graffle', '.tf')):
@@ -52,12 +55,12 @@ def does_file_affect_build_job(path, job_name):
         os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
     }
 
-    for dir_name, job_name_prefix in exclusive_directories.items():
+    for dir_name, task_name_prefix in exclusive_directories.items():
         if path.startswith(dir_name):
-            if job_name.startswith(job_name_prefix):
-                raise KnownAffectsThisJob(path)
+            if task_name.startswith(task_name_prefix):
+                raise KnownAffectsThisTask(path)
             else:
-                raise KnownDoesNotAffectThisJob(path)
+                raise KnownDoesNotAffectThisTask(path)
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
@@ -69,12 +72,37 @@ def does_file_affect_build_job(path, job_name):
         'sbt_common/'
     )):
         for project in PROJECTS:
-            if job_name.startswith(project.name):
+            if task_name.startswith(project.name):
                 if project.type == 'sbt_app':
-                    raise KnownAffectsThisJob(path)
+                    raise KnownAffectsThisTask(path)
                 else:
-                    raise KnownDoesNotAffectThisJob(path)
+                    raise KnownDoesNotAffectThisTask(path)
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
     raise UnrecognisedFile(path)
+
+
+def should_run_job(changed_paths, task_name):
+    """
+    Should we run this build job?  Returns a tuple (result, report).
+    """
+    # True/False is whether this path is significant to the current test job.
+    # Within each map, we're recording the type of the exception and the
+    # files associated with it.
+    report = {
+        True: collections.defaultdict(set),
+        False: collections.defaultdict(set),
+    }
+    for path in sorted(changed_paths):
+        try:
+            does_file_affect_build_job(path=path, task_name=task_name)
+        except InsignificantFile as err:
+            report[False][type(err)].add(path)
+        except SignificantFile as err:
+            report[True][type(err)].add(path)
+
+    return (
+        bool(report[True]),
+        {True: dict(report[True]), False: dict(report[False])}
+    )
