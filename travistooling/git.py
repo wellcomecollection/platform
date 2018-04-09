@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 
-def git_cmd(*args):
+def git(*args):
     """Run a Git command and return its output."""
     cmd = ['git'] + list(args)
     try:
@@ -19,17 +19,17 @@ def git_cmd(*args):
 
 
 # Root of the Git repository
-ROOT = git_cmd('rev-parse', '--show-toplevel')
+ROOT = git('rev-parse', '--show-toplevel')
 
 
-def changed_files(*args):
+def get_changed_paths(*args):
     """
-    Returns a set of changed files in a given commit range.
+    Returns a set of changed paths in a given commit range.
 
     :param commit_range: Arguments to pass to ``git diff``.
     """
     files = set()
-    diff_output = git_cmd('diff', '--name-only', *args)
+    diff_output = git('diff', '--name-only', *args)
 
     return set([
         line.strip()
