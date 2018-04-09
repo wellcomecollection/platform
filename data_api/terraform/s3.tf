@@ -4,11 +4,7 @@ locals {
 
 resource "aws_s3_bucket" "public_data" {
   bucket = "${local.public_data_bucket_name}"
-  acl    = "public-read"
-
-  website {
-    index_document = "index.html"
-  }
+  acl    = "private"
 
   lifecycle {
     prevent_destroy = true
