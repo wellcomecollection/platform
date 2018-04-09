@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api
+package uk.ac.wellcome.display.models
 
 import uk.ac.wellcome.models._
 
