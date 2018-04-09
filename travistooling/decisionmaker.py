@@ -11,7 +11,6 @@ going up.  This file contains the logic for answering the question:
 
 import os
 
-from travistooling import ROOT
 from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
@@ -19,6 +18,7 @@ from travistooling.decisions import (
     KnownDoesNotAffectThisJob,
     UnrecognisedFile
 )
+from travistooling.git import ROOT
 from travistooling.parse_makefiles import get_projects
 
 
