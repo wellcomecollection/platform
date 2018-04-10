@@ -38,16 +38,14 @@ trait SNS {
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  def withLocalSnsTopic[R](testWith: TestWith[String, R]): R = {
-    val topicName = Random.alphanumeric take 10 mkString
-    val arn = snsClient.createTopic(topicName).getTopicArn
-
-    try {
-      testWith(arn)
-    } finally {
-      snsClient.deleteTopic(arn)
-    }
-  }
+  def withLocalSnsTopic[R] = fixture[String, R](
+    create = {
+      val topicName = Random.alphanumeric take 10 mkString
+      val arn = snsClient.createTopic(topicName).getTopicArn
+      arn
+    },
+    destroy = snsClient.deleteTopic(_)
+  )
 
   private val mapper =
     (new ObjectMapper(new YAMLFactory()) with ScalaObjectMapper)

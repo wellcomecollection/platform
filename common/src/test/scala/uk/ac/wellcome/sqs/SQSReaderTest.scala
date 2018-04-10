@@ -39,7 +39,7 @@ class SQSReaderTest
   }
 
   def withFixtures[R](maxMessages: Int) =
-    withLocalSqsQueue[R] _ and withSqsReader[R](maxMessages) _
+    withLocalSqsQueue[R] and withSqsReader[R](maxMessages) _
 
   it(
     "should get messages from the SQS queue, limited by the maximum number of messages and return them") {

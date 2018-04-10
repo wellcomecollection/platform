@@ -37,19 +37,19 @@ trait SQS {
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
-  def withLocalSqsQueue[R](testWith: TestWith[String, R]) = {
-    val queueName: String = Random.alphanumeric take 10 mkString
-    val url = sqsClient.createQueue(queueName).getQueueUrl
+  def withLocalSqsQueue[R] = fixture[String, R](
+    create = {
+      val queueName: String = Random.alphanumeric take 10 mkString
+      val url = sqsClient.createQueue(queueName).getQueueUrl
 
-    sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
-
-    try {
-      testWith(url)
-    } finally {
+      sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
+      url
+    },
+    destroy = { url: String =>
       Try { sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url)) }
       Try { sqsClient.deleteQueue(url) }
     }
-  }
+  )
 
   object TestSqsMessage {
     def apply() =

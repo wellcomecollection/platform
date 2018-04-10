@@ -65,8 +65,8 @@ class SQSWorkerTest
   )
 
   def withFixtures[R] =
-    withActorSystem[R] _ and
-      withLocalSqsQueue[R] _ and
+    withActorSystem[R] and
+      withLocalSqsQueue[R] and
       withMockMetricSender[R] _ and
       withSqsWorker[R] _
 

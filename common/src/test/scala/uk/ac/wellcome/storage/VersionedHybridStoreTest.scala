@@ -31,7 +31,7 @@ class VersionedHybridStoreTest
   import uk.ac.wellcome.dynamo._
 
   def withFixtures[R] =
-    withLocalS3Bucket[R] _ and
+    withLocalS3Bucket[R] and
       withLocalDynamoDbTable[R] _ and
       withVersionedHybridStore[ExampleRecord, R] _
 

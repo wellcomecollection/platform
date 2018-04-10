@@ -58,12 +58,12 @@ class ConvertorServiceTest
   }
 
   def withFixtures[R] =
-    withActorSystem[R] _ and
+    withActorSystem[R] and
       withMaterializer[R] _ and
       withS3AkkaClient[R] _ and
       withConvertorService[R] _ and
-      withLocalS3Bucket[R] _ and
-      withLocalS3Bucket[R] _
+      withLocalS3Bucket[R] and
+      withLocalS3Bucket[R]
 
   it("completes a conversion successfully") {
     withFixtures {
