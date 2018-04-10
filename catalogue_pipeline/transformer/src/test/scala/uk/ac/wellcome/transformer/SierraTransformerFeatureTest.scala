@@ -33,7 +33,7 @@ class SierraTransformerFeatureTest
 
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val sierraHybridRecordMessage =
             hybridRecordSqsMessage(
               message = createValidSierraTransformableJson(
@@ -44,7 +44,7 @@ class SierraTransformerFeatureTest
               sourceName = "sierra",
               version = 1,
               s3Client = s3Client,
-              bucketName = bucketName
+              bucket = bucket
             )
 
           sqsClient.sendMessage(
@@ -54,7 +54,7 @@ class SierraTransformerFeatureTest
 
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucketName) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
+          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
             queueUrl)
 
           withServer(flags) { _ =>

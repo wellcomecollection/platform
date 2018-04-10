@@ -27,6 +27,7 @@ import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -65,7 +66,7 @@ class SQSMessageReceiverTest
 
   def withSQSMessageReceiver[R](
     topicArn: String,
-    bucketName: String,
+    bucket: Bucket,
     maybeSnsWriter: Option[SNSWriter] = None
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
@@ -74,7 +75,7 @@ class SQSMessageReceiverTest
     val recordReceiver = new SQSMessageReceiver(
       snsWriter = snsWriter,
       s3Client = s3Client,
-      s3Config = S3Config(bucketName),
+      s3Config = S3Config(bucket.underlying),
       metricsSender = metricsSender
     )
 
@@ -85,7 +86,7 @@ class SQSMessageReceiverTest
 
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
             message = createValidCalmTramsformableJson(
               RecordID = "abcdef",
@@ -97,7 +98,7 @@ class SQSMessageReceiverTest
             sourceName = "calm",
             version = 1,
             s3Client = s3Client,
-            bucketName = bucketName
+            bucketName = bucket.underlying
           )
 
           withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
@@ -122,14 +123,14 @@ class SQSMessageReceiverTest
 
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val sierraMessage: SQSMessage = hybridRecordSqsMessage(
             message =
               createValidSierraTransformableJson(id, title, lastModifiedDate),
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
-            bucketName = bucketName
+            bucket = bucket
           )
 
           withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
@@ -169,14 +170,14 @@ class SQSMessageReceiverTest
   it("returns a failed future if it's unable to parse the SQS message") {
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val invalidCalmSqsMessage: SQSMessage =
             hybridRecordSqsMessage(
               message = "not a json string",
               sourceName = "calm",
               version = 1,
               s3Client = s3Client,
-              bucketName = bucketName
+              bucket = bucket
             )
 
           withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
@@ -194,7 +195,7 @@ class SQSMessageReceiverTest
   it("sends no message where Transformable work is None") {
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val snsWriter = mockSNSWriter
 
           withSQSMessageReceiver(topicArn, bucketName, Some(snsWriter)) {
@@ -203,7 +204,7 @@ class SQSMessageReceiverTest
                 createValidEmptySierraBibSQSMessage(
                   id = "0101010",
                   s3Client = s3Client,
-                  bucketName = bucketName
+                  bucket = bucket
                 )
               )
 
@@ -266,18 +267,18 @@ class SQSMessageReceiverTest
 
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val message = hybridRecordSqsMessage(
             message = JsonUtil.toJson(sierraTransformable).get,
             sourceName = "sierra",
             version = 1,
             s3Client = s3Client,
-            bucketName = bucketName
+            bucket = bucket
           )
 
           val snsWriter = mockFailPublishMessage
 
-          withSQSMessageReceiver(topicArn, bucketName, Some(snsWriter)) {
+          withSQSMessageReceiver(topicArn, bucket, Some(snsWriter)) {
             recordReceiver =>
               val future = recordReceiver.receiveMessage(message)
 

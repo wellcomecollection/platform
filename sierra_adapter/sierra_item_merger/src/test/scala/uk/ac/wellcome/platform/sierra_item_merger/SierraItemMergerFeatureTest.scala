@@ -23,13 +23,13 @@ class SierraItemMergerFeatureTest
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id = "i1000001"
               val bibId = "b1000001"
@@ -49,7 +49,7 @@ class SierraItemMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable)
               }
@@ -62,13 +62,13 @@ class SierraItemMergerFeatureTest
 
   it("stores multiple items from SQS") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val bibId1 = "b1000001"
 
@@ -105,11 +105,11 @@ class SierraItemMergerFeatureTest
                 )
 
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable1)
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable2)
               }

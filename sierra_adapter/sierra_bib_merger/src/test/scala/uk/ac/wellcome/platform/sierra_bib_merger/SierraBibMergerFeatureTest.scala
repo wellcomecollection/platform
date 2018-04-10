@@ -63,13 +63,13 @@ class SierraBibMergerFeatureTest
 
   it("should store a bib in the hybrid store") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id = "1000001"
               val record = SierraBibRecord(
@@ -89,7 +89,7 @@ class SierraBibMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket.underlying,
                   tableName,
                   expectedSierraTransformable)
               }
@@ -102,13 +102,13 @@ class SierraBibMergerFeatureTest
 
   it("stores multiple bibs from SQS") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id1 = "1000001"
               val record1 = SierraBibRecord(
@@ -144,11 +144,11 @@ class SierraBibMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable1)
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable2)
               }
@@ -161,13 +161,13 @@ class SierraBibMergerFeatureTest
 
   it("updates a bib if a newer version is sent to SQS") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id = "3000003"
               val oldBibRecord = SierraBibRecord(
@@ -206,7 +206,7 @@ class SierraBibMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable)
               }
@@ -219,13 +219,13 @@ class SierraBibMergerFeatureTest
 
   it("does not update a bib if an older version is sent to SQS") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id = "6000006"
               val newBibRecord = SierraBibRecord(
@@ -266,7 +266,7 @@ class SierraBibMergerFeatureTest
               Thread.sleep(5000)
 
               assertStored[SierraTransformable](
-                bucketName,
+                bucket,
                 tableName,
                 expectedSierraTransformable)
             }
@@ -278,13 +278,13 @@ class SierraBibMergerFeatureTest
 
   it("stores a bib from SQS if the ID already exists but no bibData") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
-              bucketName,
+              bucket,
               tableName) { hybridStore =>
               val id = "7000007"
               val newRecord = SierraTransformable(sourceId = id)
@@ -314,7 +314,7 @@ class SierraBibMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucketName,
+                  bucket,
                   tableName,
                   expectedSierraTransformable)
               }

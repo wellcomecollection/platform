@@ -16,9 +16,9 @@ class ServerTest
   it("shows the healthcheck message") {
     withLocalSqsQueue { queueUrl =>
       withLocalSnsTopic { topicArn =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-            bucketName)
+            bucket)
           withServer(flags) { server =>
             server.httpGet(
               path = "/management/healthcheck",

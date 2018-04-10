@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]
@@ -30,13 +31,13 @@ trait LocalVersionedHybridStore
   )
 
   def withVersionedHybridStore[T <: Id, R](
-    bucketName: String,
+    bucket: Bucket,
     tableName: String)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
     withVersionedDao(tableName) { dao =>
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
           s3Client = s3Client,
-          s3Config = S3Config(bucketName = bucketName),
+          s3Config = S3Config(bucketName = bucket.underlying),
           keyPrefixGenerator = new KeyPrefixGenerator[T] {
             override def generate(obj: T): String = "/"
           }
@@ -47,10 +48,10 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def assertStored[T <: Id](bucketName: String, tableName: String, record: T)(
+  def assertStored[T <: Id](bucket: Bucket, tableName: String, record: T)(
     implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
-      getJsonFor[T](bucketName, tableName, record),
+      getJsonFor[T](bucket.underlying, tableName, record),
       toJson(record).get
     )
 

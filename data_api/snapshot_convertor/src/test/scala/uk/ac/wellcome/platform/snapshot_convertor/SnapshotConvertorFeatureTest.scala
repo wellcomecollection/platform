@@ -43,9 +43,9 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queueUrl, topicArn), sourceBucketName), targetBucketName) =>
+      case (((queueUrl, topicArn), sourceBucket), targetBucket) =>
         val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-          sourceBucketName)
+          sourceBucket)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
@@ -71,11 +71,11 @@ class SnapshotConvertorFeatureTest
 
           val targetObjectKey = "target.txt.gz"
 
-          withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+          withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              sourceBucketName = sourceBucketName,
+              sourceBucketName = sourceBucket.underlying,
               sourceObjectKey = objectKey,
-              targetBucketName = targetBucketName,
+              targetBucketName = targetBucket.underlying,
               targetObjectKey = targetObjectKey
             )
 
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucketName, targetObjectKey),
+                new GetObjectRequest(targetBucket.underlying, targetObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -127,7 +127,7 @@ class SnapshotConvertorFeatureTest
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/$targetBucketName/$targetObjectKey"
+                  s"http://localhost:33333/${targetBucket.underlying}/$targetObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

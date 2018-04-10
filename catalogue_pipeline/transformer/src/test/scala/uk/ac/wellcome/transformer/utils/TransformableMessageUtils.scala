@@ -19,6 +19,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 trait TransformableMessageUtils {
   def createValidCalmTramsformableJson(RecordID: String,
@@ -35,7 +36,7 @@ trait TransformableMessageUtils {
   def createValidEmptySierraBibSQSMessage(
     id: String,
     s3Client: AmazonS3,
-    bucketName: String
+    bucket: Bucket
   ): SQSMessage = {
 
     val sierraTransformable = SierraTransformable(
@@ -49,7 +50,7 @@ trait TransformableMessageUtils {
       sourceName = "sierra",
       version = 1,
       s3Client = s3Client,
-      bucketName = bucketName
+      bucket = bucket
     )
   }
 
@@ -91,10 +92,10 @@ trait TransformableMessageUtils {
                              sourceName: String,
                              version: Int = 1,
                              s3Client: AmazonS3,
-                             bucketName: String) = {
+                             bucket: Bucket) = {
 
     val key = "testSource/1/testId/dshg548.json"
-    s3Client.putObject(bucketName, key, message)
+    s3Client.putObject(bucket.underlying, key, message)
 
     val hybridRecord = HybridRecord(
       id = "testId",

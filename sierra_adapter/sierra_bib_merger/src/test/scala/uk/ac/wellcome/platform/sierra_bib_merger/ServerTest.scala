@@ -18,9 +18,9 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queueUrl =>
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucketName) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { server =>
             server.httpGet(

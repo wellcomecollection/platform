@@ -28,7 +28,7 @@ class S3SourceTest
       implicit val system = actorSystem
       implicit val materializer = ActorMaterializer()
 
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucker =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
           val expectedLines = List(
             "AARGH! An armada of alpaccas",
@@ -37,9 +37,9 @@ class S3SourceTest
           )
           val content = expectedLines.mkString("\n")
 
-          withGzipCompressedS3Key(bucketName, content) { key =>
+          withGzipCompressedS3Key(bucket, content) { key =>
             val s3inputStream = s3Client
-              .getObject(bucketName, key)
+              .getObject(bucket.underlying, key)
               .getObjectContent()
 
             val source = S3Source(s3inputStream = s3inputStream)
@@ -59,13 +59,13 @@ class S3SourceTest
       implicit val system = actorSystem
       implicit val materializer = ActorMaterializer()
 
-      withLocalS3Bucket { bucketName =>
+      withLocalS3Bucket { bucket =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
           val key = "example.txt.gz"
-          s3Client.putObject(bucketName, key, "NotAGzipCompressedFile")
+          s3Client.putObject(bucket.underlying, key, "NotAGzipCompressedFile")
 
           val s3inputStream = s3Client
-            .getObject(bucketName, key)
+            .getObject(bucket.underlying, key)
             .getObjectContent()
 
           val source = S3Source(s3inputStream = s3inputStream)

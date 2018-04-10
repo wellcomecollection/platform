@@ -36,18 +36,18 @@ class CalmTransformerFeatureTest
 
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val calmHybridRecordMessage = hybridRecordSqsMessage(
             message = JsonUtil.toJson(calmTransformable).get,
             sourceName = "calm",
             version = 1,
             s3Client = s3Client,
-            bucketName = bucketName
+            bucket = bucket
           )
 
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucketName) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
+          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
             queueUrl)
 
           withServer(flags) { _ =>

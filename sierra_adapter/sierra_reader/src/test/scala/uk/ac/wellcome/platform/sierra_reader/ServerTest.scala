@@ -8,9 +8,9 @@ import uk.ac.wellcome.test.fixtures.{S3, SQS}
 class ServerTest extends FunSpec with fixtures.Server with S3 with SQS {
 
   it("it shows the healthcheck message") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       withLocalSqsQueue { queueUrl =>
-        val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl) ++ Map(
+        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queueUrl) ++ Map(
           "reader.resourceType" -> "bibs",
           "sierra.apiUrl" -> "http://localhost:8080",
           "sierra.oauthKey" -> "key",
