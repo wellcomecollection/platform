@@ -43,8 +43,8 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queueUrl, topicArn), sourceBucket), targetBucket) =>
-        val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
+      case (((queueUrl, topic), sourceBucket), targetBucket) =>
+        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
           sourceBucket)
 
         withServer(flags) { _ =>
@@ -83,7 +83,7 @@ class SnapshotConvertorFeatureTest
               subject = Some("Sent from SnapshotConvertorFeatureTest"),
               body = toJson(conversionJob).get,
               messageType = "json",
-              topic = topicArn,
+              topic = topic.arn,
               timestamp = "now"
             )
 
@@ -121,7 +121,7 @@ class SnapshotConvertorFeatureTest
                   assertJsonStringsAreEqual(actualLine, expectedLine)
               }
 
-              val receivedMessages = listMessagesReceivedFromSNS(topicArn)
+              val receivedMessages = listMessagesReceivedFromSNS(topic)
               receivedMessages.size should be >= 1
 
               val expectedJob = CompletedConversionJob(

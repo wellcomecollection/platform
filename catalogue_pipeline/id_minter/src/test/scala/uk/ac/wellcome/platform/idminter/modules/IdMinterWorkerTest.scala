@@ -28,9 +28,9 @@ class IdMinterWorkerTest
 
   it("should create the Identifiers table in MySQL upon startup") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           val identifiersDao = mock[IdentifiersDao]
 

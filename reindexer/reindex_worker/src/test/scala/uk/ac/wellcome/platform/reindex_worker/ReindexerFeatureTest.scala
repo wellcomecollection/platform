@@ -91,13 +91,13 @@ class ReindexerFeatureTest
 
   it("increases the reindexVersion on every record that needs a reindex") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withLocalDynamoDbTableAndIndex { fixtures =>
           val tableName = fixtures.tableName
           val indexName = fixtures.indexName
 
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
             tableName) ++ sqsLocalFlags(queueUrl) ++ Map(
             "aws.dynamo.indexName" -> indexName)
 
@@ -121,13 +121,13 @@ class ReindexerFeatureTest
 
   it("sends an SNS notice for a completed reindex") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withLocalDynamoDbTableAndIndex { fixtures =>
           val tableName = fixtures.tableName
           val indexName = fixtures.indexName
 
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
             tableName) ++ sqsLocalFlags(queueUrl) ++ Map(
             "aws.dynamo.indexName" -> indexName)
 
@@ -141,7 +141,7 @@ class ReindexerFeatureTest
             )
 
             eventually {
-              val messages = listMessagesReceivedFromSNS(topicArn)
+              val messages = listMessagesReceivedFromSNS(topic)
 
               messages should have size 1
 
@@ -159,13 +159,13 @@ class ReindexerFeatureTest
 
   it("does not send a message if it cannot complete a reindex") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withLocalDynamoDbTableAndIndex { fixtures =>
           val tableName = fixtures.tableName
           val indexName = fixtures.indexName
 
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
             "non_existent_table") ++ sqsLocalFlags(queueUrl) ++ Map(
             "aws.dynamo.indexName" -> indexName)
 
@@ -176,7 +176,7 @@ class ReindexerFeatureTest
             // We wait some time to ensure that the message is not processed
             Thread.sleep(5000)
 
-            val messages = listMessagesReceivedFromSNS(topicArn)
+            val messages = listMessagesReceivedFromSNS(topic)
             messages should have size 0
           }
         }

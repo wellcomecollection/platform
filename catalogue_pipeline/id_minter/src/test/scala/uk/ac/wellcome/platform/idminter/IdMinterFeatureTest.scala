@@ -64,9 +64,9 @@ class IdMinterFeatureTest
   it(
     "mints the same ID for SourcedWorks that have matching source identifiers") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { _ =>
             eventuallyTableExists(dbConfig)
@@ -104,7 +104,7 @@ class IdMinterFeatureTest
             }
 
             eventually {
-              val messages = listMessagesReceivedFromSNS(topicArn)
+              val messages = listMessagesReceivedFromSNS(topic)
               messages.length shouldBe >=(messageCount)
 
               getWorksFromMessages(messages).foreach { work =>
@@ -120,9 +120,9 @@ class IdMinterFeatureTest
 
   it("continues if something fails processing a message") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { _ =>
             sqsClient.sendMessage(queueUrl, "not a json string")
@@ -133,7 +133,7 @@ class IdMinterFeatureTest
             sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
 
             eventually {
-              val messages = listMessagesReceivedFromSNS(topicArn)
+              val messages = listMessagesReceivedFromSNS(topic)
               messages should have size (1)
             }
 

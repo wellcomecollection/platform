@@ -53,7 +53,7 @@ class ReindexWorkerServiceTest
       )
 
       withLocalSqsQueue { queueUrl =>
-        withLocalSnsTopic { topicArn =>
+        withLocalSnsTopic { topic =>
           val workerService = new ReindexWorkerService(
             targetService = new ReindexService(
               dynamoDBClient = dynamoDbClient,
@@ -75,7 +75,7 @@ class ReindexWorkerServiceTest
             ),
             snsWriter = new SNSWriter(
               snsClient = snsClient,
-              snsConfig = SNSConfig(topicArn = topicArn)
+              snsConfig = SNSConfig(topicArn = topic.arn)
             ),
             system = actorSystem,
             metrics = metricsSender

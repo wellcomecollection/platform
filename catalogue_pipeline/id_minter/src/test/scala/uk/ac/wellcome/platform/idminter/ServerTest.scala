@@ -14,9 +14,9 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
+      withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topicArn) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { server =>
             server.httpGet(
