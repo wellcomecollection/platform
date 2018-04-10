@@ -9,9 +9,7 @@ import scala.util.Random
 import scala.collection.JavaConversions._
 import uk.ac.wellcome.models.aws.SQSMessage
 
-import scala.util.Try
-
-trait SQS {
+trait SQS extends ImplicitLogging {
 
   private val sqsEndpointUrl = "http://localhost:9324"
 
@@ -46,8 +44,10 @@ trait SQS {
       url
     },
     destroy = { url: String =>
-      Try { sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url)) }
-      Try { sqsClient.deleteQueue(url) }
+      safeCleanup(url) { url =>
+        sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url))
+      }
+      sqsClient.deleteQueue(url)
     }
   )
 
