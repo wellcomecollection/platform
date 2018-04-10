@@ -39,7 +39,7 @@ class S3SourceTest
 
           withGzipCompressedS3Key(bucket, content) { key =>
             val s3inputStream = s3Client
-              .getObject(bucket.underlying, key)
+              .getObject(bucket.name, key)
               .getObjectContent()
 
             val source = S3Source(s3inputStream = s3inputStream)
@@ -62,10 +62,10 @@ class S3SourceTest
       withLocalS3Bucket { bucket =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
           val key = "example.txt.gz"
-          s3Client.putObject(bucket.underlying, key, "NotAGzipCompressedFile")
+          s3Client.putObject(bucket.name, key, "NotAGzipCompressedFile")
 
           val s3inputStream = s3Client
-            .getObject(bucket.underlying, key)
+            .getObject(bucket.name, key)
             .getObjectContent()
 
           val source = S3Source(s3inputStream = s3inputStream)

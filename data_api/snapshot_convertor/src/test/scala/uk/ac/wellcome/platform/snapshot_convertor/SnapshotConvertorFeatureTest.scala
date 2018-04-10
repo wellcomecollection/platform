@@ -73,9 +73,9 @@ class SnapshotConvertorFeatureTest
 
           withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              sourceBucketName = sourceBucket.underlying,
+              sourceBucketName = sourceBucket.name,
               sourceObjectKey = objectKey,
-              targetBucketName = targetBucket.underlying,
+              targetBucketName = targetBucket.name,
               targetObjectKey = targetObjectKey
             )
 
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucket.underlying, targetObjectKey),
+                new GetObjectRequest(targetBucket.name, targetObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -127,7 +127,7 @@ class SnapshotConvertorFeatureTest
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/${targetBucket.underlying}/$targetObjectKey"
+                  s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

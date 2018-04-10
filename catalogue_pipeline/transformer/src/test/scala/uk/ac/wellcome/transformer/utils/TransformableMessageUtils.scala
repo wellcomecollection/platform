@@ -95,7 +95,7 @@ trait TransformableMessageUtils {
                              bucket: Bucket) = {
 
     val key = "testSource/1/testId/dshg548.json"
-    s3Client.putObject(bucket.underlying, key, message)
+    s3Client.putObject(bucket.name, key, message)
 
     val hybridRecord = HybridRecord(
       id = "testId",

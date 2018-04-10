@@ -65,10 +65,10 @@ class SierraReaderWorkerServiceTest
           val worker = new SierraReaderWorkerService(
             reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
             s3client = s3Client,
-            s3Config = S3Config(bucket.underlying),
+            s3Config = S3Config(bucket.name),
             windowManager = new WindowManager(
               s3Client,
-              S3Config(bucket.underlying),
+              S3Config(bucket.name),
               fields,
               resourceType),
             batchSize = batchSize,
@@ -124,7 +124,7 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucket.underlying).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
         objects.map { _.getKey() } shouldBe pageNames
@@ -168,7 +168,7 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucket.underlying).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
@@ -190,9 +190,9 @@ class SierraReaderWorkerServiceTest
       val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
 
       // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
-      s3Client.putObject(fixtures.bucket.underlying, s"$prefix/0000.json", "[]")
+      s3Client.putObject(fixtures.bucket.name, s"$prefix/0000.json", "[]")
       s3Client.putObject(
-        fixtures.bucket.underlying,
+        fixtures.bucket.name,
         s"$prefix/0001.json",
         """
           |[
@@ -231,7 +231,7 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucket.underlying).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames

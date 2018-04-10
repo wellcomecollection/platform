@@ -37,7 +37,7 @@ trait LocalVersionedHybridStore
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
           s3Client = s3Client,
-          s3Config = S3Config(bucketName = bucket.underlying),
+          s3Config = S3Config(bucketName = bucket.name),
           keyPrefixGenerator = new KeyPrefixGenerator[T] {
             override def generate(obj: T): String = "/"
           }

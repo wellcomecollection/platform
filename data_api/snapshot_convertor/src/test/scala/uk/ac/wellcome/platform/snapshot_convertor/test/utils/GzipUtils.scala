@@ -15,7 +15,7 @@ trait GzipUtils extends S3 {
     val gzipFile = createGzipFile(content)
     val key = (Random.alphanumeric take 10 mkString).toLowerCase
 
-    s3Client.putObject(bucket.underlying, key, gzipFile)
+    s3Client.putObject(bucket.name, key, gzipFile)
 
     testWith(key)
   }

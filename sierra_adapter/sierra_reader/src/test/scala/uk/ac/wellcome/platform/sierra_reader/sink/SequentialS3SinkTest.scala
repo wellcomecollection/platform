@@ -33,7 +33,7 @@ class SequentialS3SinkTest
     implicit val executionContext = actorSystem.dispatcher
     val sink = SequentialS3Sink(
       s3Client,
-      bucketName = bucket.underlying,
+      bucketName = bucket.name,
       keyPrefix = keyPrefix,
       offset = offset
     )
@@ -58,7 +58,7 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucket.underlying).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 1
               s3objects.head.getKey() shouldBe "testA_0000.json"
 
@@ -87,7 +87,7 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucket.underlying).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 3
               s3objects.map {
                 _.getKey()
@@ -124,7 +124,7 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucket.underlying).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects.map {
                 _.getKey()
               } shouldBe List(

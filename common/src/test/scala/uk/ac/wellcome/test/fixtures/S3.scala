@@ -14,8 +14,8 @@ import scala.util.Random
 
 object S3 {
 
-  class Bucket(val underlying: String) extends AnyVal {
-    override def toString = s"Bucket($underlying)"
+  class Bucket(val name: String) extends AnyVal {
+    override def toString = s"S3.Bucket($name)"
   }
 
   object Bucket {
@@ -39,7 +39,7 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
     "aws.region" -> "localhost",
-    "aws.s3.bucketName" -> bucket.underlying
+    "aws.s3.bucketName" -> bucket.name
   )
 
   private val credentials = new AWSStaticCredentialsProvider(
@@ -66,17 +66,17 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
       },
       destroy = { bucket: Bucket =>
         safeCleanup(s3Client) {
-          _.listObjects(bucket.underlying).getObjectSummaries.foreach { obj =>
-            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.underlying, _) }
+          _.listObjects(bucket.name).getObjectSummaries.foreach { obj =>
+            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
           }
         }
 
-        s3Client.deleteBucket(bucket.underlying)
+        s3Client.deleteBucket(bucket.name)
       }
     )
 
   def getContentFromS3(bucket: Bucket, key: String): String = {
-    IOUtils.toString(s3Client.getObject(bucket.underlying, key).getObjectContent)
+    IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
   }
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {

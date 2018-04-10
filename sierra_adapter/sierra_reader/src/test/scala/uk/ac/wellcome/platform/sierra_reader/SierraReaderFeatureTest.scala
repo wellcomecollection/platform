@@ -47,7 +47,7 @@ class SierraReaderFeatureTest
           eventually {
             // This comes from the wiremock recordings for Sierra API response
             s3Client
-              .listObjects(bucket.underlying)
+              .listObjects(bucket.name)
               .getObjectSummaries should have size 2
           }
         }

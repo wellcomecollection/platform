@@ -25,7 +25,7 @@ class WindowManagerTest
     testWith: TestWith[WindowManager, Assertion]) = {
     val windowManager = new WindowManager(
       s3client = s3Client,
-      s3Config = S3Config(bucket.underlying),
+      s3Config = S3Config(bucket.name),
       fields = "title",
       resourceType = SierraResourceTypes.bibs
     )
@@ -51,7 +51,7 @@ class WindowManagerTest
         val prefix = windowManager.buildWindowShard("[2013,2014]")
 
         // We pre-populate S3 with files as if they'd come from a prior run of the reader.
-        s3Client.putObject(bucket.underlying, s"$prefix/0000.json", "[]")
+        s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
         val record =
           SierraRecord(
@@ -60,7 +60,7 @@ class WindowManagerTest
             modifiedDate = Instant.now())
 
         s3Client.putObject(
-          bucket.underlying,
+          bucket.name,
           s"$prefix/0001.json",
           toJson(List(record)).get
         )
@@ -78,7 +78,7 @@ class WindowManagerTest
     withLocalS3Bucket { bucket =>
       withWindowManager(bucket) { windowManager =>
         val prefix = windowManager.buildWindowShard("[2013,2014]")
-        s3Client.putObject(bucket.underlying, s"$prefix/0000.json", "not valid")
+        s3Client.putObject(bucket.name, s"$prefix/0000.json", "not valid")
 
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
@@ -94,7 +94,7 @@ class WindowManagerTest
       withWindowManager(bucket) { windowManager =>
         val prefix = windowManager.buildWindowShard("[2013,2014]")
 
-        s3Client.putObject(bucket.underlying, s"$prefix/0000.json", "[]")
+        s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
@@ -110,7 +110,7 @@ class WindowManagerTest
       withWindowManager(bucket) { windowManager =>
         val prefix = windowManager.buildWindowShard("[2013,2014]")
 
-        s3Client.putObject(bucket.underlying, s"$prefix/000x.json", "[]")
+        s3Client.putObject(bucket.name, s"$prefix/000x.json", "[]")
 
         val result = windowManager.getCurrentStatus("[2013,2014]")
 

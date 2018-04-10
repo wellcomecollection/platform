@@ -108,9 +108,9 @@ class ConvertorServiceTest
           val targetObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.underlying,
+            sourceBucketName = sourceBucket.name,
             sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.underlying,
+            targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
           )
 
@@ -120,7 +120,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.underlying, targetObjectKey),
+              new GetObjectRequest(targetBucket.name, targetObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -138,7 +138,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.underlying}/$targetObjectKey"
+                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
             )
           }
         }
@@ -195,9 +195,9 @@ class ConvertorServiceTest
         withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
           val targetObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.underlying,
+            sourceBucketName = sourceBucket.name,
             sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.underlying,
+            targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
           )
 
@@ -207,7 +207,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.underlying, targetObjectKey),
+              new GetObjectRequest(targetBucket.name, targetObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -225,7 +225,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.underlying}/$targetObjectKey"
+                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
             )
           }
         }
@@ -238,9 +238,9 @@ class ConvertorServiceTest
           ((_, _, _, convertorService: ConvertorService), sourceBucket),
           targetBucket) =>
         val conversionJob = ConversionJob(
-          sourceBucketName = sourceBucket.underlying,
+          sourceBucketName = sourceBucket.name,
           sourceObjectKey = "doesnotexist.txt.gz",
-          targetBucketName = targetBucket.underlying,
+          targetBucketName = targetBucket.name,
           targetObjectKey = "target.txt.gz"
         )
 
@@ -261,9 +261,9 @@ class ConvertorServiceTest
           sourceBucket,
           content = "This is not what snapshots look like") { objectKey =>
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.underlying,
+            sourceBucketName = sourceBucket.name,
             sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.underlying,
+            targetBucketName = targetBucket.name,
             targetObjectKey = "target.txt.gz"
           )
 

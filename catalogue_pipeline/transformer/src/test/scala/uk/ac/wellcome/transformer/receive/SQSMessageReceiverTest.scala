@@ -75,7 +75,7 @@ class SQSMessageReceiverTest
     val recordReceiver = new SQSMessageReceiver(
       snsWriter = snsWriter,
       s3Client = s3Client,
-      s3Config = S3Config(bucket.underlying),
+      s3Config = S3Config(bucket.name),
       metricsSender = metricsSender
     )
 

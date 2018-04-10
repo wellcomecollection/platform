@@ -591,7 +591,7 @@ class SierraItemMergerUpdaterServiceTest
               new VersionedHybridStore[SierraTransformable](
                 sourcedObjectStore = new S3ObjectStore(
                   s3Client = s3Client,
-                  s3Config = S3Config(bucketName = bucket.underlying),
+                  s3Config = S3Config(bucketName = bucket.name),
                   new SourcedKeyPrefixGenerator),
                 versionedDao = failingVersionedDao
               )

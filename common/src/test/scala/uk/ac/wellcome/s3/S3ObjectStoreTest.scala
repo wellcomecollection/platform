@@ -29,7 +29,7 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucket.underlying),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -63,7 +63,7 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucket.underlying),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -88,7 +88,7 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucket.underlying),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -113,7 +113,7 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucket.underlying),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -133,7 +133,7 @@ class S3ObjectStoreTest
     withLocalS3Bucket { bucket =>
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucket.underlying),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = "doesnt_matter"
         }
