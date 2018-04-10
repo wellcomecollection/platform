@@ -45,18 +45,17 @@ trait LocalDynamoDb[T <: Versioned with Id] {
 
   case class FixtureParams(tableName: String, indexName: String)
 
-  def withLocalDynamoDbTableAndIndex[R](
-    testWith: TestWith[FixtureParams, R]): R = {
-    val tableName = Random.alphanumeric.take(10).mkString
-    val indexName = Random.alphanumeric.take(10).mkString
-
-    try {
+  def withLocalDynamoDbTableAndIndex[R] = fixture[FixtureParams, R](
+    create = {
+      val tableName = Random.alphanumeric.take(10).mkString
+      val indexName = Random.alphanumeric.take(10).mkString
       createTable(tableName, indexName)
-      testWith(FixtureParams(tableName, indexName))
-    } finally {
+      FixtureParams(tableName, indexName)
+    },
+    destroy = { _ =>
       deleteAllTables()
     }
-  }
+  )
 
   def withLocalDynamoDbTable[R](testWith: TestWith[String, R]): R = {
     withLocalDynamoDbTableAndIndex { fixtures =>

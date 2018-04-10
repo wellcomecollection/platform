@@ -1,30 +1,20 @@
 package uk.ac.wellcome.test.fixtures
 
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
+import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.Eventually
 
 trait Akka extends Eventually {
 
-  def withActorSystem[R](testWith: TestWith[ActorSystem, R]) = {
-    val actorSystem = ActorSystem()
+  def withActorSystem[R] = fixture[ActorSystem, R](
+    create = ActorSystem(),
+    destroy = eventually { _.terminate() }
+  )
 
-    try {
-      testWith(actorSystem)
-    } finally {
-      actorSystem.terminate()
-      eventually { actorSystem.whenTerminated }
-    }
-  }
+  def withMaterializer[R](actorSystem: ActorSystem) =
+    fixture[ActorMaterializer, R](
+      create = ActorMaterializer()(actorSystem),
+      destroy = _.shutdown()
+    )
 
-  def withMaterializer[R](actorSystem: ActorSystem)(
-    testWith: TestWith[ActorMaterializer, R]): R = {
-    val materializer = ActorMaterializer()(actorSystem)
-
-    try {
-      testWith(materializer)
-    } finally {
-      materializer.shutdown()
-    }
-  }
 }

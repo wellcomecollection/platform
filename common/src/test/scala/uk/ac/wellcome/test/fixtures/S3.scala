@@ -2,7 +2,6 @@ package uk.ac.wellcome.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.s3.model.S3ObjectSummary
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.twitter.inject.Logging
 import io.circe.Json
@@ -40,25 +39,27 @@ trait S3 extends Logging with Eventually {
       new EndpointConfiguration(localS3EndpointUrl, regionName))
     .build()
 
-  def withLocalS3Bucket[R](testWith: TestWith[String, R]) = {
-    val bucketName: String = (Random.alphanumeric take 10 mkString).toLowerCase
+  def withLocalS3Bucket[R] =
+    fixture[String, R](
+      create = {
+        val bucketName: String =
+          (Random.alphanumeric take 10 mkString).toLowerCase
 
-    val bucket = s3Client.createBucket(bucketName)
-    eventually { s3Client.doesBucketExistV2(bucketName) }
+        val bucket = s3Client.createBucket(bucketName)
+        eventually { s3Client.doesBucketExistV2(bucketName) }
 
-    try {
-      testWith(bucket.getName)
-    } finally {
-
-      safeCleanup(s3Client) {
-        _.listObjects(bucket.getName).getObjectSummaries.foreach { obj =>
-          safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.getName, _) }
+        bucketName
+      },
+      destroy = { bucketName: String =>
+        safeCleanup(s3Client) {
+          _.listObjects(bucketName).getObjectSummaries.foreach { obj =>
+            safeCleanup(obj.getKey) { s3Client.deleteObject(bucketName, _) }
+          }
         }
-      }
 
-      safeCleanup(bucket.getName) { s3Client.deleteBucket(_) }
-    }
-  }
+        safeCleanup(bucketName) { s3Client.deleteBucket(_) }
+      }
+    )
 
   def safeCleanup[T](resource: T)(f: T => Unit): Unit = {
     Try {

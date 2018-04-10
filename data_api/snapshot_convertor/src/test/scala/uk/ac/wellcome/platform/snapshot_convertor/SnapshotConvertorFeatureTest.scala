@@ -36,10 +36,10 @@ class SnapshotConvertorFeatureTest
     with ExtendedPatience {
 
   def withFixtures[R] =
-    withLocalSqsQueue[R] _ and
-      withLocalSnsTopic[R] _ and
-      withLocalS3Bucket[R] _ and
-      withLocalS3Bucket[R] _
+    withLocalSqsQueue[R] and
+      withLocalSnsTopic[R] and
+      withLocalS3Bucket[R] and
+      withLocalS3Bucket[R]
 
   it("completes a conversion successfully") {
     withFixtures {
