@@ -2,21 +2,11 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.display.models.WorksUtil
 import uk.ac.wellcome.platform.api.fixtures.{
   ElasticsearchServiceFixture,
   WorksServiceFixture
 }
-import uk.ac.wellcome.display.models.{
-  DisplayIdentifier,
-  DisplayWork,
-  WorksIncludes,
-  WorksUtil
-}
-import uk.ac.wellcome.platform.api.models.DisplayResultList
-import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class WorksServiceTest
     extends FunSpec

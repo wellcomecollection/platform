@@ -434,8 +434,6 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-
-
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     val identifier1 = SourceIdentifier(

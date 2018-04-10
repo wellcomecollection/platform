@@ -7,9 +7,9 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayJacksonModuleTest
+class DisplayWorkSerialisationTest
     extends FunSpec
-    with DisplayJacksonModuleTestBase
+    with DisplaySerialisationTestBase
     with JsonTestUtil
     with WorksUtil {
   val injector = Guice.createInjector(DisplayJacksonModule)
@@ -69,8 +69,9 @@ class DisplayJacksonModuleTest
       )
     )
 
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(items = true)))
-        val expectedJson = s"""
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(work, WorksIncludes(items = true)))
+    val expectedJson = s"""
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
@@ -93,7 +94,8 @@ class DisplayJacksonModuleTest
       title = "Without windows or wind or washing-up liquid",
       items = List()
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(items = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(work, WorksIncludes(items = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -131,7 +133,8 @@ class DisplayJacksonModuleTest
       canonicalId = "yxh928a",
       items = List(item))
 
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(workWithCopyright, WorksIncludes(items = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(workWithCopyright, WorksIncludes(items = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
@@ -170,19 +173,19 @@ class DisplayJacksonModuleTest
       canonicalId = "test_subject1",
       subjects = List(Concept("fish"), Concept("gardening"))
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(workWithSubjects))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWork(workWithSubjects))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [ ${concepts(
-          workWithSubjects.subjects)} ],
+                            workWithSubjects.subjects)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin
-
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
@@ -196,7 +199,8 @@ class DisplayJacksonModuleTest
       canonicalId = "test_subject1",
       genres = List(Concept("woodwork"), Concept("etching"))
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(workWithSubjects))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWork(workWithSubjects))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",
@@ -208,7 +212,6 @@ class DisplayJacksonModuleTest
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin
-
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
 
