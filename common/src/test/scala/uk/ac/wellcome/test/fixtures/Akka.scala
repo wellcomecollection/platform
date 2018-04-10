@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.Eventually
 
-trait Akka extends Eventually {
+trait Akka extends Eventually with ImplicitLogging {
 
   def withActorSystem[R] = fixture[ActorSystem, R](
     create = ActorSystem(),

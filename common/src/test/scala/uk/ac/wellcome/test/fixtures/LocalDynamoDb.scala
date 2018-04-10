@@ -14,7 +14,7 @@ import com.gu.scanamo.DynamoFormat
 
 import scala.collection.JavaConversions._
 
-trait LocalDynamoDb[T <: Versioned with Id] {
+trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
 
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port

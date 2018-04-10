@@ -10,9 +10,9 @@ import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
 
 import scala.collection.JavaConversions._
-import scala.util.{Random, Try}
+import scala.util.Random
 
-trait S3 extends Logging with Eventually {
+trait S3 extends Logging with Eventually with ImplicitLogging {
 
   protected val localS3EndpointUrl = "http://localhost:33333"
   protected val regionName = "localhost"
@@ -57,20 +57,9 @@ trait S3 extends Logging with Eventually {
           }
         }
 
-        safeCleanup(bucketName) { s3Client.deleteBucket(_) }
+        s3Client.deleteBucket(bucketName)
       }
     )
-
-  def safeCleanup[T](resource: T)(f: T => Unit): Unit = {
-    Try {
-      logger.debug(s"cleaning up resource=[$resource]")
-      f(resource)
-    } recover {
-      case e =>
-        logger.warn(s"error cleaning up resource=[$resource]")
-        e.printStackTrace()
-    }
-  }
 
   def getContentFromS3(bucketName: String, key: String): String = {
     IOUtils.toString(s3Client.getObject(bucketName, key).getObjectContent)
