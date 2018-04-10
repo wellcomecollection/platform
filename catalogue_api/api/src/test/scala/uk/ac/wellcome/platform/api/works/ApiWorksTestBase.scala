@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.Indexable
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{DisplayJacksonModuleTestBase, WorksUtil}
+import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.Server
@@ -14,7 +14,7 @@ trait ApiWorksTestBase
     extends FunSpec
     with FeatureTestMixin
     with IndexedElasticSearchLocal
-    with DisplayJacksonModuleTestBase
+    with DisplaySerialisationTestBase
     with WorksUtil {
 
   val indexName = "works"
