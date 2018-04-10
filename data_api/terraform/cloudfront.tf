@@ -14,6 +14,8 @@ resource "aws_cloudfront_distribution" "data_api" {
   enabled         = true
   is_ipv6_enabled = true
 
+  default_root_object = "index.html"
+
   aliases = ["data.wellcomecollection.org"]
 
   default_cache_behavior {
