@@ -44,11 +44,13 @@ import math
 import boto3
 import docopt
 import maya
+import pytz
 import tqdm
 
 
 def generate_windows(start, end, minutes):
-    current = start
+    current = pytz.utc.localize(start)
+    end = pytz.utc.localize(end)
     while current <= end:
         yield {
             'start': current.isoformat(),
