@@ -51,17 +51,17 @@ trait LocalVersionedHybridStore
   def assertStored[T <: Id](bucket: Bucket, tableName: String, record: T)(
     implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
-      getJsonFor[T](bucket.underlying, tableName, record),
+      getJsonFor[T](bucket, tableName, record),
       toJson(record).get
     )
 
-  def getJsonFor[T <: Id](bucketName: String, tableName: String, record: T) = {
+  def getJsonFor[T <: Id](bucket: Bucket, tableName: String, record: T) = {
     val hybridRecord = Scanamo
       .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
       .get
       .right
       .get
 
-    getJsonFromS3(bucketName, hybridRecord.s3key).noSpaces
+    getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
   }
 }

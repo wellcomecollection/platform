@@ -89,7 +89,7 @@ class SierraBibMergerFeatureTest
 
               eventually {
                 assertStored[SierraTransformable](
-                  bucket.underlying,
+                  bucket,
                   tableName,
                   expectedSierraTransformable)
               }

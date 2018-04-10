@@ -104,7 +104,7 @@ class ConvertorServiceTest
         }
         val content = elasticsearchJsons.mkString("\n")
 
-        withGzipCompressedS3Key(sourceBucket.underlying, content) { objectKey =>
+        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
           val targetObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
@@ -192,7 +192,7 @@ class ConvertorServiceTest
         val gzipFileSize = createGzipFile(content).length.toInt
         gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
-        withGzipCompressedS3Key(sourceBucket.underlying, content) { objectKey =>
+        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
           val targetObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
             sourceBucketName = sourceBucket.underlying,

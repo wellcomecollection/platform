@@ -47,7 +47,7 @@ class VersionedHybridStoreTest
           hybridStore.updateRecord(record.id)(record)(identity)()
 
         whenReady(future) { _ =>
-          getJsonFor(bucket.underlying, tableName, record) shouldBe toJson(record).get
+          getJsonFor(bucket, tableName, record) shouldBe toJson(record).get
         }
     }
   }
@@ -70,7 +70,7 @@ class VersionedHybridStoreTest
             .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
         whenReady(future) { _ =>
-          getJsonFor(bucket.underlying, tableName, record) shouldBe toJson(
+          getJsonFor(bucket, tableName, record) shouldBe toJson(
             expectedRecord).get
         }
     }
@@ -97,7 +97,7 @@ class VersionedHybridStoreTest
         }
 
         whenReady(updatedFuture) { _ =>
-          getJsonFor(bucket.underlying, tableName, updatedRecord) shouldBe toJson(
+          getJsonFor(bucket, tableName, updatedRecord) shouldBe toJson(
             updatedRecord).get
         }
     }

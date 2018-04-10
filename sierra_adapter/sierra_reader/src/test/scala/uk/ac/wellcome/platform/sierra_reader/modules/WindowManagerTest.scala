@@ -25,7 +25,7 @@ class WindowManagerTest
     testWith: TestWith[WindowManager, Assertion]) = {
     val windowManager = new WindowManager(
       s3client = s3Client,
-      s3Config = S3Config(bucket),
+      s3Config = S3Config(bucket.underlying),
       fields = "title",
       resourceType = SierraResourceTypes.bibs
     )

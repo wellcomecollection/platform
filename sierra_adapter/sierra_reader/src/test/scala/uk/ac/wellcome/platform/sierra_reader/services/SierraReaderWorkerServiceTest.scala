@@ -129,9 +129,9 @@ class SierraReaderWorkerServiceTest
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
         objects.map { _.getKey() } shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(0)) should have size 10
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(1)) should have size 10
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(2)) should have size 9
+        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
+        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
+        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 9
       }
     }
   }
@@ -173,10 +173,10 @@ class SierraReaderWorkerServiceTest
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(0)) should have size 50
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(1)) should have size 50
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(2)) should have size 50
-        getRecordsFromS3(fixtures.bucket.underlying, pageNames(3)) should have size 7
+        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
       }
     }
   }
@@ -249,7 +249,7 @@ class SierraReaderWorkerServiceTest
 
   private def getRecordsFromS3(bucket: Bucket,
                                key: String): List[SierraRecord] =
-    fromJson[List[SierraRecord]](getContentFromS3(bucket.underlying, key)).get
+    fromJson[List[SierraRecord]](getContentFromS3(bucket, key)).get
 
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {

@@ -47,7 +47,7 @@ class S3ObjectStoreTest
         actualKey shouldBe expectedKey
 
         val jsonFromS3 = getJsonFromS3(
-          bucket.underlying,
+          bucket,
           expectedKey
         ).noSpaces
 

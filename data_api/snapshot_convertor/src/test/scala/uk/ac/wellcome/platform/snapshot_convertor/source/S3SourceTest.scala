@@ -28,7 +28,7 @@ class S3SourceTest
       implicit val system = actorSystem
       implicit val materializer = ActorMaterializer()
 
-      withLocalS3Bucket { bucker =>
+      withLocalS3Bucket { bucket =>
         withS3AkkaClient(actorSystem, materializer) { akkaS3client =>
           val expectedLines = List(
             "AARGH! An armada of alpaccas",

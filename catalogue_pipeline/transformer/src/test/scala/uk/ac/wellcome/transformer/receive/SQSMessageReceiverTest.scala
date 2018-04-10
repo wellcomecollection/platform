@@ -98,10 +98,10 @@ class SQSMessageReceiverTest
             sourceName = "calm",
             version = 1,
             s3Client = s3Client,
-            bucketName = bucket.underlying
+            bucket = bucket
           )
 
-          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+          withSQSMessageReceiver(topicArn, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(calmSqsMessage)
 
             whenReady(future) { _ =>
@@ -133,7 +133,7 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+          withSQSMessageReceiver(topicArn, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
             val sourceIdentifier = SourceIdentifier(
@@ -180,7 +180,7 @@ class SQSMessageReceiverTest
               bucket = bucket
             )
 
-          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+          withSQSMessageReceiver(topicArn, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
             whenReady(future.failed) { x =>
@@ -198,7 +198,7 @@ class SQSMessageReceiverTest
         withLocalS3Bucket { bucket =>
           val snsWriter = mockSNSWriter
 
-          withSQSMessageReceiver(topicArn, bucketName, Some(snsWriter)) {
+          withSQSMessageReceiver(topicArn, bucket, Some(snsWriter)) {
             recordReceiver =>
               val future = recordReceiver.receiveMessage(
                 createValidEmptySierraBibSQSMessage(
@@ -222,7 +222,7 @@ class SQSMessageReceiverTest
     "returns a failed future if it's unable to transform the transformable object") {
     withLocalSnsTopic { topicArn =>
       withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+        withLocalS3Bucket { bucket =>
           val failingTransformCalmSqsMessage: SQSMessage =
             hybridRecordSqsMessage(
               message = createValidCalmTramsformableJson(
@@ -235,10 +235,10 @@ class SQSMessageReceiverTest
               sourceName = "calm",
               version = 1,
               s3Client = s3Client,
-              bucketName = bucketName
+              bucket = bucket
             )
 
-          withSQSMessageReceiver(topicArn, bucketName) { recordReceiver =>
+          withSQSMessageReceiver(topicArn, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
