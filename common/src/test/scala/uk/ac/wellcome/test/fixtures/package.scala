@@ -10,7 +10,8 @@ package object fixtures extends FixtureComposers {
 
   type Fixture[L, R] = TestWith[L, R] => R
 
-  def safeCleanup[L](resource: L)(f: L => Unit)(implicit logger: Logger): Unit = {
+  def safeCleanup[L](resource: L)(f: L => Unit)(
+    implicit logger: Logger): Unit = {
     Try {
       logger.debug(s"cleaning up resource=[$resource]")
       f(resource)
@@ -21,13 +22,14 @@ package object fixtures extends FixtureComposers {
 
   private val noop = (x: Any) => ()
 
-  def fixture[L, R](create: => L, destroy: L => Unit = noop)(implicit logger: Logger): Fixture[L, R] =
+  def fixture[L, R](create: => L, destroy: L => Unit = noop)(
+    implicit logger: Logger): Fixture[L, R] =
     (testWith: TestWith[L, R]) => {
       val loan = create
       try {
         testWith(loan)
       } finally {
-        safeCleanup(loan){ destroy(_) }
+        safeCleanup(loan) { destroy(_) }
       }
     }
 
