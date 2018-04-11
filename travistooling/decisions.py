@@ -5,11 +5,6 @@ class Decision(Exception):
     """
     The base class for all decisions.
     """
-    path = None
-
-    def __init__(self, path):
-        self.path == path
-        super(Decision, self).__init__()
 
 
 class SignificantFile(Decision):
