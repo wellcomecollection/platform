@@ -101,9 +101,9 @@ def should_run_job(changed_paths, task_name):
         try:
             does_file_affect_build_job(path=path, task_name=task_name)
         except InsignificantFile as err:
-            report[False][type(err)].add(path)
+            report[False][err.message].add(path)
         except SignificantFile as err:
-            report[True][type(err)].add(path)
+            report[True][err.message].add(path)
 
     return (
         bool(report[True]),
