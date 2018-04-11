@@ -217,8 +217,7 @@ class DisplayWorkSerialisationTest
 
   }
 
-  it(
-    "includes a list of identifiers on DisplayWork") {
+  it("includes a list of identifiers on DisplayWork") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       ontologyType = "Work",
@@ -229,7 +228,8 @@ class DisplayWorkSerialisationTest
       title = "An insect huddled in an igloo",
       identifiers = List(srcIdentifier)
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(identifiers = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(work, WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -243,7 +243,7 @@ class DisplayWorkSerialisationTest
                           | "placesOfPublication": [ ]
                           |}
           """.stripMargin
-      assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
   it(
@@ -253,7 +253,8 @@ class DisplayWorkSerialisationTest
       title = "Idling inkwells of indigo images",
       identifiers = List()
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(identifiers = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(work, WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -281,7 +282,8 @@ class DisplayWorkSerialisationTest
         license = License_CCBY
       )
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(thumbnail = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWork(work, WorksIncludes(thumbnail = true)))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",
@@ -386,9 +388,15 @@ class DisplayWorkSerialisationTest
                              |  "id": "${work.canonicalId}",
                              |  "title": "${work.title.get}",
                              |  "creators": [
-                             |    ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-                             |    ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)},
-                             |    ${identifiedOrUnidentifiable(work.creators(2), abstractAgent)}
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(0),
+                              abstractAgent)},
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(1),
+                              abstractAgent)},
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(2),
+                              abstractAgent)}
                              |  ],
                              |  "subjects": [ ],
                              |  "genres": [ ],
@@ -420,7 +428,8 @@ class DisplayWorkSerialisationTest
           )
         )
       )
-      val displayWork = DisplayWork(work, includes = WorksIncludes(items = true))
+      val displayWork =
+        DisplayWork(work, includes = WorksIncludes(items = true))
 
       val actualJson = objectMapper.writeValueAsString(displayWork)
       val expectedJson = s"""
@@ -521,7 +530,8 @@ class DisplayWorkSerialisationTest
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
-                            |  "publicationDate": ${period(work.publicationDate.get)},
+                            |  "publicationDate": ${period(
+                              work.publicationDate.get)},
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
 
@@ -559,9 +569,15 @@ class DisplayWorkSerialisationTest
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [
-                            |    ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(work.publishers(2), abstractAgent)}
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(0),
+                              abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(1),
+                              abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(2),
+                              abstractAgent)}
                             |  ],
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
