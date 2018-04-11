@@ -55,5 +55,5 @@ class ScalaChangeAndIsScalaApp(SignificantFile):
     message = 'Changes to Scala common libs affect Scala apps'
 
 
-class ScalaChangeAndScalaFree(InsignificantFile):
+class ScalaChangeAndNotScalaApp(InsignificantFile):
     message = 'Changes to Scala common libs are irrelevant to non-Scala apps'

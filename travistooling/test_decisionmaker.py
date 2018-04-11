@@ -13,7 +13,7 @@ from travistooling.decisions import (
     IgnoredFileFormat,
     IgnoredPath,
     ScalaChangeAndIsScalaApp,
-    ScalaChangeAndScalaFree,
+    ScalaChangeAndNotScalaApp,
     UnrecognisedFile
 )
 
@@ -54,11 +54,11 @@ from travistooling.decisions import (
     ('catalogue_pipeline/ingestor/bar.scala', 'api-test', ExclusivelyAffectsAnotherTask, False),
 
     # Anything in the sierra_adapter directory/common lib
-    ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndScalaFree, False),
-    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndScalaFree, False),
-    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndScalaFree, False),
+    ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
+    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndNotScalaApp, False),
+    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
-    ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndScalaFree, False),
+    ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
 ])
 def test_does_file_affect_build_job(path, task_name, exc_class, is_significant):
@@ -78,7 +78,7 @@ def test_should_not_run_job_with_no_relevant_changes():
         task_name='loris-test'
     )
     assert result == (False, {
-        False: {ScalaChangeAndScalaFree.message: set(['sierra_adapter/common/main.scala'])},
+        False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
         True: {}
     })
 
@@ -92,6 +92,6 @@ def test_should_run_job_with_relevant_changes():
         task_name='loris-test'
     )
     assert result == (True, {
-        False: {ScalaChangeAndScalaFree.message: set(['sierra_adapter/common/main.scala'])},
+        False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
         True: {ExclusivelyAffectsThisTask.message: set(['loris/loris/Dockerfile'])}
     })
