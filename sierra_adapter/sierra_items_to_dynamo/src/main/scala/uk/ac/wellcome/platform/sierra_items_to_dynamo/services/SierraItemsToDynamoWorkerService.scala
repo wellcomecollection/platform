@@ -17,11 +17,11 @@ class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  versionedDao: VersionedDao
+  dynamoInserter: DynamoInserter
 ) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics) {
 
   override implicit val decoder = deriveDecoder[SierraRecord]
 
   override def store(record: SierraRecord): Future[Unit] =
-    versionedDao.updateRecord(record.toItemRecord.get)
+    dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
 }

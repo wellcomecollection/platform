@@ -97,8 +97,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
     mergedRecord.unlinkedBibIds shouldBe List("3")
   }
 
-  it(
-    "should return the existing record unchanged if the update has an older date") {
+  it("returns the existing record unchanged if the update has an older date") {
     val existingRecord = sierraItemRecord(
       bibIds = List("1", "2", "3"),
       modifiedDate = "2017-01-01T00:00:00Z",
