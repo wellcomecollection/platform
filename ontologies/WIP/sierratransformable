@@ -47,13 +47,13 @@
    */
 
 
-   /* Populate wwork:remainingTitle. The rules are as follows:
+   /* Populate wwork:subTitle. The rules are as follows:
    * 
    * 1. For all bibliographic records use bib 245 b.
    * 2. Populate wwork:remainingTitle with contents of 245 b.
    *
    * Example: 
-   *    "remainingTitle" : "a handbook on methods and programs of tuberculosis work"
+   *    "subTitle" : "a handbook on methods and programs of tuberculosis work"
    */
    
    
@@ -102,15 +102,14 @@
 
    /* Populate wwork:creators. Rules:
    * 
-   * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
+   * 1. For all bibliographic records use "marcTag": "100", "110" (removing "111" from scope)
    * 2. Platform "label" populate from subfield "a"
    * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
    * 4. For "110" type as "Organisation"
-   * 5. Ignore: For "111" type as "Event"
    * 6. If subfield 0 contains a value use it to populate "identifiers". The "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
-   * ignore for now 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * ignore for now 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
-   * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
+   * 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
+   * 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation,  
+   * 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
    *
    * Note: Do we need to remove trailing punctuation on subfields? The punctuation is there for the purpose of the concatentation of concept and qualifiers.
    *
@@ -152,14 +151,14 @@
    /* Populate wwork:contributors. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "100", "110" (removing this from scope "111")
-   * 2. Platform "name" populate from subfield "a"
+   * 2. Platform "label" populate from subfield "a"
    * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
    * 4. For "110" type as "Organisation"
    * 5. Ignore: For "111" type as "Event"
    * 6. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
-   * ignore for now 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * ignore for now 9. If 700, 710 or 711 repeat with same rules where; 700 type Person, 710 type Organisation, 711 type Event 
-   * ignore for now 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
+   * 7. For subfield "d" and "f" type as "Period", for all other subfields provide no type
+   * 9. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation 
+   * 10. Inaddition to excluding 6,9,4 also exclude 4 and 5 
    * 11. Populate roles "label" with the contents of subfield e for both 100 and 110.
    *
    *
@@ -224,36 +223,35 @@
    * 
    * 1. For all bibliographic records use "marcTag": "655".
    * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- ' and type as "Genre".
-   * 3. Populate platform "primaryConcept" "label" with subfield "a".
+   * 3. Populate platform "concepts" with "label" from subfield "a".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 5. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period", "v" as "Form" and "z" as "Place").
-   * 
+   * 5. For other subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield "y" type as "Period", "v" as "Concept" and "z" as "Place".
    *
    *
    *
    *{
    *  "genres": [
    *    {
-   *      "label": "Caricatures 1952",
+   *      "label": "Caricatures -- sketch",
    *      "type": "Genre",
-   *      "primaryConcept": {
-   *       "id": "a24s7qf3",
-   *        "label": "Caricatures",
-   *        "type": "Concept",
-   *        "identifiers": [
-   *          {
-   *            "type": "Identifier",
-   *            "identifierScheme": "lctgm",
-   *            "value": "tgm001698"
-   *          }
-   *        ],
-   *        "secondaryConcepts": [
-   *          {
-   *            "label": "bibliography",
-   *            "type": "Form"
-   *          }
-   *        ]
-   *      }
+   *      "concepts": [
+   *        {
+   *          "id": "a24s7qf3",
+   *          "label": "Caricatures",
+   *          "type": "Concept",
+   *          "identifiers": [
+   *            {
+   *              "type": "Identifier",
+   *              "identifierScheme": "lctgm",
+   *              "value": "tgm001698"
+   *            }
+   *          ]
+   *        },
+   *        {
+   *          "label": "sketch",
+   *          "type": "Concept"
+   *        }
+   *      ]
    *    }
    *  ]
    *}
@@ -266,9 +264,9 @@
    * 
    * 1. For all bibliographic records use "marcTag": "650".
    * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- '  and type as "Subject".
-   * 3. Populate platform "primaryConcept" "label" with subfield "a".
+   * 3. Populate platform "concepts" "label" with subfield "a".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 5. For each subfield, for subfields v,x,y,z populate "secondaryConcepts" with a "label", type "Concept" (except subfield "y" type as "Period", "v" as "Form" and "z" as "Place").
+   * 5. For for subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield "y" type as "Period", "v" as "Concept" and "z" as "Place".
    * 
    *
    *
@@ -277,27 +275,27 @@
    *{
    *  "subjects": [
    *    {
-   *      "label": "Tuberculosis - prevention & control.",
+   *      "label": "Tuberculosis -- prevention & control -- Paris -- 1850 -- bibliography.",
    *      "type": "Subject",
-   *      "primaryConcept": {
-   *        "id": "hd2891f",
-   *        "label": "Tuberculosis",
-   *        "type": "Concept",
-   *        "identifiers": [
-   *          {
-   *            "type": "Identifier",
-   *            "identifierScheme": "mesh",
-   *            "value": "D014376Q000517"
-   *          }
-   *        ]
-   *      },
-   *      "secondaryConcepts": [
+   *      "concepts": [
    *        {
-   *          "label": "prevention & control",
+   *          "id": "hd2891f",
+   *          "label": "Tuberculosis",
+   *          "type": "Concept",
+   *          "identifiers": [
+   *            {
+   *              "type": "Identifier",
+   *              "identifierScheme": "mesh",
+   *              "value": "D014376Q000517"
+   *            }
+   *          ]
+   *        },
+   *        {
+   *          "label": "Paris",
    *          "type": "Place"
    *        },
    *        {
-   *          "label": "prevention & control",
+   *          "label": "1850",
    *          "type": "Period"
    *        },
    *        {
@@ -306,10 +304,38 @@
    *        },
    *        {
    *          "label": "bibliography",
-   *          "type": "Form"
+   *          "type": "Genre"
    *        }
    *      ]
-   *    }
+   *},
+   *    {
+   *      "label": "Paris",
+   *      "type": "Subject",
+   *      "concepts": [
+   *        {
+   *          "id": "h388hh",
+   *          "label": "Paris",
+   *          "type": "Place",
+   *          "identifiers": [
+   *            {
+   *              "type": "Identifier",
+   *              "identifierScheme": "lcsh",
+   *              "value": "sh2168721872"
+   *            }
+   *          ]
+   *        }
+   *      ]
+       *},
+   *    {
+   *      "label": "1820",
+   *      "type": "Subject",
+   *      "concepts": [
+   *        {
+   *          "label": "1820",
+   *          "type": "Period"
+   *        }
+   *      ]
+       *}
    *  ]
    *}
    *
