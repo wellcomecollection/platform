@@ -50,7 +50,6 @@ trait ApiWorksTestBase
     |  "results": []
     |}""".stripMargin
 
-
   def badRequest(description: String) =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",

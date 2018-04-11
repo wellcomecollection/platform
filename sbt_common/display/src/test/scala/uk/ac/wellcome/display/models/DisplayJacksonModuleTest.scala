@@ -6,7 +6,11 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayJacksonModuleTest extends FunSpec with DisplayJacksonModuleTestBase with JsonTestUtil with WorksUtil {
+class DisplayJacksonModuleTest
+    extends FunSpec
+    with DisplayJacksonModuleTestBase
+    with JsonTestUtil
+    with WorksUtil {
   val injector = Guice.createInjector(DisplayJacksonModule)
 
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
@@ -39,8 +43,8 @@ class DisplayJacksonModuleTest extends FunSpec with DisplayJacksonModuleTestBase
        | "lettering": "$lettering",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
-      work.creators(0),
-      abstractAgent)} ],
+                                  work.creators(0),
+                                  abstractAgent)} ],
        | "subjects": [ ],
        | "genres": [ ],
        | "publishers": [ ],

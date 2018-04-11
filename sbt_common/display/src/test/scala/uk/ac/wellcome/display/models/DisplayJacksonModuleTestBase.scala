@@ -5,7 +5,7 @@ import io.circe.parser._
 import org.scalatest.Suite
 import uk.ac.wellcome.models._
 
-trait DisplayJacksonModuleTestBase {this: Suite =>
+trait DisplayJacksonModuleTestBase { this: Suite =>
 
   def items(its: List[IdentifiedItem]) =
     its
@@ -128,7 +128,6 @@ trait DisplayJacksonModuleTestBase {this: Suite =>
       "type": "Period",
       "label": "${p.label}"
     }"""
-
 
   def concept(con: AbstractConcept) =
     s"""
