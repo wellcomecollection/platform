@@ -216,4 +216,86 @@ class DisplayWorkSerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
 
   }
+
+  it(
+    "includes a list of identifiers on DisplayWork") {
+    val srcIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "Test1234"
+    )
+    val work = workWith(
+      canonicalId = "1234",
+      title = "An insect huddled in an igloo",
+      identifiers = List(srcIdentifier)
+    )
+    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(identifiers = true)))
+    val expectedJson = s"""
+                          |{
+                          | "type": "Work",
+                          | "id": "${work.canonicalId}",
+                          | "title": "${work.title.get}",
+                          | "creators": [ ],
+                          | "identifiers": [ ${identifier(srcIdentifier)} ],
+                          | "subjects": [ ],
+                          | "genres": [ ],
+                          | "publishers": [ ],
+                          | "placesOfPublication": [ ]
+                          |}
+          """.stripMargin
+      assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
+
+  it(
+    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+    val work = workWith(
+      canonicalId = "a87na87",
+      title = "Idling inkwells of indigo images",
+      identifiers = List()
+    )
+    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(identifiers = true)))
+    val expectedJson = s"""
+                          |{
+                          | "type": "Work",
+                          | "id": "${work.canonicalId}",
+                          | "title": "${work.title.get}",
+                          | "creators": [ ],
+                          | "identifiers": [ ],
+                          | "subjects": [ ],
+                          | "genres": [ ],
+                          | "publishers": [ ],
+                          | "placesOfPublication": [ ]
+                          |}
+          """.stripMargin
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
+
+  it(
+    "includes the thumbnail field if available and we use the thumbnail include") {
+    val work = identifiedWorkWith(
+      canonicalId = "1234",
+      title = "A thorn in the thumb tells a traumatic tale",
+      thumbnail = DigitalLocation(
+        locationType = "thumbnail-image",
+        url = "https://iiif.example.org/1234/default.jpg",
+        license = License_CCBY
+      )
+    )
+    val actualJson = objectMapper.writeValueAsString(DisplayWork(work, WorksIncludes(thumbnail = true)))
+    val expectedJson = s"""
+                          |   {
+                          |     "type": "Work",
+                          |     "id": "${work.canonicalId}",
+                          |     "title": "${work.title.get}",
+                          |     "creators": [ ],
+                          |     "subjects": [ ],
+                          |     "genres": [ ],
+                          |     "publishers": [ ],
+                          |     "placesOfPublication": [ ],
+                          |     "thumbnail": ${location(work.thumbnail.get)}
+                          |   }
+          """.stripMargin
+
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
 }
