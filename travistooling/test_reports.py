@@ -1,9 +1,9 @@
 # -*- encoding: utf-8
 
 from travistooling.decisions import (
-    KnownAffectsThisTask,
-    KnownDoesNotAffectThisTask,
+    ExclusivelyAffectsThisTask,
     IgnoredPath,
+    ScalaChangeAndScalaFree,
 )
 from travistooling.reports import build_report_output
 
@@ -11,17 +11,17 @@ from travistooling.reports import build_report_output
 def test_build_complete_report():
     report = {
         True: {
-            KnownAffectsThisTask: set(['foo/bar.txt', 'foo/baz.txt']),
+            ExclusivelyAffectsThisTask: set(['foo/bar.txt', 'foo/baz.txt']),
         },
         False: {
             IgnoredPath: set(['README.md', 'LICENSE']),
-            KnownDoesNotAffectThisTask: set(['main.scala']),
+            ScalaChangeAndScalaFree: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
 ## Reasons to run tests ##
 
-KnownAffectsThisTask:
+ExclusivelyAffectsThisTask:
  - foo/bar.txt
  - foo/baz.txt
 
@@ -32,7 +32,7 @@ IgnoredPath:
  - LICENSE
  - README.md
 
-KnownDoesNotAffectThisTask:
+ScalaChangeAndScalaFree:
  - main.scala""".strip()
 
 
@@ -41,7 +41,7 @@ def test_report_only_includes_relevant_sections():
         True: {},
         False: {
             IgnoredPath: set(['README.md', 'LICENSE']),
-            KnownDoesNotAffectThisTask: set(['main.scala']),
+            ScalaChangeAndScalaFree: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
@@ -51,5 +51,5 @@ IgnoredPath:
  - LICENSE
  - README.md
 
-KnownDoesNotAffectThisTask:
+ScalaChangeAndScalaFree:
  - main.scala""".strip()
