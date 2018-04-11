@@ -62,6 +62,13 @@ trait DisplayJacksonModuleTestBase {this: Suite =>
       "value": "${identifier.value}"
     }"""
 
+  // Some of our fields can be optionally identified (e.g. creators).
+  //
+  // Values in these fields are wrapped in either "Unidentifiable" or
+  // "Identified".  In the first case, we use the default serialisation
+  // unmodified.  In the second case, we modify the JSON to include
+  // the "id" field and the "identifiers" field.
+  //
   def identifiedOrUnidentifiable[T](displayableAgent: Displayable[T],
                                     f: T => String) =
     displayableAgent match {
