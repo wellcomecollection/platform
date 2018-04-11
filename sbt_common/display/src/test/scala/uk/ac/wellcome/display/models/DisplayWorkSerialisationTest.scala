@@ -399,4 +399,44 @@ class DisplayWorkSerialisationTest
       assertJsonStringsAreEqual(actualJson, expectedJson)
     }
   }
+
+  describe("locations") {
+    it("serialises a physical location correctly") {
+      val physicalLocation = PhysicalLocation(
+        locationType = "smeg",
+        label = "a stack of slick slimes"
+      )
+
+      val work = IdentifiedWork(
+        canonicalId = "zm9q6c6h",
+        sourceIdentifier = sourceIdentifier,
+        version = 1,
+        title = Some("A zoo of zebras doing zumba"),
+        items = List(
+          IdentifiedItem(
+            canonicalId = "mhberjwy7",
+            sourceIdentifier = sourceIdentifier,
+            locations = List(physicalLocation)
+          )
+        )
+      )
+      val displayWork = DisplayWork(work, includes = WorksIncludes(items = true))
+
+      val actualJson = objectMapper.writeValueAsString(displayWork)
+      val expectedJson = s"""
+                             |{
+                             |  "type": "Work",
+                             |  "id": "${work.canonicalId}",
+                             |  "title": "${work.title.get}",
+                             |  "creators": [ ],
+                             |  "items": [ ${items(work.items)} ],
+                             |  "subjects": [ ],
+                             |  "genres": [ ],
+                             |  "publishers": [],
+                             |  "placesOfPublication": [ ]
+                             |}""".stripMargin
+
+      assertJsonStringsAreEqual(actualJson, expectedJson)
+    }
+  }
 }
