@@ -45,9 +45,9 @@ class IngestorFeatureTest
       )
       .get
 
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       sqsClient.sendMessage(
-        queueUrl,
+        queue.url,
         JsonUtil
           .toJson(
             SQSMessage(
@@ -61,7 +61,7 @@ class IngestorFeatureTest
           .get
       )
 
-      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, itemType)
 
       withLocalElasticsearchIndex(indexName, itemType) { _ =>
         withServer(flags) { _ =>
@@ -86,7 +86,7 @@ class IngestorFeatureTest
   }
 
   it("deletes a message from the queue if it fails processing") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       val invalidMessage = JsonUtil
         .toJson(
           SQSMessage(
@@ -100,11 +100,11 @@ class IngestorFeatureTest
         .get
 
       sqsClient.sendMessage(
-        queueUrl,
+        queue.url,
         invalidMessage
       )
 
-      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, itemType)
 
       withServer(flags) { _ =>
         // After a message is read, it stays invisible for 1 second and then it gets sent again.
@@ -117,7 +117,7 @@ class IngestorFeatureTest
         eventually {
           sqsClient
             .getQueueAttributes(
-              queueUrl,
+              queue.url,
               List("ApproximateNumberOfMessagesNotVisible")
             )
             .getAttributes

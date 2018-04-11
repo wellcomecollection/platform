@@ -18,8 +18,8 @@ class SierraReaderFeatureTest
 
   it("reads bibs from Sierra and writes files to S3") {
     withLocalS3Bucket { bucket =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queueUrl) ++ Map(
+      withLocalSqsQueue { queue =>
+        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queue) ++ Map(
           "reader.resourceType" -> "bibs",
           "sierra.apiUrl" -> "http://localhost:8080",
           "sierra.oauthKey" -> "key",
@@ -42,7 +42,7 @@ class SierraReaderFeatureTest
             "topic",
             "messageType",
             "timestamp")
-          sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response

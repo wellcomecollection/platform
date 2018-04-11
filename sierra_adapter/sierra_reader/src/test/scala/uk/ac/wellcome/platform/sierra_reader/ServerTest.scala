@@ -9,8 +9,8 @@ class ServerTest extends FunSpec with fixtures.Server with S3 with SQS {
 
   it("it shows the healthcheck message") {
     withLocalS3Bucket { bucket =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queueUrl) ++ Map(
+      withLocalSqsQueue { queue =>
+        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queue) ++ Map(
           "reader.resourceType" -> "bibs",
           "sierra.apiUrl" -> "http://localhost:8080",
           "sierra.oauthKey" -> "key",

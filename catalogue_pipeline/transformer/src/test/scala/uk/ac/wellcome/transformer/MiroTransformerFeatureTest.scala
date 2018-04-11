@@ -12,6 +12,7 @@ import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class MiroTransformerFeatureTest
     extends FunSpec
@@ -33,26 +34,26 @@ class MiroTransformerFeatureTest
     val secondTitle = "A song about a snake"
 
     withLocalSnsTopic { topicArn =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { queue =>
         withLocalS3Bucket { bucket =>
           sendMiroImageToSQS(
             miroID = miroID,
             data = shouldNotTransformMessage(title),
             bucket = bucket,
-            queueUrl = queueUrl
+            queue = queue
           )
 
           sendMiroImageToSQS(
             miroID = secondMiroID,
             data = shouldTransformMessage(secondTitle),
             bucket = bucket,
-            queueUrl = queueUrl
+            queue = queue
           )
 
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queueUrl)
+            queue)
 
           withServer(flags) { _ =>
             eventually {
@@ -93,7 +94,7 @@ class MiroTransformerFeatureTest
     miroID: String,
     data: String,
     bucket: Bucket,
-    queueUrl: String
+    queue: Queue
   ) = {
     val miroTransformable =
       MiroTransformable(
@@ -111,7 +112,7 @@ class MiroTransformerFeatureTest
         bucket = bucket
       )
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queue.url, JsonUtil.toJson(sqsMessage).get)
   }
 
 }

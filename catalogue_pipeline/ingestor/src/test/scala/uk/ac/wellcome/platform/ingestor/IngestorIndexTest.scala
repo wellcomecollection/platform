@@ -28,8 +28,8 @@ class IngestorIndexTest
       }
     }
 
-    withLocalSqsQueue { queueUrl =>
-      val flags = sqsLocalFlags(queueUrl) ++ esLocalFlags(indexName, itemType)
+    withLocalSqsQueue { queue =>
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, itemType)
 
       withServer(flags) { _ =>
         eventually {

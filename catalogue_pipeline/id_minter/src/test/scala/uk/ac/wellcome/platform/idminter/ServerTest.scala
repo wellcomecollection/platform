@@ -13,10 +13,10 @@ class ServerTest
     with fixtures.IdentifiersDatabase {
 
   it("shows the healthcheck message") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { server =>
             server.httpGet(

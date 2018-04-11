@@ -35,7 +35,7 @@ class CalmTransformerFeatureTest
         data = """{"AccessStatus": ["public"]}""")
 
     withLocalSnsTopic { topicArn =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { queue =>
         withLocalS3Bucket { bucket =>
           val calmHybridRecordMessage = hybridRecordSqsMessage(
             message = JsonUtil.toJson(calmTransformable).get,
@@ -48,11 +48,11 @@ class CalmTransformerFeatureTest
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queueUrl)
+            queue)
 
           withServer(flags) { _ =>
             sqsClient.sendMessage(
-              queueUrl,
+              queue.url,
               JsonUtil.toJson(calmHybridRecordMessage).get
             )
 

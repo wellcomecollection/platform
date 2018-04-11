@@ -33,8 +33,8 @@ class SierraItemsToDynamoFeatureTest
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { tableName =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(
+      withLocalSqsQueue { queue =>
+        val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(
           tableName)
 
         withServer(flags) { server =>
@@ -51,7 +51,7 @@ class SierraItemsToDynamoFeatureTest
               "topic",
               "messageType",
               "timestamp")
-          sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
           eventually {
             Scanamo.scan[SierraItemRecord](dynamoDbClient)(tableName) should have size 1

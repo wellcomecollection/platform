@@ -19,6 +19,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
@@ -50,7 +51,7 @@ class SierraReaderWorkerServiceTest
       ActorSystem())
 
   case class FixtureParams(worker: SierraReaderWorkerService,
-                           queueUrl: String,
+                           queue: Queue,
                            bucket: Bucket)
 
   def withSierraReaderWorkerService(
@@ -60,10 +61,10 @@ class SierraReaderWorkerServiceTest
     resourceType: SierraResourceTypes.Value = SierraResourceTypes.bibs
   )(testWith: TestWith[FixtureParams, Assertion]) = {
     withActorSystem { actorSystem =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { queue =>
         withLocalS3Bucket { bucket =>
           val worker = new SierraReaderWorkerService(
-            reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             s3client = s3Client,
             s3Config = S3Config(bucket.name),
             windowManager = new WindowManager(
@@ -82,7 +83,7 @@ class SierraReaderWorkerServiceTest
           )
 
           try {
-            testWith(FixtureParams(worker, queueUrl, bucket))
+            testWith(FixtureParams(worker, queue, bucket))
           } finally {
             worker.stop()
           }
@@ -114,7 +115,7 @@ class SierraReaderWorkerServiceTest
           "messageType",
           "timestamp")
 
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -158,7 +159,7 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -221,7 +222,7 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>

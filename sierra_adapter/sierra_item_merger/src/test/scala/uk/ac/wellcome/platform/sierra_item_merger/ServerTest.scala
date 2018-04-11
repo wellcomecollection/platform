@@ -17,10 +17,10 @@ class ServerTest
     DynamoFormat[HybridRecord]
 
   it("shows the healthcheck message") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { server =>
             server.httpGet(

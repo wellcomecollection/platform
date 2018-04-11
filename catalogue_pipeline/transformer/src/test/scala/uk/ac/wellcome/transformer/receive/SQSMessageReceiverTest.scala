@@ -86,7 +86,7 @@ class SQSMessageReceiverTest
   it("receives a message and send it to SNS client") {
 
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
             message = createValidCalmTramsformableJson(
@@ -123,7 +123,7 @@ class SQSMessageReceiverTest
     val version = 5
 
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage: SQSMessage = hybridRecordSqsMessage(
             message =
@@ -170,7 +170,7 @@ class SQSMessageReceiverTest
 
   it("returns a failed future if it's unable to parse the SQS message") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val invalidCalmSqsMessage: SQSMessage =
             hybridRecordSqsMessage(
@@ -195,7 +195,7 @@ class SQSMessageReceiverTest
 
   it("sends no message where Transformable work is None") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val snsWriter = mockSNSWriter
 
@@ -222,7 +222,7 @@ class SQSMessageReceiverTest
   it(
     "returns a failed future if it's unable to transform the transformable object") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val failingTransformCalmSqsMessage: SQSMessage =
             hybridRecordSqsMessage(
@@ -267,7 +267,7 @@ class SQSMessageReceiverTest
           .get)
 
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val message = hybridRecordSqsMessage(
             message = JsonUtil.toJson(sierraTransformable).get,

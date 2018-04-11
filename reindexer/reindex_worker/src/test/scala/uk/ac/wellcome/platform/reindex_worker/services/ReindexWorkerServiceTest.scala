@@ -52,7 +52,7 @@ class ReindexWorkerServiceTest
         actorSystem = actorSystem
       )
 
-      withLocalSqsQueue { queueUrl =>
+      withLocalSqsQueue { queue =>
         withLocalSnsTopic { topic =>
           val workerService = new ReindexWorkerService(
             targetService = new ReindexService(
@@ -68,7 +68,7 @@ class ReindexWorkerServiceTest
             reader = new SQSReader(
               sqsClient = sqsClient,
               sqsConfig = SQSConfig(
-                queueUrl = queueUrl,
+                queueUrl = queue.url,
                 waitTime = 1 second,
                 maxMessages = 1
               )

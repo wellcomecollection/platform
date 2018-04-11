@@ -18,8 +18,8 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalDynamoDbTable { tableName =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(
+      withLocalSqsQueue { queue =>
+        val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(
           tableName)
 
         withServer(flags) { server =>

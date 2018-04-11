@@ -27,10 +27,10 @@ class IdMinterWorkerTest
     with MockitoSugar {
 
   it("should create the Identifiers table in MySQL upon startup") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           val identifiersDao = mock[IdentifiersDao]
 

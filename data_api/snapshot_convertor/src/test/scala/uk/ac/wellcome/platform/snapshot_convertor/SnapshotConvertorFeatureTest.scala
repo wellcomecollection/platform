@@ -43,8 +43,8 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queueUrl, topic), sourceBucket), targetBucket) =>
-        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
+      case (((queue, topic), sourceBucket), targetBucket) =>
+        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
           sourceBucket)
 
         withServer(flags) { _ =>
@@ -87,7 +87,7 @@ class SnapshotConvertorFeatureTest
               timestamp = "now"
             )
 
-            sqsClient.sendMessage(queueUrl, toJson(message).get)
+            sqsClient.sendMessage(queue.url, toJson(message).get)
 
             eventually {
 

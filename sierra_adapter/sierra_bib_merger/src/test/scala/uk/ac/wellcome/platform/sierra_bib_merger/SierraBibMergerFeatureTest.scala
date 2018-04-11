@@ -11,7 +11,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS}
+import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -62,10 +63,10 @@ class SierraBibMergerFeatureTest
   implicit val encoder = Encoder[SierraTransformable]
 
   it("should store a bib in the hybrid store") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
@@ -82,7 +83,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2001-01-01T01:01:01Z"
               )
 
-              sendMessageToSQS(toJson(record).get, queueUrl = queueUrl)
+              sendMessageToSQS(toJson(record).get, queue)
 
               val expectedSierraTransformable =
                 SierraTransformable(bibRecord = record)
@@ -101,10 +102,10 @@ class SierraBibMergerFeatureTest
   }
 
   it("stores multiple bibs from SQS") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
@@ -121,7 +122,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2001-01-01T01:01:01Z"
               )
 
-              sendMessageToSQS(toJson(record1).get, queueUrl = queueUrl)
+              sendMessageToSQS(toJson(record1).get, queue)
 
               val expectedSierraTransformable1 =
                 SierraTransformable(bibRecord = record1)
@@ -137,7 +138,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2002-02-02T02:02:02Z"
               )
 
-              sendMessageToSQS(toJson(record2).get, queueUrl = queueUrl)
+              sendMessageToSQS(toJson(record2).get, queue)
 
               val expectedSierraTransformable2 =
                 SierraTransformable(bibRecord = record2)
@@ -160,10 +161,10 @@ class SierraBibMergerFeatureTest
   }
 
   it("updates a bib if a newer version is sent to SQS") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
@@ -198,7 +199,7 @@ class SierraBibMergerFeatureTest
                 .updateRecord(oldRecord.id)(oldRecord)(identity)(
                   SourceMetadata(oldRecord.sourceName))
                 .map { _ =>
-                  sendMessageToSQS(toJson(record).get, queueUrl = queueUrl)
+                  sendMessageToSQS(toJson(record).get, queue)
                 }
 
               val expectedSierraTransformable =
@@ -218,10 +219,10 @@ class SierraBibMergerFeatureTest
   }
 
   it("does not update a bib if an older version is sent to SQS") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
@@ -258,7 +259,7 @@ class SierraBibMergerFeatureTest
                   expectedSierraTransformable)(identity)(
                   SourceMetadata(expectedSierraTransformable.sourceName))
                 .map { _ =>
-                  sendMessageToSQS(toJson(record).get, queueUrl = queueUrl)
+                  sendMessageToSQS(toJson(record).get, queue)
                 }
 
               // Blocking in Scala is generally a bad idea; we do it here so there's
@@ -277,10 +278,10 @@ class SierraBibMergerFeatureTest
   }
 
   it("stores a bib from SQS if the ID already exists but no bibData") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { tableName =>
-          val flags = sqsLocalFlags(queueUrl) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
+          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
             tableName)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
@@ -306,7 +307,7 @@ class SierraBibMergerFeatureTest
                   SourceMetadata(newRecord.sourceName))
 
               future.map { _ =>
-                sendMessageToSQS(toJson(record).get, queueUrl = queueUrl)
+                sendMessageToSQS(toJson(record).get, queue)
               }
 
               val expectedSierraTransformable =
@@ -325,7 +326,7 @@ class SierraBibMergerFeatureTest
     }
   }
 
-  private def sendMessageToSQS(body: String, queueUrl: String) = {
+  private def sendMessageToSQS(body: String, queue: Queue) = {
     val message = SQSMessage(
       subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
       body = body,
@@ -333,6 +334,6 @@ class SierraBibMergerFeatureTest
       messageType = "messageType",
       timestamp = "2001-01-01T01:01:01Z"
     )
-    sqsClient.sendMessage(queueUrl, toJson(message).get)
+    sqsClient.sendMessage(queue.url, toJson(message).get)
   }
 }

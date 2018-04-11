@@ -26,6 +26,7 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFix
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.duration._
 
@@ -45,7 +46,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,
-    queueUrl: String,
+    queue: Queue,
     tableName: String
   )
 
@@ -54,7 +55,7 @@ class SierraItemsToDynamoWorkerServiceTest
     withActorSystem { actorSystem =>
       withDynamoInserter {
         case (tableName, dynamoInserter) =>
-          withLocalSqsQueue { queueUrl =>
+          withLocalSqsQueue { queue =>
             val mockPutMetricDataResult = mock[PutMetricDataResult]
             val mockCloudWatch = mock[AmazonCloudWatch]
 
@@ -70,7 +71,7 @@ class SierraItemsToDynamoWorkerServiceTest
             val sierraItemsToDynamoWorkerService =
               new SierraItemsToDynamoWorkerService(
                 reader =
-                  new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+                  new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
                 system = actorSystem,
                 metrics = mockMetrics,
                 dynamoInserter = new DynamoInserter(
@@ -83,7 +84,7 @@ class SierraItemsToDynamoWorkerServiceTest
             testWith(
               ServiceFixtures(
                 service = sierraItemsToDynamoWorkerService,
-                queueUrl = queueUrl,
+                queue = queue,
                 tableName = tableName
               ))
           }
@@ -130,7 +131,7 @@ class SierraItemsToDynamoWorkerServiceTest
         "timestamp"
       )
 
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val expectedBibIds = List("3", "4", "5")
       val expectedUnlinkedBibIds = List("1", "2")

@@ -4,24 +4,42 @@ import com.amazonaws.auth._
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
+import uk.ac.wellcome.models.aws.SQSMessage
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.auth.AWSStaticCredentialsProvider
 
 import scala.util.Random
 import scala.collection.JavaConversions._
-import uk.ac.wellcome.models.aws.SQSMessage
+
+import scala.util.Random
+
+object SQS {
+
+  class Queue(val url: String) extends AnyVal {
+    override def toString = s"SQS.Queue($url)"
+  }
+
+  object Queue {
+    def apply(url: String): Queue = new Queue(url)
+  }
+
+}
 
 trait SQS extends ImplicitLogging {
+
+  import SQS._
 
   private val sqsEndpointUrl = "http://localhost:9324"
 
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def sqsLocalFlags(queueUrl: String) = Map(
+  def sqsLocalFlags(queue: Queue) = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.sqs.accessKey" -> accessKey,
     "aws.sqs.secretKey" -> secretKey,
     "aws.region" -> "localhost",
-    "aws.sqs.queue.url" -> queueUrl,
+    "aws.sqs.queue.url" -> queue.url,
     "aws.sqs.waitTime" -> "1"
   )
 
@@ -35,19 +53,19 @@ trait SQS extends ImplicitLogging {
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
-  def withLocalSqsQueue[R] = fixture[String, R](
+  def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
       val url = sqsClient.createQueue(queueName).getQueueUrl
 
       sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
-      url
+      Queue(url)
     },
-    destroy = { url: String =>
-      safeCleanup(url) { url =>
-        sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(url))
+    destroy = { queue =>
+      safeCleanup(queue) { url =>
+        sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
       }
-      sqsClient.deleteQueue(url)
+      sqsClient.deleteQueue(queue.url)
     }
   )
 

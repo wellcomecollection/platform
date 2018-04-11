@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.collection.JavaConversions._
 
@@ -42,7 +43,7 @@ class IdMinterFeatureTest
       "timestamp")
   }
 
-  private def assertMessageIsNotDeleted(queueUrl: String): Unit = {
+  private def assertMessageIsNotDeleted(queue: Queue): Unit = {
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
     // So we wait for longer than the visibility timeout and then we assert that it has become
     // invisible again, which means that the id_minter picked it up again,
@@ -53,7 +54,7 @@ class IdMinterFeatureTest
     eventually {
       sqsClient
         .getQueueAttributes(
-          queueUrl,
+          queue.url,
           List("ApproximateNumberOfMessagesNotVisible")
         )
         .getAttributes
@@ -63,10 +64,10 @@ class IdMinterFeatureTest
 
   it(
     "mints the same ID for SourcedWorks that have matching source identifiers") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { _ =>
             eventuallyTableExists(dbConfig)
@@ -98,7 +99,7 @@ class IdMinterFeatureTest
 
             (1 to messageCount).foreach { _ =>
               sqsClient.sendMessage(
-                queueUrl,
+                queue.url,
                 toJson(sqsMessage).get
               )
             }
@@ -119,25 +120,25 @@ class IdMinterFeatureTest
   }
 
   it("continues if something fails processing a message") {
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queueUrl) ++ snsLocalFlags(topic) ++ dbConfig.flags
+          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
 
           withServer(flags) { _ =>
-            sqsClient.sendMessage(queueUrl, "not a json string")
+            sqsClient.sendMessage(queue.url, "not a json string")
 
             val miroId = "1234"
             val sqsMessage = generateSqsMessage(miroId)
 
-            sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
             eventually {
               val messages = listMessagesReceivedFromSNS(topic)
               messages should have size (1)
             }
 
-            assertMessageIsNotDeleted(queueUrl)
+            assertMessageIsNotDeleted(queue)
           }
         }
       }
