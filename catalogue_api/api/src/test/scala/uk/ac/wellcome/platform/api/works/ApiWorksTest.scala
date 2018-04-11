@@ -171,7 +171,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns the requested page of results when requested with page & pageSize") {
+  it(
+    "returns the requested page of results when requested with page & pageSize") {
     val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
@@ -294,7 +295,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a BadRequest error when malformed query parameters are presented") {
+  it(
+    "returns a BadRequest error when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -319,7 +321,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns a BadRequest error if the user asks for a page size just over the maximum") {
+  it(
+    "returns a BadRequest error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -329,7 +332,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns a BadRequest error if the user asks for an overly large page size") {
+  it(
+    "returns a BadRequest error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -339,8 +343,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns a BadRequest error if the user asks for zero-length pages") {
+  it("returns a BadRequest error if the user asks for zero-length pages") {
     val pageSize = 0
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -350,8 +353,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns a BadRequest error if the user asks for a negative page size") {
+  it("returns a BadRequest error if the user asks for a negative page size") {
     val pageSize = -50
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
