@@ -16,7 +16,7 @@ class DisplayWorkSerialisationTest
 
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
-  it("should serialise a DisplayWork correctly") {
+  it("serialises a DisplayWork correctly") {
 
     val work = workWith(
       canonicalId = canonicalId,
