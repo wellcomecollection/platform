@@ -134,7 +134,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("renders an item if the items include is present") {
+  it("renders the items if the items include is present") {
     val work = workWith(
       canonicalId = "b4heraz7",
       title = "Inside an irate igloo",
@@ -171,8 +171,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "returns the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
+  it("returns the requested page of results when requested with page & pageSize") {
     val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
@@ -295,7 +294,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a BadRequest when malformed query parameters are presented") {
+  it("returns a BadRequest error when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -303,7 +302,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("ignores parameters that are unused when making an api request") {
+  it("ignores parameters that are unused when making an API request") {
     server.httpGet(
       path = s"/$apiPrefix/works?foo=bar",
       andExpect = Status.Ok,
@@ -311,8 +310,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns a not found error when requesting a single work with a non existing id") {
+  it("returns a NotFound error when requesting a work with a non-existent id") {
     val badId = "non-existing-id"
     server.httpGet(
       path = s"/$apiPrefix/works/$badId",
@@ -321,8 +319,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+  it("returns a BadRequest error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -332,8 +329,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns an HTTP Bad Request error if the user asks for an overly large page size") {
+  it("returns a BadRequest error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -344,7 +340,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "returns an HTTP Bad Request error if the user asks for zero-length pages") {
+    "returns a BadRequest error if the user asks for zero-length pages") {
     val pageSize = 0
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -355,7 +351,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "returns an HTTP Bad Request error if the user asks for a negative page size") {
+    "returns a BadRequest error if the user asks for a negative page size") {
     val pageSize = -50
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -365,7 +361,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns an HTTP Bad Request error if the user asks for page 0") {
+  it("returns a BadRequest error if the user asks for page 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
@@ -373,7 +369,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns an HTTP Bad Request error if the user asks for a page before 0") {
+  it("returns a BadRequest error if the user asks for a page before 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
@@ -535,8 +531,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "can look at different Elasticsearch indices based on the ?index query parameter") {
+  it("searches different indices with the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A whale on a wave"
@@ -590,8 +585,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "can search different Elasticsearch indices based on the ?_index query parameter") {
+  it("looks up works in different indices with the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A wombat wallowing under a willow"
