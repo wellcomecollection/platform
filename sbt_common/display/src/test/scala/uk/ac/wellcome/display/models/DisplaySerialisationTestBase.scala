@@ -5,7 +5,7 @@ import io.circe.parser._
 import org.scalatest.Suite
 import uk.ac.wellcome.models._
 
-trait DisplayJacksonModuleTestBase { this: Suite =>
+trait DisplaySerialisationTestBase { this: Suite =>
 
   def items(its: List[IdentifiedItem]) =
     its

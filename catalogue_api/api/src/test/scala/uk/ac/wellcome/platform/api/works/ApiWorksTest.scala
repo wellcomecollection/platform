@@ -134,7 +134,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("renders an item if the items include is present") {
+  it("renders the items if the items include is present") {
     val work = workWith(
       canonicalId = "b4heraz7",
       title = "Inside an irate igloo",
@@ -171,98 +171,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes 'items' if the items include is present, even with no items") {
-    val work = workWith(
-      canonicalId = "dgdb712",
-      title = "Without windows or wind or washing-up liquid",
-      items = List()
-    )
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          | "type": "Work",
-                          | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
-                          | "creators": [ ],
-                          | "items": [ ],
-                          | "subjects": [ ],
-                          | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
-  it("includes credit information in API responses") {
-    val location = DigitalLocation(
-      locationType = "thumbnail-image",
-      url = "",
-      credit = Some("Wellcome Collection"),
-      license = License_CCBY
-    )
-    val item = IdentifiedItem(
-      canonicalId = "chu27a8",
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(),
-      locations = List(location)
-    )
-    val workWithCopyright = IdentifiedWork(
-      title = Some("A scarf on a squirrel"),
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "yxh928a",
-      items = List(item))
-    insertIntoElasticSearch(workWithCopyright)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works?includes=items",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-          |{
-          |  ${resultList()},
-          |  "results": [
-          |   {
-          |     "type": "Work",
-          |     "id": "${workWithCopyright.canonicalId}",
-          |     "title": "${workWithCopyright.title.get}",
-          |     "creators": [ ],
-          |     "subjects": [ ],
-          |     "genres": [ ],
-          |     "publishers": [ ],
-          |     "placesOfPublication": [ ],
-          |     "items": [
-          |       {
-          |         "id": "${item.canonicalId}",
-          |         "type": "${item.ontologyType}",
-          |         "locations": [
-          |           {
-          |             "type": "${location.ontologyType}",
-          |             "url": "",
-          |             "locationType": "${location.locationType}",
-          |             "license": ${license(location.license)},
-          |             "credit": "${location.credit.get}"
-          |           }
-          |         ]
-          |       }
-          |     ]
-          |   }
-          |  ]
-          |}""".stripMargin
-      )
-    }
-  }
-
   it(
-    "returns the requested page of results when requested with page & pageSize, alongside correct next/prev links ") {
+    "returns the requested page of results when requested with page & pageSize") {
     val works = createWorks(3)
 
     insertIntoElasticSearch(works: _*)
@@ -385,7 +295,8 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns a BadRequest when malformed query parameters are presented") {
+  it(
+    "returns a BadRequest error when malformed query parameters are presented") {
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=penguin",
       andExpect = Status.BadRequest,
@@ -393,7 +304,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("ignores parameters that are unused when making an api request") {
+  it("ignores parameters that are unused when making an API request") {
     server.httpGet(
       path = s"/$apiPrefix/works?foo=bar",
       andExpect = Status.Ok,
@@ -401,8 +312,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns a not found error when requesting a single work with a non existing id") {
+  it("returns a NotFound error when requesting a work with a non-existent id") {
     val badId = "non-existing-id"
     server.httpGet(
       path = s"/$apiPrefix/works/$badId",
@@ -412,7 +322,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "returns an HTTP Bad Request error if the user asks for a page size just over the maximum") {
+    "returns a BadRequest error if the user asks for a page size just over the maximum") {
     val pageSize = 101
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -423,7 +333,7 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "returns an HTTP Bad Request error if the user asks for an overly large page size") {
+    "returns a BadRequest error if the user asks for an overly large page size") {
     val pageSize = 100000
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -433,8 +343,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns an HTTP Bad Request error if the user asks for zero-length pages") {
+  it("returns a BadRequest error if the user asks for zero-length pages") {
     val pageSize = 0
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -444,8 +353,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it(
-    "returns an HTTP Bad Request error if the user asks for a negative page size") {
+  it("returns a BadRequest error if the user asks for a negative page size") {
     val pageSize = -50
     server.httpGet(
       path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -455,7 +363,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns an HTTP Bad Request error if the user asks for page 0") {
+  it("returns a BadRequest error if the user asks for page 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=0",
       andExpect = Status.BadRequest,
@@ -463,7 +371,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     )
   }
 
-  it("returns an HTTP Bad Request error if the user asks for a page before 0") {
+  it("returns a BadRequest error if the user asks for a page before 0") {
     server.httpGet(
       path = s"/$apiPrefix/works?page=-50",
       andExpect = Status.BadRequest,
@@ -515,77 +423,6 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "creators": [],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
-                          |   }
-                          |  ]
-                          |}""".stripMargin
-      )
-    }
-  }
-
-  it("includes subject information in API responses") {
-    val workWithSubjects = IdentifiedWork(
-      title = Some("A seal selling seaweed sandwiches in Scotland"),
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      identifiers = List(),
-      canonicalId = "test_subject1",
-      subjects = List(Concept("fish"), Concept("gardening"))
-    )
-    insertIntoElasticSearch(workWithSubjects)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          |  ${resultList()},
-                          |  "results": [
-                          |   {
-                          |     "type": "Work",
-                          |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
-                          |     "creators": [],
-                          |     "subjects": [ ${concepts(
-                            workWithSubjects.subjects)} ],
-                          |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
-                          |   }
-                          |  ]
-                          |}""".stripMargin
-      )
-    }
-  }
-
-  it("includes genre information in API responses") {
-    val workWithSubjects = IdentifiedWork(
-      title = Some("A guppy in a greenhouse"),
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      identifiers = List(),
-      canonicalId = "test_subject1",
-      genres = List(Concept("woodwork"), Concept("etching"))
-    )
-    insertIntoElasticSearch(workWithSubjects)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          |  ${resultList()},
-                          |  "results": [
-                          |   {
-                          |     "type": "Work",
-                          |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
-                          |     "creators": [],
-                          |     "subjects": [ ],
-                          |     "genres": [ ${concepts(workWithSubjects.genres)} ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }
@@ -696,39 +533,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
-    val work = workWith(
-      canonicalId = "a87na87",
-      title = "Idling inkwells of indigo images",
-      identifiers = List()
-    )
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          | "type": "Work",
-                          | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
-                          | "creators": [ ],
-                          | "identifiers": [ ],
-                          | "subjects": [ ],
-                          | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
-  it(
-    "can look at different Elasticsearch indices based on the ?index query parameter") {
+  it("searches different indices with the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A whale on a wave"
@@ -782,8 +587,7 @@ class ApiWorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "can search different Elasticsearch indices based on the ?_index query parameter") {
+  it("looks up works in different indices with the ?_index query parameter") {
     val work = workWith(
       canonicalId = "1234",
       title = "A wombat wallowing under a willow"
@@ -920,43 +724,6 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
-                          |   }
-                          |  ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
-  it("does not include the thumbnail if we omit the thumbnail include") {
-    val work = identifiedWorkWith(
-      canonicalId = "5678",
-      title = "An otter omitted from an occasion in Oslo",
-      thumbnail = DigitalLocation(
-        locationType = "thumbnail-image",
-        url = "",
-        license = License_CCBY
-      )
-    )
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          |  ${resultList()},
-                          |  "results": [
-                          |   {
-                          |     "type": "Work",
-                          |     "id": "${work.canonicalId}",
-                          |     "title": "${work.title.get}",
-                          |     "creators": [ ],
-                          |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
                           |   }
                           |  ]
                           |}
