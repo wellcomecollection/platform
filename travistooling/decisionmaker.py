@@ -13,11 +13,14 @@ import collections
 import os
 
 from travistooling.decisions import (
+    CheckedByTravisFormat,
+    ExclusivelyAffectsAnotherTask,
+    ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
     IgnoredPath,
     InsignificantFile,
-    KnownAffectsThisTask,
-    KnownDoesNotAffectThisTask,
+    ScalaChangeAndIsScalaApp,
+    ScalaChangeAndScalaFree,
     SignificantFile,
     UnrecognisedFile
 )
@@ -36,7 +39,7 @@ def does_file_affect_build_job(path, task_name):
         task_name == 'travis-format' and
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
-        raise KnownAffectsThisTask()
+        raise CheckedByTravisFormat()
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(('.md', '.png', '.graffle', '.tf')):
@@ -58,9 +61,9 @@ def does_file_affect_build_job(path, task_name):
     for dir_name, task_name_prefix in exclusive_directories.items():
         if path.startswith(dir_name):
             if task_name.startswith(task_name_prefix):
-                raise KnownAffectsThisTask()
+                raise ExclusivelyAffectsThisTask()
             else:
-                raise KnownDoesNotAffectThisTask()
+                raise ExclusivelyAffectsAnotherTask(task_name_prefix)
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
@@ -74,9 +77,9 @@ def does_file_affect_build_job(path, task_name):
         for project in PROJECTS:
             if task_name.startswith(project.name):
                 if project.type == 'sbt_app':
-                    raise KnownAffectsThisTask()
+                    raise ScalaChangeAndIsScalaApp()
                 else:
-                    raise KnownDoesNotAffectThisTask()
+                    raise ScalaChangeAndScalaFree()
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.

@@ -5,6 +5,7 @@ class Decision(Exception):
     """
     The base class for all decisions.
     """
+    message = None
 
 
 class SignificantFile(Decision):
@@ -22,30 +23,37 @@ class InsignificantFile(Decision):
 
 
 class UnrecognisedFile(SignificantFile):
-    """
-    We cannot determine if this file has an effect on the current build task.
-    """
+    message = 'Unrecognised file, so assuming significant'
 
 
 class IgnoredPath(InsignificantFile):
-    """
-    This path never has an effect on build tasks.
-    """
+    message = 'Path has no effect on build tasks'
 
 
-class IgnoredFileFormat(IgnoredPath):
-    """
-    This file format never has an effect on build tasks.
-    """
+class IgnoredFileFormat(InsignificantFile):
+    message = 'File format has no effect on build tasks'
 
 
-class KnownAffectsThisTask(SignificantFile):
-    """
-    This file has a known effect on this build task.
-    """
+class ExclusivelyAffectsThisTask(SignificantFile):
+    message = 'Path is an exclusive dependency of this build task'
 
 
-class KnownDoesNotAffectThisTask(InsignificantFile):
-    """
-    This file is known not to affect this build task.
-    """
+class ExclusivelyAffectsAnotherTask(InsignificantFile):
+    def __init__(self, other_task):
+        self.message = (
+            'Path is an exclusive dependency of a different build task (%s)' %
+            (other_task,)
+        )
+        super(ExclusivelyAffectsAnotherTask, self).__init__()
+
+
+class CheckedByTravisFormat(SignificantFile):
+    message = 'File format is checked by the travis-format task'
+
+
+class ScalaChangeAndIsScalaApp(SignificantFile):
+    message = 'Changes to Scala common libs affect Scala apps'
+
+
+class ScalaChangeAndScalaFree(InsignificantFile):
+    message = 'Changes to Scala common libs are irrelevant to non-Scala apps'
