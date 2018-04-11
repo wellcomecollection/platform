@@ -17,7 +17,8 @@ trait LocalVersionedHybridStore
     with S3
     with JsonTestUtil
     with Matchers
-    with ImplicitLogging { this: Suite
+    with ImplicitLogging {
+  this: Suite
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
