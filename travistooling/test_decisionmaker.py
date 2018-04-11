@@ -7,20 +7,23 @@ from travistooling.decisionmaker import (
     should_run_job
 )
 from travistooling.decisions import (
+    CheckedByTravisFormat,
+    ExclusivelyAffectsAnotherTask,
+    ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
     IgnoredPath,
-    KnownAffectsThisTask,
-    KnownDoesNotAffectThisTask,
+    ScalaChangeAndIsScalaApp,
+    ScalaChangeAndNotScalaApp,
     UnrecognisedFile
 )
 
 
 @pytest.mark.parametrize('path, task_name, exc_class, is_significant', [
     # Travis format task
-    ('misc/myscript.py', 'travis-format', KnownAffectsThisTask, True),
-    ('ontologies/item.ttl', 'travis-format', KnownAffectsThisTask, True),
-    ('main.tf', 'travis-format', KnownAffectsThisTask, True),
-    ('example.json', 'travis-format', KnownAffectsThisTask, True),
+    ('misc/myscript.py', 'travis-format', CheckedByTravisFormat, True),
+    ('ontologies/item.ttl', 'travis-format', CheckedByTravisFormat, True),
+    ('main.tf', 'travis-format', CheckedByTravisFormat, True),
+    ('example.json', 'travis-format', CheckedByTravisFormat, True),
     ('README.md', 'travis-format', IgnoredFileFormat, False),
 
     # Unrecognised filenames fall through to being significant, regardless
@@ -45,17 +48,17 @@ from travistooling.decisions import (
     ('ontologies/work.ttl', 'monitoring-publish', IgnoredPath, False),
 
     # Changes that belong exclusively to a single task
-    ('loris/loris/Dockerfile', 'loris-build', KnownAffectsThisTask, True),
-    ('loris/loris/Dockerfile', 'ingestor-test', KnownDoesNotAffectThisTask, False),
-    ('sierra_adapter/sierra_reader/foo.scala', 'sierra_reader-publish', KnownAffectsThisTask, True),
-    ('catalogue_pipeline/ingestor/bar.scala', 'api-test', KnownDoesNotAffectThisTask, False),
+    ('loris/loris/Dockerfile', 'loris-build', ExclusivelyAffectsThisTask, True),
+    ('loris/loris/Dockerfile', 'ingestor-test', ExclusivelyAffectsAnotherTask, False),
+    ('sierra_adapter/sierra_reader/foo.scala', 'sierra_reader-publish', ExclusivelyAffectsThisTask, True),
+    ('catalogue_pipeline/ingestor/bar.scala', 'api-test', ExclusivelyAffectsAnotherTask, False),
 
     # Anything in the sierra_adapter directory/common lib
-    ('sierra_adapter/common/main.scala', 'loris-test', KnownDoesNotAffectThisTask, False),
-    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', KnownDoesNotAffectThisTask, False),
-    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', KnownDoesNotAffectThisTask, False),
-    ('sbt_common/display/model.scala', 'id_minter-test', KnownAffectsThisTask, True),
-    ('sbt_common/display/model.scala', 'loris-publish', KnownDoesNotAffectThisTask, False),
+    ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
+    ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndNotScalaApp, False),
+    ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndNotScalaApp, False),
+    ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
+    ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
 ])
 def test_does_file_affect_build_job(path, task_name, exc_class, is_significant):
@@ -75,7 +78,7 @@ def test_should_not_run_job_with_no_relevant_changes():
         task_name='loris-test'
     )
     assert result == (False, {
-        False: {KnownDoesNotAffectThisTask: set(['sierra_adapter/common/main.scala'])},
+        False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
         True: {}
     })
 
@@ -89,6 +92,6 @@ def test_should_run_job_with_relevant_changes():
         task_name='loris-test'
     )
     assert result == (True, {
-        False: {KnownDoesNotAffectThisTask: set(['sierra_adapter/common/main.scala'])},
-        True: {KnownAffectsThisTask: set(['loris/loris/Dockerfile'])}
+        False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
+        True: {ExclusivelyAffectsThisTask.message: set(['loris/loris/Dockerfile'])}
     })

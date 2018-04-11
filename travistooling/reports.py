@@ -14,7 +14,7 @@ def build_report_output(report, description='run tests'):
         if report[significance]:
             lines.append('## %s %s ##' % (prefix, description))
             for reason, affected_paths in report[significance].items():
-                lines.append('\n%s:' % reason.__name__)
+                lines.append('\n%s:' % reason)
                 for p in sorted(affected_paths):
                     lines.append(' - %s' % p)
 
