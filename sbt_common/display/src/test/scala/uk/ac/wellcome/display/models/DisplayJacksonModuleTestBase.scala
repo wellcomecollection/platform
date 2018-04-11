@@ -69,12 +69,12 @@ trait DisplayJacksonModuleTestBase {this: Suite =>
   // unmodified.  In the second case, we modify the JSON to include
   // the "id" field and the "identifiers" field.
   //
-  def identifiedOrUnidentifiable[T](displayableAgent: Displayable[T],
-                                    f: T => String) =
-    displayableAgent match {
-      case Unidentifiable(ag) => f(ag)
+  def identifiedOrUnidentifiable[T](displayable: Displayable[T],
+                                    serialise: T => String) =
+    displayable match {
+      case Unidentifiable(ag) => serialise(ag)
       case Identified(ag, id, identifiers) =>
-        val agent = parse(f(ag)).right.get.asObject.get
+        val agent = parse(serialise(ag)).right.get.asObject.get
         val identifiersJson = identifiers.map { sourceIdentifier =>
           parse(identifier(sourceIdentifier)).right.get
         }
