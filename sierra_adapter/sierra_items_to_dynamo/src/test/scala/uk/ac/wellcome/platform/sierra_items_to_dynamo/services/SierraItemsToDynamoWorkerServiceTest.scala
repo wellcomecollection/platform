@@ -13,29 +13,28 @@ import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraItemRecord,
-  SierraRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.utils.JsonUtil
 
 import scala.concurrent.duration._
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
-    with LocalDynamoDb[SierraItemRecord]
-    with SQS
-    with Matchers
-    with Eventually
-    with ExtendedPatience
-    with MockitoSugar
-    with Akka
-    with ScalaFutures {
+      with LocalDynamoDb[SierraItemRecord]
+      with SQS
+      with Matchers
+      with Eventually
+      with ExtendedPatience
+      with MockitoSugar
+      with Akka
+      with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
     DynamoFormat[SierraItemRecord]
@@ -88,20 +87,54 @@ class SierraItemsToDynamoWorkerServiceTest
 
   it("reads a sierra record from sqs an inserts it into DynamoDb") {
     withSierraWorkerService { fixtures =>
-      val id = "i12345"
-      val bibId = "b54321"
-      val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
-      val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
-      val message = SierraRecord(id, data, modifiedDate)
+      val id = "12345"
 
-      val sqsMessage =
-        SQSMessage(
+      val bibIds1 = List("1", "2", "3")
+      val modifiedDate1 = "2002-01-01T01:01:01Z"
+
+      val record1 = SierraItemRecord(
+        id = s"$id",
+        modifiedDate = modifiedDate1,
+        data = sierraRecordData(
+          bibIds = bibIds1,
+          modifiedDate = modifiedDate1
+        ),
+        bibIds = bibIds1
+      )
+
+      Scanamo.put(dynamoDbClient)(fixtures.tableName)(record1)
+
+      val bibIds2 = List("3", "4", "5")
+      val modifiedDate2 = Instant.parse("2002-01-01T01:01:01Z")
+
+      val record2 = SierraRecord(
+        id = id,
+        data = sierraRecordData(
+          bibIds = bibIds2,
+          modifiedDate = modifiedDate2.toString
+        ),
+        modifiedDate = modifiedDate2
+      )
+
+      val sqsMessage = SQSMessage(
           Some("subject"),
-          toJson(message).get,
+          toJson(record2).get,
           "topic",
           "messageType",
-          "timestamp")
+          "timestamp"
+        )
+
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+
+      val expectedBibIds = List("3", "4", "5")
+      val expectedUnlinkedBibIds = List("1", "2")
+
+      val expectedRecord = SierraItemRecordMerger.mergeItems(
+              existingRecord = record1,
+              updatedRecord = record2.toItemRecord.get
+      )
+
+      val expectedData = JsonUtil.toJson(expectedRecord).get
 
       eventually {
         Scanamo.scan[SierraItemRecord](dynamoDbClient)(fixtures.tableName) should have size 1
@@ -112,7 +145,13 @@ class SierraItemsToDynamoWorkerServiceTest
 
         scanamoResult shouldBe defined
         scanamoResult.get shouldBe Right(
-          SierraItemRecord(id, data, modifiedDate, List(bibId), version = 1))
+          SierraItemRecord(id = id,
+            data = expectedData,
+            modifiedDate = modifiedDate2,
+            bibIds = expectedBibIds,
+            unlinkedBibIds = expectedUnlinkedBibIds,
+            version = 1
+          ))
       }
     }
   }
@@ -138,5 +177,27 @@ class SierraItemsToDynamoWorkerServiceTest
         ex shouldBe a[GracefulFailureException]
       }
     }
+  }
+
+  private def sierraRecordData(bibIds: List[String] = List(),
+                               unlinkedBibIds: List[String] = List(),
+                               modifiedDate: String = "2001-01-01T01:01:01Z"
+                          ): String = {
+
+    val sierraItemRecord = SierraItemRecord(
+      id = s"i111",
+      modifiedDate = Instant.parse(modifiedDate),
+      data = s"""
+                |{
+                |  "id": "i111",
+                |  "updatedDate": "$modifiedDate",
+                |  "comment": "Legacy line of lamentable leopards",
+                |  "bibIds": ${toJson(bibIds).get}
+                |}""".stripMargin,
+      bibIds = bibIds,
+      unlinkedBibIds = unlinkedBibIds
+    )
+
+    JsonUtil.toJson(sierraItemRecord).get
   }
 }
