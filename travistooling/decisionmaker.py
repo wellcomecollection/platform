@@ -36,15 +36,15 @@ def does_file_affect_build_job(path, task_name):
         task_name == 'travis-format' and
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
-        raise KnownAffectsThisTask(path)
+        raise KnownAffectsThisTask()
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(('.md', '.png', '.graffle', '.tf')):
-        raise IgnoredFileFormat(path)
+        raise IgnoredFileFormat()
 
     # These paths never have an effect on tests.
     if path in ['LICENSE', ] or path.startswith(('misc/', 'ontologies/')):
-        raise IgnoredPath(path)
+        raise IgnoredPath()
 
     # Some directories only affect one task.
     #
@@ -58,9 +58,9 @@ def does_file_affect_build_job(path, task_name):
     for dir_name, task_name_prefix in exclusive_directories.items():
         if path.startswith(dir_name):
             if task_name.startswith(task_name_prefix):
-                raise KnownAffectsThisTask(path)
+                raise KnownAffectsThisTask()
             else:
-                raise KnownDoesNotAffectThisTask(path)
+                raise KnownDoesNotAffectThisTask()
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
@@ -74,13 +74,13 @@ def does_file_affect_build_job(path, task_name):
         for project in PROJECTS:
             if task_name.startswith(project.name):
                 if project.type == 'sbt_app':
-                    raise KnownAffectsThisTask(path)
+                    raise KnownAffectsThisTask()
                 else:
-                    raise KnownDoesNotAffectThisTask(path)
+                    raise KnownDoesNotAffectThisTask()
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
-    raise UnrecognisedFile(path)
+    raise UnrecognisedFile()
 
 
 def should_run_job(changed_paths, task_name):
