@@ -20,7 +20,7 @@ from travistooling.decisions import (
     IgnoredPath,
     InsignificantFile,
     ScalaChangeAndIsScalaApp,
-    ScalaChangeAndScalaFree,
+    ScalaChangeAndNotScalaApp,
     SignificantFile,
     UnrecognisedFile
 )
@@ -79,7 +79,7 @@ def does_file_affect_build_job(path, task_name):
                 if project.type == 'sbt_app':
                     raise ScalaChangeAndIsScalaApp()
                 else:
-                    raise ScalaChangeAndScalaFree()
+                    raise ScalaChangeAndNotScalaApp()
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.

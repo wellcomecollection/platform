@@ -3,7 +3,7 @@
 from travistooling.decisions import (
     ExclusivelyAffectsThisTask,
     IgnoredPath,
-    ScalaChangeAndScalaFree,
+    ScalaChangeAndNotScalaApp,
 )
 from travistooling.reports import build_report_output
 
@@ -15,7 +15,7 @@ def test_build_complete_report():
         },
         False: {
             IgnoredPath.message: set(['README.md', 'LICENSE']),
-            ScalaChangeAndScalaFree.message: set(['main.scala']),
+            ScalaChangeAndNotScalaApp.message: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
@@ -41,7 +41,7 @@ def test_report_only_includes_relevant_sections():
         True: {},
         False: {
             IgnoredPath.message: set(['README.md', 'LICENSE']),
-            ScalaChangeAndScalaFree.message: set(['main.scala']),
+            ScalaChangeAndNotScalaApp.message: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
