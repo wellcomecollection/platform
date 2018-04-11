@@ -536,37 +536,6 @@ class ApiWorksTest extends ApiWorksTestBase {
   }
 
   it(
-    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
-    val work = workWith(
-      canonicalId = "a87na87",
-      title = "Idling inkwells of indigo images",
-      identifiers = List()
-    )
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                          | "type": "Work",
-                          | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
-                          | "creators": [ ],
-                          | "identifiers": [ ],
-                          | "subjects": [ ],
-                          | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
-  it(
     "can look at different Elasticsearch indices based on the ?index query parameter") {
     val work = workWith(
       canonicalId = "1234",
@@ -759,43 +728,6 @@ class ApiWorksTest extends ApiWorksTestBase {
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
-                          |   }
-                          |  ]
-                          |}
-          """.stripMargin
-      )
-    }
-  }
-
-  it("does not include the thumbnail if we omit the thumbnail include") {
-    val work = identifiedWorkWith(
-      canonicalId = "5678",
-      title = "An otter omitted from an occasion in Oslo",
-      thumbnail = DigitalLocation(
-        locationType = "thumbnail-image",
-        url = "",
-        license = License_CCBY
-      )
-    )
-    insertIntoElasticSearch(work)
-
-    eventually {
-      server.httpGet(
-        path = s"/$apiPrefix/works",
-        andExpect = Status.Ok,
-        withJsonBody = s"""
-                          |{
-                          |  ${resultList()},
-                          |  "results": [
-                          |   {
-                          |     "type": "Work",
-                          |     "id": "${work.canonicalId}",
-                          |     "title": "${work.title.get}",
-                          |     "creators": [ ],
-                          |     "subjects": [ ],
-                          |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
                           |   }
                           |  ]
                           |}
