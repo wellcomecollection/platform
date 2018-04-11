@@ -3,7 +3,7 @@ package uk.ac.wellcome.test.fixtures
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import io.circe.Encoder
-import org.scalatest.{Assertion, Matchers}
+import org.scalatest.{Assertion, Matchers, Suite}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.aws.{DynamoConfig, S3Config}
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
@@ -18,6 +18,7 @@ trait LocalVersionedHybridStore
     with JsonTestUtil
     with Matchers
     with ImplicitLogging {
+  this: Suite
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]

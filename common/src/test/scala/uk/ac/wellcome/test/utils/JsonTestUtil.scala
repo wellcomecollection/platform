@@ -1,9 +1,9 @@
 package uk.ac.wellcome.test.utils
 
-import org.scalatest.Matchers
+import org.scalatest.{Matchers, Suite}
 import io.circe.parser._
 
-trait JsonTestUtil { this: Matchers =>
+trait JsonTestUtil extends Matchers { this: Suite =>
 
   def assertJsonStringsAreEqual(json1: String, json2: String) = {
     val tree1 = parse(json1).right.get
