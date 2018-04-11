@@ -13,7 +13,10 @@ import uk.ac.wellcome.models.aws.{DynamoConfig, SQSConfig, SQSMessage}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecord
+}
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
@@ -28,14 +31,14 @@ import scala.concurrent.duration._
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
-      with DynamoInserterFixture
-      with SQS
-      with Matchers
-      with Eventually
-      with ExtendedPatience
-      with MockitoSugar
-      with Akka
-      with ScalaFutures {
+    with DynamoInserterFixture
+    with SQS
+    with Matchers
+    with Eventually
+    with ExtendedPatience
+    with MockitoSugar
+    with Akka
+    with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
     DynamoFormat[SierraItemRecord]
@@ -70,10 +73,11 @@ class SierraItemsToDynamoWorkerServiceTest
                   new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
                 system = actorSystem,
                 metrics = mockMetrics,
-                dynamoInserter = new DynamoInserter(new VersionedDao(
-                  dynamoDbClient = dynamoDbClient,
-                  dynamoConfig = DynamoConfig(tableName)
-                ))
+                dynamoInserter = new DynamoInserter(
+                  new VersionedDao(
+                    dynamoDbClient = dynamoDbClient,
+                    dynamoConfig = DynamoConfig(tableName)
+                  ))
               )
 
             testWith(
@@ -119,12 +123,12 @@ class SierraItemsToDynamoWorkerServiceTest
       )
 
       val sqsMessage = SQSMessage(
-          Some("subject"),
-          toJson(record2).get,
-          "topic",
-          "messageType",
-          "timestamp"
-        )
+        Some("subject"),
+        toJson(record2).get,
+        "topic",
+        "messageType",
+        "timestamp"
+      )
 
       sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
 
@@ -132,8 +136,8 @@ class SierraItemsToDynamoWorkerServiceTest
       val expectedUnlinkedBibIds = List("1", "2")
 
       val expectedRecord = SierraItemRecordMerger.mergeItems(
-              existingRecord = record1,
-              updatedRecord = record2.toItemRecord.get
+        existingRecord = record1,
+        updatedRecord = record2.toItemRecord.get
       )
 
       val expectedData = expectedRecord.data
@@ -147,13 +151,13 @@ class SierraItemsToDynamoWorkerServiceTest
 
         scanamoResult shouldBe defined
         scanamoResult.get shouldBe Right(
-          SierraItemRecord(id = id,
+          SierraItemRecord(
+            id = id,
             data = expectedData,
             modifiedDate = modifiedDate2,
             bibIds = expectedBibIds,
             unlinkedBibIds = expectedUnlinkedBibIds,
-            version = 1
-          ))
+            version = 1))
       }
     }
   }
@@ -181,10 +185,10 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  private def sierraRecordData(bibIds: List[String] = List(),
-                               unlinkedBibIds: List[String] = List(),
-                               modifiedDate: String = "2001-01-01T01:01:01Z"
-                          ): String = {
+  private def sierraRecordData(
+    bibIds: List[String] = List(),
+    unlinkedBibIds: List[String] = List(),
+    modifiedDate: String = "2001-01-01T01:01:01Z"): String = {
 
     val sierraItemRecord = SierraItemRecord(
       id = s"i111",

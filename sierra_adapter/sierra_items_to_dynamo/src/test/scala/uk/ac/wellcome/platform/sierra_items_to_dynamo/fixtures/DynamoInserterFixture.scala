@@ -14,7 +14,7 @@ trait DynamoInserterFixture extends LocalDynamoDb[SierraItemRecord] {
     DynamoFormat[SierraItemRecord]
 
   def withDynamoInserter[R](
-                             testWith: TestWith[(String, DynamoInserter), R]): Unit = {
+    testWith: TestWith[(String, DynamoInserter), R]): Unit = {
     withLocalDynamoDbTable { tableName =>
       val dynamoInserter = new DynamoInserter(
         new VersionedDao(
