@@ -78,7 +78,7 @@ def test_should_not_run_job_with_no_relevant_changes():
         task_name='loris-test'
     )
     assert result == (False, {
-        False: {ScalaChangeAndScalaFree: set(['sierra_adapter/common/main.scala'])},
+        False: {ScalaChangeAndScalaFree.message: set(['sierra_adapter/common/main.scala'])},
         True: {}
     })
 
@@ -92,6 +92,6 @@ def test_should_run_job_with_relevant_changes():
         task_name='loris-test'
     )
     assert result == (True, {
-        False: {ScalaChangeAndScalaFree: set(['sierra_adapter/common/main.scala'])},
-        True: {ExclusivelyAffectsThisTask: set(['loris/loris/Dockerfile'])}
+        False: {ScalaChangeAndScalaFree.message: set(['sierra_adapter/common/main.scala'])},
+        True: {ExclusivelyAffectsThisTask.message: set(['loris/loris/Dockerfile'])}
     })

@@ -11,28 +11,28 @@ from travistooling.reports import build_report_output
 def test_build_complete_report():
     report = {
         True: {
-            ExclusivelyAffectsThisTask: set(['foo/bar.txt', 'foo/baz.txt']),
+            ExclusivelyAffectsThisTask.message: set(['foo/bar.txt', 'foo/baz.txt']),
         },
         False: {
-            IgnoredPath: set(['README.md', 'LICENSE']),
-            ScalaChangeAndScalaFree: set(['main.scala']),
+            IgnoredPath.message: set(['README.md', 'LICENSE']),
+            ScalaChangeAndScalaFree.message: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
 ## Reasons to run tests ##
 
-ExclusivelyAffectsThisTask:
+Path is an exclusive dependency of this build task:
  - foo/bar.txt
  - foo/baz.txt
 
 
 ## Reasons not to run tests ##
 
-IgnoredPath:
+Path has no effect on build tasks:
  - LICENSE
  - README.md
 
-ScalaChangeAndScalaFree:
+Changes to Scala common libs are irrelevant to non-Scala apps:
  - main.scala""".strip()
 
 
@@ -40,16 +40,16 @@ def test_report_only_includes_relevant_sections():
     report = {
         True: {},
         False: {
-            IgnoredPath: set(['README.md', 'LICENSE']),
-            ScalaChangeAndScalaFree: set(['main.scala']),
+            IgnoredPath.message: set(['README.md', 'LICENSE']),
+            ScalaChangeAndScalaFree.message: set(['main.scala']),
         },
     }
     assert build_report_output(report) == """
 ## Reasons not to run tests ##
 
-IgnoredPath:
+Path has no effect on build tasks:
  - LICENSE
  - README.md
 
-ScalaChangeAndScalaFree:
+Changes to Scala common libs are irrelevant to non-Scala apps:
  - main.scala""".strip()
