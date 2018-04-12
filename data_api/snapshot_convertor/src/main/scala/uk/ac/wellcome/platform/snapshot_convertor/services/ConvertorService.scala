@@ -12,17 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import javax.inject.Inject
-import uk.ac.wellcome.display.models.DisplayWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{
-  DisplayWorkToJsonStringFlow,
-  ElasticsearchHitToIdentifiedWorkFlow,
-  IdentifiedWorkToVisibleDisplayWork,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.platform.snapshot_convertor.flow.{DisplayWorkToJsonStringFlow, ElasticsearchHitToIdentifiedWorkFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -79,7 +71,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val s3source = S3Source(s3inputStream = s3inputStream)
 
     // This source generates instances of DisplayWork from the source snapshot.
-    val displayWorks: Source[DisplayWork, Any] = s3source
+    val displayWorks: Source[DisplayWorkV1, Any] = s3source
       .via(ElasticsearchHitToIdentifiedWorkFlow())
       .via(IdentifiedWorkToVisibleDisplayWork())
 

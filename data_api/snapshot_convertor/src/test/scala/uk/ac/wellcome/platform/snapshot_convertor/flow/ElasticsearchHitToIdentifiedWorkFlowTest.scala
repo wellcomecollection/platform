@@ -1,19 +1,11 @@
 package uk.ac.wellcome.platform.snapshot_convertor.flow
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
