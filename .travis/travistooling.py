@@ -214,10 +214,6 @@ def make(task, dry_run=False):
     check_call(command)
 
 
-def git(*args):
-    check_call(['git'] + list(args))
-
-
 def rreplace(string, old, new, count=None):
     """
     Replace ``old`` with ``new``, starting from the right.
