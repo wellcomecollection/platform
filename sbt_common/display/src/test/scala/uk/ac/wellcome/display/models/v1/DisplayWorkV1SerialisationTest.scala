@@ -3,7 +3,11 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Guice
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksIncludes, WorksUtil}
+import uk.ac.wellcome.display.models.{
+  DisplaySerialisationTestBase,
+  WorksIncludes,
+  WorksUtil
+}
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -218,8 +222,7 @@ class DisplayWorkV1SerialisationTest
 
   }
 
-  it(
-    "includes a list of identifiers on DisplayWorkV1") {
+  it("includes a list of identifiers on DisplayWorkV1") {
     val srcIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       ontologyType = "Work",
@@ -230,7 +233,8 @@ class DisplayWorkV1SerialisationTest
       title = "An insect huddled in an igloo",
       identifiers = List(srcIdentifier)
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWorkV1(work, WorksIncludes(identifiers = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWorkV1(work, WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -244,7 +248,7 @@ class DisplayWorkV1SerialisationTest
                           | "placesOfPublication": [ ]
                           |}
           """.stripMargin
-      assertJsonStringsAreEqual(actualJson, expectedJson)
+    assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
   it(
@@ -254,7 +258,8 @@ class DisplayWorkV1SerialisationTest
       title = "Idling inkwells of indigo images",
       identifiers = List()
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWorkV1(work, WorksIncludes(identifiers = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWorkV1(work, WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -282,7 +287,8 @@ class DisplayWorkV1SerialisationTest
         license = License_CCBY
       )
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWorkV1(work, WorksIncludes(thumbnail = true)))
+    val actualJson = objectMapper.writeValueAsString(
+      DisplayWorkV1(work, WorksIncludes(thumbnail = true)))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",
@@ -387,9 +393,15 @@ class DisplayWorkV1SerialisationTest
                              |  "id": "${work.canonicalId}",
                              |  "title": "${work.title.get}",
                              |  "creators": [
-                             |    ${identifiedOrUnidentifiable(work.creators(0), abstractAgent)},
-                             |    ${identifiedOrUnidentifiable(work.creators(1), abstractAgent)},
-                             |    ${identifiedOrUnidentifiable(work.creators(2), abstractAgent)}
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(0),
+                              abstractAgent)},
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(1),
+                              abstractAgent)},
+                             |    ${identifiedOrUnidentifiable(
+                              work.creators(2),
+                              abstractAgent)}
                              |  ],
                              |  "subjects": [ ],
                              |  "genres": [ ],
@@ -421,7 +433,8 @@ class DisplayWorkV1SerialisationTest
           )
         )
       )
-      val displayWork = DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      val displayWork =
+        DisplayWorkV1(work, includes = WorksIncludes(items = true))
 
       val actualJson = objectMapper.writeValueAsString(displayWork)
       val expectedJson = s"""
@@ -522,7 +535,8 @@ class DisplayWorkV1SerialisationTest
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
-                            |  "publicationDate": ${period(work.publicationDate.get)},
+                            |  "publicationDate": ${period(
+                              work.publicationDate.get)},
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
 
@@ -560,9 +574,15 @@ class DisplayWorkV1SerialisationTest
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [
-                            |    ${identifiedOrUnidentifiable(work.publishers(0), abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(work.publishers(1), abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(work.publishers(2), abstractAgent)}
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(0),
+                              abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(1),
+                              abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                              work.publishers(2),
+                              abstractAgent)}
                             |  ],
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
