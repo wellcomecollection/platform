@@ -16,4 +16,3 @@ resource "aws_s3_bucket" "private_data" {
     }
   }
 }
-
