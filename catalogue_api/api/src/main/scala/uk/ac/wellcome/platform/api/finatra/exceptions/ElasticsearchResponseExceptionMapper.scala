@@ -33,21 +33,14 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   // When returning a 400 to the user, we wrap this error to avoid talking
   // about internal Elasticsearch concepts.
   private val resultSizePattern =
-    """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
+  """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
 
   override def toResponse(request: Request,
                           exception: ResponseException): Response = {
     val result = toError(exception = exception)
     val version = getVersion(request, s"$apiPrefix")
 
-    val errorResponse = ResultResponse(
-      context = buildContextUri(
-        apiScheme,
-        apiHost,
-        apiPrefix,
-        version,
-        apiContextSuffix),
-      result = result)
+    val errorResponse = ResultResponse(context = buildContextUri(apiScheme, apiHost, apiPrefix, version, apiContextSuffix), result = result)
     result.httpStatus.get match {
       case 500 => response.internalServerError.json(errorResponse)
       case 404 => response.notFound.json(errorResponse)
