@@ -13,25 +13,25 @@ import run_elasticdump
 
 @pytest.mark.parametrize('environ_config, index, expected_url', [
     (
-            {
-                'es_username': 'elastic',
-                'es_password': 'changeme',
-                'es_hostname': 'example.org',
-                'es_port': 9200,
-            },
-            'index_with_no_scheme',
-            'https://elastic:changeme@example.org:9200/index_with_no_scheme'
+        {
+            'es_username': 'elastic',
+            'es_password': 'changeme',
+            'es_hostname': 'example.org',
+            'es_port': 9200,
+        },
+        'index_with_no_scheme',
+        'https://elastic:changeme@example.org:9200/index_with_no_scheme'
     ),
     (
-            {
-                'es_username': 'elastic',
-                'es_password': 'changeme',
-                'es_hostname': 'example.org',
-                'es_port': 9200,
-                'es_scheme': 'http://',
-            },
-            'index_with_http_scheme',
-            'http://elastic:changeme@example.org:9200/index_with_http_scheme'
+        {
+            'es_username': 'elastic',
+            'es_password': 'changeme',
+            'es_hostname': 'example.org',
+            'es_port': 9200,
+            'es_scheme': 'http://',
+        },
+        'index_with_http_scheme',
+        'http://elastic:changeme@example.org:9200/index_with_http_scheme'
     ),
 ])
 def test_build_elasticsearch_url(environ_config, index, expected_url):
