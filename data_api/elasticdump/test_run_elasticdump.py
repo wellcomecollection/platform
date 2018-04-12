@@ -50,6 +50,36 @@ def test_getting_no_messages_from_sqs_is_sysexit(sqs_client, queue_url):
         )
 
 
+def test_getting_only_one_message_from_sqs(
+        sqs_client,
+        queue_url,
+        s3_client,
+        bucket,
+        sqs_endpoint_url,
+        s3_endpoint_url,
+        elasticsearch_index,
+        elasticsearch_url,
+        elasticsearch_hostname
+):
+    requests = [
+        attr.asdict(
+            run_elasticdump.SnapshotRequest(time, bucket, elasticsearch_index)
+        ) for time in ('now', 'then')
+    ]
+    for r in requests:
+        sqs_client.send_message(
+            QueueUrl=queue_url,
+            MessageBody=json.dumps(r)
+        )
+
+    received_message = run_elasticdump.get_message(
+        sqs_client=sqs_client,
+        sqs_queue_url=queue_url
+    )
+    received_body = json.loads(received_message['Body'])
+    assert received_body in requests
+
+
 def test_end_to_end(
         sqs_client,
         queue_url,
@@ -129,33 +159,3 @@ def test_end_to_end(
         }
         for i in range(10)
     ]
-
-
-def test_getting_only_one_message_from_sqs(
-        sqs_client,
-        queue_url,
-        s3_client,
-        bucket,
-        sqs_endpoint_url,
-        s3_endpoint_url,
-        elasticsearch_index,
-        elasticsearch_url,
-        elasticsearch_hostname
-):
-    requests = [
-        attr.asdict(
-            run_elasticdump.SnapshotRequest(time, bucket, elasticsearch_index)
-        ) for time in ('now', 'then')
-    ]
-    for r in requests:
-        sqs_client.send_message(
-            QueueUrl=queue_url,
-            MessageBody=json.dumps(r)
-        )
-
-    received_message = run_elasticdump.get_message(
-        sqs_client=sqs_client,
-        sqs_queue_url=queue_url
-    )
-    received_body = json.loads(received_message['Body'])
-    assert received_body in requests

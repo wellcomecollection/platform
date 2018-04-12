@@ -125,11 +125,13 @@ def sqs_endpoint_url(docker_services, docker_ip):
 @pytest.fixture(scope='session')
 def sqs_client(sqs_endpoint_url, docker_services, docker_ip):
     docker_services.wait_until_responsive(
-        timeout=30.0, pause=0.1,
+        timeout=45.0, pause=0.1,
         check=_is_responsive(sqs_endpoint_url, lambda r: r.status_code == 404)
     )
 
-    yield boto3.client('sqs', endpoint_url=sqs_endpoint_url)
+    sqs_client = boto3.client('sqs', endpoint_url=sqs_endpoint_url)
+
+    yield sqs_client
 
 
 @pytest.fixture(scope='session')
@@ -214,7 +216,13 @@ def queue_url(sqs_client):
     queue_name = 'test-lambda-queue'
 
     resp = sqs_client.create_queue(QueueName=queue_name)
-    yield resp['QueueUrl']
+    queue_url = resp['QueueUrl']
+
+    yield queue_url
+
+    sqs_client.delete_queue(
+        QueueUrl=queue_url
+    )
 
 
 @pytest.fixture

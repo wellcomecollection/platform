@@ -87,8 +87,9 @@ def run():
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
     snapshot_request = parse_message(message)
 
-    print('*** Constructing Elasticsearch URL')
+    print(f'*** Parsed snapshot request {snapshot_request!r} from message')
 
+    print('*** Constructing Elasticsearch URL')
     es_index = snapshot_request.es_index
     es_url = build_elasticsearch_url(environ_config=os.environ, index=es_index)
 
