@@ -30,19 +30,17 @@ class Server extends HttpServer {
 
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
-  private final val apiVersion =
-    flag(name = "api.version", default = "v1", help = "API version path part")
   private final val apiPrefix = flag(
     name = "api.prefix",
-    default = "/" + apiName() + "/" + apiVersion(),
+    default = "/" + apiName(),
     help = "API path prefix")
 
   flag[String](name = "es.index", default = "records", help = "ES index name")
   flag[String](name = "es.type", default = "item", help = "ES document type")
   flag(
-    name = "api.context",
-    default = apiPrefix() + "/context.json",
-    help = "API JSON-LD context")
+    name = "api.context.suffix",
+    default = "/context.json",
+    help = "Relative API JSON-LD context")
 
   override def jacksonModule = DisplayJacksonModule
 

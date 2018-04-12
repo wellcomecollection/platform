@@ -10,6 +10,7 @@ import javax.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.{Error, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ApiSwagger
+import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
@@ -23,7 +24,7 @@ import scala.collection.JavaConverters._
 
 @Singleton
 class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
-                                @Flag("api.context") apiContext: String,
+                                @Flag("api.context.suffix") apiContextSuffix: String,
                                 @Flag("api.host") apiHost: String,
                                 @Flag("api.scheme") apiScheme: String,
                                 @Flag("api.pageSize") defaultPageSize: Int,
@@ -33,7 +34,6 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
 
   override implicit protected val swagger = ApiSwagger
 
-  val contextUri: String = s"$apiScheme://$apiHost$apiContext"
   val includesSwaggerParam: QueryParameter = new QueryParameter()
     .name("includes")
     .description("A comma-separated list of extra fields to include")
@@ -43,13 +43,13 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
   prefix(apiPrefix) {
-    setupResultListEndpoint("/works")
-    setupSingleWorkEndpoint("/works/:id")
+    setupResultListEndpoint("/v1", "/works")
+    setupSingleWorkEndpoint("/v1", "/works/:id")
   }
 
-  private def setupResultListEndpoint(endpointSuffix: String): Unit = {
-    getWithDoc(endpointSuffix) { doc =>
-      setupResultListSwaggerDocs(endpointSuffix, doc)
+  private def setupResultListEndpoint(version: String, endpointSuffix: String): Unit = {
+    getWithDoc(s"$version$endpointSuffix") { doc =>
+      setupResultListSwaggerDocs(s"$version$endpointSuffix", doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
@@ -61,27 +61,25 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           pageSize = pageSize,
           includes = includes
         )
-      } yield
-        ResultListResponse.create(
-          contextUri,
-          displayResultList,
-          request,
-          s"$apiScheme://$apiHost"
-        )
+      } yield ResultListResponse.create(
+        buildContextUri(apiScheme = apiScheme, apiHost = apiHost, apiPrefix= apiPrefix, version = version, apiContextSuffix = apiContextSuffix),
+        displayResultList,
+        request,
+        s"$apiScheme://$apiHost"
+      )
     }
   }
 
-  private def setupSingleWorkEndpoint(endpointSuffix: String): Unit = {
-    getWithDoc(endpointSuffix) { doc =>
-      setUpSingleWorkSwaggerDocs(doc)
+  private def setupSingleWorkEndpoint(version: String, endpointSuffix: String): Unit = {
+    getWithDoc(s"$version$endpointSuffix") { doc =>
+      setUpSingleWorkSwaggerDocs(version,doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
+      val contextUri = buildContextUri(apiScheme = apiScheme, apiHost = apiHost, apiPrefix= apiPrefix, version = version, apiContextSuffix = apiContextSuffix)
       val eventualResponse = for {
-        maybeWork <- worksService.findWorkById(
-          canonicalId = request.id,
-          index = request._index)
-      } yield generateSingleWorkResponse(maybeWork, includes, request)
+        maybeWork <- worksService.findWorkById(canonicalId = request.id, index = request._index)
+      } yield generateSingleWorkResponse(maybeWork, includes, request, contextUri)
 
       eventualResponse.recover {
         // If a user tries to request an ID without escaping it correctly
@@ -130,26 +128,23 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     works
   }
 
-  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork],
-                                         includes: WorksIncludes,
-                                         request: SingleWorkRequest) =
-    maybeWork match {
-      case Some(work: IdentifiedWork) =>
-        if (work.visible) {
-          respondWithWork(includes, work)
-        } else {
-          respondWithGoneError
-        }
-      case None =>
-        respondWithNotFoundError(request)
-    }
+  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork], includes: WorksIncludes, request: SingleWorkRequest, contextUri: String) = maybeWork match {
+    case Some(work: IdentifiedWork) =>
+      if (work.visible) {
+        respondWithWork(includes, work, contextUri: String)
+      } else {
+        respondWithGoneError(contextUri: String)
+      }
+    case None =>
+      respondWithNotFoundError(request, contextUri: String)
+  }
 
-  private def respondWithWork(includes: WorksIncludes, work: IdentifiedWork) = {
+  private def respondWithWork(includes: WorksIncludes, work: IdentifiedWork, contextUri: String) = {
     val result = DisplayWork(work = work, includes = includes)
     response.ok.json(ResultResponse(context = contextUri, result = result))
   }
 
-  private def respondWithGoneError = {
+  private def respondWithGoneError(contextUri: String) = {
     val result = Error(
       variant = "http-410",
       description = Some("This work has been deleted")
@@ -162,7 +157,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     )
   }
 
-  private def respondWithNotFoundError(request: SingleWorkRequest) = {
+  private def respondWithNotFoundError(request: SingleWorkRequest, contextUri: String) = {
     val result = Error(
       variant = "http-404",
       description = Some(s"Work not found for identifier ${request.id}")
@@ -172,8 +167,7 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     )
   }
 
-  private def setupResultListSwaggerDocs(endpointSuffix: String,
-                                         doc: Operation) = {
+  private def setupResultListSwaggerDocs(endpointSuffix: String, doc: Operation) = {
     doc
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
@@ -216,9 +210,9 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     // in the public docs.
   }
 
-  private def setUpSingleWorkSwaggerDocs(doc: Operation) = {
+  private def setUpSingleWorkSwaggerDocs(version: String, doc: Operation) = {
     doc
-      .summary("/works/{id}")
+      .summary(s"$version/works/{id}")
       .description("Returns a single work")
       .tag("Works")
       .routeParam[String]("id", "The work to return", required = true)

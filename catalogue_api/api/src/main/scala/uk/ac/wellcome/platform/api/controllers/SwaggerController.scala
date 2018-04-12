@@ -25,8 +25,11 @@ class SwaggerController @Inject()(
   }
 
   prefix(apiPrefix) {
+    setupSwaggerEndpoint("/v1")
+  }
 
-    get("/swagger.json") { request: Request =>
+  private def setupSwaggerEndpoint(version: String): Unit = {
+    get(s"$version/swagger.json") { request: Request =>
       ApiSwagger.info(
         new Info()
           .description("Search our collections")
@@ -34,12 +37,11 @@ class SwaggerController @Inject()(
           .title("Catalogue"))
       ApiSwagger.scheme(scheme)
       ApiSwagger.host(apiHost)
-      ApiSwagger.basePath(apiPrefix)
+      ApiSwagger.basePath(s"$apiPrefix$version")
       ApiSwagger.produces("application/json")
       ApiSwagger.produces("application/ld+json")
 
       response.ok.json(Json.mapper.writeValueAsString(ApiSwagger))
     }
-
   }
 }
