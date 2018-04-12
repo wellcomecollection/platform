@@ -21,21 +21,6 @@ class SnapshotRequest(object):
     es_index = attr.ib()
 
 
-def _run(sns_client, topic_arn, target_bucket_name, es_index):
-    snapshot_request_message = SnapshotRequest(
-        time=dt.datetime.utcnow().isoformat(),
-        target_bucket_name=target_bucket_name,
-        es_index=es_index
-    )
-
-    publish_sns_message(
-        sns_client=sns_client,
-        topic_arn=topic_arn,
-        message=attr.asdict(snapshot_request_message),
-        subject='source: snapshot_generator.main'
-    )
-
-
 def main(event=None, _ctxt=None, sns_client=None):
     print(f'event = {event!r}')
     sns_client = sns_client or boto3.client('sns')
@@ -49,4 +34,15 @@ def main(event=None, _ctxt=None, sns_client=None):
     es_index = os.environ['ES_INDEX']
     print(f'es_index={es_index}')
 
-    _run(sns_client, topic_arn, bucket_name, es_index)
+    snapshot_request_message = SnapshotRequest(
+        time=dt.datetime.utcnow().isoformat(),
+        target_bucket_name=bucket_name,
+        es_index=es_index
+    )
+
+    publish_sns_message(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        message=attr.asdict(snapshot_request_message),
+        subject='source: snapshot_generator.main'
+    )

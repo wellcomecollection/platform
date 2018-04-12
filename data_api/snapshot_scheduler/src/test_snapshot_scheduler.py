@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 
 import datetime as dt
+import os
 
 import mock
+from unittest.mock import patch
 
 import snapshot_scheduler
 
@@ -18,12 +20,18 @@ def test_writes_message_to_sqs(sns_client, topic_arn):
     target_bucket_name = "target_bucket_name"
     es_index = "es_index"
 
-    snapshot_scheduler._run(
-        sns_client=sns_client,
-        topic_arn=topic_arn,
-        target_bucket_name=target_bucket_name,
-        es_index=es_index
-    )
+    patched_os_environ = {
+        'TOPIC_ARN': topic_arn,
+        'TARGET_BUCKET_NAME': target_bucket_name,
+        'ES_INDEX': es_index
+    }
+
+    with patch.dict(os.environ, patched_os_environ, clear=True):
+        snapshot_scheduler.main(
+            event=None,
+            _ctxt=None,
+            sns_client=sns_client
+        )
 
     messages = sns_client.list_messages()
     assert len(messages) == 1
