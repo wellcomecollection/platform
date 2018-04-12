@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.api.services
 import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.models.WorksUtil
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
-import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes, WorksUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ElasticsearchServiceTest
@@ -38,7 +38,7 @@ class ElasticsearchServiceTest
         indexName = indexName,
         limit = 3,
         from = 0,
-        expectedWorks = List(work3, work2, work1).map { DisplayWork(_) }
+        expectedWorks = List(work3, work2, work1)
       )
 
     // TODO: canonicalID is the only user-defined field that we can sort on.
@@ -116,32 +116,27 @@ class ElasticsearchServiceTest
       val works = visibleWorks ++ invisibleWorks
       insertIntoElasticsearch(indexName, itemType, works: _*)
 
-      val displayWorks = toDisplayWorks(visibleWorks)
-
       assertSliceIsCorrect(
         indexName = indexName,
         limit = 10,
         from = 0,
-        expectedWorks = displayWorks
+        expectedWorks = works.toList
       )
     }
   }
 
-  private def populateElasticsearch(indexName: String): List[DisplayWork] = {
+  private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
     val works = createWorks(10)
     insertIntoElasticsearch(indexName, itemType, works: _*)
 
-    toDisplayWorks(works)
+    works.sortBy(_.canonicalId).toList
   }
-
-  private def toDisplayWorks(works: Seq[IdentifiedWork]): List[DisplayWork] =
-    works.map(DisplayWork(_)).sortBy(_.id).toList
 
   private def assertSliceIsCorrect(
     indexName: String,
     limit: Int,
     from: Int,
-    expectedWorks: List[DisplayWork]
+    expectedWorks: List[IdentifiedWork]
   ) = {
     withElasticSearchService(indexName = indexName, itemType = itemType) {
       searchService =>
@@ -156,7 +151,6 @@ class ElasticsearchServiceTest
             .map { h: SearchHit =>
               jsonToIdentifiedWork(h.sourceAsString)
             }
-            .map { DisplayWork(_) }
           returnedWorks.toList shouldBe expectedWorks
         }
     }
