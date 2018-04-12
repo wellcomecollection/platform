@@ -1,51 +1,27 @@
 package uk.ac.wellcome.platform.api.finatra.exceptions
 
-import javax.inject.{Inject, Singleton}
-
-import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
-import com.twitter.inject.annotations.Flag
 import com.twitter.inject.Logging
+import com.twitter.inject.annotations.Flag
+import javax.inject.{Inject, Singleton}
 import org.elasticsearch.client.ResponseException
-
 import uk.ac.wellcome.models.Error
+import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.DisplayError
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
 class ElasticsearchResponseExceptionMapper @Inject()(
   response: ResponseBuilder,
-  @Flag("api.context") apiContext: String,
+  @Flag("api.context.suffix") apiContextSuffix: String,
   @Flag("api.host") apiHost: String,
+  @Flag("api.prefix") apiPrefix: String,
   @Flag("api.scheme") apiScheme: String)
     extends ExceptionMapper[ResponseException]
     with Logging {
-
-  val contextUri: String = s"${apiScheme}://${apiHost}${apiContext}"
-
-  private def userError(message: String, exception: Exception): DisplayError = {
-    error(
-      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
-      exception)
-    DisplayError(Error(variant = "http-400", description = Some(message)))
-  }
-
-  private def notFound(message: String, exception: Exception): DisplayError = {
-    error(
-      s"Sending HTTP 404 from ElasticsearchResponseExceptionMapper ($message)",
-      exception)
-    DisplayError(Error(variant = "http-404", description = Some(message)))
-  }
-
-  private def serverError(message: String,
-                          exception: Exception): DisplayError = {
-    error(
-      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
-      exception)
-    DisplayError(Error(variant = "http-500", description = None))
-  }
 
   // This error is of the form:
   //
@@ -56,63 +32,30 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   //
   // When returning a 400 to the user, we wrap this error to avoid talking
   // about internal Elasticsearch concepts.
-  val resultSizePattern =
+  private val resultSizePattern =
     """Result window is too large, from \+ size must be less than or equal to: \[([0-9]+)\]""".r.unanchored
 
-  private def jsonToError(jsonDocument: String,
-                          exception: Exception): DisplayError = {
-    val mapper = new ObjectMapper()
-    val exceptionData = mapper.readTree(jsonDocument)
+  override def toResponse(request: Request,
+                          exception: ResponseException): Response = {
+    val result = toError(exception = exception)
+    val version = getVersion(request, s"$apiPrefix")
 
-    val esError = exceptionData.get("error")
-    val esErrorType = esError
-      .get("type")
-      .asText
-
-    esErrorType match {
-      // This occurs if the user requests a non-existent index as ?_index=foo.
-      // We return this as a 404 error to the user.
-      case "index_not_found_exception" => {
-        val index = esError
-          .get("index")
-          .asText
-        notFound(s"There is no index $index", exception)
-      }
-
-      // This may occur if the user requests an overly large page of results.
-      // We return this as a 400 error to the user.
-      case "search_phase_execution_exception" => {
-        val reason = esError
-          .get("root_cause")
-          .get(0)
-          .get("reason")
-          .asText
-
-        resultSizePattern.findFirstMatchIn(reason) match {
-          case Some(s) => {
-            val size = s.group(1)
-            userError(
-              s"Only the first $size works are available in the API.",
-              exception)
-          }
-          case _ => {
-            serverError(
-              s"Unknown error in search phase execution: $reason",
-              exception)
-          }
-        }
-      }
-
-      // Anything else should bubble up as a 500, as it's at least somewhat
-      // unexpected and worthy of further investigation.
-      case _ => {
-        serverError("Unknown error", exception)
-      }
+    val errorResponse = ResultResponse(
+      context = buildContextUri(
+        apiScheme,
+        apiHost,
+        apiPrefix,
+        version,
+        apiContextSuffix),
+      result = result)
+    result.httpStatus.get match {
+      case 500 => response.internalServerError.json(errorResponse)
+      case 404 => response.notFound.json(errorResponse)
+      case 400 => response.badRequest.json(errorResponse)
     }
   }
 
-  private def toError(request: Request,
-                      exception: ResponseException): DisplayError = {
+  private def toError(exception: ResponseException): DisplayError = {
     // Elasticsearch returns errors as JSON documents, which are stored in the
     // `message` attribute of ElasticsearchException.  Try to read it as JSON,
     // so we can check if this was a user error -- but if parsing fails, it's
@@ -140,14 +83,72 @@ class ElasticsearchResponseExceptionMapper @Inject()(
     }
   }
 
-  override def toResponse(request: Request,
-                          exception: ResponseException): Response = {
-    val result = toError(request = request, exception = exception)
-    val errorResponse = ResultResponse(context = contextUri, result = result)
-    result.httpStatus.get match {
-      case 500 => response.internalServerError.json(errorResponse)
-      case 404 => response.notFound.json(errorResponse)
-      case 400 => response.badRequest.json(errorResponse)
+  private def jsonToError(jsonDocument: String,
+                          exception: Exception): DisplayError = {
+    val mapper = new ObjectMapper()
+    val exceptionData = mapper.readTree(jsonDocument)
+
+    val esError = exceptionData.get("error")
+    val esErrorType = esError
+      .get("type")
+      .asText
+
+    esErrorType match {
+      // This occurs if the user requests a non-existent index as ?_index=foo.
+      // We return this as a 404 error to the user.
+      case "index_not_found_exception" =>
+        val index = esError
+          .get("index")
+          .asText
+        notFound(s"There is no index $index", exception)
+
+      // This may occur if the user requests an overly large page of results.
+      // We return this as a 400 error to the user.
+      case "search_phase_execution_exception" =>
+        val reason = esError
+          .get("root_cause")
+          .get(0)
+          .get("reason")
+          .asText
+
+        resultSizePattern.findFirstMatchIn(reason) match {
+          case Some(s) =>
+            val size = s.group(1)
+            userError(
+              s"Only the first $size works are available in the API.",
+              exception)
+          case _ =>
+            serverError(
+              s"Unknown error in search phase execution: $reason",
+              exception)
+        }
+
+      // Anything else should bubble up as a 500, as it's at least somewhat
+      // unexpected and worthy of further investigation.
+      case _ =>
+        serverError("Unknown error", exception)
     }
+  }
+
+  private def userError(message: String, exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 400 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
+    DisplayError(Error(variant = "http-400", description = Some(message)))
+  }
+
+  private def notFound(message: String, exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 404 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
+    DisplayError(Error(variant = "http-404", description = Some(message)))
+  }
+
+  private def serverError(message: String,
+                          exception: Exception): DisplayError = {
+    error(
+      s"Sending HTTP 500 from ElasticsearchResponseExceptionMapper ($message)",
+      exception)
+    DisplayError(Error(variant = "http-500", description = None))
   }
 }
