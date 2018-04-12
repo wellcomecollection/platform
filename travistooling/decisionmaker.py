@@ -13,6 +13,7 @@ import collections
 import os
 
 from travistooling.decisions import (
+    ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
     ExclusivelyAffectsAnotherTask,
     ExclusivelyAffectsThisTask,
@@ -64,6 +65,14 @@ def does_file_affect_build_job(path, task_name):
                 raise ExclusivelyAffectsThisTask()
             else:
                 raise ExclusivelyAffectsAnotherTask(task_name_prefix)
+
+    # If this is a Scala test file and we're in a publish task, we can
+    # skip running the task.
+    if (
+        'src/test/scala/uk/ac/wellcome' in path and
+        task_name.endswith('-publish')
+    ):
+        raise ChangesToTestsDontGetPublished()
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.

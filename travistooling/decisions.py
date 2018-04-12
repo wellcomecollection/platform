@@ -57,3 +57,7 @@ class ScalaChangeAndIsScalaApp(SignificantFile):
 
 class ScalaChangeAndNotScalaApp(InsignificantFile):
     message = 'Changes to Scala common libs are irrelevant to non-Scala apps'
+
+
+class ChangesToTestsDontGetPublished(InsignificantFile):
+    message = "Changes to test files don't need to be published"
