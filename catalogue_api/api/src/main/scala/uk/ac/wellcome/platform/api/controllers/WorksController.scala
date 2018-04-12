@@ -15,7 +15,10 @@ import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.DisplayError
 import uk.ac.wellcome.platform.api.models.v1.DisplayResultListV1
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -159,7 +162,9 @@ class WorksController @Inject()(
         respondWithNotFoundError(request, contextUri: String)
     }
 
-  private def respondWithWork(includes: WorksIncludes, work: IdentifiedWork, contextUri: String) = {
+  private def respondWithWork(includes: WorksIncludes,
+                              work: IdentifiedWork,
+                              contextUri: String) = {
     val result = DisplayWorkV1(work = work, includes = includes)
     response.ok.json(ResultResponse(context = contextUri, result = result))
   }
