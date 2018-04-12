@@ -40,60 +40,44 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
   prefix(apiPrefix) {
-    setupResultListEnpoint("/works")
-
-    setupSingleWorkEnpoint("/works/:id")
+    setupResultListEndpoint("/works")
+    setupSingleWorkEndpoint("/works/:id")
   }
 
-  private def setupResultListEnpoint(endpointSuffix: String): Unit = {
+  private def setupResultListEndpoint(endpointSuffix: String): Unit = {
     getWithDoc(endpointSuffix) { doc =>
       setupResultListSwaggerDocs(endpointSuffix, doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
 
-      val eventualResultList = getWorkList(request, pageSize)
-
-      eventualResultList
-        .map { resultList =>
-          DisplayResultList(
-            resultList = resultList,
-            pageSize = pageSize,
-            includes = includes
-          )
-        }
-        .map(
-          displayResultList => {
-            ResultListResponse.create(
-              contextUri,
-              displayResultList,
-              request,
-              s"$apiScheme://$apiHost"
-            )
-          }
+      for {
+        resultList <- getWorkList(request, pageSize)
+        displayResultList = DisplayResultList(
+          resultList = resultList,
+          pageSize = pageSize,
+          includes = includes
         )
+      } yield ResultListResponse.create(
+        contextUri,
+        displayResultList,
+        request,
+        s"$apiScheme://$apiHost"
+      )
     }
   }
 
-  private def setupSingleWorkEnpoint(enpointSuffix: String): Unit = {
+  private def setupSingleWorkEndpoint(enpointSuffix: String): Unit = {
     getWithDoc(enpointSuffix) { doc =>
       setUpSingleWorkSwaggerDocs(doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
-      worksService
-        .findWorkById(canonicalId = request.id, index = request._index)
-        .map {
 
-          case Some(work: IdentifiedWork) =>
-            if (work.visible) {
-              respondWithWork(includes, work)
-            } else {
-              respondWithGoneError
-            }
-          case None =>
-            respondWithNotFoundError(request)
-        }
-        .recover {
+      val eventualResponse = for {
+        maybeWork <- worksService.findWorkById(canonicalId = request.id, index = request._index)
+      } yield generateSingleWorkResponse(maybeWork, includes, request)
+
+        eventualResponse.recover {
           // If a user tries to request an ID without escaping it correctly
           // (e.g. "/works/work/zd224ncv]"), we get an IllegalArgumentException with
           // the error:
@@ -138,6 +122,17 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         )
     }
     works
+  }
+
+  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork], includes: WorksIncludes, request: SingleWorkRequest) = maybeWork match {
+    case Some(work: IdentifiedWork) =>
+      if (work.visible) {
+        respondWithWork(includes, work)
+      } else {
+        respondWithGoneError
+      }
+    case None =>
+      respondWithNotFoundError(request)
   }
 
   private def respondWithWork(includes: WorksIncludes, work: IdentifiedWork) = {
