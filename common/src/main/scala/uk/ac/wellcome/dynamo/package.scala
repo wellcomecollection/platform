@@ -5,7 +5,7 @@ import java.time.Instant
 import com.amazonaws.services.dynamodbv2.model.AttributeValue
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.error.DynamoReadError
-import shapeless.{the, HList, Lazy}
+import shapeless.{HList, Lazy}
 
 package object dynamo {
   implicit val instantLongFormat =
