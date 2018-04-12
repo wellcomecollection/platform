@@ -16,6 +16,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.test.fixtures.{Akka, LocalDynamoDb, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.concurrent.duration._
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 class ReindexServiceTest
     extends FunSpec
@@ -41,7 +42,7 @@ class ReindexServiceTest
     reindexVersion = currentVersion
   )
 
-  private def withReindexService(tableName: String, indexName: String)(
+  private def withReindexService(table: Table)(
     testWith: TestWith[ReindexService, Assertion]) = {
     withActorSystem { actorSystem =>
       val metricsSender = new MetricsSender(
@@ -54,12 +55,12 @@ class ReindexServiceTest
       val reindexService =
         new ReindexService(
           dynamoDBClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(tableName),
+          dynamoConfig = DynamoConfig(table.name),
           metricsSender = metricsSender,
           versionedDao = new VersionedDao(
             dynamoDbClient = dynamoDbClient,
-            DynamoConfig(tableName)),
-          indexName = indexName
+            DynamoConfig(table.name)),
+          indexName = table.index
         )
 
       testWith(reindexService)
@@ -67,10 +68,8 @@ class ReindexServiceTest
   }
 
   it("only updates records with a lower than desired reindexVersion") {
-    withLocalDynamoDbTableAndIndex { fixtures =>
-      val tableName = fixtures.tableName
-      val indexName = fixtures.indexName
-      withReindexService(tableName, indexName) { reindexService =>
+    withLocalDynamoDbTable { table =>
+      withReindexService(table) { reindexService =>
         val newerRecord = exampleRecord.copy(
           id = "id1",
           reindexVersion = desiredVersion + 1
@@ -94,7 +93,7 @@ class ReindexServiceTest
         )
 
         records.foreach(record =>
-          Scanamo.put(dynamoDbClient)(tableName)(record))
+          Scanamo.put(dynamoDbClient)(table.name)(record))
 
         val reindexJob = ReindexJob(
           shardId = shardName,
@@ -103,7 +102,7 @@ class ReindexServiceTest
 
         whenReady(reindexService.runReindex(reindexJob)) { _ =>
           val records = Scanamo
-            .scan[TestRecord](dynamoDbClient)(tableName)
+            .scan[TestRecord](dynamoDbClient)(table.name)
             .map(_.right.get)
 
           records should contain theSameElementsAs expectedRecords
@@ -113,10 +112,8 @@ class ReindexServiceTest
   }
 
   it("updates records in the specified shard") {
-    withLocalDynamoDbTableAndIndex { fixtures =>
-      val tableName = fixtures.tableName
-      val indexName = fixtures.indexName
-      withReindexService(tableName, indexName) { reindexService =>
+    withLocalDynamoDbTable { table =>
+      withReindexService(table) { reindexService =>
         val inShardRecords = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -135,7 +132,7 @@ class ReindexServiceTest
         val recordList = inShardRecords ++ notInShardRecords
 
         recordList.foreach(record =>
-          Scanamo.put(dynamoDbClient)(tableName)(record))
+          Scanamo.put(dynamoDbClient)(table.name)(record))
 
         val expectedUpdatedRecords = inShardRecords.map(
           record =>
@@ -147,7 +144,7 @@ class ReindexServiceTest
         whenReady(reindexService.runReindex(reindexJob)) { _ =>
           val testRecords =
             Scanamo
-              .scan[TestRecord](dynamoDbClient)(tableName)
+              .scan[TestRecord](dynamoDbClient)(table.name)
               .map(_.right.get)
 
           testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
@@ -158,7 +155,7 @@ class ReindexServiceTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexService("does-not-exist", "no-such-index") { service =>
+    withReindexService(Table("does-not-exist", "no-such-index")) { service =>
       val reindexJob = ReindexJob(
         shardId = "sierra/000",
         desiredVersion = 2

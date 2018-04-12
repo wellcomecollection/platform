@@ -9,6 +9,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -16,6 +17,7 @@ import scala.collection.JavaConversions._
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.actor.ActorSystem
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class SQSWorkerTest
     extends FunSpec
@@ -39,9 +41,9 @@ class SQSWorkerTest
 
   def withSqsWorker[R](
     actors: ActorSystem,
-    queueUrl: String,
+    queue: Queue,
     metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
-    val sqsReader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1))
+    val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
       new SQSWorker(sqsReader, actors, metrics) {
@@ -72,10 +74,10 @@ class SQSWorkerTest
 
   it("processes messages") {
     withFixtures {
-      case (_, queueUrl, metrics, worker) =>
+      case (_, queue, metrics, worker) =>
         val json = toJson(ValidSqsMessage()).get
 
-        sqsClient.sendMessage(queueUrl, json)
+        sqsClient.sendMessage(queue.url, json)
 
         eventually {
           verify(
@@ -91,7 +93,7 @@ class SQSWorkerTest
 
   it("does report an error when a runtime error occurs") {
     withFixtures {
-      case (_, queueUrl, metrics, worker) =>
+      case (_, queue, metrics, worker) =>
         when(
           metrics.timeAndCount[Unit](
             anyString(),
@@ -101,7 +103,7 @@ class SQSWorkerTest
 
         val json = toJson(ValidSqsMessage()).get
 
-        sqsClient.sendMessage(queueUrl, json)
+        sqsClient.sendMessage(queue.url, json)
 
         eventually {
           verify(metrics)
@@ -112,8 +114,8 @@ class SQSWorkerTest
 
   it("does not report an error when unable to parse a message") {
     withFixtures {
-      case (_, queueUrl, metrics, worker) =>
-        sqsClient.sendMessage(queueUrl, "this is not valid Json")
+      case (_, queue, metrics, worker) =>
+        sqsClient.sendMessage(queue.url, "this is not valid Json")
 
         eventually {
           verify(metrics, never())

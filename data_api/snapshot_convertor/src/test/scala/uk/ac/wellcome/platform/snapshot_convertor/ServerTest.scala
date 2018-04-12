@@ -14,11 +14,11 @@ class ServerTest
     with fixtures.Server {
 
   it("shows the healthcheck message") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalS3Bucket { bucketName =>
-          val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-            bucketName)
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+            bucket)
           withServer(flags) { server =>
             server.httpGet(
               path = "/management/healthcheck",

@@ -13,19 +13,33 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 import scala.util.Random
 
+object SNS {
+
+  class Topic(val arn: String) extends AnyVal {
+    override def toString = s"SNS.Topic($arn)"
+  }
+
+  object Topic {
+    def apply(arn: String): Topic = new Topic(arn)
+  }
+
+}
+
 trait SNS extends ImplicitLogging {
+
+  import SNS._
 
   private val localSNSEndpointUrl = "http://localhost:9292"
 
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def snsLocalFlags(topicArn: String) = Map(
+  def snsLocalFlags(topic: Topic) = Map(
     "aws.sns.endpoint" -> localSNSEndpointUrl,
     "aws.sns.accessKey" -> accessKey,
     "aws.sns.secretKey" -> secretKey,
     "aws.region" -> "localhost",
-    "aws.sns.topic.arn" -> topicArn
+    "aws.sns.topic.arn" -> topic.arn
   )
 
   private val credentials = new AWSStaticCredentialsProvider(
@@ -38,13 +52,15 @@ trait SNS extends ImplicitLogging {
       new EndpointConfiguration(localSNSEndpointUrl, "local"))
     .build()
 
-  def withLocalSnsTopic[R] = fixture[String, R](
+  def withLocalSnsTopic[R] = fixture[Topic, R](
     create = {
       val topicName = Random.alphanumeric take 10 mkString
       val arn = snsClient.createTopic(topicName).getTopicArn
-      arn
+      Topic(arn)
     },
-    destroy = snsClient.deleteTopic(_)
+    destroy = { topic =>
+      snsClient.deleteTopic(topic.arn)
+    }
   )
 
   private val mapper =
@@ -52,7 +68,7 @@ trait SNS extends ImplicitLogging {
       .registerModule(DefaultScalaModule)
       .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-  def listMessagesReceivedFromSNS(topicArn: String): List[MessageInfo] = {
+  def listMessagesReceivedFromSNS(topic: Topic): List[MessageInfo] = {
     /*
     This is a sample returned by the fake-sns implementation:
     ---
@@ -74,7 +90,7 @@ trait SNS extends ImplicitLogging {
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
     val messages = mapper.readValue(string, classOf[Messages])
-    messages.messages.filter(_.topic_arn == topicArn)
+    messages.messages.filter(_.topic_arn == topic.arn)
   }
 }
 
