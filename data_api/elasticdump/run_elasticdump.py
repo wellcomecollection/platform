@@ -40,9 +40,9 @@ def get_message(sqs_client, sqs_queue_url):
 
 
 def parse_message(message):
-    raw_messsage_dict = json.loads(message['Body'])
+    raw_message_dict = json.loads(message['Body'])
 
-    return SnapshotRequest(**raw_messsage_dict)
+    return SnapshotRequest(**raw_message_dict)
 
 
 def build_elasticsearch_url(environ_config, index):
