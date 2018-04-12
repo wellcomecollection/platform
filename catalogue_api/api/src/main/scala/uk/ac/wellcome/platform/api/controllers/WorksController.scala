@@ -191,8 +191,7 @@ class WorksController @Inject()(
     )
   }
 
-  private def setupResultListSwaggerDocs(endpointSuffix: String,
-                                         doc: Operation) = {
+  private def setupResultListSwaggerDocs(endpointSuffix: String, doc: Operation) = {
     doc
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
