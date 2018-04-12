@@ -7,6 +7,7 @@ from travistooling.decisionmaker import (
     should_run_job
 )
 from travistooling.decisions import (
+    ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
     ExclusivelyAffectsAnotherTask,
     ExclusivelyAffectsThisTask,
@@ -60,6 +61,11 @@ from travistooling.decisions import (
     ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
     ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
+
+    # Changes to Scala test files trigger a -test Scala task, but not
+    # a -publish task.
+    ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
+    ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
 ])
 def test_does_file_affect_build_job(path, task_name, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
