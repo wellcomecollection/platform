@@ -12,7 +12,10 @@ import uk.ac.wellcome.models.{Error, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -58,12 +61,13 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
           pageSize = pageSize,
           includes = includes
         )
-      } yield ResultListResponse.create(
-        contextUri,
-        displayResultList,
-        request,
-        s"$apiScheme://$apiHost"
-      )
+      } yield
+        ResultListResponse.create(
+          contextUri,
+          displayResultList,
+          request,
+          s"$apiScheme://$apiHost"
+        )
     }
   }
 
@@ -74,34 +78,36 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       val includes = request.includes.getOrElse(WorksIncludes())
 
       val eventualResponse = for {
-        maybeWork <- worksService.findWorkById(canonicalId = request.id, index = request._index)
+        maybeWork <- worksService.findWorkById(
+          canonicalId = request.id,
+          index = request._index)
       } yield generateSingleWorkResponse(maybeWork, includes, request)
 
-        eventualResponse.recover {
-          // If a user tries to request an ID without escaping it correctly
-          // (e.g. "/works/work/zd224ncv]"), we get an IllegalArgumentException with
-          // the error:
-          //
-          //      Illegal character in path at index 20: /works/work/zd224ncv]
-          //
-          // In this case, we return a 400 Bad Request exception rather than bubbling
-          // up as a 500 error.
-          case exception: IllegalArgumentException =>
-            if (exception.getMessage.startsWith(
-              "Illegal character in path at index ")) {
-              val result = Error(
-                variant = "http-400",
-                description =
-                  Some(s"Unrecognised character in identifier ${request.id}")
+      eventualResponse.recover {
+        // If a user tries to request an ID without escaping it correctly
+        // (e.g. "/works/work/zd224ncv]"), we get an IllegalArgumentException with
+        // the error:
+        //
+        //      Illegal character in path at index 20: /works/work/zd224ncv]
+        //
+        // In this case, we return a 400 Bad Request exception rather than bubbling
+        // up as a 500 error.
+        case exception: IllegalArgumentException =>
+          if (exception.getMessage.startsWith(
+                "Illegal character in path at index ")) {
+            val result = Error(
+              variant = "http-400",
+              description =
+                Some(s"Unrecognised character in identifier ${request.id}")
+            )
+            response.badRequest.json(
+              ResultResponse(
+                context = contextUri,
+                result = DisplayError(result)
               )
-              response.badRequest.json(
-                ResultResponse(
-                  context = contextUri,
-                  result = DisplayError(result)
-                )
-              )
-            }
-        }
+            )
+          }
+      }
     }
   }
 
@@ -124,21 +130,23 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     works
   }
 
-  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork], includes: WorksIncludes, request: SingleWorkRequest) = maybeWork match {
-    case Some(work: IdentifiedWork) =>
-      if (work.visible) {
-        respondWithWork(includes, work)
-      } else {
-        respondWithGoneError
-      }
-    case None =>
-      respondWithNotFoundError(request)
-  }
+  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork],
+                                         includes: WorksIncludes,
+                                         request: SingleWorkRequest) =
+    maybeWork match {
+      case Some(work: IdentifiedWork) =>
+        if (work.visible) {
+          respondWithWork(includes, work)
+        } else {
+          respondWithGoneError
+        }
+      case None =>
+        respondWithNotFoundError(request)
+    }
 
   private def respondWithWork(includes: WorksIncludes, work: IdentifiedWork) = {
     val result = DisplayWork(work = work, includes = includes)
-    response.ok.json(
-      ResultResponse(context = contextUri, result = result))
+    response.ok.json(ResultResponse(context = contextUri, result = result))
   }
 
   private def respondWithGoneError = {
@@ -157,17 +165,15 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
   private def respondWithNotFoundError(request: SingleWorkRequest) = {
     val result = Error(
       variant = "http-404",
-      description =
-        Some(s"Work not found for identifier ${request.id}")
+      description = Some(s"Work not found for identifier ${request.id}")
     )
     response.notFound.json(
-      ResultResponse(
-        context = contextUri,
-        result = DisplayError(result))
+      ResultResponse(context = contextUri, result = DisplayError(result))
     )
   }
 
-  private def setupResultListSwaggerDocs(endpointSuffix: String, doc: Operation) = {
+  private def setupResultListSwaggerDocs(endpointSuffix: String,
+                                         doc: Operation) = {
     doc
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
@@ -177,16 +183,16 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](500, "Internal Server Error")
       .queryParam[Int](
-      "page",
-      "The page to return from the result list",
-      required = false)
+        "page",
+        "The page to return from the result list",
+        required = false)
       .queryParam[Int](
-      "pageSize",
-      "The number of works to return per page (default: 10)",
-      required = false)
+        "pageSize",
+        "The number of works to return per page (default: 10)",
+        required = false)
       .queryParam[String](
-      "query",
-      """Full-text search query, which will OR supplied terms by default.
+        "query",
+        """Full-text search query, which will OR supplied terms by default.
         |
         |The following special characters can be used to change the search behaviour:
         |
@@ -200,8 +206,8 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
         |- ~N after a phrase signifies slop amount
         |
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
-      required = false
-    )
+        required = false
+      )
       .parameter(includesSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is
