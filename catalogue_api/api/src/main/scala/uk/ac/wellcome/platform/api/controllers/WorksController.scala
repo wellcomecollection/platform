@@ -167,21 +167,6 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     )
   }
 
-  private def setUpSingleWorkSwaggerDocs(doc: Operation) = {
-    doc
-      .summary("/works/{id}")
-      .description("Returns a single work")
-      .tag("Works")
-      .routeParam[String]("id", "The work to return", required = true)
-      .responseWith[DisplayWork](200, "Work")
-      .responseWith[DisplayError](400, "Bad Request Error")
-      .responseWith[DisplayError](404, "Not Found Error")
-      .responseWith[DisplayError](410, "Gone Error")
-      .responseWith[DisplayError](500, "Internal Server Error")
-      .parameter(includesSwaggerParam)
-    // Deliberately undocumented: the index flag.  See above.
-  }
-
   private def setupResultListSwaggerDocs(endpointSuffix: String, doc: Operation) = {
     doc
       .summary(endpointSuffix)
@@ -223,5 +208,20 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     // useful for us to try out transformer changes, different index
     // weighting, etc., but we don't want to advertise its existence
     // in the public docs.
+  }
+
+  private def setUpSingleWorkSwaggerDocs(doc: Operation) = {
+    doc
+      .summary("/works/{id}")
+      .description("Returns a single work")
+      .tag("Works")
+      .routeParam[String]("id", "The work to return", required = true)
+      .responseWith[DisplayWork](200, "Work")
+      .responseWith[DisplayError](400, "Bad Request Error")
+      .responseWith[DisplayError](404, "Not Found Error")
+      .responseWith[DisplayError](410, "Gone Error")
+      .responseWith[DisplayError](500, "Internal Server Error")
+      .parameter(includesSwaggerParam)
+    // Deliberately undocumented: the index flag.  See above.
   }
 }
