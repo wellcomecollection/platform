@@ -29,7 +29,7 @@ class DynamoInserterTest
 
   it("ingests a json item into DynamoDB") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "100001"
         val updatedDate = "2013-12-13T12:43:16Z"
 
@@ -49,7 +49,7 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(record)
 
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(record.copy(version = 1)))
         }
     }
@@ -57,7 +57,7 @@ class DynamoInserterTest
 
   it("does not overwrite new data with old data") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "200002"
         val oldUpdatedDate = "2001-01-01T00:00:01Z"
         val newUpdatedDate = "2017-12-12T23:59:59Z"
@@ -69,7 +69,7 @@ class DynamoInserterTest
             s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record", "bibIds": ["1556974"]}""",
           bibIds = List("1556974")
         )
-        Scanamo.put(dynamoDbClient)(tableName)(newRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(newRecord)
 
         val oldRecord = SierraItemRecord(
           id = id,
@@ -87,7 +87,7 @@ class DynamoInserterTest
 
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(newRecord))
         }
     }
@@ -95,7 +95,7 @@ class DynamoInserterTest
 
   it("overwrites old data with new data") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -108,7 +108,7 @@ class DynamoInserterTest
           bibIds = List("1556974"),
           version = 1
         )
-        Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = SierraItemRecord(
           id = s"$id",
@@ -127,7 +127,7 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(newRecord.copy(version = 2)))
         }
     }
@@ -135,7 +135,7 @@ class DynamoInserterTest
 
   it("records unlinked bibIds") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -147,7 +147,7 @@ class DynamoInserterTest
             s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1", "b2", "b3"]}""",
           bibIds = List("b1", "b2", "b3")
         )
-        Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = SierraItemRecord(
           id = s"$id",
@@ -165,7 +165,7 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b3"))))
         }
@@ -174,7 +174,7 @@ class DynamoInserterTest
 
   it("adds new bibIds and records unlinked bibIds in the same update") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -186,7 +186,7 @@ class DynamoInserterTest
             s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1", "b2", "b3"]}""",
           bibIds = List("b1", "b2", "b3")
         )
-        Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = SierraItemRecord(
           id = s"$id",
@@ -204,7 +204,7 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b1"))))
         }
@@ -213,7 +213,7 @@ class DynamoInserterTest
 
   it("preserves existing unlinked bibIds in DynamoDB") {
     withDynamoInserter {
-      case (tableName, dynamoInserter) =>
+      case (table, dynamoInserter) =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -227,7 +227,7 @@ class DynamoInserterTest
           unlinkedBibIds = List("b5")
         )
 
-        Scanamo.put(dynamoDbClient)(tableName)(oldRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = SierraItemRecord(
           id = s"$id",
@@ -245,7 +245,7 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
         whenReady(futureUnit) { _ =>
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(
             Right(
               newRecord.copy(version = 1, unlinkedBibIds = List("b5", "b1"))))

@@ -7,12 +7,13 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.SQSConfig
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSReaderTest
     extends FunSpec
@@ -22,9 +23,9 @@ class SQSReaderTest
     with ExtendedPatience
     with SQS {
 
-  def withSqsReader[R](maxMessages: Int)(queueUrl: String)(
+  def withSqsReader[R](maxMessages: Int)(queue: Queue)(
     testWith: TestWith[SQSReader, R]) = {
-    val sqsConfig = SQSConfig(queueUrl, waitTime = 20 seconds, maxMessages)
+    val sqsConfig = SQSConfig(queue.url, waitTime = 20 seconds, maxMessages)
     val sqsReader = new SQSReader(sqsClient, sqsConfig)
 
     testWith(sqsReader)
@@ -44,10 +45,10 @@ class SQSReaderTest
   it(
     "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
     withFixtures(maxMessages = 2) {
-      case (queueUrl, sqsReader) =>
+      case (queue, sqsReader) =>
         val messageStrings =
           List("someMessage1", "someMessage2", "someMessage3")
-        messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
         var receivedMessages: List[Message] = Nil
 
@@ -87,13 +88,13 @@ class SQSReaderTest
   it(
     "should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
     withFixtures(maxMessages = 10) {
-      case (queueUrl, sqsReader) =>
+      case (queue, sqsReader) =>
         val failingMessage = "This message will fail"
         val messageStrings = List(
           "This is the first message",
           failingMessage,
           "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
         val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
           if (message.getBody == failingMessage)
@@ -114,13 +115,13 @@ class SQSReaderTest
   it(
     "should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
     withFixtures(maxMessages = 10) {
-      case (queueUrl, sqsReader) =>
+      case (queue, sqsReader) =>
         val failingMessage = "This message will fail"
         val messageStrings = List(
           "This is the first message",
           failingMessage,
           "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
         val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
           if (message.getBody == failingMessage)
@@ -143,13 +144,13 @@ class SQSReaderTest
   it(
     "should return a successful future but not delete the message if processing a message fails with GracefulFailureException") {
     withFixtures(maxMessages = 10) {
-      case (queueUrl, sqsReader) =>
+      case (queue, sqsReader) =>
         val failingMessage = "This message will fail gracefully"
         val messageStrings = List(
           "This is the first message",
           failingMessage,
           "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queueUrl, _))
+        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
         val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
           if (message.getBody == failingMessage)

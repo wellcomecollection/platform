@@ -11,6 +11,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -25,14 +26,14 @@ class SequentialS3SinkTest
     with ExtendedPatience {
 
   private def withSink(actorSystem: ActorSystem,
-                       bucketName: String,
+                       bucket: Bucket,
                        keyPrefix: String,
                        offset: Int = 0)(
     testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
     implicit val executionContext = actorSystem.dispatcher
     val sink = SequentialS3Sink(
       s3Client,
-      bucketName = bucketName,
+      bucketName = bucket.name,
       keyPrefix = keyPrefix,
       offset = offset
     )
@@ -43,11 +44,11 @@ class SequentialS3SinkTest
   it("puts a single JSON in S3") {
     val json = parse(s"""{"hello": "world"}""").right.get
 
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       withActorSystem { actorSystem =>
         withSink(
           actorSystem = actorSystem,
-          bucketName = bucketName,
+          bucket = bucket,
           keyPrefix = "testA_") { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source
@@ -57,11 +58,11 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucketName).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 1
               s3objects.head.getKey() shouldBe "testA_0000.json"
 
-              getJsonFromS3(bucketName, "testA_0000.json") shouldBe json
+              getJsonFromS3(bucket, "testA_0000.json") shouldBe json
             }
           }
         }
@@ -74,11 +75,11 @@ class SequentialS3SinkTest
     val json1 = parse(s"""{"orange": "yellow"}""").right.get
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       withActorSystem { actorSystem =>
         withSink(
           actorSystem = actorSystem,
-          bucketName = bucketName,
+          bucket = bucket,
           keyPrefix = "testB_") { sink =>
           withMaterializer(actorSystem) { materializer =>
             val futureDone = Source(List(json0, json1, json2)).zipWithIndex
@@ -86,7 +87,7 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucketName).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 3
               s3objects.map {
                 _.getKey()
@@ -95,9 +96,9 @@ class SequentialS3SinkTest
                 "testB_0001.json",
                 "testB_0002.json")
 
-              getJsonFromS3(bucketName, "testB_0000.json") shouldBe json0
-              getJsonFromS3(bucketName, "testB_0001.json") shouldBe json1
-              getJsonFromS3(bucketName, "testB_0002.json") shouldBe json2
+              getJsonFromS3(bucket, "testB_0000.json") shouldBe json0
+              getJsonFromS3(bucket, "testB_0001.json") shouldBe json1
+              getJsonFromS3(bucket, "testB_0002.json") shouldBe json2
             }
           }
         }
@@ -110,11 +111,11 @@ class SequentialS3SinkTest
     val json1 = parse(s"""{"orange": "yellow"}""").right.get
     val json2 = parse(s"""{"yellow": "green"}""").right.get
 
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       withActorSystem { actorSystem =>
         withSink(
           actorSystem = actorSystem,
-          bucketName = bucketName,
+          bucket = bucket,
           keyPrefix = "testC_",
           offset = 3) { sink =>
           withMaterializer(actorSystem) { materializer =>
@@ -123,7 +124,7 @@ class SequentialS3SinkTest
 
             whenReady(futureDone) { _ =>
               val s3objects =
-                s3Client.listObjects(bucketName).getObjectSummaries
+                s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects.map {
                 _.getKey()
               } shouldBe List(
@@ -131,9 +132,9 @@ class SequentialS3SinkTest
                 "testC_0004.json",
                 "testC_0005.json")
 
-              getJsonFromS3(bucketName, "testC_0003.json") shouldBe json0
-              getJsonFromS3(bucketName, "testC_0004.json") shouldBe json1
-              getJsonFromS3(bucketName, "testC_0005.json") shouldBe json2
+              getJsonFromS3(bucket, "testC_0003.json") shouldBe json0
+              getJsonFromS3(bucket, "testC_0004.json") shouldBe json1
+              getJsonFromS3(bucket, "testC_0005.json") shouldBe json2
             }
           }
         }

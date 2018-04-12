@@ -12,7 +12,21 @@ import org.scalatest.concurrent.Eventually
 import scala.collection.JavaConversions._
 import scala.util.Random
 
+object S3 {
+
+  class Bucket(val name: String) extends AnyVal {
+    override def toString = s"S3.Bucket($name)"
+  }
+
+  object Bucket {
+    def apply(name: String): Bucket = new Bucket(name)
+  }
+
+}
+
 trait S3 extends Logging with Eventually with ImplicitLogging {
+
+  import S3._
 
   protected val localS3EndpointUrl = "http://localhost:33333"
   protected val regionName = "localhost"
@@ -20,12 +34,12 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
 
-  def s3LocalFlags(bucketName: String) = Map(
+  def s3LocalFlags(bucket: Bucket) = Map(
     "aws.s3.endpoint" -> localS3EndpointUrl,
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
     "aws.region" -> "localhost",
-    "aws.s3.bucketName" -> bucketName
+    "aws.s3.bucketName" -> bucket.name
   )
 
   private val credentials = new AWSStaticCredentialsProvider(
@@ -40,33 +54,33 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
     .build()
 
   def withLocalS3Bucket[R] =
-    fixture[String, R](
+    fixture[Bucket, R](
       create = {
         val bucketName: String =
           (Random.alphanumeric take 10 mkString).toLowerCase
 
-        val bucket = s3Client.createBucket(bucketName)
+        s3Client.createBucket(bucketName)
         eventually { s3Client.doesBucketExistV2(bucketName) }
 
-        bucketName
+        Bucket(bucketName)
       },
-      destroy = { bucketName: String =>
+      destroy = { bucket: Bucket =>
         safeCleanup(s3Client) {
-          _.listObjects(bucketName).getObjectSummaries.foreach { obj =>
-            safeCleanup(obj.getKey) { s3Client.deleteObject(bucketName, _) }
+          _.listObjects(bucket.name).getObjectSummaries.foreach { obj =>
+            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
           }
         }
 
-        s3Client.deleteBucket(bucketName)
+        s3Client.deleteBucket(bucket.name)
       }
     )
 
-  def getContentFromS3(bucketName: String, key: String): String = {
-    IOUtils.toString(s3Client.getObject(bucketName, key).getObjectContent)
+  def getContentFromS3(bucket: Bucket, key: String): String = {
+    IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
   }
 
-  def getJsonFromS3(bucketName: String, key: String): Json = {
-    parse(getContentFromS3(bucketName, key)).right.get
+  def getJsonFromS3(bucket: Bucket, key: String): Json = {
+    parse(getContentFromS3(bucket, key)).right.get
   }
 
 }

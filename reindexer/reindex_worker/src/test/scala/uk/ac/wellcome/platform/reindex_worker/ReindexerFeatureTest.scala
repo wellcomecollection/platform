@@ -16,6 +16,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
+import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 case class TestRecord(
   id: String,
@@ -45,8 +47,8 @@ class ReindexerFeatureTest
 
   val shardName = "shard"
 
-  private def createReindexableData(queueUrl: String,
-                                    tableName: String): List[ReindexRecord] = {
+  private def createReindexableData(queue: Queue,
+                                    table: Table): List[ReindexRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -60,7 +62,7 @@ class ReindexerFeatureTest
     })
 
     //TODO re-factor shared test state here into fixture method
-    testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
+    testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
 
     val expectedRecords = testRecords.map(
       (r: TestRecord) =>
@@ -84,31 +86,28 @@ class ReindexerFeatureTest
       "now"
     )
 
-    sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+    sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
     expectedRecords.toList
   }
 
   it("increases the reindexVersion on every record that needs a reindex") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
-
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalDynamoDbTable { table =>
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
-            tableName) ++ sqsLocalFlags(queueUrl) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
+            table) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queueUrl = queueUrl, tableName = tableName)
+              createReindexableData(queue, table)
 
             eventually {
               val actualRecords =
                 Scanamo
-                  .scan[ReindexRecord](dynamoDbClient)(tableName)
+                  .scan[ReindexRecord](dynamoDbClient)(table.name)
                   .map(_.right.get)
 
               actualRecords should contain theSameElementsAs expectedRecords
@@ -120,20 +119,17 @@ class ReindexerFeatureTest
   }
 
   it("sends an SNS notice for a completed reindex") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
-
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalDynamoDbTable { table =>
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
-            tableName) ++ sqsLocalFlags(queueUrl) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
+            table) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queueUrl = queueUrl, tableName = tableName)
+              createReindexableData(queue, table)
 
             val expectedMessage = CompletedReindexJob(
               shardId = shardName,
@@ -141,7 +137,7 @@ class ReindexerFeatureTest
             )
 
             eventually {
-              val messages = listMessagesReceivedFromSNS(topicArn)
+              val messages = listMessagesReceivedFromSNS(topic)
 
               messages should have size 1
 
@@ -158,25 +154,22 @@ class ReindexerFeatureTest
   }
 
   it("does not send a message if it cannot complete a reindex") {
-    withLocalSqsQueue { queueUrl =>
-      withLocalSnsTopic { topicArn =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
-
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalDynamoDbTable { table =>
           val flags
-            : Map[String, String] = snsLocalFlags(topicArn) ++ dynamoDbLocalEndpointFlags(
-            "non_existent_table") ++ sqsLocalFlags(queueUrl) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table
+            .copy(name = "non_existent_table")) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queueUrl = queueUrl, tableName = tableName)
+              createReindexableData(queue, table)
 
             // We wait some time to ensure that the message is not processed
             Thread.sleep(5000)
 
-            val messages = listMessagesReceivedFromSNS(topicArn)
+            val messages = listMessagesReceivedFromSNS(topic)
             messages should have size 0
           }
         }

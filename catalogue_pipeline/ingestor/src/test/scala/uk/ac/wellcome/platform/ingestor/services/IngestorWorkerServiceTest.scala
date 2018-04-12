@@ -82,11 +82,11 @@ class IngestorWorkerServiceTest
     val workIndexer =
       new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
 
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       withLocalElasticsearchIndex(indexName, itemType) { _ =>
         val service = new IngestorWorkerService(
           identifiedWorkIndexer = workIndexer,
-          reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+          reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
           system = actorSystem,
           metrics = metricsSender
         )
@@ -107,7 +107,7 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
     val indexName = "works"
 
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       val workIndexer = new WorkIndexer(
         esIndex = indexName,
         esType = itemType,
@@ -117,7 +117,7 @@ class IngestorWorkerServiceTest
 
       val service = new IngestorWorkerService(
         identifiedWorkIndexer = workIndexer,
-        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
         metrics = metricsSender
       )
@@ -155,10 +155,10 @@ class IngestorWorkerServiceTest
 
     val sqsMessage = messageFromString(toJson(work).get)
 
-    withLocalSqsQueue { queueUrl =>
+    withLocalSqsQueue { queue =>
       val service = new IngestorWorkerService(
         identifiedWorkIndexer = brokenWorkIndexer,
-        reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
         metrics = metricsSender
       )

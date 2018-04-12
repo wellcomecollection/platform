@@ -17,8 +17,8 @@ class SNSWriterTest
 
   it(
     "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
-    withLocalSnsTopic { arn =>
-      val snsConfig = SNSConfig(arn)
+    withLocalSnsTopic { topic =>
+      val snsConfig = SNSConfig(topic.arn)
       val snsWriter = new SNSWriter(snsClient, snsConfig)
       val message = "sns-writer-test-message"
       val subject = "sns-writer-test-subject"
@@ -28,7 +28,7 @@ class SNSWriterTest
       )
 
       whenReady(futurePublishAttempt) { publishAttempt =>
-        val messages = listMessagesReceivedFromSNS(arn)
+        val messages = listMessagesReceivedFromSNS(topic)
         messages should have size (1)
         messages.head.message shouldBe message
         messages.head.subject shouldBe subject

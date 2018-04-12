@@ -17,10 +17,9 @@ class ServerTest
   override lazy val evidence = DynamoFormat[SierraItemRecord]
 
   it("shows the healthcheck message") {
-    withLocalDynamoDbTable { tableName =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = sqsLocalFlags(queueUrl) ++ dynamoDbLocalEndpointFlags(
-          tableName)
+    withLocalDynamoDbTable { table =>
+      withLocalSqsQueue { queue =>
+        val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
 
         withServer(flags) { server =>
           server.httpGet(

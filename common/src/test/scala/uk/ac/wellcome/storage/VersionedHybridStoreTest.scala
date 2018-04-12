@@ -32,12 +32,12 @@ class VersionedHybridStoreTest
 
   def withFixtures[R] =
     withLocalS3Bucket[R] and
-      withLocalDynamoDbTable[R] _ and
+      withLocalDynamoDbTable[R] and
       withVersionedHybridStore[ExampleRecord, R] _
 
   it("stores a versioned record if it has never been seen before") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "1111",
           content = "One ocelot in orange"
@@ -47,14 +47,14 @@ class VersionedHybridStoreTest
           hybridStore.updateRecord(record.id)(record)(identity)()
 
         whenReady(future) { _ =>
-          getJsonFor(bucketName, tableName, record) shouldBe toJson(record).get
+          getJsonFor(bucket, table, record) shouldBe toJson(record).get
         }
     }
   }
 
   it("applies the given transformation to an existing record") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "1111",
           content = "One ocelot in orange"
@@ -70,15 +70,14 @@ class VersionedHybridStoreTest
             .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
         whenReady(future) { _ =>
-          getJsonFor(bucketName, tableName, record) shouldBe toJson(
-            expectedRecord).get
+          getJsonFor(bucket, table, record) shouldBe toJson(expectedRecord).get
         }
     }
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "2222",
           content = "Two teal turtles in Tenerife"
@@ -97,7 +96,7 @@ class VersionedHybridStoreTest
         }
 
         whenReady(updatedFuture) { _ =>
-          getJsonFor(bucketName, tableName, updatedRecord) shouldBe toJson(
+          getJsonFor(bucket, table, updatedRecord) shouldBe toJson(
             updatedRecord).get
         }
     }
@@ -105,7 +104,7 @@ class VersionedHybridStoreTest
 
   it("returns a future of None for a non-existent record") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (_, _, hybridStore) =>
         val future = hybridStore.getRecord(id = "does/notexist")
 
         whenReady(future) { result =>
@@ -116,7 +115,7 @@ class VersionedHybridStoreTest
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "5555",
           content = "Five fishing flinging flint"
@@ -137,7 +136,7 @@ class VersionedHybridStoreTest
 
   it("does not allow creation of records with a different id than indicated") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "8934",
           content = "Five fishing flinging flint"
@@ -154,7 +153,7 @@ class VersionedHybridStoreTest
 
   it("does not allow transformation to a record with a different id") {
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (bucketName, _, hybridStore) =>
         val record = ExampleRecord(
           id = "8934",
           content = "Five fishing flinging flint"
@@ -193,13 +192,14 @@ class VersionedHybridStoreTest
     )
 
     withFixtures {
-      case (bucketName, tableName, hybridStore) =>
+      case (_, table, hybridStore) =>
         val future =
           hybridStore.updateRecord(record.id)(record)(identity)(data)
 
         whenReady(future) { _ =>
           val maybeResult =
-            Scanamo.get[ExtraData](dynamoDbClient)(tableName)('id -> record.id)
+            Scanamo.get[ExtraData](dynamoDbClient)(table.name)(
+              'id -> record.id)
 
           maybeResult shouldBe defined
           maybeResult.get.isRight shouldBe true

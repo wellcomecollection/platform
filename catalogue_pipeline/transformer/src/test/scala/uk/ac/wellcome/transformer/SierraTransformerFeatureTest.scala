@@ -32,8 +32,8 @@ class SierraTransformerFeatureTest
     val lastModifiedDate = Instant.now()
 
     withLocalSnsTopic { topicArn =>
-      withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
           val sierraHybridRecordMessage =
             hybridRecordSqsMessage(
               message = createValidSierraTransformableJson(
@@ -44,18 +44,18 @@ class SierraTransformerFeatureTest
               sourceName = "sierra",
               version = 1,
               s3Client = s3Client,
-              bucketName = bucketName
+              bucket = bucket
             )
 
           sqsClient.sendMessage(
-            queueUrl,
+            queue.url,
             JsonUtil.toJson(sierraHybridRecordMessage).get
           )
 
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucketName) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queueUrl)
+          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
+            queue)
 
           withServer(flags) { _ =>
             eventually {

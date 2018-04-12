@@ -18,6 +18,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
@@ -49,8 +51,8 @@ class SierraReaderWorkerServiceTest
       ActorSystem())
 
   case class FixtureParams(worker: SierraReaderWorkerService,
-                           queueUrl: String,
-                           bucketName: String)
+                           queue: Queue,
+                           bucket: Bucket)
 
   def withSierraReaderWorkerService(
     fields: String,
@@ -59,15 +61,16 @@ class SierraReaderWorkerServiceTest
     resourceType: SierraResourceTypes.Value = SierraResourceTypes.bibs
   )(testWith: TestWith[FixtureParams, Assertion]) = {
     withActorSystem { actorSystem =>
-      withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
           val worker = new SierraReaderWorkerService(
-            reader = new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+            reader =
+              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             s3client = s3Client,
-            s3Config = S3Config(bucketName),
+            s3Config = S3Config(bucket.name),
             windowManager = new WindowManager(
               s3Client,
-              S3Config(bucketName),
+              S3Config(bucket.name),
               fields,
               resourceType),
             batchSize = batchSize,
@@ -81,7 +84,7 @@ class SierraReaderWorkerServiceTest
           )
 
           try {
-            testWith(FixtureParams(worker, queueUrl, bucketName))
+            testWith(FixtureParams(worker, queue, bucket))
           } finally {
             worker.stop()
           }
@@ -113,7 +116,7 @@ class SierraReaderWorkerServiceTest
           "messageType",
           "timestamp")
 
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -123,14 +126,14 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
         objects.map { _.getKey() } shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucketName, pageNames(0)) should have size 10
-        getRecordsFromS3(fixtures.bucketName, pageNames(1)) should have size 10
-        getRecordsFromS3(fixtures.bucketName, pageNames(2)) should have size 9
+        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
+        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
+        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 9
       }
     }
   }
@@ -157,7 +160,7 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -167,15 +170,15 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucketName, pageNames(0)) should have size 50
-        getRecordsFromS3(fixtures.bucketName, pageNames(1)) should have size 50
-        getRecordsFromS3(fixtures.bucketName, pageNames(2)) should have size 50
-        getRecordsFromS3(fixtures.bucketName, pageNames(3)) should have size 7
+        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
       }
     }
   }
@@ -189,9 +192,9 @@ class SierraReaderWorkerServiceTest
       val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
 
       // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
-      s3Client.putObject(fixtures.bucketName, s"$prefix/0000.json", "[]")
+      s3Client.putObject(fixtures.bucket.name, s"$prefix/0000.json", "[]")
       s3Client.putObject(
-        fixtures.bucketName,
+        fixtures.bucket.name,
         s"$prefix/0001.json",
         """
           |[
@@ -220,7 +223,7 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
-      sqsClient.sendMessage(fixtures.queueUrl, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -230,25 +233,25 @@ class SierraReaderWorkerServiceTest
 
       eventually {
         val objects =
-          s3Client.listObjects(fixtures.bucketName).getObjectSummaries
+          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         objects.map { _.getKey() } shouldBe pageNames
 
         // These two files were pre-populated -- we check the reader hasn't overwritten these
-        getRecordsFromS3(fixtures.bucketName, pageNames(0)) should have size 0
-        getRecordsFromS3(fixtures.bucketName, pageNames(1)) should have size 1
+        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0
+        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 1
 
         // We check the reader has filled these in correctly
-        getRecordsFromS3(fixtures.bucketName, pageNames(2)) should have size 50
-        getRecordsFromS3(fixtures.bucketName, pageNames(3)) should have size 7
+        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
+        getRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
       }
     }
   }
 
-  private def getRecordsFromS3(bucketName: String,
+  private def getRecordsFromS3(bucket: Bucket,
                                key: String): List[SierraRecord] =
-    fromJson[List[SierraRecord]](getContentFromS3(bucketName, key)).get
+    fromJson[List[SierraRecord]](getContentFromS3(bucket, key)).get
 
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {

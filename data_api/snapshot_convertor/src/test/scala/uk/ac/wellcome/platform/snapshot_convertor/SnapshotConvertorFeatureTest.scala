@@ -43,9 +43,9 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queueUrl, topicArn), sourceBucketName), targetBucketName) =>
-        val flags = snsLocalFlags(topicArn) ++ sqsLocalFlags(queueUrl) ++ s3LocalFlags(
-          sourceBucketName)
+      case (((queue, topic), sourceBucket), targetBucket) =>
+        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+          sourceBucket)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
@@ -71,11 +71,11 @@ class SnapshotConvertorFeatureTest
 
           val targetObjectKey = "target.txt.gz"
 
-          withGzipCompressedS3Key(sourceBucketName, content) { objectKey =>
+          withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              sourceBucketName = sourceBucketName,
+              sourceBucketName = sourceBucket.name,
               sourceObjectKey = objectKey,
-              targetBucketName = targetBucketName,
+              targetBucketName = targetBucket.name,
               targetObjectKey = targetObjectKey
             )
 
@@ -83,11 +83,11 @@ class SnapshotConvertorFeatureTest
               subject = Some("Sent from SnapshotConvertorFeatureTest"),
               body = toJson(conversionJob).get,
               messageType = "json",
-              topic = topicArn,
+              topic = topic.arn,
               timestamp = "now"
             )
 
-            sqsClient.sendMessage(queueUrl, toJson(message).get)
+            sqsClient.sendMessage(queue.url, toJson(message).get)
 
             eventually {
 
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucketName, targetObjectKey),
+                new GetObjectRequest(targetBucket.name, targetObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -121,13 +121,13 @@ class SnapshotConvertorFeatureTest
                   assertJsonStringsAreEqual(actualLine, expectedLine)
               }
 
-              val receivedMessages = listMessagesReceivedFromSNS(topicArn)
+              val receivedMessages = listMessagesReceivedFromSNS(topic)
               receivedMessages.size should be >= 1
 
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/$targetBucketName/$targetObjectKey"
+                  s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

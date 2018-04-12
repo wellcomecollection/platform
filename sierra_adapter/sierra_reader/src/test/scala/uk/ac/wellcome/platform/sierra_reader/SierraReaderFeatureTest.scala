@@ -17,9 +17,9 @@ class SierraReaderFeatureTest
     with ExtendedPatience {
 
   it("reads bibs from Sierra and writes files to S3") {
-    withLocalS3Bucket { bucketName =>
-      withLocalSqsQueue { queueUrl =>
-        val flags = s3LocalFlags(bucketName) ++ sqsLocalFlags(queueUrl) ++ Map(
+    withLocalS3Bucket { bucket =>
+      withLocalSqsQueue { queue =>
+        val flags = s3LocalFlags(bucket) ++ sqsLocalFlags(queue) ++ Map(
           "reader.resourceType" -> "bibs",
           "sierra.apiUrl" -> "http://localhost:8080",
           "sierra.oauthKey" -> "key",
@@ -42,12 +42,12 @@ class SierraReaderFeatureTest
             "topic",
             "messageType",
             "timestamp")
-          sqsClient.sendMessage(queueUrl, toJson(sqsMessage).get)
+          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response
             s3Client
-              .listObjects(bucketName)
+              .listObjects(bucket.name)
               .getObjectSummaries should have size 2
           }
         }

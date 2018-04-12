@@ -11,6 +11,8 @@ import uk.ac.wellcome.test.fixtures.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class MiroTransformerFeatureTest
     extends FunSpec
@@ -32,26 +34,26 @@ class MiroTransformerFeatureTest
     val secondTitle = "A song about a snake"
 
     withLocalSnsTopic { topicArn =>
-      withLocalSqsQueue { queueUrl =>
-        withLocalS3Bucket { bucketName =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
           sendMiroImageToSQS(
             miroID = miroID,
             data = shouldNotTransformMessage(title),
-            bucketName = bucketName,
-            queueUrl = queueUrl
+            bucket = bucket,
+            queue = queue
           )
 
           sendMiroImageToSQS(
             miroID = secondMiroID,
             data = shouldTransformMessage(secondTitle),
-            bucketName = bucketName,
-            queueUrl = queueUrl
+            bucket = bucket,
+            queue = queue
           )
 
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucketName) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queueUrl)
+          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
+            queue)
 
           withServer(flags) { _ =>
             eventually {
@@ -91,8 +93,8 @@ class MiroTransformerFeatureTest
   private def sendMiroImageToSQS(
     miroID: String,
     data: String,
-    bucketName: String,
-    queueUrl: String
+    bucket: Bucket,
+    queue: Queue
   ) = {
     val miroTransformable =
       MiroTransformable(
@@ -107,10 +109,10 @@ class MiroTransformerFeatureTest
         sourceName = "miro",
         version = 1,
         s3Client = s3Client,
-        bucketName = bucketName
+        bucket = bucket
       )
 
-    sqsClient.sendMessage(queueUrl, JsonUtil.toJson(sqsMessage).get)
+    sqsClient.sendMessage(queue.url, JsonUtil.toJson(sqsMessage).get)
   }
 
 }

@@ -23,13 +23,13 @@ class S3ObjectStoreTest
     with ExtendedPatience {
 
   it("stores a versioned object with path id/version/hash") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       val content = "Some content!"
       val prefix = "foo"
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucketName),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -47,7 +47,7 @@ class S3ObjectStoreTest
         actualKey shouldBe expectedKey
 
         val jsonFromS3 = getJsonFromS3(
-          bucketName,
+          bucket,
           expectedKey
         ).noSpaces
 
@@ -57,13 +57,13 @@ class S3ObjectStoreTest
   }
 
   it("removes leading slashes from prefixes") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       val content = "Some content!"
       val prefix = "/foo"
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucketName),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -82,13 +82,13 @@ class S3ObjectStoreTest
   }
 
   it("removes trailing slashes from prefixes") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       val content = "Some content!"
       val prefix = "foo/"
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucketName),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -107,13 +107,13 @@ class S3ObjectStoreTest
   }
 
   it("retrieves a versioned object from s3") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       val content = "Some content!"
       val prefix = "foo"
 
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucketName),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = prefix
         }
@@ -130,10 +130,10 @@ class S3ObjectStoreTest
   }
 
   it("throws an exception when retrieving a missing object") {
-    withLocalS3Bucket { bucketName =>
+    withLocalS3Bucket { bucket =>
       val objectStore = new S3ObjectStore(
         s3Client,
-        S3Config(bucketName = bucketName),
+        S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
           override def generate(obj: TestObject): String = "doesnt_matter"
         }

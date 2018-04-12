@@ -16,6 +16,7 @@ import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
@@ -49,9 +50,9 @@ class SQSWorkerToDynamoTest
 
   val testMessageJson = toJson(testMessage).get
 
-  class TestWorker(queueUrl: String, system: ActorSystem)
+  class TestWorker(queue: Queue, system: ActorSystem)
       extends SQSWorkerToDynamo[TestObject](
-        new SQSReader(sqsClient, SQSConfig(queueUrl, 1.second, 1)),
+        new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system,
         metricsSender) {
 
@@ -71,21 +72,21 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  type TestWorkerFactory = (String, ActorSystem) => TestWorker
+  type TestWorkerFactory = (Queue, ActorSystem) => TestWorker
 
-  def defaultTestWorkerFactory(queueUrl: String, system: ActorSystem) =
-    new TestWorker(queueUrl, system)
+  def defaultTestWorkerFactory(queue: Queue, system: ActorSystem) =
+    new TestWorker(queue, system)
 
-  def conditionalCheckFailingTestWorkerFactory(queueUrl: String,
+  def conditionalCheckFailingTestWorkerFactory(queue: Queue,
                                                system: ActorSystem) =
-    new TestWorker(queueUrl: String, system) {
+    new TestWorker(queue, system) {
       override def store(record: TestObject): Future[Unit] = Future {
         throw new ConditionalCheckFailedException("Wrong!")
       }
     }
 
-  def terminalTestWorkerFactory(queueUrl: String, system: ActorSystem) =
-    new TestWorker(queueUrl: String, system) {
+  def terminalTestWorkerFactory(queue: Queue, system: ActorSystem) =
+    new TestWorker(queue, system) {
       override def store(record: TestObject): Future[Unit] = Future {
         throw new RuntimeException("Wrong!")
       }
@@ -93,8 +94,8 @@ class SQSWorkerToDynamoTest
 
   def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
     system: ActorSystem,
-    queueUrl: String)(testWith: TestWith[TestWorker, R]) = {
-    val worker = testWorkFactory(queueUrl, system)
+    queue: Queue)(testWith: TestWith[TestWorker, R]) = {
+    val worker = testWorkFactory(queue, system)
 
     try {
       testWith(worker)
@@ -111,8 +112,8 @@ class SQSWorkerToDynamoTest
 
   it("processes messages") {
     withFixtures() {
-      case (_, queueUrl, worker) =>
-        sqsClient.sendMessage(queueUrl, testMessageJson)
+      case (_, queue, worker) =>
+        sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
           worker.processCalled shouldBe true
@@ -123,8 +124,8 @@ class SQSWorkerToDynamoTest
 
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
     withFixtures(conditionalCheckFailingTestWorkerFactory) {
-      case (_, queueUrl, worker) =>
-        sqsClient.sendMessage(queueUrl, testMessageJson)
+      case (_, queue, worker) =>
+        sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
           worker.terminalFailure shouldBe false
@@ -134,7 +135,7 @@ class SQSWorkerToDynamoTest
 
   it("fails gracefully when a conversion fails") {
     withFixtures(terminalTestWorkerFactory) {
-      case (_, queueUrl, worker) =>
+      case (_, queue, worker) =>
         val invalidBodyTestMessage = SQSMessage(
           subject = Some("subject"),
           messageType = "messageType",
@@ -145,7 +146,7 @@ class SQSWorkerToDynamoTest
 
         val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get
 
-        sqsClient.sendMessage(queueUrl, invalidBodyTestMessageJson)
+        sqsClient.sendMessage(queue.url, invalidBodyTestMessageJson)
 
         eventually {
           worker.terminalFailure shouldBe false
@@ -156,8 +157,8 @@ class SQSWorkerToDynamoTest
   it(
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
     withFixtures(terminalTestWorkerFactory) {
-      case (_, queueUrl, worker) =>
-        sqsClient.sendMessage(queueUrl, testMessageJson)
+      case (_, queue, worker) =>
+        sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
           worker.terminalFailure shouldBe true
