@@ -15,8 +15,8 @@ class patched_datetime(dt.datetime):
 
 @mock.patch('datetime.datetime', patched_datetime)
 def test_writes_message_to_sqs(sns_client, topic_arn):
-    target_bucket_name="target_bucket_name"
-    es_index="es_index"
+    target_bucket_name = "target_bucket_name"
+    es_index = "es_index"
 
     snapshot_scheduler._run(
         sns_client=sns_client,
