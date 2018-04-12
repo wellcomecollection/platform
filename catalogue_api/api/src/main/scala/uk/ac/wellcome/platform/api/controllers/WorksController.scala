@@ -67,8 +67,8 @@ class WorksController @Inject()(@Flag("api.prefix") apiPrefix: String,
     }
   }
 
-  private def setupSingleWorkEndpoint(enpointSuffix: String): Unit = {
-    getWithDoc(enpointSuffix) { doc =>
+  private def setupSingleWorkEndpoint(endpointSuffix: String): Unit = {
+    getWithDoc(endpointSuffix) { doc =>
       setUpSingleWorkSwaggerDocs(doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
