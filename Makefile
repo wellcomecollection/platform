@@ -27,7 +27,7 @@ travistooling-test:
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
 		wellcome/build_tooling \
-		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/test_*.py
+		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
 		wellcome/build_tooling \
