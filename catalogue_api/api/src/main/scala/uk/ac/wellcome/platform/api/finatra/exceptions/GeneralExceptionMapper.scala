@@ -12,11 +12,12 @@ import uk.ac.wellcome.platform.api.models.DisplayError
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
-class GeneralExceptionMapper @Inject()(response: ResponseBuilder,
-                                       @Flag("api.context.suffix") apiContextSuffix: String,
-                                       @Flag("api.host") apiHost: String,
-                                       @Flag("api.prefix") apiPrefix: String,
-                                       @Flag("api.scheme") apiScheme: String)
+class GeneralExceptionMapper @Inject()(
+  response: ResponseBuilder,
+  @Flag("api.context.suffix") apiContextSuffix: String,
+  @Flag("api.host") apiHost: String,
+  @Flag("api.prefix") apiPrefix: String,
+  @Flag("api.scheme") apiScheme: String)
     extends ExceptionMapper[Exception]
     with Logging {
 
@@ -30,7 +31,14 @@ class GeneralExceptionMapper @Inject()(response: ResponseBuilder,
         variant = "http-500",
         description = None
       ))
-    val errorResponse = ResultResponse(context = buildContextUri(apiScheme, apiHost, apiPrefix, version, apiContextSuffix), result = result)
+    val errorResponse = ResultResponse(
+      context = buildContextUri(
+        apiScheme,
+        apiHost,
+        apiPrefix,
+        version,
+        apiContextSuffix),
+      result = result)
     response.internalServerError.json(errorResponse)
   }
 }

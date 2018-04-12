@@ -14,11 +14,11 @@ import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
 class CaseClassMappingExceptionWrapper @Inject()(
-                                                  response: ResponseBuilder,
-                                                  @Flag("api.context.suffix") apiContextSuffix: String,
-                                                  @Flag("api.host") apiHost: String,
-                                                  @Flag("api.prefix") apiPrefix: String,
-                                                  @Flag("api.scheme") apiScheme: String)
+  response: ResponseBuilder,
+  @Flag("api.context.suffix") apiContextSuffix: String,
+  @Flag("api.host") apiHost: String,
+  @Flag("api.prefix") apiPrefix: String,
+  @Flag("api.scheme") apiScheme: String)
     extends ExceptionMapper[CaseClassMappingException]
     with Logging {
 
@@ -34,7 +34,14 @@ class CaseClassMappingExceptionWrapper @Inject()(
     error(s"Sending HTTP 400 for $errorString")
     val result = DisplayError(
       Error(variant = "http-400", description = Some(errorString)))
-    val errorResponse = ResultResponse(context = buildContextUri(apiScheme, apiHost, apiPrefix, version, apiContextSuffix), result = result)
+    val errorResponse = ResultResponse(
+      context = buildContextUri(
+        apiScheme,
+        apiHost,
+        apiPrefix,
+        version,
+        apiContextSuffix),
+      result = result)
 
     response.badRequest.json(errorResponse)
   }
