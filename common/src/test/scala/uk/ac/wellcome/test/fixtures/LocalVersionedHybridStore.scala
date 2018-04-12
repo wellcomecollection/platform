@@ -12,6 +12,7 @@ import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]
@@ -23,17 +24,17 @@ trait LocalVersionedHybridStore
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  def withVersionedDao[R](tableName: String) = fixture[VersionedDao, R](
+  def withVersionedDao[R](table: Table) = fixture[VersionedDao, R](
     create = new VersionedDao(
       dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(tableName)
+      dynamoConfig = DynamoConfig(table.name)
     )
   )
 
   def withVersionedHybridStore[T <: Id, R](
     bucket: Bucket,
-    tableName: String)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
-    withVersionedDao(tableName) { dao =>
+    table: Table)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
+    withVersionedDao(table) { dao =>
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(
           s3Client = s3Client,
@@ -48,16 +49,16 @@ trait LocalVersionedHybridStore
     }
   }
 
-  def assertStored[T <: Id](bucket: Bucket, tableName: String, record: T)(
+  def assertStored[T <: Id](bucket: Bucket, table: Table, record: T)(
     implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
-      getJsonFor[T](bucket, tableName, record),
+      getJsonFor[T](bucket, table, record),
       toJson(record).get
     )
 
-  def getJsonFor[T <: Id](bucket: Bucket, tableName: String, record: T) = {
+  def getJsonFor[T <: Id](bucket: Bucket, table: Table, record: T) = {
     val hybridRecord = Scanamo
-      .get[HybridRecord](dynamoDbClient)(tableName)('id -> record.id)
+      .get[HybridRecord](dynamoDbClient)(table.name)('id -> record.id)
       .get
       .right
       .get

@@ -17,6 +17,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
 import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 case class TestRecord(
   id: String,
@@ -47,7 +48,7 @@ class ReindexerFeatureTest
   val shardName = "shard"
 
   private def createReindexableData(queue: Queue,
-                                    tableName: String): List[ReindexRecord] = {
+                                    table: Table): List[ReindexRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -61,7 +62,7 @@ class ReindexerFeatureTest
     })
 
     //TODO re-factor shared test state here into fixture method
-    testRecords.foreach(Scanamo.put(dynamoDbClient)(tableName)(_))
+    testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
 
     val expectedRecords = testRecords.map(
       (r: TestRecord) =>
@@ -93,23 +94,21 @@ class ReindexerFeatureTest
   it("increases the reindexVersion on every record that needs a reindex") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
+        withLocalDynamoDbTable { table =>
 
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            tableName) ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            table) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queue, tableName)
+              createReindexableData(queue, table)
 
             eventually {
               val actualRecords =
                 Scanamo
-                  .scan[ReindexRecord](dynamoDbClient)(tableName)
+                  .scan[ReindexRecord](dynamoDbClient)(table.name)
                   .map(_.right.get)
 
               actualRecords should contain theSameElementsAs expectedRecords
@@ -123,18 +122,16 @@ class ReindexerFeatureTest
   it("sends an SNS notice for a completed reindex") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
+        withLocalDynamoDbTable { table =>
 
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            tableName) ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            table) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queue, tableName)
+              createReindexableData(queue, table)
 
             val expectedMessage = CompletedReindexJob(
               shardId = shardName,
@@ -161,18 +158,15 @@ class ReindexerFeatureTest
   it("does not send a message if it cannot complete a reindex") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withLocalDynamoDbTableAndIndex { fixtures =>
-          val tableName = fixtures.tableName
-          val indexName = fixtures.indexName
-
+        withLocalDynamoDbTable { table =>
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            "non_existent_table") ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> indexName)
+            table.copy(name ="non_existent_table")) ++ sqsLocalFlags(queue) ++ Map(
+            "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
             val expectedRecords =
-              createReindexableData(queue, tableName)
+              createReindexableData(queue, table)
 
             // We wait some time to ensure that the message is not processed
             Thread.sleep(5000)

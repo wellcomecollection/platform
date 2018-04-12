@@ -6,6 +6,7 @@ import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.DynamoInserter
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, TestWith}
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import uk.ac.wellcome.dynamo._
 
@@ -14,16 +15,16 @@ trait DynamoInserterFixture extends LocalDynamoDb[SierraItemRecord] {
     DynamoFormat[SierraItemRecord]
 
   def withDynamoInserter[R](
-    testWith: TestWith[(String, DynamoInserter), R]): Unit = {
-    withLocalDynamoDbTable { tableName =>
+    testWith: TestWith[(Table, DynamoInserter), R]): Unit = {
+    withLocalDynamoDbTable { table =>
       val dynamoInserter = new DynamoInserter(
         new VersionedDao(
           dynamoDbClient,
-          dynamoConfig = DynamoConfig(tableName)
+          dynamoConfig = DynamoConfig(table.name)
         )
       )
 
-      testWith((tableName, dynamoInserter))
+      testWith((table, dynamoInserter))
     }
   }
 }

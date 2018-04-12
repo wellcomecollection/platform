@@ -27,6 +27,7 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMer
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.duration._
 
@@ -47,14 +48,14 @@ class SierraItemsToDynamoWorkerServiceTest
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,
     queue: Queue,
-    tableName: String
+    table: Table
   )
 
   def withSierraWorkerService[R](
     testWith: TestWith[ServiceFixtures, R]): Unit = {
     withActorSystem { actorSystem =>
       withDynamoInserter {
-        case (tableName, dynamoInserter) =>
+        case (table, dynamoInserter) =>
           withLocalSqsQueue { queue =>
             val mockPutMetricDataResult = mock[PutMetricDataResult]
             val mockCloudWatch = mock[AmazonCloudWatch]
@@ -77,7 +78,7 @@ class SierraItemsToDynamoWorkerServiceTest
                 dynamoInserter = new DynamoInserter(
                   new VersionedDao(
                     dynamoDbClient = dynamoDbClient,
-                    dynamoConfig = DynamoConfig(tableName)
+                    dynamoConfig = DynamoConfig(table.name)
                   ))
               )
 
@@ -85,7 +86,7 @@ class SierraItemsToDynamoWorkerServiceTest
               ServiceFixtures(
                 service = sierraItemsToDynamoWorkerService,
                 queue = queue,
-                tableName = tableName
+                table = table
               ))
           }
       }
@@ -109,7 +110,7 @@ class SierraItemsToDynamoWorkerServiceTest
         bibIds = bibIds1
       )
 
-      Scanamo.put(dynamoDbClient)(fixtures.tableName)(record1)
+      Scanamo.put(dynamoDbClient)(fixtures.table.name)(record1)
 
       val bibIds2 = List("3", "4", "5")
       val modifiedDate2 = Instant.parse("2002-01-01T01:01:01Z")
@@ -144,10 +145,10 @@ class SierraItemsToDynamoWorkerServiceTest
       val expectedData = expectedRecord.data
 
       eventually {
-        Scanamo.scan[SierraItemRecord](dynamoDbClient)(fixtures.tableName) should have size 1
+        Scanamo.scan[SierraItemRecord](dynamoDbClient)(fixtures.table.name) should have size 1
 
         val scanamoResult =
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(fixtures.tableName)(
+          Scanamo.get[SierraItemRecord](dynamoDbClient)(fixtures.table.name)(
             'id -> id)
 
         scanamoResult shouldBe defined

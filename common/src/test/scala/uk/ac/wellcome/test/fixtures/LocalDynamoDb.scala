@@ -14,7 +14,15 @@ import com.gu.scanamo.DynamoFormat
 
 import scala.collection.JavaConversions._
 
+object LocalDynamoDb {
+
+  case class Table(name: String, index: String)
+
+}
+
 trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
+
+  import LocalDynamoDb._
 
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
@@ -22,10 +30,10 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def dynamoDbLocalEndpointFlags(tableName: String) =
+  def dynamoDbLocalEndpointFlags(table: Table) =
     Map(
       "aws.region" -> "localhost",
-      "aws.dynamo.tableName" -> tableName,
+      "aws.dynamo.tableName" -> table.name,
       "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
       "aws.dynamoDb.accessKey" -> accessKey,
       "aws.dynamoDb.secretKey" -> secretKey
@@ -43,30 +51,22 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
 
   implicit val evidence: DynamoFormat[T]
 
-  case class FixtureParams(tableName: String, indexName: String)
-
-  def withLocalDynamoDbTableAndIndex[R] = fixture[FixtureParams, R](
+  def withLocalDynamoDbTable[R] = fixture[Table, R] (
     create = {
       val tableName = Random.alphanumeric.take(10).mkString
       val indexName = Random.alphanumeric.take(10).mkString
-      createTable(tableName, indexName)
-      FixtureParams(tableName, indexName)
+
+      createTable(Table(tableName, indexName))
     },
     destroy = { _ =>
       deleteAllTables()
     }
   )
 
-  def withLocalDynamoDbTable[R](testWith: TestWith[String, R]): R = {
-    withLocalDynamoDbTableAndIndex { fixtures =>
-      testWith(fixtures.tableName)
-    }
-  }
-
-  private def createTable(tableName: String, indexName: String) = {
+  private def createTable(table: Table): Table = {
     dynamoDbClient.createTable(
       new CreateTableRequest()
-        .withTableName(tableName)
+        .withTableName(table.name)
         .withKeySchema(new KeySchemaElement()
           .withAttributeName("id")
           .withKeyType(KeyType.HASH))
@@ -86,7 +86,7 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
           .withWriteCapacityUnits(1L))
         .withGlobalSecondaryIndexes(
           new GlobalSecondaryIndex()
-            .withIndexName(indexName)
+            .withIndexName(table.index)
             .withProjection(
               new Projection().withProjectionType(ProjectionType.ALL))
             .withKeySchema(
@@ -100,6 +100,8 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
             .withProvisionedThroughput(new ProvisionedThroughput()
               .withReadCapacityUnits(1L)
               .withWriteCapacityUnits(1L))))
+
+    table
   }
 
   private def deleteAllTables() = {

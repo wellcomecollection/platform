@@ -24,6 +24,7 @@ import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,7 +43,7 @@ class ReindexWorkerServiceTest
   override lazy val evidence: DynamoFormat[TestRecord] =
     DynamoFormat[TestRecord]
 
-  def withReindexWorkerService(tableName: String, indexName: String)(
+  def withReindexWorkerService(table: Table)(
     testWith: TestWith[ReindexWorkerService, Assertion]) = {
     withActorSystem { actorSystem =>
       val metricsSender = new MetricsSender(
@@ -60,10 +61,10 @@ class ReindexWorkerServiceTest
               metricsSender = metricsSender,
               versionedDao = new VersionedDao(
                 dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(table = tableName)
+                dynamoConfig = DynamoConfig(table = table.name)
               ),
-              dynamoConfig = DynamoConfig(table = tableName),
-              indexName = indexName
+              dynamoConfig = DynamoConfig(table = table.name),
+              indexName = table.index
             ),
             reader = new SQSReader(
               sqsClient = sqsClient,
@@ -92,10 +93,8 @@ class ReindexWorkerServiceTest
   }
 
   it("returns a successful Future if the reindex completes correctly") {
-    withLocalDynamoDbTableAndIndex { fixtures =>
-      val tableName = fixtures.tableName
-      val indexName = fixtures.indexName
-      withReindexWorkerService(tableName, indexName) { service =>
+    withLocalDynamoDbTable { table =>
+      withReindexWorkerService(table) { service =>
         val reindexJob = ReindexJob(
           shardId = "sierra/123",
           desiredVersion = 6
@@ -109,7 +108,7 @@ class ReindexWorkerServiceTest
           reindexVersion = reindexJob.desiredVersion - 1
         )
 
-        Scanamo.put(dynamoDbClient)(tableName)(testRecord)
+        Scanamo.put(dynamoDbClient)(table.name)(testRecord)
 
         val expectedRecords = List(
           testRecord.copy(
@@ -131,7 +130,7 @@ class ReindexWorkerServiceTest
         whenReady(future) { _ =>
           val actualRecords: List[TestRecord] =
             Scanamo
-              .scan[TestRecord](dynamoDbClient)(tableName)
+              .scan[TestRecord](dynamoDbClient)(table.name)
               .map(_.right.get)
 
           actualRecords shouldBe expectedRecords
@@ -142,10 +141,8 @@ class ReindexWorkerServiceTest
 
   it(
     "returns a failed Future if it cannot parse the SQS message as a ReindexJob") {
-    withLocalDynamoDbTableAndIndex { fixtures =>
-      val tableName = fixtures.tableName
-      val indexName = fixtures.indexName
-      withReindexWorkerService(tableName, indexName) { service =>
+    withLocalDynamoDbTable { table =>
+      withReindexWorkerService(table) { service =>
         val sqsMessage = SQSMessage(
           subject = None,
           body = "<xml>What is JSON.</xl?>",

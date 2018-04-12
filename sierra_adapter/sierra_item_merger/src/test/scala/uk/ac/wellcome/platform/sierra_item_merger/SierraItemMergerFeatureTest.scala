@@ -25,13 +25,13 @@ class SierraItemMergerFeatureTest
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { tableName =>
+        withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
-            tableName)
+            table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
               bucket,
-              tableName) { hybridStore =>
+              table) { hybridStore =>
               val id = "i1000001"
               val bibId = "b1000001"
 
@@ -51,7 +51,7 @@ class SierraItemMergerFeatureTest
               eventually {
                 assertStored[SierraTransformable](
                   bucket,
-                  tableName,
+                  table,
                   expectedSierraTransformable)
               }
             }
@@ -64,13 +64,13 @@ class SierraItemMergerFeatureTest
   it("stores multiple items from SQS") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { tableName =>
+        withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(
-            tableName)
+            table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](
               bucket,
-              tableName) { hybridStore =>
+              table) { hybridStore =>
               val bibId1 = "b1000001"
 
               val id1 = "1000001"
@@ -107,11 +107,11 @@ class SierraItemMergerFeatureTest
 
                 assertStored[SierraTransformable](
                   bucket,
-                  tableName,
+                  table,
                   expectedSierraTransformable1)
                 assertStored[SierraTransformable](
                   bucket,
-                  tableName,
+                  table,
                   expectedSierraTransformable2)
               }
             }
