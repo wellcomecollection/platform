@@ -2,7 +2,7 @@
 
 import pytest
 
-from travistooling.git import get_changed_paths, git
+from travistooling.git_utils import get_changed_paths, git
 
 
 def test_no_change_is_empty_diff():
