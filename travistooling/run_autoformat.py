@@ -1,32 +1,23 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8
 """
-Wrapper script for doing auto-formatting in Travis.
+This script does autoformatting in Travis CI on pull requests.
 
-In particular, this script will autoformat Terraform and Scala, then commit
-and push the results.  It also lints Python and JSON, but those aren't
-auto-formatted (yet).
+In particular, it runs the 'make format' task, and if there are any changes,
+it pushes a new commit to your pull request and aborts the current build.
 """
 
-import os
 import sys
 
-from travistooling import changed_files, git, make
+from travistooling.git_utils import get_changed_paths, git, make
+from travistooling.make_utils import make
+from travistooling.travisenv import branch_name
 
 
 if __name__ == '__main__':
     make('format')
 
-    # https://graysonkoonce.com/getting-the-current-branch-name-during-a-pull-request-in-travis-ci/
-    if os.environ['TRAVIS_PULL_REQUEST'] == 'false':
-        branch = os.environ['TRAVIS_BRANCH']
-    else:
-        branch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
-
-    if changed_files():
-        print(
-            '*** There were changes from formatting, creating a commit',
-            flush=True)
+    if get_changed_paths():
+        print('*** There were changes from formatting, creating a commit')
 
         git('config', 'user.name', 'Travis CI on behalf of Wellcome')
         git('config', 'user.email', 'wellcomedigitalplatform@wellcome.ac.uk')
@@ -40,7 +31,7 @@ if __name__ == '__main__':
         # We checkout the branch before we add the commit, so we don't
         # include the merge commit that Travis makes.
         git('fetch', 'ssh-origin')
-        git('checkout', branch)
+        git('checkout', branch_name())
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
@@ -50,6 +41,6 @@ if __name__ == '__main__':
         # build, which includes the autoformat commit.
         sys.exit(1)
     else:
-        print('*** There were no changes from auto-formatting', flush=True)
+        print('*** There were no changes from auto-formatting')
 
     make('check-format')
