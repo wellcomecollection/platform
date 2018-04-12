@@ -15,7 +15,6 @@ import uk.ac.wellcome.platform.api.ApiSwagger
 class SwaggerController @Inject()(
   @Flag("api.scheme") apiScheme: String,
   @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.version") apiVersion: String,
   @Flag("api.host") apiHost: String
 ) extends Controller {
 
@@ -25,21 +24,23 @@ class SwaggerController @Inject()(
   }
 
   prefix(apiPrefix) {
+    setupSwaggerEndpoint("v1")
+  }
 
-    get("/swagger.json") { request: Request =>
+  private def setupSwaggerEndpoint(version: String): Unit = {
+    get(s"/$version/swagger.json") { request: Request =>
       ApiSwagger.info(
         new Info()
           .description("Search our collections")
-          .version(apiVersion)
+          .version(version)
           .title("Catalogue"))
       ApiSwagger.scheme(scheme)
       ApiSwagger.host(apiHost)
-      ApiSwagger.basePath(apiPrefix)
+      ApiSwagger.basePath(s"$apiPrefix/$version")
       ApiSwagger.produces("application/json")
       ApiSwagger.produces("application/ld+json")
 
       response.ok.json(Json.mapper.writeValueAsString(ApiSwagger))
     }
-
   }
 }

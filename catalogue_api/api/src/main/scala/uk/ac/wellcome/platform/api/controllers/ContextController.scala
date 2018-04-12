@@ -13,7 +13,7 @@ class ContextController @Inject()(
 
   prefix(apiPrefix) {
 
-    get("/context.json") { request: Request =>
+    get("/v1/context.json") { request: Request =>
       response.ok.file("context.json")
     }
 
