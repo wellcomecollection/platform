@@ -41,4 +41,4 @@ check-format: format lint-python lint-ontologies
 	git diff --exit-code
 
 travis-format:
-	python3 travistooling/run_autoformat.py
+	python3 run_autoformat.py

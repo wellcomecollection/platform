@@ -8,7 +8,7 @@ it pushes a new commit to your pull request and aborts the current build.
 
 import sys
 
-from travistooling.git_utils import get_changed_paths, git, make
+from travistooling.git_utils import get_changed_paths, git
 from travistooling.make_utils import make
 from travistooling.travisenv import branch_name
 

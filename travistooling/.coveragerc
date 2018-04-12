@@ -1,8 +1,6 @@
 [run]
 branch = True
 source = travistooling
-omit =
-    travistooling/run_*.py
 
 [report]
 fail_under = 100
