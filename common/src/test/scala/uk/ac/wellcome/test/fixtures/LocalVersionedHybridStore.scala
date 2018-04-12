@@ -31,9 +31,8 @@ trait LocalVersionedHybridStore
     )
   )
 
-  def withVersionedHybridStore[T <: Id, R](
-    bucket: Bucket,
-    table: Table)(testWith: TestWith[VersionedHybridStore[T], R]): R = {
+  def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
+    testWith: TestWith[VersionedHybridStore[T], R]): R = {
     withVersionedDao(table) { dao =>
       val store = new VersionedHybridStore[T](
         sourcedObjectStore = new S3ObjectStore(

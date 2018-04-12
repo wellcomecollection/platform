@@ -58,7 +58,9 @@ trait SNS extends ImplicitLogging {
       val arn = snsClient.createTopic(topicName).getTopicArn
       Topic(arn)
     },
-    destroy = { topic => snsClient.deleteTopic(topic.arn) }
+    destroy = { topic =>
+      snsClient.deleteTopic(topic.arn)
+    }
   )
 
   private val mapper =

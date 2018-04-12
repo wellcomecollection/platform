@@ -68,7 +68,8 @@ class ConvertorServiceTest
   it("completes a conversion successfully") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket), targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          targetBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val visibleWorks = (1 to 3).map { version =>

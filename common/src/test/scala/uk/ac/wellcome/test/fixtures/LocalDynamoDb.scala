@@ -51,7 +51,7 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
 
   implicit val evidence: DynamoFormat[T]
 
-  def withLocalDynamoDbTable[R] = fixture[Table, R] (
+  def withLocalDynamoDbTable[R] = fixture[Table, R](
     create = {
       val tableName = Random.alphanumeric.take(10).mkString
       val indexName = Random.alphanumeric.take(10).mkString

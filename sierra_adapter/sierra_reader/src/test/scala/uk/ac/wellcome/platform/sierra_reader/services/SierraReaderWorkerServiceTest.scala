@@ -64,7 +64,8 @@ class SierraReaderWorkerServiceTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { bucket =>
           val worker = new SierraReaderWorkerService(
-            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            reader =
+              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             s3client = s3Client,
             s3Config = S3Config(bucket.name),
             windowManager = new WindowManager(

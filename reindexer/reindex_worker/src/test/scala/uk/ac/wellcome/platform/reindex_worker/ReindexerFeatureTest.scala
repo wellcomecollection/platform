@@ -95,7 +95,6 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalDynamoDbTable { table =>
-
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
             table) ++ sqsLocalFlags(queue) ++ Map(
@@ -123,7 +122,6 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalDynamoDbTable { table =>
-
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
             table) ++ sqsLocalFlags(queue) ++ Map(
@@ -160,8 +158,8 @@ class ReindexerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalDynamoDbTable { table =>
           val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table.copy(name ="non_existent_table")) ++ sqsLocalFlags(queue) ++ Map(
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table
+            .copy(name = "non_existent_table")) ++ sqsLocalFlags(queue) ++ Map(
             "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>

@@ -70,8 +70,7 @@ class VersionedHybridStoreTest
             .flatMap(_ => hybridStore.updateRecord(record.id)(record)(t)())
 
         whenReady(future) { _ =>
-          getJsonFor(bucket, table, record) shouldBe toJson(
-            expectedRecord).get
+          getJsonFor(bucket, table, record) shouldBe toJson(expectedRecord).get
         }
     }
   }
@@ -199,7 +198,8 @@ class VersionedHybridStoreTest
 
         whenReady(future) { _ =>
           val maybeResult =
-            Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> record.id)
+            Scanamo.get[ExtraData](dynamoDbClient)(table.name)(
+              'id -> record.id)
 
           maybeResult shouldBe defined
           maybeResult.get.isRight shouldBe true
