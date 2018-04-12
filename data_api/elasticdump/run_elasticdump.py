@@ -14,7 +14,7 @@ import boto3
 from service_utils import service
 
 
-# This class is duplicated in the elasticdump app
+# This class is duplicated in the snapshot_scheduler app
 # Changes here will need to be reflected there.
 @attr.s
 class SnapshotRequest(object):
@@ -40,7 +40,7 @@ def get_message(sqs_client, sqs_queue_url):
 
 
 def parse_message(message):
-    raw_messsage_dict = json.loads(message)
+    raw_messsage_dict = json.loads(message['Body'])
 
     return SnapshotRequest(**raw_messsage_dict)
 
@@ -79,11 +79,6 @@ def aws_client(service_name):
 def run():
     print(os.environ)
     sqs_queue_url = os.environ['sqs_queue_url']
-
-    # TODO: Currently we read the target bucket from the environment config.
-    # It would be nice to support overriding the bucket name with config from
-    # the SQS message.
-    target_bucket = os.environ['upload_bucket']
 
     s3_client = aws_client('s3')
     sqs_client = aws_client('sqs')
