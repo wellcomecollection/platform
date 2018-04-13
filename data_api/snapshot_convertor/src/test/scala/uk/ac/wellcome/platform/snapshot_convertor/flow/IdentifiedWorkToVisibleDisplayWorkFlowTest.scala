@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.snapshot_convertor.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.models.{
   IdentifiedWork,
   IdentifierSchemes,
@@ -47,7 +48,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
         whenReady(eventualDisplayWorks) { displayWorks =>
           val expectedDisplayWorks = works.map {
-            DisplayWork(_, includes = AllWorksIncludes())
+            DisplayWorkV1(_, includes = AllWorksIncludes())
           }
           displayWorks shouldBe expectedDisplayWorks
         }
@@ -92,7 +93,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
         whenReady(eventualDisplayWorks) { displayWorks =>
           val expectedDisplayWorks = visibleWorks.map {
-            DisplayWork(_, includes = AllWorksIncludes())
+            DisplayWorkV1(_, includes = AllWorksIncludes())
           }
           displayWorks shouldBe expectedDisplayWorks
         }

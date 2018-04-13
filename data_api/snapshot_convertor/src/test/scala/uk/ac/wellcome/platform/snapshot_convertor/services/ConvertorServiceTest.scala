@@ -10,7 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork}
+import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
@@ -127,7 +128,7 @@ class ConvertorServiceTest
             val contents = readGzipFile(downloadFile.getPath)
             val expectedContents = visibleWorks
               .map {
-                DisplayWork(_, includes = AllWorksIncludes())
+                DisplayWorkV1(_, includes = AllWorksIncludes())
               }
               .map {
                 mapper.writeValueAsString(_)
@@ -214,7 +215,7 @@ class ConvertorServiceTest
             val contents = readGzipFile(downloadFile.getPath)
             val expectedContents = works
               .map {
-                DisplayWork(_, includes = AllWorksIncludes())
+                DisplayWorkV1(_, includes = AllWorksIncludes())
               }
               .map {
                 mapper.writeValueAsString(_)

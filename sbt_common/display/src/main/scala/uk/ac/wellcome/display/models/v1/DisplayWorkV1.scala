@@ -140,6 +140,6 @@ case object DisplayWorkV1 {
     )
   }
 
-  def apply(work: IdentifiedWork): DisplayWork =
-    DisplayWork(work = work, includes = WorksIncludes())
+  def apply(work: IdentifiedWork): DisplayWorkV1 =
+    DisplayWorkV1(work = work, includes = WorksIncludes())
 }
