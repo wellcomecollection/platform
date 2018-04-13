@@ -2,10 +2,6 @@ output "ecs_services_cluster_name" {
   value = "${module.catalogue_pipeline_cluster.cluster_name}"
 }
 
-output "miro_transformer_topic_publish_policy" {
-  value = "${module.miro_transformer_topic.publish_policy}"
-}
-
 output "vhs_full_access_policy" {
   value = "${module.vhs_sourcedata.full_access_policy}"
 }
