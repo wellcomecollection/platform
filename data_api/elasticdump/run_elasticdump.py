@@ -3,13 +3,24 @@
 
 import datetime as dt
 import gzip
+import json
 import os
 import subprocess
 import sys
 
+import attr
 import boto3
 
 from service_utils import service
+
+
+# This class is duplicated in the snapshot_scheduler app
+# Changes here will need to be reflected there.
+@attr.s
+class SnapshotRequest(object):
+    time = attr.ib()
+    target_bucket_name = attr.ib()
+    es_index = attr.ib()
 
 
 def get_message(sqs_client, sqs_queue_url):
@@ -26,6 +37,12 @@ def get_message(sqs_client, sqs_queue_url):
     else:
         print(f'*** Received message {message!r} from SQS')
         return message
+
+
+def parse_message(message):
+    raw_message_dict = json.loads(message['Body'])
+
+    return SnapshotRequest(**raw_message_dict)
 
 
 def build_elasticsearch_url(environ_config, index):
@@ -63,24 +80,17 @@ def run():
     print(os.environ)
     sqs_queue_url = os.environ['sqs_queue_url']
 
-    # TODO: Currently we read the target bucket from the environment config.
-    # It would be nice to support overriding the bucket name with config from
-    # the SQS message.
-    target_bucket = os.environ['upload_bucket']
-
     s3_client = aws_client('s3')
     sqs_client = aws_client('sqs')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
+    snapshot_request = parse_message(message)
+
+    print(f'*** Parsed snapshot request {snapshot_request!r} from message')
 
     print('*** Constructing Elasticsearch URL')
-
-    # TODO: Currently we read the index name from the environment config.
-    # It would be nice to support overriding the index name with config from
-    # the SQS message.
-    es_index = os.environ['es_index']
-
+    es_index = snapshot_request.es_index
     es_url = build_elasticsearch_url(environ_config=os.environ, index=es_index)
 
     print('*** Running Elasticdump task')
@@ -116,7 +126,7 @@ def run():
     print(f'*** Uploading gzip file to S3 with key {key}')
 
     s3_client.upload_file(
-        Bucket=target_bucket,
+        Bucket=snapshot_request.target_bucket_name,
         Key=prefix + key,
         Filename='index.txt.gz'
     )
