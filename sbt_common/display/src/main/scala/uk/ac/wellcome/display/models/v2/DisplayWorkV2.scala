@@ -143,5 +143,3 @@ case object DisplayWorkV2 {
   def apply(work: IdentifiedWork): DisplayWorkV2 =
     DisplayWorkV2(work = work, includes = WorksIncludes())
 }
-
-
