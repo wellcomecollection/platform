@@ -1,16 +1,16 @@
 package uk.ac.wellcome.display.models.v2
 
-import ch.qos.logback.classic.gaffer.ConfigurationContributor
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
+import uk.ac.wellcome.models.IdentifiedWork
 
 @ApiModel(
   value = "Work",
   description =
     "An individual work such as a text, archive item or picture; or a grouping of individual works (so, for instance, an archive collection counts as a work, as do all the series and individual files within it).  Each work may exist in multiple instances (e.g. copies of the same book).  N.B. this is not synonymous with \\\"work\\\" as that is understood in the International Federation of Library Associations and Institutions' Functional Requirements for Bibliographic Records model (FRBR) but represents something lower down the FRBR hierarchy, namely manifestation. Groups of related items are also included as works because they have similar properties to the individual ones."
 )
-case class DisplayWorkV1(
+case class DisplayWorkV2(
   @ApiModelProperty(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: String,
@@ -96,6 +96,52 @@ case class DisplayWorkV1(
       "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
   )
   @JsonProperty("type") val ontologyType: String = "Work"
+}
+
+case object DisplayWorkV2 {
+
+  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV2 = {
+
+    if (!work.visible) {
+      throw new RuntimeException(
+        s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork")
+    }
+
+    DisplayWorkV2(
+      id = work.canonicalId,
+      title = work.title.get,
+      description = work.description,
+      physicalDescription = work.physicalDescription,
+      extent = work.extent,
+      lettering = work.lettering,
+      createdDate = work.createdDate.map { DisplayPeriod(_) },
+      contributors = Nil,
+      subjects = work.subjects.map { DisplayConcept(_) },
+      genres = work.genres.map { DisplayConcept(_) },
+      identifiers =
+        if (includes.identifiers)
+          Some(work.identifiers.map { DisplayIdentifier(_) })
+        else None,
+      workType = work.workType.map { DisplayWorkType(_) },
+      thumbnail =
+        if (includes.thumbnail)
+          work.thumbnail.map { DisplayLocation(_) } else None,
+      items =
+        if (includes.items)
+          Some(work.items.map {
+            DisplayItem(_, includesIdentifiers = includes.identifiers)
+          })
+        else None,
+      publishers = work.publishers.map(DisplayAbstractAgent(_)),
+      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
+      placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
+      language = work.language.map { DisplayLanguage(_) },
+      dimensions = work.dimensions
+    )
+  }
+
+  def apply(work: IdentifiedWork): DisplayWorkV2 =
+    DisplayWorkV2(work = work, includes = WorksIncludes())
 }
 
 
