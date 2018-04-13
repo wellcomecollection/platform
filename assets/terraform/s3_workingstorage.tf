@@ -24,11 +24,14 @@ resource "aws_s3_bucket" "working_storage" {
   versioning {
     enabled = true
   }
+
   lifecycle_rule {
-    enabled = true
+    id = "expire_noncurrent_versions"
 
     noncurrent_version_expiration {
       days = 30
     }
+
+    enabled = true
   }
 }
