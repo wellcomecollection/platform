@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models.v1
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Guice
@@ -25,7 +25,7 @@ class DisplayPlaceOfPublicationSerialisationTest
       placesOfPublication = List(Place("Durmstrang")),
       version = 1
     )
-    val displayWork = DisplayWorkV1(work)
+    val displayWork = DisplayWorkV2(work)
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -33,7 +33,7 @@ class DisplayPlaceOfPublicationSerialisationTest
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title.get}",
-                            |  "creators": [ ],
+                            |  "contributors": [ ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],

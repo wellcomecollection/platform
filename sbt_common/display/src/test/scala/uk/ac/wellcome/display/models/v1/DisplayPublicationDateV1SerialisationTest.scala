@@ -8,7 +8,7 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models.{IdentifiedWork, Period}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayPublicationDateSerialisationTest
+class DisplayPublicationDateV1SerialisationTest
     extends FunSpec
     with DisplaySerialisationTestBase
     with JsonTestUtil
