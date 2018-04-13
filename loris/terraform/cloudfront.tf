@@ -54,7 +54,7 @@ resource "aws_cloudfront_distribution" "loris" {
 
   logging_config {
     include_cookies = false
-    bucket          = "${aws_s3_bucket.cloudfront_logs.bucket_domain_name}"
+    bucket          = "${local.cloudfront_logs_bucket_domain_name}"
     prefix          = "loris"
   }
 }

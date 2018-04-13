@@ -37,3 +37,7 @@ output "bucket_alb_logs_id" {
 output "terraform_apply_topic_name" {
   value = "${module.terraform_apply_topic.name}"
 }
+
+output "cloudfront_logs_bucket_domain_name" {
+  value = "${aws_s3_bucket.cloudfront_logs.bucket_domain_name}"
+}
