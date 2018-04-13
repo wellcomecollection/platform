@@ -2,32 +2,27 @@ package uk.ac.wellcome.platform.api.works
 
 import com.sksamuel.elastic4s.Indexable
 import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
-import uk.ac.wellcome.elasticsearch.test.utils.IndexedElasticSearchLocal
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.Server
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait ApiWorksTestBase
-    extends FunSpec
-    with FeatureTestMixin
-    with IndexedElasticSearchLocal
+    extends FunSpec with ElasticsearchFixtures
     with DisplaySerialisationTestBase
     with WorksUtil {
-
-  val indexName = "works"
-  val itemType = "work"
 
   implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
     override def json(t: IdentifiedWork): String =
       toJson(t).get
   }
 
-  implicit val jsonMapper = IdentifiedWork
-  override val server =
-    new EmbeddedHttpServer(
+  def withServer[R](indexName: String, itemType: String = "work")(testWith: TestWith[EmbeddedHttpServer, R]) = {
+
+    val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
       flags = Map(
         "es.host" -> "localhost",
@@ -38,9 +33,23 @@ trait ApiWorksTestBase
       )
     )
 
-  val apiPrefix = "catalogue/v1"
+    server.start()
 
-  val emptyJsonResult = s"""
+    try {
+      testWith(server)
+    } finally {
+      server.close()
+    }
+  }
+
+  def withApiFixtures[R](apiVersion: String,apiName: String = "catalogue/",itemType: String = "work")(testWith: TestWith[(String, String, String, EmbeddedHttpServer) ,R]) =
+    withLocalElasticsearchIndex(itemType = itemType) { index =>
+      withServer(index, itemType) { server =>
+        testWith((apiName + apiVersion, index, itemType, server))
+      }
+  }
+
+  def emptyJsonResult(apiPrefix: String): String = s"""
     |{
     |  "@context": "https://localhost:8888/$apiPrefix/context.json",
     |  "type": "ResultList",
@@ -50,7 +59,7 @@ trait ApiWorksTestBase
     |  "results": []
     |}""".stripMargin
 
-  def badRequest(description: String) =
+  def badRequest(apiPrefix: String, description: String) =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
@@ -60,7 +69,7 @@ trait ApiWorksTestBase
       "description": "$description"
     }"""
 
-  def resultList(pageSize: Int = 10,
+  def resultList(apiPrefix: String,pageSize: Int = 10,
                  totalPages: Int = 1,
                  totalResults: Int = 1) =
     s"""
@@ -71,7 +80,7 @@ trait ApiWorksTestBase
       "totalResults": $totalResults
     """
 
-  def notFound(description: String) =
+  def notFound(apiPrefix: String,description: String) =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
@@ -81,7 +90,7 @@ trait ApiWorksTestBase
       "description": "$description"
     }"""
 
-  def gone =
+  def gone(apiPrefix: String) =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
