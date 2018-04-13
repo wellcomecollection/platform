@@ -25,7 +25,7 @@ case class DisplayWorkV2(
     value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
     String] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayWorkType]",
+    dataType = "uk.ac.wellcome.display.models.DisplayWorkType",
     value = "The type of work.") workType: Option[DisplayWorkType] = None,
   @ApiModelProperty(
     dataType = "String",
@@ -57,7 +57,7 @@ case class DisplayWorkV2(
       "Relates a work to the general thesaurus-based concept that describes the work's content."
   ) subjects: List[DisplayConcept] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content.") genres: List[
     DisplayConcept] = List(),
   @ApiModelProperty(
