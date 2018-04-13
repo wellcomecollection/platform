@@ -7,11 +7,13 @@ import io.swagger.models.Operation
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import javax.inject.{Inject, Singleton}
-import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
+import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.models.{Error, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
+import uk.ac.wellcome.platform.api.models.DisplayError
+import uk.ac.wellcome.platform.api.models.v1.DisplayResultListV1
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
@@ -58,7 +60,7 @@ class WorksController @Inject()(
 
       for {
         resultList <- getWorkList(request, pageSize)
-        displayResultList = DisplayResultList(
+        displayResultList = DisplayResultListV1(
           resultList = resultList,
           pageSize = pageSize,
           includes = includes
@@ -163,7 +165,7 @@ class WorksController @Inject()(
   private def respondWithWork(includes: WorksIncludes,
                               work: IdentifiedWork,
                               contextUri: String) = {
-    val result = DisplayWork(work = work, includes = includes)
+    val result = DisplayWorkV1(work = work, includes = includes)
     response.ok.json(ResultResponse(context = contextUri, result = result))
   }
 
@@ -197,7 +199,7 @@ class WorksController @Inject()(
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
       .tag("Works")
-      .responseWith[DisplayResultList](200, "ResultList[Work]")
+      .responseWith[DisplayResultListV1](200, "ResultList[Work]")
       .responseWith[DisplayError](400, "Bad Request Error")
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](500, "Internal Server Error")
@@ -241,7 +243,7 @@ class WorksController @Inject()(
       .description("Returns a single work")
       .tag("Works")
       .routeParam[String]("id", "The work to return", required = true)
-      .responseWith[DisplayWork](200, "Work")
+      .responseWith[DisplayWorkV1](200, "Work")
       .responseWith[DisplayError](400, "Bad Request Error")
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](410, "Gone Error")

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.responses
 
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
-import uk.ac.wellcome.platform.api.models.DisplayResultList
+import uk.ac.wellcome.platform.api.models.v1.DisplayResultListV1
 import uk.ac.wellcome.platform.api.requests.{
   ApiRequest,
   MultipleResultsRequest
@@ -26,22 +26,9 @@ case class ResultListResponse(
 )
 
 object ResultListResponse {
-  private def createApiLink(
-    requestBaseUri: String,
-    apiRequest: ApiRequest
-  )(
-    updateMap: Map[String, Any]
-  ): String = {
-
-    val baseUrl = s"$requestBaseUri${apiRequest.request.path}"
-    val queryString = (apiRequest.request.params ++ updateMap).toString()
-
-    s"$baseUrl$queryString"
-  }
-
   def create(
     contextUri: String,
-    displayResultList: DisplayResultList,
+    displayResultList: DisplayResultListV1,
     multipleResultsRequest: MultipleResultsRequest,
     requestBaseUri: String
   ): ResultListResponse = {
@@ -72,5 +59,18 @@ object ResultListResponse {
       prevPage = prevLink,
       nextPage = nextLink
     )
+  }
+
+  private def createApiLink(
+    requestBaseUri: String,
+    apiRequest: ApiRequest
+  )(
+    updateMap: Map[String, Any]
+  ): String = {
+
+    val baseUrl = s"$requestBaseUri${apiRequest.request.path}"
+    val queryString = (apiRequest.request.params ++ updateMap).toString()
+
+    s"$baseUrl$queryString"
   }
 }
