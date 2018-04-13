@@ -9,7 +9,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayPublishersSerialisationTest
-  extends FunSpec
+    extends FunSpec
     with DisplaySerialisationTestBase
     with JsonTestUtil
     with WorksUtil {
@@ -17,27 +17,27 @@ class DisplayPublishersSerialisationTest
 
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
-    it(
-      "includes the publishers field with a mixture of agents/organisations/persons") {
-      val work = IdentifiedWork(
-        canonicalId = "v9w6cz66",
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        title = Some("Vultures vying for victory"),
-        publishers = List(
-          Unidentifiable(Agent("Vivian Violet")),
-          Unidentifiable(Organisation("Verily Volumes")),
-          Unidentifiable(
-            Person(
-              label = "Havelock Vetinari",
-              prefix = Some("Lord Patrician"),
-              numeration = Some("I")))
-        )
+  it(
+    "includes the publishers field with a mixture of agents/organisations/persons") {
+    val work = IdentifiedWork(
+      canonicalId = "v9w6cz66",
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      title = Some("Vultures vying for victory"),
+      publishers = List(
+        Unidentifiable(Agent("Vivian Violet")),
+        Unidentifiable(Organisation("Verily Volumes")),
+        Unidentifiable(
+          Person(
+            label = "Havelock Vetinari",
+            prefix = Some("Lord Patrician"),
+            numeration = Some("I")))
       )
-      val displayWork = DisplayWorkV1(work)
+    )
+    val displayWork = DisplayWorkV1(work)
 
-      val actualJson = objectMapper.writeValueAsString(displayWork)
-      val expectedJson = s"""
+    val actualJson = objectMapper.writeValueAsString(displayWork)
+    val expectedJson = s"""
                             |{
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
@@ -47,18 +47,18 @@ class DisplayPublishersSerialisationTest
                             |  "genres": [ ],
                             |  "publishers": [
                             |    ${identifiedOrUnidentifiable(
-        work.publishers(0),
-        abstractAgent)},
+                            work.publishers(0),
+                            abstractAgent)},
                             |    ${identifiedOrUnidentifiable(
-        work.publishers(1),
-        abstractAgent)},
+                            work.publishers(1),
+                            abstractAgent)},
                             |    ${identifiedOrUnidentifiable(
-        work.publishers(2),
-        abstractAgent)}
+                            work.publishers(2),
+                            abstractAgent)}
                             |  ],
                             |  "placesOfPublication": [ ]
                             |}""".stripMargin
 
-      assertJsonStringsAreEqual(actualJson, expectedJson)
-    }
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
 }

@@ -8,26 +8,27 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models.{IdentifiedWork, Place}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayPlaceOfPublicationSerialisationTest extends FunSpec
-  with DisplaySerialisationTestBase
-  with JsonTestUtil
-  with WorksUtil {
+class DisplayPlaceOfPublicationSerialisationTest
+    extends FunSpec
+    with DisplaySerialisationTestBase
+    with JsonTestUtil
+    with WorksUtil {
   val injector = Guice.createInjector(DisplayJacksonModule)
 
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
-    it("serialises the placesOfPublication field") {
-      val work = IdentifiedWork(
-        canonicalId = "avfpwgrr",
-        sourceIdentifier = sourceIdentifier,
-        title = Some("Ahoy!  Armoured angelfish are attacking the armada!"),
-        placesOfPublication = List(Place("Durmstrang")),
-        version = 1
-      )
-      val displayWork = DisplayWorkV1(work)
+  it("serialises the placesOfPublication field") {
+    val work = IdentifiedWork(
+      canonicalId = "avfpwgrr",
+      sourceIdentifier = sourceIdentifier,
+      title = Some("Ahoy!  Armoured angelfish are attacking the armada!"),
+      placesOfPublication = List(Place("Durmstrang")),
+      version = 1
+    )
+    val displayWork = DisplayWorkV1(work)
 
-      val actualJson = objectMapper.writeValueAsString(displayWork)
-      val expectedJson = s"""
+    val actualJson = objectMapper.writeValueAsString(displayWork)
+    val expectedJson = s"""
                             |{
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
@@ -45,7 +46,7 @@ class DisplayPlaceOfPublicationSerialisationTest extends FunSpec
                             |
                              |}""".stripMargin
 
-      assertJsonStringsAreEqual(actualJson, expectedJson)
-    }
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
 
 }
