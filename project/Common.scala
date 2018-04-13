@@ -12,11 +12,8 @@ object Common {
       "-encoding",
       "UTF-8",
       "-Xlint",
-      "-Yclosure-elim",
-      "-Yinline",
       "-Xverify",
       "-Xfatal-warnings",
-      "-Yinline-warnings:false",
       "-feature",
       "-language:postfixOps"
     ),
