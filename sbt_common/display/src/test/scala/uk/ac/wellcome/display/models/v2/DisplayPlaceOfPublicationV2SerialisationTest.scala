@@ -8,7 +8,7 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models.{IdentifiedWork, Place}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayPlaceOfPublicationSerialisationTest
+class DisplayPlaceOfPublicationV2SerialisationTest
     extends FunSpec
     with DisplaySerialisationTestBase
     with JsonTestUtil
