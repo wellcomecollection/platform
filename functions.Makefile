@@ -209,6 +209,33 @@ $(1)-terraform-plan:
 
 $(1)-terraform-apply:
 	$(call terraform_apply,$(2))
+
+# These are a pair of dodgy hacks to allow us to run something like:
+#
+#	$ make stack-terraform-import aws_s3_bucket.bucket my-bucket-name
+#
+#	$ make stack-terraform-state-rm aws_s3_bucket.bucket
+#
+# In practice it slightly breaks the conventions of Make (you're not meant to
+# read command-line arguments), but since this is only for one-offs I think
+# it's okay.
+#
+# This is slightly easier than using terraform on the command line, as paths
+# are different in/outside Docker, so you have to reload all your modules,
+# which is slow and boring.
+#
+$(1)-terraform-import:
+	$(ROOT)/docker_run.py --aws -- \
+		--volume $(ROOT):/data \
+		--workdir /data/$(2) \
+		hashicorp/terraform:0.11.3 import $(filter-out $(1)-terraform-import,$(MAKECMDGOALS))
+
+$(1)-terraform-state-rm:
+	$(ROOT)/docker_run.py --aws -- \
+		--volume $(ROOT):/data \
+		--workdir /data/$(2) \
+		hashicorp/terraform:0.11.3 state rm $(filter-out $(1)-terraform-state-rm,$(MAKECMDGOALS))
+
 endef
 
 
