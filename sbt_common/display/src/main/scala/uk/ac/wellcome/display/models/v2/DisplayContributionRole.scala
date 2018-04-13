@@ -5,13 +5,11 @@ import io.swagger.annotations.{ApiModel, ApiModelProperty}
 
 @ApiModel(
   value = "ContributionRole",
-  description =
-    "A contribution role"
+  description = "A contribution role"
 )
-case class DisplayContributionRole (
-                                     @ApiModelProperty(
-                                       value = "The name of the agent"
-                                     )
-                              label: String,
+case class DisplayContributionRole(
+  @ApiModelProperty(
+    value = "The name of the agent"
+  ) label: String,
   @JsonProperty("type") ontologyType: String = "ContributionRole"
-                              )
+)
