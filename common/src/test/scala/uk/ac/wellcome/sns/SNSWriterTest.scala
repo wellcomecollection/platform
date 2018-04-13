@@ -35,21 +35,27 @@ class SNSWriterTest
           messages.head.subject shouldBe subject
           publishAttempt.right.value.id should be(messages.head.messageId)
 
-          getContentFromS3(bucket, publishAttempt.right.value.key) should be (message)
+          getContentFromS3(bucket, publishAttempt.right.value.key) should be(
+            message)
         }
       }
     }
   }
 
-  it("should return a failed future if it fails to publish the message pointer") {
+  it(
+    "should return a failed future if it fails to publish the message pointer") {
     withLocalS3Bucket { bucket =>
       val s3Config = S3Config(bucketName = bucket.name)
-      val snsWriter = new SNSWriter(snsClient, SNSConfig("not a valid topic"), s3Client, s3Config)
+      val snsWriter = new SNSWriter(
+        snsClient,
+        SNSConfig("not a valid topic"),
+        s3Client,
+        s3Config)
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
       whenReady(eventualAttempt) { publishAttempt =>
-        publishAttempt.isLeft should be (true)
+        publishAttempt.isLeft should be(true)
       }
     }
   }
@@ -57,12 +63,13 @@ class SNSWriterTest
   it("should return a failed future if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsWriter = new SNSWriter(snsClient, SNSConfig(topic.arn), s3Client, s3Config)
+      val snsWriter =
+        new SNSWriter(snsClient, SNSConfig(topic.arn), s3Client, s3Config)
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
       whenReady(eventualAttempt) { publishAttempt =>
-        publishAttempt.isLeft should be (true)
+        publishAttempt.isLeft should be(true)
       }
     }
   }
@@ -70,12 +77,13 @@ class SNSWriterTest
   it("should not publish message pointer if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsWriter = new SNSWriter(snsClient, SNSConfig(topic.arn), s3Client, s3Config)
+      val snsWriter =
+        new SNSWriter(snsClient, SNSConfig(topic.arn), s3Client, s3Config)
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
       whenReady(eventualAttempt) { publishAttempt =>
-        listMessagesReceivedFromSNS(topic) should be ('empty)
+        listMessagesReceivedFromSNS(topic) should be('empty)
       }
     }
   }

@@ -72,7 +72,12 @@ class SQSMessageReceiverTest
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
     val snsWriter =
-      maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topic.arn), s3Client, S3Config(bucketName = bucket.name)))
+      maybeSnsWriter.getOrElse(
+        new SNSWriter(
+          snsClient,
+          SNSConfig(topic.arn),
+          s3Client,
+          S3Config(bucketName = bucket.name)))
     val recordReceiver = new SQSMessageReceiver(
       snsWriter = snsWriter,
       s3Client = s3Client,
@@ -303,7 +308,8 @@ class SQSMessageReceiverTest
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[String]))
       .thenReturn(
-        Future.successful(Left(new RuntimeException("Failed publishing message"))))
+        Future.successful(
+          Left(new RuntimeException("Failed publishing message"))))
     mockSNS
   }
 }

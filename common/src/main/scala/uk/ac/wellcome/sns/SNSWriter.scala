@@ -21,7 +21,9 @@ class SNSWriter @Inject()(
   s3Config: S3Config
 ) extends Logging {
 
-  def writeMessage(message: String, subject: String): Future[Either[Throwable, PublishAttempt]] = {
+  def writeMessage(
+    message: String,
+    subject: String): Future[Either[Throwable, PublishAttempt]] = {
 
     val contentId = randomUUID.toString
     // TODO make key prefix configurable
@@ -49,7 +51,8 @@ class SNSWriter @Inject()(
   private def eventuallyPublishMessagePointer(subject: String) = Future {
     blocking {
       debug(s"publishing message to SNS topic ${config.topicArn}")
-      val request = new PublishRequest(config.topicArn, s3Config.bucketName, subject)
+      val request =
+        new PublishRequest(config.topicArn, s3Config.bucketName, subject)
       client.publish(request)
     }
   }
