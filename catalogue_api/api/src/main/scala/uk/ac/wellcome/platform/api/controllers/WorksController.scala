@@ -9,16 +9,13 @@ import io.swagger.models.properties.StringProperty
 import javax.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
-import uk.ac.wellcome.models.{Error, IdentifiedWork}
+import uk.ac.wellcome.models.{ApiVersions, Error, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.DisplayError
 import uk.ac.wellcome.platform.api.models.v1.DisplayResultListV1
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
@@ -46,14 +43,14 @@ class WorksController @Inject()(
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
   prefix(apiPrefix) {
-    setupResultListEndpoint("/v1", "/works")
-    setupSingleWorkEndpoint("/v1", "/works/:id")
+    setupResultListEndpoint(ApiVersions.v1, "/works")
+    setupSingleWorkEndpoint(ApiVersions.v1, "/works/:id")
   }
 
-  private def setupResultListEndpoint(version: String,
+  private def setupResultListEndpoint(version: ApiVersions.Value,
                                       endpointSuffix: String): Unit = {
-    getWithDoc(s"$version$endpointSuffix") { doc =>
-      setupResultListSwaggerDocs(s"$version$endpointSuffix", doc)
+    getWithDoc(s"/$version$endpointSuffix") { doc =>
+      setupResultListSwaggerDocs(s"/$version$endpointSuffix", doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
@@ -80,9 +77,9 @@ class WorksController @Inject()(
     }
   }
 
-  private def setupSingleWorkEndpoint(version: String,
+  private def setupSingleWorkEndpoint(version: ApiVersions.Value,
                                       endpointSuffix: String): Unit = {
-    getWithDoc(s"$version$endpointSuffix") { doc =>
+    getWithDoc(s"/$version$endpointSuffix") { doc =>
       setUpSingleWorkSwaggerDocs(version, doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
@@ -237,9 +234,9 @@ class WorksController @Inject()(
     // in the public docs.
   }
 
-  private def setUpSingleWorkSwaggerDocs(version: String, doc: Operation) = {
+  private def setUpSingleWorkSwaggerDocs(version: ApiVersions.Value, doc: Operation) = {
     doc
-      .summary(s"$version/works/{id}")
+      .summary(s"/$version/works/{id}")
       .description("Returns a single work")
       .tag("Works")
       .routeParam[String]("id", "The work to return", required = true)

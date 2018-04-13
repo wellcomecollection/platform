@@ -2,37 +2,29 @@ package uk.ac.wellcome.platform.api
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.{ApiVersions, IdentifiedWork}
+import org.scalacheck.ScalacheckShapeless._
 
-class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
+class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with PropertyChecks {
 
-  it("should return a valid JSON response for v1") {
-    val tree = readTree("/test/v1/swagger.json")
+  it("should return a valid JSON response for all api versions") {
+    forAll {version: ApiVersions.Value =>
+      val tree = readTree(s"/test/${version.toString}/swagger.json")
 
-    tree.at("/host").toString should be("\"test.host\"")
-    tree.at("/schemes").toString should be("[\"http\"]")
-    tree.at("/info/version").toString should be("\"v1\"")
-    tree.at("/basePath").toString should be("\"/test/v1\"")
+      tree.at("/host").toString should be("\"test.host\"")
+      tree.at("/schemes").toString should be("[\"http\"]")
+      tree.at("/info/version").toString should be(s""""${version.toString}"""")
+      tree.at("/basePath").toString should be(s""""/test/${version.toString}"""")
+    }
   }
 
-  it("should include the DisplayError model for v1") {
-    val tree = readTree("/test/v1/swagger.json")
-    tree.at("/definitions/Error/type").toString should be("\"object\"")
-  }
-
-  it("should return a valid JSON response for v2") {
-    val tree = readTree("/test/v2/swagger.json")
-
-    tree.at("/host").toString should be("\"test.host\"")
-    tree.at("/schemes").toString should be("[\"http\"]")
-    tree.at("/info/version").toString should be("\"v2\"")
-    tree.at("/basePath").toString should be("\"/test/v2\"")
-  }
-
-  it("should include the DisplayError model for v2") {
-    val tree = readTree("/test/v2/swagger.json")
-    tree.at("/definitions/Error/type").toString should be("\"object\"")
+  it("should include the DisplayError model all api versions") {
+    forAll { version: ApiVersions.Value =>
+      val tree = readTree(s"/test/${version.toString}/swagger.json")
+      tree.at("/definitions/Error/type").toString should be("\"object\"")
+    }
   }
 
   def readTree(path: String): JsonNode = {
