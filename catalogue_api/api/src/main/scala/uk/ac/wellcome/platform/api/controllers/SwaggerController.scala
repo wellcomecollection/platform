@@ -25,6 +25,7 @@ class SwaggerController @Inject()(
 
   prefix(apiPrefix) {
     setupSwaggerEndpoint("v1")
+    setupSwaggerEndpoint("v2")
   }
 
   private def setupSwaggerEndpoint(version: String): Unit = {
