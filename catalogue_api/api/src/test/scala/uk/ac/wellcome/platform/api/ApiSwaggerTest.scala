@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.IdentifiedWork
 
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
-  it("should return a valid JSON response") {
+  it("should return a valid JSON response for v1") {
     val tree = readTree("/test/v1/swagger.json")
 
     tree.at("/host").toString should be("\"test.host\"")
@@ -16,8 +16,22 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     tree.at("/basePath").toString should be("\"/test/v1\"")
   }
 
-  it("should include the DisplayError model") {
+  it("should include the DisplayError model for v1") {
     val tree = readTree("/test/v1/swagger.json")
+    tree.at("/definitions/Error/type").toString should be("\"object\"")
+  }
+
+  it("should return a valid JSON response for v2") {
+    val tree = readTree("/test/v2/swagger.json")
+
+    tree.at("/host").toString should be("\"test.host\"")
+    tree.at("/schemes").toString should be("[\"http\"]")
+    tree.at("/info/version").toString should be("\"v2\"")
+    tree.at("/basePath").toString should be("\"/test/v2\"")
+  }
+
+  it("should include the DisplayError model for v2") {
+    val tree = readTree("/test/v2/swagger.json")
     tree.at("/definitions/Error/type").toString should be("\"object\"")
   }
 
