@@ -269,4 +269,16 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
       }
     }
   }
+
+  it(
+    "returns a Not Found error if you try to get a version that doesn't exist") {
+      withServer(indexName = "not-important") { server =>
+        server.httpGet(
+          path = "/catalogue/v567/works?pageSize=100&page=101",
+          andExpect = Status.NotFound,
+          withJsonBody =
+            badRequest(s"catalogue/${ApiVersions.default.toString}", "v567 is not a valid API version")
+        )
+      }
+  }
 }
