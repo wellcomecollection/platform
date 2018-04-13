@@ -8,46 +8,47 @@ import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 class ApiV1WorksTestInvisible extends ApiWorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
-    withApiFixtures(apiVersion = "v1") { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      val work = workWith(
-        canonicalId = "g9dtcj2e",
-        title = "This work has been deleted",
-        visible = false
-      )
-
-      insertIntoElasticsearch(indexName, itemType, work)
-
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works/${work.canonicalId}",
-          andExpect = Status.Gone,
-          withJsonBody = gone(apiPrefix)
+    withApiFixtures(apiVersion = "v1") {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        val work = workWith(
+          canonicalId = "g9dtcj2e",
+          title = "This work has been deleted",
+          visible = false
         )
-      }
+
+        insertIntoElasticsearch(indexName, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}",
+            andExpect = Status.Gone,
+            withJsonBody = gone(apiPrefix)
+          )
+        }
     }
   }
 
   it("excludes works with visible=false from list results") {
-    withApiFixtures(apiVersion = "v1") { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      // Start by indexing a work with visible=false.
-      val deletedWork = workWith(
-        canonicalId = "gze7bc24",
-        title = "This work has been deleted",
-        visible = false
-      )
+    withApiFixtures(apiVersion = "v1") {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        // Start by indexing a work with visible=false.
+        val deletedWork = workWith(
+          canonicalId = "gze7bc24",
+          title = "This work has been deleted",
+          visible = false
+        )
 
-      // Then we index two ordinary works into Elasticsearch.
-      val works = createWorks(2)
+        // Then we index two ordinary works into Elasticsearch.
+        val works = createWorks(2)
 
-      val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
-      insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
+        val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
+        insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
 
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works",
-          andExpect = Status.Ok,
-          withJsonBody =
-            s"""
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
                |{
                |  ${resultList(apiPrefix, totalResults = 2)},
                |  "results": [
@@ -63,11 +64,9 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |     },
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${
-              identifiedOrUnidentifiable(
-                works(0).creators(0),
-                abstractAgent)
-            } ],
+               |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(0).creators(0),
+                                abstractAgent)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -85,11 +84,9 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |     },
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${
-              identifiedOrUnidentifiable(
-                works(1).creators(0),
-                abstractAgent)
-            } ],
+               |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(1).creators(0),
+                                abstractAgent)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -98,30 +95,30 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |  ]
                |}
           """.stripMargin
-        )
-      }
+          )
+        }
     }
   }
 
   it("excludes works with visible=false from search results") {
-    withApiFixtures(apiVersion = "v1") { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      val work = workWith(
-        canonicalId = "r8dx6std",
-        title = "A deleted dodo"
-      )
-      val deletedWork = workWith(
-        canonicalId = "e7rxkty8",
-        title = "This work has been deleted",
-        visible = false
-      )
-      insertIntoElasticsearch(indexName, itemType, work, deletedWork)
+    withApiFixtures(apiVersion = "v1") {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        val work = workWith(
+          canonicalId = "r8dx6std",
+          title = "A deleted dodo"
+        )
+        val deletedWork = workWith(
+          canonicalId = "e7rxkty8",
+          title = "This work has been deleted",
+          visible = false
+        )
+        insertIntoElasticsearch(indexName, itemType, work, deletedWork)
 
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works?query=deleted",
-          andExpect = Status.Ok,
-          withJsonBody =
-            s"""
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?query=deleted",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
                |{
                |  ${resultList(apiPrefix)},
                |  "results": [
@@ -137,8 +134,8 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |   }
                |  ]
                |}""".stripMargin
-        )
-      }
+          )
+        }
     }
   }
 }
