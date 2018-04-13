@@ -8,7 +8,7 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
-class DisplayCreatorsSerialisationTest
+class DisplayCreatorsV1SerialisationTest
     extends FunSpec
     with DisplaySerialisationTestBase
     with JsonTestUtil
