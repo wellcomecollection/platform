@@ -6,12 +6,13 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.s3.S3ObjectStore
 
 import scala.concurrent.{blocking, Future}
 
 case class PublishAttempt(id: Either[Throwable, String])
 
-class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
+class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig, s3: S3ObjectStore[String])
     extends Logging {
 
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =
