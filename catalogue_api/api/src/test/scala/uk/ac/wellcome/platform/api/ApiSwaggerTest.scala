@@ -27,6 +27,12 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with Pro
     }
   }
 
+  it("should show the correct Work model for v1") {
+      val tree = readTree(s"/test/${ApiVersions.v1.toString}/swagger.json")
+      tree.at("/definitions/Work").isObject shouldBe true
+      tree.at("/definitions/Work/properties/creators/type") shouldBe "array"
+  }
+
   def readTree(path: String): JsonNode = {
     val flags = Map(
       "api.host" -> "test.host",
