@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
         git('add', '--verbose', '--all')
         git('commit', '-m', 'Apply auto-formatting rules')
-        git('push', 'ssh-origin', 'HEAD:%s' % branch)
+        git('push', 'ssh-origin', 'HEAD:%s' % branch_name())
 
         # We exit here to fail the build, so Travis will skip to the next
         # build, which includes the autoformat commit.
