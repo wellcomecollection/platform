@@ -89,7 +89,7 @@ case class DisplayWorkV1(
   @ApiModelProperty(
     dataType = "String"
   ) dimensions: Option[String] = None
-) {
+)  extends DisplayWork{
   @ApiModelProperty(
     readOnly = true,
     value =

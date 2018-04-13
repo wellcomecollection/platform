@@ -6,21 +6,24 @@ import org.scalatest.prop.PropertyChecks
 import uk.ac.wellcome.models.ApiVersions
 import org.scalacheck.ScalacheckShapeless._
 
-class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks{
+class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a BadRequest error when malformed query parameters are presented") {
-      withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?pageSize=penguin",
           andExpect = Status.BadRequest,
           withJsonBody = badRequest(apiPrefix, "pageSize: 'penguin' is not a valid Integer")
         )
       }
+    }
   }
 
   it("returns a NotFound error when requesting a work with a non-existent id") {
-      withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         val badId = "non-existing-id"
         server.httpGet(
           path = s"/$apiPrefix/works/$badId",
@@ -28,161 +31,190 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks{
           withJsonBody = notFound(apiPrefix, s"Work not found for identifier $badId")
         )
       }
+    }
   }
 
   it(
     "returns a BadRequest error if the user asks for a page size just over the maximum") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      val pageSize = 101
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=$pageSize",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, s"pageSize: [$pageSize] is not less than or equal to 100")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        val pageSize = 101
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=$pageSize",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, s"pageSize: [$pageSize] is not less than or equal to 100")
+        )
+      }
     }
   }
 
   it(
     "returns a BadRequest error if the user asks for an overly large page size") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      val pageSize = 100000
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=$pageSize",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, s"pageSize: [$pageSize] is not less than or equal to 100")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        val pageSize = 100000
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=$pageSize",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, s"pageSize: [$pageSize] is not less than or equal to 100")
+        )
+      }
     }
   }
 
   it("returns a BadRequest error if the user asks for zero-length pages") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      val pageSize = 0
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=$pageSize",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, s"pageSize: [$pageSize] is not greater than or equal to 1")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        val pageSize = 0
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=$pageSize",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, s"pageSize: [$pageSize] is not greater than or equal to 1")
+        )
+      }
     }
   }
 
   it("returns a BadRequest error if the user asks for a negative page size") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      val pageSize = -50
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=$pageSize",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, s"pageSize: [$pageSize] is not greater than or equal to 1")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        val pageSize = -50
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=$pageSize",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, s"pageSize: [$pageSize] is not greater than or equal to 1")
+        )
+      }
     }
   }
 
   it("returns a BadRequest error if the user asks for page 0") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?page=0",
-        andExpect = Status.BadRequest,
-        withJsonBody = badRequest(apiPrefix, "page: [0] is not greater than or equal to 1")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?page=0",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest(apiPrefix, "page: [0] is not greater than or equal to 1")
+        )
+      }
     }
   }
 
   it("returns a BadRequest error if the user asks for a page before 0") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?page=-50",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, "page: [-50] is not greater than or equal to 1")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?page=-50",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, "page: [-50] is not greater than or equal to 1")
+        )
+      }
     }
   }
 
   it("returns multiple errors if there's more than one invalid parameter") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=-60&page=-50",
-        andExpect = Status.BadRequest,
-        withJsonBody = badRequest(apiPrefix,
-          "page: [-50] is not greater than or equal to 1, pageSize: [-60] is not greater than or equal to 1")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=-60&page=-50",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest(apiPrefix,
+            "page: [-50] is not greater than or equal to 1, pageSize: [-60] is not greater than or equal to 1")
+        )
+      }
     }
   }
 
   it("returns a Bad Request error if asked for an invalid include") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?includes=foo",
-        andExpect = Status.BadRequest,
-        withJsonBody = badRequest(apiPrefix, "includes: 'foo' is not a valid include")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?includes=foo",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest(apiPrefix, "includes: 'foo' is not a valid include")
+        )
+      }
     }
   }
 
   it("returns a Bad Request error if asked for more than one invalid include") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?includes=foo,bar",
           andExpect = Status.BadRequest,
           withJsonBody =
             badRequest(apiPrefix, "includes: 'foo', 'bar' are not valid includes")
         )
+      }
     }
   }
 
   it(
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, "includes: 'foo', 'bar' are not valid includes")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, "includes: 'foo', 'bar' are not valid includes")
+        )
+      }
     }
   }
 
   it(
     "returns a Bad Request error if asked for an invalid include on an individual work") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
-        andExpect = Status.BadRequest,
-        withJsonBody = badRequest(apiPrefix, "includes: 'foo' is not a valid include")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
+          andExpect = Status.BadRequest,
+          withJsonBody = badRequest(apiPrefix, "includes: 'foo' is not a valid include")
+        )
+      }
     }
   }
 
   it("returns Not Found if you look up a non-existent index") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>      server.httpGet(
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) => server.httpGet(
         path = s"/$apiPrefix/works?_index=foobarbaz",
         andExpect = Status.NotFound,
         withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
       )
+      }
     }
   }
 
   it("returns Not Found if you ask for a non-existent work") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works/xhu96f9j",
-        andExpect = Status.NotFound,
-        withJsonBody = notFound(apiPrefix, "Work not found for identifier xhu96f9j")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works/xhu96f9j",
+          andExpect = Status.NotFound,
+          withJsonBody = notFound(apiPrefix, "Work not found for identifier xhu96f9j")
+        )
+      }
     }
   }
 
   it("returns Bad Request if you ask for a malformed identifier") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works/zd224ncv]",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, "Unrecognised character in identifier zd224ncv]")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works/zd224ncv]",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, "Unrecognised character in identifier zd224ncv]")
+        )
+      }
     }
   }
 
@@ -193,7 +225,8 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks{
     // Elasticsearch has a number of "private" indexes, which don't have
     // a canonicalId field to sort on.  Trying to query one of these will
     // trigger one such exception!
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version)  { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
       server.httpGet(
         path = s"/$apiPrefix/works?_index=.watches",
         andExpect = Status.InternalServerError,
@@ -206,29 +239,34 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks{
         }"""
       )
     }
+    }
   }
 
   it(
     "returns a Bad Request error if you try to access the 10000th page") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?page=10000",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, "Only the first 10000 works are available in the API.")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?page=10000",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, "Only the first 10000 works are available in the API.")
+        )
+      }
     }
     }
 
   it(
     "returns a Bad Request error if you try to get the 101th page with 100 results per page") {
-    withApiFixtures(apiVersion = ApiVersions.v1) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
-      server.httpGet(
-        path = s"/$apiPrefix/works?pageSize=100&page=101",
-        andExpect = Status.BadRequest,
-        withJsonBody =
-          badRequest(apiPrefix, "Only the first 10000 works are available in the API.")
-      )
+    forAll { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) { case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        server.httpGet(
+          path = s"/$apiPrefix/works?pageSize=100&page=101",
+          andExpect = Status.BadRequest,
+          withJsonBody =
+            badRequest(apiPrefix, "Only the first 10000 works are available in the API.")
+        )
+      }
     }
-    }
+  }
 }
