@@ -25,7 +25,7 @@ from travistooling.decisions import (
     SignificantFile,
     UnrecognisedFile
 )
-from travistooling.git import ROOT
+from travistooling.git_utils import ROOT
 from travistooling.parse_makefiles import get_projects
 
 
