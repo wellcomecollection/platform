@@ -11,7 +11,8 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait ApiWorksTestBase
-    extends FunSpec with ElasticsearchFixtures
+    extends FunSpec
+    with ElasticsearchFixtures
     with DisplaySerialisationTestBase
     with WorksUtil {
 
@@ -20,7 +21,8 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexName: String, itemType: String = "work")(testWith: TestWith[EmbeddedHttpServer, R]) = {
+  def withServer[R](indexName: String, itemType: String = "work")(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
@@ -42,12 +44,15 @@ trait ApiWorksTestBase
     }
   }
 
-  def withApiFixtures[R](apiVersion: String,apiName: String = "catalogue/",itemType: String = "work")(testWith: TestWith[(String, String, String, EmbeddedHttpServer) ,R]) =
+  def withApiFixtures[R](apiVersion: String,
+                         apiName: String = "catalogue/",
+                         itemType: String = "work")(
+    testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]) =
     withLocalElasticsearchIndex(itemType = itemType) { index =>
       withServer(index, itemType) { server =>
         testWith((apiName + apiVersion, index, itemType, server))
       }
-  }
+    }
 
   def emptyJsonResult(apiPrefix: String): String = s"""
     |{
@@ -69,7 +74,8 @@ trait ApiWorksTestBase
       "description": "$description"
     }"""
 
-  def resultList(apiPrefix: String,pageSize: Int = 10,
+  def resultList(apiPrefix: String,
+                 pageSize: Int = 10,
                  totalPages: Int = 1,
                  totalResults: Int = 1) =
     s"""
@@ -80,7 +86,7 @@ trait ApiWorksTestBase
       "totalResults": $totalResults
     """
 
-  def notFound(apiPrefix: String,description: String) =
+  def notFound(apiPrefix: String, description: String) =
     s"""{
       "@context": "https://localhost:8888/$apiPrefix/context.json",
       "type": "Error",
