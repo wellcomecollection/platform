@@ -53,7 +53,7 @@ def _should_run_tests(task, travis_event_type):
         changed_paths=changed_paths,
         task=task
     )
-    print(build_report_output(report) + '\n')
+    print('\n' + build_report_output(report) + '\n')
 
     return result
 
@@ -82,7 +82,7 @@ def _should_publish(task, travis_event_type):
         changed_paths=changed_paths,
         task=task
     )
-    print(build_report_output(report) + '\n')
+    print('\n' + build_report_output(report) + '\n')
 
     return result
 
