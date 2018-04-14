@@ -37,9 +37,6 @@ from travistooling.make_utils import (
 def _should_run_tests(task_name, travis_event_type):
     """
     Should we run the tests?
-
-    We skip doing the publish/deploy step when running a build on master that
-    doesn't have any relevant changes since the last deploy.
     """
     if travis_event_type == 'cron':
         print('*** We always run tests in cron!')
@@ -57,6 +54,33 @@ def _should_run_tests(task_name, travis_event_type):
     print(build_report_output(report))
 
     return bool(report[True])
+
+
+def _should_publish(task, travis_event_type):
+    """
+    Should we run the publish step?
+    """
+    if travis_event_type in ('cron', 'pull_request'):
+        print('*** We never publish from cron or pull requests!')
+        return False
+
+    assert travis_event_type == 'push'
+
+    if task in [
+        'check-format',
+        'travistooling-test',
+    ]:
+        print('*** Task %s does not have a publish step' % task)
+        return False
+
+    git('fetch', 'origin')
+
+    changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
+    report = should_run_build_task(changed_paths=changed_paths, task=task)
+    print(build_report_output(report, description='publish a new version'))
+
+    return bool(report[True])
+
 
 
 def main():
@@ -80,7 +104,7 @@ def main():
         print("*** We're going to run the publish task")
         make(publish_task)
     else:
-        print("*** We don't need to actually run the publish task")
+        print("*** We don't need to run the publish task")
         make(publish_task, '--dry-run')
 
     return 0
