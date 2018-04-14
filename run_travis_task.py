@@ -23,12 +23,12 @@ less important on master where results are transient.
 import os
 import sys
 
-from travistooling.make_utils import (
+from travistooling import (
     build_report_output,
     get_changed_paths,
     git,
     make,
-    should_run_job,
+    should_run_build_task,
     unpack_secrets
 )
 
