@@ -3,8 +3,8 @@
 import pytest
 
 from travistooling.decisionmaker import (
-    does_file_affect_build_job,
-    should_run_job
+    does_file_affect_build_task,
+    should_run_build_task
 )
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
@@ -19,7 +19,7 @@ from travistooling.decisions import (
 )
 
 
-@pytest.mark.parametrize('path, task_name, exc_class, is_significant', [
+@pytest.mark.parametrize('path, task, exc_class, is_significant', [
     # Travis format task
     ('misc/myscript.py', 'travis-format', CheckedByTravisFormat, True),
     ('ontologies/item.ttl', 'travis-format', CheckedByTravisFormat, True),
@@ -67,21 +67,21 @@ from travistooling.decisions import (
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
 ])
-def test_does_file_affect_build_job(path, task_name, exc_class, is_significant):
+def test_does_file_affect_build_task(path, task, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
-        does_file_affect_build_job(path=path, task_name=task_name)
+        does_file_affect_build_task(path=path, task=task)
     assert err.value.is_significant == is_significant
 
 
-def test_should_run_job_with_no_important_changes():
-    result = should_run_job(changed_paths=[], task_name='loris-test')
+def test_should_run_build_task_with_no_important_changes():
+    result = should_run_build_task(changed_paths=[], task='loris-test')
     assert result == (False, {False: {}, True: {}})
 
 
 def test_should_not_run_job_with_no_relevant_changes():
-    result = should_run_job(
+    result = should_run_build_task(
         changed_paths=['sierra_adapter/common/main.scala'],
-        task_name='loris-test'
+        task='loris-test'
     )
     assert result == (False, {
         False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
@@ -89,13 +89,13 @@ def test_should_not_run_job_with_no_relevant_changes():
     })
 
 
-def test_should_run_job_with_relevant_changes():
-    result = should_run_job(
+def test_should_run_build_task_with_relevant_changes():
+    result = should_run_build_task(
         changed_paths=[
             'sierra_adapter/common/main.scala',
             'loris/loris/Dockerfile',
         ],
-        task_name='loris-test'
+        task='loris-test'
     )
     assert result == (True, {
         False: {ScalaChangeAndNotScalaApp.message: set(['sierra_adapter/common/main.scala'])},
