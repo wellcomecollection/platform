@@ -49,10 +49,13 @@ def _should_run_tests(task, travis_event_type):
         git('fetch', 'origin')
         changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
 
-    report = should_run_build_task(changed_paths=changed_paths, task=task)
+    result, report = should_run_build_task(
+        changed_paths=changed_paths,
+        task=task
+    )
     print(build_report_output(report))
 
-    return bool(report[True])
+    return result
 
 
 def _should_publish(task, travis_event_type):
@@ -75,11 +78,13 @@ def _should_publish(task, travis_event_type):
     git('fetch', 'origin')
 
     changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
-    report = should_run_build_task(changed_paths=changed_paths, task=task)
-    print(build_report_output(report, description='publish a new version'))
+    result, report = should_run_build_task(
+        changed_paths=changed_paths,
+        task=task
+    )
+    print(build_report_output(report))
 
-    return bool(report[True])
-
+    return result
 
 
 def main():
