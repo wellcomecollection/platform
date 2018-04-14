@@ -20,14 +20,12 @@ less important on master where results are transient.
 
 """
 
-from __future__ import print_function
-
 import os
 import sys
 
 from should_publish import should_publish
 from should_run_tests import should_run_tests
-from travistooling import make, rreplace, unpack_secrets
+from travistooling.make_utils import make, unpack_secrets
 
 
 def main():
@@ -35,26 +33,24 @@ def main():
     task = os.environ['TASK']
 
     if should_run_tests(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run tests", flush=True)
+        print("*** We're going to run tests")
     else:
-        print("*** We don't need to run tests, exiting early", flush=True)
+        print("*** We don't need to run tests, exiting early")
         return 0
 
     unpack_secrets()
 
     make(task)
 
-    publish_task = rreplace(task, 'build', 'publish', count=1)
-    publish_task = rreplace(task, 'test', 'publish', count=1)
+    publish_task = task.replace('-build', '-publish')
+    publish_task = task.replace('-test', '-publish')
 
     if should_publish(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run the publish task", flush=True)
-        dry_run = False
+        print("*** We're going to run the publish task")
+        make(publish_task)
     else:
-        print("*** We don't need to actually run the publish task", flush=True)
-        dry_run = True
-
-    make(publish_task, dry_run=dry_run)
+        print("*** We don't need to actually run the publish task")
+        make(publish_task, '--dry-run')
 
     return 0
 
