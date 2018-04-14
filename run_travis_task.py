@@ -33,7 +33,7 @@ from travistooling import (
 )
 
 
-def _should_run_tests(task_name, travis_event_type):
+def _should_run_tests(task, travis_event_type):
     """
     Should we run the tests?
     """
