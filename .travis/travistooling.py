@@ -223,35 +223,3 @@ def rreplace(string, old, new, count=None):
 
     # Then join back together with ``new``
     return new.join(parts)
-
-
-def unpack_secrets():
-    """
-    We store our AWS credentials and SSH keys for Travis in an
-    encrypted ZIP bundle.
-
-    This unencrypts the credentials, and copies them into place.
-    """
-    print('*** Loading secrets for Travis', flush=True)
-
-    # Unencrypted the encrypted ZIP file.
-    check_call([
-        'openssl', 'aes-256-cbc',
-        '-K', os.environ['encrypted_83630750896a_key'],
-        '-iv', os.environ['encrypted_83630750896a_iv'],
-        '-in', 'secrets.zip.enc',
-        '-out', 'secrets.zip', '-d'
-    ])
-
-    import zipfile
-    zf = zipfile.ZipFile('secrets.zip')
-    zf.extractall(path='.')
-
-    os.makedirs(os.path.join(os.environ['HOME'], '.aws'), exist_ok=True)
-    for f in ['config', 'credentials']:
-        os.rename(
-            src=os.path.join('secrets', f),
-            dst=os.path.join(os.environ['HOME'], '.aws', f)
-        )
-
-    check_call(['chmod', '400', 'secrets/id_rsa'])
