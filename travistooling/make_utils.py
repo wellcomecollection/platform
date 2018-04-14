@@ -1,15 +1,8 @@
 # -*- encoding: utf-8
 
-import subprocess
-import sys
+from travistooling.shell_utils import check_call
 
 
 def make(*args):
     """Run a Make command, and check it completes successfully."""
-    cmd = ['make'] + list(args)
-    print('Running %r' % ' '.join(cmd))
-    try:
-        return subprocess.check_call(cmd)
-    except subprocess.CalledProcessError as err:
-        print(err)
-        sys.exit(err.returncode)
+    check_call(['make'] + list(args))
