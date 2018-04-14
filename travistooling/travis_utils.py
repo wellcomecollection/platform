@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
 import os
+import subprocess
 import zipfile
 
 from travistooling.shell_utils import check_call
@@ -15,7 +16,7 @@ def branch_name():
         return os.environ['TRAVIS_PULL_REQUEST_BRANCH']
 
 
-def unpack_secrets():
+def unpack_secrets():  # pragma: no cover
     """
     We store our AWS credentials and SSH keys for Travis in an
     encrypted ZIP bundle.
@@ -25,13 +26,17 @@ def unpack_secrets():
     print('*** Loading secrets for Travis')
 
     # Unencrypted the encrypted ZIP file.
-    check_call([
-        'openssl', 'aes-256-cbc',
-        '-K', os.environ['encrypted_83630750896a_key'],
-        '-iv', os.environ['encrypted_83630750896a_iv'],
-        '-in', 'secrets.zip.enc',
-        '-out', 'secrets.zip', '-d'
-    ])
+    try:
+        subprocess.check_call([
+            'openssl', 'aes-256-cbc',
+            '-K', os.environ['encrypted_83630750896a_key'],
+            '-iv', os.environ['encrypted_83630750896a_iv'],
+            '-in', 'secrets.zip.enc',
+            '-out', 'secrets.zip', '-d'
+        ])
+    except subprocess.CalledProcessException:
+        print('*** Error unpacking secrets')
+        sys.exit(1)
 
     zf = zipfile.ZipFile('secrets.zip')
     zf.extractall(path='.')
