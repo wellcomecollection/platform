@@ -23,7 +23,6 @@ less important on master where results are transient.
 import os
 import sys
 
-from should_publish import should_publish
 from travistooling.make_utils import (
     build_report_output,
     get_changed_paths,
@@ -100,7 +99,7 @@ def main():
     publish_task = task.replace('-build', '-publish')
     publish_task = task.replace('-test', '-publish')
 
-    if should_publish(task=task, travis_event_type=travis_event_type):
+    if _should_publish(task=task, travis_event_type=travis_event_type):
         print("*** We're going to run the publish task")
         make(publish_task)
     else:
