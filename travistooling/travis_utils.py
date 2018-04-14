@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import sys
 import zipfile
 
 from travistooling.shell_utils import check_call
