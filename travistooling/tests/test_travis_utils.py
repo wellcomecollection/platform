@@ -4,12 +4,12 @@ import os
 
 import pytest
 
-from travistooling import travisenv
+from travistooling import travis_utils
 
 
 def test_not_in_travis_is_an_error():
     with pytest.raises(KeyError):
-        travisenv.branch_name()
+        travis_utils.branch_name()
 
 
 def test_travis_branch_name_on_master():
@@ -18,7 +18,7 @@ def test_travis_branch_name_on_master():
         'TRAVIS_BRANCH': 'master',
         'TRAVIS_PULL_REQUEST_BRANCH': 'feature-branch',
     }
-    assert travisenv.branch_name() == 'master'
+    assert travis_utils.branch_name() == 'master'
 
 
 def test_travis_branch_name_on_pr():
@@ -27,4 +27,9 @@ def test_travis_branch_name_on_pr():
         'TRAVIS_BRANCH': 'master',
         'TRAVIS_PULL_REQUEST_BRANCH': 'feature-branch',
     }
-    assert travisenv.branch_name() == 'feature-branch'
+    assert travis_utils.branch_name() == 'feature-branch'
+
+
+def test_unpack_secrets():
+    travis_utils.unpack_secrets()
+    assert os.path.exists('secrets/id_rsa')
