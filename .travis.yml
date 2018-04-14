@@ -44,7 +44,7 @@ cache:
     - sierra_adapter/sierra_item_merger/target
 
 script:
-  - .travis/run_task.py
+  - run_travis_task.py
 
 env:
   global:
