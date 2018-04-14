@@ -34,10 +34,10 @@ from travistooling.parse_makefiles import get_projects
 PROJECTS = list(get_projects(ROOT))
 
 
-def does_file_affect_build_job(path, task_name):
+def does_file_affect_build_task(path, task):
     # Catch all the common file types that we care about for travis-format.
     if (
-        task_name == 'travis-format' and
+        task == 'travis-format' and
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
         raise CheckedByTravisFormat()
@@ -59,18 +59,18 @@ def does_file_affect_build_job(path, task_name):
         os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
     }
 
-    for dir_name, task_name_prefix in exclusive_directories.items():
+    for dir_name, task_prefix in exclusive_directories.items():
         if path.startswith(dir_name):
-            if task_name.startswith(task_name_prefix):
+            if task.startswith(task_prefix):
                 raise ExclusivelyAffectsThisTask()
             else:
-                raise ExclusivelyAffectsAnotherTask(task_name_prefix)
+                raise ExclusivelyAffectsAnotherTask(task_prefix)
 
     # If this is a Scala test file and we're in a publish task, we can
     # skip running the task.
     if (
         'src/test/scala/uk/ac/wellcome' in path and
-        task_name.endswith('-publish')
+        task.endswith('-publish')
     ):
         raise ChangesToTestsDontGetPublished()
 
@@ -84,7 +84,7 @@ def does_file_affect_build_job(path, task_name):
         'sbt_common/'
     )):
         for project in PROJECTS:
-            if task_name.startswith(project.name):
+            if task.startswith(project.name):
                 if project.type == 'sbt_app':
                     raise ScalaChangeAndIsScalaApp()
                 else:
@@ -95,7 +95,7 @@ def does_file_affect_build_job(path, task_name):
     raise UnrecognisedFile()
 
 
-def should_run_job(changed_paths, task_name):
+def should_run_build_task(changed_paths, task):
     """
     Should we run this build job?  Returns a tuple (result, report).
     """
@@ -108,7 +108,7 @@ def should_run_job(changed_paths, task_name):
     }
     for path in sorted(changed_paths):
         try:
-            does_file_affect_build_job(path=path, task_name=task_name)
+            does_file_affect_build_task(path=path, task=task)
         except InsignificantFile as err:
             report[False][err.message].add(path)
         except SignificantFile as err:
