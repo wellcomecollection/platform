@@ -36,4 +36,4 @@ travistooling-test:
 		coverage report --rcfile=travistooling/.coveragerc
 
 travistooling-publish:
-	echo "nothing to do!"
+	$(error "Nothing to do for this task")

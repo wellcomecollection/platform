@@ -68,13 +68,6 @@ def _should_publish(task, travis_event_type):
 
     assert travis_event_type == 'push'
 
-    if task in [
-        'check-format',
-        'travistooling-test',
-    ]:
-        print('*** Task %s does not have a publish step' % task)
-        return False
-
     git('fetch', 'origin')
 
     changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
@@ -100,6 +93,13 @@ def main():
     unpack_secrets()
 
     make(task)
+
+    if task in [
+        'check-format',
+        'travistooling-test',
+    ]:
+        print('*** Task %s does not have a publish step' % task)
+        return False
 
     publish_task = task.replace('-build', '-publish')
     publish_task = task.replace('-test', '-publish')
