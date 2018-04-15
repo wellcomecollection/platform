@@ -33,3 +33,20 @@ def test_travis_branch_name_on_pr():
 def test_unpack_secrets():
     travis_utils.unpack_secrets()
     assert os.path.exists('secrets/id_rsa')
+
+
+def test_unpack_secrets_with_no_secrets_file():
+    os.environ = {
+        'encrypted_83630750896a_key': 'K3Y',
+        'encrypted_83630750896a_iv': '1V',
+    }
+    with pytest.raises(SystemExit) as err:
+        travis_utils.unpack_secrets()
+    assert err.value.code == 1
+
+
+def test_unpack_secrets_with_no_env_vars():
+    os.environ = {}
+    with pytest.raises(SystemExit) as err:
+        travis_utils.unpack_secrets()
+    assert err.value.code == 2

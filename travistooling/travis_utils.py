@@ -35,9 +35,13 @@ def unpack_secrets():  # pragma: no cover
             '-in', 'secrets.zip.enc',
             '-out', 'secrets.zip', '-d'
         ])
-    except subprocess.CalledProcessException:
+    except subprocess.CalledProcessError:
         print('*** Error unpacking secrets')
         sys.exit(1)
+    except KeyError as err:
+        print('*** Error unpacking secrets -- do you have the env vars?')
+        print(err)
+        sys.exit(2)
 
     zf = zipfile.ZipFile('secrets.zip')
     zf.extractall(path='.')
