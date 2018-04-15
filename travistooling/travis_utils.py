@@ -1,6 +1,7 @@
 # -*- encoding: utf-8
 
 import os
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -48,7 +49,7 @@ def unpack_secrets():  # pragma: no cover
 
     os.makedirs(os.path.join(os.environ['HOME'], '.aws'), exist_ok=True)
     for f in ['config', 'credentials']:
-        os.rename(
+        shutil.move(
             src=os.path.join('secrets', f),
             dst=os.path.join(os.environ['HOME'], '.aws', f)
         )
