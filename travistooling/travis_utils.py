@@ -29,6 +29,9 @@ def unpack_secrets():  # pragma: no cover
 
     # Unencrypted the encrypted ZIP file.
     try:
+        # We deliberately use subprocess so we can catch the error here,
+        # and suppress the encrypted environment variables from appearing
+        # in any exception output.
         subprocess.check_call([
             'openssl', 'aes-256-cbc',
             '-K', os.environ['encrypted_83630750896a_key'],
@@ -37,7 +40,7 @@ def unpack_secrets():  # pragma: no cover
             '-out', 'secrets.zip', '-d'
         ])
     except subprocess.CalledProcessError:
-        print('*** Error unpacking secrets')
+        print('*** Unexpected error unpacking secrets')
         sys.exit(1)
     except KeyError as err:
         print('*** Error unpacking secrets -- do you have the env vars?')
