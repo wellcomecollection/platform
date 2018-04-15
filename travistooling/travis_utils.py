@@ -58,3 +58,6 @@ def unpack_secrets():  # pragma: no cover
         )
 
     check_call(['chmod', '400', 'secrets/id_rsa'])
+
+    print('*** Unpacked an SSH private key with corresponding public key:')
+    check_call(['ssh-keygen', '-y', '-f', 'secrets/id_rsa'])
