@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.github.xiaodongw.swagger.finatra.SwaggerSupport
+import com.github.xiaodongw.swagger.finatra.{FinatraOperation, FinatraSwagger, SwaggerSupport}
+import com.twitter.finagle.http.RouteIndex
 
 import reflect.runtime.universe.TypeTag
-import com.twitter.finatra.http.Controller
+import com.twitter.finatra.http.{Controller, RouteDSL, SwaggerRouteDSL}
 import com.twitter.inject.annotations.Flag
-import io.swagger.models.Operation
+import io.swagger.models.{Operation, Swagger}
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import javax.inject.{Inject, Singleton}
@@ -13,13 +14,13 @@ import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.models.{ApiVersions, Error, IdentifiedWork}
-import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.language.implicitConversions
 
 import scala.collection.JavaConverters._
 
@@ -31,11 +32,9 @@ class WorksController @Inject()(
   @Flag("api.scheme") apiScheme: String,
   @Flag("api.pageSize") defaultPageSize: Int,
   worksService: WorksService)
-    extends Controller
-    with SwaggerSupport {
+    extends Controller {
 
-  override implicit protected val swagger = ApiSwagger
-
+  protected val dsl = this
   val includesSwaggerParam: QueryParameter = new QueryParameter()
     .name("includes")
     .description("A comma-separated list of extra fields to include")
@@ -45,16 +44,16 @@ class WorksController @Inject()(
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
   prefix(apiPrefix) {
-    setupResultListEndpoint(ApiVersions.v1, "/works",DisplayWorkV1.apply)
-    setupResultListEndpoint(ApiVersions.v2, "/works", DisplayWorkV2.apply)
-    setupSingleWorkEndpoint(ApiVersions.v1, "/works/:id",DisplayWorkV1.apply)
-    setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id",DisplayWorkV2.apply)
+    setupResultListEndpoint(ApiVersions.v1, ApiV1Swagger,"/works",DisplayWorkV1.apply)
+    setupResultListEndpoint(ApiVersions.v2, ApiV2Swagger, "/works", DisplayWorkV2.apply)
+    setupSingleWorkEndpoint(ApiVersions.v1, ApiV1Swagger, "/works/:id",DisplayWorkV1.apply)
+    setupSingleWorkEndpoint(ApiVersions.v2,ApiV2Swagger, "/works/:id",DisplayWorkV2.apply)
   }
 
-  private def setupResultListEndpoint[T <: DisplayWork](version: ApiVersions.Value,
+  private def setupResultListEndpoint[T <: DisplayWork](version: ApiVersions.Value, swagger: Swagger,
                                       endpointSuffix: String, toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(implicit evidence: TypeTag[DisplayResultList[T]]): Unit = {
-    getWithDoc(s"/$version$endpointSuffix") { doc =>
-      setupResultListSwaggerDocs[T](s"/$version$endpointSuffix", doc)
+    getWithDoc(s"/$version$endpointSuffix", swagger) { doc =>
+      setupResultListSwaggerDocs[T](s"/$version$endpointSuffix", swagger, doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
@@ -81,10 +80,10 @@ class WorksController @Inject()(
     }
   }
 
-  private def setupSingleWorkEndpoint[T <: DisplayWork](version: ApiVersions.Value,
+  private def setupSingleWorkEndpoint[T <: DisplayWork](version: ApiVersions.Value, swagger: Swagger,
                                       endpointSuffix: String,toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(implicit evidence: TypeTag[T]): Unit = {
-    getWithDoc(s"/$version$endpointSuffix") { doc =>
-      setUpSingleWorkSwaggerDocs[T](version, doc)
+    getWithDoc(s"/$version$endpointSuffix", swagger) { doc =>
+      setUpSingleWorkSwaggerDocs[T](version, swagger, doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
@@ -193,8 +192,9 @@ class WorksController @Inject()(
     )
   }
 
-  private def setupResultListSwaggerDocs[T <: DisplayWork](endpointSuffix: String,
+  private def setupResultListSwaggerDocs[T <: DisplayWork](endpointSuffix: String, swagger: Swagger,
                                          doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]) = {
+    implicit val finatraSwagger = swagger
     doc
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
@@ -237,7 +237,8 @@ class WorksController @Inject()(
     // in the public docs.
   }
 
-  private def setUpSingleWorkSwaggerDocs[T <: DisplayWork](version: ApiVersions.Value, doc: Operation)(implicit evidence: TypeTag[T])  = {
+  private def setUpSingleWorkSwaggerDocs[T <: DisplayWork](version: ApiVersions.Value,swagger: Swagger, doc: Operation)(implicit evidence: TypeTag[T])  = {
+    implicit val finatraSwagger = swagger
     doc
       .summary(s"/$version/works/{id}")
       .description("Returns a single work")
@@ -251,4 +252,19 @@ class WorksController @Inject()(
       .parameter(includesSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
   }
+
+  def getWithDoc[RequestType: Manifest, ResponseType: Manifest](route: String, swagger: Swagger, name: String = "", admin: Boolean = false, routeIndex: Option[RouteIndex] = None)
+                                                               (doc: Operation => Unit)
+                                                               (callback: RequestType => ResponseType): Unit = {
+    registerOperation(route, "get", swagger)(doc)
+    dsl.get(route, name, admin, routeIndex)(callback)
+  }
+
+  private def registerOperation(path: String, method: String, swagger: Swagger)(doc: Operation => Unit): Unit = {
+    val op = new Operation
+    doc(op)
+
+    FinatraSwagger.convertToFinatraSwagger(swagger).registerOperation(path, method, op)
+  }
+  implicit def convertToFinatraOperation(operation: Operation): FinatraOperation = new FinatraOperation(operation)
 }
