@@ -120,7 +120,7 @@ def run():
     # which are human-readable, unambiguous, and easy to browse in the
     # S3 Console.
     try:
-        key = os.environ['target_key']
+        key = os.environ['private_object_key']
     except KeyError:
         key = dt.datetime.now().strftime('%Y/%m/%Y-%m-%d') + f'_{es_index}.txt.gz'
     print(f'*** Uploading gzip file to S3 with key {key}')

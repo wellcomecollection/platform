@@ -12,7 +12,7 @@ module "snapshot_convertor_job_generator_lambda" {
 
   environment_variables = {
     "TOPIC_ARN"          = "${module.snapshot_convertor_topic.arn}"
-    "TARGET_BUCKET_NAME" = "${var.target_bucket_name}"
-    "TARGET_OBJECT_KEY"  = "${var.target_object_key}"
+    "PUBLIC_BUCKET_NAME" = "${var.public_bucket_name}"
+    "PUBLIC_OBJECT_KEY"  = "${var.public_object_key}"
   }
 }
