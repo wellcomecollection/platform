@@ -13,21 +13,14 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 @Singleton
-class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
-                                     @Flag("es.type") documentType: String,
+class ElasticSearchService @Inject()(@Flag("es.type") documentType: String,
                                      elasticClient: HttpClient) {
 
-  private def getIndex(queryParam: Option[String]): String =
-    queryParam match {
-      case Some(index) => index
-      case None => defaultIndex
-    }
 
-  def findResultById(id: String,
-                     index: Option[String] = None): Future[GetResponse] =
+  def findResultById(canonicalId: String, indexName: String): Future[GetResponse] =
     elasticClient
       .execute {
-        get(id).from(s"${getIndex(index)}/$documentType")
+        get(canonicalId).from(s"${indexName}/$documentType")
       }
 
   def listResults(sortByField: String,
@@ -44,13 +37,13 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
       }
 
   def simpleStringQueryResults(
-    queryString: String,
-    limit: Int = 10,
-    from: Int = 0,
-    index: Option[String] = None): Future[SearchResponse] =
+                                queryString: String,
+                                limit: Int = 10,
+                                from: Int = 0,
+                                indexName: String): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"${getIndex(index)}/$documentType")
+        search(s"${indexName}/$documentType")
           .query(
             must(
               simpleStringQuery(queryString),

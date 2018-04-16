@@ -10,7 +10,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("returns a list of works") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
         insertIntoElasticsearch(indexName, itemType, works: _*)
@@ -94,7 +94,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("returns a single work when requested with id") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = canonicalId,
           title = title,
@@ -141,7 +141,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("renders the items if the items include is present") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "b4heraz7",
           title = "Inside an irate igloo",
@@ -182,7 +182,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   it(
     "returns the requested page of results when requested with page & pageSize") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
         insertIntoElasticsearch(indexName, itemType, works: _*)
@@ -308,7 +308,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("ignores parameters that are unused when making an API request") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?foo=bar",
           andExpect = Status.Ok,
@@ -319,7 +319,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("returns matching results if doing a full-text search") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work1 = workWith(
           canonicalId = "1234",
           title = "A drawing of a dodo"
@@ -366,7 +366,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
           ontologyType = "Work",
@@ -432,7 +432,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
           ontologyType = "Work",
@@ -471,7 +471,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("searches different indices with the ?_index query parameter") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
           title = "A whale on a wave"
@@ -532,7 +532,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("looks up works in different indices with the ?_index query parameter") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
           title = "A wombat wallowing under a willow"
@@ -601,7 +601,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, indexName, _, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(
           canonicalId = "1234",
           title = "A thorn in the thumb tells a traumatic tale",

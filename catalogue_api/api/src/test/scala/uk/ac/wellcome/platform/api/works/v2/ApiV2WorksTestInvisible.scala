@@ -11,7 +11,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "g9dtcj2e",
           title = "This work has been deleted",
@@ -32,7 +32,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexName, itemType, server: EmbeddedHttpServer) =>
         // Start by indexing a work with visible=false.
         val deletedWork = workWith(
           canonicalId = "gze7bc24",
@@ -100,7 +100,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "r8dx6std",
           title = "A deleted dodo"

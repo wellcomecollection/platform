@@ -18,7 +18,7 @@ class WorksServiceTest
 
   val itemType = "work"
 
-  it("should return the records in Elasticsearch") {
+  it("gets records in Elasticsearch") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
@@ -37,7 +37,7 @@ class WorksServiceTest
     }
   }
 
-  it("should get a DisplayWork by id") {
+  it("gets a DisplayWork by id") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
@@ -47,7 +47,10 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
             val recordsFuture =
-              worksService.findWorkById(works.head.canonicalId)
+              worksService.findWorkById(
+                canonicalId = works.head.canonicalId,
+                indexName = indexName
+              )
 
             whenReady(recordsFuture) { records =>
               records.isDefined shouldBe true
@@ -58,7 +61,7 @@ class WorksServiceTest
     }
   }
 
-  it("should only find results that match a query if doing a full-text search") {
+  it("only finds results that match a query if doing a full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
@@ -74,13 +77,20 @@ class WorksServiceTest
 
             insertIntoElasticsearch(indexName, itemType, workDodo, workMouse)
 
-            val searchForCat = worksService.searchWorks("cat")
+            val searchForCat = worksService.searchWorks(
+              query = "cat",
+              indexName = indexName
+            )
 
             whenReady(searchForCat) { works =>
               works.results should have size 0
             }
 
-            val searchForDodo = worksService.searchWorks("dodo")
+            val searchForDodo = worksService.searchWorks(
+              query = "dodo",
+              indexName = indexName
+            )
+
             whenReady(searchForDodo) { works =>
               works.results should have size 1
               works.results.head shouldBe workDodo
@@ -90,12 +100,15 @@ class WorksServiceTest
     }
   }
 
-  it("should return a future of None if it cannot get a record by id") {
+  it("returns a future of None if it cannot get a record by id") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val recordsFuture = worksService.findWorkById("1234")
+            val recordsFuture = worksService.findWorkById(
+              canonicalId = "1234",
+              indexName = indexName
+            )
 
             whenReady(recordsFuture) { record =>
               record shouldBe None
@@ -105,7 +118,7 @@ class WorksServiceTest
     }
   }
 
-  it("should return 0 pages when no results are available") {
+  it("returns 0 pages when no results are available") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
@@ -122,8 +135,7 @@ class WorksServiceTest
     }
   }
 
-  it(
-    "should return an empty result set when asked for a page that does not exist") {
+  it("returns an empty result set when asked for a page that does not exist") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
@@ -146,12 +158,12 @@ class WorksServiceTest
     }
   }
 
-  it(
-    "should not throw an exception if passed an invalid query string for full-text search") {
+  it("throws an exception if passed an invalid query string for full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
+
             val workEmu = workWith(
               canonicalId = "1234",
               title = "An etching of an emu"
@@ -159,7 +171,8 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, workEmu)
 
             val searchForEmu = worksService.searchWorks(
-              "emu \"unmatched quotes are a lexical error in the Elasticsearch parser"
+              query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser",
+              indexName = indexName
             )
 
             whenReady(searchForEmu) { works =>

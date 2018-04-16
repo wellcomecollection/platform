@@ -17,10 +17,10 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
 
   def findWorkById(
-    canonicalId: String,
-    index: Option[String] = None): Future[Option[IdentifiedWork]] =
+                    canonicalId: String,
+                    indexName: String): Future[Option[IdentifiedWork]] =
     searchService
-      .findResultById(canonicalId, index = index)
+      .findResultById(canonicalId, indexName = indexName)
       .map { result =>
         if (result.exists)
           Some(jsonToIdentifiedWork(result.sourceAsString))
@@ -47,15 +47,15 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
       }
 
   def searchWorks(query: String,
+                  indexName: String,
                   pageSize: Int = defaultPageSize,
-                  pageNumber: Int = 1,
-                  index: Option[String] = None): Future[ResultList] =
+                  pageNumber: Int = 1): Future[ResultList] =
     searchService
       .simpleStringQueryResults(
         query,
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
-        index = index
+        indexName = indexName
       )
       .map { searchResponse =>
         ResultList(

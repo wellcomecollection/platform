@@ -35,7 +35,9 @@ class Server extends HttpServer {
     default = "/" + apiName(),
     help = "API path prefix")
 
-  flag[String](name = "es.index", default = "records", help = "ES index name")
+  flag[String](name = "es.index.v1", help = "V1 ES index name")
+  flag[String](name = "es.index.v2", help = "V2 ES index name")
+
   flag[String](name = "es.type", default = "item", help = "ES document type")
   flag(
     name = "api.context.suffix",
