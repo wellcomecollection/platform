@@ -49,7 +49,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       s3inputStream <- Future {
         s3Client
           .getObject(
-            conversionJob.sourceBucketName,
+            conversionJob.privateBucketName,
             conversionJob.sourceObjectKey)
           .getObjectContent
       }
