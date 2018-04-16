@@ -75,7 +75,7 @@ class SnapshotConvertorFeatureTest
             val conversionJob = ConversionJob(
               privateBucketName = privateBucket.name,
               privateObjectKey = objectKey,
-              targetBucketName = targetBucket.name,
+              publicBucketName = targetBucket.name,
               targetObjectKey = targetObjectKey
             )
 
