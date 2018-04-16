@@ -47,7 +47,11 @@ def does_file_affect_build_task(path, task):
         raise IgnoredFileFormat()
 
     # These paths never have an effect on tests.
-    if path in ['LICENSE', ] or path.startswith(('misc/', 'ontologies/')):
+    if path in [
+        'LICENSE',
+        '.travis.yml',
+        'run_travis_task.py',
+    ] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath()
 
     # Some directories only affect one task.
