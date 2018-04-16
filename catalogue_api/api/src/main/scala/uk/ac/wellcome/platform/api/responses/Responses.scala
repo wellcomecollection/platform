@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.api.responses
 import com.fasterxml.jackson.annotation.{JsonProperty, JsonUnwrapped}
 import uk.ac.wellcome.display.models.DisplayWork
 import uk.ac.wellcome.platform.api.models.DisplayResultList
-import uk.ac.wellcome.platform.api.requests.{ApiRequest, MultipleResultsRequest}
+import uk.ac.wellcome.platform.api.requests.{
+  ApiRequest,
+  MultipleResultsRequest
+}
 
 import scala.language.existentials
 

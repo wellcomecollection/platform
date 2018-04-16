@@ -10,16 +10,21 @@ import uk.ac.wellcome.versions.ApiVersions
 
 import scala.collection.JavaConversions._
 
-class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with PropertyChecks {
+class ApiSwaggerTest
+    extends FunSpec
+    with Matchers
+    with fixtures.Server
+    with PropertyChecks {
 
   it("returns a valid JSON response for all api versions") {
-    forAll {version: ApiVersions.Value =>
+    forAll { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
 
       tree.at("/host").toString should be("\"test.host\"")
       tree.at("/schemes").toString should be("[\"http\"]")
       tree.at("/info/version").toString should be(s""""${version.toString}"""")
-      tree.at("/basePath").toString should be(s""""/test/${version.toString}"""")
+      tree.at("/basePath").toString should be(
+        s""""/test/${version.toString}"""")
     }
   }
 
@@ -34,30 +39,39 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with Pro
     forAll { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
       tree.at("/paths").isObject shouldBe true
-      tree.at("/paths").fieldNames.toList should contain only ("/works", "/works/{id}")
+      tree
+        .at("/paths")
+        .fieldNames
+        .toList should contain only ("/works", "/works/{id}")
     }
   }
 
   it("shows the correct Work model for v1") {
-      val tree = readTree(s"/test/${ApiVersions.v1.toString}/swagger.json")
-      tree.at("/definitions/Work").isObject shouldBe true
-      tree.at("/definitions/Work/properties/creators/type").toString shouldBe "\"array\""
+    val tree = readTree(s"/test/${ApiVersions.v1.toString}/swagger.json")
+    tree.at("/definitions/Work").isObject shouldBe true
+    tree
+      .at("/definitions/Work/properties/creators/type")
+      .toString shouldBe "\"array\""
   }
 
   it("shows the correct Work model for v2") {
-      val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
-      tree.at("/definitions/Work").isObject shouldBe true
-      tree.at("/definitions/Work/properties/contributors/type").toString shouldBe "\"array\""
+    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    tree.at("/definitions/Work").isObject shouldBe true
+    tree
+      .at("/definitions/Work/properties/contributors/type")
+      .toString shouldBe "\"array\""
   }
 
   it("doesn't show DisplayWork in the definitions") {
-      val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
-      tree.at("/definitions").fieldNames.toList shouldNot contain ("DisplayWork")
+    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    tree.at("/definitions").fieldNames.toList shouldNot contain("DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {
-      val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
-      tree.at(s"/definitions/ResultList/properties/results/items/$$ref").toString shouldBe "\"#/definitions/Work\""
+    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    tree
+      .at(s"/definitions/ResultList/properties/results/items/$$ref")
+      .toString shouldBe "\"#/definitions/Work\""
   }
 
   def readTree(path: String): JsonNode = {

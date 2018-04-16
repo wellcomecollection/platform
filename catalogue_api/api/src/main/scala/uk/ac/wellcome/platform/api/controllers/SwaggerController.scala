@@ -23,13 +23,20 @@ class SwaggerController @Inject()(
     setupSwaggerEndpoint(ApiVersions.v2, ApiV2Swagger)
   }
 
-  private def setupSwaggerEndpoint(version: ApiVersions.Value, swagger: Swagger): Unit = {
+  private def setupSwaggerEndpoint(version: ApiVersions.Value,
+                                   swagger: Swagger): Unit = {
     get(s"/$version/swagger.json") { request: Request =>
-      response.ok.json(Json.mapper.writeValueAsString(buildSwagger(swagger, apiScheme, apiHost, apiPrefix, version)))
+      response.ok.json(
+        Json.mapper.writeValueAsString(
+          buildSwagger(swagger, apiScheme, apiHost, apiPrefix, version)))
     }
   }
 
-  private def buildSwagger(swagger: Swagger, apiScheme: String, apiHost: String, apiPrefix: String, apiVersion:ApiVersions.Value): Swagger = {
+  private def buildSwagger(swagger: Swagger,
+                           apiScheme: String,
+                           apiHost: String,
+                           apiPrefix: String,
+                           apiVersion: ApiVersions.Value): Swagger = {
     val scheme = apiScheme match {
       case "https" => Scheme.HTTPS
       case _ => Scheme.HTTP

@@ -12,16 +12,18 @@ case class DisplayResultList[T <: DisplayWork](
   @ApiModelProperty(value = "Number of things returned per page") pageSize: Int,
   @ApiModelProperty(value = "Total number of pages in the result list") totalPages: Int,
   @ApiModelProperty(value = "Total number of results in the result list") totalResults: Int,
-  @ApiModelProperty(value = "List of things in the current page") results: List[T]) {
+  @ApiModelProperty(value = "List of things in the current page") results: List[
+    T]) {
   @ApiModelProperty(name = "type", value = "A type of thing", readOnly = true)
   val ontologyType: String = "ResultList"
 }
 
 case object DisplayResultList {
-  def apply[T <: DisplayWork](resultList: ResultList,
-                              toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
-                              pageSize: Int,
-                              includes: WorksIncludes): DisplayResultList[T] =
+  def apply[T <: DisplayWork](
+    resultList: ResultList,
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
+    pageSize: Int,
+    includes: WorksIncludes): DisplayResultList[T] =
     DisplayResultList(
       results = resultList.results.map { toDisplayWork(_, includes) },
       pageSize = pageSize,
