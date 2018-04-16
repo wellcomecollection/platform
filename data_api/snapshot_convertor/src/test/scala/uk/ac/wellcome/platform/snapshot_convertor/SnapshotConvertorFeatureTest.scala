@@ -43,7 +43,7 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queue, topic), privateBucket), targetBucket) =>
+      case (((queue, topic), privateBucket), publicBucket) =>
         val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
           privateBucket)
 
@@ -75,7 +75,7 @@ class SnapshotConvertorFeatureTest
             val conversionJob = ConversionJob(
               privateBucketName = privateBucket.name,
               privateObjectKey = objectKey,
-              publicBucketName = targetBucket.name,
+              publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey
             )
 
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucket.name, publicObjectKey),
+                new GetObjectRequest(publicBucket.name, publicObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -127,7 +127,7 @@ class SnapshotConvertorFeatureTest
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
+                  s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

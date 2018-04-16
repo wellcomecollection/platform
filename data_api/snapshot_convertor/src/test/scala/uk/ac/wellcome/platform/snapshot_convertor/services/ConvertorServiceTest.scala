@@ -70,7 +70,7 @@ class ConvertorServiceTest
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
-          targetBucket) =>
+          publicBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val visibleWorks = (1 to 3).map { version =>
@@ -112,7 +112,7 @@ class ConvertorServiceTest
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
-            publicBucketName = targetBucket.name,
+            publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey
           )
 
@@ -122,7 +122,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, publicObjectKey),
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -140,7 +140,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -164,7 +164,7 @@ class ConvertorServiceTest
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
-          targetBucket) =>
+          publicBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
         // which they can be gzip-compressed -- so we can cross the
@@ -199,7 +199,7 @@ class ConvertorServiceTest
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
-            publicBucketName = targetBucket.name,
+            publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey
           )
 
@@ -209,7 +209,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, publicObjectKey),
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -227,7 +227,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -238,11 +238,11 @@ class ConvertorServiceTest
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
-          targetBucket) =>
+          publicBucket) =>
         val conversionJob = ConversionJob(
           privateBucketName = privateBucket.name,
           privateObjectKey = "doesnotexist.txt.gz",
-          publicBucketName = targetBucket.name,
+          publicBucketName = publicBucket.name,
           publicObjectKey = "target.txt.gz"
         )
 
@@ -258,14 +258,14 @@ class ConvertorServiceTest
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
-          targetBucket) =>
+          publicBucket) =>
         withGzipCompressedS3Key(
           privateBucket,
           content = "This is not what snapshots look like") { objectKey =>
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
-            publicBucketName = targetBucket.name,
+            publicBucketName = publicBucket.name,
             publicObjectKey = "target.txt.gz"
           )
 
@@ -282,7 +282,7 @@ class ConvertorServiceTest
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
-          targetBucket) =>
+          publicBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val works = (1 to 3).map { version =>
