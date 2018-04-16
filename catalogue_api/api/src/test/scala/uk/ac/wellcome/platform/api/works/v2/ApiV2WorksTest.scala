@@ -4,6 +4,7 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
+import uk.ac.wellcome.versions.ApiVersions
 
 class ApiV2WorksTest extends ApiWorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)

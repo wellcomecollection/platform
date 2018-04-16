@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{ApiVersions, IdentifiedWork}
+import uk.ac.wellcome.models.IdentifiedWork
 import org.scalacheck.ScalacheckShapeless._
+import uk.ac.wellcome.versions.ApiVersions
+
 import scala.collection.JavaConversions._
 
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with PropertyChecks {

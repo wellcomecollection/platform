@@ -2,8 +2,9 @@ package uk.ac.wellcome.platform.api.works.v1
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.models.{ApiVersions, IdentifiedWork}
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
+import uk.ac.wellcome.versions.ApiVersions
 
 class ApiV1WorksTestInvisible extends ApiWorksTestBase {
 
