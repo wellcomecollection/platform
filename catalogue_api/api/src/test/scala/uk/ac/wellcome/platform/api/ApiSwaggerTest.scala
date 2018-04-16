@@ -6,6 +6,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{ApiVersions, IdentifiedWork}
 import org.scalacheck.ScalacheckShapeless._
+import scala.collection.JavaConversions._
 
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with PropertyChecks {
 
@@ -24,6 +25,14 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server with Pro
     forAll { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
       tree.at("/definitions/Error/type").toString should be("\"object\"")
+    }
+  }
+
+  it("should show only the endpoints for the specified version") {
+    forAll { version: ApiVersions.Value =>
+      val tree = readTree(s"/test/${version.toString}/swagger.json")
+      tree.at("/paths").isObject shouldBe true
+      tree.at("/paths").fieldNames.toList should contain only ("/works", "/works/{id}")
     }
   }
 
