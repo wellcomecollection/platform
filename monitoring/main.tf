@@ -78,6 +78,7 @@ module "post_to_slack" {
   dlq_alarm_arn                                   = "${local.dlq_alarm_arn}"
   bitly_access_token                              = "${var.bitly_access_token}"
   ec2_instance_terminating_for_too_long_alarm_arn = "${local.ec2_instance_terminating_for_too_long_alarm_arn}"
+  cloudfront_errors_topic_arn                     = "${local.cloudfront_errors_topic_arn}"
 
   infra_bucket = "${var.infra_bucket}"
 }
