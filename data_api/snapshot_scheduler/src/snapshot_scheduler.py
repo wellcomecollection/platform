@@ -25,28 +25,34 @@ class SnapshotRequest(object):
 
 def main(event=None, _ctxt=None, sns_client=None):
     print(f'event = {event!r}')
+    print(os.environ)
     sns_client = sns_client or boto3.client('sns')
 
     topic_arn = os.environ['TOPIC_ARN']
-    print(f'topic_arn={topic_arn}')
 
-    bucket_name = os.environ['TARGET_BUCKET_NAME']
-    print(f'bucket_name={bucket_name}')
+    private_bucket_name = os.environ['PRIVATE_BUCKET_NAME']
 
-    es_index = os.environ['ES_INDEX']
-    print(f'es_index={es_index}')
+    es_index_v1 = os.environ['ES_INDEX_V1']
+    es_index_v2 = os.environ['ES_INDEX_V2']
 
-    snapshot_request_message = SnapshotRequest(
-        time=dt.datetime.utcnow().isoformat(),
-        private_bucket_name=bucket_name,
-        public_bucket_name='wellcomecollection-data-private',
-        public_object_key='catalogue/v1/works.json.gz'
-        es_index=es_index
-    )
+    public_object_key_v1 = os.environ['PUBLIC_OBJECT_KEY_V1']
+    public_object_key_v2 = os.environ['PUBLIC_OBJECT_KEY_V2']
 
-    publish_sns_message(
-        sns_client=sns_client,
-        topic_arn=topic_arn,
-        message=attr.asdict(snapshot_request_message),
-        subject='source: snapshot_generator.main'
-    )
+    for es_index, public_object_key in [
+        (es_index_v1, public_object_key_v1),
+        (es_index_v2, public_object_key_v2),
+    ]:
+        snapshot_request_message = SnapshotRequest(
+            time=dt.datetime.utcnow().isoformat(),
+            private_bucket_name=private_bucket_name,
+            public_bucket_name=public_bucket_name,
+            public_object_key=public_object_key
+            es_index=es_index
+        )
+
+        publish_sns_message(
+            sns_client=sns_client,
+            topic_arn=topic_arn,
+            message=attr.asdict(snapshot_request_message),
+            subject='source: snapshot_scheduler.main'
+        )
