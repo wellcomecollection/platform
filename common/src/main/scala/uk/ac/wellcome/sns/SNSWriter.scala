@@ -11,8 +11,8 @@ import com.amazonaws.services.s3.AmazonS3
 import java.util.UUID.randomUUID
 
 import scala.concurrent.{blocking, Future}
-
-case class PublishAttempt(id: String, key: String)
+import uk.ac.wellcome.utils.JsonUtil._
+import scala.util.{Failure, Success, Try}
 
 class SNSWriter @Inject()(
   client: AmazonSNS,
@@ -21,40 +21,46 @@ class SNSWriter @Inject()(
   s3Config: S3Config
 ) extends Logging {
 
+  private val arn = config.topicArn
+  private val bucket = s3Config.bucketName
+
   def writeMessage(
     message: String,
-    subject: String): Future[Either[Throwable, PublishAttempt]] = {
+    subject: String): Future[Unit] = {
 
     val contentId = randomUUID.toString
     // TODO make key prefix configurable
     val key = s"messages/$contentId"
 
-    (for {
+    for {
       _ <- eventuallyStoreMessage(message, key)
-      publishResult <- eventuallyPublishMessagePointer(subject)
+      pointer <- toFuture(toJson(MessagePointer(s"s3://$bucket/$key")))
+      publishResult <- eventuallyPublishMessagePointer(pointer, subject, key)
     } yield {
       info(s"Published message ${publishResult.getMessageId}")
-      Right(PublishAttempt(publishResult.getMessageId, key))
-    }) recover {
-      case e: Throwable => Left(e)
+      ()
     }
 
   }
 
   private def eventuallyStoreMessage(message: String, key: String) = Future {
     blocking {
-      debug(s"storing message s3://${s3Config.bucketName}/$key")
-      s3Client.putObject(s3Config.bucketName, key, message)
+      debug(s"storing message s3://$bucket/$key")
+      s3Client.putObject(bucket, key, message)
     }
   }
 
-  private def eventuallyPublishMessagePointer(subject: String) = Future {
+  private def eventuallyPublishMessagePointer(message: String, subject: String, key: String) = Future {
     blocking {
-      debug(s"publishing message to SNS topic ${config.topicArn}")
-      val request =
-        new PublishRequest(config.topicArn, s3Config.bucketName, subject)
+      debug(s"publishing message to SNS topic $arn")
+      val request = new PublishRequest(arn, message, subject)
       client.publish(request)
     }
+  }
+
+  private def toFuture[T](t: Try[T]): Future[T] = t match {
+    case Success(value) => Future.successful(value)
+    case Failure(ex) => Future.failed(ex)
   }
 
 }

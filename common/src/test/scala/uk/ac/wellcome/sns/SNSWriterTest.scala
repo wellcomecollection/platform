@@ -1,11 +1,14 @@
 package uk.ac.wellcome.sns
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest._
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.models.aws.S3Config
 import org.scalatest.EitherValues
+import uk.ac.wellcome.s3.S3Uri
+import uk.ac.wellcome.utils.JsonUtil._
+import scala.util.Success
 
 class SNSWriterTest
     extends FunSpec
@@ -14,7 +17,7 @@ class SNSWriterTest
     with SNS
     with S3
     with IntegrationPatience
-    with EitherValues {
+    with Inside {
 
   it(
     "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
@@ -28,15 +31,18 @@ class SNSWriterTest
 
         val eventualAttempt = snsWriter.writeMessage(message, subject)
 
-        whenReady(eventualAttempt) { publishAttempt =>
+        whenReady(eventualAttempt) { pointer =>
           val messages = listMessagesReceivedFromSNS(topic)
           messages should have size (1)
-          messages.head.message shouldBe bucket.name
           messages.head.subject shouldBe subject
-          publishAttempt.right.value.id should be(messages.head.messageId)
 
-          getContentFromS3(bucket, publishAttempt.right.value.key) should be(
-            message)
+          val pointer = fromJson[MessagePointer](messages.head.message)
+
+          inside(pointer) {
+            case Success(MessagePointer(S3Uri(bucketName, _))) => bucketName shouldBe bucket.name
+          }
+
+          getContentFromS3(bucket) should contain (message)
         }
       }
     }
@@ -54,8 +60,8 @@ class SNSWriterTest
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
-      whenReady(eventualAttempt) { publishAttempt =>
-        publishAttempt.isLeft should be(true)
+      whenReady(eventualAttempt.failed) { ex =>
+        ex shouldBe a [Throwable]
       }
     }
   }
@@ -68,8 +74,8 @@ class SNSWriterTest
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
-      whenReady(eventualAttempt) { publishAttempt =>
-        publishAttempt.isLeft should be(true)
+      whenReady(eventualAttempt.failed) { ex =>
+        ex shouldBe a [Throwable]
       }
     }
   }
@@ -82,9 +88,10 @@ class SNSWriterTest
 
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
-      whenReady(eventualAttempt) { publishAttempt =>
+      whenReady(eventualAttempt.failed) { _ =>
         listMessagesReceivedFromSNS(topic) should be('empty)
       }
     }
   }
+
 }

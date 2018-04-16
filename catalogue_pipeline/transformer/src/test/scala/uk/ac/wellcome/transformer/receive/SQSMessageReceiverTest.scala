@@ -20,7 +20,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS, TestWith}
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -299,8 +299,8 @@ class SQSMessageReceiverTest
 
   private def mockSNSWriter = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(Future.successful(Right(PublishAttempt("1234", "5678"))))
+    val result: Future[Unit] = Future.successful(Unit)
+    when(mockSNS.writeMessage(anyString(), anyString())).thenReturn(result)
     mockSNS
   }
 
@@ -308,8 +308,7 @@ class SQSMessageReceiverTest
     val mockSNS = mock[SNSWriter]
     when(mockSNS.writeMessage(anyString(), any[String]))
       .thenReturn(
-        Future.successful(
-          Left(new RuntimeException("Failed publishing message"))))
+        Future.failed(new RuntimeException("Failed publishing message")))
     mockSNS
   }
 }

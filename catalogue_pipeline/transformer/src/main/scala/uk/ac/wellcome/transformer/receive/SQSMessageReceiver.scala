@@ -15,7 +15,7 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.s3.S3ObjectStore
-import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.transformer.transformers.{
   CalmTransformableTransformer,
@@ -100,23 +100,14 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     }
   }
 
-  private def toOption[R](either: Either[Throwable, R]): Option[R] =
-    either match {
-      case Right(value) => Some(value)
-      case Left(ex) => {
-        logger.error("error sending transform message", ex)
-        None
-      }
-    }
-
-  private def publishMessage(
-    maybeWork: Option[UnidentifiedWork]): Future[Option[PublishAttempt]] =
-    maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
-      snsWriter
-        .writeMessage(
-          message = toJson(work).get,
-          subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
-        )
-        .map { toOption(_) }
-    }
+  private def publishMessage(maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+    Future.successful {
+      maybeWork.map { work =>
+        snsWriter
+          .writeMessage(
+            message = toJson(work).get,
+            subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
+          )
+      }.getOrElse(Unit)
+  }
 }
