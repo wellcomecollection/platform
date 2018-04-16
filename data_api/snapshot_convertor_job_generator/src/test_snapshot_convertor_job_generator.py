@@ -35,8 +35,8 @@ def test_snapshot_convertor_job_generator_sends_message_for_object_created_event
     event_name = "ObjectCreated:CompleteMultipartUpload"
 
     os.environ.update({
-        'TARGET_BUCKET_NAME': public_bucket_name,
-        'TARGET_OBJECT_KEY': public_object_key
+        'PUBLIC_BUCKET_NAME': public_bucket_name,
+        'PUBLIC_OBJECT_KEY': public_object_key
     })
 
     event = createS3Event(
