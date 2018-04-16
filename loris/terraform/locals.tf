@@ -1,7 +1,4 @@
 locals {
-  vpc_api_subnets = "${data.terraform_remote_state.catalogue_api.vpc_api_subnets}"
-  vpc_api_id      = "${data.terraform_remote_state.catalogue_api.vpc_api_id}"
-
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
   ec2_terminating_topic_arn                       = "${data.terraform_remote_state.shared_infra.ec2_terminating_topic_arn}"
