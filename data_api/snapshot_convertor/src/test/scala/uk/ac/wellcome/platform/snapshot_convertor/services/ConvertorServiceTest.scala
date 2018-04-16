@@ -111,7 +111,7 @@ class ConvertorServiceTest
 
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
-            sourceObjectKey = objectKey,
+            privateObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
           )
@@ -198,7 +198,7 @@ class ConvertorServiceTest
           val targetObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
-            sourceObjectKey = objectKey,
+            privateObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
           )
@@ -241,7 +241,7 @@ class ConvertorServiceTest
           targetBucket) =>
         val conversionJob = ConversionJob(
           privateBucketName = privateBucket.name,
-          sourceObjectKey = "doesnotexist.txt.gz",
+          privateObjectKey = "doesnotexist.txt.gz",
           targetBucketName = targetBucket.name,
           targetObjectKey = "target.txt.gz"
         )
@@ -264,7 +264,7 @@ class ConvertorServiceTest
           content = "This is not what snapshots look like") { objectKey =>
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
-            sourceObjectKey = objectKey,
+            privateObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = "target.txt.gz"
           )
@@ -307,7 +307,7 @@ class ConvertorServiceTest
         val bucketName = "wrongBukkit"
         val conversionJob = ConversionJob(
           privateBucketName = bucketName,
-          sourceObjectKey = "wrongKey",
+          privateObjectKey = "wrongKey",
           targetBucketName = bucketName,
           targetObjectKey = "target.json.gz"
         )

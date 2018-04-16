@@ -74,7 +74,7 @@ class SnapshotConvertorFeatureTest
           withGzipCompressedS3Key(privateBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
               privateBucketName = privateBucket.name,
-              sourceObjectKey = objectKey,
+              privateObjectKey = objectKey,
               targetBucketName = targetBucket.name,
               targetObjectKey = targetObjectKey
             )

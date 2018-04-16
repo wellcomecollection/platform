@@ -50,7 +50,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
         s3Client
           .getObject(
             conversionJob.privateBucketName,
-            conversionJob.sourceObjectKey)
+            conversionJob.privateObjectKey)
           .getObjectContent
       }
 
