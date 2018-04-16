@@ -8,10 +8,7 @@ import uk.ac.wellcome.versions.ApiVersions
 
 import scala.collection.JavaConversions._
 
-class ApiSwaggerTest
-    extends FunSpec
-    with Matchers
-    with fixtures.Server {
+class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   it("returns a valid JSON response for all api versions") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
