@@ -39,10 +39,11 @@ class SNSWriterTest
           val pointer = fromJson[MessagePointer](messages.head.message)
 
           inside(pointer) {
-            case Success(MessagePointer(S3Uri(bucketName, _))) => bucketName shouldBe bucket.name
+            case Success(MessagePointer(S3Uri(bucketName, _))) =>
+              bucketName shouldBe bucket.name
           }
 
-          getContentFromS3(bucket) should contain (message)
+          getContentFromS3(bucket) should contain(message)
         }
       }
     }
@@ -61,7 +62,7 @@ class SNSWriterTest
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
       whenReady(eventualAttempt.failed) { ex =>
-        ex shouldBe a [Throwable]
+        ex shouldBe a[Throwable]
       }
     }
   }
@@ -75,7 +76,7 @@ class SNSWriterTest
       val eventualAttempt = snsWriter.writeMessage("someMessage", "subject")
 
       whenReady(eventualAttempt.failed) { ex =>
-        ex shouldBe a [Throwable]
+        ex shouldBe a[Throwable]
       }
     }
   }

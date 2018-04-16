@@ -9,13 +9,13 @@ class S3UriTest extends FunSpec with Matchers with Inside {
 
   it("should match S3 URI bucket name") {
     inside(s3Uri) {
-      case S3Uri(bucket, _) => bucket should be ("bucket")
+      case S3Uri(bucket, _) => bucket should be("bucket")
     }
   }
 
   it("should match S3 URI object key") {
     inside(s3Uri) {
-      case S3Uri(_, key) => key should be ("key")
+      case S3Uri(_, key) => key should be("key")
     }
   }
 

@@ -10,11 +10,11 @@ object MessagePointer {
 
   def apply(uri: String): MessagePointer = MessagePointer(new URI(uri))
 
-  implicit val encoder = Encoder.instance[MessagePointer]{ pointer =>
+  implicit val encoder = Encoder.instance[MessagePointer] { pointer =>
     Json.obj(("src", Json.fromString(pointer.src.toString)))
   }
 
-  implicit val decoder = Decoder.instance[MessagePointer]{ cursor =>
+  implicit val decoder = Decoder.instance[MessagePointer] { cursor =>
     for {
       src <- cursor.downField("src").as[String]
     } yield {

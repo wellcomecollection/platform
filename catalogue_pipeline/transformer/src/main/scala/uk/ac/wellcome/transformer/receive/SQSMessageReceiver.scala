@@ -100,14 +100,18 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
     }
   }
 
-  private def publishMessage(maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+  private def publishMessage(
+    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
     Future.successful {
-      maybeWork.map { work =>
-        snsWriter
-          .writeMessage(
-            message = toJson(work).get,
-            subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
-          )
-      }.getOrElse(Unit)
-  }
+      maybeWork
+        .map { work =>
+          snsWriter
+            .writeMessage(
+              message = toJson(work).get,
+              subject =
+                s"source: ${this.getClass.getSimpleName}.publishMessage"
+            )
+        }
+        .getOrElse(Unit)
+    }
 }
