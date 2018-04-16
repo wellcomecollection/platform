@@ -11,12 +11,16 @@ How we decide what to build:
    ---------------+------------------+---------------------
     pull request  | Run tests        | Don't run tests
                   | Don't deploy     | Don't deploy
-   ---------------+------------------+---------------------
-    master        | Run tests        | Run tests
-                  | Deploy to AWS    | Don't deploy
+   ---------------+------------------+
+    master        | Run tests        |
+                  | Deploy to AWS    |
+    --------------+------------------+---------------------
+    cron          | Always run tests
+                  | Never deploy to AWS
 
-We always run tests on master so we get consistent build results, that's
-less important on master where results are transient.
+We run a full test suite in the cron tests so that even if we think a file
+that has no relevant changes actually affects the tests, we still get
+notice fairly quickly of the problem in master.
 
 """
 
@@ -109,6 +113,9 @@ def main():
         make(publish_task)
     else:
         print("*** We don't need to run the publish task")
+
+        # Doing a --dry-run checks that the associated publish task exists,
+        # which protects us from merging a branch with no publish task.
         make(publish_task, '--dry-run')
 
     return 0
