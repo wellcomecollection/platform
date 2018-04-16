@@ -90,6 +90,15 @@ def does_file_affect_build_task(path, task):
                 else:
                     raise ScalaChangeAndNotScalaApp()
 
+    # Changes made in the travistooling directory only ever affect the
+    # travistooling tests (but they're not defined in a Makefile).
+    # Check and skip here if possible.
+    if path.startswith('travistooling/'):
+        if task == 'travistooling-test':
+            raise ExclusivelyAffectsThisTask()
+        else:
+            raise ExclusivelyAffectsAnotherTask('travistooling-test')
+
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
     raise UnrecognisedFile()

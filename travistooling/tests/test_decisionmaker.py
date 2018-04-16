@@ -66,6 +66,10 @@ from travistooling.decisions import (
     # a -publish task.
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
+
+    # Changes to travistooling only trigger the travistooling tests
+    ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
+    ('travistooling/decisionmaker.py', 'loris-test', ExclusivelyAffectsAnotherTask, False),
 ])
 def test_does_file_affect_build_task(path, task, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
