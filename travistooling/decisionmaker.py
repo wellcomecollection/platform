@@ -99,6 +99,13 @@ def does_file_affect_build_task(path, task):
         else:
             raise ExclusivelyAffectsAnotherTask('travistooling-test')
 
+    # This script is only used in the travis-format task.
+    if path == 'run_autoformat.py':
+        if task == 'travis-format':
+            raise ExclusivelyAffectsAnotherTask()
+        else:
+            raise ExclusivelyAffectsAnotherTask('travis-format')
+
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
     raise UnrecognisedFile()
