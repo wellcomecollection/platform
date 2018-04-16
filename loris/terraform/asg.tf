@@ -1,11 +1,11 @@
 module "loris_cluster_asg" {
   source                = "git::https://github.com/wellcometrust/terraform.git//ecs_asg?ref=v1.0.0"
   asg_name              = "loris-cluster"
-  subnet_list           = ["${local.vpc_api_subnets}"]
+  subnet_list           = ["${module.vpc_loris.subnets}"]
   key_name              = "${var.key_name}"
   instance_profile_name = "${module.ecs_loris_iam.instance_profile_name}"
   user_data             = "${module.loris_userdata.rendered}"
-  vpc_id                = "${local.vpc_api_id}"
+  vpc_id                = "${module.vpc_loris.vpc_id}"
 
   asg_desired = "4"
   asg_max     = "4"

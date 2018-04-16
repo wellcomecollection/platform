@@ -2,7 +2,7 @@ module "loris" {
   source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.1"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
-  vpc_id             = "${local.vpc_api_id}"
+  vpc_id             = "${module.vpc_loris.vpc_id}"
   app_uri            = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"
   nginx_uri          = "${module.ecr_nginx_loris.repository_url}:${var.release_ids["nginx_loris"]}"
   listener_https_arn = "${module.loris_alb.listener_https_arn}"
