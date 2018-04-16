@@ -168,5 +168,5 @@ def test_end_to_end(
         'sourceBucketName': bucket,
         'sourceObjectKey': 'blah/dump.txt.gz',
         'targetBucketName': 'public-bukkit',
-        'targetObjectKey': 'target.txt.gz',
+        'targetObjectKey': 'catalogue/v1/works.json.gz',
     }
