@@ -123,7 +123,7 @@ def sqs_endpoint_url(docker_services, docker_ip):
 
 
 @pytest.fixture(scope='session')
-def sqs_client(sqs_endpoint_url, docker_services, docker_ip):
+def sqs_client(sqs_endpoint_url, docker_services):
     docker_services.wait_until_responsive(
         timeout=45.0, pause=0.1,
         check=_is_responsive(sqs_endpoint_url, lambda r: r.status_code == 404)
@@ -135,21 +135,22 @@ def sqs_client(sqs_endpoint_url, docker_services, docker_ip):
 
 
 @pytest.fixture(scope='session')
-def sns_client(docker_services, docker_ip):
-    endpoint_url = (
-        f'http://{docker_ip}:{docker_services.port_for("sns", 9292)}'
-    )
+def sns_endpoint_url(docker_services, docker_ip):
+    return f'http://{docker_ip}:{docker_services.port_for("sns", 9292)}'
 
+
+@pytest.fixture(scope='session')
+def sns_client(sns_endpoint_url, docker_services):
     docker_services.wait_until_responsive(
         timeout=5.0, pause=0.1,
-        check=_is_responsive(endpoint_url, lambda r: r.status_code == 200)
+        check=_is_responsive(sns_endpoint_url, lambda r: r.status_code == 200)
     )
 
     client = boto3.client(
         'sns',
         aws_access_key_id='testAccessKey',
         aws_secret_access_key='testSecretAccessKey',
-        endpoint_url=endpoint_url
+        endpoint_url=sns_endpoint_url
     )
 
     # This is a sample returned by the fake-sns implementation:

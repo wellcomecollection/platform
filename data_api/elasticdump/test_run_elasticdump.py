@@ -89,6 +89,7 @@ def test_end_to_end(
         topic_arn,
         sqs_endpoint_url,
         s3_endpoint_url,
+        sns_endpoint_url,
         elasticsearch_index,
         elasticsearch_url,
         elasticsearch_hostname
@@ -135,6 +136,9 @@ def test_end_to_end(
 
         '--env', f'local_s3_endpoint={s3_endpoint_url}',
         '--env', f'local_sqs_endpoint={sqs_endpoint_url}',
+        '--env', f'local_sns_endpoint={sns_endpoint_url}',
+
+        '--env', f'TOPIC_ARN={topic_arn}',
         '--env', f'es_username=elastic',
         '--env', f'es_password=changeme',
         '--env', f'es_hostname={elasticsearch_hostname}',

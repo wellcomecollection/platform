@@ -83,6 +83,7 @@ def run():
 
     s3_client = aws_client('s3')
     sqs_client = aws_client('sqs')
+    sns_client = aws_client('sns')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
@@ -129,12 +130,13 @@ def run():
 
     print(f'*** Uploading gzip file to S3 with key {private_object_key}')
     s3_client.upload_file(
-        Bucket=snapshot_request.target_bucket_name,
+        Bucket=snapshot_request.private_bucket_name,
         Key=private_object_key,
         Filename='index.txt.gz'
     )
 
-    sns_client.publish(
+    print(f'*** Sending a job notification to SNS')
+    resp = sns_client.publish(
         TopicArn=topic_arn,
         MessageStructure='json',
         Message=json.dumps({
