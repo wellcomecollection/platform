@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.api.works
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.prop.PropertyChecks
-import uk.ac.wellcome.models.ApiVersions
 import org.scalacheck.ScalacheckShapeless._
+import uk.ac.wellcome.versions.ApiVersions
 
 class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 

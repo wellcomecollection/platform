@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.api.finatra
 
 import com.twitter.finagle.http.Request
-import uk.ac.wellcome.models.ApiVersions
+import uk.ac.wellcome.versions.ApiVersions
 
 package object exceptions {
   // Shitty workaround to the fact that ExceptionMapper.toResponse method only allows

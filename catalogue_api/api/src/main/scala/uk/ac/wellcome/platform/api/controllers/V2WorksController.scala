@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.api.controllers
 import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.models.ApiVersions
 import uk.ac.wellcome.platform.api.services.WorksService
+import uk.ac.wellcome.versions.ApiVersions
 
 @Singleton
 class V2WorksController @Inject()(

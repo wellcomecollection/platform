@@ -9,6 +9,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.Server
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.versions.ApiVersions
 
 trait ApiWorksTestBase
     extends FunSpec
