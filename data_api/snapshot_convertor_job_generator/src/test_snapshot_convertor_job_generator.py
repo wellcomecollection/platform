@@ -49,7 +49,7 @@ def test_snapshot_convertor_job_generator_sends_message_for_object_created_event
         "privateBucketName": source_bucket_name,
         "privateObjectKey": source_object_key,
         "publicBucketName": target_bucket_name,
-        "targetObjectKey": target_object_key
+        "publicObjectKey": target_object_key
     }
 
     _run(

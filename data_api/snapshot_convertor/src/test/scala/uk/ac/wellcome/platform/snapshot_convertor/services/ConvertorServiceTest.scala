@@ -107,13 +107,13 @@ class ConvertorServiceTest
         val content = elasticsearchJsons.mkString("\n")
 
         withGzipCompressedS3Key(privateBucket, content) { objectKey =>
-          val targetObjectKey = "target.txt.gz"
+          val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = targetBucket.name,
-            targetObjectKey = targetObjectKey
+            publicObjectKey = publicObjectKey
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -122,7 +122,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, targetObjectKey),
+              new GetObjectRequest(targetBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -140,7 +140,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -195,12 +195,12 @@ class ConvertorServiceTest
         gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
         withGzipCompressedS3Key(privateBucket, content) { objectKey =>
-          val targetObjectKey = "target.txt.gz"
+          val publicObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = targetBucket.name,
-            targetObjectKey = targetObjectKey
+            publicObjectKey = publicObjectKey
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -209,7 +209,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, targetObjectKey),
+              new GetObjectRequest(targetBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -227,7 +227,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -243,7 +243,7 @@ class ConvertorServiceTest
           privateBucketName = privateBucket.name,
           privateObjectKey = "doesnotexist.txt.gz",
           publicBucketName = targetBucket.name,
-          targetObjectKey = "target.txt.gz"
+          publicObjectKey = "target.txt.gz"
         )
 
         val future = convertorService.runConversion(conversionJob)
@@ -266,7 +266,7 @@ class ConvertorServiceTest
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = targetBucket.name,
-            targetObjectKey = "target.txt.gz"
+            publicObjectKey = "target.txt.gz"
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -309,7 +309,7 @@ class ConvertorServiceTest
           privateBucketName = bucketName,
           privateObjectKey = "wrongKey",
           publicBucketName = bucketName,
-          targetObjectKey = "target.json.gz"
+          publicObjectKey = "target.json.gz"
         )
 
         val future = convertorService.runConversion(conversionJob)
