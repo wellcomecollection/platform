@@ -56,3 +56,11 @@ module "trigger_post_to_slack_terminal_failure" {
   lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
   sns_trigger_arn      = "${var.terminal_failure_alarm_arn}"
 }
+
+module "trigger_cloudfront_errors" {
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+
+  lambda_function_name = "${module.lambda_post_to_slack.function_name}"
+  lambda_function_arn  = "${module.lambda_post_to_slack.arn}"
+  sns_trigger_arn      = "${var.cloudfront_errors_topic_arn}"
+}

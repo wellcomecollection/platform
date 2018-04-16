@@ -14,4 +14,6 @@ locals {
   ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
 
   terraform_apply_topic_name = "${data.terraform_remote_state.shared_infra.terraform_apply_topic_name}"
+
+  cloudfront_errors_topic_arn = "${data.terraform_remote_state.loris_cloudfront_monitoring.cloudfront_errors_topic_arn}"
 }
