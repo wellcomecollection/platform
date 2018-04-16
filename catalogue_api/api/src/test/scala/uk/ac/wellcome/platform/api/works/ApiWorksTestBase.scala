@@ -9,6 +9,7 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.Server
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.versions.ApiVersions
 
 trait ApiWorksTestBase
     extends FunSpec
@@ -44,7 +45,7 @@ trait ApiWorksTestBase
     }
   }
 
-  def withApiFixtures[R](apiVersion: String,
+  def withApiFixtures[R](apiVersion: ApiVersions.Value,
                          apiName: String = "catalogue/",
                          itemType: String = "work")(
     testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]) =

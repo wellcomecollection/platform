@@ -2,18 +2,13 @@ package uk.ac.wellcome.platform.api.controllers
 
 import com.github.xiaodongw.swagger.finatra.SwaggerSupport
 import com.twitter.finatra.http.Controller
-import com.twitter.inject.annotations.Flag
-import io.swagger.models.Operation
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
-import javax.inject.{Inject, Singleton}
-import uk.ac.wellcome.display.models.WorksIncludes
-import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import io.swagger.models.{Operation, Swagger}
+import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.{Error, IdentifiedWork}
-import uk.ac.wellcome.platform.api.ApiSwagger
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.DisplayError
-import uk.ac.wellcome.platform.api.models.v1.DisplayResultListV1
+import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{
   ResultListResponse,
@@ -21,21 +16,19 @@ import uk.ac.wellcome.platform.api.responses.{
 }
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.versions.ApiVersions
 
 import scala.collection.JavaConverters._
+import scala.reflect.runtime.universe.TypeTag
 
-@Singleton
-class WorksController @Inject()(
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.context.suffix") apiContextSuffix: String,
-  @Flag("api.host") apiHost: String,
-  @Flag("api.scheme") apiScheme: String,
-  @Flag("api.pageSize") defaultPageSize: Int,
-  worksService: WorksService)
+abstract class WorksController(apiPrefix: String,
+                               apiContextSuffix: String,
+                               apiHost: String,
+                               apiScheme: String,
+                               defaultPageSize: Int,
+                               worksService: WorksService)
     extends Controller
     with SwaggerSupport {
-
-  override implicit protected val swagger = ApiSwagger
 
   val includesSwaggerParam: QueryParameter = new QueryParameter()
     .name("includes")
@@ -45,26 +38,24 @@ class WorksController @Inject()(
     .collectionFormat("csv")
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
-  prefix(apiPrefix) {
-    setupResultListEndpoint("/v1", "/works")
-    setupSingleWorkEndpoint("/v1", "/works/:id")
-  }
-
-  private def setupResultListEndpoint(version: String,
-                                      endpointSuffix: String): Unit = {
-    getWithDoc(s"$version$endpointSuffix") { doc =>
-      setupResultListSwaggerDocs(s"$version$endpointSuffix", doc)
+  protected def setupResultListEndpoint[T <: DisplayWork](
+    version: ApiVersions.Value,
+    endpointSuffix: String,
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
+    implicit evidence: TypeTag[DisplayResultList[T]]): Unit = {
+    getWithDoc(s"$endpointSuffix") { doc =>
+      setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
 
       for {
         resultList <- getWorkList(request, pageSize)
-        displayResultList = DisplayResultListV1(
+        displayResultList = DisplayResultList(
           resultList = resultList,
+          toDisplayWork,
           pageSize = pageSize,
-          includes = includes
-        )
+          includes = includes)
       } yield
         ResultListResponse.create(
           buildContextUri(
@@ -80,10 +71,13 @@ class WorksController @Inject()(
     }
   }
 
-  private def setupSingleWorkEndpoint(version: String,
-                                      endpointSuffix: String): Unit = {
-    getWithDoc(s"$version$endpointSuffix") { doc =>
-      setUpSingleWorkSwaggerDocs(version, doc)
+  protected def setupSingleWorkEndpoint[T <: DisplayWork](
+    version: ApiVersions.Value,
+    endpointSuffix: String,
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
+    implicit evidence: TypeTag[T]): Unit = {
+    getWithDoc(s"$endpointSuffix") { doc =>
+      setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
@@ -98,7 +92,12 @@ class WorksController @Inject()(
           canonicalId = request.id,
           index = request._index)
       } yield
-        generateSingleWorkResponse(maybeWork, includes, request, contextUri)
+        generateSingleWorkResponse(
+          maybeWork,
+          toDisplayWork,
+          includes,
+          request,
+          contextUri)
 
       eventualResponse.recover {
         // If a user tries to request an ID without escaping it correctly
@@ -147,14 +146,16 @@ class WorksController @Inject()(
     works
   }
 
-  private def generateSingleWorkResponse(maybeWork: Option[IdentifiedWork],
-                                         includes: WorksIncludes,
-                                         request: SingleWorkRequest,
-                                         contextUri: String) =
+  private def generateSingleWorkResponse[T <: DisplayWork](
+    maybeWork: Option[IdentifiedWork],
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
+    includes: WorksIncludes,
+    request: SingleWorkRequest,
+    contextUri: String) =
     maybeWork match {
       case Some(work: IdentifiedWork) =>
         if (work.visible) {
-          respondWithWork(includes, work, contextUri: String)
+          respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
         } else {
           respondWithGoneError(contextUri: String)
         }
@@ -162,10 +163,8 @@ class WorksController @Inject()(
         respondWithNotFoundError(request, contextUri: String)
     }
 
-  private def respondWithWork(includes: WorksIncludes,
-                              work: IdentifiedWork,
-                              contextUri: String) = {
-    val result = DisplayWorkV1(work = work, includes = includes)
+  private def respondWithWork[T <: DisplayWork](result: T,
+                                                contextUri: String) = {
     response.ok.json(ResultResponse(context = contextUri, result = result))
   }
 
@@ -193,13 +192,16 @@ class WorksController @Inject()(
     )
   }
 
-  private def setupResultListSwaggerDocs(endpointSuffix: String,
-                                         doc: Operation) = {
+  private def setupResultListSwaggerDocs[T <: DisplayWork](
+    endpointSuffix: String,
+    swagger: Swagger,
+    doc: Operation)(implicit evidence: TypeTag[DisplayResultList[T]]) = {
+    implicit val finatraSwagger = swagger
     doc
       .summary(endpointSuffix)
       .description("Returns a paginated list of works")
       .tag("Works")
-      .responseWith[DisplayResultListV1](200, "ResultList[Work]")
+      .responseWith[DisplayResultList[T]](200, "ResultList[Work]")
       .responseWith[DisplayError](400, "Bad Request Error")
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](500, "Internal Server Error")
@@ -237,13 +239,16 @@ class WorksController @Inject()(
     // in the public docs.
   }
 
-  private def setUpSingleWorkSwaggerDocs(version: String, doc: Operation) = {
+  private def setUpSingleWorkSwaggerDocs[T <: DisplayWork](
+    swagger: Swagger,
+    doc: Operation)(implicit evidence: TypeTag[T]) = {
+    implicit val finatraSwagger = swagger
     doc
-      .summary(s"$version/works/{id}")
+      .summary(s"/works/{id}")
       .description("Returns a single work")
       .tag("Works")
       .routeParam[String]("id", "The work to return", required = true)
-      .responseWith[DisplayWorkV1](200, "Work")
+      .responseWith[T](200, "Work")
       .responseWith[DisplayError](400, "Bad Request Error")
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](410, "Gone Error")

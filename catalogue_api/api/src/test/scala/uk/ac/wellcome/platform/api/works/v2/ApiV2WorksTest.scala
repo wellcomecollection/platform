@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.works.v1
+package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
@@ -6,10 +6,11 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 import uk.ac.wellcome.versions.ApiVersions
 
-class ApiV1WorksTest extends ApiWorksTestBase {
+class ApiV2WorksTest extends ApiWorksTestBase {
+  def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
 
   it("returns a list of works") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
@@ -36,9 +37,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     },
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -56,9 +55,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     },
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -76,9 +73,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     },
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -93,7 +88,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("returns a single work when requested with id") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = canonicalId,
@@ -125,9 +120,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                | },
                | "lettering": "$lettering",
                | "createdDate": ${period(work.createdDate.get)},
-               | "creators": [ ${identifiedOrUnidentifiable(
-                                work.creators(0),
-                                abstractAgent)} ],
+               | "contributors": [ ],
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
@@ -140,7 +133,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("renders the items if the items include is present") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "b4heraz7",
@@ -166,7 +159,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                | "type": "Work",
                | "id": "${work.canonicalId}",
                | "title": "${work.title.get}",
-               | "creators": [ ],
+               | "contributors": [ ],
                | "items": [ ${items(work.items)} ],
                | "subjects": [ ],
                | "genres": [ ],
@@ -181,7 +174,8 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it(
     "returns the requested page of results when requested with page & pageSize") {
-    withApiFixtures(ApiVersions.v1) {
+
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
@@ -213,9 +207,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |      },
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -251,9 +243,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |      },
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -289,9 +279,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |      },
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
-                                abstractAgent)} ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -307,7 +295,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("ignores parameters that are unused when making an API request") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?foo=bar",
@@ -318,7 +306,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("returns matching results if doing a full-text search") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work1 = workWith(
           canonicalId = "1234",
@@ -350,7 +338,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title.get}",
-               |     "creators": [],
+               |     "contributors": [],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -365,7 +353,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -403,7 +391,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title.get}",
-               |     "creators": [ ],
+               |     "contributors": [ ],
                |     "identifiers": [ ${identifier(identifier1)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
@@ -414,7 +402,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work2.canonicalId}",
                |     "title": "${work2.title.get}",
-               |     "creators": [ ],
+               |     "contributors": [ ],
                |     "identifiers": [ ${identifier(identifier2)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
@@ -431,7 +419,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -456,7 +444,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                | "type": "Work",
                | "id": "${work.canonicalId}",
                | "title": "${work.title.get}",
-               | "creators": [ ],
+               | "contributors": [ ],
                | "identifiers": [ ${identifier(srcIdentifier)} ],
                | "subjects": [ ],
                | "genres": [ ],
@@ -470,7 +458,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("searches different indices with the ?_index query parameter") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
@@ -497,7 +485,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                | "type": "Work",
                | "id": "${work.canonicalId}",
                | "title": "${work.title.get}",
-               | "creators": [ ],
+               | "contributors": [ ],
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
@@ -518,7 +506,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                | "type": "Work",
                | "id": "${work_alt.canonicalId}",
                | "title": "${work_alt.title.get}",
-               | "creators": [ ],
+               | "contributors": [ ],
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
@@ -531,7 +519,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
   }
 
   it("looks up works in different indices with the ?_index query parameter") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
@@ -560,7 +548,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work.canonicalId}",
                |     "title": "${work.title.get}",
-               |     "creators": [ ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -584,7 +572,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work_alt.canonicalId}",
                |     "title": "${work_alt.title.get}",
-               |     "creators": [ ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -600,7 +588,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
-    withApiFixtures(ApiVersions.v1) {
+    withV2Api {
       case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(
           canonicalId = "1234",
@@ -625,7 +613,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                |     "type": "Work",
                |     "id": "${work.canonicalId}",
                |     "title": "${work.title.get}",
-               |     "creators": [ ],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
