@@ -45,7 +45,10 @@ trait ApiWorksTestBase
     }
   }
 
-  def withApiFixtures[R](apiVersion: ApiVersions.Value,apiName: String = "catalogue/",itemType: String = "work")(testWith: TestWith[(String, String, String, EmbeddedHttpServer) ,R]) =
+  def withApiFixtures[R](apiVersion: ApiVersions.Value,
+                         apiName: String = "catalogue/",
+                         itemType: String = "work")(
+    testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]) =
     withLocalElasticsearchIndex(itemType = itemType) { index =>
       withServer(index, itemType) { server =>
         testWith((apiName + apiVersion, index, itemType, server))

@@ -8,16 +8,23 @@ import uk.ac.wellcome.versions.ApiVersions
 
 @Singleton
 class V2WorksController @Inject()(
-                                   @Flag("api.prefix") apiPrefix: String,
-                                   @Flag("api.context.suffix") apiContextSuffix: String,
-                                   @Flag("api.host") apiHost: String,
-                                   @Flag("api.scheme") apiScheme: String,
-                                   @Flag("api.pageSize") defaultPageSize: Int,
-                                   worksService: WorksService) extends WorksController(apiPrefix,apiContextSuffix,apiHost,apiScheme,defaultPageSize,worksService) {
+  @Flag("api.prefix") apiPrefix: String,
+  @Flag("api.context.suffix") apiContextSuffix: String,
+  @Flag("api.host") apiHost: String,
+  @Flag("api.scheme") apiScheme: String,
+  @Flag("api.pageSize") defaultPageSize: Int,
+  worksService: WorksService)
+    extends WorksController(
+      apiPrefix,
+      apiContextSuffix,
+      apiHost,
+      apiScheme,
+      defaultPageSize,
+      worksService) {
   implicit protected val swagger = ApiV2Swagger
 
   prefix(s"$apiPrefix/${ApiVersions.v2.toString}") {
-    setupResultListEndpoint(ApiVersions.v2,"/works", DisplayWorkV2.apply)
-    setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id",DisplayWorkV2.apply)
+    setupResultListEndpoint(ApiVersions.v2, "/works", DisplayWorkV2.apply)
+    setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id", DisplayWorkV2.apply)
   }
 }

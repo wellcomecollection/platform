@@ -10,46 +10,47 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
-    withV2Api { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      val work = workWith(
-        canonicalId = "g9dtcj2e",
-        title = "This work has been deleted",
-        visible = false
-      )
-
-      insertIntoElasticsearch(indexName, itemType, work)
-
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works/${work.canonicalId}",
-          andExpect = Status.Gone,
-          withJsonBody = gone(apiPrefix)
+    withV2Api {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        val work = workWith(
+          canonicalId = "g9dtcj2e",
+          title = "This work has been deleted",
+          visible = false
         )
-      }
+
+        insertIntoElasticsearch(indexName, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}",
+            andExpect = Status.Gone,
+            withJsonBody = gone(apiPrefix)
+          )
+        }
     }
   }
 
   it("excludes works with visible=false from list results") {
-    withV2Api { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      // Start by indexing a work with visible=false.
-      val deletedWork = workWith(
-        canonicalId = "gze7bc24",
-        title = "This work has been deleted",
-        visible = false
-      )
+    withV2Api {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        // Start by indexing a work with visible=false.
+        val deletedWork = workWith(
+          canonicalId = "gze7bc24",
+          title = "This work has been deleted",
+          visible = false
+        )
 
-      // Then we index two ordinary works into Elasticsearch.
-      val works = createWorks(2)
+        // Then we index two ordinary works into Elasticsearch.
+        val works = createWorks(2)
 
-      val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
-      insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
+        val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
+        insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
 
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works",
-          andExpect = Status.Ok,
-          withJsonBody =
-            s"""
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
                |{
                |  ${resultList(apiPrefix, totalResults = 2)},
                |  "results": [
@@ -92,30 +93,30 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
                |  ]
                |}
           """.stripMargin
-        )
-      }
+          )
+        }
     }
   }
 
   it("excludes works with visible=false from search results") {
-    withV2Api { case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
-      val work = workWith(
-        canonicalId = "r8dx6std",
-        title = "A deleted dodo"
-      )
-      val deletedWork = workWith(
-        canonicalId = "e7rxkty8",
-        title = "This work has been deleted",
-        visible = false
-      )
-      insertIntoElasticsearch(indexName, itemType, work, deletedWork)
+    withV2Api {
+      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+        val work = workWith(
+          canonicalId = "r8dx6std",
+          title = "A deleted dodo"
+        )
+        val deletedWork = workWith(
+          canonicalId = "e7rxkty8",
+          title = "This work has been deleted",
+          visible = false
+        )
+        insertIntoElasticsearch(indexName, itemType, work, deletedWork)
 
-      eventually {
-        server.httpGet(
-          path = s"/$apiPrefix/works?query=deleted",
-          andExpect = Status.Ok,
-          withJsonBody =
-            s"""
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?query=deleted",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
                |{
                |  ${resultList(apiPrefix)},
                |  "results": [
@@ -131,8 +132,8 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
                |   }
                |  ]
                |}""".stripMargin
-        )
-      }
+          )
+        }
     }
   }
 }
