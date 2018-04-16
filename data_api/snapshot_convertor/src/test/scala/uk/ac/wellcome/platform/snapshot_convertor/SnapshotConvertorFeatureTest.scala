@@ -69,14 +69,14 @@ class SnapshotConvertorFeatureTest
           }
           val content = elasticsearchJsons.mkString("\n")
 
-          val targetObjectKey = "target.txt.gz"
+          val publicObjectKey = "target.txt.gz"
 
           withGzipCompressedS3Key(privateBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
               privateBucketName = privateBucket.name,
               privateObjectKey = objectKey,
               publicBucketName = targetBucket.name,
-              targetObjectKey = targetObjectKey
+              publicObjectKey = publicObjectKey
             )
 
             val message = SQSMessage(
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucket.name, targetObjectKey),
+                new GetObjectRequest(targetBucket.name, publicObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -127,7 +127,7 @@ class SnapshotConvertorFeatureTest
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                  s"http://localhost:33333/${targetBucket.name}/$publicObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

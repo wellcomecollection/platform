@@ -26,7 +26,7 @@ def _run(event, sns_client, topic_arn):
             "privateBucketName": s3_event['bucket_name'],
             "privateObjectKey": s3_event['object_key'],
             "publicBucketName": os.environ['TARGET_BUCKET_NAME'],
-            "targetObjectKey": os.environ['TARGET_OBJECT_KEY'],
+            "publicObjectKey": os.environ['TARGET_OBJECT_KEY'],
         }
 
         print(f'Publishing message {message} to SNS')
