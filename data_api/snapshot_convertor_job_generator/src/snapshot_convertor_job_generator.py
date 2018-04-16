@@ -24,7 +24,7 @@ def _run(event, sns_client, topic_arn):
         # This is the job format accepted by the snapshot_convertor
         message = {
             "privateBucketName": s3_event['bucket_name'],
-            "sourceObjectKey": s3_event['object_key'],
+            "privateObjectKey": s3_event['object_key'],
             "targetBucketName": os.environ['TARGET_BUCKET_NAME'],
             "targetObjectKey": os.environ['TARGET_OBJECT_KEY'],
         }
