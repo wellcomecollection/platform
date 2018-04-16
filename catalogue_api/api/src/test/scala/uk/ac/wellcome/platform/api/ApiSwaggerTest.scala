@@ -2,10 +2,8 @@ package uk.ac.wellcome.platform.api
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.IdentifiedWork
-import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.versions.ApiVersions
 
 import scala.collection.JavaConversions._
@@ -13,11 +11,10 @@ import scala.collection.JavaConversions._
 class ApiSwaggerTest
     extends FunSpec
     with Matchers
-    with fixtures.Server
-    with PropertyChecks {
+    with fixtures.Server {
 
   it("returns a valid JSON response for all api versions") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
 
       tree.at("/host").toString should be("\"test.host\"")
@@ -29,14 +26,14 @@ class ApiSwaggerTest
   }
 
   it("includes the DisplayError model all api versions") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
       tree.at("/definitions/Error/type").toString should be("\"object\"")
     }
   }
 
   it("shows only the endpoints for the specified version") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       val tree = readTree(s"/test/${version.toString}/swagger.json")
       tree.at("/paths").isObject shouldBe true
       tree
