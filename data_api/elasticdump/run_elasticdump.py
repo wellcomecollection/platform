@@ -19,7 +19,7 @@ from service_utils import service
 @attr.s
 class SnapshotRequest(object):
     time = attr.ib()
-    target_bucket_name = attr.ib()
+    private_bucket_name = attr.ib()
     es_index = attr.ib()
 
 
@@ -126,7 +126,7 @@ def run():
     print(f'*** Uploading gzip file to S3 with key {key}')
 
     s3_client.upload_file(
-        Bucket=snapshot_request.target_bucket_name,
+        Bucket=snapshot_request.private_bucket_name,
         Key=prefix + key,
         Filename='index.txt.gz'
     )
