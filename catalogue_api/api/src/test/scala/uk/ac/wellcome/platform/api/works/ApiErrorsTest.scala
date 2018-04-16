@@ -2,15 +2,13 @@ package uk.ac.wellcome.platform.api.works
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.prop.PropertyChecks
-import org.scalacheck.ScalacheckShapeless._
 import uk.ac.wellcome.versions.ApiVersions
 
-class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
+class ApiErrorsTest extends ApiWorksTestBase {
 
   it(
     "returns a BadRequest error when malformed query parameters are presented") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -25,7 +23,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a NotFound error when requesting a work with a non-existent id") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           val badId = "non-existing-id"
@@ -41,7 +39,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a BadRequest error if the user asks for a page size just over the maximum") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 101
@@ -58,7 +56,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a BadRequest error if the user asks for an overly large page size") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 100000
@@ -74,7 +72,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a BadRequest error if the user asks for zero-length pages") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 0
@@ -90,7 +88,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a BadRequest error if the user asks for a negative page size") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           val pageSize = -50
@@ -106,7 +104,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a BadRequest error if the user asks for page 0") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -121,7 +119,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a BadRequest error if the user asks for a page before 0") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -136,7 +134,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns multiple errors if there's more than one invalid parameter") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -151,7 +149,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a Bad Request error if asked for an invalid include") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -165,7 +163,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a Bad Request error if asked for more than one invalid include") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -181,7 +179,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -197,7 +195,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a Bad Request error if asked for an invalid include on an individual work") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -211,7 +209,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns Not Found if you look up a non-existent index") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -224,7 +222,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns Not Found if you ask for a non-existent work") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -238,7 +236,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns Bad Request if you ask for a malformed identifier") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -259,7 +257,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
     // Elasticsearch has a number of "private" indexes, which don't have
     // a canonicalId field to sort on.  Trying to query one of these will
     // trigger one such exception!
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -278,7 +276,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
   }
 
   it("returns a Bad Request error if you try to access the 10000th page") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
@@ -294,7 +292,7 @@ class ApiErrorsTest extends ApiWorksTestBase with PropertyChecks {
 
   it(
     "returns a Bad Request error if you try to get the 101th page with 100 results per page") {
-    forAll { version: ApiVersions.Value =>
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
