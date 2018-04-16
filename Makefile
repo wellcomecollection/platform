@@ -26,6 +26,8 @@ sbt-common-publish:
 travistooling-test:
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
+		--env encrypted_83630750896a_key=$(encrypted_83630750896a_key) \
+		--env encrypted_83630750896a_iv=$(encrypted_83630750896a_iv) \
 		wellcome/build_tooling \
 		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
 	$(ROOT)/docker_run.py -- \
@@ -34,4 +36,4 @@ travistooling-test:
 		coverage report --rcfile=travistooling/.coveragerc
 
 travistooling-publish:
-	echo "nothing to do!"
+	$(error "Nothing to do for this task")
