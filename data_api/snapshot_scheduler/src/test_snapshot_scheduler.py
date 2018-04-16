@@ -17,12 +17,12 @@ class patched_datetime(dt.datetime):
 
 @mock.patch('datetime.datetime', patched_datetime)
 def test_writes_message_to_sqs(sns_client, topic_arn):
-    target_bucket_name = "target_bucket_name"
+    private_bucket_name = "private_bucket_name"
     es_index = "es_index"
 
     patched_os_environ = {
         'TOPIC_ARN': topic_arn,
-        'TARGET_BUCKET_NAME': target_bucket_name,
+        'TARGET_BUCKET_NAME': private_bucket_name,
         'ES_INDEX': es_index
     }
 
@@ -37,6 +37,6 @@ def test_writes_message_to_sqs(sns_client, topic_arn):
     assert len(messages) == 1
     assert messages[0][':message'] == {
         'time': '2011-06-21T00:00:00',
-        'target_bucket_name': target_bucket_name,
+        'private_bucket_name': private_bucket_name,
         'es_index': es_index
     }

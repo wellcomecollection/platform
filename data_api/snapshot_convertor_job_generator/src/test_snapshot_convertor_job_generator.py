@@ -26,30 +26,30 @@ def createS3Event(bucket_name, object_key, event_name):
 
 
 def test_snapshot_convertor_job_generator_sends_message_for_object_created_event(sns_client, topic_arn):
-    source_bucket_name = "bukkit"
-    source_object_key = "test0001.json"
+    private_bucket_name = "bukkit"
+    private_object_key = "test0001.json"
 
-    target_bucket_name = "target_bukkit"
-    target_object_key = "target.json.gz"
+    public_bucket_name = "target_bukkit"
+    public_object_key = "target.json.gz"
 
     event_name = "ObjectCreated:CompleteMultipartUpload"
 
     os.environ.update({
-        'TARGET_BUCKET_NAME': target_bucket_name,
-        'TARGET_OBJECT_KEY': target_object_key
+        'PUBLIC_BUCKET_NAME': public_bucket_name,
+        'PUBLIC_OBJECT_KEY': public_object_key
     })
 
     event = createS3Event(
-        bucket_name=source_bucket_name,
-        object_key=source_object_key,
+        bucket_name=private_bucket_name,
+        object_key=private_object_key,
         event_name=event_name
     )
 
     expected_job = {
-        "sourceBucketName": source_bucket_name,
-        "sourceObjectKey": source_object_key,
-        "targetBucketName": target_bucket_name,
-        "targetObjectKey": target_object_key
+        "privateBucketName": private_bucket_name,
+        "privateObjectKey": private_object_key,
+        "publicBucketName": public_bucket_name,
+        "publicObjectKey": public_object_key
     }
 
     _run(

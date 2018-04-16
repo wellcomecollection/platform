@@ -69,8 +69,8 @@ class ConvertorServiceTest
   it("completes a conversion successfully") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
-          targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val visibleWorks = (1 to 3).map { version =>
@@ -106,14 +106,14 @@ class ConvertorServiceTest
         }
         val content = elasticsearchJsons.mkString("\n")
 
-        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
-          val targetObjectKey = "target.txt.gz"
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
+          val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
-            sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.name,
-            targetObjectKey = targetObjectKey
+            privateBucketName = privateBucket.name,
+            privateObjectKey = objectKey,
+            publicBucketName = publicBucket.name,
+            publicObjectKey = publicObjectKey
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -122,7 +122,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, targetObjectKey),
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -140,7 +140,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -163,8 +163,8 @@ class ConvertorServiceTest
   it("completes a very large conversion successfully") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
-          targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
         // which they can be gzip-compressed -- so we can cross the
@@ -194,13 +194,13 @@ class ConvertorServiceTest
         val gzipFileSize = createGzipFile(content).length.toInt
         gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
-        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
-          val targetObjectKey = "target.txt.gz"
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
+          val publicObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
-            sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.name,
-            targetObjectKey = targetObjectKey
+            privateBucketName = privateBucket.name,
+            privateObjectKey = objectKey,
+            publicBucketName = publicBucket.name,
+            publicObjectKey = publicObjectKey
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -209,7 +209,7 @@ class ConvertorServiceTest
             val downloadFile =
               File.createTempFile("convertorServiceTest", ".txt.gz")
             s3Client.getObject(
-              new GetObjectRequest(targetBucket.name, targetObjectKey),
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
 
             val contents = readGzipFile(downloadFile.getPath)
@@ -227,7 +227,7 @@ class ConvertorServiceTest
             result shouldBe CompletedConversionJob(
               conversionJob = conversionJob,
               targetLocation =
-                s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
           }
         }
@@ -237,13 +237,13 @@ class ConvertorServiceTest
   it("returns a failed future if asked to convert a non-existent snapshot") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
-          targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         val conversionJob = ConversionJob(
-          sourceBucketName = sourceBucket.name,
-          sourceObjectKey = "doesnotexist.txt.gz",
-          targetBucketName = targetBucket.name,
-          targetObjectKey = "target.txt.gz"
+          privateBucketName = privateBucket.name,
+          privateObjectKey = "doesnotexist.txt.gz",
+          publicBucketName = publicBucket.name,
+          publicObjectKey = "target.txt.gz"
         )
 
         val future = convertorService.runConversion(conversionJob)
@@ -257,16 +257,16 @@ class ConvertorServiceTest
   it("returns a failed future if asked to convert a malformed snapshot") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
-          targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         withGzipCompressedS3Key(
-          sourceBucket,
+          privateBucket,
           content = "This is not what snapshots look like") { objectKey =>
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
-            sourceObjectKey = objectKey,
-            targetBucketName = targetBucket.name,
-            targetObjectKey = "target.txt.gz"
+            privateBucketName = privateBucket.name,
+            privateObjectKey = objectKey,
+            publicBucketName = publicBucket.name,
+            publicObjectKey = "target.txt.gz"
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -281,8 +281,8 @@ class ConvertorServiceTest
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
-          targetBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val works = (1 to 3).map { version =>
@@ -306,10 +306,10 @@ class ConvertorServiceTest
 
         val bucketName = "wrongBukkit"
         val conversionJob = ConversionJob(
-          sourceBucketName = bucketName,
-          sourceObjectKey = "wrongKey",
-          targetBucketName = bucketName,
-          targetObjectKey = "target.json.gz"
+          privateBucketName = bucketName,
+          privateObjectKey = "wrongKey",
+          publicBucketName = bucketName,
+          publicObjectKey = "target.json.gz"
         )
 
         val future = convertorService.runConversion(conversionJob)
