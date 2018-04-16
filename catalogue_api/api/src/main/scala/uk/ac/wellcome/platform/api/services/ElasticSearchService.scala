@@ -31,12 +31,12 @@ class ElasticSearchService @Inject()(@Flag("es.index") defaultIndex: String,
       }
 
   def listResults(sortByField: String,
+                  indexName: String,
                   limit: Int = 10,
-                  from: Int = 0,
-                  index: Option[String] = None): Future[SearchResponse] =
+                  from: Int = 0): Future[SearchResponse] =
     elasticClient
       .execute {
-        search(s"${getIndex(index)}/$documentType")
+        search(s"${indexName}/$documentType")
           .query(termQuery("visible", true))
           .sortBy(fieldSort(sortByField))
           .limit(limit)

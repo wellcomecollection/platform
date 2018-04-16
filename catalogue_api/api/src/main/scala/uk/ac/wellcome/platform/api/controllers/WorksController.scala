@@ -140,7 +140,8 @@ abstract class WorksController(apiPrefix: String,
         worksService.listWorks(
           pageSize = pageSize,
           pageNumber = request.page,
-          index = request._index
+          // TODO: Not this
+          indexName = request._index.get
         )
     }
     works

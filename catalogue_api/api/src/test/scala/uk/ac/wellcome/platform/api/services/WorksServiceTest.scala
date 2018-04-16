@@ -27,7 +27,7 @@ class WorksServiceTest
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
-            val future = worksService.listWorks()
+            val future = worksService.listWorks(indexName=indexName)
 
             whenReady(future) { resultList =>
               resultList.results shouldBe works
@@ -110,7 +110,9 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val displayWorksFuture = worksService.listWorks(pageSize = 10)
+            val displayWorksFuture = worksService.listWorks(
+              indexName = indexName,
+              pageSize = 10)
 
             whenReady(displayWorksFuture) { works =>
               works.totalResults shouldBe 0
@@ -131,7 +133,10 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
             val displayWorksFuture =
-              worksService.listWorks(pageSize = 1, pageNumber = 4)
+              worksService.listWorks(
+                indexName = indexName,
+                pageSize = 1,
+                pageNumber = 4)
 
             whenReady(displayWorksFuture) { receivedWorks =>
               receivedWorks.results shouldBe empty

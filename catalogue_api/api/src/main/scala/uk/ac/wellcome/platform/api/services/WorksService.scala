@@ -27,15 +27,15 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
         else None
       }
 
-  def listWorks(pageSize: Int = defaultPageSize,
-                pageNumber: Int = 1,
-                index: Option[String] = None): Future[ResultList] =
+  def listWorks(indexName: String,
+                pageSize: Int = defaultPageSize,
+                pageNumber: Int = 1): Future[ResultList] =
     searchService
       .listResults(
         sortByField = "canonicalId",
         limit = pageSize,
         from = (pageNumber - 1) * pageSize,
-        index = index
+        indexName = indexName
       )
       .map { searchResponse =>
         ResultList(

@@ -142,6 +142,7 @@ class ElasticsearchServiceTest
       searchService =>
         val searchResultFuture = searchService.listResults(
           sortByField = "canonicalId",
+          indexName = indexName,
           limit = limit,
           from = from
         )
