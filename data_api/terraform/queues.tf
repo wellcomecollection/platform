@@ -3,7 +3,7 @@ module "snapshot_convertor_queue" {
   queue_name  = "snapshot_convertor_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.snapshot_convertor_job_generator.topic_name}"]
+  topic_names = ["${module.snapshot_convertor_jobs_topic.name}"]
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
