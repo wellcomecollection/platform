@@ -43,17 +43,20 @@ class WorksController @Inject()(
     .collectionFormat("csv")
     .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
 
-  prefix(apiPrefix) {
+  prefix(s"$apiPrefix/${ApiVersions.v1.toString}") {
     setupResultListEndpoint(ApiVersions.v1, ApiV1Swagger,"/works",DisplayWorkV1.apply)
-    setupResultListEndpoint(ApiVersions.v2, ApiV2Swagger, "/works", DisplayWorkV2.apply)
     setupSingleWorkEndpoint(ApiVersions.v1, ApiV1Swagger, "/works/:id",DisplayWorkV1.apply)
+  }
+
+  prefix(s"$apiPrefix/${ApiVersions.v2.toString}") {
+    setupResultListEndpoint(ApiVersions.v2, ApiV2Swagger, "/works", DisplayWorkV2.apply)
     setupSingleWorkEndpoint(ApiVersions.v2,ApiV2Swagger, "/works/:id",DisplayWorkV2.apply)
   }
 
   private def setupResultListEndpoint[T <: DisplayWork](version: ApiVersions.Value, swagger: Swagger,
                                       endpointSuffix: String, toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(implicit evidence: TypeTag[DisplayResultList[T]]): Unit = {
-    getWithDoc(s"/$version$endpointSuffix", swagger) { doc =>
-      setupResultListSwaggerDocs[T](s"/$version$endpointSuffix", swagger, doc)
+    getWithDoc(s"$endpointSuffix", swagger) { doc =>
+      setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: MultipleResultsRequest =>
       val pageSize = request.pageSize.getOrElse(defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
@@ -82,8 +85,8 @@ class WorksController @Inject()(
 
   private def setupSingleWorkEndpoint[T <: DisplayWork](version: ApiVersions.Value, swagger: Swagger,
                                       endpointSuffix: String,toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(implicit evidence: TypeTag[T]): Unit = {
-    getWithDoc(s"/$version$endpointSuffix", swagger) { doc =>
-      setUpSingleWorkSwaggerDocs[T](version, swagger, doc)
+    getWithDoc(s"$endpointSuffix", swagger) { doc =>
+      setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
@@ -237,10 +240,10 @@ class WorksController @Inject()(
     // in the public docs.
   }
 
-  private def setUpSingleWorkSwaggerDocs[T <: DisplayWork](version: ApiVersions.Value,swagger: Swagger, doc: Operation)(implicit evidence: TypeTag[T])  = {
+  private def setUpSingleWorkSwaggerDocs[T <: DisplayWork](swagger: Swagger, doc: Operation)(implicit evidence: TypeTag[T])  = {
     implicit val finatraSwagger = swagger
     doc
-      .summary(s"/$version/works/{id}")
+      .summary(s"/works/{id}")
       .description("Returns a single work")
       .tag("Works")
       .routeParam[String]("id", "The work to return", required = true)
@@ -266,5 +269,6 @@ class WorksController @Inject()(
 
     FinatraSwagger.convertToFinatraSwagger(swagger).registerOperation(path, method, op)
   }
+
   implicit def convertToFinatraOperation(operation: Operation): FinatraOperation = new FinatraOperation(operation)
 }
