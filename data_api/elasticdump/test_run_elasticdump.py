@@ -84,7 +84,9 @@ def test_end_to_end(
         sqs_client,
         queue_url,
         s3_client,
+        sns_client,
         bucket,
+        topic_arn,
         sqs_endpoint_url,
         s3_endpoint_url,
         elasticsearch_index,
@@ -159,3 +161,12 @@ def test_end_to_end(
         }
         for i in range(10)
     ]
+
+    messages = sns_client.list_messages()
+    assert len(messages) == 1
+    assert messages.pop() == {
+        'sourceBucketName': bucket,
+        'sourceObjectKey': 'blah/dump.txt.gz',
+        'targetBucketName': 'public-bukkit',
+        'targetObjectKey': 'target.txt.gz',
+    }
