@@ -62,7 +62,7 @@ def _should_run_tests(task, travis_event_type):
     return result
 
 
-def _should_publish(task, travis_event_type):
+def _should_run_publish(task, travis_event_type):
     """
     Should we run the publish step?
     """
@@ -85,6 +85,7 @@ def _should_publish(task, travis_event_type):
 
 
 def main():
+    # https://docs.travis-ci.com/user/environment-variables/
     travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
     task = os.environ['TASK']
 
@@ -99,16 +100,16 @@ def main():
     make(task)
 
     if task in [
-        'check-format',
+        'travis-format',
         'travistooling-test',
     ]:
         print('*** Task %s does not have a publish step' % task)
-        return False
+        return 0
 
     publish_task = task.replace('-build', '-publish')
     publish_task = task.replace('-test', '-publish')
 
-    if _should_publish(task=task, travis_event_type=travis_event_type):
+    if _should_run_publish(task=task, travis_event_type=travis_event_type):
         print("*** We're going to run the publish task")
         make(publish_task)
     else:
