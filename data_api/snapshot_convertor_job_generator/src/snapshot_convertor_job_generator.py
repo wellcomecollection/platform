@@ -23,10 +23,10 @@ def _run(event, sns_client, topic_arn):
 
         # This is the job format accepted by the snapshot_convertor
         message = {
-            "sourceBucketName": s3_event['bucket_name'],
-            "sourceObjectKey": s3_event['object_key'],
-            "targetBucketName": os.environ['TARGET_BUCKET_NAME'],
-            "targetObjectKey": os.environ['TARGET_OBJECT_KEY'],
+            "privateBucketName": s3_event['bucket_name'],
+            "privateObjectKey": s3_event['object_key'],
+            "publicBucketName": os.environ['PUBLIC_BUCKET_NAME'],
+            "publicObjectKey": os.environ['PUBLIC_OBJECT_KEY'],
         }
 
         print(f'Publishing message {message} to SNS')

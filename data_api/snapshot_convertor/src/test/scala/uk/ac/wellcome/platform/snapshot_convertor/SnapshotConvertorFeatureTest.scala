@@ -43,9 +43,9 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queue, topic), sourceBucket), targetBucket) =>
+      case (((queue, topic), privateBucket), publicBucket) =>
         val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-          sourceBucket)
+          privateBucket)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
@@ -69,14 +69,14 @@ class SnapshotConvertorFeatureTest
           }
           val content = elasticsearchJsons.mkString("\n")
 
-          val targetObjectKey = "target.txt.gz"
+          val publicObjectKey = "target.txt.gz"
 
-          withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
+          withGzipCompressedS3Key(privateBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              sourceBucketName = sourceBucket.name,
-              sourceObjectKey = objectKey,
-              targetBucketName = targetBucket.name,
-              targetObjectKey = targetObjectKey
+              privateBucketName = privateBucket.name,
+              privateObjectKey = objectKey,
+              publicBucketName = publicBucket.name,
+              publicObjectKey = publicObjectKey
             )
 
             val message = SQSMessage(
@@ -95,7 +95,7 @@ class SnapshotConvertorFeatureTest
                 File.createTempFile("convertorServiceTest", ".txt.gz")
 
               s3Client.getObject(
-                new GetObjectRequest(targetBucket.name, targetObjectKey),
+                new GetObjectRequest(publicBucket.name, publicObjectKey),
                 downloadFile)
 
               val actualJsonLines: List[String] =
@@ -127,7 +127,7 @@ class SnapshotConvertorFeatureTest
               val expectedJob = CompletedConversionJob(
                 conversionJob = conversionJob,
                 targetLocation =
-                  s"http://localhost:33333/${targetBucket.name}/$targetObjectKey"
+                  s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
               )
               val actualJob = fromJson[CompletedConversionJob](
                 receivedMessages.head.message).get

@@ -3,8 +3,8 @@ module "snapshot_convertor_job_generator" {
 
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
   infra_bucket           = "${var.infra_bucket}"
-  target_object_key      = "catalogue/v1/works.json.gz"
-  target_bucket_name     = "${aws_s3_bucket.public_data.id}"
+  public_object_key      = "catalogue/v1/works.json.gz"
+  public_bucket_name     = "${aws_s3_bucket.public_data.id}"
 }
 
 module "snapshot_convertor" {
@@ -18,17 +18,14 @@ module "snapshot_convertor" {
   release_id         = "${var.release_ids["snapshot_convertor"]}"
 
   env_vars = {
-    source_bucket_name = "${aws_s3_bucket.private_data.id}"
-    target_bucket_name = "${aws_s3_bucket.public_data.id}"
-
     queue_url = "${module.snapshot_convertor_queue.id}"
     topic_arn = "${module.snapshot_conversion_complete_topic.arn}"
   }
 
+  env_vars_length = 2
+
   memory = 2048
   cpu    = 512
-
-  env_vars_length = 4
 
   cluster_name = "${module.data_api_cluster.cluster_name}"
   vpc_id       = "${module.vpc_data_api.vpc_id}"

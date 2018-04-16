@@ -124,7 +124,7 @@ def test_end_to_end(
     subprocess.check_call([
         'docker', 'run', '--net', 'host',
         '--env', f'sqs_queue_url={queue_url}',
-        '--env', f'target_key=dump.txt.gz',
+        '--env', f'private_object_key=dump.txt.gz',
         '--env', f'key_prefix=blah/',
 
         '--env', 'AWS_DEFAULT_REGION=localhost',

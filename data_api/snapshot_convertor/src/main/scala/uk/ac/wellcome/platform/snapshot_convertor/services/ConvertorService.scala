@@ -42,28 +42,28 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     conversionJob: ConversionJob): Future[CompletedConversionJob] = {
     info(s"ConvertorService running $conversionJob")
 
-    val targetBucketName = conversionJob.targetBucketName
-    val targetObjectKey = conversionJob.targetObjectKey
+    val publicBucketName = conversionJob.publicBucketName
+    val publicObjectKey = conversionJob.publicObjectKey
 
     val uploadResult = for {
       s3inputStream <- Future {
         s3Client
           .getObject(
-            conversionJob.sourceBucketName,
-            conversionJob.sourceObjectKey)
+            conversionJob.privateBucketName,
+            conversionJob.privateObjectKey)
           .getObjectContent
       }
 
       gzipStream <- runStream(
-        targetBucketName = targetBucketName,
-        targetObjectKey = targetObjectKey,
+        publicBucketName = publicBucketName,
+        publicObjectKey = publicObjectKey,
         s3inputStream = s3inputStream
       )
     } yield gzipStream
 
     uploadResult.map { _ =>
       val targetLocation =
-        Uri(s"$s3Endpoint/$targetBucketName/$targetObjectKey")
+        Uri(s"$s3Endpoint/$publicBucketName/$publicObjectKey")
 
       CompletedConversionJob(
         conversionJob = conversionJob,
@@ -73,8 +73,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
   }
 
   private def runStream(
-    targetBucketName: String,
-    targetObjectKey: String,
+    publicBucketName: String,
+    publicObjectKey: String,
     s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
     val s3source = S3Source(s3inputStream = s3inputStream)
 
@@ -95,8 +95,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
 
     val s3Sink: Sink[ByteString, Future[MultipartUploadResult]] =
       akkaS3Client.multipartUpload(
-        bucket = targetBucketName,
-        key = targetObjectKey
+        bucket = publicBucketName,
+        key = publicObjectKey
       )
 
     gzipContent.runWith(s3Sink)
