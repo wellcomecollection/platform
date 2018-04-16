@@ -54,7 +54,7 @@ from travistooling.decisions import (
     ('sierra_adapter/sierra_reader/foo.scala', 'sierra_reader-publish', ExclusivelyAffectsThisTask, True),
     ('catalogue_pipeline/ingestor/bar.scala', 'api-test', ExclusivelyAffectsAnotherTask, False),
     ('run_autoformat.py', 'travistooling-test', ExclusivelyAffectsAnotherTask, False),
-    ('run_autoformat.py', 'travis-format', ExclusivelyAffectsThisTask, True),
+    ('run_autoformat.py', 'travis-format', CheckedByTravisFormat, True),
 
     # Anything in the sierra_adapter directory/common lib
     ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
