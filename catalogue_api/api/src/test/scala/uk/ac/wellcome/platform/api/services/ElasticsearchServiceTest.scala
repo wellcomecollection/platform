@@ -17,7 +17,7 @@ class ElasticsearchServiceTest
 
   val itemType = "work"
 
-  it("should sort results from Elasticsearch in the correct order") {
+  it("sorts results from Elasticsearch in the correct order") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val work1 = workWith(
         canonicalId = "000Z",
@@ -47,7 +47,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should return everything if we ask for a limit > result size") {
+  it("returns everything if we ask for a limit > result size") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val displayWorks = populateElasticsearch(indexName)
 
@@ -60,7 +60,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should return a page from the beginning of the result set") {
+  it("returns a page from the beginning of the result set") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val displayWorks = populateElasticsearch(indexName)
       assertSliceIsCorrect(
@@ -72,7 +72,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should return a page from halfway through the result set") {
+  it("returns a page from halfway through the result set") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val displayWorks = populateElasticsearch(indexName)
       assertSliceIsCorrect(
@@ -84,7 +84,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should return a page from the end of the result set") {
+  it("returns a page from the end of the result set") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val displayWorks = populateElasticsearch(indexName)
       assertSliceIsCorrect(
@@ -96,7 +96,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should return an empty page if asked for a limit > result size") {
+  it("returns an empty page if asked for a limit > result size") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val displayWorks = populateElasticsearch(indexName)
       assertSliceIsCorrect(
@@ -108,7 +108,7 @@ class ElasticsearchServiceTest
     }
   }
 
-  it("should not list works that have visible=false") {
+  it("does not list works that have visible=false") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       val visibleWorks = createWorks(count = 8, visible = true)
       val invisibleWorks = createWorks(count = 2, start = 9, visible = false)
