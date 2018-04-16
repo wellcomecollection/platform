@@ -20,6 +20,8 @@ from service_utils import service
 class SnapshotRequest(object):
     time = attr.ib()
     private_bucket_name = attr.ib()
+    public_bucket_name = attr.ib()
+    public_object_key = attr.ib()
     es_index = attr.ib()
 
 
@@ -142,8 +144,8 @@ def run():
         Message=json.dumps({
             'privateBucketName': snapshot_request.private_bucket_name,
             'privateObjectKey': private_object_key,
-            'publicBucketName': 'public-bukkit',
-            'publicObjectKey': 'catalogue/v1/works.json.gz',
+            'publicBucketName': public_bucket_name,
+            'publicObjectKey': public_object_key,
         })
     )
     print(f'resp = {resp!r}')

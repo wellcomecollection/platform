@@ -94,14 +94,19 @@ def test_end_to_end(
         elasticsearch_url,
         elasticsearch_hostname
 ):
+    public_bucket_name = 'public-bukkit'
+    public_object_key = 'catalogue/v1/works.json.gz'
+
     sqs_client.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(
             attr.asdict(
                 run_elasticdump.SnapshotRequest(
                     "time",
-                    bucket,
-                    elasticsearch_index
+                    private_bucket_name=bucket,
+                    public_bucket_name=public_bucket_name,
+                    public_object_key=public_object_key,
+                    es_index=elasticsearch_index
                 )
             )
         )
@@ -171,6 +176,6 @@ def test_end_to_end(
     assert messages.pop() == {
         'sourceBucketName': bucket,
         'sourceObjectKey': 'blah/dump.txt.gz',
-        'targetBucketName': 'public-bukkit',
-        'targetObjectKey': 'catalogue/v1/works.json.gz',
+        'targetBucketName': public_bucket_name,
+        'targetObjectKey': public_object_key,
     }

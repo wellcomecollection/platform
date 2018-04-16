@@ -18,6 +18,8 @@ from wellcome_aws_utils.sns_utils import publish_sns_message
 class SnapshotRequest(object):
     time = attr.ib()
     private_bucket_name = attr.ib()
+    public_bucket_name = attr.ib()
+    public_object_key = attr.ib()
     es_index = attr.ib()
 
 
@@ -37,6 +39,8 @@ def main(event=None, _ctxt=None, sns_client=None):
     snapshot_request_message = SnapshotRequest(
         time=dt.datetime.utcnow().isoformat(),
         private_bucket_name=bucket_name,
+        public_bucket_name='wellcomecollection-data-private',
+        public_object_key='catalogue/v1/works.json.gz'
         es_index=es_index
     )
 
