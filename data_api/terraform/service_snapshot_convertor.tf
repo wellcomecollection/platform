@@ -1,12 +1,3 @@
-module "snapshot_convertor_job_generator" {
-  source = "snapshot_convertor_job_generator"
-
-  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
-  infra_bucket           = "${var.infra_bucket}"
-  public_object_key      = "catalogue/v1/works.json.gz"
-  public_bucket_name     = "${aws_s3_bucket.public_data.id}"
-}
-
 module "snapshot_convertor" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.0.0"
   name   = "snapshot_convertor"
