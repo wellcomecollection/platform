@@ -43,9 +43,9 @@ class SnapshotConvertorFeatureTest
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queue, topic), sourceBucket), targetBucket) =>
+      case (((queue, topic), privateBucket), targetBucket) =>
         val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-          sourceBucket)
+          privateBucket)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
@@ -71,9 +71,9 @@ class SnapshotConvertorFeatureTest
 
           val targetObjectKey = "target.txt.gz"
 
-          withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
+          withGzipCompressedS3Key(privateBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              sourceBucketName = sourceBucket.name,
+              privateBucketName = privateBucket.name,
               sourceObjectKey = objectKey,
               targetBucketName = targetBucket.name,
               targetObjectKey = targetObjectKey

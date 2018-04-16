@@ -46,7 +46,7 @@ def test_snapshot_convertor_job_generator_sends_message_for_object_created_event
     )
 
     expected_job = {
-        "sourceBucketName": source_bucket_name,
+        "privateBucketName": source_bucket_name,
         "sourceObjectKey": source_object_key,
         "targetBucketName": target_bucket_name,
         "targetObjectKey": target_object_key

@@ -69,7 +69,7 @@ class ConvertorServiceTest
   it("completes a conversion successfully") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
           targetBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
@@ -106,11 +106,11 @@ class ConvertorServiceTest
         }
         val content = elasticsearchJsons.mkString("\n")
 
-        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
           val targetObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
+            privateBucketName = privateBucket.name,
             sourceObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
@@ -163,7 +163,7 @@ class ConvertorServiceTest
   it("completes a very large conversion successfully") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
           targetBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
@@ -194,10 +194,10 @@ class ConvertorServiceTest
         val gzipFileSize = createGzipFile(content).length.toInt
         gzipFileSize shouldBe >=(8 * 1024 * 1024)
 
-        withGzipCompressedS3Key(sourceBucket, content) { objectKey =>
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
           val targetObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
+            privateBucketName = privateBucket.name,
             sourceObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = targetObjectKey
@@ -237,10 +237,10 @@ class ConvertorServiceTest
   it("returns a failed future if asked to convert a non-existent snapshot") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
           targetBucket) =>
         val conversionJob = ConversionJob(
-          sourceBucketName = sourceBucket.name,
+          privateBucketName = privateBucket.name,
           sourceObjectKey = "doesnotexist.txt.gz",
           targetBucketName = targetBucket.name,
           targetObjectKey = "target.txt.gz"
@@ -257,13 +257,13 @@ class ConvertorServiceTest
   it("returns a failed future if asked to convert a malformed snapshot") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
           targetBucket) =>
         withGzipCompressedS3Key(
-          sourceBucket,
+          privateBucket,
           content = "This is not what snapshots look like") { objectKey =>
           val conversionJob = ConversionJob(
-            sourceBucketName = sourceBucket.name,
+            privateBucketName = privateBucket.name,
             sourceObjectKey = objectKey,
             targetBucketName = targetBucket.name,
             targetObjectKey = "target.txt.gz"
@@ -281,7 +281,7 @@ class ConvertorServiceTest
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
       case (
-          ((_, _, _, convertorService: ConvertorService), sourceBucket),
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
           targetBucket) =>
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
@@ -306,7 +306,7 @@ class ConvertorServiceTest
 
         val bucketName = "wrongBukkit"
         val conversionJob = ConversionJob(
-          sourceBucketName = bucketName,
+          privateBucketName = bucketName,
           sourceObjectKey = "wrongKey",
           targetBucketName = bucketName,
           targetObjectKey = "target.json.gz"
