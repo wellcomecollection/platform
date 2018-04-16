@@ -47,7 +47,11 @@ def does_file_affect_build_task(path, task):
         raise IgnoredFileFormat()
 
     # These paths never have an effect on tests.
-    if path in ['LICENSE', ] or path.startswith(('misc/', 'ontologies/')):
+    if path in [
+        'LICENSE',
+        '.travis.yml',
+        'run_travis_task.py',
+    ] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath()
 
     # Some directories only affect one task.
@@ -98,6 +102,11 @@ def does_file_affect_build_task(path, task):
             raise ExclusivelyAffectsThisTask()
         else:
             raise ExclusivelyAffectsAnotherTask('travistooling-test')
+
+    # This script is only used in the travis-format task.  It's already
+    # picked up as significant by travis-format because it's a *.py file.
+    if path == 'run_autoformat.py' and task != 'travis-format':
+        raise ExclusivelyAffectsAnotherTask('travis-format')
 
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
