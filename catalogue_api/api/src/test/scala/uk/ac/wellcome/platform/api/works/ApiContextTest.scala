@@ -14,7 +14,8 @@ class ApiContextTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/context.json",
             andExpect = Status.Ok,
-            withJsonBody = IOUtils.toString(getClass.getResourceAsStream("/context.json")))
+            withJsonBody =
+              IOUtils.toString(getClass.getResourceAsStream("/context.json")))
       }
     }
   }
