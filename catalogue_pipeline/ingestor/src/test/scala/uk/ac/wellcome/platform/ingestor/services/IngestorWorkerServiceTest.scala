@@ -48,13 +48,22 @@ class IngestorWorkerServiceTest
 
   val actorSystem = ActorSystem()
 
+  def createMiroWork(
+                      canonicalId: String,
+                      sourceId: String,
+                      title: String,
+                      visible: Boolean = true,
+                      version: Int = 1
+                    ): IdentifiedWork = createWork(canonicalId, sourceId, title, IdentifierSchemes.miroImageNumber, visible, version)
+
   def createWork(canonicalId: String,
                  sourceId: String,
                  title: String,
+                 identifierScheme: IdentifierSchemes.IdentifierScheme,
                  visible: Boolean = true,
                  version: Int = 1): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierScheme = identifierScheme,
       ontologyType = "Work",
       value = sourceId
     )
@@ -68,14 +77,12 @@ class IngestorWorkerServiceTest
       visible = visible)
   }
 
-  it("should insert an identified Work into Elasticsearch") {
-    val work = createWork(
+  it("should insert an Miro identified Work into v1 and v2 indices") {
+    val work = createMiroWork(
       canonicalId = "m7b2aqtw",
       sourceId = "M000765",
       title = "A monstrous monolith of moss"
     )
-
-    val indexName = "works"
 
     val sqsMessage = messageFromString(toJson(work).get)
 
@@ -83,30 +90,37 @@ class IngestorWorkerServiceTest
       new WorkIndexer(itemType, elasticClient, metricsSender)
 
     withLocalSqsQueue { queue =>
-      withLocalElasticsearchIndex(indexName, itemType) { _ =>
-        val service = new IngestorWorkerService(
-          indexName,
-          identifiedWorkIndexer = workIndexer,
-          reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-          system = actorSystem,
-          metrics = metricsSender
-        )
+      withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+          val service = new IngestorWorkerService(
+            indexNameV1,
+            indexNameV2,
+            identifiedWorkIndexer = workIndexer,
+            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            system = actorSystem,
+            metrics = metricsSender
+          )
 
-        service.processMessage(sqsMessage)
+          service.processMessage(sqsMessage)
 
-        eventually {
+            assertElasticsearchEventuallyHasWork(
+              work,
+              indexName = indexNameV1,
+              itemType = itemType)
+
           assertElasticsearchEventuallyHasWork(
-            work,
-            indexName = indexName,
-            itemType = itemType)
-        }
+              work,
+              indexName = indexNameV2,
+              itemType = itemType)
+          }
       }
     }
   }
 
   it("should return a failed future if the input string is not a Work") {
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
-    val indexName = "works"
+    val indexNameV1 = "works-v1"
+    val indexNameV2 = "works-v1"
 
     withLocalSqsQueue { queue =>
       val workIndexer = new WorkIndexer(
@@ -116,7 +130,8 @@ class IngestorWorkerServiceTest
       )
 
       val service = new IngestorWorkerService(
-        esIndex = indexName,
+        esIndexV1 = indexNameV1,
+        esIndexV2 = indexNameV2,
         identifiedWorkIndexer = workIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
@@ -147,7 +162,7 @@ class IngestorWorkerServiceTest
       metricsSender = metricsSender
     )
 
-    val work = createWork(
+    val work = createMiroWork(
       canonicalId = "b4aurznb",
       sourceId = "B000765",
       title = "A broken beach of basilisks"
@@ -157,7 +172,8 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       val service = new IngestorWorkerService(
-        esIndex = "works",
+        esIndexV1 = "works-v1",
+        esIndexV2 = "works-v2",
         identifiedWorkIndexer = brokenWorkIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
