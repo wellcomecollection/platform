@@ -11,13 +11,15 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.fixtures.S3
 
 class SierraBibMergerWorkerServiceTest
     extends FunSpec
     with MockitoSugar
     with ScalaFutures
     with Matchers
-    with ExtendedPatience {
+    with ExtendedPatience
+    with S3 {
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
@@ -32,7 +34,8 @@ class SierraBibMergerWorkerServiceTest
       sqsReader,
       ActorSystem(),
       metricsSender,
-      mergerUpdaterService)
+      mergerUpdaterService,
+      s3Client)
 
     val future = worker.processMessage(
       SQSMessage(

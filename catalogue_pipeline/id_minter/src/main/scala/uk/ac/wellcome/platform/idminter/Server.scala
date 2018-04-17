@@ -26,7 +26,9 @@ class Server extends HttpServer {
     SQSReaderModule,
     SNSConfigModule,
     SNSClientModule,
-    AmazonCloudWatchModule
+    AmazonCloudWatchModule,
+    S3ClientModule,
+    S3ConfigModule
   )
 
   override def configureHttp(router: HttpRouter) {

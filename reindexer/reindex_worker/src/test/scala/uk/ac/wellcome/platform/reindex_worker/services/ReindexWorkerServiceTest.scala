@@ -29,6 +29,7 @@ import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import uk.ac.wellcome.models.aws.S3Config
 
 class ReindexWorkerServiceTest
     extends FunSpec
@@ -38,6 +39,7 @@ class ReindexWorkerServiceTest
     with LocalDynamoDb[TestRecord]
     with SNS
     with SQS
+    with S3
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[TestRecord] =
@@ -55,37 +57,42 @@ class ReindexWorkerServiceTest
 
       withLocalSqsQueue { queue =>
         withLocalSnsTopic { topic =>
-          val workerService = new ReindexWorkerService(
-            targetService = new ReindexService(
-              dynamoDBClient = dynamoDbClient,
-              metricsSender = metricsSender,
-              versionedDao = new VersionedDao(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(table = table.name)
+          withLocalS3Bucket { bucket =>
+            val workerService = new ReindexWorkerService(
+              targetService = new ReindexService(
+                dynamoDBClient = dynamoDbClient,
+                metricsSender = metricsSender,
+                versionedDao = new VersionedDao(
+                  dynamoDbClient = dynamoDbClient,
+                  dynamoConfig = DynamoConfig(table = table.name)
+                ),
+                dynamoConfig = DynamoConfig(table = table.name),
+                indexName = table.index
               ),
-              dynamoConfig = DynamoConfig(table = table.name),
-              indexName = table.index
-            ),
-            reader = new SQSReader(
-              sqsClient = sqsClient,
-              sqsConfig = SQSConfig(
-                queueUrl = queue.url,
-                waitTime = 1 second,
-                maxMessages = 1
-              )
-            ),
-            snsWriter = new SNSWriter(
-              snsClient = snsClient,
-              snsConfig = SNSConfig(topicArn = topic.arn)
-            ),
-            system = actorSystem,
-            metrics = metricsSender
-          )
+              reader = new SQSReader(
+                sqsClient = sqsClient,
+                sqsConfig = SQSConfig(
+                  queueUrl = queue.url,
+                  waitTime = 1 second,
+                  maxMessages = 1
+                )
+              ),
+              snsWriter = new SNSWriter(
+                snsClient,
+                SNSConfig(topicArn = topic.arn),
+                s3Client,
+                S3Config(bucketName = bucket.name)
+              ),
+              system = actorSystem,
+              metrics = metricsSender,
+              s3 = s3Client
+            )
 
-          try {
-            testWith(workerService)
-          } finally {
-            workerService.stop()
+            try {
+              testWith(workerService)
+            } finally {
+              workerService.stop()
+            }
           }
         }
       }
@@ -183,7 +190,8 @@ class ReindexWorkerServiceTest
         reader = mock[SQSReader],
         snsWriter = mock[SNSWriter],
         system = actorSystem,
-        metrics = metricsSender
+        metrics = metricsSender,
+        s3 = s3Client
       )
 
       val reindexJob = ReindexJob(

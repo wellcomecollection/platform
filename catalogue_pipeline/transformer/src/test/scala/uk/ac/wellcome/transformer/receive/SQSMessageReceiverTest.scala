@@ -20,7 +20,7 @@ import uk.ac.wellcome.models.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS, TestWith}
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -72,7 +72,12 @@ class SQSMessageReceiverTest
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
     val snsWriter =
-      maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topic.arn)))
+      maybeSnsWriter.getOrElse(
+        new SNSWriter(
+          snsClient,
+          SNSConfig(topic.arn),
+          s3Client,
+          S3Config(bucketName = bucket.name)))
     val recordReceiver = new SQSMessageReceiver(
       snsWriter = snsWriter,
       s3Client = s3Client,
@@ -294,8 +299,8 @@ class SQSMessageReceiverTest
 
   private def mockSNSWriter = {
     val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(Future { PublishAttempt(Right("1234")) })
+    val result: Future[Unit] = Future.successful(Unit)
+    when(mockSNS.writeMessage(anyString(), anyString())).thenReturn(result)
     mockSNS
   }
 

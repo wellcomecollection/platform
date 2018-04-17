@@ -10,6 +10,7 @@ import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.sns.SNSWriter
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import com.amazonaws.services.s3.AmazonS3
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -20,8 +21,9 @@ class IdMinterWorkerService @Inject()(
   writer: SNSWriter,
   reader: SQSReader,
   system: ActorSystem,
-  metrics: MetricsSender
-) extends SQSWorker(reader, system, metrics) {
+  metrics: MetricsSender,
+  s3: AmazonS3
+) extends SQSWorker(reader, system, metrics, s3) {
 
   override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"

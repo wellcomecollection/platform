@@ -12,13 +12,15 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import io.circe.generic.extras.semiauto._
 import scala.concurrent.Future
 import uk.ac.wellcome.dynamo._
+import com.amazonaws.services.s3.AmazonS3
 
 class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  dynamoInserter: DynamoInserter
-) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics) {
+  dynamoInserter: DynamoInserter,
+  s3: AmazonS3
+) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics, s3) {
 
   override implicit val decoder = deriveDecoder[SierraRecord]
 

@@ -7,15 +7,17 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.utils.JsonUtil.fromJson
+import com.amazonaws.services.s3.AmazonS3
 
 import scala.concurrent.Future
 
 abstract class SQSWorkerToDynamo[T](
   sqsReader: SQSReader,
   actorSystem: ActorSystem,
-  metricsSender: MetricsSender
-) extends SQSWorker(sqsReader, actorSystem, metricsSender) {
+  metricsSender: MetricsSender,
+  s3: AmazonS3
+) extends SQSWorker(sqsReader, actorSystem, metricsSender, s3) {
 
   implicit val decoder: Decoder[T]
   def store(t: T): Future[Unit]

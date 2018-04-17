@@ -9,10 +9,14 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import com.twitter.inject.Logging
 import scala.concurrent.duration._
+import com.amazonaws.services.s3.AmazonS3
+import uk.ac.wellcome.s3.S3Uri
+import uk.ac.wellcome.s3.S3ObjectStore
 
 abstract class SQSWorker(sqsReader: SQSReader,
                          actorSystem: ActorSystem,
-                         metricsSender: MetricsSender)
+                         metricsSender: MetricsSender,
+                         s3: AmazonS3)
     extends Logging {
 
   info(s"Starting SQS worker=[$workerName]")
@@ -27,13 +31,30 @@ abstract class SQSWorker(sqsReader: SQSReader,
   private def processMessages(): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        m <- Future.fromTry { fromJson[SQSMessage](message.getBody) }
-        _ <- Future.successful { debug(s"Processing message: $m") }
+        pointer <- Future.fromTry { fromJson[MessagePointer](message.getBody) }
+        _ <- Future.successful {
+          debug(s"Processing message pointer: $pointer")
+        }
+        message <- loadMessageFromStore(pointer)
+
         metricName = s"${workerName}_ProcessMessage"
-        _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
+        _ <- Future.successful { debug(s"Processing message: $message") }
+        _ <- metricsSender.timeAndCount(
+          metricName,
+          () => processMessage(message))
       } yield ()
     } recover {
       case exception: Throwable => terminalFailureHook(exception)
+    }
+  }
+
+  private def loadMessageFromStore(
+    pointer: MessagePointer): Future[SQSMessage] = {
+    pointer.src match {
+      case S3Uri(bucket, key) => S3ObjectStore.get[SQSMessage](s3, bucket)(key)
+      case _ =>
+        Future.failed(new RuntimeException(
+          s"Unsupported SQS message pointer scheme = [${pointer.src.getScheme}]"))
     }
   }
 
