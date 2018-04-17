@@ -42,9 +42,9 @@ class IngestorWorkerServiceTest
   val metricsSender: MetricsSender =
     new MetricsSender(
       namespace = "reindexer-tests",
-      100 milliseconds,
-      mock[AmazonCloudWatch],
-      ActorSystem())
+      flushInterval = 100 milliseconds,
+      amazonCloudWatch = mock[AmazonCloudWatch],
+      actorSystem = ActorSystem())
 
   val actorSystem = ActorSystem()
 
@@ -55,6 +55,14 @@ class IngestorWorkerServiceTest
                       visible: Boolean = true,
                       version: Int = 1
                     ): IdentifiedWork = createWork(canonicalId, sourceId, title, IdentifierSchemes.miroImageNumber, visible, version)
+
+  def createSierraWork(
+                      canonicalId: String,
+                      sourceId: String,
+                      title: String,
+                      visible: Boolean = true,
+                      version: Int = 1
+                    ): IdentifiedWork = createWork(canonicalId, sourceId, title, IdentifierSchemes.sierraSystemNumber, visible, version)
 
   def createWork(canonicalId: String,
                  sourceId: String,
@@ -77,7 +85,7 @@ class IngestorWorkerServiceTest
       visible = visible)
   }
 
-  it("should insert an Miro identified Work into v1 and v2 indices") {
+  it("inserts an Miro identified Work into v1 and v2 indices") {
     val work = createMiroWork(
       canonicalId = "m7b2aqtw",
       sourceId = "M000765",
@@ -117,7 +125,83 @@ class IngestorWorkerServiceTest
     }
   }
 
-  it("should return a failed future if the input string is not a Work") {
+  it("inserts an Sierra identified Work only into the v2 index") {
+    val work = createSierraWork(
+      canonicalId = "m7b2aqtw",
+      sourceId = "M000765",
+      title = "A monstrous monolith of moss"
+    )
+
+    val sqsMessage = messageFromString(toJson(work).get)
+
+    val workIndexer =
+      new WorkIndexer(itemType, elasticClient, metricsSender)
+
+    withLocalSqsQueue { queue =>
+      withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+          val service = new IngestorWorkerService(
+            indexNameV1,
+            indexNameV2,
+            identifiedWorkIndexer = workIndexer,
+            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            system = actorSystem,
+            metrics = metricsSender
+          )
+
+          service.processMessage(sqsMessage)
+
+          assertElasticsearchNeverHasWork(
+              work,
+              indexName = indexNameV1,
+              itemType = itemType)
+
+          assertElasticsearchEventuallyHasWork(
+              work,
+              indexName = indexNameV2,
+              itemType = itemType)
+          }
+      }
+    }
+  }
+
+  it("fails inserting a non sierra or miro identified work") {
+    val work = createWork(
+      canonicalId = "m7b2aqtw",
+      sourceId = "M000765",
+      title = "A monstrous monolith of moss",
+      identifierScheme = IdentifierSchemes.calmAltRefNo
+    )
+
+    val sqsMessage = messageFromString(toJson(work).get)
+
+    val workIndexer =
+      new WorkIndexer(itemType, elasticClient, metricsSender)
+
+    withLocalSqsQueue { queue =>
+      withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+          val service = new IngestorWorkerService(
+            indexNameV1,
+            indexNameV2,
+            identifiedWorkIndexer = workIndexer,
+            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            system = actorSystem,
+            metrics = metricsSender
+          )
+
+          val future = service.processMessage(sqsMessage)
+
+          whenReady(future.failed){ ex =>
+            ex shouldBe a [GracefulFailureException]
+            ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+          }
+        }
+      }
+    }
+  }
+
+  it("returns a failed future if the input string is not a Work") {
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
     val indexNameV1 = "works-v1"
     val indexNameV2 = "works-v1"

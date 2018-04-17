@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes}
 import uk.ac.wellcome.models.aws.SQSMessage
@@ -29,6 +30,11 @@ class IngestorWorkerService @Inject()(
     } yield ()
 
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
-    List(esIndexV1, esIndexV2)
+    work.sourceIdentifier.identifierScheme match {
+      case IdentifierSchemes.miroImageNumber => List(esIndexV1, esIndexV2)
+      case IdentifierSchemes.sierraSystemNumber => List(esIndexV2)
+      case _ => throw GracefulFailureException(new RuntimeException(s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))
+    }
+
   }
 }
