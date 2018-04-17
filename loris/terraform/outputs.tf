@@ -1,3 +1,3 @@
-output "loris_cloudfront_id" {
-  value = "${aws_cloudfront_distribution.loris.id}"
+output "cloudfront_errors_topic_arn" {
+  value = "${aws_sns_topic.cloudfront_errors.arn}"
 }

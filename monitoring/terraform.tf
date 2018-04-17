@@ -19,12 +19,12 @@ data "terraform_remote_state" "catalogue_pipeline" {
   }
 }
 
-data "terraform_remote_state" "loris_cloudfront_monitoring" {
+data "terraform_remote_state" "loris" {
   backend = "s3"
 
   config {
     bucket = "wellcomecollection-platform-infra"
-    key    = "terraform/loris_cloudfront_monitoring.tfstate"
+    key    = "terraform/loris.tfstate"
     region = "eu-west-1"
   }
 }
