@@ -63,7 +63,13 @@ def test_getting_only_one_message_from_sqs(
 ):
     requests = [
         attr.asdict(
-            run_elasticdump.SnapshotRequest(time, bucket, elasticsearch_index)
+            run_elasticdump.SnapshotRequest(
+                time=time,
+                private_bucket_name=bucket,
+                public_bucket_name='bukkit',
+                public_object_key='works.json.gz',
+                es_index=elasticsearch_index
+            )
         ) for time in ('now', 'then')
     ]
     for r in requests:
