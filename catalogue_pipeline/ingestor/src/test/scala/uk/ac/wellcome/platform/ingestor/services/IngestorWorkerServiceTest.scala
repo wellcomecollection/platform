@@ -27,6 +27,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.duration._
+import uk.ac.wellcome.test.fixtures.S3
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -35,7 +36,8 @@ class IngestorWorkerServiceTest
     with MockitoSugar
     with JsonTestUtil
     with ElasticsearchFixtures
-    with SQS {
+    with SQS
+    with S3 {
 
   val itemType = "work"
 
@@ -88,7 +90,8 @@ class IngestorWorkerServiceTest
           identifiedWorkIndexer = workIndexer,
           reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
           system = actorSystem,
-          metrics = metricsSender
+          metrics = metricsSender,
+          s3 = s3Client
         )
 
         service.processMessage(sqsMessage)
@@ -119,7 +122,8 @@ class IngestorWorkerServiceTest
         identifiedWorkIndexer = workIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
-        metrics = metricsSender
+        metrics = metricsSender,
+        s3 = s3Client
       )
 
       val future = service.processMessage(sqsMessage)
@@ -160,7 +164,8 @@ class IngestorWorkerServiceTest
         identifiedWorkIndexer = brokenWorkIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
-        metrics = metricsSender
+        metrics = metricsSender,
+        s3 = s3Client
       )
 
       val future = service.processMessage(sqsMessage)

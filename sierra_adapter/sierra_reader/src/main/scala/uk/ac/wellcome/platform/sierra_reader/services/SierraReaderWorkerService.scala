@@ -37,7 +37,7 @@ class SierraReaderWorkerService @Inject()(
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.fields") fields: String
-) extends SQSWorker(reader, system, metrics) {
+) extends SQSWorker(reader, system, metrics, s3client) {
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()

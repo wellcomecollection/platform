@@ -12,13 +12,14 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao
 }
 import uk.ac.wellcome.platform.idminter.{fixtures, Server}
-import uk.ac.wellcome.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest
     extends FunSpec
     with SQS
     with SNS
+    with S3
     with fixtures.IdentifiersDatabase
     with fixtures.Server
     with Eventually
@@ -29,32 +30,34 @@ class IdMinterWorkerTest
   it("should create the Identifiers table in MySQL upon startup") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
+        withLocalS3Bucket { bucket =>
+          withIdentifiersDatabase { dbConfig =>
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket) ++ dbConfig.flags
 
-          val identifiersDao = mock[IdentifiersDao]
+            val identifiersDao = mock[IdentifiersDao]
 
-          withServer(flags, (server: EmbeddedHttpServer) => {
-            server.bind[IdentifiersDao](identifiersDao)
-          }) { _ =>
-            val database = dbConfig.database
-            val table = dbConfig.table
+            withServer(flags, (server: EmbeddedHttpServer) => {
+              server.bind[IdentifiersDao](identifiersDao)
+            }) { _ =>
+              val database = dbConfig.database
+              val table = dbConfig.table
 
-            eventually {
-              val fields = DB readOnly { implicit session =>
-                sql"DESCRIBE $database.$table"
-                  .map(
-                    rs =>
-                      FieldDescription(
-                        rs.string("Field"),
-                        rs.string("Type"),
-                        rs.string("Null"),
-                        rs.string("Key")))
-                  .list()
-                  .apply()
+              eventually {
+                val fields = DB readOnly { implicit session =>
+                  sql"DESCRIBE $database.$table"
+                    .map(
+                      rs =>
+                        FieldDescription(
+                          rs.string("Field"),
+                          rs.string("Type"),
+                          rs.string("Null"),
+                          rs.string("Key")))
+                    .list()
+                    .apply()
+                }
+
+                fields.length should be > 0
               }
-
-              fields.length should be > 0
             }
           }
         }

@@ -9,6 +9,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import com.amazonaws.services.s3.AmazonS3
 
 import io.circe.generic.extras.semiauto._
 
@@ -18,8 +19,9 @@ class SierraBibMergerWorkerService @Inject()(
   reader: SQSReader,
   system: ActorSystem,
   metrics: MetricsSender,
-  sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics) {
+  sierraBibMergerUpdaterService: SierraBibMergerUpdaterService,
+  s3: AmazonS3
+) extends SQSWorkerToDynamo[SierraRecord](reader, system, metrics, s3) {
 
   override implicit val decoder = deriveDecoder[SierraRecord]
 

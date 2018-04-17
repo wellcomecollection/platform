@@ -84,7 +84,8 @@ class ReindexWorkerServiceTest
                 S3Config(bucketName = bucket.name)
               ),
               system = actorSystem,
-              metrics = metricsSender
+              metrics = metricsSender,
+              s3 = s3Client
             )
 
             try {
@@ -189,7 +190,8 @@ class ReindexWorkerServiceTest
         reader = mock[SQSReader],
         snsWriter = mock[SNSWriter],
         system = actorSystem,
-        metrics = metricsSender
+        metrics = metricsSender,
+        s3 = s3Client
       )
 
       val reindexJob = ReindexJob(

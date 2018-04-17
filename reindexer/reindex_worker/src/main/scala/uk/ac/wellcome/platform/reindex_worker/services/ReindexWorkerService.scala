@@ -14,14 +14,16 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
+import com.amazonaws.services.s3.AmazonS3
 
 class ReindexWorkerService @Inject()(
   targetService: ReindexService,
   reader: SQSReader,
   snsWriter: SNSWriter,
   system: ActorSystem,
-  metrics: MetricsSender
-) extends SQSWorker(reader, system, metrics) {
+  metrics: MetricsSender,
+  s3: AmazonS3
+) extends SQSWorker(reader, system, metrics, s3) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {

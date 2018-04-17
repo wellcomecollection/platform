@@ -24,7 +24,8 @@ class SQSWorkerTest
     with MockitoSugar
     with Eventually
     with Akka
-    with SQS {
+    with SQS
+    with S3 {
 
   def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
     val metricsSender: MetricsSender = mock[MetricsSender]
@@ -42,11 +43,12 @@ class SQSWorkerTest
   def withSqsWorker[R](
     actors: ActorSystem,
     queue: Queue,
-    metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
+    metrics: MetricsSender,
+    bucket: S3.Bucket)(testWith: TestWith[SQSWorker, R]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
-      new SQSWorker(sqsReader, actors, metrics) {
+      new SQSWorker(sqsReader, actors, metrics, s3Client) {
         override def processMessage(message: SQSMessage) =
           Future.successful(())
       }
@@ -70,14 +72,17 @@ class SQSWorkerTest
     withActorSystem[R] and
       withLocalSqsQueue[R] and
       withMockMetricSender[R] _ and
+      withLocalS3Bucket[R] and
       withSqsWorker[R] _
 
   it("processes messages") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (_, queue, metrics, bucket, worker) =>
         val json = toJson(ValidSqsMessage()).get
 
-        sqsClient.sendMessage(queue.url, json)
+        val key = "message-key"
+        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        s3Client.putObject(bucket.name, key, json)
 
         eventually {
           verify(
@@ -93,7 +98,7 @@ class SQSWorkerTest
 
   it("does report an error when a runtime error occurs") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (_, queue, metrics, bucket, worker) =>
         when(
           metrics.timeAndCount[Unit](
             anyString(),
@@ -103,7 +108,30 @@ class SQSWorkerTest
 
         val json = toJson(ValidSqsMessage()).get
 
-        sqsClient.sendMessage(queue.url, json)
+        val key = "message-key"
+        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        s3Client.putObject(bucket.name, key, json)
+
+        eventually {
+          verify(metrics)
+            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+        }
+    }
+  }
+
+  it("report error when unsupported protocol is provided as pointer") {
+    withFixtures {
+      case (_, queue, metrics, bucket, worker) =>
+        when(
+          metrics.timeAndCount[Unit](
+            anyString(),
+            any[() => Future[Unit]].apply
+          )
+        ).thenThrow(new RuntimeException)
+
+        val json = toJson(ValidSqsMessage()).get
+
+        sqsClient.sendMessage(queue.url, s"""{"src":"http://example.org"}""")
 
         eventually {
           verify(metrics)
@@ -114,7 +142,7 @@ class SQSWorkerTest
 
   it("does not report an error when unable to parse a message") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (_, queue, metrics, bucket, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
 
         eventually {

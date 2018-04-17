@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sns
+package uk.ac.wellcome.sqs
 
 import java.net.URI
 import io.circe._

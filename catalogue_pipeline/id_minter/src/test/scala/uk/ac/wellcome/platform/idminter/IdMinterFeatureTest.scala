@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
 
@@ -16,6 +16,7 @@ class IdMinterFeatureTest
     extends FunSpec
     with SQS
     with SNS
+    with S3
     with fixtures.IdentifiersDatabase
     with fixtures.Server
     with ExtendedPatience
@@ -43,7 +44,7 @@ class IdMinterFeatureTest
       "timestamp")
   }
 
-  private def assertMessageIsNotDeleted(queue: Queue): Unit = {
+  private def assertMessageIsNotDeleted(queue: SQS.Queue): Unit = {
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
     // So we wait for longer than the visibility timeout and then we assert that it has become
     // invisible again, which means that the id_minter picked it up again,
@@ -66,51 +67,53 @@ class IdMinterFeatureTest
     "mints the same ID for SourcedWorks that have matching source identifiers") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
+        withLocalS3Bucket { bucket =>
+          withIdentifiersDatabase { dbConfig =>
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket) ++ dbConfig.flags
 
-          withServer(flags) { _ =>
-            eventuallyTableExists(dbConfig)
+            withServer(flags) { _ =>
+              eventuallyTableExists(dbConfig)
 
-            val miroID = "M0001234"
-            val title = "A limerick about a lion"
+              val miroID = "M0001234"
+              val title = "A limerick about a lion"
 
-            val identifier =
-              SourceIdentifier(
-                IdentifierSchemes.miroImageNumber,
-                "Work",
-                miroID)
+              val identifier =
+                SourceIdentifier(
+                  IdentifierSchemes.miroImageNumber,
+                  "Work",
+                  miroID)
 
-            val work = UnidentifiedWork(
-              title = Some(title),
-              sourceIdentifier = identifier,
-              version = 1,
-              identifiers = List(identifier))
+              val work = UnidentifiedWork(
+                title = Some(title),
+                sourceIdentifier = identifier,
+                version = 1,
+                identifiers = List(identifier))
 
-            val sqsMessage = SQSMessage(
-              Some("subject"),
-              toJson(work).get,
-              "topic",
-              "messageType",
-              "timestamp"
-            )
-
-            val messageCount = 5
-
-            (1 to messageCount).foreach { _ =>
-              sqsClient.sendMessage(
-                queue.url,
-                toJson(sqsMessage).get
+              val sqsMessage = SQSMessage(
+                Some("subject"),
+                toJson(work).get,
+                "topic",
+                "messageType",
+                "timestamp"
               )
-            }
 
-            eventually {
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages.length shouldBe >=(messageCount)
+              val messageCount = 5
+              val baseKey = "message-key"
 
-              getWorksFromMessages(messages).foreach { work =>
-                work.identifiers.head.value shouldBe miroID
-                work.title shouldBe Some(title)
+              (1 to messageCount).foreach { _ =>
+                val key = s"$baseKey/$messageCount"
+                s3Client.putObject(bucket.name, key, toJson(sqsMessage).get)
+                sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+              }
+
+              eventually {
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages.length shouldBe >=(messageCount)
+
+                getWorksFromMessages(messages).foreach { work =>
+                  work.identifiers.head.value shouldBe miroID
+                  work.title shouldBe Some(title)
+                }
               }
             }
           }
@@ -122,23 +125,27 @@ class IdMinterFeatureTest
   it("continues if something fails processing a message") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
-          val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
+        withLocalS3Bucket { bucket =>
+          withIdentifiersDatabase { dbConfig =>
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket) ++ dbConfig.flags
 
-          withServer(flags) { _ =>
-            sqsClient.sendMessage(queue.url, "not a json string")
+            withServer(flags) { _ =>
+              sqsClient.sendMessage(queue.url, "not a json string")
 
-            val miroId = "1234"
-            val sqsMessage = generateSqsMessage(miroId)
+              val miroId = "1234"
+              val sqsMessage = generateSqsMessage(miroId)
 
-            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+              val key = "message-key"
+              sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+              s3Client.putObject(bucket.name, key, toJson(sqsMessage).get)
 
-            eventually {
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size (1)
+              eventually {
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages should have size (1)
+              }
+
+              assertMessageIsNotDeleted(queue)
             }
-
-            assertMessageIsNotDeleted(queue)
           }
         }
       }

@@ -40,7 +40,8 @@ class SierraItemsToDynamoWorkerServiceTest
     with ExtendedPatience
     with MockitoSugar
     with Akka
-    with ScalaFutures {
+    with ScalaFutures
+    with S3 {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
     DynamoFormat[SierraItemRecord]
@@ -79,7 +80,8 @@ class SierraItemsToDynamoWorkerServiceTest
                   new VersionedDao(
                     dynamoDbClient = dynamoDbClient,
                     dynamoConfig = DynamoConfig(table.name)
-                  ))
+                  )),
+                s3 = s3Client
               )
 
             testWith(

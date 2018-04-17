@@ -13,6 +13,7 @@ import java.util.UUID.randomUUID
 import scala.concurrent.{blocking, Future}
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.{Failure, Success, Try}
+import uk.ac.wellcome.sqs.MessagePointer
 
 class SNSWriter @Inject()(
   client: AmazonSNS,

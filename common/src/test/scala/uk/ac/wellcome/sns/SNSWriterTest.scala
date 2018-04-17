@@ -9,6 +9,7 @@ import org.scalatest.EitherValues
 import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.Success
+import uk.ac.wellcome.sqs.MessagePointer
 
 class SNSWriterTest
     extends FunSpec
