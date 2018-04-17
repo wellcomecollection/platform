@@ -25,6 +25,8 @@ resource "aws_lambda_permission" "allow_sns_cloudfront_trigger" {
 }
 
 resource "aws_sns_topic_subscription" "subscribe_lambda_to_cloudfront_errors" {
+  provider = "aws.us_east_1"
+
   topic_arn = "${var.cloudfront_errors_topic_arn}"
   protocol  = "lambda"
   endpoint  = "${module.lambda_post_to_slack.arn}"
