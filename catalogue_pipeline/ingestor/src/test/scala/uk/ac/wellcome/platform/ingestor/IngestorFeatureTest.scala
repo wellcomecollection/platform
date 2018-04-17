@@ -85,7 +85,7 @@ class IngestorFeatureTest
     }
   }
 
-  it("deletes a message from the queue if it fails processing") {
+  it("does not delete a message from the queue if it fails processing") {
     withLocalSqsQueue { queue =>
       val invalidMessage = JsonUtil
         .toJson(
