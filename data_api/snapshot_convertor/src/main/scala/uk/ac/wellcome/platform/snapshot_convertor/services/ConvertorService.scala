@@ -85,10 +85,11 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
     val s3source = S3Source(s3inputStream = s3inputStream)
 
-    val toDisplayWork: ((IdentifiedWork, WorksIncludes) => DisplayWork) = apiVersion match {
-      case ApiVersions.v1 => DisplayWorkV1.apply
-      case ApiVersions.v2 => DisplayWorkV2.apply
-    }
+    val toDisplayWork: ((IdentifiedWork, WorksIncludes) => DisplayWork) =
+      apiVersion match {
+        case ApiVersions.v1 => DisplayWorkV1.apply
+        case ApiVersions.v2 => DisplayWorkV2.apply
+      }
 
     // This source generates instances of DisplayWork from the source snapshot.
     val displayWorks: Source[DisplayWork, Any] = s3source

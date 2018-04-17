@@ -130,8 +130,8 @@ class ConvertorServiceTest
   it("completes a V2 conversion successfully") {
     withFixtures {
       case (
-        ((_, _, _, convertorService: ConvertorService), privateBucket),
-        publicBucket) =>
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
         val visibleWorks = createWorks(count = 4).toList
         val notVisibleWorks = createWorks(count = 2, visible = false).toList
 

@@ -24,7 +24,8 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(toDisplayWork = DisplayWorkV1.apply)
+        val flow = IdentifiedWorkToVisibleDisplayWork(
+          toDisplayWork = DisplayWorkV1.apply)
 
         val works = createWorks(count = 3).toList
 
@@ -47,7 +48,8 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(toDisplayWork = DisplayWorkV2.apply)
+        val flow = IdentifiedWorkToVisibleDisplayWork(
+          toDisplayWork = DisplayWorkV2.apply)
 
         val works = createWorks(count = 3).toList
 
@@ -70,7 +72,8 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       implicit val executionContext: ExecutionContextExecutor =
         actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(toDisplayWork = DisplayWorkV1.apply)
+        val flow = IdentifiedWorkToVisibleDisplayWork(
+          toDisplayWork = DisplayWorkV1.apply)
 
         val visibleWorks = createWorks(count = 3).toList
         val notVisibleWorks = createWorks(count = 2, visible = false).toList
