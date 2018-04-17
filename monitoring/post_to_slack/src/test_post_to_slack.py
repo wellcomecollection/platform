@@ -108,7 +108,7 @@ def event(critical_hook, alarm_name, alarm_reason):
 def test_post_to_slack(mock_post, event, critical_hook, alarm_name):
     mock_post.return_value.ok = True
 
-    post_to_slack.main(event, context=None)
+    post_to_slack.main(event)
 
     calls = mock_post.call_args_list
 
@@ -213,3 +213,40 @@ class TestPrepareSlackPayload:
         )
 
         # TODO: Make an assertion on the payload about the log events we see.
+
+
+@mock.patch('post_to_slack.requests.post')
+def test_regression_issue_1900(mock_post):
+    event = {
+        'Records': [{
+            'EventSource': 'aws:sns',
+            'EventSubscriptionArn': 'arn:aws:sns:eu-west-1:760097843905:shared_alb_server_error_alarm:7701d498-64a4-425e-b966-f9069ecf91a2',
+            'EventVersion': '1.0',
+            'Sns': {
+                'Message': '{"AlarmName":"loris-alb-not-enough-healthy-hosts","AlarmDescription":"This '
+                           'metric monitors '
+                           'loris-alb-not-enough-healthy-hosts","AWSAccountId":"760097843905","NewStateValue":"ALARM","NewStateReason":"Threshold '
+                           'Crossed: no datapoints were received for 1 '
+                           'period and 1 missing datapoint was treated '
+                           'as '
+                           '[Breaching].","StateChangeTime":"2018-04-16T15:34:56.438+0000","Region":"EU '
+                           '(Ireland)","OldStateValue":"INSUFFICIENT_DATA","Trigger":{"MetricName":"HealthyHostCount","Namespace":"AWS/ApplicationELB","StatisticType":"Statistic","Statistic":"SUM","Unit":null,"Dimensions":[{"name":"TargetGroup","value":"targetgroup/loris/087013874ebbe481"},{"name":"LoadBalancer","value":"app/loris/c0af06f31b54a8c9"}],"Period":60,"EvaluationPeriods":1,"ComparisonOperator":"LessThanThreshold","Threshold":2.0,"TreatMissingData":"- '
+                           'TreatMissingData: '
+                           'Breaching","EvaluateLowSampleCountPercentile":""}}',
+                'MessageAttributes': {},
+                'MessageId': '6bd3a539-6665-5449-9496-f677a285954e',
+                'Signature': 'QI0mjffHTGE0y/HcQQoECquP0c3Xtzc6CiFzFBEfM3KRKWFmT2gcebnRU7vGBqh5uHKU+H98k7XJkUqkTVwtz0NkNk5gnRdP/Aqz3ZOtheRqv2qydbzXiIh94mHm9u62Fsiplqlq2vXdKMRKtRFovw58baieYSYAuPhxf+s74TTIY1gU79Lx4IdXfJHf1xfT2UZLHvt83swy5C+19elIlqM9+48+dnShRdQJAk/SOQnGNyTWeVdu+6w2JeNNa6avFaTqLryIBXUO8kgQy6E5VdXtka0Ufiu6qmDKhWRWZajGQBhYHpS6QbgVD7tsBr+FEgeQSb8JfOeuAHtly+hIOw==',
+                'SignatureVersion': '1',
+                'SigningCertUrl': 'https://sns.eu-west-1.amazonaws.com/SimpleNotificationService-433026a4050d206028891664da859041.pem',
+                'Subject': 'ALARM: "loris-alb-not-enough-healthy-hosts" '
+                           'in EU (Ireland)',
+                'Timestamp': '2018-04-16T15:34:56.473Z',
+                'TopicArn': 'arn:aws:sns:eu-west-1:760097843905:shared_alb_server_error_alarm',
+                'Type': 'Notification',
+                'UnsubscribeUrl': 'https://sns.eu-west-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:eu-west-1:760097843905:shared_alb_server_error_alarm:7701d498-64a4-425e-b966-f9069ecf91a2'
+            }
+        }]
+    }
+
+    mock_post.return_value.ok = True
+    post_to_slack.main(event)
