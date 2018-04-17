@@ -44,13 +44,15 @@ module "service" {
     es_port     = "${var.es_config["port"]}"
     es_name     = "${var.es_config["name"]}"
     es_index    = "${var.es_config["index"]}"
+    es_index_v1    = "${var.es_config["index_v1"]}"
+    es_index_v2    = "${var.es_config["index_v2"]}"
     es_doc_type = "${var.es_config["doc_type"]}"
     es_username = "${var.es_config["username"]}"
     es_password = "${var.es_config["password"]}"
     es_protocol = "${var.es_config["protocol"]}"
   }
 
-  env_vars_length = 9
+  env_vars_length = 11
 
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
