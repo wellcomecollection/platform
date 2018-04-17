@@ -12,8 +12,7 @@
   <logger name="org.apache.http" level="ERROR"/>
   <logger name="io.swagger" level="ERROR"/>
   <logger name="io.netty" level="ERROR"/>
-  <logger name="com.twitter" level="ERROR"/>
-  <logger name="uk.ac.wellcome.platform.api.Server" level="ERROR"/>
+  <logger name="com.twitter" level="INFO"/>
   <logger name="com.sksamuel.elastic4s" level="INFO"/>
   <logger name="com.amazonaws" level="INFO"/>
     <root level="DEBUG">
