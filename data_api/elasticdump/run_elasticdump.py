@@ -144,8 +144,8 @@ def run():
         Message=json.dumps({
             'privateBucketName': snapshot_request.private_bucket_name,
             'privateObjectKey': private_object_key,
-            'publicBucketName': public_bucket_name,
-            'publicObjectKey': public_object_key,
+            'publicBucketName': snapshot_request.public_bucket_name,
+            'publicObjectKey': snapshot_request.public_object_key,
         })
     )
     print(f'resp = {resp!r}')

@@ -46,7 +46,7 @@ def main(event=None, _ctxt=None, sns_client=None):
             time=dt.datetime.utcnow().isoformat(),
             private_bucket_name=private_bucket_name,
             public_bucket_name=public_bucket_name,
-            public_object_key=public_object_key
+            public_object_key=public_object_key,
             es_index=es_index
         )
 
