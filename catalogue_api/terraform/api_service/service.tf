@@ -4,7 +4,7 @@ locals {
   api_release_id   = "${local.is_prod_api ? var.prod_api_release_id : var.release_ids["api"]}"
   nginx_release_id = "${local.is_prod_api ? var.prod_api_nginx_release_id : var.release_ids["nginx_api"]}"
 
-  host_name = "${local.is_prod_api ? "api.wellcomecollection.org" : "api-stage.wellcomecollection.org"}"
+  host_name = "${local.is_prod_api ? var.api_prod_host : var.api_stage_host}"
 }
 
 data "template_file" "es_cluster_host" {
@@ -39,7 +39,7 @@ module "service" {
   memory = 2048
 
   env_vars = {
-    api_host    = "${var.api_host}"
+    api_host    = "${local.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_config["port"]}"
     es_name     = "${var.es_config["name"]}"
@@ -55,7 +55,7 @@ module "service" {
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
   healthcheck_path   = "/management/healthcheck"
-  path_pattern       = "/catalogue/v1/*"
+  path_pattern       = "/catalogue/*"
 
   loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
   server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"

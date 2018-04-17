@@ -57,9 +57,14 @@ variable "pinned_remus_api_nginx" {
 # These variables change less frequently -- the service blocks in services.tf
 # will choose which variable to use based on the value of `production_api`.
 
-variable "api_host" {
+variable "api_prod_host" {
   description = "Hostname to use for the production API"
   default     = "api.wellcomecollection.org"
+}
+
+variable "api_stage_host" {
+  description = "Hostname to use for the production API"
+  default     = "api-stage.wellcomecollection.org"
 }
 
 variable "es_config_romulus" {
