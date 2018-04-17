@@ -631,8 +631,12 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("only returns works from the v2 index") {
     withV2Api {
-      case (apiPrefix, indexNameV1, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-
+      case (
+          apiPrefix,
+          indexNameV1,
+          indexNameV2,
+          itemType,
+          server: EmbeddedHttpServer) =>
         val work1 = workWith(
           canonicalId = "1234",
           title = "A wombat wallowing under a willow"
@@ -651,21 +655,14 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=wombat",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(apiPrefix)
-              },
+                 |  ${resultList(apiPrefix)},
                  |  "results": [
                  |   {
                  |     "type": "Work",
-                 |     "id": "${
-                work2.canonicalId
-              }",
-                 |     "title": "${
-                work2.title.get
-              }",
+                 |     "id": "${work2.canonicalId}",
+                 |     "title": "${work2.title.get}",
                  |     "contributors": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],

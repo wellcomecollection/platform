@@ -20,8 +20,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  ${resultList(apiPrefix, totalResults = 3)},
                  |  "results": [
@@ -37,11 +36,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     },
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(0).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(0).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -59,11 +56,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     },
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(1).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(1).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -81,11 +76,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     },
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(2).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(2).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -118,8 +111,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/$canonicalId",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
@@ -133,11 +125,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  | },
                  | "lettering": "$lettering",
                  | "createdDate": ${period(work.createdDate.get)},
-                 | "creators": [ ${
-                identifiedOrUnidentifiable(
-                  work.creators(0),
-                  abstractAgent)
-              } ],
+                 | "creators": [ ${identifiedOrUnidentifiable(
+                                work.creators(0),
+                                abstractAgent)} ],
                  | "subjects": [ ],
                  | "genres": [ ],
                  | "publishers": [ ],
@@ -170,8 +160,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
@@ -202,16 +191,13 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?page=2&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(
-                  apiPrefix,
-                  pageSize = 1,
-                  totalPages = 3,
-                  totalResults = 3)
-              },
+                 |  ${resultList(
+                                apiPrefix,
+                                pageSize = 1,
+                                totalPages = 3,
+                                totalResults = 3)},
                  |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
                  |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
                  |  "results": [
@@ -227,11 +213,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |      },
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(1).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(1).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -246,16 +230,13 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?page=1&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(
-                  apiPrefix,
-                  pageSize = 1,
-                  totalPages = 3,
-                  totalResults = 3)
-              },
+                 |  ${resultList(
+                                apiPrefix,
+                                pageSize = 1,
+                                totalPages = 3,
+                                totalResults = 3)},
                  |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                  |  "results": [
                  |   {
@@ -270,11 +251,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |      },
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(0).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(0).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -289,16 +268,13 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?page=3&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(
-                  apiPrefix,
-                  pageSize = 1,
-                  totalPages = 3,
-                  totalResults = 3)
-              },
+                 |  ${resultList(
+                                apiPrefix,
+                                pageSize = 1,
+                                totalPages = 3,
+                                totalResults = 3)},
                  |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
                  |  "results": [
                  |   {
@@ -313,11 +289,9 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |      },
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
-                 |     "creators": [ ${
-                identifiedOrUnidentifiable(
-                  works(2).creators(0),
-                  abstractAgent)
-              } ],
+                 |     "creators": [ ${identifiedOrUnidentifiable(
+                                works(2).creators(0),
+                                abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -368,8 +342,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=dodo",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  ${resultList(apiPrefix)},
                  |  "results": [
@@ -422,8 +395,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?includes=identifiers",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  ${resultList(apiPrefix, totalResults = 2)},
                  |  "results": [
@@ -478,8 +450,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
             path =
               s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
@@ -520,8 +491,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/${work.canonicalId}",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
@@ -542,8 +512,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
             path =
               s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
@@ -583,8 +552,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=wombat",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  ${resultList(apiPrefix)},
                  |  "results": [
@@ -608,8 +576,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=igloo&_index=alt_records",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
                  |  ${resultList(apiPrefix)},
                  |  "results": [
@@ -631,7 +598,6 @@ class ApiV1WorksTest extends ApiWorksTestBase {
     }
   }
 
-
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     withApiFixtures(ApiVersions.v1) {
@@ -651,29 +617,20 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?includes=thumbnail",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(apiPrefix)
-              },
+                 |  ${resultList(apiPrefix)},
                  |  "results": [
                  |   {
                  |     "type": "Work",
-                 |     "id": "${
-                work.canonicalId
-              }",
-                 |     "title": "${
-                work.title.get
-              }",
+                 |     "id": "${work.canonicalId}",
+                 |     "title": "${work.title.get}",
                  |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
                  |     "placesOfPublication": [ ],
-                 |     "thumbnail": ${
-                location(work.thumbnail.get)
-              }
+                 |     "thumbnail": ${location(work.thumbnail.get)}
                  |    }
                  |  ]
                  |}
@@ -686,8 +643,12 @@ class ApiV1WorksTest extends ApiWorksTestBase {
 
   it("only returns works from the v1 index") {
     withApiFixtures(ApiVersions.v1) {
-      case (apiPrefix, indexNameV1, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-
+      case (
+          apiPrefix,
+          indexNameV1,
+          indexNameV2,
+          itemType,
+          server: EmbeddedHttpServer) =>
         val work1 = workWith(
           canonicalId = "1234",
           title = "A wombat wallowing under a willow"
@@ -706,21 +667,14 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=wombat",
             andExpect = Status.Ok,
-            withJsonBody =
-              s"""
+            withJsonBody = s"""
                  |{
-                 |  ${
-                resultList(apiPrefix)
-              },
+                 |  ${resultList(apiPrefix)},
                  |  "results": [
                  |   {
                  |     "type": "Work",
-                 |     "id": "${
-                work1.canonicalId
-              }",
-                 |     "title": "${
-                work1.title.get
-              }",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title.get}",
                  |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -735,5 +689,3 @@ class ApiV1WorksTest extends ApiWorksTestBase {
     }
   }
 }
-
-

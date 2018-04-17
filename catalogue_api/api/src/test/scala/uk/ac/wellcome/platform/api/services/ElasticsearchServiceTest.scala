@@ -12,7 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class ElasticsearchServiceTest
-  extends FunSpec
+    extends FunSpec
     with ElasticsearchServiceFixture
     with Matchers
     with ScalaFutures
@@ -40,20 +40,19 @@ class ElasticsearchServiceTest
 
         withElasticSearchService(indexName = indexName, itemType = itemType) {
           searchService =>
+            val searchResultFuture = searchService.simpleStringQueryResults(
+              queryString = "Aegean",
+              indexName = indexName
+            )
 
-          val searchResultFuture = searchService.simpleStringQueryResults(
-            queryString = "Aegean",
-            indexName = indexName
-          )
-
-          whenReady(searchResultFuture) { result =>
-            result.hits should have size 1
-            val returnedWorks = result.hits.hits
-              .map { h: SearchHit =>
-                jsonToIdentifiedWork(h.sourceAsString)
-              }
-            returnedWorks.toList shouldBe List(work1)
-          }
+            whenReady(searchResultFuture) { result =>
+              result.hits should have size 1
+              val returnedWorks = result.hits.hits
+                .map { h: SearchHit =>
+                  jsonToIdentifiedWork(h.sourceAsString)
+                }
+              returnedWorks.toList shouldBe List(work1)
+            }
         }
       }
     }
@@ -73,11 +72,11 @@ class ElasticsearchServiceTest
 
         withElasticSearchService(indexName = indexName, itemType = itemType) {
           searchService =>
-
-            val searchResultFuture: Future[GetResponse] = searchService.findResultById(
-              canonicalId = canonicalId,
-              indexName = indexName
-            )
+            val searchResultFuture: Future[GetResponse] =
+              searchService.findResultById(
+                canonicalId = canonicalId,
+                indexName = indexName
+              )
 
             whenReady(searchResultFuture) { result =>
               val returnedWork = jsonToIdentifiedWork(result.sourceAsString)
@@ -113,9 +112,9 @@ class ElasticsearchServiceTest
           expectedWorks = List(work3, work2, work1)
         )
 
-        // TODO: canonicalID is the only user-defined field that we can sort on.
-        // When we have other fields we can sort on, we should extend this test
-        // for different sort orders.
+      // TODO: canonicalID is the only user-defined field that we can sort on.
+      // When we have other fields we can sort on, we should extend this test
+      // for different sort orders.
       }
     }
 
@@ -207,11 +206,11 @@ class ElasticsearchServiceTest
   }
 
   private def assertSliceIsCorrect(
-                                    indexName: String,
-                                    limit: Int,
-                                    from: Int,
-                                    expectedWorks: List[IdentifiedWork]
-                                  ) = {
+    indexName: String,
+    limit: Int,
+    from: Int,
+    expectedWorks: List[IdentifiedWork]
+  ) = {
     withElasticSearchService(indexName = indexName, itemType = itemType) {
       searchService =>
         val searchResultFuture = searchService.listResults(

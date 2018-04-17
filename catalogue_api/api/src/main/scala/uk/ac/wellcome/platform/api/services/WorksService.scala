@@ -16,9 +16,8 @@ import scala.util.{Failure, Success}
 class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
                              searchService: ElasticSearchService) {
 
-  def findWorkById(
-                    canonicalId: String,
-                    indexName: String): Future[Option[IdentifiedWork]] =
+  def findWorkById(canonicalId: String,
+                   indexName: String): Future[Option[IdentifiedWork]] =
     searchService
       .findResultById(canonicalId, indexName = indexName)
       .map { result =>

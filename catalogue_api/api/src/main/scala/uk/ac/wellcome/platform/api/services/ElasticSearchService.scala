@@ -16,8 +16,8 @@ import scala.concurrent.Future
 class ElasticSearchService @Inject()(@Flag("es.type") documentType: String,
                                      elasticClient: HttpClient) {
 
-
-  def findResultById(canonicalId: String, indexName: String): Future[GetResponse] =
+  def findResultById(canonicalId: String,
+                     indexName: String): Future[GetResponse] =
     elasticClient
       .execute {
         get(canonicalId).from(s"${indexName}/$documentType")
@@ -36,11 +36,10 @@ class ElasticSearchService @Inject()(@Flag("es.type") documentType: String,
           .from(from)
       }
 
-  def simpleStringQueryResults(
-                                queryString: String,
-                                limit: Int = 10,
-                                from: Int = 0,
-                                indexName: String): Future[SearchResponse] =
+  def simpleStringQueryResults(queryString: String,
+                               limit: Int = 10,
+                               from: Int = 0,
+                               indexName: String): Future[SearchResponse] =
     elasticClient
       .execute {
         search(s"${indexName}/$documentType")

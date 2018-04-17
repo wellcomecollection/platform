@@ -22,7 +22,8 @@ class V1WorksController @Inject()(
       apiScheme = apiScheme,
       indexName = indexName,
       defaultPageSize = defaultPageSize,
-      worksService = worksService) {
+      worksService = worksService
+    ) {
   implicit protected val swagger = ApiV1Swagger
 
   prefix(s"$apiPrefix/${ApiVersions.v1.toString}") {

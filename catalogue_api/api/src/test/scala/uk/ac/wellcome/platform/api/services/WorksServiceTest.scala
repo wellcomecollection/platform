@@ -27,7 +27,7 @@ class WorksServiceTest
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
-            val future = worksService.listWorks(indexName=indexName)
+            val future = worksService.listWorks(indexName = indexName)
 
             whenReady(future) { resultList =>
               resultList.results shouldBe works
@@ -123,9 +123,8 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val displayWorksFuture = worksService.listWorks(
-              indexName = indexName,
-              pageSize = 10)
+            val displayWorksFuture =
+              worksService.listWorks(indexName = indexName, pageSize = 10)
 
             whenReady(displayWorksFuture) { works =>
               works.totalResults shouldBe 0
@@ -158,12 +157,12 @@ class WorksServiceTest
     }
   }
 
-  it("throws an exception if passed an invalid query string for full-text search") {
+  it(
+    "throws an exception if passed an invalid query string for full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-
             val workEmu = workWith(
               canonicalId = "1234",
               title = "An etching of an emu"
@@ -171,7 +170,8 @@ class WorksServiceTest
             insertIntoElasticsearch(indexName, itemType, workEmu)
 
             val searchForEmu = worksService.searchWorks(
-              query = "emu \"unmatched quotes are a lexical error in the Elasticsearch parser",
+              query =
+                "emu \"unmatched quotes are a lexical error in the Elasticsearch parser",
               indexName = indexName
             )
 
