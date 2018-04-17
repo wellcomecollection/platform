@@ -18,6 +18,8 @@ import uk.ac.wellcome.platform.api.finatra.exceptions.{
   GeneralExceptionMapper
 }
 
+object ServerMain extends Server
+
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(ElasticClientModule)
