@@ -12,6 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
@@ -68,7 +69,7 @@ class ConvertorServiceTest
       withLocalS3Bucket[R] and
       withLocalS3Bucket[R]
 
-  it("completes a conversion successfully") {
+  it("completes a V1 conversion successfully") {
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
@@ -108,6 +109,64 @@ class ConvertorServiceTest
             val expectedContents = visibleWorks
               .map {
                 DisplayWorkV1(_, includes = AllWorksIncludes())
+              }
+              .map {
+                mapper.writeValueAsString(_)
+              }
+              .mkString("\n") + "\n"
+
+            contents shouldBe expectedContents
+
+            result shouldBe CompletedConversionJob(
+              conversionJob = conversionJob,
+              targetLocation =
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
+            )
+          }
+        }
+    }
+  }
+
+  it("completes a V2 conversion successfully") {
+    withFixtures {
+      case (
+        ((_, _, _, convertorService: ConvertorService), privateBucket),
+        publicBucket) =>
+        val visibleWorks = createWorks(count = 4).toList
+        val notVisibleWorks = createWorks(count = 2, visible = false).toList
+
+        val works = visibleWorks ++ notVisibleWorks
+
+        val elasticsearchJsons = works.map { work =>
+          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+            work).get}}"""
+        }
+        val content = elasticsearchJsons.mkString("\n")
+
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
+          val publicObjectKey = "target.txt.gz"
+
+          val conversionJob = ConversionJob(
+            privateBucketName = privateBucket.name,
+            privateObjectKey = objectKey,
+            publicBucketName = publicBucket.name,
+            publicObjectKey = publicObjectKey,
+            modelVersion = ModelVersions.v2
+          )
+
+          val future = convertorService.runConversion(conversionJob)
+
+          whenReady(future) { result =>
+            val downloadFile =
+              File.createTempFile("convertorServiceTest", ".txt.gz")
+            s3Client.getObject(
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
+              downloadFile)
+
+            val contents = readGzipFile(downloadFile.getPath)
+            val expectedContents = visibleWorks
+              .map {
+                DisplayWorkV2(_, includes = AllWorksIncludes())
               }
               .map {
                 mapper.writeValueAsString(_)
