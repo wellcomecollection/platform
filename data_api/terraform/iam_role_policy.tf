@@ -26,3 +26,8 @@ resource "aws_iam_role_policy" "allow_s3_elasticdump_write" {
   role   = "${module.elasticdump.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_elasticdump_write.json}"
 }
+
+resource "aws_iam_role_policy" "snapshot_scheduler_sns_publish" {
+  role   = "${module.elasticdump.task_role_name}"
+  policy = "${module.snapshot_convertor_jobs_topic.publish_policy}"
+}

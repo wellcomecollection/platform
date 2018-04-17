@@ -10,6 +10,8 @@ module "elasticdump" {
   env_vars = {
     AWS_DEFAULT_REGION = "${var.aws_region}"
 
+    TOPIC_ARN = "${module.snapshot_convertor_jobs_topic.arn}"
+
     sqs_queue_url = "${module.elasticdump_queue.id}"
     key_prefix    = "elasticdump/"
     upload_bucket = "${aws_s3_bucket.private_data.id}"

@@ -20,6 +20,8 @@ from service_utils import service
 class SnapshotRequest(object):
     time = attr.ib()
     private_bucket_name = attr.ib()
+    public_bucket_name = attr.ib()
+    public_object_key = attr.ib()
     es_index = attr.ib()
 
 
@@ -79,9 +81,11 @@ def aws_client(service_name):
 def run():
     print(os.environ)
     sqs_queue_url = os.environ['sqs_queue_url']
+    topic_arn = os.environ['TOPIC_ARN']
 
     s3_client = aws_client('s3')
     sqs_client = aws_client('sqs')
+    sns_client = aws_client('sns')
 
     print('*** Reading messages from SQS')
     message = get_message(sqs_client=sqs_client, sqs_queue_url=sqs_queue_url)
@@ -112,30 +116,46 @@ def run():
         with gzip.open('index.txt.gz', 'wb') as gzip_file:
             gzip_file.writelines(index_file)
 
-    prefix = os.environ['key_prefix']
     # This creates keys of the form
     #
     #   2018/03/2018-03-13_myindexname.txt.gz
     #
     # which are human-readable, unambiguous, and easy to browse in the
     # S3 Console.
+    #
+    prefix = os.environ['key_prefix']
     try:
         key = os.environ['private_object_key']
     except KeyError:
         key = dt.datetime.now().strftime('%Y/%m/%Y-%m-%d') + f'_{es_index}.txt.gz'
-    print(f'*** Uploading gzip file to S3 with key {key}')
+    private_object_key = prefix + key
 
+    print(f'*** Uploading gzip file to S3 with key {private_object_key}')
     s3_client.upload_file(
         Bucket=snapshot_request.private_bucket_name,
-        Key=prefix + key,
+        Key=private_object_key,
         Filename='index.txt.gz'
     )
 
+    print(f'*** Sending a job notification to SNS')
+    resp = sns_client.publish(
+        TopicArn=topic_arn,
+        MessageStructure='json',
+        Message=json.dumps({
+            'privateBucketName': snapshot_request.private_bucket_name,
+            'privateObjectKey': private_object_key,
+            'publicBucketName': snapshot_request.public_bucket_name,
+            'publicObjectKey': snapshot_request.public_object_key,
+        })
+    )
+    print(f'resp = {resp!r}')
+
     print('*** Deleting the SQS message')
-    sqs_client.delete_message(
+    resp = sqs_client.delete_message(
         QueueUrl=sqs_queue_url,
         ReceiptHandle=message['ReceiptHandle']
     )
+    print(f'resp = {resp!r}')
 
 
 if __name__ == '__main__':

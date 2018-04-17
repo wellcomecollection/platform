@@ -16,3 +16,7 @@ s3:
   image: scality/s3server:mem-latest
   ports:
     - "33333:8000"
+sns:
+  image: wellcome/fake-sns
+  ports:
+    - "9292:9292"

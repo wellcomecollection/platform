@@ -63,7 +63,13 @@ def test_getting_only_one_message_from_sqs(
 ):
     requests = [
         attr.asdict(
-            run_elasticdump.SnapshotRequest(time, bucket, elasticsearch_index)
+            run_elasticdump.SnapshotRequest(
+                time=time,
+                private_bucket_name=bucket,
+                public_bucket_name='bukkit',
+                public_object_key='works.json.gz',
+                es_index=elasticsearch_index
+            )
         ) for time in ('now', 'then')
     ]
     for r in requests:
@@ -84,21 +90,29 @@ def test_end_to_end(
         sqs_client,
         queue_url,
         s3_client,
+        sns_client,
         bucket,
+        topic_arn,
         sqs_endpoint_url,
         s3_endpoint_url,
+        sns_endpoint_url,
         elasticsearch_index,
         elasticsearch_url,
         elasticsearch_hostname
 ):
+    public_bucket_name = 'public-bukkit'
+    public_object_key = 'catalogue/v1/works.json.gz'
+
     sqs_client.send_message(
         QueueUrl=queue_url,
         MessageBody=json.dumps(
             attr.asdict(
                 run_elasticdump.SnapshotRequest(
                     "time",
-                    bucket,
-                    elasticsearch_index
+                    private_bucket_name=bucket,
+                    public_bucket_name=public_bucket_name,
+                    public_object_key=public_object_key,
+                    es_index=elasticsearch_index
                 )
             )
         )
@@ -133,6 +147,9 @@ def test_end_to_end(
 
         '--env', f'local_s3_endpoint={s3_endpoint_url}',
         '--env', f'local_sqs_endpoint={sqs_endpoint_url}',
+        '--env', f'local_sns_endpoint={sns_endpoint_url}',
+
+        '--env', f'TOPIC_ARN={topic_arn}',
         '--env', f'es_username=elastic',
         '--env', f'es_password=changeme',
         '--env', f'es_hostname={elasticsearch_hostname}',
@@ -159,3 +176,12 @@ def test_end_to_end(
         }
         for i in range(10)
     ]
+
+    messages = sns_client.list_messages()
+    assert len(messages) == 1
+    assert messages.pop()[':message'] == {
+        'privateBucketName': bucket,
+        'privateObjectKey': 'blah/dump.txt.gz',
+        'publicBucketName': public_bucket_name,
+        'publicObjectKey': public_object_key,
+    }
