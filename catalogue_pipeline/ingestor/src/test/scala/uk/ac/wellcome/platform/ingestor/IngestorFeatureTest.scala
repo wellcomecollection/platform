@@ -61,7 +61,7 @@ class IngestorFeatureTest
           .get
       )
 
-      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, "", itemType)
 
       withLocalElasticsearchIndex(indexName, itemType) { _ =>
         withServer(flags) { _ =>
@@ -104,7 +104,7 @@ class IngestorFeatureTest
         invalidMessage
       )
 
-      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, itemType)
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexName, "", itemType)
 
       withServer(flags) { _ =>
         // After a message is read, it stays invisible for 1 second and then it gets sent again.

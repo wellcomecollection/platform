@@ -16,7 +16,25 @@ trait ElasticSearchIndex extends Logging {
   val httpClient: HttpClient
   val mappingDefinition: MappingDefinition
 
-  def update(): Future[PutMappingResponse] =
+  def create: Future[Unit] =
+    httpClient
+      .execute(createIndex(indexName).mappings {
+        mappingDefinition
+      })
+      .recoverWith {
+        case e: ResponseException
+            if e.getMessage.contains("index_already_exists_exception") =>
+          info(s"Index $indexName already exists")
+          update()
+        case e: Throwable =>
+          error(s"Failed creating index $indexName", e)
+          Future.failed(e)
+      }
+      .map { _ =>
+        info("Index updated successfully")
+      }
+
+  private def update(): Future[PutMappingResponse] =
     httpClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)
@@ -27,23 +45,5 @@ trait ElasticSearchIndex extends Logging {
         case e: Throwable =>
           error(s"Failed updating index $indexName", e)
           throw e
-      }
-
-  def create: Future[Unit] =
-    httpClient
-      .execute(createIndex(indexName).mappings {
-        mappingDefinition
-      })
-      .recoverWith {
-        case e: ResponseException
-            if e.getMessage().contains("index_already_exists_exception") =>
-          info(s"Index $indexName already exists")
-          update()
-        case e: Throwable =>
-          error(s"Failed creating index $indexName", e)
-          Future.failed(e)
-      }
-      .map { _ =>
-        info("Index updated successfully")
       }
 }
