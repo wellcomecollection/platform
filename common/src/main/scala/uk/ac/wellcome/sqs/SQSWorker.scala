@@ -32,22 +32,29 @@ abstract class SQSWorker(sqsReader: SQSReader,
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
         pointer <- Future.fromTry { fromJson[MessagePointer](message.getBody) }
-        _ <- Future.successful { debug(s"Processing message pointer: $pointer") }
+        _ <- Future.successful {
+          debug(s"Processing message pointer: $pointer")
+        }
         message <- loadMessageFromStore(pointer)
 
         metricName = s"${workerName}_ProcessMessage"
         _ <- Future.successful { debug(s"Processing message: $message") }
-        _ <- metricsSender.timeAndCount(metricName, () => processMessage(message))
+        _ <- metricsSender.timeAndCount(
+          metricName,
+          () => processMessage(message))
       } yield ()
     } recover {
       case exception: Throwable => terminalFailureHook(exception)
     }
   }
 
-  private def loadMessageFromStore(pointer: MessagePointer): Future[SQSMessage] = {
+  private def loadMessageFromStore(
+    pointer: MessagePointer): Future[SQSMessage] = {
     pointer.src match {
       case S3Uri(bucket, key) => S3ObjectStore.get[SQSMessage](s3, bucket)(key)
-      case _                  => Future.failed(new RuntimeException(s"Unsupported SQS message pointer scheme = [${pointer.src.getScheme}]"))
+      case _ =>
+        Future.failed(new RuntimeException(
+          s"Unsupported SQS message pointer scheme = [${pointer.src.getScheme}]"))
     }
   }
 

@@ -40,11 +40,10 @@ class SQSWorkerTest
     testWith(metricsSender)
   }
 
-  def withSqsWorker[R](
-    actors: ActorSystem,
-    queue: Queue,
-    metrics: MetricsSender,
-    bucket: S3.Bucket)(testWith: TestWith[SQSWorker, R]) = {
+  def withSqsWorker[R](actors: ActorSystem,
+                       queue: Queue,
+                       metrics: MetricsSender,
+                       bucket: S3.Bucket)(testWith: TestWith[SQSWorker, R]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
@@ -81,7 +80,9 @@ class SQSWorkerTest
         val json = toJson(ValidSqsMessage()).get
 
         val key = "message-key"
-        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"s3://${bucket.name}/$key"}""")
         s3Client.putObject(bucket.name, key, json)
 
         eventually {
@@ -109,7 +110,9 @@ class SQSWorkerTest
         val json = toJson(ValidSqsMessage()).get
 
         val key = "message-key"
-        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"s3://${bucket.name}/$key"}""")
         s3Client.putObject(bucket.name, key, json)
 
         eventually {

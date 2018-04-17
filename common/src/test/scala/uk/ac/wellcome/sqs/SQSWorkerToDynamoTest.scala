@@ -108,7 +108,7 @@ class SQSWorkerToDynamoTest
 
   def withFixtures[R](
     testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
-      withActorSystem[R] and
+    withActorSystem[R] and
       withLocalSqsQueue[R] and
       withTestWorker[R](testWorkFactory) _ and
       withLocalS3Bucket[R]
@@ -116,9 +116,10 @@ class SQSWorkerToDynamoTest
   it("processes messages") {
     withFixtures() {
       case ((_, queue, worker), bucket) =>
-
         val key = "message-key"
-        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"s3://${bucket.name}/$key"}""")
         s3Client.putObject(bucket.name, key, testMessageJson)
 
         eventually {
@@ -165,7 +166,9 @@ class SQSWorkerToDynamoTest
     withFixtures(terminalTestWorkerFactory) {
       case ((_, queue, worker), bucket) =>
         val key = "message-key"
-        sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"s3://${bucket.name}/$key"}""")
         s3Client.putObject(bucket.name, key, testMessageJson)
 
         eventually {

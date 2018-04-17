@@ -69,7 +69,8 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { dbConfig =>
-            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket) ++ dbConfig.flags
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(
+              bucket) ++ dbConfig.flags
 
             withServer(flags) { _ =>
               eventuallyTableExists(dbConfig)
@@ -103,7 +104,9 @@ class IdMinterFeatureTest
               (1 to messageCount).foreach { _ =>
                 val key = s"$baseKey/$messageCount"
                 s3Client.putObject(bucket.name, key, toJson(sqsMessage).get)
-                sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+                sqsClient.sendMessage(
+                  queue.url,
+                  s"""{"src":"s3://${bucket.name}/$key"}""")
               }
 
               eventually {
@@ -127,7 +130,8 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { dbConfig =>
-            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket) ++ dbConfig.flags
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(
+              bucket) ++ dbConfig.flags
 
             withServer(flags) { _ =>
               sqsClient.sendMessage(queue.url, "not a json string")
@@ -136,7 +140,9 @@ class IdMinterFeatureTest
               val sqsMessage = generateSqsMessage(miroId)
 
               val key = "message-key"
-              sqsClient.sendMessage(queue.url, s"""{"src":"s3://${bucket.name}/$key"}""")
+              sqsClient.sendMessage(
+                queue.url,
+                s"""{"src":"s3://${bucket.name}/$key"}""")
               s3Client.putObject(bucket.name, key, toJson(sqsMessage).get)
 
               eventually {
