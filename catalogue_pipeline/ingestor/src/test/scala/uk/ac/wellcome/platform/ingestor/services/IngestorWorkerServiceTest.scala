@@ -80,11 +80,12 @@ class IngestorWorkerServiceTest
     val sqsMessage = messageFromString(toJson(work).get)
 
     val workIndexer =
-      new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
+      new WorkIndexer(itemType, elasticClient, metricsSender)
 
     withLocalSqsQueue { queue =>
       withLocalElasticsearchIndex(indexName, itemType) { _ =>
         val service = new IngestorWorkerService(
+          indexName,
           identifiedWorkIndexer = workIndexer,
           reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
           system = actorSystem,
@@ -109,13 +110,13 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       val workIndexer = new WorkIndexer(
-        esIndex = indexName,
         esType = itemType,
         elasticClient = elasticClient,
         metricsSender = metricsSender
       )
 
       val service = new IngestorWorkerService(
+        esIndex = indexName,
         identifiedWorkIndexer = workIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
@@ -141,7 +142,6 @@ class IngestorWorkerServiceTest
       HttpClient.fromRestClient(brokenRestClient)
 
     val brokenWorkIndexer = new WorkIndexer(
-      esIndex = "works",
       esType = "work",
       elasticClient = brokenElasticClient,
       metricsSender = metricsSender
@@ -157,6 +157,7 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       val service = new IngestorWorkerService(
+        esIndex = "works",
         identifiedWorkIndexer = brokenWorkIndexer,
         reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system = actorSystem,
