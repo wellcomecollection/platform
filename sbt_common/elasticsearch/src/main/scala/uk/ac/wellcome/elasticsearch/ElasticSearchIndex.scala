@@ -12,11 +12,10 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 trait ElasticSearchIndex extends Logging {
-  val indexName: String
   val httpClient: HttpClient
   val mappingDefinition: MappingDefinition
 
-  def create: Future[Unit] =
+  def create(indexName: String): Future[Unit] =
     httpClient
       .execute(createIndex(indexName).mappings {
         mappingDefinition
@@ -25,7 +24,7 @@ trait ElasticSearchIndex extends Logging {
         case e: ResponseException
             if e.getMessage.contains("index_already_exists_exception") =>
           info(s"Index $indexName already exists")
-          update()
+          update(indexName)
         case e: Throwable =>
           error(s"Failed creating index $indexName", e)
           Future.failed(e)
@@ -34,7 +33,7 @@ trait ElasticSearchIndex extends Logging {
         info("Index updated successfully")
       }
 
-  private def update(): Future[PutMappingResponse] =
+  private def update(indexName: String): Future[PutMappingResponse] =
     httpClient
       .execute {
         putMapping(indexName / mappingDefinition.`type`)

@@ -24,7 +24,10 @@ class IngestorIndexTest
     deleteIndexIfExists(indexNameV2)
 
     withLocalSqsQueue { queue =>
-      val flags = sqsLocalFlags(queue) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+      val flags = sqsLocalFlags(queue) ++ esLocalFlags(
+        indexNameV1,
+        indexNameV2,
+        itemType)
 
       withServer(flags) { _ =>
         eventuallyIndexExists(indexNameV1)

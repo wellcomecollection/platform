@@ -10,7 +10,6 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 
 class WorksIndex @Inject()(client: HttpClient,
-                           @Flag("es.index") name: String,
                            @Flag("es.type") itemType: String)
     extends ElasticSearchIndex
     with Logging {
@@ -18,7 +17,6 @@ class WorksIndex @Inject()(client: HttpClient,
   val rootIndexType = itemType
 
   val httpClient: HttpClient = client
-  val indexName = name
 
   val license = objectField("license").fields(
     keywordField("ontologyType"),

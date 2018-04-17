@@ -31,7 +31,9 @@ trait ElasticsearchFixtures
   private val esPort = "9200"
   private val esName = "wellcome"
 
-  def esLocalFlags(indexNameV1: String,indexNameV2: String, itemType: String) = Map(
+  def esLocalFlags(indexNameV1: String,
+                   indexNameV2: String,
+                   itemType: String) = Map(
     "es.host" -> esHost,
     "es.port" -> esPort,
     "es.name" -> esName,
@@ -52,37 +54,34 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](
-    indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
-    itemType: String)(testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,itemType: String)(testWith: TestWith[String, R]): R = {
 
     val index = new WorksIndex(
       client = elasticClient,
-      name = indexName,
       itemType = itemType
     )
 
-    withLocalElasticsearchIndex(index)(testWith)
+    withLocalElasticsearchIndex(index, indexName)(testWith)
   }
 
-  def withLocalElasticsearchIndex[R](index: ElasticSearchIndex)(
+  def withLocalElasticsearchIndex[R](index: ElasticSearchIndex, indexName: String)(
     testWith: TestWith[String, R]): R = {
 
-    index.create.await
+    index.create(indexName).await
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
     eventually {
       elasticClient
-        .execute(indexExists(index.indexName))
+        .execute(indexExists(indexName))
         .await
         .isExists should be(true)
     }
 
     try {
-      testWith(index.indexName)
+      testWith(indexName)
     } finally {
-      elasticClient.execute(deleteIndex(index.indexName))
+      elasticClient.execute(deleteIndex(indexName))
     }
   }
 

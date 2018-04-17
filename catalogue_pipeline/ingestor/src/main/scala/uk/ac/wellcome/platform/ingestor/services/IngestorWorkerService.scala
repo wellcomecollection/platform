@@ -13,7 +13,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class IngestorWorkerService @Inject()(
-  @Flag("es.index") esIndex: String,
+  @Flag("es.index.v1") esIndex: String,
   identifiedWorkIndexer: WorkIndexer,
   reader: SQSReader,
   system: ActorSystem,
