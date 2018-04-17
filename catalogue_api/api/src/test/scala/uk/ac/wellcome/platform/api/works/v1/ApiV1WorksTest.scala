@@ -20,72 +20,79 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix, totalResults = 3)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(0).canonicalId}",
-               |     "title": "${works(0).title.get}",
-               |     "description": "${works(0).description.get}",
-               |     "workType": {
-               |       "id": "${works(0).workType.get.id}",
-               |       "label": "${works(0).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   },
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(1).canonicalId}",
-               |     "title": "${works(1).title.get}",
-               |     "description": "${works(1).description.get}",
-               |     "workType": {
-               |       "id": "${works(1).workType.get.id}",
-               |       "label": "${works(1).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   },
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(2).canonicalId}",
-               |     "title": "${works(2).title.get}",
-               |     "description": "${works(2).description.get}",
-               |     "workType": {
-               |       "id": "${works(2).workType.get.id}",
-               |       "label": "${works(2).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
-               |     "lettering": "${works(2).lettering.get}",
-               |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 3)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(0).canonicalId}",
+                 |     "title": "${works(0).title.get}",
+                 |     "description": "${works(0).description.get}",
+                 |     "workType": {
+                 |       "id": "${works(0).workType.get.id}",
+                 |       "label": "${works(0).workType.get.label}",
+                 |       "type": "WorkType"
+                 |     },
+                 |     "lettering": "${works(0).lettering.get}",
+                 |     "createdDate": ${period(works(0).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(0).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(1).canonicalId}",
+                 |     "title": "${works(1).title.get}",
+                 |     "description": "${works(1).description.get}",
+                 |     "workType": {
+                 |       "id": "${works(1).workType.get.id}",
+                 |       "label": "${works(1).workType.get.label}",
+                 |       "type": "WorkType"
+                 |     },
+                 |     "lettering": "${works(1).lettering.get}",
+                 |     "createdDate": ${period(works(1).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(1).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(2).canonicalId}",
+                 |     "title": "${works(2).title.get}",
+                 |     "description": "${works(2).description.get}",
+                 |     "workType": {
+                 |       "id": "${works(2).workType.get.id}",
+                 |       "label": "${works(2).workType.get.label}",
+                 |       "type": "WorkType"
+                 |     },
+                 |     "lettering": "${works(2).lettering.get}",
+                 |     "createdDate": ${period(works(2).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(2).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
         }
@@ -111,28 +118,31 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/$canonicalId",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               | "@context": "https://localhost:8888/$apiPrefix/context.json",
-               | "type": "Work",
-               | "id": "$canonicalId",
-               | "title": "$title",
-               | "description": "$description",
-               | "workType": {
-               |       "id": "${workType.id}",
-               |       "label": "${workType.label}",
-               |       "type": "WorkType"
-               | },
-               | "lettering": "$lettering",
-               | "createdDate": ${period(work.createdDate.get)},
-               | "creators": [ ${identifiedOrUnidentifiable(
-                                work.creators(0),
-                                abstractAgent)} ],
-               | "subjects": [ ],
-               | "genres": [ ],
-               | "publishers": [ ],
-               | "placesOfPublication": [ ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 | "type": "Work",
+                 | "id": "$canonicalId",
+                 | "title": "$title",
+                 | "description": "$description",
+                 | "workType": {
+                 |       "id": "${workType.id}",
+                 |       "label": "${workType.label}",
+                 |       "type": "WorkType"
+                 | },
+                 | "lettering": "$lettering",
+                 | "createdDate": ${period(work.createdDate.get)},
+                 | "creators": [ ${
+                identifiedOrUnidentifiable(
+                  work.creators(0),
+                  abstractAgent)
+              } ],
+                 | "subjects": [ ],
+                 | "genres": [ ],
+                 | "publishers": [ ],
+                 | "placesOfPublication": [ ]
+                 |}
           """.stripMargin
           )
         }
@@ -160,19 +170,20 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               | "@context": "https://localhost:8888/$apiPrefix/context.json",
-               | "type": "Work",
-               | "id": "${work.canonicalId}",
-               | "title": "${work.title.get}",
-               | "creators": [ ],
-               | "items": [ ${items(work.items)} ],
-               | "subjects": [ ],
-               | "genres": [ ],
-               | "publishers": [ ],
-               | "placesOfPublication": [ ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 | "type": "Work",
+                 | "id": "${work.canonicalId}",
+                 | "title": "${work.title.get}",
+                 | "creators": [ ],
+                 | "items": [ ${items(work.items)} ],
+                 | "subjects": [ ],
+                 | "genres": [ ],
+                 | "publishers": [ ],
+                 | "placesOfPublication": [ ]
+                 |}
           """.stripMargin
           )
         }
@@ -191,115 +202,130 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?page=2&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(
-                                apiPrefix,
-                                pageSize = 1,
-                                totalPages = 3,
-                                totalResults = 3)},
-               |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
-               |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(1).canonicalId}",
-               |     "title": "${works(1).title.get}",
-               |     "description": "${works(1).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(1).workType.get.id}",
-               |        "label" : "${works(1).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${
+                resultList(
+                  apiPrefix,
+                  pageSize = 1,
+                  totalPages = 3,
+                  totalResults = 3)
+              },
+                 |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=1&pageSize=1",
+                 |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=3&pageSize=1",
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(1).canonicalId}",
+                 |     "title": "${works(1).title.get}",
+                 |     "description": "${works(1).description.get}",
+                 |     "workType" : {
+                 |        "id" : "${works(1).workType.get.id}",
+                 |        "label" : "${works(1).workType.get.label}",
+                 |        "type" : "WorkType"
+                 |      },
+                 |     "lettering": "${works(1).lettering.get}",
+                 |     "createdDate": ${period(works(1).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(1).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
 
           server.httpGet(
             path = s"/$apiPrefix/works?page=1&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(
-                                apiPrefix,
-                                pageSize = 1,
-                                totalPages = 3,
-                                totalResults = 3)},
-               |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(0).canonicalId}",
-               |     "title": "${works(0).title.get}",
-               |     "description": "${works(0).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(0).workType.get.id}",
-               |        "label" : "${works(0).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${
+                resultList(
+                  apiPrefix,
+                  pageSize = 1,
+                  totalPages = 3,
+                  totalResults = 3)
+              },
+                 |  "nextPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(0).canonicalId}",
+                 |     "title": "${works(0).title.get}",
+                 |     "description": "${works(0).description.get}",
+                 |     "workType" : {
+                 |        "id" : "${works(0).workType.get.id}",
+                 |        "label" : "${works(0).workType.get.label}",
+                 |        "type" : "WorkType"
+                 |      },
+                 |     "lettering": "${works(0).lettering.get}",
+                 |     "createdDate": ${period(works(0).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(0).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
 
           server.httpGet(
             path = s"/$apiPrefix/works?page=3&pageSize=1",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(
-                                apiPrefix,
-                                pageSize = 1,
-                                totalPages = 3,
-                                totalResults = 3)},
-               |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${works(2).canonicalId}",
-               |     "title": "${works(2).title.get}",
-               |     "description": "${works(2).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(2).workType.get.id}",
-               |        "label" : "${works(2).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
-               |     "lettering": "${works(2).lettering.get}",
-               |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
-                                abstractAgent)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${
+                resultList(
+                  apiPrefix,
+                  pageSize = 1,
+                  totalPages = 3,
+                  totalResults = 3)
+              },
+                 |  "prevPage": "https://localhost:8888/$apiPrefix/works?page=2&pageSize=1",
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${works(2).canonicalId}",
+                 |     "title": "${works(2).title.get}",
+                 |     "description": "${works(2).description.get}",
+                 |     "workType" : {
+                 |        "id" : "${works(2).workType.get.id}",
+                 |        "label" : "${works(2).workType.get.label}",
+                 |        "type" : "WorkType"
+                 |      },
+                 |     "lettering": "${works(2).lettering.get}",
+                 |     "createdDate": ${period(works(2).createdDate.get)},
+                 |     "creators": [ ${
+                identifiedOrUnidentifiable(
+                  works(2).creators(0),
+                  abstractAgent)
+              } ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
         }
@@ -342,22 +368,23 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=dodo",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${work1.canonicalId}",
-               |     "title": "${work1.title.get}",
-               |     "creators": [],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }
-               |  ]
-               |}""".stripMargin
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title.get}",
+                 |     "creators": [],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}""".stripMargin
           )
         }
     }
@@ -395,34 +422,35 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?includes=identifiers",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix, totalResults = 2)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${work1.canonicalId}",
-               |     "title": "${work1.title.get}",
-               |     "creators": [ ],
-               |     "identifiers": [ ${identifier(identifier1)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   },
-               |   {
-               |     "type": "Work",
-               |     "id": "${work2.canonicalId}",
-               |     "title": "${work2.title.get}",
-               |     "creators": [ ],
-               |     "identifiers": [ ${identifier(identifier2)} ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title.get}",
+                 |     "creators": [ ],
+                 |     "identifiers": [ ${identifier(identifier1)} ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work2.canonicalId}",
+                 |     "title": "${work2.title.get}",
+                 |     "creators": [ ],
+                 |     "identifiers": [ ${identifier(identifier2)} ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
         }
@@ -450,19 +478,20 @@ class ApiV1WorksTest extends ApiWorksTestBase {
             path =
               s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               | "@context": "https://localhost:8888/$apiPrefix/context.json",
-               | "type": "Work",
-               | "id": "${work.canonicalId}",
-               | "title": "${work.title.get}",
-               | "creators": [ ],
-               | "identifiers": [ ${identifier(srcIdentifier)} ],
-               | "subjects": [ ],
-               | "genres": [ ],
-               | "publishers": [ ],
-               | "placesOfPublication": [ ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 | "type": "Work",
+                 | "id": "${work.canonicalId}",
+                 | "title": "${work.title.get}",
+                 | "creators": [ ],
+                 | "identifiers": [ ${identifier(srcIdentifier)} ],
+                 | "subjects": [ ],
+                 | "genres": [ ],
+                 | "publishers": [ ],
+                 | "placesOfPublication": [ ]
+                 |}
           """.stripMargin
           )
         }
@@ -483,7 +512,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           title = "An impostor in an igloo"
         )
         insertIntoElasticsearch(
-          indexNameV1 = "alt_records",
+          indexName = "alt_records",
           itemType = itemType,
           work_alt)
 
@@ -491,18 +520,19 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/${work.canonicalId}",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               | "@context": "https://localhost:8888/$apiPrefix/context.json",
-               | "type": "Work",
-               | "id": "${work.canonicalId}",
-               | "title": "${work.title.get}",
-               | "creators": [ ],
-               | "subjects": [ ],
-               | "genres": [ ],
-               | "publishers": [ ],
-               | "placesOfPublication": [ ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 | "type": "Work",
+                 | "id": "${work.canonicalId}",
+                 | "title": "${work.title.get}",
+                 | "creators": [ ],
+                 | "subjects": [ ],
+                 | "genres": [ ],
+                 | "publishers": [ ],
+                 | "placesOfPublication": [ ]
+                 |}
           """.stripMargin
           )
         }
@@ -512,18 +542,19 @@ class ApiV1WorksTest extends ApiWorksTestBase {
             path =
               s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               | "@context": "https://localhost:8888/$apiPrefix/context.json",
-               | "type": "Work",
-               | "id": "${work_alt.canonicalId}",
-               | "title": "${work_alt.title.get}",
-               | "creators": [ ],
-               | "subjects": [ ],
-               | "genres": [ ],
-               | "publishers": [ ],
-               | "placesOfPublication": [ ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 | "type": "Work",
+                 | "id": "${work_alt.canonicalId}",
+                 | "title": "${work_alt.title.get}",
+                 | "creators": [ ],
+                 | "subjects": [ ],
+                 | "genres": [ ],
+                 | "publishers": [ ],
+                 | "placesOfPublication": [ ]
+                 |}
           """.stripMargin
           )
         }
@@ -544,7 +575,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           title = "An impostor in an igloo"
         )
         insertIntoElasticsearch(
-          indexNameV1 = "alt_records",
+          indexName = "alt_records",
           itemType = itemType,
           work_alt)
 
@@ -552,22 +583,23 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=wombat",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${work.canonicalId}",
-               |     "title": "${work.title.get}",
-               |     "creators": [ ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work.canonicalId}",
+                 |     "title": "${work.title.get}",
+                 |     "creators": [ ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
         }
@@ -576,27 +608,29 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?query=igloo&_index=alt_records",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${work_alt.canonicalId}",
-               |     "title": "${work_alt.title.get}",
-               |     "creators": [ ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
-               |   }
-               |  ]
-               |}
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work_alt.canonicalId}",
+                 |     "title": "${work_alt.title.get}",
+                 |     "creators": [ ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
           """.stripMargin
           )
         }
     }
   }
+
 
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
@@ -617,28 +651,89 @@ class ApiV1WorksTest extends ApiWorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?includes=thumbnail",
             andExpect = Status.Ok,
-            withJsonBody = s"""
-               |{
-               |  ${resultList(apiPrefix)},
-               |  "results": [
-               |   {
-               |     "type": "Work",
-               |     "id": "${work.canonicalId}",
-               |     "title": "${work.title.get}",
-               |     "creators": [ ],
-               |     "subjects": [ ],
-               |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ],
-               |     "thumbnail": ${location(work.thumbnail.get)}
-               |    }
-               |  ]
-               |}
-               |
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${
+                resultList(apiPrefix)
+              },
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${
+                work.canonicalId
+              }",
+                 |     "title": "${
+                work.title.get
+              }",
+                 |     "creators": [ ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ],
+                 |     "thumbnail": ${
+                location(work.thumbnail.get)
+              }
+                 |    }
+                 |  ]
+                 |}
+                 |
             """.stripMargin
           )
         }
     }
   }
 
+  it("only returns works from the v1 index") {
+    withApiFixtures(ApiVersions.v1) {
+      case (apiPrefix, indexNameV1, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+
+        val work1 = workWith(
+          canonicalId = "1234",
+          title = "A wombat wallowing under a willow"
+        )
+
+        insertIntoElasticsearch(indexNameV1, itemType, work1)
+
+        val work2 = workWith(
+          canonicalId = "5678",
+          title = "A wombat wrestling with wet weather"
+        )
+
+        insertIntoElasticsearch(indexNameV2, itemType, work2)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?query=wombat",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${
+                resultList(apiPrefix)
+              },
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${
+                work1.canonicalId
+              }",
+                 |     "title": "${
+                work1.title.get
+              }",
+                 |     "creators": [ ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
 }
+
+
