@@ -22,16 +22,12 @@ def test_writes_message_to_sqs(sns_client, topic_arn):
 
     patched_os_environ = {
         'TOPIC_ARN': topic_arn,
-        'TARGET_BUCKET_NAME': private_bucket_name,
+        'PRIVATE_BUCKET_NAME': private_bucket_name,
         'ES_INDEX': es_index
     }
 
     with patch.dict(os.environ, patched_os_environ, clear=True):
-        snapshot_scheduler.main(
-            event=None,
-            _ctxt=None,
-            sns_client=sns_client
-        )
+        snapshot_scheduler.main(sns_client=sns_client)
 
     messages = sns_client.list_messages()
     assert len(messages) == 1
