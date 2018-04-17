@@ -79,7 +79,6 @@ jobs:
 
     # Data API stack
     - env: TASK=snapshot_scheduler-test
-    - env: TASK=snapshot_convertor_job_generator-test
     - env: TASK=snapshot_convertor-test
     - env: TASK=elasticdump-test
 
