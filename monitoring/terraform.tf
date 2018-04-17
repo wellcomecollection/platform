@@ -19,6 +19,16 @@ data "terraform_remote_state" "catalogue_pipeline" {
   }
 }
 
+data "terraform_remote_state" "loris" {
+  backend = "s3"
+
+  config {
+    bucket = "wellcomecollection-platform-infra"
+    key    = "terraform/loris.tfstate"
+    region = "eu-west-1"
+  }
+}
+
 data "terraform_remote_state" "shared_infra" {
   backend = "s3"
 
