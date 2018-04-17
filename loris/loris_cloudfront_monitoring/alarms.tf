@@ -24,5 +24,5 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_alarm" {
   }
 
   alarm_description = "Monitors 4xx errors from the Loris CloudFront distro"
-  alarm_actions = ["${module.cloudfront_errors_topic.arn}"]
+  alarm_actions     = ["${module.cloudfront_errors_topic.arn}"]
 }
