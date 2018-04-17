@@ -17,7 +17,7 @@ from wellcome_aws_utils.sns_utils import publish_sns_message
 @attr.s
 class SnapshotRequest(object):
     time = attr.ib()
-    model_version = attr.ib()
+    api_version = attr.ib()
     private_bucket_name = attr.ib()
     public_bucket_name = attr.ib()
     public_object_key = attr.ib()
@@ -40,13 +40,13 @@ def main(event=None, _ctxt=None, sns_client=None):
     public_object_key_v1 = os.environ['PUBLIC_OBJECT_KEY_V1']
     public_object_key_v2 = os.environ['PUBLIC_OBJECT_KEY_V2']
 
-    for (model_version, es_index, public_object_key) in [
+    for (api_version, es_index, public_object_key) in [
         ('v1', es_index_v1, public_object_key_v1),
         ('v2', es_index_v2, public_object_key_v2),
     ]:
         snapshot_request_message = SnapshotRequest(
             time=dt.datetime.utcnow().isoformat(),
-            model_version=model_version,
+            api_version=api_version,
             private_bucket_name=private_bucket_name,
             public_bucket_name=public_bucket_name,
             public_object_key=public_object_key,

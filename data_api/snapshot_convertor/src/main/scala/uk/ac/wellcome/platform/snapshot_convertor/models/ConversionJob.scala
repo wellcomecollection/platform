@@ -6,4 +6,4 @@ case class ConversionJob(privateBucketName: String,
                          privateObjectKey: String,
                          publicBucketName: String,
                          publicObjectKey: String,
-                         modelVersion: ApiVersions.Value)
+                         apiVersion: ApiVersions.Value)

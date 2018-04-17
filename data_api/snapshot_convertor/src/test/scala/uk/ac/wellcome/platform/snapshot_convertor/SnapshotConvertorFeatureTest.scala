@@ -78,7 +78,7 @@ class SnapshotConvertorFeatureTest
               privateObjectKey = objectKey,
               publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey,
-              modelVersion = ApiVersions.v1
+              apiVersion = ApiVersions.v1
             )
 
             val message = SQSMessage(

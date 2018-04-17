@@ -93,7 +93,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ApiVersions.v1
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -151,7 +151,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ApiVersions.v2
+            apiVersion = ApiVersions.v2
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -239,7 +239,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ApiVersions.v1
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -283,7 +283,7 @@ class ConvertorServiceTest
           privateObjectKey = "doesnotexist.txt.gz",
           publicBucketName = publicBucket.name,
           publicObjectKey = "target.txt.gz",
-          modelVersion = ApiVersions.v1
+          apiVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)
@@ -307,7 +307,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = "target.txt.gz",
-            modelVersion = ApiVersions.v1
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -338,7 +338,7 @@ class ConvertorServiceTest
           privateObjectKey = "wrongKey",
           publicBucketName = bucketName,
           publicObjectKey = "target.json.gz",
-          modelVersion = ApiVersions.v1
+          apiVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)

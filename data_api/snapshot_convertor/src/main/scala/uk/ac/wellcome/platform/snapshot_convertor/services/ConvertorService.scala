@@ -62,7 +62,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       gzipStream <- runStream(
         publicBucketName = publicBucketName,
         publicObjectKey = publicObjectKey,
-        modelVersion = conversionJob.modelVersion,
+        apiVersion = conversionJob.apiVersion,
         s3inputStream = s3inputStream
       )
     } yield gzipStream
@@ -81,11 +81,11 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
   private def runStream(
     publicBucketName: String,
     publicObjectKey: String,
-    modelVersion: ApiVersions.Value,
+    apiVersion: ApiVersions.Value,
     s3inputStream: S3ObjectInputStream): Future[MultipartUploadResult] = {
     val s3source = S3Source(s3inputStream = s3inputStream)
 
-    val toDisplayWork: ((IdentifiedWork, WorksIncludes) => DisplayWork) = modelVersion match {
+    val toDisplayWork: ((IdentifiedWork, WorksIncludes) => DisplayWork) = apiVersion match {
       case ApiVersions.v1 => DisplayWorkV1.apply
       case ApiVersions.v2 => DisplayWorkV2.apply
     }
