@@ -10,7 +10,6 @@ trait ElasticsearchServiceFixture extends ElasticsearchFixtures {
   def withElasticSearchService(indexName: String, itemType: String)(
     testWith: TestWith[ElasticSearchService, Assertion]) = {
     val searchService = new ElasticSearchService(
-      defaultIndex = indexName,
       documentType = itemType,
       elasticClient = elasticClient
     )

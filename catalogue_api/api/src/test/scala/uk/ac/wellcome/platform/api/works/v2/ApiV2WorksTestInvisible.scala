@@ -11,14 +11,14 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "g9dtcj2e",
           title = "This work has been deleted",
           visible = false
         )
 
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
@@ -32,7 +32,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("excludes works with visible=false from list results") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         // Start by indexing a work with visible=false.
         val deletedWork = workWith(
           canonicalId = "gze7bc24",
@@ -44,7 +44,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
         val works = createWorks(2)
 
         val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
-        insertIntoElasticsearch(indexName, itemType, worksToIndex: _*)
+        insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
 
         eventually {
           server.httpGet(
@@ -100,7 +100,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
 
   it("excludes works with visible=false from search results") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "r8dx6std",
           title = "A deleted dodo"
@@ -110,7 +110,7 @@ class ApiV2WorksTestInvisible extends ApiWorksTestBase {
           title = "This work has been deleted",
           visible = false
         )
-        insertIntoElasticsearch(indexName, itemType, work, deletedWork)
+        insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 
         eventually {
           server.httpGet(

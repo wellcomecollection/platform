@@ -25,6 +25,7 @@ abstract class WorksController(apiPrefix: String,
                                apiContextSuffix: String,
                                apiHost: String,
                                apiScheme: String,
+                               indexName: String,
                                defaultPageSize: Int,
                                worksService: WorksService)
     extends Controller
@@ -90,7 +91,8 @@ abstract class WorksController(apiPrefix: String,
       val eventualResponse = for {
         maybeWork <- worksService.findWorkById(
           canonicalId = request.id,
-          index = request._index)
+          indexName = request._index
+            .getOrElse(indexName))
       } yield
         generateSingleWorkResponse(
           maybeWork,
@@ -134,13 +136,15 @@ abstract class WorksController(apiPrefix: String,
           queryString,
           pageSize = pageSize,
           pageNumber = request.page,
-          index = request._index
+          indexName = request._index
+            .getOrElse(indexName)
         )
       case None =>
         worksService.listWorks(
           pageSize = pageSize,
           pageNumber = request.page,
-          index = request._index
+          indexName = request._index
+            .getOrElse(indexName)
         )
     }
     works

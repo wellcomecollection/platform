@@ -10,7 +10,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a BadRequest error when malformed query parameters are presented") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=penguin",
             andExpect = Status.BadRequest,
@@ -25,7 +25,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a NotFound error when requesting a work with a non-existent id") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val badId = "non-existing-id"
           server.httpGet(
             path = s"/$apiPrefix/works/$badId",
@@ -41,7 +41,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a BadRequest error if the user asks for a page size just over the maximum") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 101
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -58,7 +58,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a BadRequest error if the user asks for an overly large page size") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 100000
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -74,7 +74,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a BadRequest error if the user asks for zero-length pages") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 0
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -90,7 +90,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a BadRequest error if the user asks for a negative page size") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = -50
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=$pageSize",
@@ -106,7 +106,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a BadRequest error if the user asks for page 0") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=0",
             andExpect = Status.BadRequest,
@@ -121,7 +121,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a BadRequest error if the user asks for a page before 0") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=-50",
             andExpect = Status.BadRequest,
@@ -136,7 +136,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns multiple errors if there's more than one invalid parameter") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=-60&page=-50",
             andExpect = Status.BadRequest,
@@ -151,7 +151,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a Bad Request error if asked for an invalid include") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo",
             andExpect = Status.BadRequest,
@@ -165,7 +165,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a Bad Request error if asked for more than one invalid include") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo,bar",
             andExpect = Status.BadRequest,
@@ -181,7 +181,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
             andExpect = Status.BadRequest,
@@ -197,7 +197,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a Bad Request error if asked for an invalid include on an individual work") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
             andExpect = Status.BadRequest,
@@ -211,7 +211,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns Not Found if you look up a non-existent index") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?_index=foobarbaz",
             andExpect = Status.NotFound,
@@ -224,7 +224,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns Not Found if you ask for a non-existent work") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/xhu96f9j",
             andExpect = Status.NotFound,
@@ -238,7 +238,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns Bad Request if you ask for a malformed identifier") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/zd224ncv]",
             andExpect = Status.BadRequest,
@@ -259,7 +259,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     // trigger one such exception!
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?_index=.watches",
             andExpect = Status.InternalServerError,
@@ -278,7 +278,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
   it("returns a Bad Request error if you try to access the 10000th page") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=10000",
             andExpect = Status.BadRequest,
@@ -294,7 +294,7 @@ class ApiErrorsTest extends ApiWorksTestBase {
     "returns a Bad Request error if you try to get the 101th page with 100 results per page") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
-        case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=100&page=101",
             andExpect = Status.BadRequest,
@@ -309,14 +309,15 @@ class ApiErrorsTest extends ApiWorksTestBase {
   // TODO figure out what the correct behaviour should be in this case
   ignore(
     "returns a Not Found error if you try to get a version that doesn't exist") {
-    withServer(indexName = "not-important") { server =>
-      server.httpGet(
-        path = "/catalogue/v567/works?pageSize=100&page=101",
-        andExpect = Status.NotFound,
-        withJsonBody = badRequest(
-          s"catalogue/${ApiVersions.default.toString}",
-          "v567 is not a valid API version")
-      )
+    withServer(indexNameV1 = "not-important", indexNameV2 = "not-important") {
+      server =>
+        server.httpGet(
+          path = "/catalogue/v567/works?pageSize=100&page=101",
+          andExpect = Status.NotFound,
+          withJsonBody = badRequest(
+            s"catalogue/${ApiVersions.default.toString}",
+            "v567 is not a valid API version")
+        )
     }
   }
 }

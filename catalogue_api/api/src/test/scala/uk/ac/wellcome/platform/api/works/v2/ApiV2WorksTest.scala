@@ -11,10 +11,10 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("returns a list of works") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
-        insertIntoElasticsearch(indexName, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
         eventually {
 
@@ -89,7 +89,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("returns a single work when requested with id") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = canonicalId,
           title = title,
@@ -100,7 +100,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           items = List(defaultItem),
           visible = true)
 
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
@@ -134,7 +134,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("renders the items if the items include is present") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "b4heraz7",
           title = "Inside an irate igloo",
@@ -147,7 +147,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           )
         )
 
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
@@ -176,10 +176,10 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     "returns the requested page of results when requested with page & pageSize") {
 
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
 
-        insertIntoElasticsearch(indexName, itemType, works: _*)
+        insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
         eventually {
           server.httpGet(
@@ -296,7 +296,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("ignores parameters that are unused when making an API request") {
     withV2Api {
-      case (apiPrefix, _, _, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
         server.httpGet(
           path = s"/$apiPrefix/works?foo=bar",
           andExpect = Status.Ok,
@@ -307,7 +307,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("returns matching results if doing a full-text search") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work1 = workWith(
           canonicalId = "1234",
           title = "A drawing of a dodo"
@@ -316,7 +316,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           canonicalId = "5678",
           title = "A mezzotint of a mouse"
         )
-        insertIntoElasticsearch(indexName, itemType, work1, work2)
+        insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
 
         eventually {
           server.httpGet(
@@ -354,7 +354,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
           ontologyType = "Work",
@@ -377,7 +377,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           identifiers = List(identifier2)
         )
 
-        insertIntoElasticsearch(indexName, itemType, work1, work2)
+        insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
 
         eventually {
           server.httpGet(
@@ -420,7 +420,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
   it(
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
           ontologyType = "Work",
@@ -431,7 +431,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           title = "An insect huddled in an igloo",
           identifiers = List(srcIdentifier)
         )
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
@@ -459,12 +459,12 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("searches different indices with the ?_index query parameter") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
           title = "A whale on a wave"
         )
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         val work_alt = workWith(
           canonicalId = "5678",
@@ -520,12 +520,12 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it("looks up works in different indices with the ?_index query parameter") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = workWith(
           canonicalId = "1234",
           title = "A wombat wallowing under a willow"
         )
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         val work_alt = workWith(
           canonicalId = "5678",
@@ -589,7 +589,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     withV2Api {
-      case (apiPrefix, indexName, itemType, server: EmbeddedHttpServer) =>
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(
           canonicalId = "1234",
           title = "A thorn in the thumb tells a traumatic tale",
@@ -599,7 +599,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
             license = License_CCBY
           )
         )
-        insertIntoElasticsearch(indexName, itemType, work)
+        insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
@@ -629,4 +629,51 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
+  it("only returns works from the v2 index") {
+    withV2Api {
+      case (
+          apiPrefix,
+          indexNameV1,
+          indexNameV2,
+          itemType,
+          server: EmbeddedHttpServer) =>
+        val work1 = workWith(
+          canonicalId = "1234",
+          title = "A wombat wallowing under a willow"
+        )
+
+        insertIntoElasticsearch(indexNameV1, itemType, work1)
+
+        val work2 = workWith(
+          canonicalId = "5678",
+          title = "A wombat wrestling with wet weather"
+        )
+
+        insertIntoElasticsearch(indexNameV2, itemType, work2)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?query=wombat",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  ${resultList(apiPrefix)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work2.canonicalId}",
+                 |     "title": "${work2.title.get}",
+                 |     "contributors": [ ],
+                 |     "subjects": [ ],
+                 |     "genres": [ ],
+                 |     "publishers": [ ],
+                 |     "placesOfPublication": [ ]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
 }

@@ -72,7 +72,9 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     val flags = Map(
       "api.host" -> "test.host",
       "api.scheme" -> "http",
-      "api.name" -> "test"
+      "api.name" -> "test",
+      "es.index.v1" -> "v1",
+      "es.index.v2" -> "v2"
     )
 
     implicit val jsonMapper = IdentifiedWork

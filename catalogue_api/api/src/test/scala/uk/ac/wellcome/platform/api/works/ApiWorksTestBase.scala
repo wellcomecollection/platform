@@ -22,8 +22,10 @@ trait ApiWorksTestBase
       toJson(t).get
   }
 
-  def withServer[R](indexName: String, itemType: String = "work")(
-    testWith: TestWith[EmbeddedHttpServer, R]) = {
+  def withServer[R](
+    indexNameV1: String,
+    indexNameV2: String,
+    itemType: String = "work")(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
@@ -31,7 +33,8 @@ trait ApiWorksTestBase
         "es.host" -> "localhost",
         "es.port" -> 9200.toString,
         "es.name" -> "wellcome",
-        "es.index" -> indexName,
+        "es.index.v1" -> indexNameV1,
+        "es.index.v2" -> indexNameV2,
         "es.type" -> itemType
       )
     )
@@ -48,10 +51,13 @@ trait ApiWorksTestBase
   def withApiFixtures[R](apiVersion: ApiVersions.Value,
                          apiName: String = "catalogue/",
                          itemType: String = "work")(
-    testWith: TestWith[(String, String, String, EmbeddedHttpServer), R]) =
-    withLocalElasticsearchIndex(itemType = itemType) { index =>
-      withServer(index, itemType) { server =>
-        testWith((apiName + apiVersion, index, itemType, server))
+    testWith: TestWith[(String, String, String, String, EmbeddedHttpServer),
+                       R]) =
+    withLocalElasticsearchIndex(itemType = itemType) { indexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { indexV2 =>
+        withServer(indexV1, indexV2, itemType) { server =>
+          testWith((apiName + apiVersion, indexV1, indexV2, itemType, server))
+        }
       }
     }
 

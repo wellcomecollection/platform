@@ -13,14 +13,17 @@ class V2WorksController @Inject()(
   @Flag("api.host") apiHost: String,
   @Flag("api.scheme") apiScheme: String,
   @Flag("api.pageSize") defaultPageSize: Int,
+  @Flag("es.index.v2") indexName: String,
   worksService: WorksService)
     extends WorksController(
-      apiPrefix,
-      apiContextSuffix,
-      apiHost,
-      apiScheme,
-      defaultPageSize,
-      worksService) {
+      apiPrefix = apiPrefix,
+      apiContextSuffix = apiContextSuffix,
+      apiHost = apiHost,
+      apiScheme = apiScheme,
+      indexName = indexName,
+      defaultPageSize = defaultPageSize,
+      worksService = worksService
+    ) {
   implicit protected val swagger = ApiV2Swagger
 
   prefix(s"$apiPrefix/${ApiVersions.v2.toString}") {
