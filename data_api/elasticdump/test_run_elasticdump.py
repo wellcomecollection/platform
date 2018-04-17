@@ -179,9 +179,9 @@ def test_end_to_end(
 
     messages = sns_client.list_messages()
     assert len(messages) == 1
-    assert messages.pop() == {
-        'sourceBucketName': bucket,
-        'sourceObjectKey': 'blah/dump.txt.gz',
-        'targetBucketName': public_bucket_name,
-        'targetObjectKey': public_object_key,
+    assert messages.pop()[':message'] == {
+        'privateBucketName': bucket,
+        'privateObjectKey': 'blah/dump.txt.gz',
+        'publicBucketName': public_bucket_name,
+        'publicObjectKey': public_object_key,
     }
