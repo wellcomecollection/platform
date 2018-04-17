@@ -26,10 +26,10 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
   ConversionJob
 }
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
-import uk.ac.wellcome.platform.snapshot_convertor.versions.ModelVersions
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith, _}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.versions.ApiVersions
 
 import scala.util.Random
 
@@ -93,7 +93,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ModelVersions.v1
+            modelVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -151,7 +151,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ModelVersions.v2
+            modelVersion = ApiVersions.v2
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -239,7 +239,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
-            modelVersion = ModelVersions.v1
+            modelVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -283,7 +283,7 @@ class ConvertorServiceTest
           privateObjectKey = "doesnotexist.txt.gz",
           publicBucketName = publicBucket.name,
           publicObjectKey = "target.txt.gz",
-          modelVersion = ModelVersions.v1
+          modelVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)
@@ -307,7 +307,7 @@ class ConvertorServiceTest
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
             publicObjectKey = "target.txt.gz",
-            modelVersion = ModelVersions.v1
+            modelVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -338,7 +338,7 @@ class ConvertorServiceTest
           privateObjectKey = "wrongKey",
           publicBucketName = bucketName,
           publicObjectKey = "target.json.gz",
-          modelVersion = ModelVersions.v1
+          modelVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)

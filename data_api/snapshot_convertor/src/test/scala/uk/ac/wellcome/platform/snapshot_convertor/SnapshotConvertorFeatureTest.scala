@@ -17,10 +17,10 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
   ConversionJob
 }
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
-import uk.ac.wellcome.platform.snapshot_convertor.versions.ModelVersions
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.versions.ApiVersions
 
 class SnapshotConvertorFeatureTest
     extends FunSpec
@@ -78,7 +78,7 @@ class SnapshotConvertorFeatureTest
               privateObjectKey = objectKey,
               publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey,
-              modelVersion = ModelVersions.v1
+              modelVersion = ApiVersions.v1
             )
 
             val message = SQSMessage(
