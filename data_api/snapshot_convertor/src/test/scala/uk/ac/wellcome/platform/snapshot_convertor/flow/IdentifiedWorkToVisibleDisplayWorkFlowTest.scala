@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.snapshot_convertor.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.models.{
   IdentifiedWork,
@@ -20,7 +20,8 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     with Matchers
     with Akka
     with ScalaFutures
-    with ExtendedPatience {
+    with ExtendedPatience
+    with WorksUtil {
 
   it("creates DisplayWorks from IdentifiedWorks") {
     withActorSystem { actorSystem =>
@@ -29,18 +30,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork()
 
-        val works = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "rbfhv6b4",
-            title = Some("Rumblings from a rambunctious rodent"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            version = version
-          )
-        }
+        val works = createWorks(count = 3).toList
 
         val eventualDisplayWorks = Source(works)
           .via(flow)
@@ -63,31 +53,10 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork()
 
-        val visibleWorks = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "rbfhv6b4",
-            title = Some("Rumblings from a rambunctious rodent"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            version = version
-          )
-        }
-        val notVisibleWork = IdentifiedWork(
-          canonicalId = "rbfhv6b4",
-          title = Some("Rumblings from a rambunctious rodent"),
-          sourceIdentifier = SourceIdentifier(
-            identifierScheme = IdentifierSchemes.miroImageNumber,
-            ontologyType = "work",
-            value = "R0060400"
-          ),
-          visible = false,
-          version = 1
-        )
+        val visibleWorks = createWorks(count = 3).toList
+        val notVisibleWorks = createWorks(count = 2, visible = false).toList
 
-        val eventualDisplayWorks = Source(visibleWorks :+ notVisibleWork)
+        val eventualDisplayWorks = Source(visibleWorks ++ notVisibleWorks)
           .via(flow)
           .runWith(Sink.seq)(materializer)
 

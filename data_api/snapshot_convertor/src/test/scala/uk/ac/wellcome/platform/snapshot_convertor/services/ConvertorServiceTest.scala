@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
@@ -39,7 +39,8 @@ class ConvertorServiceTest
     with AkkaS3
     with S3
     with GzipUtils
-    with ExtendedPatience {
+    with ExtendedPatience
+    with WorksUtil {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
@@ -71,34 +72,10 @@ class ConvertorServiceTest
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
           publicBucket) =>
-        // Create a collection of works.  These three differ by version,
-        // if not anything more interesting!
-        val visibleWorks = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "rbfhv6b4",
-            title = Some("Rumblings from a rambunctious rodent"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            version = version
-          )
-        }
+        val visibleWorks = createWorks(count = 3).toList
+        val notVisibleWorks = createWorks(count = 1, visible = false).toList
 
-        val notVisibleWork = IdentifiedWork(
-          canonicalId = "rbfhv6b4",
-          title = Some("Rumblings from a rambunctious rodent"),
-          sourceIdentifier = SourceIdentifier(
-            identifierScheme = IdentifierSchemes.miroImageNumber,
-            ontologyType = "work",
-            value = "R0060400"
-          ),
-          visible = false,
-          version = 1
-        )
-
-        val works = visibleWorks :+ notVisibleWork
+        val works = visibleWorks ++ notVisibleWorks
 
         val elasticsearchJsons = works.map { work =>
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
@@ -283,20 +260,7 @@ class ConvertorServiceTest
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
           publicBucket) =>
-        // Create a collection of works.  These three differ by version,
-        // if not anything more interesting!
-        val works = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "h4dh3esm",
-            title = Some("Harrowing Henry is hardly heard from"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "r4f2t3bf"
-            ),
-            version = version
-          )
-        }
+        val works = createWorks(count = 3)
 
         val elasticsearchJsons = works.map { work =>
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
