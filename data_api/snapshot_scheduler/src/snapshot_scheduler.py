@@ -31,6 +31,7 @@ def main(event=None, _ctxt=None, sns_client=None):
     topic_arn = os.environ['TOPIC_ARN']
 
     private_bucket_name = os.environ['PRIVATE_BUCKET_NAME']
+    public_bucket_name = os.environ['PUBLIC_BUCKET_NAME']
 
     es_index_v1 = os.environ['ES_INDEX_V1']
     es_index_v2 = os.environ['ES_INDEX_V2']
@@ -38,7 +39,7 @@ def main(event=None, _ctxt=None, sns_client=None):
     public_object_key_v1 = os.environ['PUBLIC_OBJECT_KEY_V1']
     public_object_key_v2 = os.environ['PUBLIC_OBJECT_KEY_V2']
 
-    for es_index, public_object_key in [
+    for (es_index, public_object_key) in [
         (es_index_v1, public_object_key_v1),
         (es_index_v2, public_object_key_v2),
     ]:
