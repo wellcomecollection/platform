@@ -81,7 +81,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     // This source generates instances of DisplayWork from the source snapshot.
     val displayWorks: Source[DisplayWorkV1, Any] = s3source
       .via(ElasticsearchHitToIdentifiedWorkFlow())
-      .via(IdentifiedWorkToVisibleDisplayWork())
+      .via(IdentifiedWorkToVisibleDisplayWork(DisplayWorkV1.apply))
 
     // This source generates JSON strings of DisplayWork instances, which
     // should be written to the destination snapshot.
