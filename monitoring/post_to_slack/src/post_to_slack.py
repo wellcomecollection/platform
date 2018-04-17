@@ -32,9 +32,13 @@ class Interval:
     end = attr.ib()
 
 
+class MessageHasNoDateError(Exception):
+    pass
+
+
+@attr.s
 class Alarm:
-    def __init__(self, json_message):
-        self.message = json.loads(json_message)
+    message = attr.ib(converter=json.loads)
 
     @property
     def name(self):
@@ -48,17 +52,20 @@ class Alarm:
     # about useful CloudWatch logs to check, so we include that in the alarm.
     # The methods and properties below pull out the relevant info.
 
-    @property
     def cloudwatch_timeframe(self):
         """
         Try to work out a likely timeframe for CloudWatch errors.
         """
         threshold = ThresholdMessage.from_message(self.state_reason)
 
-        return Interval(
-            start=threshold.date - dt.timedelta(seconds=300),
-            end=threshold.date + dt.timedelta(seconds=300)
-        )
+        try:
+            return Interval(
+                start=threshold.date - dt.timedelta(seconds=300),
+                end=threshold.date + dt.timedelta(seconds=300)
+            )
+        except TypeError:
+            # Raised when threshold.date is None.
+            raise MessageHasNoDateError()
 
     def cloudwatch_urls(self):
         """
@@ -66,7 +73,7 @@ class Alarm:
         """
         try:
             log_group_name = guess_cloudwatch_log_group(alarm_name=self.name)
-            timeframe = self.cloudwatch_timeframe
+            timeframe = self.cloudwatch_timeframe()
             return [
                 build_cloudwatch_url(
                     search_term=search_term,
@@ -77,6 +84,10 @@ class Alarm:
                 for search_term in guess_cloudwatch_search_terms(
                     alarm_name=self.name)
             ]
+
+        except MessageHasNoDateError:
+            pass
+
         except ValueError as err:
             print(f'Error in cloudwatch_urls: {err}')
             return []
@@ -94,7 +105,7 @@ class Alarm:
 
             # CloudWatch wants these parameters specified as seconds since
             # 1 Jan 1970 00:00:00, so convert to that first.
-            timeframe = self.cloudwatch_timeframe
+            timeframe = self.cloudwatch_timeframe()
             startTime = datetime_to_cloudwatch_ts(timeframe.start)
             endTime = datetime_to_cloudwatch_ts(timeframe.end)
 
@@ -109,6 +120,9 @@ class Alarm:
                     filterPattern=term
                 )
                 messages.extend([e['message'] for e in resp['events']])
+
+        except MessageHasNoDateError:
+            pass
 
         except Exception as err:
             print(f'Error in cloudwatch_messages: {err!r}')
@@ -160,6 +174,8 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
         }
     ]
 
+    print(alarm)
+
     messages = alarm.cloudwatch_messages()
     if messages:
         cloudwatch_message_str = '\n'.join(set([
@@ -184,7 +200,7 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     return slack_data
 
 
-def main(event, context):
+def main(event, _ctxt=None):
     print(f'event = {event!r}')
 
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
