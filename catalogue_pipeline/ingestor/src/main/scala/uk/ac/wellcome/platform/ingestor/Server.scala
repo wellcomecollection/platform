@@ -28,8 +28,8 @@ class Server extends HttpServer {
     ElasticClientModule,
     WorksIndexModule
   )
-  flag[String]("es.index.v1","V1 ES index name")
-  flag[String]("es.index.v2","V2 ES index name")
+  flag[String]("es.index.v1", "V1 ES index name")
+  flag[String]("es.index.v2", "V2 ES index name")
   flag[String]("es.type", "item", "ES document type")
   override def configureHttp(router: HttpRouter) {
     router

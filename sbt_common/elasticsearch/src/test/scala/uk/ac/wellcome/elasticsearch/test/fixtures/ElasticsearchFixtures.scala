@@ -54,7 +54,9 @@ trait ElasticsearchFixtures
     elasticClient.execute(clusterHealth()).await.numberOfNodes shouldBe 1
   }
 
-  def withLocalElasticsearchIndex[R](indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,itemType: String)(testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](
+    indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
+    itemType: String)(testWith: TestWith[String, R]): R = {
 
     val index = new WorksIndex(
       client = elasticClient,
@@ -64,8 +66,9 @@ trait ElasticsearchFixtures
     withLocalElasticsearchIndex(index, indexName)(testWith)
   }
 
-  def withLocalElasticsearchIndex[R](index: ElasticSearchIndex, indexName: String)(
-    testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](
+    index: ElasticSearchIndex,
+    indexName: String)(testWith: TestWith[String, R]): R = {
 
     index.create(indexName).await
 
