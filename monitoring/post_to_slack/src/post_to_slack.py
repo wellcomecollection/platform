@@ -184,7 +184,7 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     return slack_data
 
 
-def main(event, context):
+def main(event, _ctxt=None):
     print(f'event = {event!r}')
 
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
