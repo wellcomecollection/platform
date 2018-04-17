@@ -17,6 +17,7 @@ module "snapshot_scheduler_lambda" {
     ES_INDEX_V2 = "${var.es_index_v2}"
 
     PRIVATE_BUCKET_NAME = "${var.private_bucket_name}"
+    PUBLIC_BUCKET_NAME  = "${var.public_bucket_name}"
 
     PUBLIC_OBJECT_KEY_V1 = "${var.public_object_key_v1}"
     PUBLIC_OBJECT_KEY_V2 = "${var.public_object_key_v2}"
