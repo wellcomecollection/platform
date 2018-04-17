@@ -17,6 +17,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.models.{
   ConversionJob
 }
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
+import uk.ac.wellcome.platform.snapshot_convertor.versions.ModelVersions
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -76,7 +77,8 @@ class SnapshotConvertorFeatureTest
               privateBucketName = privateBucket.name,
               privateObjectKey = objectKey,
               publicBucketName = publicBucket.name,
-              publicObjectKey = publicObjectKey
+              publicObjectKey = publicObjectKey,
+              modelVersion = ModelVersions.v1
             )
 
             val message = SQSMessage(
