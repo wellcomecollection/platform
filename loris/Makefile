@@ -14,9 +14,6 @@ TF_IS_PUBLIC_FACING = true
 $(val $(call stack_setup))
 
 
-include $(ROOT)/loris/loris_cloudfront_monitoring/Makefile
-
-
 # TODO: Flip this to using micktwomey/pip-tools when that's updated
 # with a newer version of pip-tools.
 $(ROOT)/loris/loris/requirements.txt: $(ROOT)/loris/loris/requirements.in

@@ -19,10 +19,12 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_alarm" {
   treat_missing_data  = "breaching"
 
   dimensions {
-    DistributionId = "${local.loris_cloudfront_id}"
+    DistributionId = "${aws_cloudfront_distribution.loris.id}"
     Region         = "Global"
   }
 
   alarm_description = "Monitors 4xx errors from the Loris CloudFront distro"
-  alarm_actions     = ["${module.cloudfront_errors_topic.arn}"]
+  alarm_actions     = ["${aws_sns_topic.cloudfront_errors.arn}"]
+
+  provider = "aws.us_east_1"
 }
