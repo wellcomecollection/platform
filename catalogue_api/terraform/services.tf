@@ -16,7 +16,8 @@ module "api_romulus_v1" {
   ecr_repository_api_url   = "${module.ecr_repository_api.repository_url}"
   ecr_repository_nginx_url = "${module.ecr_repository_nginx_api.repository_url}"
 
-  api_host = "${var.api_host}"
+  api_prod_host  = "${var.api_prod_host}"
+  api_stage_host = "${var.api_stage_host}"
 
   alb_listener_https_arn     = "${module.api_alb.listener_https_arn}"
   alb_listener_http_arn      = "${module.api_alb.listener_http_arn}"
@@ -43,7 +44,8 @@ module "api_remus_v1" {
   ecr_repository_api_url   = "${module.ecr_repository_api.repository_url}"
   ecr_repository_nginx_url = "${module.ecr_repository_nginx_api.repository_url}"
 
-  api_host = "${var.api_host}"
+  api_prod_host  = "${var.api_prod_host}"
+  api_stage_host = "${var.api_stage_host}"
 
   alb_listener_https_arn     = "${module.api_alb.listener_https_arn}"
   alb_listener_http_arn      = "${module.api_alb.listener_http_arn}"
