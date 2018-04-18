@@ -49,20 +49,34 @@ class IngestorWorkerServiceTest
   val actorSystem = ActorSystem()
 
   def createMiroWork(
-                      canonicalId: String,
-                      sourceId: String,
-                      title: String,
-                      visible: Boolean = true,
-                      version: Int = 1
-                    ): IdentifiedWork = createWork(canonicalId, sourceId, title, IdentifierSchemes.miroImageNumber, visible, version)
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
+    createWork(
+      canonicalId,
+      sourceId,
+      title,
+      IdentifierSchemes.miroImageNumber,
+      visible,
+      version)
 
   def createSierraWork(
-                      canonicalId: String,
-                      sourceId: String,
-                      title: String,
-                      visible: Boolean = true,
-                      version: Int = 1
-                    ): IdentifiedWork = createWork(canonicalId, sourceId, title, IdentifierSchemes.sierraSystemNumber, visible, version)
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
+    createWork(
+      canonicalId,
+      sourceId,
+      title,
+      IdentifierSchemes.sierraSystemNumber,
+      visible,
+      version)
 
   def createWork(canonicalId: String,
                  sourceId: String,
@@ -104,23 +118,24 @@ class IngestorWorkerServiceTest
             indexNameV1,
             indexNameV2,
             identifiedWorkIndexer = workIndexer,
-            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            reader =
+              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             system = actorSystem,
             metrics = metricsSender
           )
 
           service.processMessage(sqsMessage)
 
-            assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = indexNameV1,
-              itemType = itemType)
+          assertElasticsearchEventuallyHasWork(
+            work,
+            indexName = indexNameV1,
+            itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = indexNameV2,
-              itemType = itemType)
-          }
+            work,
+            indexName = indexNameV2,
+            itemType = itemType)
+        }
       }
     }
   }
@@ -144,7 +159,8 @@ class IngestorWorkerServiceTest
             indexNameV1,
             indexNameV2,
             identifiedWorkIndexer = workIndexer,
-            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            reader =
+              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             system = actorSystem,
             metrics = metricsSender
           )
@@ -152,15 +168,15 @@ class IngestorWorkerServiceTest
           service.processMessage(sqsMessage)
 
           assertElasticsearchNeverHasWork(
-              work,
-              indexName = indexNameV1,
-              itemType = itemType)
+            work,
+            indexName = indexNameV1,
+            itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = indexNameV2,
-              itemType = itemType)
-          }
+            work,
+            indexName = indexNameV2,
+            itemType = itemType)
+        }
       }
     }
   }
@@ -185,15 +201,16 @@ class IngestorWorkerServiceTest
             indexNameV1,
             indexNameV2,
             identifiedWorkIndexer = workIndexer,
-            reader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+            reader =
+              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             system = actorSystem,
             metrics = metricsSender
           )
 
           val future = service.processMessage(sqsMessage)
 
-          whenReady(future.failed){ ex =>
-            ex shouldBe a [GracefulFailureException]
+          whenReady(future.failed) { ex =>
+            ex shouldBe a[GracefulFailureException]
             ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
           }
         }

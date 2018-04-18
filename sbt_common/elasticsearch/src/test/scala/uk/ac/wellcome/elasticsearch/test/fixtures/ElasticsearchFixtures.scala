@@ -106,17 +106,17 @@ trait ElasticsearchFixtures
   }
 
   def assertElasticsearchNeverHasWork(work: IdentifiedWork,
-                                           indexName: String,
-                                           itemType: String) = {
+                                      indexName: String,
+                                      itemType: String) = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
-          val hit = elasticClient
-        .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
-        .await
+    val hit = elasticClient
+      .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+      .await
 
-      hit.found shouldBe false
+    hit.found shouldBe false
   }
 
   def insertIntoElasticsearch(indexName: String,

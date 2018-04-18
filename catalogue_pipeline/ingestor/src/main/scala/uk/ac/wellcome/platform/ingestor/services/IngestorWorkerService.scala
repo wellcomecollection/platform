@@ -14,19 +14,20 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class IngestorWorkerService @Inject()(
-                                       @Flag("es.index.v1") esIndexV1: String,
-                                       @Flag("es.index.v2") esIndexV2: String,
-                                       identifiedWorkIndexer: WorkIndexer,
-                                       reader: SQSReader,
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
+  @Flag("es.index.v1") esIndexV1: String,
+  @Flag("es.index.v2") esIndexV2: String,
+  identifiedWorkIndexer: WorkIndexer,
+  reader: SQSReader,
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       work <- Future.fromTry(fromJson[IdentifiedWork](message.body))
       indices = decideTargetIndices(work)
-      _ <- Future.sequence(indices.map(identifiedWorkIndexer.indexWork(work, _)))
+      _ <- Future.sequence(
+        indices.map(identifiedWorkIndexer.indexWork(work, _)))
     } yield ()
 
   // This method returns the indices where a work is to be ingested.
@@ -37,7 +38,9 @@ class IngestorWorkerService @Inject()(
     work.sourceIdentifier.identifierScheme match {
       case IdentifierSchemes.miroImageNumber => List(esIndexV1, esIndexV2)
       case IdentifierSchemes.sierraSystemNumber => List(esIndexV2)
-      case _ => throw GracefulFailureException(new RuntimeException(s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))
+      case _ =>
+        throw GracefulFailureException(new RuntimeException(
+          s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))
     }
 
   }
