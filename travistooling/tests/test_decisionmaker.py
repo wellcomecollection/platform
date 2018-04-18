@@ -37,6 +37,9 @@ from travistooling.decisions import (
     ('foo.md', 'ingestor-build', IgnoredFileFormat, False),
     ('image.png', 'reindex_worker-test', IgnoredFileFormat, False),
     ('ontology.graffle', 'nginx-test', IgnoredFileFormat, False),
+    ('Makefile', 'travistooling-test', IgnoredFileFormat, False),
+    ('monitoring/Makefile', 'travistooling-test', IgnoredFileFormat, False),
+    ('formatting.Makefile', 'travistooling-test', IgnoredFileFormat, False),
 
     # Terraform files are significant, but only in the travis-format task
     ('s3.tf', 'elasticdump-test', IgnoredFileFormat, False),
