@@ -35,13 +35,13 @@ class WorkIndexerTest
   val itemType = "work"
 
   val workIndexer =
-    new WorkIndexer(indexName, itemType, elasticClient, metricsSender)
+    new WorkIndexer(itemType, elasticClient, metricsSender)
 
   it("should insert an identified Work into Elasticsearch") {
     val work = createWork("5678", "1234", "An identified igloo")
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
-      val future = workIndexer.indexWork(work)
+      val future = workIndexer.indexWork(work, indexName)
 
       whenReady(future) { _ =>
         assertElasticsearchEventuallyHasWork(
@@ -58,7 +58,7 @@ class WorkIndexerTest
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       val future = Future.sequence(
-        (1 to 2).map(_ => workIndexer.indexWork(work))
+        (1 to 2).map(_ => workIndexer.indexWork(work, indexName))
       )
 
       whenReady(future) { _ =>
@@ -77,7 +77,7 @@ class WorkIndexerTest
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
-      val future = workIndexer.indexWork(work.copy(version = 1))
+      val future = workIndexer.indexWork(work.copy(version = 1), indexName)
 
       whenReady(future) { _ =>
         // give elasticsearch enough time to ingest the work
@@ -102,7 +102,7 @@ class WorkIndexerTest
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
       val updatedWork = work.copy(title = Some("boring title"))
-      val future = workIndexer.indexWork(updatedWork)
+      val future = workIndexer.indexWork(updatedWork, indexName)
 
       whenReady(future) { _ =>
         assertElasticsearchEventuallyHasWork(

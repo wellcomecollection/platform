@@ -20,7 +20,6 @@ import scala.concurrent.Future
 
 @Singleton
 class WorkIndexer @Inject()(
-  @Flag("es.index") esIndex: String,
   @Flag("es.type") esType: String,
   elasticClient: HttpClient,
   metricsSender: MetricsSender
@@ -32,7 +31,7 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWork(work: IdentifiedWork): Future[Any] = {
+  def indexWork(work: IdentifiedWork, esIndex: String): Future[Any] = {
 
     // This is required for elastic4s, not Circe
     implicit val jsonMapper = IdentifiedWork

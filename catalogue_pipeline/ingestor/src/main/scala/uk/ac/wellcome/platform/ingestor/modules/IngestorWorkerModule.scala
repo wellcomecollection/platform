@@ -5,9 +5,6 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
 
 object IngestorWorkerModule extends TwitterModule {
-  private val esIndex = flag[String]("es.index", "records", "ES index name")
-  private val esType = flag[String]("es.type", "item", "ES document type")
-
   // eagerly load worker service
   override def singletonStartup(injector: Injector) {
     super.singletonStartup(injector)

@@ -31,11 +31,14 @@ trait ElasticsearchFixtures
   private val esPort = "9200"
   private val esName = "wellcome"
 
-  def esLocalFlags(indexName: String, itemType: String) = Map(
+  def esLocalFlags(indexNameV1: String,
+                   indexNameV2: String,
+                   itemType: String) = Map(
     "es.host" -> esHost,
     "es.port" -> esPort,
     "es.name" -> esName,
-    "es.index" -> indexName,
+    "es.index.v1" -> indexNameV1,
+    "es.index.v2" -> indexNameV2,
     "es.type" -> itemType
   )
 
@@ -57,31 +60,31 @@ trait ElasticsearchFixtures
 
     val index = new WorksIndex(
       client = elasticClient,
-      name = indexName,
       itemType = itemType
     )
 
-    withLocalElasticsearchIndex(index)(testWith)
+    withLocalElasticsearchIndex(index, indexName)(testWith)
   }
 
-  def withLocalElasticsearchIndex[R](index: ElasticSearchIndex)(
-    testWith: TestWith[String, R]): R = {
+  def withLocalElasticsearchIndex[R](
+    index: ElasticSearchIndex,
+    indexName: String)(testWith: TestWith[String, R]): R = {
 
-    index.create.await
+    index.create(indexName).await
 
     // Elasticsearch is eventually consistent, so the future
     // completing doesn't actually mean that the index exists yet
     eventually {
       elasticClient
-        .execute(indexExists(index.indexName))
+        .execute(indexExists(indexName))
         .await
         .isExists should be(true)
     }
 
     try {
-      testWith(index.indexName)
+      testWith(indexName)
     } finally {
-      elasticClient.execute(deleteIndex(index.indexName))
+      elasticClient.execute(deleteIndex(indexName))
     }
   }
 
@@ -100,6 +103,20 @@ trait ElasticsearchFixtures
 
       assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
     }
+  }
+
+  def assertElasticsearchNeverHasWork(work: IdentifiedWork,
+                                      indexName: String,
+                                      itemType: String) = {
+    // Let enough time pass to account for elasticsearch
+    // eventual consistency before asserting
+    Thread.sleep(500)
+
+    val hit = elasticClient
+      .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+      .await
+
+    hit.found shouldBe false
   }
 
   def insertIntoElasticsearch(indexName: String,
