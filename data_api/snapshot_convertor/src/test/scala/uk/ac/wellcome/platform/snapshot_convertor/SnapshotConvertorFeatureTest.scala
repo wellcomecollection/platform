@@ -10,7 +10,6 @@ import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
-import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -49,7 +48,7 @@ class SnapshotConvertorFeatureTest
       }
     }
 
-  it("completes a conversion successfully") {
+  it("completes a snapshot generation successfully") {
     withFixtures {
       case (queue, topic, indexNameV1, indexNameV2,publicBucket) =>
         val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
