@@ -10,6 +10,7 @@ import sys
 
 import attr
 import boto3
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 from service_utils import service
 
@@ -139,17 +140,20 @@ def run():
     )
 
     print(f'*** Sending a job notification to SNS')
-    resp = sns_client.publish(
-        TopicArn=topic_arn,
-        MessageStructure='json',
-        Message=json.dumps({
+
+    resp = publish_sns_message(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        message={
             'privateBucketName': snapshot_request.private_bucket_name,
             'privateObjectKey': private_object_key,
             'publicBucketName': snapshot_request.public_bucket_name,
             'publicObjectKey': snapshot_request.public_object_key,
             'apiVersion': snapshot_request.api_version,
-        })
+        },
+        subject='source: elasticdump.run'
     )
+
     print(f'resp = {resp!r}')
 
     print('*** Deleting the SQS message')
