@@ -99,7 +99,7 @@ define test_lambda
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/$(1)/src:/data \
-		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
+		--volume $(ROOT)/shared_conftest.py:/conftest.py \
 		--env INSTALL_DEPENDENCIES=false \
 		--env FIND_MATCH_PATHS="/data" --tty \
 		wellcome/test_lambda_$(shell basename $(1)):latest

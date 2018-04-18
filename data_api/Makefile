@@ -19,7 +19,7 @@ elasticdump-test: elasticdump-build
 	$(ROOT)/docker_run.py --aws --dind -- \
 		--net=host \
 		--volume $(ROOT)/data_api/elasticdump:/data \
-		--volume $(ROOT)/lambda_conftest.py:/conftest.py \
+		--volume $(ROOT)/shared_conftest.py:/conftest.py \
 		--env INSTALL_DEPENDENCIES=false \
 		--env FIND_MATCH_PATHS="/data" --tty \
 		wellcome/test_lambda_elasticdump

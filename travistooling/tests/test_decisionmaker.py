@@ -37,6 +37,9 @@ from travistooling.decisions import (
     ('foo.md', 'ingestor-build', IgnoredFileFormat, False),
     ('image.png', 'reindex_worker-test', IgnoredFileFormat, False),
     ('ontology.graffle', 'nginx-test', IgnoredFileFormat, False),
+    ('Makefile', 'travistooling-test', IgnoredFileFormat, False),
+    ('monitoring/Makefile', 'travistooling-test', IgnoredFileFormat, False),
+    ('formatting.Makefile', 'travistooling-test', IgnoredFileFormat, False),
 
     # Terraform files are significant, but only in the travis-format task
     ('s3.tf', 'elasticdump-test', IgnoredFileFormat, False),
@@ -68,6 +71,12 @@ from travistooling.decisions import (
     # a -publish task.
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
+
+    # Changes to Python test files never trigger a -publish task.
+    ('lambda_conftest.py', 'loris-publish', ChangesToTestsDontGetPublished, False),
+    ('lambda_conftest.py', 'post_to_slack-publish', ChangesToTestsDontGetPublished, False),
+    ('shared_conftest.py', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
+    ('reindex_job_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
 
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
