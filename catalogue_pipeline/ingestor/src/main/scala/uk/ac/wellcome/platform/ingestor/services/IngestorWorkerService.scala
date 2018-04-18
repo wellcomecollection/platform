@@ -29,6 +29,10 @@ class IngestorWorkerService @Inject()(
       _ <- Future.sequence(indices.map(identifiedWorkIndexer.indexWork(work, _)))
     } yield ()
 
+  // This method returns the indices where a work is to be ingested.
+  // * Miro works are indexed in both v1 and v2 indices.
+  // * Sierra works are indexed only in the v2 index.
+  // * Works from any other source are not expected so they are discarded.
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
     work.sourceIdentifier.identifierScheme match {
       case IdentifierSchemes.miroImageNumber => List(esIndexV1, esIndexV2)

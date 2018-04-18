@@ -1,17 +1,14 @@
 package uk.ac.wellcome.platform.ingestor
 
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.test.fixtures.SQS
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConversions._
 
@@ -80,8 +77,7 @@ class IngestorFeatureTest
 
     it("does not delete a message from the queue if it fails processing") {
       withLocalSqsQueue { queue =>
-        val invalidMessage = JsonUtil
-          .toJson(
+        val invalidMessage = toJson(
             SQSMessage(
               Some("identified-item"),
               "not a json string - this will fail parsing",
@@ -128,12 +124,10 @@ class IngestorFeatureTest
     private def sendToSqs(work: IdentifiedWork, queue: Queue) =
       sqsClient.sendMessage(
         queue.url,
-        JsonUtil
-          .toJson(
+        toJson(
             SQSMessage(
               Some("identified-item"),
-              JsonUtil
-                .toJson(
+              toJson(
                   work
                 )
                 .get,

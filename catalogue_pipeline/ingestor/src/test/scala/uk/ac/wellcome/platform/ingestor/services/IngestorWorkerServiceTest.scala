@@ -204,7 +204,7 @@ class IngestorWorkerServiceTest
   it("returns a failed future if the input string is not a Work") {
     val sqsMessage = messageFromString("<xml><item> ??? Not JSON!!")
     val indexNameV1 = "works-v1"
-    val indexNameV2 = "works-v1"
+    val indexNameV2 = "works-v2"
 
     withLocalSqsQueue { queue =>
       val workIndexer = new WorkIndexer(
