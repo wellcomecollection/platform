@@ -19,10 +19,9 @@ module "elasticdump" {
     es_password   = "${local.es_password}"
     es_hostname   = "${local.es_name}.${local.es_region}.aws.found.io"
     es_port       = "${local.es_port}"
-    es_index      = "${local.es_index}"
   }
 
-  env_vars_length = 9
+  env_vars_length = 8
 
   memory = 1024
   cpu    = 512

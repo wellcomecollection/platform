@@ -18,8 +18,12 @@ output "prod_es_port" {
   value = "${var.production_api == "remus" ? var.es_config_remus["port"] : var.es_config_romulus["port"]}"
 }
 
-output "prod_es_index" {
-  value = "${var.production_api == "remus" ? var.es_config_remus["index"] : var.es_config_romulus["index"]}"
+output "prod_es_index_v1" {
+  value = "${var.production_api == "remus" ? var.es_config_remus["index_v1"] : var.es_config_romulus["index_v1"]}"
+}
+
+output "prod_es_index_v2" {
+  value = "${var.production_api == "remus" ? var.es_config_remus["index_v2"] : var.es_config_romulus["index_v2"]}"
 }
 
 output "prod_es_doc_type" {
