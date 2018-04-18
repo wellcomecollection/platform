@@ -24,5 +24,8 @@ elasticdump-test: elasticdump-build
 		--env FIND_MATCH_PATHS="/data" --tty \
 		wellcome/test_lambda_elasticdump
 
+$(ROOT)/data_api/elasticdump/src/requirements.txt:
+	$(ROOT)/docker_run.py -- \
+		--volume $(ROOT)/data_api/elasticdump/src/:/src micktwomey/pip-tools
 
 $(val $(call stack_setup))
