@@ -10,8 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.{
   IdentifiedWork,
@@ -28,6 +29,7 @@ import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith, _}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.versions.ApiVersions
 
 import scala.util.Random
 
@@ -39,7 +41,8 @@ class ConvertorServiceTest
     with AkkaS3
     with S3
     with GzipUtils
-    with ExtendedPatience {
+    with ExtendedPatience
+    with WorksUtil {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
@@ -66,39 +69,15 @@ class ConvertorServiceTest
       withLocalS3Bucket[R] and
       withLocalS3Bucket[R]
 
-  it("completes a conversion successfully") {
+  it("completes a V1 conversion successfully") {
     withFixtures {
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
           publicBucket) =>
-        // Create a collection of works.  These three differ by version,
-        // if not anything more interesting!
-        val visibleWorks = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "rbfhv6b4",
-            title = Some("Rumblings from a rambunctious rodent"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            version = version
-          )
-        }
+        val visibleWorks = createWorks(count = 3).toList
+        val notVisibleWorks = createWorks(count = 1, visible = false).toList
 
-        val notVisibleWork = IdentifiedWork(
-          canonicalId = "rbfhv6b4",
-          title = Some("Rumblings from a rambunctious rodent"),
-          sourceIdentifier = SourceIdentifier(
-            identifierScheme = IdentifierSchemes.miroImageNumber,
-            ontologyType = "work",
-            value = "R0060400"
-          ),
-          visible = false,
-          version = 1
-        )
-
-        val works = visibleWorks :+ notVisibleWork
+        val works = visibleWorks ++ notVisibleWorks
 
         val elasticsearchJsons = works.map { work =>
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
@@ -113,7 +92,8 @@ class ConvertorServiceTest
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
-            publicObjectKey = publicObjectKey
+            publicObjectKey = publicObjectKey,
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -129,6 +109,64 @@ class ConvertorServiceTest
             val expectedContents = visibleWorks
               .map {
                 DisplayWorkV1(_, includes = AllWorksIncludes())
+              }
+              .map {
+                mapper.writeValueAsString(_)
+              }
+              .mkString("\n") + "\n"
+
+            contents shouldBe expectedContents
+
+            result shouldBe CompletedConversionJob(
+              conversionJob = conversionJob,
+              targetLocation =
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
+            )
+          }
+        }
+    }
+  }
+
+  it("completes a V2 conversion successfully") {
+    withFixtures {
+      case (
+          ((_, _, _, convertorService: ConvertorService), privateBucket),
+          publicBucket) =>
+        val visibleWorks = createWorks(count = 4).toList
+        val notVisibleWorks = createWorks(count = 2, visible = false).toList
+
+        val works = visibleWorks ++ notVisibleWorks
+
+        val elasticsearchJsons = works.map { work =>
+          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
+            work).get}}"""
+        }
+        val content = elasticsearchJsons.mkString("\n")
+
+        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
+          val publicObjectKey = "target.txt.gz"
+
+          val conversionJob = ConversionJob(
+            privateBucketName = privateBucket.name,
+            privateObjectKey = objectKey,
+            publicBucketName = publicBucket.name,
+            publicObjectKey = publicObjectKey,
+            apiVersion = ApiVersions.v2
+          )
+
+          val future = convertorService.runConversion(conversionJob)
+
+          whenReady(future) { result =>
+            val downloadFile =
+              File.createTempFile("convertorServiceTest", ".txt.gz")
+            s3Client.getObject(
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
+              downloadFile)
+
+            val contents = readGzipFile(downloadFile.getPath)
+            val expectedContents = visibleWorks
+              .map {
+                DisplayWorkV2(_, includes = AllWorksIncludes())
               }
               .map {
                 mapper.writeValueAsString(_)
@@ -200,7 +238,8 @@ class ConvertorServiceTest
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
-            publicObjectKey = publicObjectKey
+            publicObjectKey = publicObjectKey,
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -243,7 +282,8 @@ class ConvertorServiceTest
           privateBucketName = privateBucket.name,
           privateObjectKey = "doesnotexist.txt.gz",
           publicBucketName = publicBucket.name,
-          publicObjectKey = "target.txt.gz"
+          publicObjectKey = "target.txt.gz",
+          apiVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)
@@ -266,7 +306,8 @@ class ConvertorServiceTest
             privateBucketName = privateBucket.name,
             privateObjectKey = objectKey,
             publicBucketName = publicBucket.name,
-            publicObjectKey = "target.txt.gz"
+            publicObjectKey = "target.txt.gz",
+            apiVersion = ApiVersions.v1
           )
 
           val future = convertorService.runConversion(conversionJob)
@@ -283,20 +324,7 @@ class ConvertorServiceTest
       case (
           ((_, _, _, convertorService: ConvertorService), privateBucket),
           publicBucket) =>
-        // Create a collection of works.  These three differ by version,
-        // if not anything more interesting!
-        val works = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = "h4dh3esm",
-            title = Some("Harrowing Henry is hardly heard from"),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
-              value = "r4f2t3bf"
-            ),
-            version = version
-          )
-        }
+        val works = createWorks(count = 3)
 
         val elasticsearchJsons = works.map { work =>
           s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
@@ -309,7 +337,8 @@ class ConvertorServiceTest
           privateBucketName = bucketName,
           privateObjectKey = "wrongKey",
           publicBucketName = bucketName,
-          publicObjectKey = "target.json.gz"
+          publicObjectKey = "target.json.gz",
+          apiVersion = ApiVersions.v1
         )
 
         val future = convertorService.runConversion(conversionJob)

@@ -68,7 +68,8 @@ def test_getting_only_one_message_from_sqs(
                 private_bucket_name=bucket,
                 public_bucket_name='bukkit',
                 public_object_key='works.json.gz',
-                es_index=elasticsearch_index
+                es_index=elasticsearch_index,
+                api_version='v1'
             )
         ) for time in ('now', 'then')
     ]
@@ -112,7 +113,8 @@ def test_end_to_end(
                     private_bucket_name=bucket,
                     public_bucket_name=public_bucket_name,
                     public_object_key=public_object_key,
-                    es_index=elasticsearch_index
+                    es_index=elasticsearch_index,
+                    api_version='v1'
                 )
             )
         )
@@ -184,4 +186,5 @@ def test_end_to_end(
         'privateObjectKey': 'blah/dump.txt.gz',
         'publicBucketName': public_bucket_name,
         'publicObjectKey': public_object_key,
+        'apiVersion': 'v1',
     }

@@ -19,6 +19,7 @@ from service_utils import service
 @attr.s
 class SnapshotRequest(object):
     time = attr.ib()
+    api_version = attr.ib()
     private_bucket_name = attr.ib()
     public_bucket_name = attr.ib()
     public_object_key = attr.ib()
@@ -146,6 +147,7 @@ def run():
             'privateObjectKey': private_object_key,
             'publicBucketName': snapshot_request.public_bucket_name,
             'publicObjectKey': snapshot_request.public_object_key,
+            'apiVersion': snapshot_request.api_version,
         })
     )
     print(f'resp = {resp!r}')

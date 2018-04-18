@@ -4,7 +4,7 @@ import akka.NotUsed
 import akka.stream.scaladsl.Flow
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.inject.Logging
-import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.display.models.DisplayWork
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
 object DisplayWorkToJsonStringFlow extends Logging {
 
   def apply(mapper: ObjectMapper)(implicit executionContext: ExecutionContext)
-    : Flow[DisplayWorkV1, String, NotUsed] =
+    : Flow[DisplayWork, String, NotUsed] =
     Flow.fromFunction({ work =>
       Try(mapper.writeValueAsString(work)) match {
         case Success(s: String) => s

@@ -46,12 +46,14 @@ def test_writes_message_to_sqs(sns_client, topic_arn):
             'public_bucket_name': public_bucket_name,
             'public_object_key': public_object_key_v1,
             'es_index': es_index_v1,
+            'api_version': 'v1',
         },
         {
             'time': '2011-06-21T00:00:00',
             'private_bucket_name': private_bucket_name,
             'public_bucket_name': public_bucket_name,
             'public_object_key': public_object_key_v2,
-            'es_index': es_index_v2
+            'es_index': es_index_v2,
+            'api_version': 'v2',
         },
     ]
