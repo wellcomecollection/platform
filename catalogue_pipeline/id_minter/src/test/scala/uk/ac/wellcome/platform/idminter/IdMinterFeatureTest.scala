@@ -9,6 +9,8 @@ import uk.ac.wellcome.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.sqs.MessagePointer
+import uk.ac.wellcome.s3.S3Uri
 
 import scala.collection.JavaConversions._
 
@@ -23,8 +25,17 @@ class IdMinterFeatureTest
     with Eventually
     with Matchers {
 
-  private def getWorksFromMessages(messages: List[MessageInfo]) =
-    messages.map(m => fromJson[IdentifiedWork](m.message).get)
+  private def getWorksFromMessages(messages: List[MessageInfo]) = {
+    val pointers = messages.map(m => fromJson[MessagePointer](m.message).get)
+    pointers.map(loadWork)
+  }
+
+  def loadWork(pointer: MessagePointer) = {
+    pointer.src match {
+      case S3Uri(bucket, key) => fromJson[IdentifiedWork](getContentFromS3(S3.Bucket(bucket), key)).get
+      case _ => sys.error("URI scheme unsupported by test")
+    }
+  }
 
   private def generateSqsMessage(MiroID: String): SQSMessage = {
     val identifier =
