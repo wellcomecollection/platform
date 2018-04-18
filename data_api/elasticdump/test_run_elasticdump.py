@@ -76,14 +76,14 @@ def test_getting_only_one_message_from_sqs(
     for r in requests:
         sqs_client.send_message(
             QueueUrl=queue_url,
-            MessageBody=json.dumps(r)
+            MessageBody=json.dumps({'Message': json.dumps(r)})
         )
 
     received_message = run_elasticdump.get_message(
         sqs_client=sqs_client,
         sqs_queue_url=queue_url
     )
-    received_body = json.loads(received_message['Body'])
+    received_body = json.loads(json.loads(received_message['Body'])['Message'])
     assert received_body in requests
 
 
@@ -104,20 +104,19 @@ def test_end_to_end(
     public_bucket_name = 'public-bukkit'
     public_object_key = 'catalogue/v1/works.json.gz'
 
+    snapshot_request_dict = attr.asdict(
+        run_elasticdump.SnapshotRequest(
+            "time",
+            private_bucket_name=bucket,
+            public_bucket_name=public_bucket_name,
+            public_object_key=public_object_key,
+            es_index=elasticsearch_index,
+            api_version='v1')
+    )
+
     sqs_client.send_message(
         QueueUrl=queue_url,
-        MessageBody=json.dumps(
-            attr.asdict(
-                run_elasticdump.SnapshotRequest(
-                    "time",
-                    private_bucket_name=bucket,
-                    public_bucket_name=public_bucket_name,
-                    public_object_key=public_object_key,
-                    es_index=elasticsearch_index,
-                    api_version='v1'
-                )
-            )
-        )
+        MessageBody=json.dumps({'Message': json.dumps(snapshot_request_dict)})
     )
 
     for i in range(10):

@@ -43,7 +43,7 @@ def get_message(sqs_client, sqs_queue_url):
 
 
 def parse_message(message):
-    raw_message_dict = json.loads(message['Body'])
+    raw_message_dict = json.loads(json.loads(message['Body'])['Message'])
 
     return SnapshotRequest(**raw_message_dict)
 
