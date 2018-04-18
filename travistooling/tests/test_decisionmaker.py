@@ -69,6 +69,12 @@ from travistooling.decisions import (
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
 
+    # Changes to Python test files never trigger a -publish task.
+    ('lambda_conftest.py', 'loris-publish', ChangesToTestsDontGetPublished, False),
+    ('lambda_conftest.py', 'post_to_slack-publish', ChangesToTestsDontGetPublished, False),
+    ('shared_conftest.py', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
+    ('reindex_job_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
+
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
     ('travistooling/decisionmaker.py', 'loris-test', ExclusivelyAffectsAnotherTask, False),

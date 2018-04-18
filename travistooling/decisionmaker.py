@@ -70,11 +70,15 @@ def does_file_affect_build_task(path, task):
             else:
                 raise ExclusivelyAffectsAnotherTask(task_prefix)
 
-    # If this is a Scala test file and we're in a publish task, we can
-    # skip running the task.
-    if (
-        'src/test/scala/uk/ac/wellcome' in path and
-        task.endswith('-publish')
+    # If this is a test file and we're in a publish task, we can skip
+    # running the task.
+    if task.endswith('-publish') and (
+
+        # Scala test files
+        'src/test/scala/uk/ac/wellcome' in path or
+
+        # Python test files
+        path.endswith(('conftest.py', '.coveragerc'))
     ):
         raise ChangesToTestsDontGetPublished()
 
