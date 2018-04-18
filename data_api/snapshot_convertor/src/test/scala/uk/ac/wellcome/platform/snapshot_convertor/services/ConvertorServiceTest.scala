@@ -10,25 +10,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier
-}
+import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
-import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith, _}
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.versions.ApiVersions
 
 import scala.util.Random
@@ -42,6 +34,7 @@ class ConvertorServiceTest
     with S3
     with GzipUtils
     with ExtendedPatience
+    with ElasticsearchFixtures
     with WorksUtil {
 
   val mapper = new ObjectMapper with ScalaObjectMapper
@@ -61,36 +54,40 @@ class ConvertorServiceTest
     testWith(convertorService)
   }
 
-  def withFixtures[R] =
-    withActorSystem[R] and
-      withMaterializer[R] _ and
-      withS3AkkaClient[R] _ and
-      withConvertorService[R] _ and
-      withLocalS3Bucket[R] and
-      withLocalS3Bucket[R]
+  def withFixtures[R](
+                    testWith: TestWith[(ConvertorService, String, String, Bucket), R]) =
+    withActorSystem { actorSystem =>
+      withMaterializer(actorSystem) { actorMaterialiser =>
+        withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
+          withLocalElasticsearchIndex(itemType = "work") { indexNameV1 =>
+          withLocalElasticsearchIndex(itemType = "work") { indexNameV2 =>
+            withLocalS3Bucket { bucket =>
+              withConvertorService(actorSystem, actorMaterialiser, s3Client) { convertorService => {
+                testWith((convertorService, indexNameV1, indexNameV2, bucket))
+              }
+              }
+            }
+          }
+          }
+        }
+      }
+    }
 
   it("completes a V1 conversion successfully") {
     withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
-        val visibleWorks = createWorks(count = 3).toList
-        val notVisibleWorks = createWorks(count = 1, visible = false).toList
+      case (convertorService: ConvertorService, indexNameV1, _, publicBucket) =>
+        val visibleWorks = createWorks(count = 3)
+        val notVisibleWorks = createWorks(count = 1,start = 4, visible = false)
 
         val works = visibleWorks ++ notVisibleWorks
 
-        val elasticsearchJsons = works.map { work =>
-          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-            work).get}}"""
-        }
-        val content = elasticsearchJsons.mkString("\n")
+        insertIntoElasticsearch(indexNameV1, "work", works: _*)
 
-        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
           val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            privateBucketName = privateBucket.name,
-            privateObjectKey = objectKey,
+            privateBucketName = "",
+            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
@@ -123,32 +120,23 @@ class ConvertorServiceTest
                 s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
           }
-        }
     }
   }
 
   it("completes a V2 conversion successfully") {
-    withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
-        val visibleWorks = createWorks(count = 4).toList
-        val notVisibleWorks = createWorks(count = 2, visible = false).toList
+    withFixtures { case (convertorService: ConvertorService, _, indexNameV2, publicBucket) =>
+        val visibleWorks = createWorks(count = 4)
+        val notVisibleWorks = createWorks(count = 2, start = 5, visible = false)
 
         val works = visibleWorks ++ notVisibleWorks
 
-        val elasticsearchJsons = works.map { work =>
-          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-            work).get}}"""
-        }
-        val content = elasticsearchJsons.mkString("\n")
+        insertIntoElasticsearch(indexNameV2, "work", works: _*)
 
-        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
           val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            privateBucketName = privateBucket.name,
-            privateObjectKey = objectKey,
+            privateBucketName = "",
+            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v2
@@ -182,7 +170,7 @@ class ConvertorServiceTest
             )
           }
         }
-    }
+
   }
 
   // This test is meant to catch an error we saw when we first turned on
@@ -198,11 +186,9 @@ class ConvertorServiceTest
   // an 8MB file from S3.  This test deliberately creates a very large file,
   // and tries to stream it back out.
   //
-  it("completes a very large conversion successfully") {
+  it("completes a very large snapshot generation successfully") {
     withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
+      case (convertorService: ConvertorService, indexNameV1, _, publicBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
         // which they can be gzip-compressed -- so we can cross the
@@ -222,21 +208,12 @@ class ConvertorServiceTest
           )
         }
 
-        val elasticsearchJsons = works.map { work =>
-          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-            work).get}}"""
-        }
-        val content = elasticsearchJsons.mkString("\n")
+        insertIntoElasticsearch(indexNameV1, "work", works: _*)
 
-        // We want to ensure the source snapshot is at least 8MB in size.
-        val gzipFileSize = createGzipFile(content).length.toInt
-        gzipFileSize shouldBe >=(8 * 1024 * 1024)
-
-        withGzipCompressedS3Key(privateBucket, content) { objectKey =>
           val publicObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
-            privateBucketName = privateBucket.name,
-            privateObjectKey = objectKey,
+            privateBucketName = "",
+            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
@@ -270,73 +247,19 @@ class ConvertorServiceTest
             )
           }
         }
-    }
-  }
-
-  it("returns a failed future if asked to convert a non-existent snapshot") {
-    withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
-        val conversionJob = ConversionJob(
-          privateBucketName = privateBucket.name,
-          privateObjectKey = "doesnotexist.txt.gz",
-          publicBucketName = publicBucket.name,
-          publicObjectKey = "target.txt.gz",
-          apiVersion = ApiVersions.v1
-        )
-
-        val future = convertorService.runConversion(conversionJob)
-
-        whenReady(future.failed) { result =>
-          result shouldBe a[AmazonS3Exception]
-        }
-    }
-  }
-
-  it("returns a failed future if asked to convert a malformed snapshot") {
-    withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
-        withGzipCompressedS3Key(
-          privateBucket,
-          content = "This is not what snapshots look like") { objectKey =>
-          val conversionJob = ConversionJob(
-            privateBucketName = privateBucket.name,
-            privateObjectKey = objectKey,
-            publicBucketName = publicBucket.name,
-            publicObjectKey = "target.txt.gz",
-            apiVersion = ApiVersions.v1
-          )
-
-          val future = convertorService.runConversion(conversionJob)
-
-          whenReady(future.failed) { result =>
-            result shouldBe a[GracefulFailureException]
-          }
-        }
-    }
   }
 
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
-      case (
-          ((_, _, _, convertorService: ConvertorService), privateBucket),
-          publicBucket) =>
+      case (convertorService: ConvertorService,indexNameV1,_, publicBucket) =>
         val works = createWorks(count = 3)
 
-        val elasticsearchJsons = works.map { work =>
-          s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-            work).get}}"""
-        }
-        val content = elasticsearchJsons.mkString("\n")
+        insertIntoElasticsearch(indexNameV1, "work", works: _*)
 
-        val bucketName = "wrongBukkit"
         val conversionJob = ConversionJob(
-          privateBucketName = bucketName,
-          privateObjectKey = "wrongKey",
-          publicBucketName = bucketName,
+          privateBucketName = "",
+          privateObjectKey = "",
+          publicBucketName = "wrongBukkit",
           publicObjectKey = "target.json.gz",
           apiVersion = ApiVersions.v1
         )
@@ -348,6 +271,10 @@ class ConvertorServiceTest
         }
 
     }
+
+  }
+
+  it("returns a failed future if it fails reading from elasticsearch") {
 
   }
 }
