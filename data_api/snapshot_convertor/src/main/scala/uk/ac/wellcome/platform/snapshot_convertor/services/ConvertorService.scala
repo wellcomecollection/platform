@@ -44,11 +44,20 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     val publicBucketName = conversionJob.publicBucketName
     val publicObjectKey = conversionJob.publicObjectKey
 
-    val uploadResult = runStream(
+    val uploadResult = conversionJob.apiVersion match {
+      case ApiVersions.v1 => runStream(
         publicBucketName = publicBucketName,
         publicObjectKey = publicObjectKey,
-        apiVersion = conversionJob.apiVersion
-    )
+        indexName = esIndexV1,
+        toDisplayWork = DisplayWorkV1.apply
+      )
+      case ApiVersions.v2 => runStream(
+        publicBucketName = publicBucketName,
+        publicObjectKey = publicObjectKey,
+        indexName = esIndexV2,
+        toDisplayWork = DisplayWorkV2.apply
+      )
+    }
 
     uploadResult.map { _ =>
       val targetLocation =
@@ -64,17 +73,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
   private def runStream(
     publicBucketName: String,
     publicObjectKey: String,
-    apiVersion: ApiVersions.Value): Future[MultipartUploadResult] = {
-
-    val toDisplayWork: ((IdentifiedWork, WorksIncludes) => DisplayWork) =
-      apiVersion match {
-        case ApiVersions.v1 => DisplayWorkV1.apply
-        case ApiVersions.v2 => DisplayWorkV2.apply
-      }
-    val indexName = apiVersion match {
-      case ApiVersions.v1 => esIndexV1
-      case ApiVersions.v2 => esIndexV2
-    }
+    indexName: String,
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork): Future[MultipartUploadResult] = {
 
     // This source generates instances of DisplayWork from the source snapshot.
     val displayWorks: Source[DisplayWork, Any] = ElasticsearchSource(elasticClient, indexName, esType)
