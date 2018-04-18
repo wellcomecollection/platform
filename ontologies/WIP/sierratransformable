@@ -154,8 +154,8 @@
    * 4. For "110" type as "Organisation"
    * 5. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
    * 6. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * 7. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX. 
-   * 8. Populate roles "label" with the contents of subfield "e" for all enteries.
+   * 7. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX.
+   * 8. Populate roles "label" with the contents of subfield "e" for all entries.
    *
    *
    *
@@ -218,7 +218,7 @@
    * 
    * 
    * 1. For all bibliographic records use "marcTag": "655".
-   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' -- ' and type as "Genre".
+   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' - ' and type as "Genre".
    * 3. Populate platform "concepts" with "label" from subfield "a".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
    * 5. For other subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield "y" type as "Period", "v" as "Concept" and "z" as "Place".
@@ -228,7 +228,7 @@
    *{
    *  "genres": [
    *    {
-   *      "label": "Caricatures -- sketch",
+   *      "label": "Caricatures - sketch",
    *      "type": "Genre",
    *      "concepts": [
    *        {
@@ -259,7 +259,7 @@
    /* Populate wwork:subjects topics, places and periods. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650", "648", "651".
-   * 2. If more than one subfield is populated. Populate platform "label" with a concatenated with subfields v,x,y,z in order, seperated by a double hyphen ' -- '  and type as "Subject".
+   * 2. If more than one subfield is populated. Populate platform "label" with a concatenated with subfields v,x,y,z in order, seperated by a double hyphen ' - '  and type as "Subject".
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Concept" for "650", "Period" for "648" and "Place" for "651".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
    * 5. For for subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield, "y" type as "Period", "v" as "Concept" and "z" as "Place".
@@ -271,7 +271,7 @@
    *{
    *  "subjects": [
    *    {
-   *      "label": "Tuberculosis -- prevention & control -- Paris -- 1850 -- bibliography.",
+   *      "label": "Tuberculosis - prevention & control - Paris - 1850 - bibliography.",
    *      "type": "Subject",
    *      "concepts": [
    *        {
