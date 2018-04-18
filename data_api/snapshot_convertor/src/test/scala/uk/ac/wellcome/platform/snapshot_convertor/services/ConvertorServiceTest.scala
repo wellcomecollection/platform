@@ -4,6 +4,7 @@ import java.io.File
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.alpakka.s3.S3Exception
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -39,15 +40,20 @@ class ConvertorServiceTest
 
   val mapper = new ObjectMapper with ScalaObjectMapper
 
+  val itemType = "work"
+
   private def withConvertorService[R](
     actorSystem: ActorSystem,
     materializer: ActorMaterializer,
-    s3AkkaClient: S3Client)(testWith: TestWith[ConvertorService, R]) = {
+    s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[ConvertorService, R]) = {
     val convertorService = new ConvertorService(
       actorSystem = actorSystem,
-      s3Client = s3Client,
+      elasticClient = elasticClient,
       akkaS3Client = s3AkkaClient,
       s3Endpoint = localS3EndpointUrl,
+      esIndexV1 = indexNameV1,
+      esIndexV2 = indexNameV2,
+      esType = itemType,
       objectMapper = mapper
     )
 
@@ -59,10 +65,10 @@ class ConvertorServiceTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
-          withLocalElasticsearchIndex(itemType = "work") { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = "work") { indexNameV2 =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              withConvertorService(actorSystem, actorMaterialiser, s3Client) { convertorService => {
+              withConvertorService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { convertorService => {
                 testWith((convertorService, indexNameV1, indexNameV2, bucket))
               }
               }
@@ -73,7 +79,7 @@ class ConvertorServiceTest
       }
     }
 
-  it("completes a V1 conversion successfully") {
+  it("completes a V1 snapshot generation successfully") {
     withFixtures {
       case (convertorService: ConvertorService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createWorks(count = 3)
@@ -81,7 +87,7 @@ class ConvertorServiceTest
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV1, "work", works: _*)
+        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
           val publicObjectKey = "target.txt.gz"
 
@@ -123,14 +129,14 @@ class ConvertorServiceTest
     }
   }
 
-  it("completes a V2 conversion successfully") {
+  it("completes a V2 snapshot generation successfully") {
     withFixtures { case (convertorService: ConvertorService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createWorks(count = 4)
         val notVisibleWorks = createWorks(count = 2, start = 5, visible = false)
 
         val works = visibleWorks ++ notVisibleWorks
 
-        insertIntoElasticsearch(indexNameV2, "work", works: _*)
+        insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
           val publicObjectKey = "target.txt.gz"
 
@@ -199,7 +205,7 @@ class ConvertorServiceTest
             title = Some(Random.alphanumeric.take(1500).mkString),
             sourceIdentifier = SourceIdentifier(
               identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = "work",
+              ontologyType = itemType,
               value = Random.alphanumeric.take(10).mkString
             ),
             description = Some(Random.alphanumeric.take(2500).mkString),
@@ -208,7 +214,7 @@ class ConvertorServiceTest
           )
         }
 
-        insertIntoElasticsearch(indexNameV1, "work", works: _*)
+        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
           val publicObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
@@ -254,7 +260,7 @@ class ConvertorServiceTest
       case (convertorService: ConvertorService,indexNameV1,_, publicBucket) =>
         val works = createWorks(count = 3)
 
-        insertIntoElasticsearch(indexNameV1, "work", works: _*)
+        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
         val conversionJob = ConversionJob(
           privateBucketName = "",
@@ -267,7 +273,7 @@ class ConvertorServiceTest
         val future = convertorService.runConversion(conversionJob)
 
         whenReady(future.failed) { result =>
-          result shouldBe a[AmazonS3Exception]
+          result shouldBe a[S3Exception]
         }
 
     }

@@ -1,20 +1,12 @@
 package uk.ac.wellcome.platform.snapshot_convertor.source
 
-import akka.NotUsed
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Sink, Source}
-import com.sksamuel.elastic4s.http.HttpClient
-import org.scalatest.{FunSpec, Matchers}
+import akka.stream.scaladsl.Sink
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.WorksUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import com.sksamuel.elastic4s.streams.ReactiveElastic._
-import com.sksamuel.elastic4s.http.ElasticDsl._
-import com.sksamuel.elastic4s.http.search.SearchHit
-import uk.ac.wellcome.utils.JsonUtil._
 
 class ElastisearchSourceTest extends FunSpec
   with Matchers
@@ -65,11 +57,4 @@ class ElastisearchSourceTest extends FunSpec
     }
   }
 
-}
-
-object ElasticsearchSource {
-  def apply(elasticClient: HttpClient, indexName: String, itemType: String)(implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
-    Source.fromPublisher(
-    elasticClient.publisher(search(s"$indexName/$itemType").query(termQuery("visible", true)).scroll("10m"))).map{searchHit: SearchHit => fromJson[IdentifiedWork](searchHit.sourceAsString).get}
-  }
 }
