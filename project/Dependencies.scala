@@ -13,7 +13,7 @@ object Dependencies {
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
     val junitInterface = "0.11"
-    val elastic4s = "5.4.1"
+    val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
     val jacksonYamlVersion = "2.8.8"
     val circeVersion = "0.9.0"
@@ -47,6 +47,7 @@ object Dependencies {
     "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
     "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 

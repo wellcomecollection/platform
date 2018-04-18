@@ -73,6 +73,7 @@ lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierr
 
 lazy val snapshot_convertor = doSharedSetup(project, "data_api/snapshot_convertor")
   .dependsOn(common_display % "compile->compile;test->test")
+  .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
 
 lazy val root = (project in file("."))

@@ -122,7 +122,7 @@ trait ElasticsearchFixtures
   def insertIntoElasticsearch(indexName: String,
                               itemType: String,
                               works: IdentifiedWork*) = {
-    works.foreach { work =>
+    val insertWorksFuture = Future.sequence(works.map { work =>
       val jsonDoc = toJson(work).get
 
       val result: Future[IndexResponse] = elasticClient.execute(
@@ -134,16 +134,21 @@ trait ElasticsearchFixtures
       )
 
       result.map { indexResponse =>
-        print(indexResponse)
+        println(indexResponse)
       }
-    }
-    eventually {
-      elasticClient
-        .execute {
-          search(indexName).matchAllQuery()
-        }
-        .await
-        .hits should have size works.size
+    })
+
+    whenReady(insertWorksFuture) {_ =>
+      eventually {
+        val hits = elasticClient
+          .execute {
+            search(indexName).matchAllQuery()
+          }
+          .await
+          .hits
+        hits should have size works.size
+        println(hits)
+      }
     }
   }
 }
