@@ -25,7 +25,7 @@ class ElastisearchSourceTest extends FunSpec
           }
           insertIntoElasticsearch(indexName, itemType, works: _*)
 
-          val future = ElasticsearchSource(elasticClient, indexName, itemType)(actorSystem).runWith(Sink.seq)
+          val future = ElasticsearchWorksSource(elasticClient, indexName, itemType)(actorSystem).runWith(Sink.seq)
 
           whenReady(future) { result =>
             result should contain theSameElementsAs works
@@ -47,7 +47,7 @@ class ElastisearchSourceTest extends FunSpec
           val works = visibleWorks ++ invisibleWorks
           insertIntoElasticsearch(indexName, itemType, works: _*)
 
-          val future = ElasticsearchSource(elasticClient, indexName, itemType)(actorSystem).runWith(Sink.seq)
+          val future = ElasticsearchWorksSource(elasticClient, indexName, itemType)(actorSystem).runWith(Sink.seq)
 
           whenReady(future) { result =>
             result should contain theSameElementsAs visibleWorks

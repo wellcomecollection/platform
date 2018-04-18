@@ -17,7 +17,7 @@ import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_convertor.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
 import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
-import uk.ac.wellcome.platform.snapshot_convertor.source.ElasticsearchSource
+import uk.ac.wellcome.platform.snapshot_convertor.source.ElasticsearchWorksSource
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
 
@@ -77,7 +77,7 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork): Future[MultipartUploadResult] = {
 
     // This source generates instances of DisplayWork from the source snapshot.
-    val displayWorks: Source[DisplayWork, Any] = ElasticsearchSource(elasticClient, indexName, esType)
+    val displayWorks: Source[DisplayWork, Any] = ElasticsearchWorksSource(elasticClient, indexName, esType)
       .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which
