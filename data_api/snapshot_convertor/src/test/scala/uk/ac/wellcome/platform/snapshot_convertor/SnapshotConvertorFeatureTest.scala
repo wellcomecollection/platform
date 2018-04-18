@@ -5,18 +5,16 @@ import java.io.File
 import com.amazonaws.services.s3.model.GetObjectRequest
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
-  CompletedConversionJob,
-  ConversionJob
-}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.services.ConvertorService
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SNS.Topic
+import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -34,26 +32,34 @@ class SnapshotConvertorFeatureTest
     with GzipUtils
     with fixtures.Server
     with JsonTestUtil
-    with ExtendedPatience {
+    with ExtendedPatience with ElasticsearchFixtures {
 
-  def withFixtures[R] =
-    withLocalSqsQueue[R] and
-      withLocalSnsTopic[R] and
-      withLocalS3Bucket[R] and
-      withLocalS3Bucket[R]
+  val itemType = "work"
+  def withFixtures[R](
+                       testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+            withLocalS3Bucket { bucket =>
+              testWith((queue, topic, indexNameV1, indexNameV2, bucket))
+            }
+          }
+        }
+      }
+    }
 
   it("completes a conversion successfully") {
     withFixtures {
-      case (((queue, topic), privateBucket), publicBucket) =>
-        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-          privateBucket)
+      case (queue, topic, indexNameV1, indexNameV2,publicBucket) =>
+        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
           // if not anything more interesting!
           val works = (1 to 3).map { version =>
             IdentifiedWork(
-              canonicalId = "rbfhv6b4",
+              canonicalId = s"rbfhv6b4$version",
               title = Some("Rumblings from a rambunctious rodent"),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -64,18 +70,13 @@ class SnapshotConvertorFeatureTest
             )
           }
 
-          val elasticsearchJsons = works.map { work =>
-            s"""{"_index": "jett4fvw", "_type": "work", "_id": "${work.canonicalId}", "_score": 1, "_source": ${toJson(
-              work).get}}"""
-          }
-          val content = elasticsearchJsons.mkString("\n")
+          insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
           val publicObjectKey = "target.txt.gz"
 
-          withGzipCompressedS3Key(privateBucket, content) { objectKey =>
             val conversionJob = ConversionJob(
-              privateBucketName = privateBucket.name,
-              privateObjectKey = objectKey,
+              privateBucketName = "",
+              privateObjectKey = "",
               publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey,
               apiVersion = ApiVersions.v1
@@ -137,6 +138,6 @@ class SnapshotConvertorFeatureTest
             }
           }
         }
-    }
+
   }
 }
