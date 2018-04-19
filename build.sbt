@@ -71,7 +71,7 @@ lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
-lazy val snapshot_convertor = doSharedSetup(project, "data_api/snapshot_convertor")
+lazy val snapshot_generator = doSharedSetup(project, "data_api/snapshot_generator")
   .dependsOn(common_display % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
@@ -91,5 +91,5 @@ lazy val root = (project in file("."))
     sierra_items_to_dynamo,
     sierra_bib_merger,
     sierra_item_merger,
-    snapshot_convertor
+    snapshot_generator
   )
