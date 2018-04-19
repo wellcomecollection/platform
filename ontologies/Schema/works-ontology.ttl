@@ -58,6 +58,16 @@ wwork:Series rdf:type owl:Class ;
     rdfs:comment "A series of works."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .              
                 
+wwork:Subject rdf:type owl:Class ;
+    rdfs:label "Subject"@en ;
+    rdfs:comment "The subject of a work."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:Contributor rdf:type owl:Class ;
+    rdfs:label "Contributor"@en ;
+    rdfs:comment "A contribution to a work."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
+                    
 #######  Object properties ##### 
     
 
@@ -121,7 +131,7 @@ wwork:subjects rdf:type owl:ObjectProperty ;
     rdfs:label "subjects"@en ;
     rdfs:comment "Relates a work to the general thesaurus-based concept that describes the work's content."@en ;
     rdfs:domain wwork:Work ;
-    rdfs:range wwork:Concept ;
+    rdfs:range wwork:Subject ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
 
 wwork:genres rdf:type owl:ObjectProperty ;
@@ -171,7 +181,35 @@ wwork:works rdf:type owl:DatatypeProperty ;
     rdfs:comment "Relates a series to works that are part of it"@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Series ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                          
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:contributors rdf:type owl:DatatypeProperty ;
+    rdfs:label "contributors"@en ;
+    rdfs:comment "Relates a work to contributors to that work"@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Contributor ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+    
+wwork:agent rdf:type owl:DatatypeProperty ;
+    rdfs:label "agent"@en ;
+    rdfs:comment "Relates an contribution to the responsible agent."@en ;
+    rdfs:domain wwork:Contributor ;
+    rdfs:range wwork:Agent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+        
+wwork:roles rdf:type owl:DatatypeProperty ;
+    rdfs:label "roles"@en ;
+    rdfs:comment "Relates a contributor to the role they played in the contribution."@en ;
+    rdfs:domain wwork:Contributor ;
+    rdfs:range wwork:ContributorRole ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:classification rdf:type owl:DatatypeProperty ;
+    rdfs:label "classification"@en ;
+    rdfs:comment "Relates a work to its classifications."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                                      
     
 #######  Data properties #####  
                         

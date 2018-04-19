@@ -23,11 +23,28 @@ wcon:ConceptScheme rdf:type owl:Class ;
     rdfs:comment "A group of concepts"@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
         
-wcon:QualifiedConcept rdf:type owl:Class ;
+wcon:Subject rdf:type owl:Class ;
+    rdfs:label "Subject"@en ;
+    rdfs:comment "A subject"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
+    
+wcon:Place rdf:type owl:Class ;
     rdfs:subClassOf wcon:Concept ;
-    rdfs:label "QualifiedConcept"@en ;
-    rdfs:comment "A qualified concept"@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .        
+    rdfs:label "Place"@en ;
+    rdfs:comment "A place"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
+        
+wcon:Period rdf:type owl:Class ;
+    rdfs:subClassOf wcon:Concept ;
+    rdfs:label "Period"@en ;
+    rdfs:comment "A period"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
+            
+wcon:Genre rdf:type owl:Class ;
+    rdfs:subClassOf wcon:Concept ;
+    rdfs:label "Genre"@en ;
+    rdfs:comment "A genre"@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .                
     
 #### object properties ####
 
@@ -52,19 +69,12 @@ wcon:concept rdf:type owl:ObjectProperty ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
     
-wcon:qualifiers rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifiers"@en ;
-    rdfs:comment "Relates a qualified concept to a list concepts that qualify the concept."@en ;
-    rdfs:domain wcon:QualifiedConcept ;
+wcon:concepts rdf:type owl:ObjectProperty ;
+    rdfs:label "concepts"@en ;
+    rdfs:comment "Relates a subject to a list of concepts."@en ;
+    rdfs:domain wcon:Subject ;
     rdfs:range wcon:Concept ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .     
-
-wcon:qualifierType rdf:type owl:ObjectProperty ;
-    rdfs:label "qualifierType"@en ;
-    rdfs:comment "Relates a concept being used as a qualifier to the type of qualifier it is."@en ;
-    rdfs:domain wcon:Concept ;
-    rdfs:range wcon:QualifierType ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .      
     
 wcon:inScheme rdf:type owl:ObjectProperty ;
     rdfs:label "inScheme"@en ;
