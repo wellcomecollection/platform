@@ -29,9 +29,10 @@ module "snapshot_generator" {
     es_username = "${var.es_config_snapshot["username"]}"
     es_password = "${var.es_config_snapshot["password"]}"
     es_protocol = "${var.es_config_snapshot["protocol"]}"
+    metrics_namespace = "snapshot_generator"
   }
 
-  env_vars_length = 11
+  env_vars_length = 12
 
   memory = 2048
   cpu    = 512
