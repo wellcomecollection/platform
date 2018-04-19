@@ -20,7 +20,7 @@ class MessageWriterSpec
     with Inside {
 
   it(
-    "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
+    "sends a message and returns a publish attempt with the id of the request") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         val s3Config = S3Config(bucketName = bucket.name)
@@ -51,7 +51,7 @@ class MessageWriterSpec
   }
 
   it(
-    "should return a failed future if it fails to publish the message pointer") {
+    "returns a failed future if it fails to publish the message pointer") {
     withLocalS3Bucket { bucket =>
       val s3Config = S3Config(bucketName = bucket.name)
       val snsConfig = SNSConfig(topicArn = "invalid-topic")
@@ -66,7 +66,7 @@ class MessageWriterSpec
     }
   }
 
-  it("should return a failed future if it fails to store message") {
+  it("returns a failed future if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
       val snsConfig = SNSConfig(topic.arn)
@@ -81,7 +81,7 @@ class MessageWriterSpec
     }
   }
 
-  it("should not publish message pointer if it fails to store message") {
+  it("does not publish message pointer if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
       val snsConfig = SNSConfig(topic.arn)

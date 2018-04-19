@@ -91,7 +91,7 @@ class MessageWorkerTest
     }
   }
 
-  it("does report an error when a runtime error occurs") {
+  it("reports an error when a runtime error occurs") {
     withFixtures {
       case (_, queue, metrics, bucket, worker) =>
         when(
