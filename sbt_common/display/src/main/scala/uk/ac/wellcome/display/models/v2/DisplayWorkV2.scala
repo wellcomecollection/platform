@@ -107,6 +107,11 @@ case object DisplayWorkV2 {
         s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork")
     }
 
+    if (work.title.isEmpty && work.visible) {
+      throw new RuntimeException(
+        s"IdentifiedWork ${work.canonicalId} has visible=true, but no title! cannot be converted to DisplayWork")
+    }
+
     DisplayWorkV2(
       id = work.canonicalId,
       title = work.title.get,
