@@ -186,26 +186,12 @@ class SnapshotServiceTest
 
   }
 
-  // This test is meant to catch an error we saw when we first turned on
-  // the snapshot convertor:
-  //
-  //    akka.http.scaladsl.model.EntityStreamSizeException:
-  //    EntityStreamSizeException: actual entity size (Some(19403836)) exceeded
-  //    content length limit (8388608 bytes)! You can configure this by setting
-  //    `akka.http.[server|client].parsing.max-content-length` or calling
-  //    `HttpEntity.withSizeLimit` before materializing the dataBytes stream.
-  //
-  // With the original code, we were unable to read anything more than
-  // an 8MB file from S3.  This test deliberately creates a very large file,
-  // and tries to stream it back out.
-  //
   it("completes a very large snapshot generation successfully") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
-        // which they can be gzip-compressed -- so we can cross the
-        // 8MB boundary with a shorter list!
+        // which they can be gzip-compressed
         val works = (1 to 5000).map { version =>
           IdentifiedWork(
             canonicalId = Random.alphanumeric.take(7).mkString,
@@ -260,7 +246,7 @@ class SnapshotServiceTest
     }
   }
 
-  it("succeeds a snapshot generation even if one of the items in the index is invalid") {
+  ignore("succeeds a snapshot generation even if one of the items in the index is invalid") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val validWorks = createWorks(count = 3)

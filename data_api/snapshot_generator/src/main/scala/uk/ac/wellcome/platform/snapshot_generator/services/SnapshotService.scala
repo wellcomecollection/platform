@@ -35,13 +35,13 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 @Flag("es.type") esType: String,
                                 objectMapper: ObjectMapper)
     extends Logging {
-  val decider: Supervision.Decider = {
-    case _: S3Exception => Supervision.Stop
-    case _: ResponseException => Supervision.Stop
-    case _: Exception => Supervision.Resume
-  }
+//  val decider: Supervision.Decider = {
+//    case _: S3Exception => Supervision.Stop
+//    case _: ResponseException => Supervision.Stop
+//    case _: Exception => Supervision.Resume
+//  }
   implicit val system: ActorSystem = actorSystem
-  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+  implicit val materializer = ActorMaterializer()
 
   def generateSnapshot(
     snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
@@ -85,7 +85,7 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork)
     : Future[MultipartUploadResult] = {
 
-    // This source generates instances of DisplayWork from the source snapshot.
+    // This source outputs DisplayWorks in the elasticsearch index.
     val displayWorks: Source[DisplayWork, Any] =
       ElasticsearchWorksSource(elasticClient, indexName, esType)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
