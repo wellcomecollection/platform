@@ -142,14 +142,14 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
       contributors = List(
-        Unidentifiable(
-          Contributor(
-            agent = Person(label = "Esmerelda Weatherwax", prefixes = Some(List("Witch")))
+        Contributor(
+          agent = Unidentifiable(
+            Person(label = "Esmerelda Weatherwax", prefixes = Some(List("Witch")))
           )
         ),
-        Unidentifiable(
-          Contributor(
-            agent = Organisation("Juniper Journals")
+        Contributor(
+          agent = Unidentifiable(
+            Organisation("Juniper Journals")
           )
         )
       )
@@ -182,17 +182,15 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
       contributors = List(
-        Unidentifiable(
-          Contributor(
-            agent = Person(label = "Poppy Northcutt")
-          )
+        Contributor(
+          agent = Unidentifiable(Person(label = "Poppy Northcutt"))
         ),
-        Identified(
-          Contributor(
-            agent = Organisation(label = "Nebulous Negotiation News")
-          ),
-          identifiers = List(sourceIdentifier),
-          canonicalId = canonicalId
+        Contributor(
+          agent = Identified(
+            Organisation(label = "Nebulous Negotiation News"),
+            identifiers = List(sourceIdentifier),
+            canonicalId = canonicalId
+          )
         )
       )
     )

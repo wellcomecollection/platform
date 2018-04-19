@@ -5,7 +5,7 @@ import com.google.inject.Guice
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.{Contributor, _}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayCreatorsV1SerialisationTest
@@ -19,24 +19,19 @@ class DisplayCreatorsV1SerialisationTest
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
   it("serialises creators with a mixture of agents/organisations/persons") {
-
-    val agent0 = Agent("Vivian Violet")
-    val agent1 = Organisation("Verily Volumes")
-    val agent2 = Person(
-      label = "Havelock Vetinari",
-      prefixes = Some(List("Lord Patrician")),
-      numeration = Some("I")
-    )
-
     val work = IdentifiedWork(
       canonicalId = "v9w6cz66",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       title = Some("Vultures vying for victory"),
       contributors = List(
-        Unidentifiable(Contributor(agent = agent0)),
-        Unidentifiable(Contributor(agent = agent1)),
-        Unidentifiable(Contributor(agent = agent2))
+        Contributor(agent = Unidentifiable(Agent("Vivian Violet"))),
+        Contributor(agent = Unidentifiable(Organisation("Verily Volumes"))),
+        Contributor(agent = Unidentifiable(Person(
+          label = "Havelock Vetinari",
+          prefixes = Some(List("Lord Patrician")),
+          numeration = Some("I")
+        )))
       )
     )
     val displayWork = DisplayWorkV1(work)
@@ -48,9 +43,15 @@ class DisplayCreatorsV1SerialisationTest
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title.get}",
                             |  "creators": [
-                            |    ${agent(agent0)},
-                            |    ${organisation(agent1)},
-                            |    ${person(agent2)}
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(0).agent,
+                            abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(1).agent,
+                            abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(2).agent,
+                            abstractAgent)}
                             |  ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
@@ -62,47 +63,54 @@ class DisplayCreatorsV1SerialisationTest
   }
 
   it("serialises identified creators") {
-
-    val agent0 = Person(
-      label = "Havelock Vetinari",
-      prefixes = Some(List("Lord Patrician")),
-      numeration = Some("I")
-    )
-    val agent1 = Organisation(label = "Unseen University")
-    val agent2 = Agent(label = "The Librarian")
-
     val work = IdentifiedWork(
       canonicalId = "v9w6cz66",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       title = Some("Vultures vying for victory"),
       contributors = List(
-        Identified(
-          Contributor(agent = agent0),
-          canonicalId = "hgfedcba",
-          identifiers = List(
-            SourceIdentifier(
-              IdentifierSchemes.libraryOfCongressNames,
-              ontologyType = "Organisation",
-              value = "hv"))
+        Contributor(
+          agent = Identified(
+            Person(
+              label = "Havelock Vetinari",
+              prefixes = Some(List("Lord Patrician")),
+              numeration = Some("I")
+            ),
+            canonicalId = "hgfedcba",
+            identifiers = List(
+              SourceIdentifier(
+                IdentifierSchemes.libraryOfCongressNames,
+                ontologyType = "Organisation",
+                value = "hv"
+              )
+            )
+          )
         ),
-        Identified(
-          Contributor(agent = agent1),
-          canonicalId = "abcdefgh",
-          identifiers = List(
-            SourceIdentifier(
-              IdentifierSchemes.libraryOfCongressNames,
-              ontologyType = "Organisation",
-              value = "uu"))
+        Contributor(
+          agent = Identified(
+            Organisation(label = "Unseen University"),
+            canonicalId = "abcdefgh",
+            identifiers = List(
+              SourceIdentifier(
+                IdentifierSchemes.libraryOfCongressNames,
+                ontologyType = "Organisation",
+                value = "uu"
+              )
+            )
+          )
         ),
-        Identified(
-          Contributor(agent = agent2),
-          canonicalId = "blahbluh",
-          identifiers = List(
-            SourceIdentifier(
-              IdentifierSchemes.libraryOfCongressNames,
-              ontologyType = "Organisation",
-              value = "uu"))
+        Contributor(
+          agent = Identified(
+            Agent(label = "The Librarian"),
+            canonicalId = "blahbluh",
+            identifiers = List(
+              SourceIdentifier(
+                IdentifierSchemes.libraryOfCongressNames,
+                ontologyType = "Organisation",
+                value = "uu"
+              )
+            )
+          )
         )
       )
     )
@@ -115,9 +123,15 @@ class DisplayCreatorsV1SerialisationTest
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title.get}",
                             |  "creators": [
-                            |    ${person(agent0)},
-                            |    ${organisation(agent1)},
-                            |    ${agent(agent2)}
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(0).agent,
+                            abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(1).agent,
+                            abstractAgent)},
+                            |    ${identifiedOrUnidentifiable(
+                            work.contributors(2).agent,
+                            abstractAgent)}
                             |  ],
                             |  "subjects": [ ],
                             |  "genres": [ ],

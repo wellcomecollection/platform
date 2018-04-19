@@ -30,7 +30,7 @@ class DisplayPublishersV1SerialisationTest
         Unidentifiable(
           Person(
             label = "Havelock Vetinari",
-            prefix = Some("Lord Patrician"),
+            prefixes = Some(List("Lord Patrician")),
             numeration = Some("I")))
       )
     )

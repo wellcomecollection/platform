@@ -49,7 +49,7 @@ class DisplayWorkV1SerialisationTest
        | "lettering": "$lettering",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
-                                  work.creators(0),
+                                  work.contributors(0).agent,
                                   abstractAgent)} ],
        | "subjects": [ ],
        | "genres": [ ],
