@@ -13,6 +13,7 @@ import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.utils.JsonUtil._
 
 abstract class MessageWorker(sqsReader: SQSReader,
                          actorSystem: ActorSystem,

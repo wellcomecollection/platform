@@ -1,5 +1,7 @@
 package uk.ac.wellcome.message
 
+import java.net.URI
+
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import com.google.inject.Inject
