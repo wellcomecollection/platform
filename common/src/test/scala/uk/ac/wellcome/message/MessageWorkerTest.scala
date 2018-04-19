@@ -15,18 +15,23 @@ import uk.ac.wellcome.sqs.SQSReader
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
-
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.actor.ActorSystem
+import io.circe.Decoder
+import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessageWorkerTest
   extends FunSpec
     with MockitoSugar
     with Eventually
+    with ExtendedPatience
     with Akka
     with SQS
     with S3 {
+
+  case class ExampleObject(name:String)
 
   def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
     val metricsSender: MetricsSender = mock[MetricsSender]
@@ -44,12 +49,15 @@ class MessageWorkerTest
   def withMessageWorker[R](actors: ActorSystem,
                            queue: Queue,
                            metrics: MetricsSender,
-                           bucket: S3.Bucket)(testWith: TestWith[MessageWorker, R]) = {
+                           bucket: S3.Bucket)(testWith: TestWith[MessageWorker[ExampleObject], R])(implicit decoderExampleObject: Decoder[ExampleObject]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
-      new MessageWorker(sqsReader, actors, metrics, s3Client) {
-        override def processMessage(message: SQSMessage) =
+      new MessageWorker[ExampleObject](sqsReader, actors, metrics, s3Client) {
+
+        override implicit val decoder:Decoder[ExampleObject] = decoderExampleObject
+
+        override def processMessage(message: ExampleObject) =
           Future.successful(())
       }
 
@@ -72,12 +80,17 @@ class MessageWorkerTest
       case (_, queue, metrics, bucket, worker) =>
         val key = "message-key"
 
-        val json = toJson(TestSqsMessage()).get
+        val exampleObject = ExampleObject("some value")
+        val json = toJson(exampleObject).get
+
         s3Client.putObject(bucket.name, key, json)
+
+        val examplePointer = MessagePointer(S3Uri(bucket.name, key))
 
         sqsClient.sendMessage(
           queue.url,
-          s"""{"src":"s3://${bucket.name}/$key"}""")
+          toJson(examplePointer).get
+        )
 
         eventually {
           verify(
@@ -102,12 +115,18 @@ class MessageWorkerTest
         ).thenThrow(new RuntimeException)
 
         val key = "message-key"
+
+        val exampleObject = ExampleObject("some value")
+        val json = toJson(exampleObject).get
+
+        s3Client.putObject(bucket.name, key, json)
+
+        val examplePointer = MessagePointer(S3Uri(bucket.name, key))
+
         sqsClient.sendMessage(
           queue.url,
-          s"""{"src":"s3://${bucket.name}/$key"}""")
-
-        val json = toJson(TestSqsMessage()).get
-        s3Client.putObject(bucket.name, key, json)
+          toJson(examplePointer).get
+        )
 
         eventually {
           verify(metrics)
@@ -127,31 +146,18 @@ class MessageWorkerTest
         ).thenThrow(new RuntimeException)
 
         val key = "message-key"
-        sqsClient.sendMessage(
-          queue.url,
-          s"""{"src":"http://www.example.com"}""")
 
-        val json = toJson(TestSqsMessage()).get
+        val exampleObject = ExampleObject("some value")
+        val json = toJson(exampleObject).get
+
         s3Client.putObject(bucket.name, key, json)
 
-        eventually {
-          verify(metrics)
-            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
-        }
-    }
-  }
+        val examplePointer = MessagePointer("http://www.example.com")
 
-  it("report error when unsupported protocol is provided as pointer") {
-    withFixtures {
-      case (_, queue, metrics, bucket, worker) =>
-        when(
-          metrics.timeAndCount[Unit](
-            anyString(),
-            any[() => Future[Unit]].apply
-          )
-        ).thenThrow(new RuntimeException)
-
-        sqsClient.sendMessage(queue.url, s"""{"src":"http://example.org"}""")
+        sqsClient.sendMessage(
+          queue.url,
+          toJson(examplePointer).get
+        )
 
         eventually {
           verify(metrics)
@@ -160,7 +166,7 @@ class MessageWorkerTest
     }
   }
 
-  it("does not report an error when unable to parse a message") {
+  it("reports an error when unable to parse a message") {
     withFixtures {
       case (_, queue, metrics, bucket, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
