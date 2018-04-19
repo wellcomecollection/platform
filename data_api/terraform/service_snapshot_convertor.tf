@@ -7,19 +7,19 @@ data "template_file" "es_cluster_host_snapshot" {
   }
 }
 
-module "snapshot_convertor" {
+module "snapshot_generator" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.0.0"
-  name   = "snapshot_convertor"
+  name   = "snapshot_generator"
 
-  source_queue_name = "${module.snapshot_convertor_queue.name}"
-  source_queue_arn  = "${module.snapshot_convertor_queue.arn}"
+  source_queue_name = "${module.snapshot_generator_queue.name}"
+  source_queue_arn  = "${module.snapshot_generator_queue.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_snapshot_convertor.repository_url}"
-  release_id         = "${var.release_ids["snapshot_convertor"]}"
+  ecr_repository_url = "${module.ecr_repository_snapshot_generator.repository_url}"
+  release_id         = "${var.release_ids["snapshot_generator"]}"
 
   env_vars = {
-    queue_url = "${module.snapshot_convertor_queue.id}"
-    topic_arn = "${module.snapshot_conversion_complete_topic.arn}"
+    queue_url = "${module.snapshot_generator_queue.id}"
+    topic_arn = "${module.snapshot_generation_complete_topic.arn}"
     es_host           = "${data.template_file.es_cluster_host_snapshot.rendered}"
     es_port           = "${var.es_config_snapshot["port"]}"
     es_name           = "${var.es_config_snapshot["name"]}"

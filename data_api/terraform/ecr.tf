@@ -1,6 +1,6 @@
-module "ecr_repository_snapshot_convertor" {
+module "ecr_repository_snapshot_generator" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "snapshot_convertor"
+  name   = "snapshot_generator"
 }
 
 module "ecr_repository_elasticdump" {
