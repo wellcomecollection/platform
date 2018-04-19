@@ -183,11 +183,14 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       canonicalId = "j7tw9jv3",
       contributors = List(
         Contributor(
-          agent = Unidentifiable(Person(label = "Poppy Northcutt"))
+          agent = Unidentifiable(Person(
+            label = "Esmerelda Weatherwax",
+            prefixes = Some(List("Witch"))
+          ))
         ),
         Contributor(
           agent = Identified(
-            Organisation(label = "Nebulous Negotiation News"),
+            Organisation(label = "Juniper Journals"),
             identifiers = List(sourceIdentifier),
             canonicalId = canonicalId
           )
@@ -200,7 +203,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       DisplayPerson(
         id = None,
         identifiers = None,
-        label = "Poppy Northcutt"),
+        label = "Esmerelda Weatherwax",
+        prefixes = Some(List("Witch"))),
       DisplayOrganisation(
         id = Some(canonicalId),
         identifiers = Some(
@@ -208,7 +212,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
             DisplayIdentifier(
               IdentifierSchemes.libraryOfCongressNames.toString,
               sourceIdentifier.value))),
-        label = "Nebulous Negotiation News"
+        label = "Juniper Journals"
       )
     )
   }
