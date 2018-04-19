@@ -134,16 +134,24 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     }
   }
 
-  it("parses a work with unidentifiable persons and organisations as creators") {
+  it("extracts creators from a Work with unidentified Contributors") {
     val work = IdentifiedWork(
       title = Some("Jumping over jackals in Japan"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
-      creators = List(
-        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
-        Unidentifiable(Organisation("Juniper Journals"))
+      contributors = List(
+        Unidentifiable(
+          Contributor(
+            agent = Person(label = "Esmerelda Weatherwax", prefixes = Some(List("Witch")))
+          )
+        ),
+        Unidentifiable(
+          Contributor(
+            agent = Organisation("Juniper Journals")
+          )
+        )
       )
     )
 
@@ -153,7 +161,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         id = None,
         identifiers = None,
         label = "Esmerelda Weatherwax",
-        prefix = Some("Witch")),
+        prefixes = Some(List("Witch"))),
       DisplayOrganisation(
         id = None,
         identifiers = None,
@@ -161,8 +169,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
   }
 
-  it(
-    "parses a work with a mixture of identifed or unidentifable persons and organisations as creators") {
+  it("extracts creators from a Work with a mixture of identified/unidentified Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.libraryOfCongressNames,
@@ -174,12 +181,19 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       version = 1,
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
-      creators = List(
-        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
+      contributors = List(
+        Unidentifiable(
+          Contributor(
+            agent = Person(label = "Poppy Northcutt")
+          )
+        ),
         Identified(
-          Organisation("Juniper Journals"),
-          canonicalId = canonicalId,
-          identifiers = List(sourceIdentifier))
+          Contributor(
+            agent = Organisation(label = "Nebulous Negotiation News")
+          ),
+          identifiers = List(sourceIdentifier),
+          canonicalId = canonicalId
+        )
       )
     )
 
@@ -188,8 +202,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       DisplayPerson(
         id = None,
         identifiers = None,
-        label = "Esmerelda Weatherwax",
-        prefix = Some("Witch")),
+        label = "Poppy Northcutt"),
       DisplayOrganisation(
         id = Some(canonicalId),
         identifiers = Some(
@@ -197,7 +210,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
             DisplayIdentifier(
               IdentifierSchemes.libraryOfCongressNames.toString,
               sourceIdentifier.value))),
-        label = "Juniper Journals"
+        label = "Nebulous Negotiation News"
       )
     )
   }
