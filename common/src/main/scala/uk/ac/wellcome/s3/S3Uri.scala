@@ -4,6 +4,8 @@ import java.net.URI
 
 object S3Uri {
 
+  def apply(bucket: String, key: String): URI = new URI(s"s3://$bucket/$key")
+
   def unapply(uri: URI): Option[(String, String)] =
     for {
       scheme <- Option(uri.getScheme) if (scheme == "s3")

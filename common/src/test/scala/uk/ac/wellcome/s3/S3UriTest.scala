@@ -7,6 +7,10 @@ class S3UriTest extends FunSpec with Matchers with Inside {
 
   val s3Uri = new URI("s3://bucket/key")
 
+  it("can be created from a bucket and key") {
+    S3Uri("bucket", "key") shouldBe new URI("s3://bucket/key")
+  }
+
   it("matches S3 URI bucket name") {
     inside(s3Uri) {
       case S3Uri(bucket, _) => bucket should be("bucket")

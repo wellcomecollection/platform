@@ -44,7 +44,9 @@ class S3ObjectStoreTest
         val expectedHash = "1770874231"
 
         val expectedKey = s"$prefix/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, expectedKey)
+
+        actualKey shouldBe expectedUri
 
         val jsonFromS3 = getJsonFromS3(
           bucket,
@@ -75,8 +77,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -100,8 +102,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -139,7 +141,7 @@ class S3ObjectStoreTest
         }
       )
 
-      whenReady(objectStore.get("not/a/real/object").failed) { exception =>
+      whenReady(objectStore.get(S3Uri(bucket.name,"not/a/real/object")).failed) { exception =>
         exception shouldBe a[AmazonS3Exception]
         exception
           .asInstanceOf[AmazonS3Exception]

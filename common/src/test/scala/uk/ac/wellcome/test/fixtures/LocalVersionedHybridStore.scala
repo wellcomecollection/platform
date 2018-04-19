@@ -34,10 +34,12 @@ trait LocalVersionedHybridStore
   def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
     testWith: TestWith[VersionedHybridStore[T], R]): R = {
     withVersionedDao(table) { dao =>
+      val s3Config = S3Config(bucketName = bucket.name)
       val store = new VersionedHybridStore[T](
+        s3Config = s3Config,
         sourcedObjectStore = new S3ObjectStore(
           s3Client = s3Client,
-          s3Config = S3Config(bucketName = bucket.name),
+          s3Config = s3Config,
           keyPrefixGenerator = new KeyPrefixGenerator[T] {
             override def generate(obj: T): String = "/"
           }
