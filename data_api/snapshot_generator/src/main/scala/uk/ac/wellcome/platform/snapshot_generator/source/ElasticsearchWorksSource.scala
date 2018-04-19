@@ -11,8 +11,16 @@ import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
 object ElasticsearchWorksSource {
-  def apply(elasticClient: HttpClient, indexName: String, itemType: String)(implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
-    Source.fromPublisher(
-    elasticClient.publisher(search(s"$indexName/$itemType").query(termQuery("visible", true)).scroll("10m"))).map{searchHit: SearchHit => fromJson[IdentifiedWork](searchHit.sourceAsString).get}
+  def apply(elasticClient: HttpClient, indexName: String, itemType: String)(
+    implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
+    Source
+      .fromPublisher(
+        elasticClient.publisher(
+          search(s"$indexName/$itemType")
+            .query(termQuery("visible", true))
+            .scroll("10m")))
+      .map { searchHit: SearchHit =>
+        fromJson[IdentifiedWork](searchHit.sourceAsString).get
+      }
   }
 }

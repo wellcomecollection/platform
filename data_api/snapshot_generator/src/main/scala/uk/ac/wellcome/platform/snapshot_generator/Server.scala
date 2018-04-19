@@ -2,13 +2,20 @@ package uk.ac.wellcome.platform.snapshot_generator
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.snapshot_generator.modules.{AkkaS3ClientModule, SnapshotGeneratorWorkerModule}
+import uk.ac.wellcome.platform.snapshot_generator.modules.{
+  AkkaS3ClientModule,
+  SnapshotGeneratorWorkerModule
+}
 
 object ServerMain extends Server
 

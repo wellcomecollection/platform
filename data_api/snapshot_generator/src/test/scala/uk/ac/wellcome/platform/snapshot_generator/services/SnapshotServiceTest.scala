@@ -16,9 +16,17 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  Period,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
@@ -44,9 +52,11 @@ class SnapshotServiceTest
   val itemType = "work"
 
   private def withSnapshotService[R](
-                                      actorSystem: ActorSystem,
-                                      materializer: ActorMaterializer,
-                                      s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
+    actorSystem: ActorSystem,
+    materializer: ActorMaterializer,
+    s3AkkaClient: S3Client,
+    indexNameV1: String,
+    indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
     val snapshotService = new SnapshotService(
       actorSystem = actorSystem,
       elasticClient = elasticClient,
@@ -62,16 +72,23 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-                       testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
+    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
               withLocalS3Bucket { bucket =>
-                withSnapshotService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { snapshotService => {
-                  testWith((snapshotService, indexNameV1, indexNameV2, bucket))
-                }
+                withSnapshotService(
+                  actorSystem,
+                  actorMaterialiser,
+                  s3Client,
+                  indexNameV1,
+                  indexNameV2) { snapshotService =>
+                  {
+                    testWith(
+                      (snapshotService, indexNameV1, indexNameV2, bucket))
+                  }
                 }
               }
             }
@@ -80,100 +97,102 @@ class SnapshotServiceTest
       }
     }
 
-
   it("completes a V1 snapshot generation successfully") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createWorks(count = 3)
-        val notVisibleWorks = createWorks(count = 1,start = 4, visible = false)
+        val notVisibleWorks =
+          createWorks(count = 1, start = 4, visible = false)
 
         val works = visibleWorks ++ notVisibleWorks
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
-          val publicObjectKey = "target.txt.gz"
+        val publicObjectKey = "target.txt.gz"
 
-          val snapshotJob = SnapshotJob(
-            publicBucketName = publicBucket.name,
-            publicObjectKey = publicObjectKey,
-            apiVersion = ApiVersions.v1
+        val snapshotJob = SnapshotJob(
+          publicBucketName = publicBucket.name,
+          publicObjectKey = publicObjectKey,
+          apiVersion = ApiVersions.v1
+        )
+
+        val future = snapshotService.generateSnapshot(snapshotJob)
+
+        whenReady(future) { result =>
+          val downloadFile =
+            File.createTempFile("snapshotServiceTest", ".txt.gz")
+          s3Client.getObject(
+            new GetObjectRequest(publicBucket.name, publicObjectKey),
+            downloadFile)
+
+          val contents = readGzipFile(downloadFile.getPath)
+          val expectedContents = visibleWorks
+            .map {
+              DisplayWorkV1(_, includes = AllWorksIncludes())
+            }
+            .map {
+              mapper.writeValueAsString(_)
+            }
+            .mkString("\n") + "\n"
+
+          contents shouldBe expectedContents
+
+          result shouldBe CompletedSnapshotJob(
+            snapshotJob = snapshotJob,
+            targetLocation =
+              s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
           )
-
-          val future = snapshotService.generateSnapshot(snapshotJob)
-
-          whenReady(future) { result =>
-            val downloadFile =
-              File.createTempFile("snapshotServiceTest", ".txt.gz")
-            s3Client.getObject(
-              new GetObjectRequest(publicBucket.name, publicObjectKey),
-              downloadFile)
-
-            val contents = readGzipFile(downloadFile.getPath)
-            val expectedContents = visibleWorks
-              .map {
-                DisplayWorkV1(_, includes = AllWorksIncludes())
-              }
-              .map {
-                mapper.writeValueAsString(_)
-              }
-              .mkString("\n") + "\n"
-
-            contents shouldBe expectedContents
-
-            result shouldBe CompletedSnapshotJob(
-              snapshotJob = snapshotJob,
-              targetLocation =
-                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
-            )
-          }
+        }
     }
   }
 
   it("completes a V2 snapshot generation successfully") {
-    withFixtures { case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
+    withFixtures {
+      case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createWorks(count = 4)
-        val notVisibleWorks = createWorks(count = 2, start = 5, visible = false)
+        val notVisibleWorks =
+          createWorks(count = 2, start = 5, visible = false)
 
         val works = visibleWorks ++ notVisibleWorks
 
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
-          val publicObjectKey = "target.txt.gz"
+        val publicObjectKey = "target.txt.gz"
 
-          val snapshotJob = SnapshotJob(
-            publicBucketName = publicBucket.name,
-            publicObjectKey = publicObjectKey,
-            apiVersion = ApiVersions.v2
+        val snapshotJob = SnapshotJob(
+          publicBucketName = publicBucket.name,
+          publicObjectKey = publicObjectKey,
+          apiVersion = ApiVersions.v2
+        )
+
+        val future = snapshotService.generateSnapshot(snapshotJob)
+
+        whenReady(future) { result =>
+          val downloadFile =
+            File.createTempFile("snapshotServiceTest", ".txt.gz")
+          s3Client.getObject(
+            new GetObjectRequest(publicBucket.name, publicObjectKey),
+            downloadFile)
+
+          val contents = readGzipFile(downloadFile.getPath)
+          val expectedContents = visibleWorks
+            .map {
+              DisplayWorkV2(_, includes = AllWorksIncludes())
+            }
+            .map {
+              mapper.writeValueAsString(_)
+            }
+            .mkString("\n") + "\n"
+
+          contents shouldBe expectedContents
+
+          result shouldBe CompletedSnapshotJob(
+            snapshotJob = snapshotJob,
+            targetLocation =
+              s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
           )
-
-          val future = snapshotService.generateSnapshot(snapshotJob)
-
-          whenReady(future) { result =>
-            val downloadFile =
-              File.createTempFile("snapshotServiceTest", ".txt.gz")
-            s3Client.getObject(
-              new GetObjectRequest(publicBucket.name, publicObjectKey),
-              downloadFile)
-
-            val contents = readGzipFile(downloadFile.getPath)
-            val expectedContents = visibleWorks
-              .map {
-                DisplayWorkV2(_, includes = AllWorksIncludes())
-              }
-              .map {
-                mapper.writeValueAsString(_)
-              }
-              .mkString("\n") + "\n"
-
-            contents shouldBe expectedContents
-
-            result shouldBe CompletedSnapshotJob(
-              snapshotJob = snapshotJob,
-              targetLocation =
-                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
-            )
-          }
         }
+    }
 
   }
 
@@ -214,46 +233,46 @@ class SnapshotServiceTest
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
-          val publicObjectKey = "target.txt.gz"
-          val snapshotJob = SnapshotJob(
-            publicBucketName = publicBucket.name,
-            publicObjectKey = publicObjectKey,
-            apiVersion = ApiVersions.v1
+        val publicObjectKey = "target.txt.gz"
+        val snapshotJob = SnapshotJob(
+          publicBucketName = publicBucket.name,
+          publicObjectKey = publicObjectKey,
+          apiVersion = ApiVersions.v1
+        )
+
+        val future = snapshotService.generateSnapshot(snapshotJob)
+
+        whenReady(future) { result =>
+          val downloadFile =
+            File.createTempFile("snapshotServiceTest", ".txt.gz")
+          s3Client.getObject(
+            new GetObjectRequest(publicBucket.name, publicObjectKey),
+            downloadFile)
+
+          val contents = readGzipFile(downloadFile.getPath)
+          val expectedContents = works
+            .map {
+              DisplayWorkV1(_, includes = AllWorksIncludes())
+            }
+            .map {
+              mapper.writeValueAsString(_)
+            }
+            .mkString("\n") + "\n"
+
+          contents shouldBe expectedContents
+
+          result shouldBe CompletedSnapshotJob(
+            snapshotJob = snapshotJob,
+            targetLocation =
+              s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
           )
-
-          val future = snapshotService.generateSnapshot(snapshotJob)
-
-          whenReady(future) { result =>
-            val downloadFile =
-              File.createTempFile("snapshotServiceTest", ".txt.gz")
-            s3Client.getObject(
-              new GetObjectRequest(publicBucket.name, publicObjectKey),
-              downloadFile)
-
-            val contents = readGzipFile(downloadFile.getPath)
-            val expectedContents = works
-              .map {
-                DisplayWorkV1(_, includes = AllWorksIncludes())
-              }
-              .map {
-                mapper.writeValueAsString(_)
-              }
-              .mkString("\n") + "\n"
-
-            contents shouldBe expectedContents
-
-            result shouldBe CompletedSnapshotJob(
-              snapshotJob = snapshotJob,
-              targetLocation =
-                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
-            )
-          }
         }
+    }
   }
 
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
-      case (snapshotService: SnapshotService,indexNameV1,_, _) =>
+      case (snapshotService: SnapshotService, indexNameV1, _, _) =>
         val works = createWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
@@ -278,32 +297,32 @@ class SnapshotServiceTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
-              withLocalS3Bucket { bucket =>
-                val brokenSnapshotService = new SnapshotService(
-                  actorSystem = actorSystem,
-                  elasticClient = elasticClient,
-                  akkaS3Client = s3Client,
-                  s3Endpoint = localS3EndpointUrl,
-                  esIndexV1 = "wrong-index",
-                  esIndexV2 = "wrong-index",
-                  esType = itemType,
-                  objectMapper = mapper
-                )
-                val snapshotJob = SnapshotJob(
-                  publicBucketName = bucket.name,
-                  publicObjectKey = "target.json.gz",
-                  apiVersion = ApiVersions.v1
-                )
+          withLocalS3Bucket { bucket =>
+            val brokenSnapshotService = new SnapshotService(
+              actorSystem = actorSystem,
+              elasticClient = elasticClient,
+              akkaS3Client = s3Client,
+              s3Endpoint = localS3EndpointUrl,
+              esIndexV1 = "wrong-index",
+              esIndexV2 = "wrong-index",
+              esType = itemType,
+              objectMapper = mapper
+            )
+            val snapshotJob = SnapshotJob(
+              publicBucketName = bucket.name,
+              publicObjectKey = "target.json.gz",
+              apiVersion = ApiVersions.v1
+            )
 
-                val future = brokenSnapshotService.generateSnapshot(snapshotJob)
+            val future = brokenSnapshotService.generateSnapshot(snapshotJob)
 
-                whenReady(future.failed) { result =>
-                  result shouldBe a[ResponseException]
-                }
-                }
-              }
+            whenReady(future.failed) { result =>
+              result shouldBe a[ResponseException]
+            }
+          }
         }
       }
     }
+  }
 
 }

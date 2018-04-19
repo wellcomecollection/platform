@@ -13,11 +13,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class SnapshotGeneratorWorkerService @Inject()(
-                                                snapshotService: SnapshotService,
-                                                reader: SQSReader,
-                                                snsWriter: SNSWriter,
-                                                system: ActorSystem,
-                                                metrics: MetricsSender
+  snapshotService: SnapshotService,
+  reader: SQSReader,
+  snsWriter: SNSWriter,
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends SQSWorker(reader, system, metrics) {
 
   override def processMessage(message: SQSMessage): Future[Unit] =

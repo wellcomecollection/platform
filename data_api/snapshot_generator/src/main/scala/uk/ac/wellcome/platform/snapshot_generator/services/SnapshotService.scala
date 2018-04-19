@@ -15,8 +15,15 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{
+  DisplayWorkToJsonStringFlow,
+  IdentifiedWorkToVisibleDisplayWork,
+  StringToGzipFlow
+}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
@@ -38,25 +45,27 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     ActorMaterializer()(actorSystem)
 
   def generateSnapshot(
-                        snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
+    snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
     info(s"ConvertorService running $snapshotJob")
 
     val publicBucketName = snapshotJob.publicBucketName
     val publicObjectKey = snapshotJob.publicObjectKey
 
     val uploadResult = snapshotJob.apiVersion match {
-      case ApiVersions.v1 => runStream(
-        publicBucketName = publicBucketName,
-        publicObjectKey = publicObjectKey,
-        indexName = esIndexV1,
-        toDisplayWork = DisplayWorkV1.apply
-      )
-      case ApiVersions.v2 => runStream(
-        publicBucketName = publicBucketName,
-        publicObjectKey = publicObjectKey,
-        indexName = esIndexV2,
-        toDisplayWork = DisplayWorkV2.apply
-      )
+      case ApiVersions.v1 =>
+        runStream(
+          publicBucketName = publicBucketName,
+          publicObjectKey = publicObjectKey,
+          indexName = esIndexV1,
+          toDisplayWork = DisplayWorkV1.apply
+        )
+      case ApiVersions.v2 =>
+        runStream(
+          publicBucketName = publicBucketName,
+          publicObjectKey = publicObjectKey,
+          indexName = esIndexV2,
+          toDisplayWork = DisplayWorkV2.apply
+        )
     }
 
     uploadResult.map { _ =>
@@ -74,11 +83,13 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     publicBucketName: String,
     publicObjectKey: String,
     indexName: String,
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork): Future[MultipartUploadResult] = {
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork)
+    : Future[MultipartUploadResult] = {
 
     // This source generates instances of DisplayWork from the source snapshot.
-    val displayWorks: Source[DisplayWork, Any] = ElasticsearchWorksSource(elasticClient, indexName, esType)
-      .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
+    val displayWorks: Source[DisplayWork, Any] =
+      ElasticsearchWorksSource(elasticClient, indexName, esType)
+        .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which
     // should be written to the destination snapshot.

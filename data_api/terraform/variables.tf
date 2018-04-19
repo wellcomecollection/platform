@@ -16,6 +16,7 @@ variable "key_name" {
 variable "data_acm_cert_arn" {
   description = "ARN for the data ssl cert"
 }
+
 variable "es_config_snapshot" {
   description = "Elasticcloud config for the snapshot generator"
   type        = "map"

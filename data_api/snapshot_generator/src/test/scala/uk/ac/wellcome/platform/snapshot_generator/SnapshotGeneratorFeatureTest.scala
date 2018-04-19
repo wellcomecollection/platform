@@ -7,9 +7,16 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -31,11 +38,12 @@ class SnapshotGeneratorFeatureTest
     with GzipUtils
     with fixtures.Server
     with JsonTestUtil
-    with ExtendedPatience with ElasticsearchFixtures {
+    with ExtendedPatience
+    with ElasticsearchFixtures {
 
   val itemType = "work"
   def withFixtures[R](
-                       testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
@@ -50,8 +58,9 @@ class SnapshotGeneratorFeatureTest
 
   it("completes a snapshot generation successfully") {
     withFixtures {
-      case (queue, topic, indexNameV1, indexNameV2,publicBucket) =>
-        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+      case (queue, topic, indexNameV1, indexNameV2, publicBucket) =>
+        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+          publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
 
         withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
@@ -73,36 +82,36 @@ class SnapshotGeneratorFeatureTest
 
           val publicObjectKey = "target.txt.gz"
 
-            val snapshotJob = SnapshotJob(
-              publicBucketName = publicBucket.name,
-              publicObjectKey = publicObjectKey,
-              apiVersion = ApiVersions.v1
-            )
+          val snapshotJob = SnapshotJob(
+            publicBucketName = publicBucket.name,
+            publicObjectKey = publicObjectKey,
+            apiVersion = ApiVersions.v1
+          )
 
-            val message = SQSMessage(
-              subject = Some("Sent from SnapshotGeneratorFeatureTest"),
-              body = toJson(snapshotJob).get,
-              messageType = "json",
-              topic = topic.arn,
-              timestamp = "now"
-            )
+          val message = SQSMessage(
+            subject = Some("Sent from SnapshotGeneratorFeatureTest"),
+            body = toJson(snapshotJob).get,
+            messageType = "json",
+            topic = topic.arn,
+            timestamp = "now"
+          )
 
-            sqsClient.sendMessage(queue.url, toJson(message).get)
+          sqsClient.sendMessage(queue.url, toJson(message).get)
 
-            eventually {
+          eventually {
 
-              val downloadFile =
-                File.createTempFile("snapshotGeneratorFeatureTest", ".txt.gz")
+            val downloadFile =
+              File.createTempFile("snapshotGeneratorFeatureTest", ".txt.gz")
 
-              s3Client.getObject(
-                new GetObjectRequest(publicBucket.name, publicObjectKey),
-                downloadFile)
+            s3Client.getObject(
+              new GetObjectRequest(publicBucket.name, publicObjectKey),
+              downloadFile)
 
-              val actualJsonLines: List[String] =
-                readGzipFile(downloadFile.getPath).split("\n").toList
+            val actualJsonLines: List[String] =
+              readGzipFile(downloadFile.getPath).split("\n").toList
 
-              val expectedJsonLines = works.map { work =>
-                s"""{
+            val expectedJsonLines = works.map { work =>
+              s"""{
                  |  "id": "${work.canonicalId}",
                  |  "title": "${work.title.get}",
                  |  "identifiers": [ ],
@@ -114,27 +123,27 @@ class SnapshotGeneratorFeatureTest
                  |  "placesOfPublication": [ ],
                  |  "type": "Work"
                    }""".stripMargin
-              }
-
-              actualJsonLines.zip(expectedJsonLines).foreach {
-                case (actualLine, expectedLine) =>
-                  assertJsonStringsAreEqual(actualLine, expectedLine)
-              }
-
-              val receivedMessages = listMessagesReceivedFromSNS(topic)
-              receivedMessages.size should be >= 1
-
-              val expectedJob = CompletedSnapshotJob(
-                snapshotJob = snapshotJob,
-                targetLocation =
-                  s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
-              )
-              val actualJob = fromJson[CompletedSnapshotJob](
-                receivedMessages.head.message).get
-              actualJob shouldBe expectedJob
             }
+
+            actualJsonLines.zip(expectedJsonLines).foreach {
+              case (actualLine, expectedLine) =>
+                assertJsonStringsAreEqual(actualLine, expectedLine)
+            }
+
+            val receivedMessages = listMessagesReceivedFromSNS(topic)
+            receivedMessages.size should be >= 1
+
+            val expectedJob = CompletedSnapshotJob(
+              snapshotJob = snapshotJob,
+              targetLocation =
+                s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
+            )
+            val actualJob =
+              fromJson[CompletedSnapshotJob](receivedMessages.head.message).get
+            actualJob shouldBe expectedJob
           }
         }
+    }
 
   }
 }

@@ -123,21 +123,20 @@ trait ElasticsearchFixtures
                               itemType: String,
                               works: IdentifiedWork*) = {
     val result = elasticClient.execute(
-        bulk(
-          works.map {work =>
-            val jsonDoc = toJson(work).get
+      bulk(
+        works.map { work =>
+          val jsonDoc = toJson(work).get
 
-            indexInto(indexName / itemType)
-              .version(work.version)
-              .versionType(VersionType.EXTERNAL_GTE)
-              .id(work.canonicalId)
-              .doc(jsonDoc)
-          }
-
-        )
+          indexInto(indexName / itemType)
+            .version(work.version)
+            .versionType(VersionType.EXTERNAL_GTE)
+            .id(work.canonicalId)
+            .doc(jsonDoc)
+        }
       )
+    )
 
-    whenReady(result) {_ =>
+    whenReady(result) { _ =>
       eventually {
         val hits = elasticClient
           .execute {
