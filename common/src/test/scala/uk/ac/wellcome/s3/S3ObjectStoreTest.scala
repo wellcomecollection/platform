@@ -1,5 +1,7 @@
 package uk.ac.wellcome.s3
 
+import java.net.URI
+
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -147,6 +149,22 @@ class S3ObjectStoreTest
           .asInstanceOf[AmazonS3Exception]
           .getErrorCode shouldBe "NoSuchKey"
 
+      }
+    }
+  }
+
+  it("throws an exception when retrieving from an invalid scheme") {
+     withLocalS3Bucket { bucket =>
+      val objectStore = new S3ObjectStore(
+        s3Client,
+        S3Config(bucketName = bucket.name),
+        new KeyPrefixGenerator[TestObject] {
+          override def generate(obj: TestObject): String = "doesnt_matter"
+        }
+      )
+
+      whenReady(objectStore.get(new URI("http://www.example.com")).failed) { exception =>
+        exception shouldBe a[RuntimeException]
       }
     }
   }
