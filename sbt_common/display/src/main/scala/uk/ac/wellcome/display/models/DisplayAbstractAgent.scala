@@ -42,14 +42,14 @@ case object DisplayAbstractAgent {
           id = Some(id),
           identifiers = Some(identifiers.map(DisplayIdentifier(_))),
           label = p.label,
-          prefixes = p.prefixes,
+          prefix = p.prefix,
           numeration = p.numeration)
       case Unidentifiable(p: Person) =>
         DisplayPerson(
           id = None,
           identifiers = None,
           label = p.label,
-          prefixes = p.prefixes,
+          prefix = p.prefix,
           numeration = p.numeration)
       case Identified(o: Organisation, id, identifiers) =>
         DisplayOrganisation(
@@ -79,8 +79,8 @@ case class DisplayPerson(
   ) label: String,
   @ApiModelProperty(
     dataType = "String",
-    value = "The title(s) of the person"
-  ) prefixes: Option[List[String]] = None,
+    value = "The title of the person"
+  ) prefix: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
     value = "The numeration of the person"

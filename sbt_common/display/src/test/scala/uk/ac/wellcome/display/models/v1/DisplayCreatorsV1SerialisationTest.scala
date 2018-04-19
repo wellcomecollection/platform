@@ -29,7 +29,7 @@ class DisplayCreatorsV1SerialisationTest
         Contributor(agent = Unidentifiable(Organisation("Verily Volumes"))),
         Contributor(agent = Unidentifiable(Person(
           label = "Havelock Vetinari",
-          prefixes = Some(List("Lord Patrician")),
+          prefix = Some("Lord Patrician"),
           numeration = Some("I")
         )))
       )
@@ -73,7 +73,7 @@ class DisplayCreatorsV1SerialisationTest
           agent = Identified(
             Person(
               label = "Havelock Vetinari",
-              prefixes = Some(List("Lord Patrician")),
+              prefix = Some("Lord Patrician"),
               numeration = Some("I")
             ),
             canonicalId = "hgfedcba",

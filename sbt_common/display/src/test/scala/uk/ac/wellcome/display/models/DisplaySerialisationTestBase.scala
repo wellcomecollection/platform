@@ -4,7 +4,6 @@ import io.circe.Json
 import io.circe.parser._
 import org.scalatest.Suite
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
@@ -95,7 +94,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def person(p: Person) = {
     s"""{
         "type": "Person",
-        ${optionalList("prefixes", p.prefixes)},
+        ${optionalString("prefix", p.prefix)},
         ${optionalString("numeration", p.numeration)},
         "label": "${p.label}"
       }"""
@@ -122,15 +121,6 @@ trait DisplaySerialisationTestBase { this: Suite =>
         s"""
            "$fieldName": "$p"
          """
-    }
-
-  def optionalList(fieldName: String, maybeValue: Option[List[String]]) =
-    maybeValue match {
-      case None => ""
-      case Some(p) =>
-        s"""
-           "$fieldName": ${toJson(p).get}
-         """.stripMargin
     }
 
   def period(p: Period) =

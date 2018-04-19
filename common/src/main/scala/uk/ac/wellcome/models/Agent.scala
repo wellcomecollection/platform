@@ -13,6 +13,6 @@ case class Organisation(
 ) extends AbstractAgent
 
 case class Person(label: String,
-                  prefixes: Option[List[String]] = None,
+                  prefix: Option[String] = None,
                   numeration: Option[String] = None)
     extends AbstractAgent

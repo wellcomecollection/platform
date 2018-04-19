@@ -144,7 +144,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       contributors = List(
         Contributor(
           agent = Unidentifiable(
-            Person(label = "Esmerelda Weatherwax", prefixes = Some(List("Witch")))
+            Person(label = "Esmerelda Weatherwax", prefix = Some("Witch"))
           )
         ),
         Contributor(
@@ -161,7 +161,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         id = None,
         identifiers = None,
         label = "Esmerelda Weatherwax",
-        prefixes = Some(List("Witch"))),
+        prefix = Some("Witch")),
       DisplayOrganisation(
         id = None,
         identifiers = None,
@@ -185,7 +185,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         Contributor(
           agent = Unidentifiable(Person(
             label = "Esmerelda Weatherwax",
-            prefixes = Some(List("Witch"))
+            prefix = Some("Witch")
           ))
         ),
         Contributor(
@@ -204,7 +204,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         id = None,
         identifiers = None,
         label = "Esmerelda Weatherwax",
-        prefixes = Some(List("Witch"))),
+        prefix = Some("Witch")),
       DisplayOrganisation(
         id = Some(canonicalId),
         identifiers = Some(
