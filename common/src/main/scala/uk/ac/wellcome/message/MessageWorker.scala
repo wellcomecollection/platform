@@ -39,7 +39,10 @@ abstract class MessageWorker(sqsReader: SQSReader,
         _ <- metricsSender.timeAndCount(metricName, () => processMessage(message))
       } yield ()
     } recover {
-      case exception: Throwable => terminalFailureHook(exception)
+      case exception: Throwable => {
+        logger.error(s"Failure while processing message.", exception)
+        metricsSender.incrementCount(s"${workerName}_MessageProcessingFailure")
+      }
     }
   }
 
@@ -48,11 +51,6 @@ abstract class MessageWorker(sqsReader: SQSReader,
       case S3Uri(bucket, key) => S3ObjectStore.get[SQSMessage](s3, bucket)(key)
       case _ => Future.failed(new RuntimeException("Unsupported URI scheme"))
     }
-
-  def terminalFailureHook(throwable: Throwable): Unit = {
-    logger.error(s"${workerName}_TerminalFailure!", throwable)
-    metricsSender.incrementCount(s"${workerName}_TerminalFailure")
-  }
 
   def stop(): Boolean = actor.cancel()
 }

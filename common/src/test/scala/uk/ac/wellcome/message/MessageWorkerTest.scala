@@ -111,7 +111,7 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics)
-            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
         }
     }
   }
@@ -136,7 +136,7 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics)
-            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
         }
     }
   }
@@ -155,7 +155,7 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics)
-            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
         }
     }
   }
@@ -167,7 +167,7 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics, never())
-            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
         }
     }
   }

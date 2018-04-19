@@ -27,7 +27,7 @@ class MessageWriter[T] @Inject()(
 
   def write(message: T, subject: String)(implicit encoder: Encoder[T]): Future[Unit] = {
 
-    val bucket= s3Config.bucketName
+    val bucket = s3Config.bucketName
 
     for {
       key <- s3.put(message)
