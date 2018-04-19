@@ -102,10 +102,11 @@ class IdEmbedderTests
       title = Some("crap"),
       sourceIdentifier = workIdentifier,
       contributors = List(
-        Contributor(agent = Identifiable(
-          person,
-          sourceIdentifier = creatorIdentifier,
-          identifiers = List(creatorIdentifier)))
+        Contributor(
+          agent = Identifiable(
+            person,
+            sourceIdentifier = creatorIdentifier,
+            identifiers = List(creatorIdentifier)))
       ),
       version = 1
     )
@@ -136,10 +137,11 @@ class IdEmbedderTests
       title = originalWork.title,
       sourceIdentifier = originalWork.sourceIdentifier,
       contributors = List(
-        Contributor(agent =  Identified(
-          agent = person,
-          canonicalId = newCreatorCanonicalId,
-          identifiers = List(creatorIdentifier)))
+        Contributor(
+          agent = Identified(
+            agent = person,
+            canonicalId = newCreatorCanonicalId,
+            identifiers = List(creatorIdentifier)))
       ),
       version = originalWork.version
     )

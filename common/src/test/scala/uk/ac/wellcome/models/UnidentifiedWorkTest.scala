@@ -207,9 +207,10 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
-    contributors = List(Contributor(
-      agent = Unidentifiable(Agent("47"))
-    )),
+    contributors = List(
+      Contributor(
+        agent = Unidentifiable(Agent("47"))
+      )),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),

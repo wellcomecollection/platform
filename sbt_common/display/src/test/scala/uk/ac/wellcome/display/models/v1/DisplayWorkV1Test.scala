@@ -169,7 +169,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
   }
 
-  it("extracts creators from a Work with a mixture of identified/unidentified Contributors") {
+  it(
+    "extracts creators from a Work with a mixture of identified/unidentified Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.libraryOfCongressNames,
@@ -183,10 +184,11 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       canonicalId = "j7tw9jv3",
       contributors = List(
         Contributor(
-          agent = Unidentifiable(Person(
-            label = "Esmerelda Weatherwax",
-            prefix = Some("Witch")
-          ))
+          agent = Unidentifiable(
+            Person(
+              label = "Esmerelda Weatherwax",
+              prefix = Some("Witch")
+            ))
         ),
         Contributor(
           agent = Identified(

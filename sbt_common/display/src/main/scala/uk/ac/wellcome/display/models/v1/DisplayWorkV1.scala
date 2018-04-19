@@ -115,7 +115,10 @@ case object DisplayWorkV1 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      creators = work.contributors.map { contributor: Contributor[Displayable[AbstractAgent]] => DisplayAbstractAgent(contributor.agent) },
+      creators = work.contributors.map {
+        contributor: Contributor[Displayable[AbstractAgent]] =>
+          DisplayAbstractAgent(contributor.agent)
+      },
       subjects = work.subjects.map { DisplayConcept(_) },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =

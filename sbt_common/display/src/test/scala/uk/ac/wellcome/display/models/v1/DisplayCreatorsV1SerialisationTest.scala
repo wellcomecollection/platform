@@ -27,11 +27,13 @@ class DisplayCreatorsV1SerialisationTest
       contributors = List(
         Contributor(agent = Unidentifiable(Agent("Vivian Violet"))),
         Contributor(agent = Unidentifiable(Organisation("Verily Volumes"))),
-        Contributor(agent = Unidentifiable(Person(
-          label = "Havelock Vetinari",
-          prefix = Some("Lord Patrician"),
-          numeration = Some("I")
-        )))
+        Contributor(
+          agent = Unidentifiable(
+            Person(
+              label = "Havelock Vetinari",
+              prefix = Some("Lord Patrician"),
+              numeration = Some("I")
+            )))
       )
     )
     val displayWork = DisplayWorkV1(work)

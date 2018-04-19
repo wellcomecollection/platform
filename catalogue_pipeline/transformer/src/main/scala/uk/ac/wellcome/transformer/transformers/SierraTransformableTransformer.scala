@@ -61,10 +61,8 @@ class SierraTransformableTransformer
               publicationDate = getPublicationDate(sierraBibData),
               placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
-
               // TODO Replace this with a proper contributors transformation
 //              creators = getCreators(sierraBibData)
-
               dimensions = getDimensions(sierraBibData)
             ))
         }

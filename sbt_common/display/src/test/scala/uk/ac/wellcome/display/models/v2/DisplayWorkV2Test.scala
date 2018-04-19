@@ -274,15 +274,16 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         agent = DisplayPerson(
           id = Some("vs7jd5dx"),
           label = "Vlad the Vanquished",
-          identifiers = Some(List(
-            DisplayIdentifier(
-              SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
-                ontologyType = "Person",
-                value = "v1"
+          identifiers = Some(
+            List(
+              DisplayIdentifier(
+                SourceIdentifier(
+                  IdentifierSchemes.libraryOfCongressNames,
+                  ontologyType = "Person",
+                  value = "v1"
+                )
               )
-            )
-          ))
+            ))
         ),
         roles = List()
       ),

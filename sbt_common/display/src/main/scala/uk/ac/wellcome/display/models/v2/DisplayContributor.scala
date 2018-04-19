@@ -20,7 +20,8 @@ case class DisplayContributor(
 )
 
 object DisplayContributor {
-  def apply(contributor: Contributor[Displayable[AbstractAgent]]): DisplayContributor =
+  def apply(
+    contributor: Contributor[Displayable[AbstractAgent]]): DisplayContributor =
     DisplayContributor(
       agent = DisplayAbstractAgent(contributor.agent),
       roles = contributor.roles.map { DisplayContributionRole(_) }
