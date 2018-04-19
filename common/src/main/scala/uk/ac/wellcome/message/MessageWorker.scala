@@ -45,6 +45,7 @@ abstract class MessageWorker(sqsReader: SQSReader,
   private def loadMessageContent(pointer: MessagePointer): Future[SQSMessage] =
     pointer.src match {
       case S3Uri(bucket, key) => S3ObjectStore.get[SQSMessage](s3, bucket)(key)
+      case _ => Future.failed(new RuntimeException("Unsupported URI scheme"))
     }
 
   def terminalFailureHook(throwable: Throwable): Unit = {

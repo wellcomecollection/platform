@@ -21,7 +21,7 @@ import akka.actor.ActorSystem
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class MessageWorkerTest
-    extends FunSpec
+  extends FunSpec
     with MockitoSugar
     with Eventually
     with Akka
@@ -42,9 +42,9 @@ class MessageWorkerTest
   }
 
   def withMessageWorker[R](actors: ActorSystem,
-                       queue: Queue,
-                       metrics: MetricsSender,
-                       bucket: S3.Bucket)(testWith: TestWith[MessageWorker, R]) = {
+                           queue: Queue,
+                           metrics: MetricsSender,
+                           bucket: S3.Bucket)(testWith: TestWith[MessageWorker, R]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
@@ -70,14 +70,14 @@ class MessageWorkerTest
   it("processes messages") {
     withFixtures {
       case (_, queue, metrics, bucket, worker) =>
-
         val key = "message-key"
-        sqsClient.sendMessage(
-          queue.url,
-          s"""{"src":"s3://${bucket.name}/$key"}""")
 
         val json = toJson(TestSqsMessage()).get
         s3Client.putObject(bucket.name, key, json)
+
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"s3://${bucket.name}/$key"}""")
 
         eventually {
           verify(
@@ -105,6 +105,31 @@ class MessageWorkerTest
         sqsClient.sendMessage(
           queue.url,
           s"""{"src":"s3://${bucket.name}/$key"}""")
+
+        val json = toJson(TestSqsMessage()).get
+        s3Client.putObject(bucket.name, key, json)
+
+        eventually {
+          verify(metrics)
+            .incrementCount(matches(".*_TerminalFailure"), anyDouble())
+        }
+    }
+  }
+
+  it("reports an error when handling unsupported scheme") {
+    withFixtures {
+      case (_, queue, metrics, bucket, worker) =>
+        when(
+          metrics.timeAndCount[Unit](
+            anyString(),
+            any[() => Future[Unit]].apply
+          )
+        ).thenThrow(new RuntimeException)
+
+        val key = "message-key"
+        sqsClient.sendMessage(
+          queue.url,
+          s"""{"src":"http://www.example.com"}""")
 
         val json = toJson(TestSqsMessage()).get
         s3Client.putObject(bucket.name, key, json)
