@@ -76,15 +76,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type": "Concept"
       |    }
       |  ],
-      |  "creators": [
-      |    {
-      |      "agent" : {
-      |        "label" : "47",
-      |        "type" : "Agent"
-      |      },
-      |      "type" : "Unidentifiable"
-      |    }
-      |  ],
+      |  "contributors": [],
       |  "genres": [
       |    {
       |      "label": "genre",
@@ -206,7 +198,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Concept("subject")),
-    creators = List(Unidentifiable(Agent("47"))),
+    // creators = List(Unidentifiable(Agent("47"))),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
