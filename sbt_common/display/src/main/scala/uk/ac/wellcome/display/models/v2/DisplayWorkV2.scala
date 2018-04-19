@@ -115,7 +115,7 @@ case object DisplayWorkV2 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      contributors = Nil,
+      contributors = work.contributors.map { DisplayContributor(_) },
       subjects = work.subjects.map { DisplayConcept(_) },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
