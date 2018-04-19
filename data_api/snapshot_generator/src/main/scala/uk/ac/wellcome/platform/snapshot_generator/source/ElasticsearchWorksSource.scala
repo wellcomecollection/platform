@@ -14,7 +14,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 object ElasticsearchWorksSource extends Logging{
   def apply(elasticClient: HttpClient, indexName: String, itemType: String)(
     implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] ={
-    val loggingSink = Flow[IdentifiedWork].grouped(1000).map(works => {
+    val loggingSink = Flow[IdentifiedWork].grouped(10000).map(works => {
       logger.info(s"Received ${works.length} works from $indexName")
       works
     }).to(Sink.ignore)
