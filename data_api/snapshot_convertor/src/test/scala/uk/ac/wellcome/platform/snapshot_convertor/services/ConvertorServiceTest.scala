@@ -6,7 +6,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.S3Exception
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.services.s3.model.{AmazonS3Exception, GetObjectRequest}
+import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.scalatest.concurrent.ScalaFutures
@@ -92,8 +92,6 @@ class ConvertorServiceTest
           val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            privateBucketName = "",
-            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
@@ -141,8 +139,6 @@ class ConvertorServiceTest
           val publicObjectKey = "target.txt.gz"
 
           val conversionJob = ConversionJob(
-            privateBucketName = "",
-            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v2
@@ -218,8 +214,6 @@ class ConvertorServiceTest
 
           val publicObjectKey = "target.txt.gz"
           val conversionJob = ConversionJob(
-            privateBucketName = "",
-            privateObjectKey = "",
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
@@ -263,8 +257,6 @@ class ConvertorServiceTest
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
         val conversionJob = ConversionJob(
-          privateBucketName = "",
-          privateObjectKey = "",
           publicBucketName = "wrongBukkit",
           publicObjectKey = "target.json.gz",
           apiVersion = ApiVersions.v1

@@ -74,8 +74,6 @@ class SnapshotConvertorFeatureTest
           val publicObjectKey = "target.txt.gz"
 
             val conversionJob = ConversionJob(
-              privateBucketName = "",
-              privateObjectKey = "",
               publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey,
               apiVersion = ApiVersions.v1
