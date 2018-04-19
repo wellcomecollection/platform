@@ -121,7 +121,7 @@ class WorksIndex @Inject()(client: HttpClient,
   )
 
   val contributors = objectField("contributors").fields(
-    identified("agents", agent),
+    identified("agent", agent),
     objectField("roles").fields(
       textField("label"),
       keywordField("ontologyType")
