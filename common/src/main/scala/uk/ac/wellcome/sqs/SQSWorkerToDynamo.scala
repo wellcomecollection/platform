@@ -15,9 +15,8 @@ import scala.concurrent.Future
 abstract class SQSWorkerToDynamo[T](
   sqsReader: SQSReader,
   actorSystem: ActorSystem,
-  metricsSender: MetricsSender,
-  s3: AmazonS3
-) extends SQSWorker(sqsReader, actorSystem, metricsSender, s3) {
+  metricsSender: MetricsSender
+) extends SQSWorker(sqsReader, actorSystem, metricsSender) {
 
   implicit val decoder: Decoder[T]
   def store(t: T): Future[Unit]

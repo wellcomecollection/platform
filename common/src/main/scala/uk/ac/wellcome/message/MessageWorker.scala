@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sqs
+package uk.ac.wellcome.message
 
 import akka.actor.ActorSystem
 import uk.ac.wellcome.utils.JsonUtil._
@@ -9,11 +9,15 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 import com.twitter.inject.Logging
 import scala.concurrent.duration._
+import com.amazonaws.services.s3.AmazonS3
+import uk.ac.wellcome.s3.S3Uri
+import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 
-abstract class SQSWorker(sqsReader: SQSReader,
+abstract class MessageWorker(sqsReader: SQSReader,
                          actorSystem: ActorSystem,
-                         metricsSender: MetricsSender)
-    extends Logging {
+                         metricsSender: MetricsSender,
+                         s3: AmazonS3) extends Logging {
 
   info(s"Starting SQS worker=[$workerName]")
 
@@ -27,15 +31,21 @@ abstract class SQSWorker(sqsReader: SQSReader,
   private def processMessages(): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        m <- Future.fromTry { fromJson[SQSMessage](message.getBody) }
-        _ <- Future.successful { debug(s"Processing message: $m") }
+        pointer <- Future.fromTry(fromJson[MessagePointer](message.getBody))
+        message <- loadMessageContent(pointer)
+        _ <- Future.successful { debug(s"Processing message: $message") }
         metricName = s"${workerName}_ProcessMessage"
-        _ <- metricsSender.timeAndCount(metricName, () => processMessage(m))
+        _ <- metricsSender.timeAndCount(metricName, () => processMessage(message))
       } yield ()
     } recover {
       case exception: Throwable => terminalFailureHook(exception)
     }
   }
+
+  private def loadMessageContent(pointer: MessagePointer): Future[SQSMessage] =
+    pointer.src match {
+      case S3Uri(bucket, key) => S3ObjectStore.get[SQSMessage](s3, bucket)(key)
+    }
 
   def terminalFailureHook(throwable: Throwable): Unit = {
     logger.error(s"${workerName}_TerminalFailure!", throwable)
@@ -43,5 +53,4 @@ abstract class SQSWorker(sqsReader: SQSReader,
   }
 
   def stop(): Boolean = actor.cancel()
-
 }

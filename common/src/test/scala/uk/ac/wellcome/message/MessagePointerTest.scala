@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sqs
+package uk.ac.wellcome.message
 
 import org.scalatest._
 import uk.ac.wellcome.utils.JsonUtil._

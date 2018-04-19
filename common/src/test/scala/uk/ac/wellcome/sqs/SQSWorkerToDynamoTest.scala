@@ -32,8 +32,7 @@ class SQSWorkerToDynamoTest
     with Eventually
     with ExtendedPatience
     with Akka
-    with SQS
-    with S3 {
+    with SQS {
 
   val mockPutMetricDataResult = mock[PutMetricDataResult]
   val mockCloudWatch = mock[AmazonCloudWatch]
@@ -55,8 +54,7 @@ class SQSWorkerToDynamoTest
       extends SQSWorkerToDynamo[TestObject](
         new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system,
-        metricsSender,
-        s3Client) {
+        metricsSender) {
 
     override lazy val poll = 100 millisecond
 
@@ -110,17 +108,12 @@ class SQSWorkerToDynamoTest
     testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
     withActorSystem[R] and
       withLocalSqsQueue[R] and
-      withTestWorker[R](testWorkFactory) _ and
-      withLocalS3Bucket[R]
+      withTestWorker[R](testWorkFactory) _
 
   it("processes messages") {
     withFixtures() {
-      case ((_, queue, worker), bucket) =>
-        val key = "message-key"
-        sqsClient.sendMessage(
-          queue.url,
-          s"""{"src":"s3://${bucket.name}/$key"}""")
-        s3Client.putObject(bucket.name, key, testMessageJson)
+      case (_, queue, worker) =>
+        sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
           worker.processCalled shouldBe true
@@ -131,7 +124,7 @@ class SQSWorkerToDynamoTest
 
   it("fails gracefully when receiving a ConditionalCheckFailedException") {
     withFixtures(conditionalCheckFailingTestWorkerFactory) {
-      case ((_, queue, worker), bucket) =>
+      case (_, queue, worker) =>
         sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
@@ -142,7 +135,7 @@ class SQSWorkerToDynamoTest
 
   it("fails gracefully when a conversion fails") {
     withFixtures(terminalTestWorkerFactory) {
-      case ((_, queue, worker), bucket) =>
+      case (_, queue, worker) =>
         val invalidBodyTestMessage = SQSMessage(
           subject = Some("subject"),
           messageType = "messageType",
@@ -164,12 +157,8 @@ class SQSWorkerToDynamoTest
   it(
     "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
     withFixtures(terminalTestWorkerFactory) {
-      case ((_, queue, worker), bucket) =>
-        val key = "message-key"
-        sqsClient.sendMessage(
-          queue.url,
-          s"""{"src":"s3://${bucket.name}/$key"}""")
-        s3Client.putObject(bucket.name, key, testMessageJson)
+      case (_, queue, worker) =>
+        sqsClient.sendMessage(queue.url, testMessageJson)
 
         eventually {
           worker.terminalFailure shouldBe true
