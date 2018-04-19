@@ -1,3 +1,12 @@
 -aws.sns.topic.arn=${topic_arn}
 -aws.sqs.queue.url=${queue_url}
 -aws.metrics.namespace=${metrics_namespace}
+-es.host=${es_host}
+-es.port=${es_port}
+-es.name=${es_name}
+-es.index.v1=${es_index_v1}
+-es.index.v2=${es_index_v2}
+-es.type=${es_doc_type}
+-es.username=${es_username}
+-es.password=${es_password}
+-es.protocol=${es_protocol}
