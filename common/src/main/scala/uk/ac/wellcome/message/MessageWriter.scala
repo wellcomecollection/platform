@@ -9,38 +9,29 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.models.aws.S3Config
 import com.amazonaws.services.s3.AmazonS3
 import java.util.UUID.randomUUID
+
+import io.circe.Encoder
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.sns.SNSWriter
 
-import scala.concurrent.{blocking, Future}
+import scala.concurrent.{Future, blocking}
 
-class MessageWriter @Inject()(
+class MessageWriter[T] @Inject()(
   private val sns: SNSWriter,
-  private val s3: AmazonS3,
-  private val s3Config: S3Config
+  private val s3Config: S3Config,
+  private val s3: S3ObjectStore[T]
 ) extends Logging {
 
-  private val bucket = s3Config.bucketName
+  def write(message: T, subject: String)(implicit encoder: Encoder[T]): Future[Unit] = {
 
-  def write(message: String, subject: String): Future[Unit] = {
-
-    val contentId = randomUUID.toString
-    // TODO make key prefix configurable
-    val key = s"messages/$contentId"
+    val bucket= s3Config.bucketName
 
     for {
-      _ <- eventuallyStoreMessage(message, key)
+      key <- s3.put(message)
       pointer <- Future.fromTry(toJson(MessagePointer(s"s3://$bucket/$key")))
       publishResult <- sns.writeMessage(pointer, subject)
     } yield ()
 
   }
-
-  private def eventuallyStoreMessage(message: String, key: String) = Future {
-    blocking {
-      debug(s"storing message s3://$bucket/$key")
-      s3.putObject(bucket, key, message)
-    }
-  }
-
 }
