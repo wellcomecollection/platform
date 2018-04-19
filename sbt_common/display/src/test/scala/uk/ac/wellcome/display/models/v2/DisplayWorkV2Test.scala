@@ -235,4 +235,65 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
   }
+
+  it("extracts contributors from a Work") {
+    val work = IdentifiedWork(
+      canonicalId = "vc6zww4f",
+      title = Some("Vicarious victory for violet vampires"),
+      sourceIdentifier = sourceIdentifier,
+      contributors = List(
+        Contributor(
+          agent = Identified(
+            Person(label = "Vlad the Vanquished"),
+            canonicalId = "vs7jd5dx",
+            identifiers = List(
+              SourceIdentifier(
+                IdentifierSchemes.libraryOfCongressNames,
+                ontologyType = "Person",
+                value = "v1"
+              )
+            )
+          )
+        ),
+        Contributor(
+          agent = Unidentifiable(
+            Organisation(label = "Transylvania Terrors")
+          ),
+          roles = List(
+            ContributionRole(label = "Background location")
+          )
+        )
+      ),
+      version = 1
+    )
+
+    val displayWork = DisplayWorkV2(work)
+
+    displayWork.contributors shouldBe List(
+      DisplayContributor(
+        agent = DisplayPerson(
+          id = Some("vs7jd5dx"),
+          label = "Vlad the Vanquished",
+          identifiers = Some(List(
+            DisplayIdentifier(
+              SourceIdentifier(
+                IdentifierSchemes.libraryOfCongressNames,
+                ontologyType = "Person",
+                value = "v1"
+              )
+            )
+          ))
+        ),
+        roles = List()
+      ),
+      DisplayContributor(
+        agent = DisplayOrganisation(
+          id = None,
+          label = "Transylvania Terrors",
+          identifiers = None
+        ),
+        roles = List(DisplayContributionRole(label = "Background location"))
+      )
+    )
+  }
 }
