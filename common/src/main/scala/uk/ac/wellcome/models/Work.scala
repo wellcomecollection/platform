@@ -15,10 +15,7 @@ trait Work extends Versioned {
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[AbstractConcept]
-
-  // Yes, this is kind of rubbish.  I haven't found another way to satisfy the compiler!
-  val contributors: List[Any]
-
+  val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val genres: List[AbstractConcept]
   val thumbnail: Option[Location]
   val publishers: List[IdentityState[AbstractAgent]]
