@@ -11,12 +11,8 @@ module "snapshot_scheduler_lambda" {
   timeout         = 10
 
   environment_variables = {
-    "TOPIC_ARN" = "${module.scheduler_topic.arn}"
+    TOPIC_ARN = "${module.scheduler_topic.arn}"
 
-    ES_INDEX_V1 = "${var.es_index_v1}"
-    ES_INDEX_V2 = "${var.es_index_v2}"
-
-    PRIVATE_BUCKET_NAME = "${var.private_bucket_name}"
     PUBLIC_BUCKET_NAME  = "${var.public_bucket_name}"
 
     PUBLIC_OBJECT_KEY_V1 = "${var.public_object_key_v1}"
