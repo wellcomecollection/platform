@@ -25,7 +25,6 @@ class SierraTransformableTransformer
     with SierraLocation
     with SierraPublicationDate
     with SierraPlaceOfPublication
-    // with SierraCreators
     with SierraDimensions
     with Logging {
 
@@ -63,9 +62,8 @@ class SierraTransformableTransformer
               placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
 
-              // @@AWLC proper implementation in a separate PR
-              // creators = getCreators(sierraBibData),
-              contributors = List(),
+              // TODO Replace this with a proper contributors transformation
+//              creators = getCreators(sierraBibData)
 
               dimensions = getDimensions(sierraBibData)
             ))
