@@ -88,7 +88,7 @@ abstract class WorksController(apiPrefix: String,
         apiPrefix = apiPrefix,
         version = version,
         apiContextSuffix = apiContextSuffix)
-      val eventualResponse = for {
+      for {
         maybeWork <- worksService.findWorkById(
           canonicalId = request.id,
           indexName = request._index
@@ -100,32 +100,6 @@ abstract class WorksController(apiPrefix: String,
           includes,
           request,
           contextUri)
-
-      eventualResponse.recover {
-        // If a user tries to request an ID without escaping it correctly
-        // (e.g. "/works/work/zd224ncv]"), we get an IllegalArgumentException with
-        // the error:
-        //
-        //      Illegal character in path at index 20: /works/work/zd224ncv]
-        //
-        // In this case, we return a 400 Bad Request exception rather than bubbling
-        // up as a 500 error.
-        case exception: IllegalArgumentException =>
-          if (exception.getMessage.startsWith(
-                "Illegal character in path at index ")) {
-            val result = Error(
-              variant = "http-400",
-              description =
-                Some(s"Unrecognised character in identifier ${request.id}")
-            )
-            response.badRequest.json(
-              ResultResponse(
-                context = contextUri,
-                result = DisplayError(result)
-              )
-            )
-          }
-      }
     }
   }
 
