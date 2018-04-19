@@ -1,38 +1,38 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, FunSuite}
-import uk.ac.wellcome.models.{Agent, Unidentifiable}
+import uk.ac.wellcome.models.{Agent, Contributor, Unidentifiable}
 
-class MiroTransformableTransformerCreatorsTest
+class MiroTransformableTransformerContributorsTest
     extends FunSpec
     with MiroTransformableWrapper {
   it("if not image_creator field is present") {
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s""""image_title": "A guide to giraffes"""",
-      expectedCreators = List()
+      expectedContributors = List()
     )
   }
 
   it("passes through a single value in the image_creator field") {
     val creator = "Researcher Rosie"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "A radio for a racoon",
           "image_creator": ["$creator"]
         """,
-      expectedCreators = List(creator)
+      expectedContributors = List(creator)
     )
   }
 
   it("ignores null values in the image_creator field") {
     val creator1 = "Beekeeper Brian"
     val creator2 = "Dog-owner Derek"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "A radio for a racoon",
           "image_creator": ["$creator1", null, "$creator2"]
         """,
-      expectedCreators = List(creator1, creator2)
+      expectedContributors = List(creator1, creator2)
     )
   }
 
@@ -40,95 +40,92 @@ class MiroTransformableTransformerCreatorsTest
     val creator1 = "Beekeeper Brian"
     val creator2 = "Cat-wrangler Carol"
     val creator3 = "Dog-owner Derek"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "A radio for a racoon",
           "image_creator": ["$creator1", "$creator2", "$creator3"]
         """,
-      expectedCreators = List(creator1, creator2, creator3)
+      expectedContributors = List(creator1, creator2, creator3)
     )
   }
 
   it("passes through a single value in the image_creator_secondary field") {
     val secondaryCreator = "Scientist Sarah"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "A radio for a racoon",
           "image_secondary_creator": ["$secondaryCreator"]
         """,
-      expectedCreators = List(secondaryCreator)
+      expectedContributors = List(secondaryCreator)
     )
   }
 
   it("passes through multiple values in the image_creator_secondary field") {
     val secondaryCreator1 = "Gamekeeper Gordon"
     val secondaryCreator2 = "Herpetologist Harriet"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "Verdant and vivid",
           "image_secondary_creator": [
             "$secondaryCreator1", "$secondaryCreator2"
           ]
         """,
-      expectedCreators = List(secondaryCreator1, secondaryCreator2)
+      expectedContributors = List(secondaryCreator1, secondaryCreator2)
     )
   }
 
   it("combines the image_creator and image_secondary_creator fields") {
     val creator = "Mycologist Morgan"
     val secondaryCreator = "Manufacturer Mel"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "Verdant and vivid",
           "image_creator": ["$creator"],
           "image_secondary_creator": ["$secondaryCreator"]
         """,
-      expectedCreators = List(creator, secondaryCreator)
+      expectedContributors = List(creator, secondaryCreator)
     )
   }
 
   it("passes through a value from the image_source_code field") {
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = """
           "image_title": "A gander and a goose are game for a goof",
           "image_source_code": "GAV"
         """,
-      expectedCreators = List("Isabella Gavazzi")
+      expectedContributors = List("Isabella Gavazzi")
     )
   }
 
   it("does not use the image_source_code field for Wellcome Collection") {
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = """
           "image_title": "Wandering wallabies within water",
           "image_source_code": "WEL"
         """,
-      expectedCreators = List()
+      expectedContributors = List()
     )
   }
 
-  it("does combine the image_creator and image_source_code fields") {
+  it("combines the image_creator and image_source_code fields") {
     val creator = "Sally Snake"
-    transformRecordAndCheckCreators(
+    transformRecordAndCheckContributors(
       data = s"""
           "image_title": "A gander and a goose are game for a goof",
           "image_creator": ["$creator"],
           "image_source_code": "SNL"
         """,
-      expectedCreators = List(creator, "Sue Snell")
+      expectedContributors = List(creator, "Sue Snell")
     )
   }
 
-  private def transformRecordAndCheckCreators(
+  private def transformRecordAndCheckContributors(
     data: String,
-    expectedCreators: List[String]
+    expectedContributors: List[String]
   ) = {
     val transformedWork = transformWork(data = data)
-
-    // TODO: Modify this test to use contributors when the new Miro
-    // transform is done.
-    // transformedWork.creators shouldBe expectedCreators.map { creator =>
-    //   Unidentifiable(Agent(creator))
-    // }
+    transformedWork.contributors shouldBe expectedContributors.map { contributor =>
+      Contributor(agent = Unidentifiable(Agent(creator)))
+    }
   }
 }
