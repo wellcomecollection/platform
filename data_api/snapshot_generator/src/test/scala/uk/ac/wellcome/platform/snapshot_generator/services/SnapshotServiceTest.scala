@@ -17,9 +17,17 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.IdentifierSchemes.sierraSystemNumber
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
+import uk.ac.wellcome.models.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  Period,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
@@ -247,12 +255,22 @@ class SnapshotServiceTest
     }
   }
 
-  it("fails a snapshot generation even if one of the items in the index is invalid") {
+  it(
+    "fails a snapshot generation even if one of the items in the index is invalid") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val validWorks = createWorks(count = 3)
 
-        val invalidWork = IdentifiedWork(canonicalId = "invalidwork", sourceIdentifier = SourceIdentifier(identifierScheme = sierraSystemNumber, ontologyType = "Work",value = "123"), version = 1 , title = None, visible = true)
+        val invalidWork = IdentifiedWork(
+          canonicalId = "invalidwork",
+          sourceIdentifier = SourceIdentifier(
+            identifierScheme = sierraSystemNumber,
+            ontologyType = "Work",
+            value = "123"),
+          version = 1,
+          title = None,
+          visible = true
+        )
 
         val works = validWorks :+ invalidWork
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)

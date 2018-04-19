@@ -11,13 +11,16 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
-object ElasticsearchWorksSource extends Logging{
+object ElasticsearchWorksSource extends Logging {
   def apply(elasticClient: HttpClient, indexName: String, itemType: String)(
-    implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] ={
-    val loggingSink = Flow[IdentifiedWork].grouped(10000).map(works => {
-      logger.info(s"Received ${works.length} works from $indexName")
-      works
-    }).to(Sink.ignore)
+    implicit actorSystem: ActorSystem): Source[IdentifiedWork, NotUsed] = {
+    val loggingSink = Flow[IdentifiedWork]
+      .grouped(10000)
+      .map(works => {
+        logger.info(s"Received ${works.length} works from $indexName")
+        works
+      })
+      .to(Sink.ignore)
     Source
       .fromPublisher(
         elasticClient.publisher(
@@ -26,6 +29,7 @@ object ElasticsearchWorksSource extends Logging{
             .scroll("10m")))
       .map { searchHit: SearchHit =>
         fromJson[IdentifiedWork](searchHit.sourceAsString).get
-      }.alsoTo(loggingSink)
-    }
+      }
+      .alsoTo(loggingSink)
+  }
 }

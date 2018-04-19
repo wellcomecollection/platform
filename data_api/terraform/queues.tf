@@ -5,6 +5,6 @@ module "snapshot_generator_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.snapshot_scheduler.topic_name}"]
 
-  alarm_topic_arn = "${local.dlq_alarm_arn}"
+  alarm_topic_arn            = "${local.dlq_alarm_arn}"
   visibility_timeout_seconds = 900
 }
