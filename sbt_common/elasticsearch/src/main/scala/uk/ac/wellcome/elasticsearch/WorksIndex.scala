@@ -90,7 +90,7 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
-  def indentified(fieldName: String, fields: Seq[FieldDefinition]) =
+  def identified(fieldName: String, fields: Seq[FieldDefinition]) =
     objectField(fieldName).fields(
       textField("type"),
       objectField("agent").fields(fields),
@@ -140,12 +140,12 @@ class WorksIndex @Inject()(client: HttpClient,
       textField("lettering").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
-      indentified("creators", agent),
+      identified("creators", agent),
       concept("subjects"),
       concept("genres"),
       labelledTextField("placesOfPublication"),
       items,
-      indentified("publishers", agent),
+      identified("publishers", agent),
       date("publicationDate"),
       language,
       location("thumbnail"),
