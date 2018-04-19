@@ -73,6 +73,28 @@ trait FixtureComposers {
 
     }
 
+  implicit def FourArgFixtureComposer[L1, L2, L3, L4, L5, R] =
+    new FixtureComposer[
+      (((L1, L2), L3), L4),
+      (L1, L2, L3, L4, L5),
+      (L1, L2, L3, L4) => Fixture[L5, R],
+      R] {
+
+      override def compose(fixture1: Fixture[(((L1, L2), L3), L4), R],
+                           function: (L1, L2, L3, L4) => Fixture[L5, R])
+        : Fixture[(L1, L2, L3, L4, L5), R] =
+        (testWith: TestWith[(L1, L2, L3, L4, L5), R]) =>
+          fixture1 {
+            case (((loan1, loan2), loan3), loan4) =>
+              val fixture2 = function(loan1, loan2, loan3, loan4)
+
+              fixture2 { loan5 =>
+                testWith((loan1, loan2, loan3, loan4, loan5))
+              }
+        }
+
+    }
+
   implicit def FlattenedThreeArgFixtureComposer[L1, L2, L3, L4, R] =
     new FixtureComposer[
       (L1, L2, L3),

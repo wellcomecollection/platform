@@ -1,5 +1,7 @@
 package uk.ac.wellcome.s3
 
+import java.net.URI
+
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -44,7 +46,9 @@ class S3ObjectStoreTest
         val expectedHash = "1770874231"
 
         val expectedKey = s"$prefix/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, expectedKey)
+
+        actualKey shouldBe expectedUri
 
         val jsonFromS3 = getJsonFromS3(
           bucket,
@@ -75,8 +79,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -100,8 +104,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -139,12 +143,28 @@ class S3ObjectStoreTest
         }
       )
 
-      whenReady(objectStore.get("not/a/real/object").failed) { exception =>
+      whenReady(objectStore.get(S3Uri(bucket.name,"not/a/real/object")).failed) { exception =>
         exception shouldBe a[AmazonS3Exception]
         exception
           .asInstanceOf[AmazonS3Exception]
           .getErrorCode shouldBe "NoSuchKey"
 
+      }
+    }
+  }
+
+  it("throws an exception when retrieving from an invalid scheme") {
+     withLocalS3Bucket { bucket =>
+      val objectStore = new S3ObjectStore(
+        s3Client,
+        S3Config(bucketName = bucket.name),
+        new KeyPrefixGenerator[TestObject] {
+          override def generate(obj: TestObject): String = "doesnt_matter"
+        }
+      )
+
+      whenReady(objectStore.get(new URI("http://www.example.com")).failed) { exception =>
+        exception shouldBe a[RuntimeException]
       }
     }
   }
