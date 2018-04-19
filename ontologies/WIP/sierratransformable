@@ -160,54 +160,58 @@
    *
    *
    * Example:
-   *  "contributors": [
+   *
+   *   "contributors": [
    *     {
-   *        "type": "Contributor" , 
-   *        "agent": {
-   *           "id": "a24s7qf3" ,
-   *           "label": "Jacobs, Philip P.",
-   *           "prefixes": ["Sir"] ,
-   *           "numeration": "II" ,
-   *           "type": "Person",
-   *           "identifiers": [
-   *        {
-   *           "value": "2005016805",
-   *           "type": "Identifier",
-   *           "identifierScheme": "lc-names"
-   *        }
-   *        ] ,  
-   *     "roles": [
-   *        {
-   *           "label": "Editor",
-   *           "type": "ContributionRole"  
-   *        } 
-   *     ] 
-   *  } 
-   * ]
+   *       "type": "Contributor" ,
+   *       "agent": {
+   *         "id": "a24s7qf3" ,
+   *         "label": "Jacobs, Philip P.",
+   *         "prefixes": ["Sir"] ,
+   *         "numeration": "II" ,
+   *         "type": "Person",
+   *         "identifiers": [
+   *           {
+   *             "value": "2005016805",
+   *             "type": "Identifier",
+   *             "identifierScheme": "lc-names"
+   *           }
+   *         ],
+   *         "roles": [
+   *           {
+   *             "label": "Editor",
+   *             "type": "ContributionRole"
+   *           }
+   *         ]
+   *       }
+   *     }
+   *   ]
    *
    * Example:
-   *  "contributors": [
+   *
+   *   "contributors": [
    *     {
-   *        "type": "Contributor" , 
-   *        "agent": {
-   *           "id": "a24s7qf3" ,
-   *           "label": "International Labour Organisation",
-   *           "type": "Organisation",
-   *           "identifiers": [
-   *        {
-   *           "value": "2005016805",
-   *           "type": "Identifier",
-   *           "identifierScheme": "lc-names"
-   *        }
-   *        ] ,  
-   *     "roles": [
-   *        {
-   *           "label": "Sponsor",
-   *           "type": "ContributionRole"  
-   *        } 
-   *     ] 
-   *  } 
-   * ]
+   *       "type": "Contributor",
+   *       "agent": {
+   *         "id": "a24s7qf3" ,
+   *         "label": "International Labour Organisation",
+   *         "type": "Organisation",
+   *         "identifiers": [
+   *           {
+   *             "value": "2005016805",
+   *             "type": "Identifier",
+   *             "identifierScheme": "lc-names"
+   *           }
+   *         ],
+   *         "roles": [
+   *           {
+   *             "label": "Sponsor",
+   *             "type": "ContributionRole"
+   *           }
+   *         ]
+   *       }
+   *     }
+   *   ]
    *
    *
    *
