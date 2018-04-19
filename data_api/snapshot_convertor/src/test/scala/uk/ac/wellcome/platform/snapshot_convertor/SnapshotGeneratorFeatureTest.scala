@@ -9,7 +9,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -19,7 +19,7 @@ import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.versions.ApiVersions
 
-class SnapshotConvertorFeatureTest
+class SnapshotGeneratorFeatureTest
     extends FunSpec
     with Eventually
     with Matchers
@@ -73,15 +73,15 @@ class SnapshotConvertorFeatureTest
 
           val publicObjectKey = "target.txt.gz"
 
-            val conversionJob = ConversionJob(
+            val snapshotJob = SnapshotJob(
               publicBucketName = publicBucket.name,
               publicObjectKey = publicObjectKey,
               apiVersion = ApiVersions.v1
             )
 
             val message = SQSMessage(
-              subject = Some("Sent from SnapshotConvertorFeatureTest"),
-              body = toJson(conversionJob).get,
+              subject = Some("Sent from SnapshotGeneratorFeatureTest"),
+              body = toJson(snapshotJob).get,
               messageType = "json",
               topic = topic.arn,
               timestamp = "now"
@@ -92,7 +92,7 @@ class SnapshotConvertorFeatureTest
             eventually {
 
               val downloadFile =
-                File.createTempFile("convertorServiceTest", ".txt.gz")
+                File.createTempFile("snapshotGeneratorFeatureTest", ".txt.gz")
 
               s3Client.getObject(
                 new GetObjectRequest(publicBucket.name, publicObjectKey),
@@ -124,12 +124,12 @@ class SnapshotConvertorFeatureTest
               val receivedMessages = listMessagesReceivedFromSNS(topic)
               receivedMessages.size should be >= 1
 
-              val expectedJob = CompletedConversionJob(
-                conversionJob = conversionJob,
+              val expectedJob = CompletedSnapshotJob(
+                snapshotJob = snapshotJob,
                 targetLocation =
                   s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
               )
-              val actualJob = fromJson[CompletedConversionJob](
+              val actualJob = fromJson[CompletedSnapshotJob](
                 receivedMessages.head.message).get
               actualJob shouldBe expectedJob
             }

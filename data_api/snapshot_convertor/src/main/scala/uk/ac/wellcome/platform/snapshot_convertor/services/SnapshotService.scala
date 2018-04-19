@@ -16,35 +16,35 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_convertor.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_convertor.source.ElasticsearchWorksSource
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
 
 import scala.concurrent.Future
 
-class ConvertorService @Inject()(actorSystem: ActorSystem,
-                                 akkaS3Client: S3Client,
-                                 elasticClient: HttpClient,
-                                 @Flag("aws.s3.endpoint") s3Endpoint: String,
-                                 @Flag("es.index.v1") esIndexV1: String,
-                                 @Flag("es.index.v2") esIndexV2: String,
-                                 @Flag("es.type") esType: String,
-                                 objectMapper: ObjectMapper)
+class SnapshotService @Inject()(actorSystem: ActorSystem,
+                                akkaS3Client: S3Client,
+                                elasticClient: HttpClient,
+                                @Flag("aws.s3.endpoint") s3Endpoint: String,
+                                @Flag("es.index.v1") esIndexV1: String,
+                                @Flag("es.index.v2") esIndexV2: String,
+                                @Flag("es.type") esType: String,
+                                objectMapper: ObjectMapper)
     extends Logging {
 
   implicit val system: ActorSystem = actorSystem
   implicit val materializer: ActorMaterializer =
     ActorMaterializer()(actorSystem)
 
-  def runConversion(
-    conversionJob: ConversionJob): Future[CompletedConversionJob] = {
-    info(s"ConvertorService running $conversionJob")
+  def generateSnapshot(
+                        snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
+    info(s"ConvertorService running $snapshotJob")
 
-    val publicBucketName = conversionJob.publicBucketName
-    val publicObjectKey = conversionJob.publicObjectKey
+    val publicBucketName = snapshotJob.publicBucketName
+    val publicObjectKey = snapshotJob.publicObjectKey
 
-    val uploadResult = conversionJob.apiVersion match {
+    val uploadResult = snapshotJob.apiVersion match {
       case ApiVersions.v1 => runStream(
         publicBucketName = publicBucketName,
         publicObjectKey = publicObjectKey,
@@ -63,8 +63,8 @@ class ConvertorService @Inject()(actorSystem: ActorSystem,
       val targetLocation =
         Uri(s"$s3Endpoint/$publicBucketName/$publicObjectKey")
 
-      CompletedConversionJob(
-        conversionJob = conversionJob,
+      CompletedSnapshotJob(
+        snapshotJob = snapshotJob,
         targetLocation = targetLocation
       )
     }

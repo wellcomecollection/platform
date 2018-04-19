@@ -17,7 +17,7 @@ import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedConversionJob, ConversionJob}
+import uk.ac.wellcome.platform.snapshot_convertor.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
@@ -26,7 +26,7 @@ import uk.ac.wellcome.versions.ApiVersions
 
 import scala.util.Random
 
-class ConvertorServiceTest
+class SnapshotServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
@@ -42,11 +42,11 @@ class ConvertorServiceTest
 
   val itemType = "work"
 
-  private def withConvertorService[R](
+  private def withSnapshotService[R](
     actorSystem: ActorSystem,
     materializer: ActorMaterializer,
-    s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[ConvertorService, R]) = {
-    val convertorService = new ConvertorService(
+    s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
+    val snapshotService = new SnapshotService(
       actorSystem = actorSystem,
       elasticClient = elasticClient,
       akkaS3Client = s3AkkaClient,
@@ -57,19 +57,19 @@ class ConvertorServiceTest
       objectMapper = mapper
     )
 
-    testWith(convertorService)
+    testWith(snapshotService)
   }
 
   def withFixtures[R](
-                    testWith: TestWith[(ConvertorService, String, String, Bucket), R]) =
+                    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              withConvertorService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { convertorService => {
-                testWith((convertorService, indexNameV1, indexNameV2, bucket))
+              withSnapshotService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { snapshotService => {
+                testWith((snapshotService, indexNameV1, indexNameV2, bucket))
               }
               }
             }
@@ -81,7 +81,7 @@ class ConvertorServiceTest
 
   it("completes a V1 snapshot generation successfully") {
     withFixtures {
-      case (convertorService: ConvertorService, indexNameV1, _, publicBucket) =>
+      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createWorks(count = 3)
         val notVisibleWorks = createWorks(count = 1,start = 4, visible = false)
 
@@ -91,17 +91,17 @@ class ConvertorServiceTest
 
           val publicObjectKey = "target.txt.gz"
 
-          val conversionJob = ConversionJob(
+          val snapshotJob = SnapshotJob(
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
           )
 
-          val future = convertorService.runConversion(conversionJob)
+          val future = snapshotService.generateSnapshot(snapshotJob)
 
           whenReady(future) { result =>
             val downloadFile =
-              File.createTempFile("convertorServiceTest", ".txt.gz")
+              File.createTempFile("snapshotServiceTest", ".txt.gz")
             s3Client.getObject(
               new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
@@ -118,8 +118,8 @@ class ConvertorServiceTest
 
             contents shouldBe expectedContents
 
-            result shouldBe CompletedConversionJob(
-              conversionJob = conversionJob,
+            result shouldBe CompletedSnapshotJob(
+              snapshotJob = snapshotJob,
               targetLocation =
                 s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
@@ -128,7 +128,7 @@ class ConvertorServiceTest
   }
 
   it("completes a V2 snapshot generation successfully") {
-    withFixtures { case (convertorService: ConvertorService, _, indexNameV2, publicBucket) =>
+    withFixtures { case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createWorks(count = 4)
         val notVisibleWorks = createWorks(count = 2, start = 5, visible = false)
 
@@ -138,13 +138,13 @@ class ConvertorServiceTest
 
           val publicObjectKey = "target.txt.gz"
 
-          val conversionJob = ConversionJob(
+          val snapshotJob = SnapshotJob(
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v2
           )
 
-          val future = convertorService.runConversion(conversionJob)
+          val future = snapshotService.generateSnapshot(snapshotJob)
 
           whenReady(future) { result =>
             val downloadFile =
@@ -165,8 +165,8 @@ class ConvertorServiceTest
 
             contents shouldBe expectedContents
 
-            result shouldBe CompletedConversionJob(
-              conversionJob = conversionJob,
+            result shouldBe CompletedSnapshotJob(
+              snapshotJob = snapshotJob,
               targetLocation =
                 s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
@@ -190,7 +190,7 @@ class ConvertorServiceTest
   //
   it("completes a very large snapshot generation successfully") {
     withFixtures {
-      case (convertorService: ConvertorService, indexNameV1, _, publicBucket) =>
+      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         // Create a collection of works.  The use of Random is meant
         // to increase the entropy of works, and thus the degree to
         // which they can be gzip-compressed -- so we can cross the
@@ -213,13 +213,13 @@ class ConvertorServiceTest
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
           val publicObjectKey = "target.txt.gz"
-          val conversionJob = ConversionJob(
+          val snapshotJob = SnapshotJob(
             publicBucketName = publicBucket.name,
             publicObjectKey = publicObjectKey,
             apiVersion = ApiVersions.v1
           )
 
-          val future = convertorService.runConversion(conversionJob)
+          val future = snapshotService.generateSnapshot(snapshotJob)
 
           whenReady(future) { result =>
             val downloadFile =
@@ -240,8 +240,8 @@ class ConvertorServiceTest
 
             contents shouldBe expectedContents
 
-            result shouldBe CompletedConversionJob(
-              conversionJob = conversionJob,
+            result shouldBe CompletedSnapshotJob(
+              snapshotJob = snapshotJob,
               targetLocation =
                 s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
             )
@@ -251,18 +251,18 @@ class ConvertorServiceTest
 
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
-      case (convertorService: ConvertorService,indexNameV1,_, publicBucket) =>
+      case (snapshotService: SnapshotService,indexNameV1,_, publicBucket) =>
         val works = createWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
-        val conversionJob = ConversionJob(
+        val snapshotJob = SnapshotJob(
           publicBucketName = "wrongBukkit",
           publicObjectKey = "target.json.gz",
           apiVersion = ApiVersions.v1
         )
 
-        val future = convertorService.runConversion(conversionJob)
+        val future = snapshotService.generateSnapshot(snapshotJob)
 
         whenReady(future.failed) { result =>
           result shouldBe a[S3Exception]

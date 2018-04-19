@@ -8,7 +8,7 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.snapshot_convertor.modules.{AkkaS3ClientModule, SnapshotConvertorWorkerModule}
+import uk.ac.wellcome.platform.snapshot_convertor.modules.{AkkaS3ClientModule, SnapshotGeneratorWorkerModule}
 
 object ServerMain extends Server
 
@@ -20,7 +20,7 @@ class Server extends HttpServer {
   flag[String](name = "es.type", default = "item", help = "ES document type")
 
   override val name =
-    "uk.ac.wellcome.platform.snapshot_convertor SnapshotConvertor"
+    "uk.ac.wellcome.platform.snapshot_convertor SnapshotGenerator"
 
   override val modules = Seq(
     AmazonCloudWatchModule,
@@ -32,7 +32,7 @@ class Server extends HttpServer {
     S3ConfigModule,
     AkkaS3ClientModule,
     ElasticClientModule,
-    SnapshotConvertorWorkerModule,
+    SnapshotGeneratorWorkerModule,
     AkkaModule
   )
 
