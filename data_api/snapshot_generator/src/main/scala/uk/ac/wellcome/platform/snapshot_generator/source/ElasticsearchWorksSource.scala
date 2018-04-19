@@ -26,7 +26,7 @@ object ElasticsearchWorksSource extends Logging {
         elasticClient.publisher(
           search(s"$indexName/$itemType")
             .query(termQuery("visible", true))
-            .scroll("10m")))
+            .scroll("30m")))
       .map { searchHit: SearchHit =>
         fromJson[IdentifiedWork](searchHit.sourceAsString).get
       }
