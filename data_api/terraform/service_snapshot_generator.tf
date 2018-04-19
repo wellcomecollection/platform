@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_snapshot" {
 }
 
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.0.3"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-ignore-missing-data"
   name   = "snapshot_generator"
 
   source_queue_name = "${module.snapshot_generator_queue.name}"
@@ -35,7 +35,7 @@ module "snapshot_generator" {
   env_vars_length = 12
 
   memory = 2048
-  cpu    = 512
+  cpu    = 2048
 
   cluster_name = "${module.data_api_cluster.cluster_name}"
   vpc_id       = "${module.vpc_data_api.vpc_id}"
@@ -49,4 +49,6 @@ module "snapshot_generator" {
   enable_alb_alarm = false
 
   max_capacity = 15
+
+  scale_down_period = 1800
 }
