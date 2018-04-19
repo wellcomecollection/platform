@@ -1,8 +1,10 @@
 package uk.ac.wellcome.platform.snapshot_generator.services
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
-import akka.stream.ActorMaterializer
+import akka.stream.alpakka.s3.S3Exception
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
@@ -11,19 +13,13 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import javax.inject.Inject
+import org.elasticsearch.client.ResponseException
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{
-  DisplayWorkToJsonStringFlow,
-  IdentifiedWorkToVisibleDisplayWork,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
@@ -39,10 +35,13 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 @Flag("es.type") esType: String,
                                 objectMapper: ObjectMapper)
     extends Logging {
-
+  val decider: Supervision.Decider = {
+    case _: S3Exception => Supervision.Stop
+    case _: ResponseException => Supervision.Stop
+    case _: Exception => Supervision.Resume
+  }
   implicit val system: ActorSystem = actorSystem
-  implicit val materializer: ActorMaterializer =
-    ActorMaterializer()(actorSystem)
+  implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
 
   def generateSnapshot(
     snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {

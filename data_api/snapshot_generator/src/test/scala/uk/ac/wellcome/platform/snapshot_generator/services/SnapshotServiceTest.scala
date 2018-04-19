@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator.services
 import java.io.File
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.S3Exception
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
@@ -16,17 +15,10 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  Period,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.IdentifierSchemes.sierraSystemNumber
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
@@ -53,7 +45,6 @@ class SnapshotServiceTest
 
   private def withSnapshotService[R](
     actorSystem: ActorSystem,
-    materializer: ActorMaterializer,
     s3AkkaClient: S3Client,
     indexNameV1: String,
     indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
@@ -81,7 +72,6 @@ class SnapshotServiceTest
               withLocalS3Bucket { bucket =>
                 withSnapshotService(
                   actorSystem,
-                  actorMaterialiser,
                   s3Client,
                   indexNameV1,
                   indexNameV2) { snapshotService =>
@@ -251,6 +241,53 @@ class SnapshotServiceTest
 
           val contents = readGzipFile(downloadFile.getPath)
           val expectedContents = works
+            .map {
+              DisplayWorkV1(_, includes = AllWorksIncludes())
+            }
+            .map {
+              mapper.writeValueAsString(_)
+            }
+            .mkString("\n") + "\n"
+
+          contents shouldBe expectedContents
+
+          result shouldBe CompletedSnapshotJob(
+            snapshotJob = snapshotJob,
+            targetLocation =
+              s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
+          )
+        }
+    }
+  }
+
+  it("succeeds a snapshot generation even if one of the items in the index is invalid") {
+    withFixtures {
+      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
+        val validWorks = createWorks(count = 3)
+
+        val invalidWork = IdentifiedWork(canonicalId = "invalidwork", sourceIdentifier = SourceIdentifier(identifierScheme = sierraSystemNumber, ontologyType = "Work",value = "123"), version = 1 , title = None, visible = true)
+
+        val works = validWorks :+ invalidWork
+        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
+
+        val publicObjectKey = "target.txt.gz"
+        val snapshotJob = SnapshotJob(
+          publicBucketName = publicBucket.name,
+          publicObjectKey = publicObjectKey,
+          apiVersion = ApiVersions.v1
+        )
+
+        val future = snapshotService.generateSnapshot(snapshotJob)
+
+        whenReady(future) { result =>
+          val downloadFile =
+            File.createTempFile("snapshotServiceTest", ".txt.gz")
+          s3Client.getObject(
+            new GetObjectRequest(publicBucket.name, publicObjectKey),
+            downloadFile)
+
+          val contents = readGzipFile(downloadFile.getPath)
+          val expectedContents = validWorks
             .map {
               DisplayWorkV1(_, includes = AllWorksIncludes())
             }
