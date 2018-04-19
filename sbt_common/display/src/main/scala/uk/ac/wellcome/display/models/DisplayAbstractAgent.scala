@@ -42,14 +42,14 @@ case object DisplayAbstractAgent {
           id = Some(id),
           identifiers = Some(identifiers.map(DisplayIdentifier(_))),
           label = p.label,
-          prefix = p.prefix,
+          prefixes = p.prefixes,
           numeration = p.numeration)
       case Unidentifiable(p: Person) =>
         DisplayPerson(
           id = None,
           identifiers = None,
           label = p.label,
-          prefix = p.prefix,
+          prefixes = p.prefixes,
           numeration = p.numeration)
       case Identified(o: Organisation, id, identifiers) =>
         DisplayOrganisation(

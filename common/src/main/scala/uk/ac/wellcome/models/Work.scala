@@ -15,7 +15,10 @@ trait Work extends Versioned {
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[AbstractConcept]
-  val contributors: List[IdentityState[Contributor]]
+
+  // Yes, this is kind of rubbish.  I haven't found another way to satisfy the compiler!
+  val contributors: List[Any]
+
   val genres: List[AbstractConcept]
   val thumbnail: Option[Location]
   val publishers: List[IdentityState[AbstractAgent]]
@@ -38,7 +41,7 @@ case class UnidentifiedWork(
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
   subjects: List[AbstractConcept] = Nil,
-  contributors: List[IdentityState[Contributor]] = Nil,
+  contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = Nil,
   genres: List[AbstractConcept] = Nil,
   thumbnail: Option[Location] = None,
   items: List[UnidentifiedItem] = Nil,
@@ -63,7 +66,7 @@ case class IdentifiedWork(canonicalId: String,
                           lettering: Option[String] = None,
                           createdDate: Option[Period] = None,
                           subjects: List[AbstractConcept] = Nil,
-                          contributors: List[IdentityState[Contributor]] = Nil,
+                          contributors: List[Contributor[Displayable[AbstractAgent]]] = Nil,
                           genres: List[AbstractConcept] = Nil,
                           thumbnail: Option[Location] = None,
                           items: List[IdentifiedItem] = Nil,

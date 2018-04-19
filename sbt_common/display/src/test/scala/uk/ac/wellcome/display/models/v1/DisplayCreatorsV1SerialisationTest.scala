@@ -25,7 +25,7 @@ class DisplayCreatorsV1SerialisationTest
     val agent2 = Person(
       label = "Havelock Vetinari",
       prefixes = Some(List("Lord Patrician")),
-      numeration = Some("I"))
+      numeration = Some("I")
     )
 
     val work = IdentifiedWork(
