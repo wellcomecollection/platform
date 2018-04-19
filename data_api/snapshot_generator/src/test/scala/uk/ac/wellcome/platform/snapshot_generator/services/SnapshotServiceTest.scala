@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.snapshot_generator.services
 
 import java.io.File
+import java.lang.RuntimeException
 
 import akka.actor.ActorSystem
 import akka.stream.alpakka.s3.S3Exception
@@ -246,7 +247,7 @@ class SnapshotServiceTest
     }
   }
 
-  ignore("succeeds a snapshot generation even if one of the items in the index is invalid") {
+  it("fails a snapshot generation even if one of the items in the index is invalid") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val validWorks = createWorks(count = 3)
@@ -265,30 +266,8 @@ class SnapshotServiceTest
 
         val future = snapshotService.generateSnapshot(snapshotJob)
 
-        whenReady(future) { result =>
-          val downloadFile =
-            File.createTempFile("snapshotServiceTest", ".txt.gz")
-          s3Client.getObject(
-            new GetObjectRequest(publicBucket.name, publicObjectKey),
-            downloadFile)
-
-          val contents = readGzipFile(downloadFile.getPath)
-          val expectedContents = validWorks
-            .map {
-              DisplayWorkV1(_, includes = AllWorksIncludes())
-            }
-            .map {
-              mapper.writeValueAsString(_)
-            }
-            .mkString("\n") + "\n"
-
-          contents shouldBe expectedContents
-
-          result shouldBe CompletedSnapshotJob(
-            snapshotJob = snapshotJob,
-            targetLocation =
-              s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
-          )
+        whenReady(future.failed) { ex =>
+          ex shouldBe a[RuntimeException]
         }
     }
   }
