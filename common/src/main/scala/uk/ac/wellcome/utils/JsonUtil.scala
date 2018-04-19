@@ -16,21 +16,28 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import scala.util.Try
 
 trait URIInstances {
-   implicit final val decodeURI: Decoder[URI] =
+  implicit final val decodeURI: Decoder[URI] =
     Decoder.instance { c =>
       c.as[String] match {
-        case Right(s) => try Right(new URI(s)) catch {
-          case _: URISyntaxException=> Left(DecodingFailure("URI", c.history))
-        }
+        case Right(s) =>
+          try Right(new URI(s))
+          catch {
+            case _: URISyntaxException =>
+              Left(DecodingFailure("URI", c.history))
+          }
         case l @ Left(_) => l.asInstanceOf[Decoder.Result[URI]]
       }
     }
 
-  implicit final val encodeURI: Encoder[URI] = Encoder.instance(uri => Json.fromString(uri.toString))
+  implicit final val encodeURI: Encoder[URI] =
+    Encoder.instance(uri => Json.fromString(uri.toString))
 }
 
-object JsonUtil extends AutoDerivation with TimeInstances with URIInstances with Logging {
-
+object JsonUtil
+    extends AutoDerivation
+    with TimeInstances
+    with URIInstances
+    with Logging {
 
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults

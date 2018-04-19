@@ -20,7 +20,7 @@ case class HybridRecord(
     with Id
 
 class VersionedHybridStore[T <: Id] @Inject()(
-                                             s3Config: S3Config,
+  s3Config: S3Config,
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
@@ -116,11 +116,13 @@ class VersionedHybridStore[T <: Id] @Inject()(
 
     dynamoRecord.flatMap {
       case Some(hybridRecord) => {
-        sourcedObjectStore.get(
-          S3Uri(s3Config.bucketName, hybridRecord.s3key)
-        ).map { s3Record =>
-          Some(VersionedHybridObject(hybridRecord, s3Record))
-        }
+        sourcedObjectStore
+          .get(
+            S3Uri(s3Config.bucketName, hybridRecord.s3key)
+          )
+          .map { s3Record =>
+            Some(VersionedHybridObject(hybridRecord, s3Record))
+          }
       }
       case None => Future.successful(None)
     }

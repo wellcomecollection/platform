@@ -143,18 +143,20 @@ class S3ObjectStoreTest
         }
       )
 
-      whenReady(objectStore.get(S3Uri(bucket.name,"not/a/real/object")).failed) { exception =>
-        exception shouldBe a[AmazonS3Exception]
-        exception
-          .asInstanceOf[AmazonS3Exception]
-          .getErrorCode shouldBe "NoSuchKey"
+      whenReady(
+        objectStore.get(S3Uri(bucket.name, "not/a/real/object")).failed) {
+        exception =>
+          exception shouldBe a[AmazonS3Exception]
+          exception
+            .asInstanceOf[AmazonS3Exception]
+            .getErrorCode shouldBe "NoSuchKey"
 
       }
     }
   }
 
   it("throws an exception when retrieving from an invalid scheme") {
-     withLocalS3Bucket { bucket =>
+    withLocalS3Bucket { bucket =>
       val objectStore = new S3ObjectStore(
         s3Client,
         S3Config(bucketName = bucket.name),
@@ -163,8 +165,9 @@ class S3ObjectStoreTest
         }
       )
 
-      whenReady(objectStore.get(new URI("http://www.example.com")).failed) { exception =>
-        exception shouldBe a[RuntimeException]
+      whenReady(objectStore.get(new URI("http://www.example.com")).failed) {
+        exception =>
+          exception shouldBe a[RuntimeException]
       }
     }
   }

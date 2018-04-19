@@ -69,13 +69,17 @@ class S3ObjectStore[T] @Inject()(
     uri match {
       case S3Uri(bucket, key) => {
 
-        if(bucket != s3Config.bucketName) {
-          debug(s"Bucket name in URI ($bucket) does not match configured bucket (${s3Config.bucketName})")
+        if (bucket != s3Config.bucketName) {
+          debug(
+            s"Bucket name in URI ($bucket) does not match configured bucket (${s3Config.bucketName})")
         }
 
         S3ObjectStore.get[T](s3Client, bucket)(key)
       }
-      case _ => Future.failed(new RuntimeException(s"Invalid URI scheme when trying to get from s3 $uri"))
+      case _ =>
+        Future.failed(
+          new RuntimeException(
+            s"Invalid URI scheme when trying to get from s3 $uri"))
     }
   }
 }
