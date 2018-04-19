@@ -13,7 +13,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class SnapshotGeneratorWorkerService @Inject()(
-                                                convertorService: SnapshotService,
+                                                snapshotService: SnapshotService,
                                                 reader: SQSReader,
                                                 snsWriter: SNSWriter,
                                                 system: ActorSystem,
@@ -23,7 +23,7 @@ class SnapshotGeneratorWorkerService @Inject()(
   override def processMessage(message: SQSMessage): Future[Unit] =
     for {
       snapshotJob <- Future.fromTry(fromJson[SnapshotJob](message.body))
-      completedSnapshotJob <- convertorService.generateSnapshot(
+      completedSnapshotJob <- snapshotService.generateSnapshot(
         snapshotJob = snapshotJob)
       message <- Future.fromTry(toJson(completedSnapshotJob))
       _ <- snsWriter.writeMessage(

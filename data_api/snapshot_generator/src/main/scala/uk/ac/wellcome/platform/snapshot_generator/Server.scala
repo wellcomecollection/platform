@@ -20,7 +20,7 @@ class Server extends HttpServer {
   flag[String](name = "es.type", default = "item", help = "ES document type")
 
   override val name =
-    "uk.ac.wellcome.platform.snapshot_convertor SnapshotGenerator"
+    "uk.ac.wellcome.platform.snapshot_generator SnapshotGenerator"
 
   override val modules = Seq(
     AmazonCloudWatchModule,

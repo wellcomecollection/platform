@@ -150,7 +150,7 @@ class SnapshotServiceTest
 
           whenReady(future) { result =>
             val downloadFile =
-              File.createTempFile("convertorServiceTest", ".txt.gz")
+              File.createTempFile("snapshotServiceTest", ".txt.gz")
             s3Client.getObject(
               new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
@@ -225,7 +225,7 @@ class SnapshotServiceTest
 
           whenReady(future) { result =>
             val downloadFile =
-              File.createTempFile("convertorServiceTest", ".txt.gz")
+              File.createTempFile("snapshotServiceTest", ".txt.gz")
             s3Client.getObject(
               new GetObjectRequest(publicBucket.name, publicObjectKey),
               downloadFile)
