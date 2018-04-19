@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = data_api
 
-SBT_APPS    = snapshot_convertor
+SBT_APPS    = snapshot_generator
 ECS_TASKS   = elasticdump
 LAMBDAS     = snapshot_scheduler
 
