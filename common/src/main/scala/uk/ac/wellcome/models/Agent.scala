@@ -5,14 +5,18 @@ sealed trait AbstractAgent {
 }
 
 case class Agent(
-  label: String
+  label: String,
+  identifiers: List[SourceIdentifier] = List()
 ) extends AbstractAgent
 
 case class Organisation(
-  label: String
+  label: String,
+  identifiers: List[SourceIdentifier] = List()
 ) extends AbstractAgent
 
-case class Person(label: String,
-                  prefix: Option[String] = None,
-                  numeration: Option[String] = None)
-    extends AbstractAgent
+case class Person(
+  label: String,
+  prefixes: Option[String] = None,
+  numeration: Option[String] = None,
+  identifiers: List[SourceIdentifier] = List()
+) extends AbstractAgent
