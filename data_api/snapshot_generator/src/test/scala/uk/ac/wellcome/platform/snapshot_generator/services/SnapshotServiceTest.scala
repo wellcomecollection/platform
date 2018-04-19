@@ -9,6 +9,7 @@ import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
@@ -43,9 +44,9 @@ class SnapshotServiceTest
   val itemType = "work"
 
   private def withSnapshotService[R](
-    actorSystem: ActorSystem,
-    materializer: ActorMaterializer,
-    s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
+                                      actorSystem: ActorSystem,
+                                      materializer: ActorMaterializer,
+                                      s3AkkaClient: S3Client, indexNameV1: String, indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
     val snapshotService = new SnapshotService(
       actorSystem = actorSystem,
       elasticClient = elasticClient,
@@ -61,23 +62,24 @@ class SnapshotServiceTest
   }
 
   def withFixtures[R](
-                    testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
+                       testWith: TestWith[(SnapshotService, String, String, Bucket), R]) =
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withLocalS3Bucket { bucket =>
-              withSnapshotService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { snapshotService => {
-                testWith((snapshotService, indexNameV1, indexNameV2, bucket))
-              }
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+              withLocalS3Bucket { bucket =>
+                withSnapshotService(actorSystem, actorMaterialiser, s3Client, indexNameV1, indexNameV2) { snapshotService => {
+                  testWith((snapshotService, indexNameV1, indexNameV2, bucket))
+                }
+                }
               }
             }
-          }
           }
         }
       }
     }
+
 
   it("completes a V1 snapshot generation successfully") {
     withFixtures {
@@ -251,7 +253,7 @@ class SnapshotServiceTest
 
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
-      case (snapshotService: SnapshotService,indexNameV1,_, publicBucket) =>
+      case (snapshotService: SnapshotService,indexNameV1,_, _) =>
         val works = createWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
@@ -273,6 +275,35 @@ class SnapshotServiceTest
   }
 
   it("returns a failed future if it fails reading from elasticsearch") {
+    withActorSystem { actorSystem =>
+      withMaterializer(actorSystem) { actorMaterialiser =>
+        withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
+              withLocalS3Bucket { bucket =>
+                val brokenSnapshotService = new SnapshotService(
+                  actorSystem = actorSystem,
+                  elasticClient = elasticClient,
+                  akkaS3Client = s3Client,
+                  s3Endpoint = localS3EndpointUrl,
+                  esIndexV1 = "wrong-index",
+                  esIndexV2 = "wrong-index",
+                  esType = itemType,
+                  objectMapper = mapper
+                )
+                val snapshotJob = SnapshotJob(
+                  publicBucketName = bucket.name,
+                  publicObjectKey = "target.json.gz",
+                  apiVersion = ApiVersions.v1
+                )
 
-  }
+                val future = brokenSnapshotService.generateSnapshot(snapshotJob)
+
+                whenReady(future.failed) { result =>
+                  result shouldBe a[ResponseException]
+                }
+                }
+              }
+        }
+      }
+    }
+
 }
