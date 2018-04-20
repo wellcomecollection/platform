@@ -216,9 +216,9 @@ class MiroTransformableTransformerTest
     )
 
     work.title shouldBe Some("A café for cats")
-
-    // TODO: Replace this test with a check on "creators"
-    // work.creators shouldBe List(Unidentifiable(Agent("Gyokushō, a cät Ôwnêr")))
+    work.contributors shouldBe List(
+      Contributor(agent = Unidentifiable(Agent("Gyokushō, a cät Ôwnêr")))
+    )
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
