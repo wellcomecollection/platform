@@ -6,9 +6,11 @@
 #
 attrs==17.4.0             # via pytest
 coverage==4.5.1
+mock==2.0.0
 more-itertools==4.1.0     # via pytest
+pbr==4.0.2                # via mock
 pluggy==0.6.0             # via pytest
 py==1.5.3                 # via pytest
 pytest==3.5.0
 pyyaml==3.12
-six==1.11.0               # via more-itertools, pytest
+six==1.11.0               # via mock, more-itertools, pytest
