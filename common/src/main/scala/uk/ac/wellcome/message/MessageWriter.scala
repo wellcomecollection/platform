@@ -17,7 +17,7 @@ import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.sns.SNSWriter
 
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{blocking, Future}
 
 class MessageWriter[T] @Inject()(
   private val sns: SNSWriter,
@@ -25,7 +25,8 @@ class MessageWriter[T] @Inject()(
   private val s3: S3ObjectStore[T]
 ) extends Logging {
 
-  def write(message: T, subject: String)(implicit encoder: Encoder[T]): Future[Unit] = {
+  def write(message: T, subject: String)(
+    implicit encoder: Encoder[T]): Future[Unit] = {
 
     val bucket = s3Config.bucketName
 

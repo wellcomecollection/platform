@@ -19,9 +19,10 @@ import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil._
 
 abstract class MessageWorker[T](sqsReader: SQSReader,
-                         actorSystem: ActorSystem,
-                         metricsSender: MetricsSender,
-                         s3: AmazonS3) extends Logging {
+                                actorSystem: ActorSystem,
+                                metricsSender: MetricsSender,
+                                s3: AmazonS3)
+    extends Logging {
 
   info(s"Starting SQS worker=[$workerName]")
 
@@ -42,7 +43,9 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
         message <- loadMessageContent(pointer)
         _ <- Future.successful { debug(s"Processing message: $message") }
         metricName = s"${workerName}_ProcessMessage"
-        _ <- metricsSender.timeAndCount(metricName, () => processMessage(message))
+        _ <- metricsSender.timeAndCount(
+          metricName,
+          () => processMessage(message))
       } yield ()
     } recover {
       case exception: Throwable => {

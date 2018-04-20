@@ -23,7 +23,7 @@ class MessageWriterTest
     with IntegrationPatience
     with Inside {
 
-  case class ExampleObject(name:String)
+  case class ExampleObject(name: String)
 
   it(
     "sends a message and returns a publish attempt with the id of the request") {
@@ -39,8 +39,12 @@ class MessageWriterTest
             override def generate(obj: ExampleObject): String = "/"
           }
 
-        val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
-        val messages = new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
+        val s3ObjectStore = new S3ObjectStore[ExampleObject](
+          s3Client,
+          s3Config,
+          keyPrefixGenerator)
+        val messages =
+          new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 
         val message = ExampleObject("Some value")
         val subject = "sns-writer-test-subject"
@@ -59,14 +63,15 @@ class MessageWriterTest
               bucketName shouldBe bucket.name
           }
 
-          getContentFromS3(bucket).map(fromJson[ExampleObject]).map(_.get) should contain(message)
+          getContentFromS3(bucket)
+            .map(fromJson[ExampleObject])
+            .map(_.get) should contain(message)
         }
       }
     }
   }
 
-  it(
-    "returns a failed future if it fails to publish the message pointer") {
+  it("returns a failed future if it fails to publish the message pointer") {
     withLocalS3Bucket { bucket =>
       val s3Config = S3Config(bucketName = bucket.name)
       val snsConfig = SNSConfig(topicArn = "invalid-topic")
@@ -77,8 +82,12 @@ class MessageWriterTest
           override def generate(obj: ExampleObject): String = "/"
         }
 
-      val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
-      val messages = new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
+      val s3ObjectStore = new S3ObjectStore[ExampleObject](
+        s3Client,
+        s3Config,
+        keyPrefixGenerator)
+      val messages =
+        new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 
       val message = ExampleObject("Some value")
 
@@ -101,8 +110,12 @@ class MessageWriterTest
           override def generate(obj: ExampleObject): String = "/"
         }
 
-      val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
-      val messages = new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
+      val s3ObjectStore = new S3ObjectStore[ExampleObject](
+        s3Client,
+        s3Config,
+        keyPrefixGenerator)
+      val messages =
+        new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 
       val message = ExampleObject("Some value")
 
@@ -125,8 +138,12 @@ class MessageWriterTest
           override def generate(obj: ExampleObject): String = "/"
         }
 
-      val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
-      val messages = new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
+      val s3ObjectStore = new S3ObjectStore[ExampleObject](
+        s3Client,
+        s3Config,
+        keyPrefixGenerator)
+      val messages =
+        new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 
       val message = ExampleObject("Some value")
 

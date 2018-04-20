@@ -23,7 +23,7 @@ import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessageWorkerTest
-  extends FunSpec
+    extends FunSpec
     with MockitoSugar
     with Eventually
     with ExtendedPatience
@@ -31,7 +31,7 @@ class MessageWorkerTest
     with SQS
     with S3 {
 
-  case class ExampleObject(name:String)
+  case class ExampleObject(name: String)
 
   def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
     val metricsSender: MetricsSender = mock[MetricsSender]
@@ -46,16 +46,19 @@ class MessageWorkerTest
     testWith(metricsSender)
   }
 
-  def withMessageWorker[R](actors: ActorSystem,
-                           queue: Queue,
-                           metrics: MetricsSender,
-                           bucket: S3.Bucket)(testWith: TestWith[MessageWorker[ExampleObject], R])(implicit decoderExampleObject: Decoder[ExampleObject]) = {
+  def withMessageWorker[R](
+    actors: ActorSystem,
+    queue: Queue,
+    metrics: MetricsSender,
+    bucket: S3.Bucket)(testWith: TestWith[MessageWorker[ExampleObject], R])(
+    implicit decoderExampleObject: Decoder[ExampleObject]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =
       new MessageWorker[ExampleObject](sqsReader, actors, metrics, s3Client) {
 
-        override implicit val decoder:Decoder[ExampleObject] = decoderExampleObject
+        override implicit val decoder: Decoder[ExampleObject] =
+          decoderExampleObject
 
         override def processMessage(message: ExampleObject) =
           Future.successful(())
@@ -130,7 +133,9 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics)
-            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
+            .incrementCount(
+              matches(".*_MessageProcessingFailure"),
+              anyDouble())
         }
     }
   }
@@ -161,7 +166,9 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics)
-            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
+            .incrementCount(
+              matches(".*_MessageProcessingFailure"),
+              anyDouble())
         }
     }
   }
@@ -173,7 +180,9 @@ class MessageWorkerTest
 
         eventually {
           verify(metrics, never())
-            .incrementCount(matches(".*_MessageProcessingFailure"), anyDouble())
+            .incrementCount(
+              matches(".*_MessageProcessingFailure"),
+              anyDouble())
         }
     }
   }
