@@ -8,8 +8,8 @@ trait SierraContributors extends MarcUtils {
   /* Populate wwork:contributors. Rules:
    *
    * For bib records with MARC tag 100 or 700, create a "Person" with:
-   *  - Subfield $b as "numeration" (NR)
-   *  - Subfield $c as "prefix", joined with spaces into a single string (R)
+   *  - Subfield $b as "numeration"
+   *  - Subfield $c as "prefix", joined with spaces into a single string
    *
    * TODO: Check this is the correct way to construct the prefix.
    *
@@ -43,17 +43,25 @@ trait SierraContributors extends MarcUtils {
     val persons = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
-      marcSubfieldTags = List("a", "c")
+      marcSubfieldTags = List("a", "b", "c")
     )
 
     persons.map { subfields =>
 
-      // Extract the label from subfield $a
+      // Extract the label from subfield $a.  This is a non-repeatable
+      // field in the MARC spec, so collectFirst is okay.
       val label = subfields.collectFirst {
         case MarcSubfield("a", content) => content
       }.get
 
-      // Extract the prefix from subfield $c
+      // Extract the numeration from subfield $b.  This is also non-repeatable
+      // in the MARC spec.
+      val numeration = subfields.collectFirst {
+        case MarcSubfield("b", content) => content
+      }
+
+      // Extract the prefix from subfield $c.  This is a repeatable field, so
+      // we take all instances and join them.
       val prefixes = subfields.collect {
         case MarcSubfield("c", content) => content
       }
@@ -61,7 +69,11 @@ trait SierraContributors extends MarcUtils {
 
       Contributor[MaybeDisplayable[Person]](
         agent = Unidentifiable(
-          Person(label = label, prefix = prefixString)
+          Person(
+            label = label,
+            prefix = prefixString,
+            numeration = numeration
+          )
         )
       )
     }
