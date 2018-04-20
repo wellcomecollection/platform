@@ -3,20 +3,14 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
+import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
@@ -43,13 +37,17 @@ class SnapshotGeneratorFeatureTest
 
   val itemType = "work"
   def withFixtures[R](
-    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
+                       testWith: TestWith[(EmbeddedHttpServer, Queue, Topic, String, String, Bucket), R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              testWith((queue, topic, indexNameV1, indexNameV2, bucket))
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+              withServer(flags) { server =>
+                testWith((server, queue, topic, indexNameV1, indexNameV2, bucket))
+              }
             }
           }
         }
@@ -58,11 +56,10 @@ class SnapshotGeneratorFeatureTest
 
   it("completes a snapshot generation successfully") {
     withFixtures {
-      case (queue, topic, indexNameV1, indexNameV2, publicBucket) =>
+      case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
         val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
           publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
 
-        withServer(flags) { _ =>
           // Create a collection of works.  These three differ by version,
           // if not anything more interesting!
           val works = (1 to 3).map { version =>
@@ -142,7 +139,6 @@ class SnapshotGeneratorFeatureTest
               fromJson[CompletedSnapshotJob](receivedMessages.head.message).get
             actualJob shouldBe expectedJob
           }
-        }
     }
 
   }
