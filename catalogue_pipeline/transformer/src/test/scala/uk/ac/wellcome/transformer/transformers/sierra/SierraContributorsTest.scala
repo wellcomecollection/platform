@@ -291,10 +291,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
-  }
 
-  describe("identifiers") {
-    it("gets identifier with inconsistent spacing from subfield $$0") {
+    it("gets an identifier with inconsistent spacing from subfield $$0") {
       val name = "Wanda the watercress"
       val lcshCodeCanonical = "lcsh2055034"
       val lcshCode1 = "lcsh 2055034"
@@ -346,6 +344,221 @@ class SierraContributorsTest extends FunSpec with Matchers {
             MarcSubfield(tag = "a", content = "Darren the Dill"),
             MarcSubfield(tag = "0", content = "lcsh9069541"),
             MarcSubfield(tag = "0", content = "lcsh3384149")
+          )
+        )
+      )
+
+      assertTransformFails(varFields = varFields)
+    }
+  }
+
+  describe("Organisation") {
+    it("gets the name from MARC tag 110 subfield $$a") {
+      val name = "Ona the orache"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name))
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Unidentifiable(Organisation(label = name)))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("gets the name from MARC tag 710 subfield $$a") {
+      val name = "Karl the kale"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "710",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name))
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Unidentifiable(Organisation(label = name)))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
+      val name1 = "Mary the mallow"
+      val name2 = "Mike the mashua"
+      val name3 = "Mickey the mozuku"
+
+      // The correct ordering is "everything from 110 first, then 710", and
+      // we deliberately pick an ordering that's different from that for
+      // the MARC fields, so we can check it really is applying this rule.
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "710",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name2))
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "110",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name1))
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "710",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(MarcSubfield(tag = "a", content = name3))
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Unidentifiable(Organisation(label = name1))),
+        Contributor(agent = Unidentifiable(Organisation(label = name2))),
+        Contributor(agent = Unidentifiable(Organisation(label = name3)))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("gets the roles from subfield $$e") {
+      val name = "Terry the turmeric"
+      val role1 = "dye"
+      val role2 = "colouring"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "e", content = role1),
+            MarcSubfield(tag = "e", content = role2)
+          )
+        )
+      )
+
+      val expectedContributors = List(
+        Contributor(
+          agent = Unidentifiable(Organisation(label = name)),
+          roles = List(ContributionRole(role1), ContributionRole(role2))
+        )
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("gets an identifier from subfield $$0") {
+      val name = "Gerry the Garlic"
+      val lcshCode = "lcsh7212"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = lcshCode)
+          )
+        )
+      )
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        ontologyType = "Organisation",
+        value = lcshCode
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Identifiable(
+          Organisation(label = name),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier)
+        ))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("gets an identifier with inconsistent spacing from subfield $$0") {
+      val name = "Charlie the chive"
+      val lcshCodeCanonical = "lcsh6791210"
+      val lcshCode1 = "lcsh 6791210"
+      val lcshCode2 = "  lcsh6791210 "
+      val lcshCode3 = " lc sh 6791210"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = lcshCode1),
+            MarcSubfield(tag = "0", content = lcshCode2),
+            MarcSubfield(tag = "0", content = lcshCode3)
+          )
+        )
+      )
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        ontologyType = "Organisation",
+        value = lcshCodeCanonical
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Identifiable(
+          Organisation(label = name),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier)
+        ))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
+
+    it("fails the transform if there are multiple distinct identifiers in subfield $$0") {
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Luke the lime"),
+            MarcSubfield(tag = "0", content = "lcsh3349285"),
+            MarcSubfield(tag = "0", content = "lcsh9059917")
           )
         )
       )
