@@ -6,5 +6,5 @@ module "snapshot_generator_queue" {
   topic_names = ["${module.snapshot_scheduler.topic_name}"]
 
   alarm_topic_arn            = "${local.dlq_alarm_arn}"
-  visibility_timeout_seconds = 1800
+  visibility_timeout_seconds = 3600
 }
