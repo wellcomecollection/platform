@@ -47,12 +47,8 @@ trait SierraContributors extends MarcUtils {
     )
 
     persons.map { subfields =>
-
-      // Extract the label from subfield $a.  This is a non-repeatable
-      // field in the MARC spec, so collectFirst is okay.
-      val label = subfields.collectFirst {
-        case MarcSubfield("a", content) => content
-      }.get
+      val label = getLabel(subfields)
+      val roles = getContributionRoles(subfields)
 
       // Extract the numeration from subfield $b.  This is also non-repeatable
       // in the MARC spec.
@@ -67,8 +63,6 @@ trait SierraContributors extends MarcUtils {
       }
       val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-      val roles = getContributionRoles(subfields)
-
       Contributor[MaybeDisplayable[Person]](
         agent = Unidentifiable(
           Person(
@@ -82,9 +76,18 @@ trait SierraContributors extends MarcUtils {
     }
   }
 
-  private def getContributionRoles(subfields: List[MarcSubfield]): List[ContributionRole] =
+  private def getLabel(subfields: List[MarcSubfield]): String = {
+    // Extract the label from subfield $a.  This is a non-repeatable
+    // field in the MARC spec, so collectFirst is okay.
+    subfields.collectFirst {
+      case MarcSubfield("a", content) => content
+    }.get
+  }
+
+  private def getContributionRoles(subfields: List[MarcSubfield]): List[ContributionRole] = {
     // Extract the roles from subfield $e.  This is a repeatable field.
     subfields.collect {
       case MarcSubfield("e", content) => ContributionRole(content)
     }
+  }
 }
