@@ -43,7 +43,7 @@ trait SierraContributors extends MarcUtils {
     val persons = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
-      marcSubfieldTags = List("a")
+      marcSubfieldTags = List("a", "c")
     )
 
     persons.map { subfields =>
@@ -53,8 +53,16 @@ trait SierraContributors extends MarcUtils {
         case MarcSubfield("a", content) => content
       }.get
 
+      // Extract the prefix from subfield $c
+      val prefixes = subfields.collect {
+        case MarcSubfield("c", content) => content
+      }
+      val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
+
       Contributor[MaybeDisplayable[Person]](
-        agent = Unidentifiable(Person(label = label))
+        agent = Unidentifiable(
+          Person(label = label, prefix = prefixString)
+        )
       )
     }
   }

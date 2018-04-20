@@ -161,5 +161,36 @@ class SierraContributorsTest extends FunSpec with Matchers {
         )))
       )
     }
+
+    it("joins multiple instances of subfield $$c into a single prefix") {
+      val name = "Mick the Mallow"
+      val prefix1 = "Mx"
+      val prefix2 = "Mr"
+
+      val bibData = SierraBibData(
+        id = "4713698",
+        title = None,
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "100",
+            indicator1 = "",
+            indicator2 = "",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "c", content = prefix1),
+              MarcSubfield(tag = "c", content = prefix2)
+            )
+          ))
+      )
+
+      val contributors = transformer.getContributors(bibData)
+      contributors shouldBe List(
+        Contributor(agent = Unidentifiable(Person(
+          label = name,
+          prefix = Some(s"${prefix1} ${prefix2}")
+        )))
+      )
+    }
   }
 }
