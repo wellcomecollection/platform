@@ -291,7 +291,9 @@ class SierraContributorsTest extends FunSpec with Matchers {
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+  }
 
+  describe("identifiers") {
     it("gets identifier with inconsistent spacing from subfield $$0") {
       val name = "Wanda the watercress"
       val lcshCodeCanonical = "lcsh2055034"
@@ -332,6 +334,24 @@ class SierraContributorsTest extends FunSpec with Matchers {
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+
+    it("fails the transform if there are multiple distinct identifiers in subfield $$0") {
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Darren the Dill"),
+            MarcSubfield(tag = "0", content = "lcsh9069541"),
+            MarcSubfield(tag = "0", content = "lcsh3384149")
+          )
+        )
+      )
+
+      assertTransformFails(varFields = varFields)
+    }
   }
 
   private def transformAndCheckContributors(
@@ -340,5 +360,13 @@ class SierraContributorsTest extends FunSpec with Matchers {
   ) = {
     val bibData = SierraBibData(id = "1661847", title = None, varFields = varFields)
     transformer.getContributors(bibData) shouldBe expectedContributors
+  }
+
+  private def assertTransformFails(varFields: List[VarField]) = {
+    val bibData = SierraBibData(id = "1663540", title = None, varFields = varFields)
+
+    intercept[RuntimeException] {
+      transformer.getContributors(bibData)
+    }
   }
 }
