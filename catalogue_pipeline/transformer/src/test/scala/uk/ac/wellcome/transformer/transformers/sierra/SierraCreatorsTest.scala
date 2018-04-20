@@ -42,32 +42,6 @@ class SierraCreatorsTest extends FunSpec with Matchers {
         numeration = Some(numeration)))
   }
 
-  it("extracts multiple prefixes from marcTag 100 c") {
-    val name = "Samuel Vines"
-    val prefixes = List("Commander", "His Grace, The Duke of Ankh")
-
-    val prefixSubfields =
-      prefixes.map(prefix => MarcSubfield(tag = "c", content = prefix))
-
-    val subfields = prefixSubfields :+ MarcSubfield(tag = "a", content = name)
-    val bibData = SierraBibData(
-      id = "1234567",
-      title = None,
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
-          subfields = subfields))
-    )
-
-    val creators = transformer.getCreators(bibData)
-
-    creators should contain only Unidentifiable(
-      Person(label = name, prefix = Some(prefixes.mkString(" "))))
-  }
-
   it("extracts the creator identifier from marcTag 100 0") {
     val name = "Carrot Ironfoundersson"
     val code = "123456"
