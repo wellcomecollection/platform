@@ -11,16 +11,19 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.sqs.SQSReader
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.collection.JavaConversions._
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.actor.ActorSystem
 import io.circe.Decoder
 import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.sns.NotificationMessage
+
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.collection.JavaConversions._
 
 class MessageWorkerTest
     extends FunSpec
@@ -54,8 +57,17 @@ class MessageWorkerTest
     implicit decoderExampleObject: Decoder[ExampleObject]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
+    val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
+      new KeyPrefixGenerator[ExampleObject] {
+        override def generate(obj: ExampleObject): String = "/"
+      }
+
+    val s3Config = S3Config(bucketName = bucket.name)
+    val s3 = new S3ObjectStore(s3Client, s3Config, keyPrefixGenerator)
+
+    val messageReader = new MessageReader(s3)
     val testWorker =
-      new MessageWorker[ExampleObject](sqsReader, actors, metrics, s3Client) {
+      new MessageWorker[ExampleObject](sqsReader, messageReader, actors, metrics) {
 
         override implicit val decoder: Decoder[ExampleObject] =
           decoderExampleObject
@@ -90,9 +102,21 @@ class MessageWorkerTest
 
         val examplePointer = MessagePointer(S3Uri(bucket.name, key))
 
+        val exampleNotification = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "TopicArn",
+          Subject = "Subject",
+          Message = toJson(examplePointer).get,
+          Timestamp = "Timestamp",
+          SignatureVersion = "SignatureVersion",
+          Signature = "Signature",
+          SigningCertURL = "SigningCertURL",
+          UnsubscribeURL = "UnsubscribeURL"
+        )
+
         sqsClient.sendMessage(
           queue.url,
-          toJson(examplePointer).get
+          toJson(exampleNotification).get
         )
 
         eventually {
@@ -126,9 +150,21 @@ class MessageWorkerTest
 
         val examplePointer = MessagePointer(S3Uri(bucket.name, key))
 
+        val exampleNotification = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "TopicArn",
+          Subject = "Subject",
+          Message = toJson(examplePointer).get,
+          Timestamp = "Timestamp",
+          SignatureVersion = "SignatureVersion",
+          Signature = "Signature",
+          SigningCertURL = "SigningCertURL",
+          UnsubscribeURL = "UnsubscribeURL"
+        )
+
         sqsClient.sendMessage(
           queue.url,
-          toJson(examplePointer).get
+          toJson(exampleNotification).get
         )
 
         eventually {
@@ -159,9 +195,21 @@ class MessageWorkerTest
 
         val examplePointer = MessagePointer("http://www.example.com")
 
+        val exampleNotification = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "TopicArn",
+          Subject = "Subject",
+          Message = toJson(examplePointer).get,
+          Timestamp = "Timestamp",
+          SignatureVersion = "SignatureVersion",
+          Signature = "Signature",
+          SigningCertURL = "SigningCertURL",
+          UnsubscribeURL = "UnsubscribeURL"
+        )
+
         sqsClient.sendMessage(
           queue.url,
-          toJson(examplePointer).get
+          toJson(exampleNotification).get
         )
 
         eventually {

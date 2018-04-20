@@ -17,14 +17,14 @@ import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.sns.NotificationMessage
 
 abstract class MessageWorker[T](sqsReader: SQSReader,
-                                actorSystem: ActorSystem,
-                                metricsSender: MetricsSender,
-                                s3: AmazonS3)
-    extends Logging {
+                         messageReader: MessageReader[T],
+                         actorSystem: ActorSystem,
+                         metricsSender: MetricsSender) extends Logging {
 
-  info(s"Starting SQS worker=[$workerName]")
+  info(s"Starting message worker=[$workerName]")
 
   lazy val poll = 1 second
 
@@ -36,11 +36,10 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
 
   def processMessage(message: T): Future[Unit]
 
-  private def processMessages(): Future[Unit] = {
+  private def processMessages()(implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        pointer <- Future.fromTry(fromJson[MessagePointer](message.getBody))
-        message <- loadMessageContent(pointer)
+        message <- messageReader.process(message)
         _ <- Future.successful { debug(s"Processing message: $message") }
         metricName = s"${workerName}_ProcessMessage"
         _ <- metricsSender.timeAndCount(
@@ -54,12 +53,6 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
       }
     }
   }
-
-  private def loadMessageContent(pointer: MessagePointer): Future[T] =
-    pointer.src match {
-      case S3Uri(bucket, key) => S3ObjectStore.get[T](s3, bucket)(key)
-      case _ => Future.failed(new RuntimeException("Unsupported URI scheme"))
-    }
 
   def stop(): Boolean = actor.cancel()
 }
