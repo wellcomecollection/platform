@@ -32,7 +32,7 @@ cache:
     - reindexer/reindex_worker/target
     - common/target
 
-    - data_api/snapshot_convertor/target
+    - data_api/snapshot_generator/target
 
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
@@ -79,7 +79,7 @@ jobs:
 
     # Data API stack
     - env: TASK=snapshot_scheduler-test
-    - env: TASK=snapshot_convertor-test
+    - env: TASK=snapshot_generator-test
 
     # Reindexer stack
     - env: TASK=reindex_worker-test
