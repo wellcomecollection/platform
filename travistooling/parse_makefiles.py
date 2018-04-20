@@ -3,6 +3,8 @@
 import collections
 import os
 
+from travistooling.git_utils import ROOT
+
 Project = collections.namedtuple('Project', ['name', 'type', 'exclusive_path'])
 
 
