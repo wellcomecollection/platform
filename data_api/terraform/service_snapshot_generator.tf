@@ -50,5 +50,5 @@ module "snapshot_generator" {
 
   max_capacity = 2
 
-  scale_down_period_in_minutes = 60
+  scale_down_period_in_minutes = 30
 }
