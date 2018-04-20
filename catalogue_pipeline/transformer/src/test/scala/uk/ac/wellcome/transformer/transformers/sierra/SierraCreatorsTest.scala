@@ -11,27 +11,7 @@ import uk.ac.wellcome.transformer.source.{
 class SierraCreatorsTest extends FunSpec with Matchers {
 
   val transformer = new SierraCreators {}
-
-  it("extracts the creator name from marcTag 100 a") {
-    val name = "Carrot Ironfoundersson"
-
-    val bibData = SierraBibData(
-      id = "1234567",
-      title = None,
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
-          subfields = List(MarcSubfield(tag = "a", content = name))))
-    )
-
-    val creators = transformer.getCreators(bibData)
-
-    creators should contain only Unidentifiable(Person(label = name))
-  }
-
+  
   it("extracts the creator numeration and prefix if present from marcTag 100") {
     val name = "Havelock Vetinari"
     val prefix = "Lord Patrician"
