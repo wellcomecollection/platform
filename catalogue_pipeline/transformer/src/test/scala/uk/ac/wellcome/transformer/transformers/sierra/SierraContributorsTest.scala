@@ -36,7 +36,9 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val contributors = transformer.getContributors(bibData)
-      contributors shouldBe List(Unidentifiable(Person(label = name)))
+      contributors shouldBe List(
+        Contributor(agent = Unidentifiable(Person(label = name)))
+      )
     }
 
     it("gets the name from MARC tag 700 subfield $$a") {
@@ -55,7 +57,9 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val contributors = transformer.getContributors(bibData)
-      contributors shouldBe List(Unidentifiable(Person(label = name)))
+      contributors shouldBe List(
+        Contributor(agent = Unidentifiable(Person(label = name)))
+      )
     }
 
     it("gets the name from MARC tags 100 and 700 subfield $$a in the right order") {
@@ -96,8 +100,9 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
       val contributors = transformer.getContributors(bibData)
       contributors shouldBe List(
-        Unidentifiable(Person(label = name1)),
-        Unidentifiable(Person(label = name2))
+        Contributor(agent = Unidentifiable(Person(label = name1))),
+        Contributor(agent = Unidentifiable(Person(label = name2))),
+        Contributor(agent = Unidentifiable(Person(label = name3)))
       )
     }
   }
