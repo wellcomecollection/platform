@@ -66,7 +66,7 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
                |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
+                                works(0).contributors(0).agent,
                                 abstractAgent)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
@@ -86,7 +86,7 @@ class ApiV1WorksTestInvisible extends ApiWorksTestBase {
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
                |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
+                                works(1).contributors(0).agent,
                                 abstractAgent)} ],
                |     "subjects": [ ],
                |     "genres": [ ],

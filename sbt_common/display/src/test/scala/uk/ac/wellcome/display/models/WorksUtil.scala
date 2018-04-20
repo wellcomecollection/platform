@@ -105,7 +105,9 @@ trait WorksUtil {
       description = Some(description),
       lettering = Some(lettering),
       createdDate = Some(createdDate),
-      creators = List(Unidentifiable(creator)),
+      contributors = List(
+        Contributor(agent = Unidentifiable(creator))
+      ),
       items = items,
       visible = visible
     )

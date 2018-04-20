@@ -83,7 +83,7 @@ case class DisplayPerson(
   ) prefix: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
-    value = "The numerationof the person"
+    value = "The numeration of the person"
   ) numeration: Option[String] = None,
   @JsonProperty("type") ontologyType: String = "Person")
     extends DisplayAbstractAgent

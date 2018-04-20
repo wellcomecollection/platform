@@ -48,7 +48,16 @@ class DisplayWorkV2SerialisationTest
        | },
        | "lettering": "$lettering",
        | "createdDate": ${period(work.createdDate.get)},
-       | "contributors": [ ],
+       | "contributors": [
+       |   {
+       |     "agent": {
+       |       "label": "a person",
+       |       "type": "Agent"
+       |     },
+       |     "roles" : [ ],
+       |     "type" : "Contributor"
+       |   }
+       | ],
        | "subjects": [ ],
        | "genres": [ ],
        | "publishers": [ ],

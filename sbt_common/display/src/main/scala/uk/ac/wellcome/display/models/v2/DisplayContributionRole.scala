@@ -2,6 +2,7 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.models.ContributionRole
 
 @ApiModel(
   value = "ContributionRole",
@@ -13,3 +14,10 @@ case class DisplayContributionRole(
   ) label: String,
   @JsonProperty("type") ontologyType: String = "ContributionRole"
 )
+
+object DisplayContributionRole {
+  def apply(contributionRole: ContributionRole): DisplayContributionRole =
+    DisplayContributionRole(
+      label = contributionRole.label
+    )
+}

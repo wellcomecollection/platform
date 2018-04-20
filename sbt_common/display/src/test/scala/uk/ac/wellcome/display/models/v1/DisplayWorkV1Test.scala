@@ -134,16 +134,24 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     }
   }
 
-  it("parses a work with unidentifiable persons and organisations as creators") {
+  it("extracts creators from a Work with unidentified Contributors") {
     val work = IdentifiedWork(
       title = Some("Jumping over jackals in Japan"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
-      creators = List(
-        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
-        Unidentifiable(Organisation("Juniper Journals"))
+      contributors = List(
+        Contributor(
+          agent = Unidentifiable(
+            Person(label = "Esmerelda Weatherwax", prefix = Some("Witch"))
+          )
+        ),
+        Contributor(
+          agent = Unidentifiable(
+            Organisation("Juniper Journals")
+          )
+        )
       )
     )
 
@@ -162,7 +170,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   it(
-    "parses a work with a mixture of identifed or unidentifable persons and organisations as creators") {
+    "extracts creators from a Work with a mixture of identified/unidentified Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.libraryOfCongressNames,
@@ -174,12 +182,21 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       version = 1,
       identifiers = Nil,
       canonicalId = "j7tw9jv3",
-      creators = List(
-        Unidentifiable(Person("Esmerelda Weatherwax", prefix = Some("Witch"))),
-        Identified(
-          Organisation("Juniper Journals"),
-          canonicalId = canonicalId,
-          identifiers = List(sourceIdentifier))
+      contributors = List(
+        Contributor(
+          agent = Unidentifiable(
+            Person(
+              label = "Esmerelda Weatherwax",
+              prefix = Some("Witch")
+            ))
+        ),
+        Contributor(
+          agent = Identified(
+            Organisation(label = "Juniper Journals"),
+            identifiers = List(sourceIdentifier),
+            canonicalId = canonicalId
+          )
+        )
       )
     )
 

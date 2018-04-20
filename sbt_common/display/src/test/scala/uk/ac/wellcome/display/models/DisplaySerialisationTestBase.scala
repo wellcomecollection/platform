@@ -4,6 +4,7 @@ import io.circe.Json
 import io.circe.parser._
 import org.scalatest.Suite
 import uk.ac.wellcome.models._
+import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
@@ -141,5 +142,14 @@ trait DisplaySerialisationTestBase { this: Suite =>
     concepts
       .map { concept(_) }
       .mkString(",")
+
+  def contributor(c: Contributor[Displayable[AbstractAgent]]) =
+    s"""
+       |{
+       |  "agent": ${identifiedOrUnidentifiable(c.agent, abstractAgent)},
+       |  "roles": ${toJson(c.roles).get},
+       |  "type": "Contributor"
+       |}
+     """.stripMargin
 
 }

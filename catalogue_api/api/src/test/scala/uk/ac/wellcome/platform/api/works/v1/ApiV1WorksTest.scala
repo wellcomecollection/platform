@@ -37,7 +37,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
+                                works(0).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -57,7 +57,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
+                                works(1).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -77,7 +77,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
+                                works(2).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -126,7 +126,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  | "lettering": "$lettering",
                  | "createdDate": ${period(work.createdDate.get)},
                  | "creators": [ ${identifiedOrUnidentifiable(
-                                work.creators(0),
+                                work.contributors(0).agent,
                                 abstractAgent)} ],
                  | "subjects": [ ],
                  | "genres": [ ],
@@ -214,7 +214,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).creators(0),
+                                works(1).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -252,7 +252,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).creators(0),
+                                works(0).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -290,7 +290,7 @@ class ApiV1WorksTest extends ApiWorksTestBase {
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).creators(0),
+                                works(2).contributors(0).agent,
                                 abstractAgent)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
