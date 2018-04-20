@@ -193,7 +193,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
     }
 
-    it("gets the numeration from MARC tag 100 subfield $$b") {
+    it("gets the numeration from subfield $$b") {
       val name = "Leopold the Lettuce"
       val numeration = "LX"
 
@@ -219,6 +219,38 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(agent = Unidentifiable(
           Person(label = name, numeration = Some(numeration))
         ))
+      )
+    }
+
+    it("gets the roles from subfield $$e") {
+      val name = "Violet the Vanilla"
+      val role1 = "spice"
+      val role2 = "flavour"
+
+      val bibData = SierraBibData(
+        id = "1661847",
+        title = None,
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "100",
+            indicator1 = "",
+            indicator2 = "",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "e", content = role1),
+              MarcSubfield(tag = "e", content = role2)
+            )
+          )
+        )
+      )
+
+      val contributors = transformer.getContributors(bibData)
+      contributors shouldBe List(
+        Contributor(
+          agent = Unidentifiable(Person(label = name)),
+          roles = List(ContributionRole(role1), ContributionRole(role2))
+        )
       )
     }
   }

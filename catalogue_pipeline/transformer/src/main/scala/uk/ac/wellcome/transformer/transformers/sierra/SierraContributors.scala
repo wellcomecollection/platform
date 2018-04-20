@@ -43,7 +43,7 @@ trait SierraContributors extends MarcUtils {
     val persons = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
-      marcSubfieldTags = List("a", "b", "c")
+      marcSubfieldTags = List("a", "b", "c", "e")
     )
 
     persons.map { subfields =>
@@ -67,6 +67,11 @@ trait SierraContributors extends MarcUtils {
       }
       val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
+      // Extract the roles from subfield $e.  This is a repeatable field.
+      val roles = subfields.collect {
+        case MarcSubfield("e", content) => ContributionRole(content)
+      }
+
       Contributor[MaybeDisplayable[Person]](
         agent = Unidentifiable(
           Person(
@@ -74,7 +79,8 @@ trait SierraContributors extends MarcUtils {
             prefix = prefixString,
             numeration = numeration
           )
-        )
+        ),
+        roles = roles
       )
     }
   }
