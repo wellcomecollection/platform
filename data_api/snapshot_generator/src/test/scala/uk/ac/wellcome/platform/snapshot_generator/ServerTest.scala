@@ -20,7 +20,9 @@ class ServerTest
     with fixtures.Server {
   val itemType = "work"
   def withFixtures[R](
-                       testWith: TestWith[(EmbeddedHttpServer, Queue, Topic, String, String, Bucket), R]) =
+    testWith: TestWith[
+      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+      R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
@@ -29,7 +31,8 @@ class ServerTest
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
                 bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
               withServer(flags) { server =>
-                testWith((server, queue, topic, indexNameV1, indexNameV2, bucket))
+                testWith(
+                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
               }
             }
           }
@@ -38,11 +41,12 @@ class ServerTest
     }
 
   it("shows the healthcheck message") {
-    withFixtures { case (server, _, _, _, _, _) =>
-      server.httpGet(
-        path = "/management/healthcheck",
-        andExpect = Ok,
-        withJsonBody = """{"message": "ok"}""")
+    withFixtures {
+      case (server, _, _, _, _, _) =>
+        server.httpGet(
+          path = "/management/healthcheck",
+          andExpect = Ok,
+          withJsonBody = """{"message": "ok"}""")
     }
   }
 }
