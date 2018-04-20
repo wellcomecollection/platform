@@ -67,10 +67,7 @@ trait SierraContributors extends MarcUtils {
       }
       val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-      // Extract the roles from subfield $e.  This is a repeatable field.
-      val roles = subfields.collect {
-        case MarcSubfield("e", content) => ContributionRole(content)
-      }
+      val roles = getContributionRoles(subfields)
 
       Contributor[MaybeDisplayable[Person]](
         agent = Unidentifiable(
@@ -84,4 +81,10 @@ trait SierraContributors extends MarcUtils {
       )
     }
   }
+
+  private def getContributionRoles(subfields: List[MarcSubfield]): List[ContributionRole] =
+    // Extract the roles from subfield $e.  This is a repeatable field.
+    subfields.collect {
+      case MarcSubfield("e", content) => ContributionRole(content)
+    }
 }
