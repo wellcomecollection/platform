@@ -601,48 +601,46 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.get.get.language.get shouldBe expectedLanguage
   }
 
-  // @@AWLC This is commented out as creators are being replaced by
-  // contributors.  I'll replace this with a proper contributors change in
-  // a separate pull request.
-  //
-//   it("extracts creators if present") {
-//     val id = "8008008"
-//     val name = "Rincewind"
-//
-//     val data =
-//       s"""
-//          | {
-//          |   "id": "$id",
-//          |   "title": "English earwigs earn evidence of evil",
-//          |   "varFields": [
-//          |     {
-//          |       "fieldTag": "",
-//          |       "marcTag": "100",
-//          |       "ind1": " ",
-//          |       "ind2": " ",
-//          |       "subfields": [
-//          |         {
-//          |           "tag": "a",
-//          |           "content": "$name"
-//          |         }
-//          |       ]
-//          |     }
-//          |   ]
-//          | }
-//       """.stripMargin
-//
-//     val sierraTransformable = SierraTransformable(
-//       sourceId = id,
-//       maybeBibData =
-//         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-//
-//     val transformedSierraRecord =
-//       transformer.transform(sierraTransformable, version = 1)
-//     transformedSierraRecord.isSuccess shouldBe true
-//
-//     transformedSierraRecord.get.get.creators should contain only Unidentifiable(
-//       Person(label = name))
-//   }
+  it("extracts contributor information if present") {
+     val id = "8008008"
+     val name = "Rincewind"
+
+     val data =
+       s"""
+          | {
+          |   "id": "$id",
+          |   "title": "English earwigs earn evidence of evil",
+          |   "varFields": [
+          |     {
+          |       "fieldTag": "",
+          |       "marcTag": "100",
+          |       "ind1": " ",
+          |       "ind2": " ",
+          |       "subfields": [
+          |         {
+          |           "tag": "a",
+          |           "content": "$name"
+          |         }
+          |       ]
+          |     }
+          |   ]
+          | }
+       """.stripMargin
+
+     val sierraTransformable = SierraTransformable(
+       sourceId = id,
+       maybeBibData =
+         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+     val transformedSierraRecord =
+       transformer.transform(sierraTransformable, version = 1)
+     transformedSierraRecord.isSuccess shouldBe true
+
+     transformedSierraRecord.get.get.contributors shouldBe List(
+       Contributor[MaybeDisplayable[AbstractAgent]](
+         Unidentifiable(Person(label = name)))
+     )
+  }
 
   it("extracts dimensions if present") {
     val id = "9009009"
