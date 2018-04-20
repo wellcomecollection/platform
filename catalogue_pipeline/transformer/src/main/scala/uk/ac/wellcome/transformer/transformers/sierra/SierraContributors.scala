@@ -104,8 +104,13 @@ trait SierraContributors extends MarcUtils {
   private def identify[T](subfields: List[MarcSubfield],
                           agent: T,
                           ontologyType: String): MaybeDisplayable[T] = {
+
+    // We take the contents of subfield $0.  They may contain inconsistent spacing, such
+    // as " nr 82270463" vs "nr 82270463", which all refer to the same identifier.
+    //
+    // For consistency, we remove all whitespace before continuing.
     val codes = subfields.collect {
-      case MarcSubfield("0", content) => content
+      case MarcSubfield("0", content) => content.replaceAll("\\s", "")
     }
 
     codes.distinct match {

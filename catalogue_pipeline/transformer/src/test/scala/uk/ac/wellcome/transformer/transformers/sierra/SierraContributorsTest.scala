@@ -291,6 +291,47 @@ class SierraContributorsTest extends FunSpec with Matchers {
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+
+    it("gets identifier with inconsistent spacing from subfield $$0") {
+      val name = "Wanda the watercress"
+      val lcshCodeCanonical = "lcsh2055034"
+      val lcshCode1 = "lcsh 2055034"
+      val lcshCode2 = "  lcsh2055034 "
+      val lcshCode3 = " lc sh 2055034"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = lcshCode1),
+            MarcSubfield(tag = "0", content = lcshCode2),
+            MarcSubfield(tag = "0", content = lcshCode3)
+          )
+        )
+      )
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        ontologyType = "Person",
+        value = lcshCodeCanonical
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Identifiable(
+          Person(label = name),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier)
+        ))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
   }
 
   private def transformAndCheckContributors(
