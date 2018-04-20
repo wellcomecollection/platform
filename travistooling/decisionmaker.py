@@ -26,12 +26,7 @@ from travistooling.decisions import (
     UnrecognisedFile
 )
 from travistooling.git_utils import ROOT
-from travistooling.parse_makefiles import get_projects
-
-
-# Cache the Makefile information in a global variable, so we only have to
-# load it once.
-PROJECTS = list(get_projects(ROOT))
+from travistooling.parse_makefiles import PROJECTS
 
 
 def does_file_affect_build_task(path, task):

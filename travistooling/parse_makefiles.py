@@ -51,3 +51,8 @@ def _get_projects_from_makefile(root, path):
                 type=project_type,
                 exclusive_path=os.path.join(root, t)
             )
+
+
+# Cache the Makefile information in a global variable, so we only have to
+# load it once.
+PROJECTS = list(get_projects(ROOT))
