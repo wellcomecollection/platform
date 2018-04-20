@@ -19,7 +19,6 @@ trait SierraContributors extends MarcUtils {
    *  - Subfield $a is "label"
    *  - Subfield $0 is used to populate "identifiers".  The identifier scheme
    *    is lc-names.
-   *    TODO: Do we need to clean up these strings, e.g. remove spaces?
    *  - Subfield $e is used for the labels in "roles"
    *
    * Order by MARC tag (100, 110, 700, 710), then by order of appearance
