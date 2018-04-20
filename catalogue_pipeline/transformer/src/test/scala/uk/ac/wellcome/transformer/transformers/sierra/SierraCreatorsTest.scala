@@ -12,36 +12,6 @@ class SierraCreatorsTest extends FunSpec with Matchers {
 
   val transformer = new SierraCreators {}
 
-  it("extracts the creator identifier from marcTag 100 0") {
-    val name = "Carrot Ironfoundersson"
-    val code = "123456"
-
-    val bibData = SierraBibData(
-      id = "1234567",
-      title = None,
-      varFields = List(
-        VarField(
-          fieldTag = "p",
-          marcTag = "100",
-          indicator1 = "",
-          indicator2 = "",
-          subfields = List(
-            MarcSubfield(tag = "a", content = name),
-            MarcSubfield(tag = "0", content = code))))
-    )
-
-    val creators = transformer.getCreators(bibData)
-
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.libraryOfCongressNames,
-      "Person",
-      code)
-    creators should contain only Identifiable(
-      Person(label = name),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier))
-  }
-
   it(
     "extracts the creator identifier removing trailing and leading from marcTag 100 0") {
     val name = "Carrot Ironfoundersson"
