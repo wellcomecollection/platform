@@ -43,7 +43,7 @@ trait SierraContributors extends MarcUtils {
     val persons = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
-      marcSubfieldTags = List("a", "b", "c", "e")
+      marcSubfieldTags = List("a", "b", "c", "e", "0")
     )
 
     persons.map { subfields =>
@@ -63,14 +63,18 @@ trait SierraContributors extends MarcUtils {
       }
       val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-      Contributor[MaybeDisplayable[Person]](
-        agent = Unidentifiable(
-          Person(
-            label = label,
-            prefix = prefixString,
-            numeration = numeration
-          )
+      val agent = identify[Person](
+        subfields = subfields,
+        agent = Person(
+          label = label,
+          prefix = prefixString,
+          numeration = numeration
         ),
+        ontologyType = "Person"
+      )
+
+      Contributor[MaybeDisplayable[Person]](
+        agent = agent,
         roles = roles
       )
     }
@@ -88,6 +92,33 @@ trait SierraContributors extends MarcUtils {
     // Extract the roles from subfield $e.  This is a repeatable field.
     subfields.collect {
       case MarcSubfield("e", content) => ContributionRole(content)
+    }
+  }
+
+  private def identify[T](subfields: List[MarcSubfield],
+                          agent: T,
+                          ontologyType: String): MaybeDisplayable[T] = {
+    val codes = subfields.collect {
+      case MarcSubfield("0", content) => content
+    }
+
+    codes.distinct match {
+      case Nil => Unidentifiable(agent)
+      case Seq(code) => {
+        val sourceIdentifier = SourceIdentifier(
+          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          value = code,
+          ontologyType = ontologyType
+        )
+        Identifiable(
+          agent = agent,
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier)
+        )
+      }
+      case _ =>
+        throw new RuntimeException(
+          s"Multiple identifiers in subfield $$0: $codes")
     }
   }
 }
