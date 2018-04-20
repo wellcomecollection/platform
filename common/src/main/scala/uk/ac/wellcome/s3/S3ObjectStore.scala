@@ -6,7 +6,6 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder}
-import uk.ac.wellcome.s3.S3Uri
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.utils.JsonUtil
