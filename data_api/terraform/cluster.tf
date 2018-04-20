@@ -1,5 +1,5 @@
 module "data_api_cluster" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=sqs-autoscaling-ignore-missing-data"
   name   = "data-api"
 
   vpc_subnets = ["${module.vpc_data_api.subnets}"]
