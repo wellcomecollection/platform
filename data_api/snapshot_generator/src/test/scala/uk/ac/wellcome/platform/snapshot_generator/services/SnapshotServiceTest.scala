@@ -243,8 +243,7 @@ class SnapshotServiceTest
     }
   }
 
-  it(
-    "fails a snapshot generation if one of the items in the index is invalid") {
+  it("fails a snapshot generation if one of the items in the index is invalid") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val validWorks = createWorks(count = 3)
