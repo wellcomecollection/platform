@@ -13,6 +13,7 @@ import scala.util.{Failure, Success, Try}
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
+    with SierraContributors
     with SierraDescription
     with SierraPhysicalDescription
     with SierraWorkType
@@ -61,8 +62,7 @@ class SierraTransformableTransformer
               publicationDate = getPublicationDate(sierraBibData),
               placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
-              // TODO Replace this with a proper contributors transformation
-//              creators = getCreators(sierraBibData)
+              contributors = getContributors(sierraBibData),
               dimensions = getDimensions(sierraBibData)
             ))
         }
