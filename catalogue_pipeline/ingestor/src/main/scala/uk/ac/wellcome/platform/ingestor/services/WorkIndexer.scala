@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import java.util.concurrent.TimeoutException
 import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.Indexable
@@ -11,6 +12,7 @@ import com.twitter.inject.annotations.Flag
 import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -56,6 +58,10 @@ class WorkIndexer @Inject()(
               warn(
                 s"Trying to ingest work ${work.canonicalId} with older version: skipping.")
               ()
+            case e: TimeoutException =>
+              warn(
+                s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
+              throw new GracefulFailureException(e)
             case e: Throwable =>
               error(
                 s"Error indexing work ${work.canonicalId} into Elasticsearch",
