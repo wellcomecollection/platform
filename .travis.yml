@@ -80,7 +80,6 @@ jobs:
     # Data API stack
     - env: TASK=snapshot_scheduler-test
     - env: TASK=snapshot_convertor-test
-    - env: TASK=elasticdump-test
 
     # Reindexer stack
     - env: TASK=reindex_worker-test
