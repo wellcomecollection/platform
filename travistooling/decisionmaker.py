@@ -51,6 +51,7 @@ def does_file_affect_build_task(path, task):
         'LICENSE',
         '.travis.yml',
         'run_travis_task.py',
+        '.gitignore',
     ] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath()
 
