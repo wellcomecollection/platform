@@ -34,7 +34,7 @@ module "snapshot_generator" {
 
   env_vars_length = 12
 
-  memory = 2048
+  memory = 3072
   cpu    = 2048
 
   cluster_name = "${module.data_api_cluster.cluster_name}"
