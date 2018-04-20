@@ -33,7 +33,10 @@ trait SierraContributors extends MarcUtils {
    */
   def getContributors(
     bibData: SierraBibData): List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
-    getPersons(bibData, marcTag = "100") ++ getPersons(bibData, marcTag = "700")
+    getPersons(bibData, marcTag = "100") ++
+      getOrganisations(bibData, marcTag = "110") ++
+      getPersons(bibData, marcTag = "700") ++
+      getOrganisations(bibData, marcTag = "710")
   }
 
   /* For a given MARC tag (100 or 700), return a list of all the Contributor[Person] instances
@@ -74,6 +77,33 @@ trait SierraContributors extends MarcUtils {
       )
 
       Contributor[MaybeDisplayable[Person]](
+        agent = agent,
+        roles = roles
+      )
+    }
+  }
+
+  /* For a given MARC tag (110 or 710), return a list of all the Contributor[Organisation] instances
+   * this MARC tag represents.
+   */
+  private def getOrganisations(bibData: SierraBibData, marcTag: String): List[Contributor[MaybeDisplayable[Organisation]]] = {
+    val organisations = getMatchingSubfields(
+      bibData,
+      marcTag = marcTag,
+      marcSubfieldTags = List("a", "b", "c", "e", "0")
+    )
+
+    organisations.map { subfields =>
+      val label = getLabel(subfields)
+      val roles = getContributionRoles(subfields)
+
+      val agent = identify[Organisation](
+        subfields = subfields,
+        agent = Organisation(label = label),
+        ontologyType = "Organisation"
+      )
+
+      Contributor[MaybeDisplayable[Organisation]](
         agent = agent,
         roles = roles
       )
