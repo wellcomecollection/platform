@@ -125,9 +125,10 @@ class MiroTransformableTransformerContributorsTest
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.contributors shouldBe expectedContributors.map {
-      contributor => Contributor(
-        agent = Unidentifiable(Agent(contributor))
-      )
+      contributor =>
+        Contributor(
+          agent = Unidentifiable(Agent(contributor))
+        )
     }
   }
 }
