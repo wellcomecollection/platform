@@ -448,7 +448,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       val varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "100",
+          marcTag = "110",
           indicator1 = "",
           indicator2 = "",
           subfields = List(
@@ -478,7 +478,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       val varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "100",
+          marcTag = "110",
           indicator1 = "",
           indicator2 = "",
           subfields = List(
@@ -517,7 +517,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       val varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "100",
+          marcTag = "110",
           indicator1 = "",
           indicator2 = "",
           subfields = List(
@@ -552,7 +552,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       val varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "100",
+          marcTag = "110",
           indicator1 = "",
           indicator2 = "",
           subfields = List(
