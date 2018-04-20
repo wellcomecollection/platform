@@ -241,10 +241,9 @@ class ApiErrorsTest extends ApiWorksTestBase {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/zd224ncv]",
-            andExpect = Status.BadRequest,
-            withJsonBody = badRequest(
-              apiPrefix,
-              "Unrecognised character in identifier zd224ncv]")
+            andExpect = Status.NotFound,
+            withJsonBody =
+              notFound(apiPrefix, "Work not found for identifier zd224ncv]")
           )
       }
     }

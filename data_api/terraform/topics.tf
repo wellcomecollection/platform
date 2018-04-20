@@ -1,9 +1,9 @@
-module "snapshot_convertor_jobs_topic" {
+module "snapshot_generator_jobs_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "snapshot_convertor_jobs"
+  name   = "snapshot_generator_jobs"
 }
 
-module "snapshot_conversion_complete_topic" {
+module "snapshot_generation_complete_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "snapshot_conversion_complete"
+  name   = "snapshot_generation_complete"
 }

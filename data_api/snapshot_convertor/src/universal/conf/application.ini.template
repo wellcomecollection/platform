@@ -1,3 +1,0 @@
--aws.sns.topic.arn=${topic_arn}
--aws.sqs.queue.url=${queue_url}
--aws.metrics.namespace=${metrics_namespace}

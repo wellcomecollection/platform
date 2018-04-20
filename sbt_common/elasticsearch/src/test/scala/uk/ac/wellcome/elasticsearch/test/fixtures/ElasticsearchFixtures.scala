@@ -2,22 +2,19 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.http.index.IndexResponse
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.index.VersionType
-import org.scalatest.{Matchers, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import uk.ac.wellcome.models.IdentifiedWork
-import uk.ac.wellcome.elasticsearch.WorksIndex
+import org.scalatest.{Matchers, Suite}
+import uk.ac.wellcome.elasticsearch.{ElasticSearchIndex, WorksIndex}
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.models.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 
-import scala.concurrent.Future
 import scala.util.Random
 
 trait ElasticsearchFixtures
@@ -122,28 +119,30 @@ trait ElasticsearchFixtures
   def insertIntoElasticsearch(indexName: String,
                               itemType: String,
                               works: IdentifiedWork*) = {
-    works.foreach { work =>
-      val jsonDoc = toJson(work).get
+    val result = elasticClient.execute(
+      bulk(
+        works.map { work =>
+          val jsonDoc = toJson(work).get
 
-      val result: Future[IndexResponse] = elasticClient.execute(
-        indexInto(indexName / itemType)
-          .version(work.version)
-          .versionType(VersionType.EXTERNAL_GTE)
-          .id(work.canonicalId)
-          .doc(jsonDoc)
-      )
-
-      result.map { indexResponse =>
-        print(indexResponse)
-      }
-    }
-    eventually {
-      elasticClient
-        .execute {
-          search(indexName).matchAllQuery()
+          indexInto(indexName / itemType)
+            .version(work.version)
+            .versionType(VersionType.EXTERNAL_GTE)
+            .id(work.canonicalId)
+            .doc(jsonDoc)
         }
-        .await
-        .hits should have size works.size
+      )
+    )
+
+    whenReady(result) { _ =>
+      eventually {
+        val hits = elasticClient
+          .execute {
+            search(indexName).matchAllQuery()
+          }
+          .await
+          .hits
+        hits.total shouldBe works.size
+      }
     }
   }
 }

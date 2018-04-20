@@ -1,7 +1,6 @@
 package uk.ac.wellcome.elasticsearch.finatra.modules
 
 import javax.inject.Singleton
-
 import com.google.inject.Provides
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
@@ -43,6 +42,9 @@ object ElasticClientModule extends TwitterModule {
       .builder(new HttpHost(host(), port(), protocol()))
       .setHttpClientConfigCallback(
         new ElasticCredentials(username(), password()))
+      // Needed for the snapshot_generator.
+      // TODO Make this a flag
+      .setMaxRetryTimeoutMillis(2000)
       .build()
 
     HttpClient.fromRestClient(restClient)

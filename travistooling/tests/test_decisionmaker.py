@@ -31,7 +31,7 @@ from travistooling.decisions import (
     # of the build job.
     ('foo.txt', 'loris-build', UnrecognisedFile, True),
     ('foo.txt', 'api-test', UnrecognisedFile, True),
-    ('foo.txt', 'snapshot_convertor-publish', UnrecognisedFile, True),
+    ('foo.txt', 'snapshot_generator-publish', UnrecognisedFile, True),
 
     # Certain file formats are always excluded.
     ('foo.md', 'ingestor-build', IgnoredFileFormat, False),
