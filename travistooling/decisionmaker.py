@@ -26,12 +26,7 @@ from travistooling.decisions import (
     UnrecognisedFile
 )
 from travistooling.git_utils import ROOT
-from travistooling.parse_makefiles import get_projects
-
-
-# Cache the Makefile information in a global variable, so we only have to
-# load it once.
-PROJECTS = list(get_projects(ROOT))
+from travistooling.parse_makefiles import PROJECTS
 
 
 def does_file_affect_build_task(path, task):
@@ -43,7 +38,7 @@ def does_file_affect_build_task(path, task):
         raise CheckedByTravisFormat()
 
     # These extensions and paths never have an effect on tests.
-    if path.endswith(('.md', '.png', '.graffle', '.tf', 'Makefile')):
+    if path.endswith(('.in', '.md', '.png', '.graffle', '.tf', 'Makefile')):
         raise IgnoredFileFormat()
 
     # These paths never have an effect on tests.
@@ -51,6 +46,7 @@ def does_file_affect_build_task(path, task):
         'LICENSE',
         '.travis.yml',
         'run_travis_task.py',
+        '.gitignore',
     ] or path.startswith(('misc/', 'ontologies/')):
         raise IgnoredPath()
 

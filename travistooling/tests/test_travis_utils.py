@@ -1,8 +1,8 @@
 # -*- encoding: utf-8
 
 import os
-from unittest import mock
 
+import mock
 import pytest
 
 from travistooling import travis_utils

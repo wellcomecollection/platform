@@ -24,16 +24,13 @@ sbt-common-publish:
 
 
 travistooling-test:
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT):/data \
-		--env encrypted_83630750896a_key=$(encrypted_83630750896a_key) \
-		--env encrypted_83630750896a_iv=$(encrypted_83630750896a_iv) \
-		wellcome/build_tooling \
-		coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
-	$(ROOT)/docker_run.py -- \
-		--volume $(ROOT):/data \
-		wellcome/build_tooling \
-		coverage report --rcfile=travistooling/.coveragerc
+	# We deliberately *don't* run this in a Docker container, because the
+	# scripts in this library are (currently) executed directly on the
+	# Travis host.  We run the tests on the host as well, so the test
+	# and actual environments are as close as possible.
+	pip install --user -r $(ROOT)/travistooling/tests/test_requirements.txt
+	coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
+	coverage report
 
 travistooling-publish:
 	$(error "Nothing to do for this task")
