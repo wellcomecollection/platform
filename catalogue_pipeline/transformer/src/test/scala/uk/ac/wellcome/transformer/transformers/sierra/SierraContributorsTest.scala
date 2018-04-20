@@ -14,6 +14,65 @@ class SierraContributorsTest extends FunSpec with Matchers {
       expectedContributors = List())
   }
 
+  it("extracts a mixture of Person and Organisation contributors") {
+    val varFields = List(
+      VarField(
+        fieldTag = "p",
+        marcTag = "100",
+        indicator1 = "",
+        indicator2 = "",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Sarah the soybean")
+        )
+      ),
+      VarField(
+        fieldTag = "p",
+        marcTag = "100",
+        indicator1 = "",
+        indicator2 = "",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Sam the squash"),
+          MarcSubfield(tag = "c", content = "Sir")
+        )
+      ),
+      VarField(
+        fieldTag = "p",
+        marcTag = "110",
+        indicator1 = "",
+        indicator2 = "",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Spinach Solicitors")
+        )
+      ),
+      VarField(
+        fieldTag = "p",
+        marcTag = "700",
+        indicator1 = "",
+        indicator2 = "",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Sebastian the sugarsnap")
+        )
+      ),
+      VarField(
+        fieldTag = "p",
+        marcTag = "710",
+        indicator1 = "",
+        indicator2 = "",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Shallot Swimmers")
+        )
+      )
+    )
+
+    val expectedContributors = List(
+      Contributor(agent = Unidentifiable(Person("Sarah the soybean"))),
+      Contributor(agent = Unidentifiable(Person("Sam the squash"))),
+      Contributor(agent = Unidentifiable(Organisation("Spinach Solicitors"))),
+      Contributor(agent = Unidentifiable(Person("Sebastian the sugarsnap"))),
+      Contributor(agent = Unidentifiable(Organisation("Shallot Swimmers")))
+    )
+  }
+
   describe("Person") {
     it("gets the name from MARC tag 100 subfield $$a") {
       val name = "Carol the Carrot"
