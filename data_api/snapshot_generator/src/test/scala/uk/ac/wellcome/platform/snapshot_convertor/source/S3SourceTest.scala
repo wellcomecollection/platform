@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.source
+package uk.ac.wellcome.platform.snapshot_generator.source
 
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Compression, Sink, Source}
@@ -6,8 +6,8 @@ import akka.util.ByteString
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
+import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

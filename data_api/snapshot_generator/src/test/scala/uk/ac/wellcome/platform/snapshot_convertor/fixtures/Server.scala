@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.snapshot_convertor.fixtures
+package uk.ac.wellcome.platform.snapshot_generator.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.platform.snapshot_convertor.{Server => AppServer}
+import uk.ac.wellcome.platform.snapshot_generator.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 

@@ -1,10 +1,10 @@
-package uk.ac.wellcome.platform.snapshot_convertor.services
+package uk.ac.wellcome.platform.snapshot_generator.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
+import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedConversionJob,
   ConversionJob
 }

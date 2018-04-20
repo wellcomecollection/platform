@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.source
+package uk.ac.wellcome.platform.snapshot_generator.source
 
 import java.io.InputStream
 

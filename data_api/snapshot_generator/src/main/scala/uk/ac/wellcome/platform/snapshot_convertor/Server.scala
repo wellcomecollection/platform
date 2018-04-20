@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor
+package uk.ac.wellcome.platform.snapshot_generator
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -11,7 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.platform.snapshot_convertor.modules.{
+import uk.ac.wellcome.platform.snapshot_generator.modules.{
   AkkaS3ClientModule,
   SnapshotConvertorWorkerModule
 }
@@ -20,7 +20,7 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.snapshot_convertor SnapshotConvertor"
+    "uk.ac.wellcome.platform.snapshot_generator SnapshotGenerator"
 
   override val modules = Seq(
     AmazonCloudWatchModule,

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor
+package uk.ac.wellcome.platform.snapshot_generator
 
 import com.twitter.finagle.http.Status.Ok
 import org.scalatest.concurrent.ScalaFutures

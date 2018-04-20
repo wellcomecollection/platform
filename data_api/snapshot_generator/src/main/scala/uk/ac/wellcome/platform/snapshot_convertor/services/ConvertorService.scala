@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.services
+package uk.ac.wellcome.platform.snapshot_generator.services
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
@@ -17,17 +17,17 @@ import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.models.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_convertor.flow.{
+import uk.ac.wellcome.platform.snapshot_generator.flow.{
   DisplayWorkToJsonStringFlow,
   ElasticsearchHitToIdentifiedWorkFlow,
   IdentifiedWorkToVisibleDisplayWork,
   StringToGzipFlow
 }
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
+import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedConversionJob,
   ConversionJob
 }
-import uk.ac.wellcome.platform.snapshot_convertor.source.S3Source
+import uk.ac.wellcome.platform.snapshot_generator.source.S3Source
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
 

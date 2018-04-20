@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.models
+package uk.ac.wellcome.platform.snapshot_generator.models
 
 import uk.ac.wellcome.versions.ApiVersions
 

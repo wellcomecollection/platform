@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.flow
+package uk.ac.wellcome.platform.snapshot_generator.flow
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow

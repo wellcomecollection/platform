@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.snapshot_convertor.fixtures
+package uk.ac.wellcome.platform.snapshot_generator.fixtures
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.regions.AwsRegionProvider
-import uk.ac.wellcome.platform.snapshot_convertor.modules.AkkaS3ClientModule
+import uk.ac.wellcome.platform.snapshot_generator.modules.AkkaS3ClientModule
 import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 
 trait AkkaS3 extends S3 {

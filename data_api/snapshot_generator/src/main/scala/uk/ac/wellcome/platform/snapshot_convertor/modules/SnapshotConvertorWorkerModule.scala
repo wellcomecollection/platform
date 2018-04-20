@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.snapshot_convertor.modules
+package uk.ac.wellcome.platform.snapshot_generator.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.snapshot_convertor.services.SnapshotConvertorWorkerService
+import uk.ac.wellcome.platform.snapshot_generator.services.SnapshotConvertorWorkerService
 
 object SnapshotConvertorWorkerModule extends TwitterModule {
 

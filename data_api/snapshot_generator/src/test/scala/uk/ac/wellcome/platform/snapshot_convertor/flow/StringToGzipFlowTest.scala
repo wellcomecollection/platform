@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.flow
+package uk.ac.wellcome.platform.snapshot_generator.flow
 
 import java.io.File
 import java.nio.file.Paths
@@ -9,7 +9,7 @@ import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
+import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

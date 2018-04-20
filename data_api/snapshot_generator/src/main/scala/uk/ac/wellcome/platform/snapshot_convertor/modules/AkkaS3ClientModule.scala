@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.modules
+package uk.ac.wellcome.platform.snapshot_generator.modules
 
 import javax.inject.Singleton
 

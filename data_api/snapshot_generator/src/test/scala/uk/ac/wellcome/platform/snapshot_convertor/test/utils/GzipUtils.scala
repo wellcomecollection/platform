@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.test.utils
+package uk.ac.wellcome.platform.snapshot_generator.test.utils
 
 import java.io.{BufferedWriter, File, FileWriter}
 import scala.io.Source.fromFile

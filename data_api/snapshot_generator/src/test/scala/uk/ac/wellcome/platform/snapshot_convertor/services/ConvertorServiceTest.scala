@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_convertor.services
+package uk.ac.wellcome.platform.snapshot_generator.services
 
 import java.io.File
 
@@ -20,12 +20,12 @@ import uk.ac.wellcome.models.{
   Period,
   SourceIdentifier
 }
-import uk.ac.wellcome.platform.snapshot_convertor.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_convertor.models.{
+import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
+import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedConversionJob,
   ConversionJob
 }
-import uk.ac.wellcome.platform.snapshot_convertor.test.utils.GzipUtils
+import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith, _}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
