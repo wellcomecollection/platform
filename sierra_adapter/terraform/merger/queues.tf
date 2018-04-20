@@ -1,5 +1,5 @@
 module "updates_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v1.1.0"
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v6.4.0"
   queue_name  = "sierra_${var.resource_type}_merger_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
