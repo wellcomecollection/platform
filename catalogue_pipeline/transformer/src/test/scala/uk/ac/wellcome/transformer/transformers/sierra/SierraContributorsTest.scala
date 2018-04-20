@@ -105,5 +105,61 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(agent = Unidentifiable(Person(label = name3)))
       )
     }
+
+    it("gets the creator prefix from MARC tag 100 subfield $$c") {
+      val name = "Darla the Dandelion"
+      val prefix = "Dr"
+
+      val bibData = SierraBibData(
+        id = "4713698",
+        title = None,
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "100",
+            indicator1 = "",
+            indicator2 = "",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "c", content = prefix))
+          ))
+      )
+
+      val contributors = transformer.getContributors(bibData)
+      contributors shouldBe List(
+        Contributor(agent = Unidentifiable(Person(
+          label = name,
+          prefix = Some(prefix)
+        )))
+      )
+    }
+
+    it("gets the creator prefix from MARC tag 700 subfield $$c") {
+      val name = "Roland the Radish"
+      val prefix = "Rev"
+
+      val bibData = SierraBibData(
+        id = "6932323",
+        title = None,
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "100",
+            indicator1 = "",
+            indicator2 = "",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "c", content = prefix))
+          ))
+      )
+
+      val contributors = transformer.getContributors(bibData)
+      contributors shouldBe List(
+        Contributor(agent = Unidentifiable(Person(
+          label = name,
+          prefix = Some(prefix)
+        )))
+      )
+    }
   }
 }
