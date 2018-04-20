@@ -199,7 +199,9 @@ class SnapshotServiceTest
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val works = (1 to 20000).map { id =>
-          workWith(canonicalId = id.toString, title = Random.alphanumeric.take(1500).mkString)
+          workWith(
+            canonicalId = id.toString,
+            title = Random.alphanumeric.take(1500).mkString)
         }
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
