@@ -43,40 +43,41 @@ class MessageReaderTest
 
   def withFixtures[R] = withLocalS3Bucket[R] and withMessageReader[R] _
 
-  it("reads a NotificationMessage from an sqs.model.Message and converts to type T") {
-    withFixtures { case (bucket, messageReader) =>
+  it(
+    "reads a NotificationMessage from an sqs.model.Message and converts to type T") {
+    withFixtures {
+      case (bucket, messageReader) =>
+        val key = "key.json"
+        val expectedObject = ExampleObject("some value")
+        val serialisedExampleObject = toJson(expectedObject).get
 
-      val key = "key.json"
-      val expectedObject = ExampleObject("some value")
-      val serialisedExampleObject = toJson(expectedObject).get
+        s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-      s3Client.putObject(bucket.name, key, serialisedExampleObject)
+        val examplePointer = MessagePointer(S3Uri(bucket.name, key))
+        val serialisedExamplePointer = toJson(examplePointer).get
 
-      val examplePointer = MessagePointer(S3Uri(bucket.name, key))
-      val serialisedExamplePointer = toJson(examplePointer).get
+        val exampleNotification = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "TopicArn",
+          Subject = "Subject",
+          Message = serialisedExamplePointer,
+          Timestamp = "Timestamp",
+          SignatureVersion = "SignatureVersion",
+          Signature = "Signature",
+          SigningCertURL = "SigningCertURL",
+          UnsubscribeURL = "UnsubscribeURL"
+        )
 
-      val exampleNotification = NotificationMessage(
-        MessageId = "MessageId",
-        TopicArn = "TopicArn",
-        Subject = "Subject",
-        Message = serialisedExamplePointer,
-        Timestamp = "Timestamp",
-        SignatureVersion = "SignatureVersion",
-        Signature = "Signature",
-        SigningCertURL = "SigningCertURL",
-        UnsubscribeURL = "UnsubscribeURL"
-      )
+        val serialisedExampleNotification = toJson(exampleNotification).get
 
-      val serialisedExampleNotification = toJson(exampleNotification).get
+        val exampleMessage = new Message()
+          .withBody(serialisedExampleNotification)
 
-      val exampleMessage = new Message()
-        .withBody(serialisedExampleNotification)
+        val actualObjectFuture = messageReader.process(exampleMessage)
 
-      val actualObjectFuture = messageReader.process(exampleMessage)
-
-      whenReady(actualObjectFuture) { actualObject =>
-        expectedObject shouldBe actualObject
-      }
+        whenReady(actualObjectFuture) { actualObject =>
+          expectedObject shouldBe actualObject
+        }
     }
   }
 }

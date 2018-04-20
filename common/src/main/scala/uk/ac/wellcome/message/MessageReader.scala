@@ -11,9 +11,11 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class MessageReader[T] @Inject ()(s3ObjectStore: S3ObjectStore[T]) {
+class MessageReader[T] @Inject()(s3ObjectStore: S3ObjectStore[T]) {
 
-  def process(message: SQSMessage)(implicit decoderN: Decoder[NotificationMessage], decoderT: Decoder[T]): Future[T] = {
+  def process(message: SQSMessage)(
+    implicit decoderN: Decoder[NotificationMessage],
+    decoderT: Decoder[T]): Future[T] = {
     val deserialisedMessagePointerAttempt = for {
       notification <- fromJson[NotificationMessage](message.getBody)
       deserialisedMessagePointer <- fromJson[MessagePointer](
@@ -21,7 +23,8 @@ class MessageReader[T] @Inject ()(s3ObjectStore: S3ObjectStore[T]) {
     } yield deserialisedMessagePointer
 
     for {
-      messagePointer <- Future.fromTry[MessagePointer](deserialisedMessagePointerAttempt)
+      messagePointer <- Future.fromTry[MessagePointer](
+        deserialisedMessagePointerAttempt)
       deserialisedObject <- s3ObjectStore.get(messagePointer.src)
     } yield deserialisedObject
   }

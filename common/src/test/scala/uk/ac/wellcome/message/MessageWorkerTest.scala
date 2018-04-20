@@ -67,7 +67,11 @@ class MessageWorkerTest
 
     val messageReader = new MessageReader(s3)
     val testWorker =
-      new MessageWorker[ExampleObject](sqsReader, messageReader, actors, metrics) {
+      new MessageWorker[ExampleObject](
+        sqsReader,
+        messageReader,
+        actors,
+        metrics) {
 
         override implicit val decoder: Decoder[ExampleObject] =
           decoderExampleObject

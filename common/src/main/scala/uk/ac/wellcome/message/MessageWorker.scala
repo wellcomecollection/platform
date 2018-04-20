@@ -20,9 +20,10 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.sns.NotificationMessage
 
 abstract class MessageWorker[T](sqsReader: SQSReader,
-                         messageReader: MessageReader[T],
-                         actorSystem: ActorSystem,
-                         metricsSender: MetricsSender) extends Logging {
+                                messageReader: MessageReader[T],
+                                actorSystem: ActorSystem,
+                                metricsSender: MetricsSender)
+    extends Logging {
 
   info(s"Starting message worker=[$workerName]")
 
@@ -36,7 +37,8 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
 
   def processMessage(message: T): Future[Unit]
 
-  private def processMessages()(implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
+  private def processMessages()(
+    implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
         message <- messageReader.process(message)
