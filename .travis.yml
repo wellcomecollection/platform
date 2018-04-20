@@ -32,7 +32,7 @@ cache:
     - reindexer/reindex_worker/target
     - common/target
 
-    - data_api/snapshot_convertor/target
+    - data_api/snapshot_generator/target
 
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
