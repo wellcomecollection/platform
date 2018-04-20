@@ -28,7 +28,7 @@ travistooling-test:
 	# scripts in this library are (currently) executed directly on the
 	# Travis host.  We run the tests on the host as well, so the test
 	# and actual environments are as close as possible.
-	pip install -r $(ROOT)/travistooling/tests/test_requirements.txt
+	pip install --user -r $(ROOT)/travistooling/tests/test_requirements.txt
 	coverage run --rcfile=travistooling/.coveragerc --module py.test travistooling/tests/test_*.py
 	coverage report
 
