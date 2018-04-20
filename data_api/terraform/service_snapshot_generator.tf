@@ -48,7 +48,7 @@ module "snapshot_generator" {
 
   enable_alb_alarm = false
 
-  max_capacity = 15
+  max_capacity = 2
 
   scale_down_period = 3600
 }
