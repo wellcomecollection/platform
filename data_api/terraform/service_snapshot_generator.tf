@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_snapshot" {
 }
 
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=sqs-autoscaling-ignore-missing-data"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
   name   = "snapshot_generator"
 
   source_queue_name = "${module.snapshot_generator_queue.name}"
