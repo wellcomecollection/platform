@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraContributorsTest extends FunSpec with Matchers {
 
@@ -118,7 +122,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("gets the name from MARC tags 100 and 700 subfield $$a in the right order") {
+    it(
+      "gets the name from MARC tags 100 and 700 subfield $$a in the right order") {
       val name1 = "Alfie the Artichoke"
       val name2 = "Alison the Apple"
       val name3 = "Archie the Aubergine"
@@ -180,10 +185,11 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
       val expectedContributors = List(
         Contributor(
-          agent = Unidentifiable(Person(
-            label = name,
-            prefix = Some(prefix)
-          ))
+          agent = Unidentifiable(
+            Person(
+              label = name,
+              prefix = Some(prefix)
+            ))
         )
       )
 
@@ -211,10 +217,11 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
       val expectedContributors = List(
         Contributor(
-          agent = Unidentifiable(Person(
-            label = name,
-            prefix = Some(prefix)
-          ))
+          agent = Unidentifiable(
+            Person(
+              label = name,
+              prefix = Some(prefix)
+            ))
         )
       )
 
@@ -244,10 +251,11 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
       val expectedContributors = List(
         Contributor(
-          agent = Unidentifiable(Person(
-            label = name,
-            prefix = Some(s"${prefix1} ${prefix2}")
-          ))
+          agent = Unidentifiable(
+            Person(
+              label = name,
+              prefix = Some(s"${prefix1} ${prefix2}")
+            ))
         )
       )
 
@@ -274,9 +282,10 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val expectedContributors = List(
-        Contributor(agent = Unidentifiable(
-          Person(label = name, numeration = Some(numeration))
-        ))
+        Contributor(
+          agent = Unidentifiable(
+            Person(label = name, numeration = Some(numeration))
+          ))
       )
 
       transformAndCheckContributors(
@@ -339,11 +348,12 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val expectedContributors = List(
-        Contributor(agent = Identifiable(
-          Person(label = name),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
-        ))
+        Contributor(
+          agent = Identifiable(
+            Person(label = name),
+            sourceIdentifier = sourceIdentifier,
+            identifiers = List(sourceIdentifier)
+          ))
       )
 
       transformAndCheckContributors(
@@ -380,11 +390,12 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val expectedContributors = List(
-        Contributor(agent = Identifiable(
-          Person(label = name),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
-        ))
+        Contributor(
+          agent = Identifiable(
+            Person(label = name),
+            sourceIdentifier = sourceIdentifier,
+            identifiers = List(sourceIdentifier)
+          ))
       )
 
       transformAndCheckContributors(
@@ -392,7 +403,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("fails the transform if there are multiple distinct identifiers in subfield $$0") {
+    it(
+      "fails the transform if there are multiple distinct identifiers in subfield $$0") {
       val varFields = List(
         VarField(
           fieldTag = "p",
@@ -456,7 +468,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
+    it(
+      "gets the name from MARC tags 110 and 710 subfield $$a in the right order") {
       val name1 = "Mary the mallow"
       val name2 = "Mike the mashua"
       val name3 = "Mickey the mozuku"
@@ -554,11 +567,12 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val expectedContributors = List(
-        Contributor(agent = Identifiable(
-          Organisation(label = name),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
-        ))
+        Contributor(
+          agent = Identifiable(
+            Organisation(label = name),
+            sourceIdentifier = sourceIdentifier,
+            identifiers = List(sourceIdentifier)
+          ))
       )
 
       transformAndCheckContributors(
@@ -595,11 +609,12 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val expectedContributors = List(
-        Contributor(agent = Identifiable(
-          Organisation(label = name),
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
-        ))
+        Contributor(
+          agent = Identifiable(
+            Organisation(label = name),
+            sourceIdentifier = sourceIdentifier,
+            identifiers = List(sourceIdentifier)
+          ))
       )
 
       transformAndCheckContributors(
@@ -607,7 +622,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("fails the transform if there are multiple distinct identifiers in subfield $$0") {
+    it(
+      "fails the transform if there are multiple distinct identifiers in subfield $$0") {
       val varFields = List(
         VarField(
           fieldTag = "p",
@@ -630,12 +646,14 @@ class SierraContributorsTest extends FunSpec with Matchers {
     varFields: List[VarField],
     expectedContributors: List[Contributor[MaybeDisplayable[AbstractAgent]]]
   ) = {
-    val bibData = SierraBibData(id = "1661847", title = None, varFields = varFields)
+    val bibData =
+      SierraBibData(id = "1661847", title = None, varFields = varFields)
     transformer.getContributors(bibData) shouldBe expectedContributors
   }
 
   private def assertTransformFails(varFields: List[VarField]) = {
-    val bibData = SierraBibData(id = "1663540", title = None, varFields = varFields)
+    val bibData =
+      SierraBibData(id = "1663540", title = None, varFields = varFields)
 
     intercept[RuntimeException] {
       transformer.getContributors(bibData)

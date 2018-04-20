@@ -30,8 +30,8 @@ trait SierraContributors extends MarcUtils {
    * https://www.loc.gov/marc/bibliographic/bd710.html
    *
    */
-  def getContributors(
-    bibData: SierraBibData): List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
+  def getContributors(bibData: SierraBibData)
+    : List[Contributor[MaybeDisplayable[AbstractAgent]]] = {
     getPersons(bibData, marcTag = "100") ++
       getOrganisations(bibData, marcTag = "110") ++
       getPersons(bibData, marcTag = "700") ++
@@ -41,7 +41,9 @@ trait SierraContributors extends MarcUtils {
   /* For a given MARC tag (100 or 700), return a list of all the Contributor[Person] instances
    * this MARC tag represents.
    */
-  private def getPersons(bibData: SierraBibData, marcTag: String): List[Contributor[MaybeDisplayable[Person]]] = {
+  private def getPersons(
+    bibData: SierraBibData,
+    marcTag: String): List[Contributor[MaybeDisplayable[Person]]] = {
     val persons = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
@@ -63,7 +65,8 @@ trait SierraContributors extends MarcUtils {
       val prefixes = subfields.collect {
         case MarcSubfield("c", content) => content
       }
-      val prefixString = if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
+      val prefixString =
+        if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
       val agent = identify[Person](
         subfields = subfields,
@@ -85,7 +88,9 @@ trait SierraContributors extends MarcUtils {
   /* For a given MARC tag (110 or 710), return a list of all the Contributor[Organisation] instances
    * this MARC tag represents.
    */
-  private def getOrganisations(bibData: SierraBibData, marcTag: String): List[Contributor[MaybeDisplayable[Organisation]]] = {
+  private def getOrganisations(
+    bibData: SierraBibData,
+    marcTag: String): List[Contributor[MaybeDisplayable[Organisation]]] = {
     val organisations = getMatchingSubfields(
       bibData,
       marcTag = marcTag,
@@ -117,7 +122,8 @@ trait SierraContributors extends MarcUtils {
     }.get
   }
 
-  private def getContributionRoles(subfields: List[MarcSubfield]): List[ContributionRole] = {
+  private def getContributionRoles(
+    subfields: List[MarcSubfield]): List[ContributionRole] = {
     // Extract the roles from subfield $e.  This is a repeatable field.
     subfields.collect {
       case MarcSubfield("e", content) => ContributionRole(content)

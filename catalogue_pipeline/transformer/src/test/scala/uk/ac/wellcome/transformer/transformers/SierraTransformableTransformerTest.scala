@@ -602,11 +602,11 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts contributor information if present") {
-     val id = "8008008"
-     val name = "Rincewind"
+    val id = "8008008"
+    val name = "Rincewind"
 
-     val data =
-       s"""
+    val data =
+      s"""
           | {
           |   "id": "$id",
           |   "title": "English earwigs earn evidence of evil",
@@ -627,19 +627,19 @@ class SierraTransformableTransformerTest
           | }
        """.stripMargin
 
-     val sierraTransformable = SierraTransformable(
-       sourceId = id,
-       maybeBibData =
-         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
 
-     val transformedSierraRecord =
-       transformer.transform(sierraTransformable, version = 1)
-     transformedSierraRecord.isSuccess shouldBe true
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+    transformedSierraRecord.isSuccess shouldBe true
 
-     transformedSierraRecord.get.get.contributors shouldBe List(
-       Contributor[MaybeDisplayable[AbstractAgent]](
-         Unidentifiable(Person(label = name)))
-     )
+    transformedSierraRecord.get.get.contributors shouldBe List(
+      Contributor[MaybeDisplayable[AbstractAgent]](
+        Unidentifiable(Person(label = name)))
+    )
   }
 
   it("extracts dimensions if present") {
