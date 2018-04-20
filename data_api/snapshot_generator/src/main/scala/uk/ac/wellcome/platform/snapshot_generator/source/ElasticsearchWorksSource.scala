@@ -27,6 +27,8 @@ object ElasticsearchWorksSource extends Logging {
           search(s"$indexName/$itemType")
             .query(termQuery("visible", true))
             .scroll(keepAlive = "2m")
+            // Increasing the size of each request from the
+            // default 100 to 1000 as it makes it go significantly faster
             .size(1000))
       )
       .map { searchHit: SearchHit =>
