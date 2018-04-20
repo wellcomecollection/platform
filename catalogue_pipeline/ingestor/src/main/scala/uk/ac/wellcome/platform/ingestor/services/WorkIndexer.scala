@@ -59,7 +59,8 @@ class WorkIndexer @Inject()(
                 s"Trying to ingest work ${work.canonicalId} with older version: skipping.")
               ()
             case e: TimeoutException =>
-              warn(s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
+              warn(
+                s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
               throw new GracefulFailureException(e)
             case e: Throwable =>
               error(
