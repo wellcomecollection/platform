@@ -195,25 +195,11 @@ class SnapshotServiceTest
 
   }
 
-  it("completes a very large snapshot generation successfully") {
+  it("completes a snapshot generation of an index with more than 10000 items") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
-        // Create a collection of works.  The use of Random is meant
-        // to increase the entropy of works, and thus the degree to
-        // which they can be gzip-compressed
-        val works = (1 to 5000).map { version =>
-          IdentifiedWork(
-            canonicalId = Random.alphanumeric.take(7).mkString,
-            title = Some(Random.alphanumeric.take(1500).mkString),
-            sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
-              ontologyType = itemType,
-              value = Random.alphanumeric.take(10).mkString
-            ),
-            description = Some(Random.alphanumeric.take(2500).mkString),
-            publicationDate = Some(Period(label = version.toString)),
-            version = version
-          )
+        val works = (1 to 20000).map { id =>
+          workWith(canonicalId = id.toString, title = Random.alphanumeric.take(1500).mkString)
         }
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
