@@ -255,6 +255,42 @@ class SierraContributorsTest extends FunSpec with Matchers {
         varFields = varFields,
         expectedContributors = expectedContributors)
     }
+
+    it("gets an identifier from subfield $$0") {
+      val name = "Ivan the ivy"
+      val lcshCode = "lcsh7101607"
+
+      val varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "100",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = name),
+            MarcSubfield(tag = "0", content = lcshCode)
+          )
+        )
+      )
+
+      val sourceIdentifier = SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        ontologyType = "Person",
+        value = lcshCode
+      )
+
+      val expectedContributors = List(
+        Contributor(agent = Identifiable(
+          Person(label = name),
+          sourceIdentifier = sourceIdentifier,
+          identifiers = List(sourceIdentifier)
+        ))
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
+    }
   }
 
   private def transformAndCheckContributors(
