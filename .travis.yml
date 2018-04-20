@@ -24,7 +24,6 @@ cache:
     - project/target/streams
     - target
     - catalogue_api/api/target
-    - catalogue_pipeline/common/target
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
     - catalogue_pipeline/transformer/target
