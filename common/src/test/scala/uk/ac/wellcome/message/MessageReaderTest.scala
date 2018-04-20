@@ -9,6 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3Uri}
 import uk.ac.wellcome.sns.NotificationMessage
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 
@@ -22,26 +23,27 @@ class MessageReaderTest
 
   case class ExampleObject(name: String)
 
-  def withMessageReader[R]()(testWith: TestWith[MessageReader[ExampleObject], R])(implicit decoderExampleObject: Decoder[ExampleObject]) = {
-    val testReader = new MessageReader[ExampleObject]()
+  def withMessageReader[R](bucket: Bucket)(testWith: TestWith[MessageReader[ExampleObject], R])(implicit decoderExampleObject: Decoder[ExampleObject]) = {
+
+    val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
+      new KeyPrefixGenerator[ExampleObject] {
+        override def generate(obj: ExampleObject): String = "/"
+      }
+
+    val s3Config = S3Config(bucketName = bucket.name)
+    val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
+
+    val testReader = new MessageReader[ExampleObject](s3ObjectStore)
 
     testWith(testReader)
   }
 
   def withFixtures[R] =
       withLocalS3Bucket[R] and
-        withMessageReader[R]() _
+        withMessageReader[R] _
 
   it("reads a NotificationMessage from an sqs.model.Message and converts to type T") {
     withFixtures { case (bucket, messageReader) =>
-
-      val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-        new KeyPrefixGenerator[ExampleObject] {
-          override def generate(obj: ExampleObject): String = "/"
-        }
-
-      val s3Config = S3Config(bucketName = bucket.name)
-      val s3ObjectStore = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
 
       val key = "key.json"
       val expectedObject = ExampleObject("some value")
@@ -68,8 +70,6 @@ class MessageReaderTest
 
       val exampleMessage = new Message()
         .withBody(serialisedExampleNotification)
-
-      val messageReader = new MessageReader[ExampleObject]()
 
       val actualObjectFuture = messageReader.process(exampleMessage)
 
