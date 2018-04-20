@@ -28,7 +28,8 @@ trait MiroContributors {
     toMap[String](Source.fromInputStream(stream).mkString).get
 
   /* Populate wwork:contributors.  We use the <image_creator> tag from the Miro XML. */
-  def getContributors(miroData: MiroTransformableData): List[Contributor[Unidentifiable[Agent]]] = {
+  def getContributors(miroData: MiroTransformableData)
+    : List[Contributor[Unidentifiable[Agent]]] = {
     val primaryCreators = miroData.creator match {
       case Some(maybeCreators) =>
         maybeCreators.collect {
@@ -60,6 +61,8 @@ trait MiroContributors {
 
     val creators = primaryCreators ++ secondaryCreators ++ contributorCreators
 
-    creators.map { agent: Unidentifiable[Agent] => Contributor(agent = agent) }
+    creators.map { agent: Unidentifiable[Agent] =>
+      Contributor(agent = agent)
+    }
   }
 }
