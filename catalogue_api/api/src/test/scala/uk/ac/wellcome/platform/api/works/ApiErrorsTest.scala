@@ -235,6 +235,19 @@ class ApiErrorsTest extends ApiWorksTestBase {
     }
   }
 
+  it("returns Bad Request if you ask for a malformed identifier") {
+    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
+      withApiFixtures(apiVersion = version) {
+        case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
+          server.httpGet(
+            path = s"/$apiPrefix/works/zd224ncv]",
+            andExpect = Status.NotFound,
+            withJsonBody = notFound(apiPrefix, "Work not found for identifier zd224ncv]")
+          )
+      }
+    }
+  }
+
   it("returns an Internal Server error if you try to search a malformed index") {
     // We need to do something that reliably triggers an internal exception
     // in the Elasticsearch handler.
