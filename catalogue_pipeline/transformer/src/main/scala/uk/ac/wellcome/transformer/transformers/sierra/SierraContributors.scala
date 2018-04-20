@@ -95,6 +95,12 @@ trait SierraContributors extends MarcUtils {
     }
   }
 
+  /* Given an agent and the associated MARC subfields, look for instances of subfield $0,
+   * which are used for identifiers.
+   *
+   * This methods them (if present) and wraps the agent in Unidentifiable or Identifiable
+   * as appropriate.
+   */
   private def identify[T](subfields: List[MarcSubfield],
                           agent: T,
                           ontologyType: String): MaybeDisplayable[T] = {
