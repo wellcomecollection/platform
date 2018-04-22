@@ -22,11 +22,9 @@ class MessageReaderTest
     with Messaging
     with S3 {
 
-  def withFixtures[R] = withLocalS3Bucket[R] and withMessageReader[R](s3Client) _
-
   it(
     "reads a NotificationMessage from an sqs.model.Message and converts to type T") {
-    withFixtures {
+    withMessageReaderFixtures {
       case (bucket, messageReader) =>
         val key = "key.json"
         val expectedObject = ExampleObject("some value")

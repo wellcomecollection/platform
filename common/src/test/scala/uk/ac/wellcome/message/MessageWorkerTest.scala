@@ -20,30 +20,15 @@ class MessageWorkerTest
     with MockitoSugar
     with Eventually
     with ExtendedPatience
-    with Metrics
-    with Messaging
-    with Akka
-    with SQS
-    with S3 {
-
-  def withFixtures[R] =
-    withActorSystem[R] and
-      withLocalSqsQueue[R] and
-      withMetricsSender[R] _ and
-      withLocalS3Bucket[R] and
-      withMessageWorker[R](
-        sqsClient, s3Client
-      ) _
+    with Messaging {
 
   it("processes messages") {
-    withFixtures {
+    withMessageWorkerFixtures {
       case (_, queue, metrics, bucket, worker) =>
         val key = "message-key"
 
         val exampleObject = ExampleObject("some value")
-        val json = toJson(exampleObject).get
-
-        s3Client.putObject(bucket.name, key, json)
+        val exampleObjectJson = toJson(exampleObject).get
 
         val examplePointer = MessagePointer(S3Uri(bucket.name, key))
 
@@ -58,6 +43,9 @@ class MessageWorkerTest
           SigningCertURL = "SigningCertURL",
           UnsubscribeURL = "UnsubscribeURL"
         )
+
+        s3Client.putObject(bucket.name, key, exampleObjectJson)
+
 
         sqsClient.sendMessage(
           queue.url,
@@ -77,7 +65,7 @@ class MessageWorkerTest
   }
 
   it("reports an error when a runtime error occurs") {
-    withFixtures {
+    withMessageWorkerFixtures {
       case (_, queue, metrics, bucket, worker) =>
         when(
           metrics.timeAndCount[Unit](
@@ -122,7 +110,7 @@ class MessageWorkerTest
   }
 
   it("reports an error when handling unsupported scheme") {
-    withFixtures {
+    withMessageWorkerFixtures {
       case (_, queue, metrics, bucket, worker) =>
         when(
           metrics.timeAndCount[Unit](
@@ -167,7 +155,7 @@ class MessageWorkerTest
   }
 
   it("reports an error when unable to parse a message") {
-    withFixtures {
+    withMessageWorkerFixtures {
       case (_, queue, metrics, bucket, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
 

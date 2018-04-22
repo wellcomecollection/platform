@@ -17,6 +17,7 @@ object SQS {
 
   class Queue(val url: String) extends AnyVal {
     override def toString = s"SQS.Queue($url)"
+    def name = url.split("/").tail
   }
 
   object Queue {
@@ -29,10 +30,14 @@ trait SQS extends ImplicitLogging {
 
   import SQS._
 
-  private val sqsEndpointUrl = "http://localhost:9324"
+  private val sqsInternalEndpointUrl = "http://sqs:9324"
+  protected val sqsEndpointUrl = "http://localhost:9324"
 
   private val accessKey = "access"
   private val secretKey = "secret"
+
+  def endpoint(queue: Queue) =
+    s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=$accessKey&secretKey=$secretKey"
 
   def sqsLocalFlags(queue: Queue) = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,

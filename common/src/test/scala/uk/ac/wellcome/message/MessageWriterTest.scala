@@ -12,18 +12,14 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Success
 import uk.ac.wellcome.sns.SNSWriter
-import uk.ac.wellcome.utils.JsonUtil
 
 class MessageWriterTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with SNS
-    with S3
+    with Messaging
     with IntegrationPatience
     with Inside {
-
-  case class ExampleObject(name: String)
 
   it(
     "sends a message and returns a publish attempt with the id of the request") {
@@ -34,15 +30,11 @@ class MessageWriterTest
         val snsConfig = SNSConfig(topic.arn)
         val snsWriter = new SNSWriter(snsClient, snsConfig)
 
-        val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-          new KeyPrefixGenerator[ExampleObject] {
-            override def generate(obj: ExampleObject): String = "/"
-          }
-
         val s3ObjectStore = new S3ObjectStore[ExampleObject](
           s3Client,
           s3Config,
           keyPrefixGenerator)
+
         val messages =
           new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 

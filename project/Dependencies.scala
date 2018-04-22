@@ -86,6 +86,7 @@ object Dependencies {
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
+    "org.scalaj" %% "scalaj-http" % "2.3.0" % "test",
     "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
