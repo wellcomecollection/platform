@@ -5,20 +5,10 @@ import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.SQS.Queue
-import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import akka.actor.ActorSystem
-import io.circe.Decoder
 import uk.ac.wellcome.s3.S3Uri
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.sns.NotificationMessage
 
 import scala.concurrent.Future
@@ -30,69 +20,20 @@ class MessageWorkerTest
     with MockitoSugar
     with Eventually
     with ExtendedPatience
+    with Metrics
+    with Messaging
     with Akka
     with SQS
     with S3 {
 
-  case class ExampleObject(name: String)
-
-  def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
-    val metricsSender: MetricsSender = mock[MetricsSender]
-
-    when(
-      metricsSender
-        .timeAndCount[Unit](anyString, any[() => Future[Unit]].apply)
-    ).thenReturn(
-      Future.successful(())
-    )
-
-    testWith(metricsSender)
-  }
-
-  def withMessageWorker[R](
-    actors: ActorSystem,
-    queue: Queue,
-    metrics: MetricsSender,
-    bucket: S3.Bucket)(testWith: TestWith[MessageWorker[ExampleObject], R])(
-    implicit decoderExampleObject: Decoder[ExampleObject]) = {
-    val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
-
-    val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-      new KeyPrefixGenerator[ExampleObject] {
-        override def generate(obj: ExampleObject): String = "/"
-      }
-
-    val s3Config = S3Config(bucketName = bucket.name)
-    val s3 = new S3ObjectStore(s3Client, s3Config, keyPrefixGenerator)
-
-    val messageReader = new MessageReader(s3)
-    val testWorker =
-      new MessageWorker[ExampleObject](
-        sqsReader,
-        messageReader,
-        actors,
-        metrics) {
-
-        override implicit val decoder: Decoder[ExampleObject] =
-          decoderExampleObject
-
-        override def processMessage(message: ExampleObject) =
-          Future.successful(())
-      }
-
-    try {
-      testWith(testWorker)
-    } finally {
-      testWorker.stop()
-    }
-  }
-
   def withFixtures[R] =
     withActorSystem[R] and
       withLocalSqsQueue[R] and
-      withMockMetricSender[R] _ and
+      withMetricsSender[R] _ and
       withLocalS3Bucket[R] and
-      withMessageWorker[R] _
+      withMessageWorker[R](
+        sqsClient, s3Client
+      ) _
 
   it("processes messages") {
     withFixtures {
