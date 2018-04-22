@@ -15,46 +15,49 @@ import uk.ac.wellcome.test.fixtures.{Akka, Messaging, Metrics, S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessagingIntegrationTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with Messaging
     with Eventually
     with ExtendedPatience {
 
   it("sends and receives messages") {
-    withMessageWorkerFixtures { case (_, queue, metrics, bucket, worker) =>
-      withLocalSnsTopic { topic =>
+    withMessageWorkerFixtures {
+      case (_, queue, metrics, bucket, worker) =>
+        withLocalSnsTopic { topic =>
+          subscribeTopicToQueue(queue, topic)
 
-        subscribeTopicToQueue(queue, topic)
+          val s3Config = S3Config(bucketName = bucket.name)
 
-        val s3Config = S3Config(bucketName = bucket.name)
+          val snsConfig = SNSConfig(topic.arn)
+          val snsWriter = new SNSWriter(snsClient, snsConfig)
 
-        val snsConfig = SNSConfig(topic.arn)
-        val snsWriter = new SNSWriter(snsClient, snsConfig)
-
-        val s3ObjectStore = new S3ObjectStore[ExampleObject](
-          s3Client,
-          s3Config,
-          keyPrefixGenerator
-        )
-
-        val messages =
-          new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
-
-        val exampleObject = ExampleObject("some value")
-
-        messages.write(exampleObject, "subject")
-
-        eventually {
-          verify(
-            metrics,
-            times(1)
-          ).timeAndCount(
-            matches(".*_ProcessMessage"),
-            any()
+          val s3ObjectStore = new S3ObjectStore[ExampleObject](
+            s3Client,
+            s3Config,
+            keyPrefixGenerator
           )
+
+          val messages =
+            new MessageWriter[ExampleObject](
+              snsWriter,
+              s3Config,
+              s3ObjectStore)
+
+          val exampleObject = ExampleObject("some value")
+
+          messages.write(exampleObject, "subject")
+
+          eventually {
+            verify(
+              metrics,
+              times(1)
+            ).timeAndCount(
+              matches(".*_ProcessMessage"),
+              any()
+            )
+          }
         }
-      }
     }
   }
 }

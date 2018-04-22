@@ -9,13 +9,11 @@ import uk.ac.wellcome.metrics.MetricsSender
 
 import scala.concurrent.Future
 
-
 trait Metrics
-  extends Logging
+    extends Logging
     with Eventually
     with ImplicitLogging
-    with MockitoSugar
-{
+    with MockitoSugar {
 
   def withMetricsSender[R](testWith: TestWith[MetricsSender, R]): R = {
     val metricsSender: MetricsSender = mock[MetricsSender]

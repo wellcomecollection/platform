@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 
 trait Messaging
-  extends Akka
+    extends Akka
     with Metrics
     with SQS
     with SNS
@@ -61,19 +61,18 @@ trait Messaging
   }
 
   def withMessageWorker[R](
-                            sqsClient: AmazonSQS,
-                            s3Client: AmazonS3
-                          )(
-                            actors: ActorSystem,
-                            queue: Queue,
-                            metrics: MetricsSender,
-                            bucket: S3.Bucket)
-                          (testWith: TestWith[MessageWorker[ExampleObject], R]) = {
+    sqsClient: AmazonSQS,
+    s3Client: AmazonS3
+  )(actors: ActorSystem,
+    queue: Queue,
+    metrics: MetricsSender,
+    bucket: S3.Bucket)(testWith: TestWith[MessageWorker[ExampleObject], R]) = {
 
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val s3Config = S3Config(bucketName = bucket.name)
-    val s3 = new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
+    val s3 =
+      new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
 
     val messageReader = new MessageReader[ExampleObject](s3)
     val testWorker =
@@ -101,14 +100,14 @@ trait Messaging
     withLocalS3Bucket[R] and
       withMessageReader[R](s3Client) _
 
-
   def withMessageWorkerFixtures[R] =
     withActorSystem[R] and
       withLocalSqsQueue[R] and
       withMetricsSender[R] _ and
       withLocalS3Bucket[R] and
       withMessageWorker[R](
-        sqsClient, s3Client
+        sqsClient,
+        s3Client
       ) _
 
 }

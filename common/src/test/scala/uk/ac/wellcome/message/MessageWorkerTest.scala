@@ -46,7 +46,6 @@ class MessageWorkerTest
 
         s3Client.putObject(bucket.name, key, exampleObjectJson)
 
-
         sqsClient.sendMessage(
           queue.url,
           toJson(exampleNotification).get
