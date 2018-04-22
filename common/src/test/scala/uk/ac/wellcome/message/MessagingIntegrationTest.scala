@@ -21,7 +21,7 @@ class MessagingIntegrationTest
     with Eventually
     with ExtendedPatience {
 
-  it("sends and recieves messages") {
+  it("sends and receives messages") {
     withMessageWorkerFixtures { case (_, queue, metrics, bucket, worker) =>
       withLocalSnsTopic { topic =>
 
@@ -35,7 +35,8 @@ class MessagingIntegrationTest
         val s3ObjectStore = new S3ObjectStore[ExampleObject](
           s3Client,
           s3Config,
-          keyPrefixGenerator)
+          keyPrefixGenerator
+        )
 
         val messages =
           new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)

@@ -6,7 +6,6 @@ import com.amazonaws.services.sqs.AmazonSQS
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
-import scalaj.http.Http
 import uk.ac.wellcome.message.{MessageReader, MessageWorker}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
@@ -24,15 +23,23 @@ trait Messaging
     with Metrics
     with SQS
     with SNS
-    with S3 {
+    with S3
+    with ImplicitLogging {
 
-  def subscribeTopicToQueue(queue: Queue, topic: Topic) =
-    Http(sqsEndpointUrl).postForm(Seq(
-      "Action" -> "Subscribe",
-      "Endpoint" -> endpoint(queue),
-      "Protocol" -> "sqs",
-      "TopicArn" -> topic.arn
-    ))
+  // This doesn't seem to work yet - also look at test output for "about to publish message"
+  // "src":"s3://mtnb2xcb3k/s3://mtnb2xcb3k//1258003404.json"
+  def subscribeTopicToQueue(queue: Queue, topic: Topic) = {
+    import com.amazonaws.services.sns.model.SubscribeRequest
+
+    info(s"Attempting to subscribe ${endpoint(queue)} to ${topic.arn}")
+
+    val subRequest = new SubscribeRequest(topic.arn, "sqs", endpoint(queue))
+    val subscribeResult = snsClient.subscribe(subRequest)
+
+    info(subscribeResult)
+
+    subscribeResult
+  }
 
   case class ExampleObject(name: String)
 

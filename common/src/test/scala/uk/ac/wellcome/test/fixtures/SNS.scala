@@ -29,7 +29,8 @@ trait SNS extends ImplicitLogging {
 
   import SNS._
 
-  private val localSNSEndpointUrl = "http://localhost:9292"
+  protected val snsInternalEndpointUrl = "http://sns:9292"
+  protected val localSNSEndpointUrl = "http://localhost:9292"
 
   private val accessKey = "access"
   private val secretKey = "secret"
