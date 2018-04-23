@@ -15,7 +15,7 @@ import uk.ac.wellcome.test.fixtures.{Akka, Messaging, Metrics, S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessagingIntegrationTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with Messaging
     with Eventually
@@ -26,12 +26,10 @@ class MessagingIntegrationTest
       case (_, queue, metrics, bucket, worker) =>
         withLocalSnsTopic { topic =>
           withSubscription(queue, topic) { _ =>
-
             val s3Config = S3Config(bucketName = bucket.name)
 
             val snsConfig = SNSConfig(topic.arn)
             val snsWriter = new SNSWriter(snsClient, snsConfig)
-
 
             val s3ObjectStore = new S3ObjectStore[ExampleObject](
               s3Client,
@@ -40,7 +38,10 @@ class MessagingIntegrationTest
             )
 
             val messages =
-              new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
+              new MessageWriter[ExampleObject](
+                snsWriter,
+                s3Config,
+                s3ObjectStore)
 
             val exampleObject = ExampleObject("some value")
 

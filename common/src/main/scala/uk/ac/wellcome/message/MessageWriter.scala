@@ -7,7 +7,6 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.models.aws.S3Config
 
-
 import io.circe.Encoder
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.JsonUtil._

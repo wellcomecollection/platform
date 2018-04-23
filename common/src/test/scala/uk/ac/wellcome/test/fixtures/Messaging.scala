@@ -19,7 +19,6 @@ import uk.ac.wellcome.test.fixtures.SQS.Queue
 import scala.concurrent.duration._
 import scala.concurrent.Future
 
-
 trait Messaging
     extends Akka
     with Metrics

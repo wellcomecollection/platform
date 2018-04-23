@@ -17,13 +17,13 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =
     Future {
       blocking {
-        debug(
-          s"Publishing message $message to ${snsConfig.topicArn}")
+        debug(s"Publishing message $message to ${snsConfig.topicArn}")
         snsClient.publish(
           toPublishRequest(message = message, subject = subject))
       }
     }.map { publishResult =>
-        info(s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
+        info(
+          s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
         PublishAttempt(Right(publishResult.getMessageId))
       }
       .recover {
