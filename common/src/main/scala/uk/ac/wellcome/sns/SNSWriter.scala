@@ -18,12 +18,12 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     Future {
       blocking {
         debug(
-          s"about to publish message $message on the SNS topic ${snsConfig.topicArn}")
+          s"Publishing message $message to ${snsConfig.topicArn}")
         snsClient.publish(
           toPublishRequest(message = message, subject = subject))
       }
     }.map { publishResult =>
-        info(s"Published message ${publishResult.getMessageId}")
+        info(s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
         PublishAttempt(Right(publishResult.getMessageId))
       }
       .recover {

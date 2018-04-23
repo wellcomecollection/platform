@@ -3,6 +3,7 @@ package uk.ac.wellcome.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
@@ -18,6 +19,7 @@ import uk.ac.wellcome.test.fixtures.SQS.Queue
 import scala.concurrent.duration._
 import scala.concurrent.Future
 
+
 trait Messaging
     extends Akka
     with Metrics
@@ -26,10 +28,9 @@ trait Messaging
     with S3
     with ImplicitLogging {
 
-  // This doesn't seem to work yet - also look at test output for "about to publish message"
-  // "src":"s3://mtnb2xcb3k/s3://mtnb2xcb3k//1258003404.json"
-  def subscribeTopicToQueue(queue: Queue, topic: Topic) = {
-    import com.amazonaws.services.sns.model.SubscribeRequest
+  // This doesn't seem to work yet
+  def withSubscription[R](queue: Queue, topic: Topic)(
+    testWith: TestWith[SubscribeResult, R]): R = {
 
     info(s"Attempting to subscribe ${endpoint(queue)} to ${topic.arn}")
 
@@ -38,7 +39,7 @@ trait Messaging
 
     info(subscribeResult)
 
-    subscribeResult
+    testWith(subscribeResult)
   }
 
   case class ExampleObject(name: String)

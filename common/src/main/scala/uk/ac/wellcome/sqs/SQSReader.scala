@@ -40,7 +40,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
             s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
         } else {
           debug(
-            s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
+            s"No messages from queue ${sqsConfig.queueUrl}")
         }
 
         ()
