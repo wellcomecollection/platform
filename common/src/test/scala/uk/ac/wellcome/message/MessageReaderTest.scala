@@ -39,12 +39,7 @@ class MessageReaderTest
           MessageId = "MessageId",
           TopicArn = "TopicArn",
           Subject = "Subject",
-          Message = serialisedExamplePointer,
-          Timestamp = "Timestamp",
-          SignatureVersion = "SignatureVersion",
-          Signature = "Signature",
-          SigningCertURL = "SigningCertURL",
-          UnsubscribeURL = "UnsubscribeURL"
+          Message = serialisedExamplePointer
         )
 
         val serialisedExampleNotification = toJson(exampleNotification).get

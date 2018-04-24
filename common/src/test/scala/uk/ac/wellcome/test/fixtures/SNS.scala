@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.annotation.JsonProperty
 
 import scala.util.Random
+import com.amazonaws.regions.Regions
 
 object SNS {
 
@@ -61,6 +62,24 @@ trait SNS extends ImplicitLogging {
     },
     destroy = { topic =>
       snsClient.deleteTopic(topic.arn)
+    }
+  )
+
+  val localStackSnsClient: AmazonSNS = AmazonSNSClientBuilder
+    .standard()
+    .withCredentials(credentials)
+    .withEndpointConfiguration(
+      new EndpointConfiguration("http://localhost:4575", "eu-west-2"))
+    .build()
+
+  def withLocalStackSnsTopic[R] = fixture[Topic, R](
+    create = {
+      val topicName = Random.alphanumeric take 10 mkString
+      val arn = localStackSnsClient.createTopic(topicName).getTopicArn
+      Topic(arn)
+    },
+    destroy = { topic =>
+      localStackSnsClient.deleteTopic(topic.arn)
     }
   )
 

@@ -1,17 +1,15 @@
 package uk.ac.wellcome.message
 
-import io.circe.Decoder
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 import org.scalatest.{FunSpec, Matchers}
-import com.amazonaws.services.sns.util.Topics
 import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.models.aws.{S3Config, SNSConfig}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.SNSWriter
-import uk.ac.wellcome.test.fixtures.{Akka, Messaging, Metrics, S3, SNS, SQS}
+import uk.ac.wellcome.test.fixtures.Messaging
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessagingIntegrationTest
@@ -21,15 +19,25 @@ class MessagingIntegrationTest
     with Eventually
     with ExtendedPatience {
 
+  def withFixtures[R] =
+    withActorSystem[R] and
+      withLocalStackSqsQueue[R] and
+      withMetricsSender[R] _ and
+      withLocalS3Bucket[R] and
+      withMessageWorker[R](
+        localStackSqsClient,
+        s3Client
+      ) _
+
   it("sends and receives messages") {
-    withMessageWorkerFixtures {
+    withFixtures {
       case (_, queue, metrics, bucket, worker) =>
-        withLocalSnsTopic { topic =>
-          withSubscription(queue, topic) { _ =>
+        withLocalStackSnsTopic { topic =>
+          withLocalStackSubscription(queue, topic) { _ =>
             val s3Config = S3Config(bucketName = bucket.name)
 
             val snsConfig = SNSConfig(topic.arn)
-            val snsWriter = new SNSWriter(snsClient, snsConfig)
+            val snsWriter = new SNSWriter(localStackSnsClient, snsConfig)
 
             val s3ObjectStore = new S3ObjectStore[ExampleObject](
               s3Client,

@@ -3,7 +3,7 @@ package uk.ac.wellcome.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
@@ -18,6 +18,7 @@ import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import com.amazonaws.services.sns.model.UnsubscribeRequest
 
 trait Messaging
     extends Akka
@@ -31,15 +32,25 @@ trait Messaging
   def withSubscription[R](queue: Queue, topic: Topic)(
     testWith: TestWith[SubscribeResult, R]): R = {
 
-    info(s"Attempting to subscribe ${endpoint(queue)} to ${topic.arn}")
+    info(s"Attempting to subscribe $queue to $topic")
 
-    val subRequest = new SubscribeRequest(topic.arn, "sqs", endpoint(queue))
+    // HACK https://github.com/yourkarma/fake_sns/issues/2
+    val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.name)
     val subscribeResult = snsClient.subscribe(subRequest)
-
-    info(subscribeResult)
 
     testWith(subscribeResult)
   }
+
+  def withLocalStackSubscription[R](queue: Queue, topic: Topic) = fixture[SubscribeResult, R](
+    create = {
+      val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.arn)
+      localStackSnsClient.subscribe(subRequest)
+    },
+    destroy = { subscribeResult =>
+      val unsubscribeRequest = new UnsubscribeRequest(subscribeResult.getSubscriptionArn)
+      localStackSnsClient.unsubscribe(unsubscribeRequest)
+    }
+  )
 
   case class ExampleObject(name: String)
 
@@ -75,6 +86,7 @@ trait Messaging
       new S3ObjectStore[ExampleObject](s3Client, s3Config, keyPrefixGenerator)
 
     val messageReader = new MessageReader[ExampleObject](s3)
+
     val testWorker =
       new MessageWorker[ExampleObject](
         sqsReader,

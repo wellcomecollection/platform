@@ -36,12 +36,7 @@ class MessageWorkerTest
           MessageId = "MessageId",
           TopicArn = "TopicArn",
           Subject = "Subject",
-          Message = toJson(examplePointer).get,
-          Timestamp = "Timestamp",
-          SignatureVersion = "SignatureVersion",
-          Signature = "Signature",
-          SigningCertURL = "SigningCertURL",
-          UnsubscribeURL = "UnsubscribeURL"
+          Message = toJson(examplePointer).get
         )
 
         s3Client.putObject(bucket.name, key, exampleObjectJson)
@@ -86,12 +81,7 @@ class MessageWorkerTest
           MessageId = "MessageId",
           TopicArn = "TopicArn",
           Subject = "Subject",
-          Message = toJson(examplePointer).get,
-          Timestamp = "Timestamp",
-          SignatureVersion = "SignatureVersion",
-          Signature = "Signature",
-          SigningCertURL = "SigningCertURL",
-          UnsubscribeURL = "UnsubscribeURL"
+          Message = toJson(examplePointer).get
         )
 
         sqsClient.sendMessage(
@@ -131,12 +121,7 @@ class MessageWorkerTest
           MessageId = "MessageId",
           TopicArn = "TopicArn",
           Subject = "Subject",
-          Message = toJson(examplePointer).get,
-          Timestamp = "Timestamp",
-          SignatureVersion = "SignatureVersion",
-          Signature = "Signature",
-          SigningCertURL = "SigningCertURL",
-          UnsubscribeURL = "UnsubscribeURL"
+          Message = toJson(examplePointer).get
         )
 
         sqsClient.sendMessage(

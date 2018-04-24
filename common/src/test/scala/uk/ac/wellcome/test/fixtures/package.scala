@@ -26,6 +26,7 @@ package object fixtures extends FixtureComposers {
     implicit logger: Logger): Fixture[L, R] =
     (testWith: TestWith[L, R]) => {
       val loan = create
+      logger.debug(s"created test resource=[$loan]")
       try {
         testWith(loan)
       } finally {

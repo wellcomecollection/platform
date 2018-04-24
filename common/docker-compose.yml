@@ -8,6 +8,7 @@ services:
     image: s12v/elasticmq
     ports:
       - "9324:9324"
+      - "4789:9324"
   dynamodb:
     image: peopleperhour/dynamodb
     ports:
@@ -16,3 +17,8 @@ services:
     image: scality/s3server:mem-latest
     ports:
       - "33333:8000"
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4567-4583:4567-4583"
+      - "8080:8080"
