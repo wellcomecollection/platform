@@ -3,7 +3,11 @@ package uk.ac.wellcome.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
+}
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
@@ -41,16 +45,18 @@ trait Messaging
     testWith(subscribeResult)
   }
 
-  def withLocalStackSubscription[R](queue: Queue, topic: Topic) = fixture[SubscribeResult, R](
-    create = {
-      val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.arn)
-      localStackSnsClient.subscribe(subRequest)
-    },
-    destroy = { subscribeResult =>
-      val unsubscribeRequest = new UnsubscribeRequest(subscribeResult.getSubscriptionArn)
-      localStackSnsClient.unsubscribe(unsubscribeRequest)
-    }
-  )
+  def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
+    fixture[SubscribeResult, R](
+      create = {
+        val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.arn)
+        localStackSnsClient.subscribe(subRequest)
+      },
+      destroy = { subscribeResult =>
+        val unsubscribeRequest =
+          new UnsubscribeRequest(subscribeResult.getSubscriptionArn)
+        localStackSnsClient.unsubscribe(unsubscribeRequest)
+      }
+    )
 
   case class ExampleObject(name: String)
 

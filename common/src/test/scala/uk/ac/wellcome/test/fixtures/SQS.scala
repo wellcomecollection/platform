@@ -61,7 +61,10 @@ trait SQS extends ImplicitLogging {
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = sqsClient.createQueue(queueName)
-      val arn = sqsClient.getQueueAttributes(response.getQueueUrl, List("QueueArn")).getAttributes.get("QueueArn")
+      val arn = sqsClient
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getAttributes
+        .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
 
       sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
@@ -86,15 +89,20 @@ trait SQS extends ImplicitLogging {
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = localStackSqsClient.createQueue(queueName)
-      val arn = localStackSqsClient.getQueueAttributes(response.getQueueUrl, List("QueueArn")).getAttributes.get("QueueArn")
+      val arn = localStackSqsClient
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getAttributes
+        .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
 
-      localStackSqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
+      localStackSqsClient
+        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
       queue
     },
     destroy = { queue =>
       safeCleanup(queue) { url =>
-        localStackSqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
+        localStackSqsClient.purgeQueue(
+          new PurgeQueueRequest().withQueueUrl(queue.url))
       }
       localStackSqsClient.deleteQueue(queue.url)
     }
