@@ -7,7 +7,7 @@ import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3Uri}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3ObjectLocation}
 import uk.ac.wellcome.sns.NotificationMessage
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
@@ -32,7 +32,7 @@ class MessageReaderTest
 
         s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-        val examplePointer = MessagePointer(S3Uri(bucket.name, key))
+        val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
         val serialisedExamplePointer = toJson(examplePointer).get
 
         val exampleNotification = NotificationMessage(

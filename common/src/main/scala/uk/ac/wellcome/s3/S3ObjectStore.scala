@@ -59,16 +59,16 @@ class S3ObjectStore[T] @Inject()(
   s3Config: S3Config,
   keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
-  def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[URI] = {
+  def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
     val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
 
     S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
       sourcedObject)
   }
 
-  def get(uri: URI)(implicit decoder: Decoder[T]): Future[T] = {
+  def get(uri: S3ObjectLocation)(implicit decoder: Decoder[T]): Future[T] = {
     uri match {
-      case S3Uri(bucket, key) => {
+      case S3ObjectLocation(bucket, key) => {
 
         if (bucket != s3Config.bucketName) {
           debug(
@@ -87,7 +87,7 @@ class S3ObjectStore[T] @Inject()(
 
 object S3ObjectStore extends Logging {
   def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
-    sourcedObject: T)(implicit encoder: Encoder[T]): Future[URI] =
+    sourcedObject: T)(implicit encoder: Encoder[T]): Future[S3ObjectLocation] =
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
 
@@ -102,7 +102,7 @@ object S3ObjectStore extends Logging {
       s3Client.putObject(bucketName, key, content)
       info(s"Successfully PUT object to s3://$bucketName/$key")
 
-      S3Uri(bucketName, key)
+      S3ObjectLocation(bucketName, key)
     }
 
   def get[T](s3Client: AmazonS3, bucketName: String)(key: String)(

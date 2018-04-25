@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3Uri}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3ObjectLocation}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Success
@@ -51,7 +51,7 @@ class MessageWriterTest
           val pointer = fromJson[MessagePointer](messages.head.message)
 
           inside(pointer) {
-            case Success(MessagePointer(S3Uri(bucketName, _))) =>
+            case Success(MessagePointer(S3ObjectLocation(bucketName, _))) =>
               bucketName shouldBe bucket.name
           }
 

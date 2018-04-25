@@ -13,7 +13,7 @@ import com.twitter.inject.Logging
 import scala.concurrent.duration._
 import com.amazonaws.services.s3.AmazonS3
 import io.circe.Decoder
-import uk.ac.wellcome.s3.S3Uri
+import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.JsonUtil._

@@ -6,7 +6,7 @@ import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{S3ObjectStore, S3Uri}
+import uk.ac.wellcome.s3.{S3ObjectStore, S3ObjectLocation}
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
@@ -104,7 +104,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
     val futureUri = sourcedObjectStore.put(sourcedObject)
 
     futureUri.flatMap {
-      case S3Uri(_, key) => versionedDao.updateRecord(f(key))
+      case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
     }
   }
 
@@ -118,7 +118,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
       case Some(hybridRecord) => {
         sourcedObjectStore
           .get(
-            S3Uri(s3Config.bucketName, hybridRecord.s3key)
+            S3ObjectLocation(s3Config.bucketName, hybridRecord.s3key)
           )
           .map { s3Record =>
             Some(VersionedHybridObject(hybridRecord, s3Record))

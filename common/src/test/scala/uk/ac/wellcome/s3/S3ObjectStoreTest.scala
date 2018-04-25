@@ -29,7 +29,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -46,7 +46,7 @@ class S3ObjectStoreTest
         val expectedHash = "1770874231"
 
         val expectedKey = s"$prefix/$expectedHash.json"
-        val expectedUri = S3Uri(bucket.name, expectedKey)
+        val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
 
         actualKey shouldBe expectedUri
 
@@ -65,7 +65,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "/foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -79,7 +79,7 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        val expectedUri = S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
         actualKey shouldBe expectedUri
       }
     }
@@ -90,7 +90,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo/"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -104,7 +104,7 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedUri = S3Uri(bucket.name, s"foo/$expectedHash.json")
+        val expectedUri = S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
         actualKey shouldBe expectedUri
       }
     }
@@ -115,7 +115,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -144,30 +144,13 @@ class S3ObjectStoreTest
       )
 
       whenReady(
-        objectStore.get(S3Uri(bucket.name, "not/a/real/object")).failed) {
+        objectStore.get(S3ObjectLocation(bucket.name, "not/a/real/object")).failed) {
         exception =>
           exception shouldBe a[AmazonS3Exception]
           exception
             .asInstanceOf[AmazonS3Exception]
             .getErrorCode shouldBe "NoSuchKey"
 
-      }
-    }
-  }
-
-  it("throws an exception when retrieving from an invalid scheme") {
-    withLocalS3Bucket { bucket =>
-      val objectStore = new S3ObjectStore(
-        s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = "doesnt_matter"
-        }
-      )
-
-      whenReady(objectStore.get(new URI("http://www.example.com")).failed) {
-        exception =>
-          exception shouldBe a[RuntimeException]
       }
     }
   }

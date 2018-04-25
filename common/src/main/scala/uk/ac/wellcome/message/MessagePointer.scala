@@ -2,8 +2,18 @@ package uk.ac.wellcome.message
 
 import java.net.URI
 
-case class MessagePointer(src: URI)
+import uk.ac.wellcome.s3.S3ObjectLocation
+
+import scala.util.Try
+
+
+case class MessagePointer(src: S3ObjectLocation)
 
 object MessagePointer {
-  def apply(uri: String): MessagePointer = MessagePointer(new URI(uri))
+  def create(uri: URI): Try[MessagePointer] =
+    S3ObjectLocation
+      .create(uri)
+      .map(MessagePointer(_))
+
 }
+
