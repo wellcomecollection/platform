@@ -143,6 +143,20 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .map { concept(_) }
       .mkString(",")
 
+  def subject(s: Subject) =
+  s"""
+  {
+    "label": "${s.label}",
+    "type" : "${s.ontologyType}",
+    "concepts": [ ${concepts(s.concepts)} ]
+   }
+   """
+
+  def subjects(subjects: List[Subject]) =
+    subjects
+      .map { subject(_) }
+      .mkString(",")
+
   def contributor(c: Contributor[Displayable[AbstractAgent]]) =
     s"""
        |{

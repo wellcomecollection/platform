@@ -176,7 +176,9 @@ class DisplayWorkV1SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      subjects = List(Concept("fish"), Concept("gardening"))
+      subjects = List(
+        Subject("label", List(Concept("fish"))),
+        Subject("label", List(Concept("gardening"))))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
@@ -185,8 +187,9 @@ class DisplayWorkV1SerialisationTest
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
-                          |     "subjects": [ ${concepts(
-                            workWithSubjects.subjects)} ],
+                          |     "subjects": [
+                          |       ${concept(workWithSubjects.subjects(0).concepts(0))},
+                          |       ${concept(workWithSubjects.subjects(1).concepts(0))} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]

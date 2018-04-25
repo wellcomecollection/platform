@@ -69,9 +69,15 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "ontologyType": "Concept",
-      |      "qualifierType": null,
-      |      "type": "Concept"
+      |      "ontologyType": "Subject",
+      |      "concepts" : [
+      |        {
+      |          "label" : "concept",
+      |          "qualifierType" : null,
+      |          "ontologyType" : "Concept",
+      |          "type" : "Concept"
+      |        }
+      |      ]
       |    }
       |  ],
       |  "contributors": [
@@ -206,7 +212,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
-    subjects = List(Concept("subject")),
+    subjects = List(Subject("subject", List(Concept("concept")))),
     contributors = List(
       Contributor(
         agent = Unidentifiable(Agent("47"))
