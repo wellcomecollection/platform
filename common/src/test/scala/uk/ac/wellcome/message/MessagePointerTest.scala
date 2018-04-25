@@ -20,7 +20,8 @@ class MessagePointerTest extends FunSpec with Matchers {
   }
 
   it("fails to parse objects that are not message pointers from json") {
-    val pointer = fromJson[MessagePointer]("""{"src":{"grump":"frump","lump":"dump"}}""")
+    val pointer =
+      fromJson[MessagePointer]("""{"src":{"grump":"frump","lump":"dump"}}""")
     val messagePointer = MessagePointer.create(new URI("s3://bucket/key")).get
 
     pointer shouldBe a[Failure[_]]

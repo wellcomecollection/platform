@@ -26,7 +26,7 @@ import scala.concurrent.Future
 import com.amazonaws.services.sns.model.UnsubscribeRequest
 
 trait Messaging
-  extends Akka
+    extends Akka
     with Metrics
     with SQS
     with SNS
@@ -49,16 +49,16 @@ trait Messaging
   case class ExampleObject(name: String)
 
   class ExampleMessageWorker(
-      sqsReader: SQSReader,
-      messageReader: MessageReader[ExampleObject],
-      actorSystem: ActorSystem,
-      metricsSender: MetricsSender
-    ) extends MessageWorker[ExampleObject](
-      sqsReader,
-      messageReader,
-      actorSystem,
-      metricsSender
-  ) {
+    sqsReader: SQSReader,
+    messageReader: MessageReader[ExampleObject],
+    actorSystem: ActorSystem,
+    metricsSender: MetricsSender
+  ) extends MessageWorker[ExampleObject](
+        sqsReader,
+        messageReader,
+        actorSystem,
+        metricsSender
+      ) {
 
     var hasBeenCalled: Boolean = false
 
@@ -90,12 +90,12 @@ trait Messaging
   }
 
   def withMessageWorker[R](
-                            sqsClient: AmazonSQS,
-                            s3Client: AmazonS3
-                          )(actorSystem: ActorSystem,
-                            queue: Queue,
-                            metricsSender: MetricsSender,
-                            bucket: S3.Bucket)(testWith: TestWith[ExampleMessageWorker, R]) = {
+    sqsClient: AmazonSQS,
+    s3Client: AmazonS3
+  )(actorSystem: ActorSystem,
+    queue: Queue,
+    metricsSender: MetricsSender,
+    bucket: S3.Bucket)(testWith: TestWith[ExampleMessageWorker, R]) = {
 
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 

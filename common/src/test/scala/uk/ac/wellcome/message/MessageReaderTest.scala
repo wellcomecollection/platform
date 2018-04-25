@@ -18,7 +18,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.util.{Failure, Success, Try}
 
 class MessageReaderTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
@@ -34,7 +34,8 @@ class MessageReaderTest
 
           s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val examplePointer =
+            MessagePointer(S3ObjectLocation(bucket.name, key))
           val serialisedExamplePointer = toJson(examplePointer).get
 
           val exampleNotification = NotificationMessage(
@@ -66,7 +67,8 @@ class MessageReaderTest
 
           s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val examplePointer =
+            MessagePointer(S3ObjectLocation(bucket.name, key))
           val serialisedExamplePointer = "Not even close to valid json."
 
           val exampleNotification = NotificationMessage(
@@ -94,7 +96,8 @@ class MessageReaderTest
         case (bucket, messageReader) =>
           val key = "key.json"
 
-          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val examplePointer =
+            MessagePointer(S3ObjectLocation(bucket.name, key))
           val serialisedExamplePointer = toJson(examplePointer).get
 
           val exampleNotification = NotificationMessage(
