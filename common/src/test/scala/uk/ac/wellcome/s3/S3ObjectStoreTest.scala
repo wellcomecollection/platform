@@ -79,7 +79,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedUri = S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+        val expectedUri =
+          S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
         actualKey shouldBe expectedUri
       }
     }
@@ -104,7 +105,8 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedUri = S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+        val expectedUri =
+          S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
         actualKey shouldBe expectedUri
       }
     }
@@ -144,12 +146,13 @@ class S3ObjectStoreTest
       )
 
       whenReady(
-        objectStore.get(S3ObjectLocation(bucket.name, "not/a/real/object")).failed) {
-        exception =>
-          exception shouldBe a[AmazonS3Exception]
-          exception
-            .asInstanceOf[AmazonS3Exception]
-            .getErrorCode shouldBe "NoSuchKey"
+        objectStore
+          .get(S3ObjectLocation(bucket.name, "not/a/real/object"))
+          .failed) { exception =>
+        exception shouldBe a[AmazonS3Exception]
+        exception
+          .asInstanceOf[AmazonS3Exception]
+          .getErrorCode shouldBe "NoSuchKey"
 
       }
     }

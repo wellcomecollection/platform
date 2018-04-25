@@ -12,7 +12,8 @@ import scala.util.{Failure, Success}
 class MessagePointerTest extends FunSpec with Matchers {
 
   it("reads from json") {
-    val pointer = fromJson[MessagePointer]("""{"src":{"bucket":"bucket","key":"key"}}""")
+    val pointer =
+      fromJson[MessagePointer]("""{"src":{"bucket":"bucket","key":"key"}}""")
     val messagePointer = MessagePointer.create(new URI("s3://bucket/key")).get
 
     pointer shouldBe Success(messagePointer)
@@ -28,7 +29,8 @@ class MessagePointerTest extends FunSpec with Matchers {
   it("writes to json") {
     val pointer = MessagePointer.create(new URI("s3://bucket/key")).get
 
-    toJson(pointer) shouldBe Success("""{"src":{"bucket":"bucket","key":"key"}}""")
+    toJson(pointer) shouldBe Success(
+      """{"src":{"bucket":"bucket","key":"key"}}""")
   }
 
 }
