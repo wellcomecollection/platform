@@ -5,6 +5,9 @@ module "miro_transformer_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.miro_transformer_topic.name}"]
 
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
+
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
@@ -14,6 +17,9 @@ module "transformer_queue" {
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.transformer_topic.name}"]
+
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
@@ -25,6 +31,9 @@ module "es_ingest_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.es_ingest_topic.name}"]
 
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
+
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
@@ -34,6 +43,9 @@ module "id_minter_queue" {
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.id_minter_topic.name}"]
+
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
