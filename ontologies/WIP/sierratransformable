@@ -153,9 +153,8 @@
    * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
    * 4. For "110" type as "Organisation"
    * 5. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
-   * 6. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * 7. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX.
-   * 8. Populate roles "label" with the contents of subfield "e" for all entries.
+   * 6. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX.
+   * 7. Populate roles "label" with the contents of subfield "e" for all entries.
    *
    *
    *
