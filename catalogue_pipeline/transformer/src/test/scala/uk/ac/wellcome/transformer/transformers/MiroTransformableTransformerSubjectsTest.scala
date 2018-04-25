@@ -17,7 +17,7 @@ class MiroTransformableTransformerSubjectsTest
   it("should have an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
       data = s""""image_title": "A snail without a subject"""",
-      expectedSubjects = List[Concept]()
+      expectedSubjects = List[Subject]()
     )
   }
 
@@ -28,9 +28,9 @@ class MiroTransformableTransformerSubjectsTest
         "image_keywords": ["animals", "arachnids", "fruit"]
       """,
       expectedSubjects = List(
-        Concept("animals"),
-        Concept("arachnids"),
-        Concept("fruit")
+        Subject(label = "animals", concepts = List(Concept("animals"))),
+        Subject(label = "arachnids", concepts = List(Concept("arachnids"))),
+        Subject(label = "fruit", concepts = List(Concept("fruit")))
       )
     )
   }
@@ -42,8 +42,8 @@ class MiroTransformableTransformerSubjectsTest
         "image_keywords_unauth": ["altruism", "mammals"]
       """,
       expectedSubjects = List(
-        Concept("altruism"),
-        Concept("mammals")
+        Subject(label = "altruism", concepts = List(Concept("altruism"))),
+        Subject(label = "mammals", concepts = List(Concept("mammals")))
       )
     )
   }
@@ -57,8 +57,8 @@ class MiroTransformableTransformerSubjectsTest
         "image_keywords_unauth": ["marine creatures"]
       """,
       expectedSubjects = List(
-        Concept("humour"),
-        Concept("marine creatures")
+        Subject(label = "humour", concepts = List(Concept("humour"))),
+        Subject(label = "marine creatures", concepts = List(Concept("marine creatures")))
       )
     )
   }
@@ -97,7 +97,7 @@ class MiroTransformableTransformerSubjectsTest
 
   private def transformRecordAndCheckSubjects(
     data: String,
-    expectedSubjects: List[Concept] = List()
+    expectedSubjects: List[Subject] = List()
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.subjects shouldBe expectedSubjects

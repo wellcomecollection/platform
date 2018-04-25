@@ -228,15 +228,16 @@ class MiroTransformableTransformer
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  private def getSubjects(miroData: MiroTransformableData): List[Concept] = {
-    val keywords: List[Concept] = miroData.keywords match {
+  private def getSubjects(miroData: MiroTransformableData): List[Subject] = {
+    val keywords: List[Subject] = miroData.keywords match {
       case Some(k) =>
-        k.map { Concept(_) }
+        k.map { keyword => Subject(label = keyword, concepts = List(Concept(keyword)) ) }
       case None => List()
     }
 
-    val keywordsUnauth: List[Concept] = miroData.keywordsUnauth match {
-      case Some(k) => k.map { Concept(_) }
+    val keywordsUnauth: List[Subject] = miroData.keywordsUnauth match {
+      case Some(k) =>
+        k.map { keyword => Subject(label = keyword, concepts = List(Concept(keyword)) ) }
       case None => List()
     }
 
