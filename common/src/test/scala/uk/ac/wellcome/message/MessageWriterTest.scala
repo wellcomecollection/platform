@@ -35,13 +35,13 @@ class MessageWriterTest
           s3Config,
           keyPrefixGenerator)
 
-        val messages =
+        val messageWriter =
           new MessageWriter[ExampleObject](snsWriter, s3Config, s3ObjectStore)
 
         val message = ExampleObject("Some value")
         val subject = "sns-writer-test-subject"
 
-        val eventualAttempt = messages.write(message, subject)
+        val eventualAttempt = messageWriter.write(message, subject)
 
         whenReady(eventualAttempt) { pointer =>
           val messages = listMessagesReceivedFromSNS(topic)

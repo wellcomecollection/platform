@@ -45,7 +45,7 @@ class MessagingIntegrationTest
               keyPrefixGenerator
             )
 
-            val messages =
+            val messageWriter =
               new MessageWriter[ExampleObject](
                 snsWriter,
                 s3Config,
@@ -53,7 +53,7 @@ class MessagingIntegrationTest
 
             val exampleObject = ExampleObject("some value")
 
-            messages.write(exampleObject, "subject")
+            messageWriter.write(exampleObject, "subject")
 
             eventually {
               verify(
