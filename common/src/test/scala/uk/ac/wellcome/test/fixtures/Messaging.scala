@@ -32,19 +32,6 @@ trait Messaging
     with S3
     with ImplicitLogging {
 
-  // This doesn't seem to work yet
-  def withSubscription[R](queue: Queue, topic: Topic)(
-    testWith: TestWith[SubscribeResult, R]): R = {
-
-    info(s"Attempting to subscribe $queue to $topic")
-
-    // HACK https://github.com/yourkarma/fake_sns/issues/2
-    val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.name)
-    val subscribeResult = snsClient.subscribe(subRequest)
-
-    testWith(subscribeResult)
-  }
-
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](
       create = {
