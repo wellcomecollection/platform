@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class MessageReader[T] @Inject()(s3ObjectStore: S3ObjectStore[T]) {
 
-  def process(message: sqs.model.Message)(
+  def read(message: sqs.model.Message)(
     implicit decoderN: Decoder[NotificationMessage],
     decoderT: Decoder[T]): Future[T] = {
     val deserialisedMessagePointerAttempt = for {

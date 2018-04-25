@@ -1,13 +1,15 @@
 package uk.ac.wellcome.message
 
+import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest._
 import io.circe.Decoder
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3ObjectLocation}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.sns.NotificationMessage
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
@@ -16,42 +18,103 @@ import uk.ac.wellcome.test.fixtures._
 import scala.util.{Failure, Success, Try}
 
 class MessageReaderTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
     with S3 {
 
-  it(
-    "reads a NotificationMessage from an sqs.model.Message and converts to type T") {
-    withMessageReaderFixtures {
-      case (bucket, messageReader) =>
-        val key = "key.json"
-        val expectedObject = ExampleObject("some value")
-        val serialisedExampleObject = toJson(expectedObject).get
+  describe("reads a NotificationMessage from an sqs.model.Message") {
+    it("converts to type T") {
+      withMessageReaderFixtures {
+        case (bucket, messageReader) =>
+          val key = "key.json"
+          val expectedObject = ExampleObject("some value")
+          val serialisedExampleObject = toJson(expectedObject).get
 
-        s3Client.putObject(bucket.name, key, serialisedExampleObject)
+          s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-        val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
-        val serialisedExamplePointer = toJson(examplePointer).get
+          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val serialisedExamplePointer = toJson(examplePointer).get
 
-        val exampleNotification = NotificationMessage(
-          MessageId = "MessageId",
-          TopicArn = "TopicArn",
-          Subject = "Subject",
-          Message = serialisedExamplePointer
-        )
+          val exampleNotification = NotificationMessage(
+            MessageId = "MessageId",
+            TopicArn = "TopicArn",
+            Subject = "Subject",
+            Message = serialisedExamplePointer
+          )
 
-        val serialisedExampleNotification = toJson(exampleNotification).get
+          val serialisedExampleNotification = toJson(exampleNotification).get
 
-        val exampleMessage = new Message()
-          .withBody(serialisedExampleNotification)
+          val exampleMessage = new Message()
+            .withBody(serialisedExampleNotification)
 
-        val actualObjectFuture = messageReader.process(exampleMessage)
+          val actualObjectFuture = messageReader.read(exampleMessage)
 
-        whenReady(actualObjectFuture) { actualObject =>
-          expectedObject shouldBe actualObject
-        }
+          whenReady(actualObjectFuture) { actualObject =>
+            expectedObject shouldBe actualObject
+          }
+      }
+    }
+
+    it("fail gracefully when NotificationMessage cannot be deserialised") {
+      withMessageReaderFixtures {
+        case (bucket, messageReader) =>
+          val key = "key.json"
+          val expectedObject = ExampleObject("some value")
+          val serialisedExampleObject = toJson(expectedObject).get
+
+          s3Client.putObject(bucket.name, key, serialisedExampleObject)
+
+          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val serialisedExamplePointer = "Not even close to valid json."
+
+          val exampleNotification = NotificationMessage(
+            MessageId = "MessageId",
+            TopicArn = "TopicArn",
+            Subject = "Subject",
+            Message = serialisedExamplePointer
+          )
+
+          val serialisedExampleNotification = toJson(exampleNotification).get
+
+          val exampleMessage = new Message()
+            .withBody(serialisedExampleNotification)
+
+          val actualObjectFuture = messageReader.read(exampleMessage)
+
+          whenReady(actualObjectFuture.failed) { throwable =>
+            throwable shouldBe a[GracefulFailureException]
+          }
+      }
+    }
+
+    it("does not fail gracefully when the s3 object cannot be retrieved") {
+      withMessageReaderFixtures {
+        case (bucket, messageReader) =>
+          val key = "key.json"
+
+          val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+          val serialisedExamplePointer = toJson(examplePointer).get
+
+          val exampleNotification = NotificationMessage(
+            MessageId = "MessageId",
+            TopicArn = "TopicArn",
+            Subject = "Subject",
+            Message = serialisedExamplePointer
+          )
+
+          val serialisedExampleNotification = toJson(exampleNotification).get
+
+          val exampleMessage = new Message()
+            .withBody(serialisedExampleNotification)
+
+          val actualObjectFuture = messageReader.read(exampleMessage)
+
+          whenReady(actualObjectFuture.failed) { throwable =>
+            throwable shouldBe a[AmazonS3Exception]
+          }
+      }
     }
   }
 }

@@ -41,7 +41,7 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
     implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
-        message <- messageReader.process(message)
+        message <- messageReader.read(message)
         _ <- Future.successful { debug(s"Processing message: $message") }
         metricName = s"${workerName}_ProcessMessage"
         _ <- metricsSender.timeAndCount(
