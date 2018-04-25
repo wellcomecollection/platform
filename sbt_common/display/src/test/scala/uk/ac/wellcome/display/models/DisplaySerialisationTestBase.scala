@@ -144,7 +144,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .mkString(",")
 
   def subject(s: Subject) =
-  s"""
+    s"""
   {
     "label": "${s.label}",
     "type" : "${s.ontologyType}",

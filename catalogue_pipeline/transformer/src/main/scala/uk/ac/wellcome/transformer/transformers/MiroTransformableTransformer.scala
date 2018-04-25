@@ -231,13 +231,17 @@ class MiroTransformableTransformer
   private def getSubjects(miroData: MiroTransformableData): List[Subject] = {
     val keywords: List[Subject] = miroData.keywords match {
       case Some(k) =>
-        k.map { keyword => Subject(label = keyword, concepts = List(Concept(keyword)) ) }
+        k.map { keyword =>
+          Subject(label = keyword, concepts = List(Concept(keyword)))
+        }
       case None => List()
     }
 
     val keywordsUnauth: List[Subject] = miroData.keywordsUnauth match {
       case Some(k) =>
-        k.map { keyword => Subject(label = keyword, concepts = List(Concept(keyword)) ) }
+        k.map { keyword =>
+          Subject(label = keyword, concepts = List(Concept(keyword)))
+        }
       case None => List()
     }
 

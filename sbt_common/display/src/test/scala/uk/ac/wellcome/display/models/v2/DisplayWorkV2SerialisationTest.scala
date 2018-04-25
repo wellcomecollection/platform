@@ -194,7 +194,8 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "contributors": [],
-                          |     "subjects": [ ${subjects(workWithSubjects.subjects)} ],
+                          |     "subjects": [ ${subjects(
+                            workWithSubjects.subjects)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]

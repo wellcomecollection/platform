@@ -119,7 +119,9 @@ case object DisplayWorkV1 {
         contributor: Contributor[Displayable[AbstractAgent]] =>
           DisplayAbstractAgent(contributor.agent)
       },
-      subjects = work.subjects.flatMap { subject => subject.concepts.map { DisplayConcept(_) } },
+      subjects = work.subjects.flatMap { subject =>
+        subject.concepts.map { DisplayConcept(_) }
+      },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)

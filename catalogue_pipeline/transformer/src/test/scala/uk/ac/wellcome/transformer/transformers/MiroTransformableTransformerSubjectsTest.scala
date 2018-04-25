@@ -58,7 +58,9 @@ class MiroTransformableTransformerSubjectsTest
       """,
       expectedSubjects = List(
         Subject(label = "humour", concepts = List(Concept("humour"))),
-        Subject(label = "marine creatures", concepts = List(Concept("marine creatures")))
+        Subject(
+          label = "marine creatures",
+          concepts = List(Concept("marine creatures")))
       )
     )
   }

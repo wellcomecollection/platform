@@ -188,8 +188,10 @@ class DisplayWorkV1SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [
-                          |       ${concept(workWithSubjects.subjects(0).concepts(0))},
-                          |       ${concept(workWithSubjects.subjects(1).concepts(0))} ],
+                          |       ${concept(
+                            workWithSubjects.subjects(0).concepts(0))},
+                          |       ${concept(
+                            workWithSubjects.subjects(1).concepts(0))} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
