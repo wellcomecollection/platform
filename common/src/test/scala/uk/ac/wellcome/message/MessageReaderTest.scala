@@ -7,7 +7,7 @@ import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3ObjectLocation}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.sns.NotificationMessage
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._

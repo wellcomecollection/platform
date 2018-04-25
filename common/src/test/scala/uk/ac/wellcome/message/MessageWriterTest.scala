@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.aws.SNSConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore, S3ObjectLocation}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Success

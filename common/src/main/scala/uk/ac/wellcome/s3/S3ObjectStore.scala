@@ -59,7 +59,8 @@ class S3ObjectStore[T] @Inject()(
   s3Config: S3Config,
   keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
-  def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
+  def put(sourcedObject: T)(
+    implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
     val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
 
     S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
