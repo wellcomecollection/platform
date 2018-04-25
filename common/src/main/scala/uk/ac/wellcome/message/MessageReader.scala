@@ -1,6 +1,6 @@
 package uk.ac.wellcome.message
 
-import com.amazonaws.services.sqs.model.{Message => SQSMessage}
+import com.amazonaws.services.sqs
 import io.circe.Decoder
 import uk.ac.wellcome.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
@@ -13,7 +13,7 @@ import scala.concurrent.Future
 
 class MessageReader[T] @Inject()(s3ObjectStore: S3ObjectStore[T]) {
 
-  def process(message: SQSMessage)(
+  def process(message: sqs.model.Message)(
     implicit decoderN: Decoder[NotificationMessage],
     decoderT: Decoder[T]): Future[T] = {
     val deserialisedMessagePointerAttempt = for {
