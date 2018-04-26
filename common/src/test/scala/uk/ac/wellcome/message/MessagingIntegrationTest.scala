@@ -19,19 +19,9 @@ class MessagingIntegrationTest
     with Eventually
     with ExtendedPatience {
 
-  def withFixtures[R] =
-    withActorSystem[R] and
-      withLocalStackSqsQueue[R] and
-      withMetricsSender[R] _ and
-      withLocalS3Bucket[R] and
-      withMessageWorker[R](
-        localStackSqsClient,
-        s3Client
-      ) _
-
   it("sends and receives messages") {
-    withFixtures {
-      case (_, queue, metrics, bucket, worker) =>
+    withMessageWorkerFixtures {
+      case (_, metrics, queue, bucket, worker) =>
         withLocalStackSnsTopic { topic =>
           withLocalStackSubscription(queue, topic) { _ =>
             val s3Config = S3Config(bucketName = bucket.name)
@@ -56,13 +46,7 @@ class MessagingIntegrationTest
             messageWriter.write(exampleObject, "subject")
 
             eventually {
-              verify(
-                metrics,
-                times(1)
-              ).timeAndCount(
-                matches(".*_ProcessMessage"),
-                any()
-              )
+              worker.calledWith shouldBe Some(exampleObject)
             }
           }
         }

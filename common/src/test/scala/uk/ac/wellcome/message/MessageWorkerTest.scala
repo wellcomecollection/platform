@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
 class MessageWorkerTest
-    extends FunSpec
+  extends FunSpec
     with MockitoSugar
     with Eventually
     with Matchers
@@ -25,7 +25,7 @@ class MessageWorkerTest
 
   it("processes messages") {
     withMessageWorkerFixtures {
-      case (_, queue, metrics, bucket, worker) =>
+      case (_, metrics, queue, bucket, worker) =>
         val key = "message-key"
 
         val exampleObject = ExampleObject("some value")
@@ -48,14 +48,14 @@ class MessageWorkerTest
         )
 
         eventually {
-          worker.hasBeenCalled shouldBe true
+          worker.calledWith shouldBe Some(exampleObject)
         }
     }
   }
 
   it("increments *_ProcessMessage metric when successful") {
-    withMessageWorkerFixtures {
-      case (_, queue, metrics, bucket, worker) =>
+    withMessageWorkerFixturesAndMockedMetrics {
+      case (_, metrics, queue, bucket, worker) =>
         val key = "message-key"
 
         val exampleObject = ExampleObject("some value")
@@ -78,8 +78,6 @@ class MessageWorkerTest
         )
 
         eventually {
-          worker.hasBeenCalled shouldBe true
-
           verify(
             metrics,
             times(1)
@@ -93,8 +91,8 @@ class MessageWorkerTest
   }
 
   it("increments *_MessageProcessingFailure metric when not successful") {
-    withMessageWorkerFixtures {
-      case (_, queue, metrics, bucket, worker) =>
+    withMessageWorkerFixturesAndMockedMetrics {
+      case (_, metrics, queue, bucket, worker) =>
         when(
           metrics.timeAndCount[Unit](
             anyString(),
@@ -124,8 +122,6 @@ class MessageWorkerTest
         )
 
         eventually {
-          worker.hasBeenCalled shouldBe false
-
           verify(metrics)
             .incrementCount(
               matches(".*_MessageProcessingFailure"),
@@ -135,13 +131,11 @@ class MessageWorkerTest
   }
 
   it("increments *_MessageProcessingFailure metric unable to parse a message") {
-    withMessageWorkerFixtures {
-      case (_, queue, metrics, bucket, worker) =>
+    withMessageWorkerFixturesAndMockedMetrics {
+      case (_, metrics, queue, bucket, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
 
         eventually {
-          worker.hasBeenCalled shouldBe false
-
           verify(metrics, never())
             .incrementCount(
               matches(".*_MessageProcessingFailure"),

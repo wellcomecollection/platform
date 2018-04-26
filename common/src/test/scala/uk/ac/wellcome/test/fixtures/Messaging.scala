@@ -5,14 +5,13 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sns.model.{
   SubscribeRequest,
-  SubscribeResult,
-  UnsubscribeRequest
+  SubscribeResult
 }
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
 import uk.ac.wellcome.message.{MessageReader, MessageWorker}
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.metrics
 import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.sqs.SQSReader
@@ -27,7 +26,7 @@ import com.amazonaws.services.sns.model.UnsubscribeRequest
 
 trait Messaging
     extends Akka
-    with Metrics
+    with MetricsSender
     with SQS
     with SNS
     with S3
@@ -37,6 +36,8 @@ trait Messaging
     fixture[SubscribeResult, R](
       create = {
         val subRequest = new SubscribeRequest(topic.arn, "sqs", queue.arn)
+        info(s"Subscribing queue ${queue.arn} to topic ${topic.arn}")
+
         localStackSnsClient.subscribe(subRequest)
       },
       destroy = { subscribeResult =>
@@ -52,7 +53,7 @@ trait Messaging
     sqsReader: SQSReader,
     messageReader: MessageReader[ExampleObject],
     actorSystem: ActorSystem,
-    metricsSender: MetricsSender
+    metricsSender: metrics.MetricsSender
   ) extends MessageWorker[ExampleObject](
         sqsReader,
         messageReader,
@@ -60,13 +61,14 @@ trait Messaging
         metricsSender
       ) {
 
-    var hasBeenCalled: Boolean = false
+    var calledWith: Option[ExampleObject] = None
+    def hasBeenCalled: Boolean = calledWith.nonEmpty
 
     override implicit val decoder: Decoder[ExampleObject] =
       deriveDecoder[ExampleObject]
 
     override def processMessage(message: ExampleObject) = Future {
-      hasBeenCalled = true
+      calledWith = Some(message)
 
       info("processMessage was called!")
     }
@@ -77,7 +79,7 @@ trait Messaging
       override def generate(obj: ExampleObject): String = "/"
     }
 
-  def withMessageReader[R](s3Client: AmazonS3)(bucket: Bucket)(
+  def withMessageReader[R](bucket: Bucket)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
@@ -90,12 +92,11 @@ trait Messaging
   }
 
   def withMessageWorker[R](
-    sqsClient: AmazonSQS,
-    s3Client: AmazonS3
-  )(actorSystem: ActorSystem,
-    queue: Queue,
-    metricsSender: MetricsSender,
-    bucket: S3.Bucket)(testWith: TestWith[ExampleMessageWorker, R]) = {
+      actorSystem: ActorSystem,
+      metricsSender: metrics.MetricsSender,
+      queue: Queue,
+      bucket: S3.Bucket
+    )(testWith: TestWith[ExampleMessageWorker, R]) = {
 
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
@@ -109,7 +110,8 @@ trait Messaging
       sqsReader,
       messageReader,
       actorSystem,
-      metricsSender)
+      metricsSender
+    )
 
     try {
       testWith(testWorker)
@@ -120,16 +122,20 @@ trait Messaging
 
   def withMessageReaderFixtures[R] =
     withLocalS3Bucket[R] and
-      withMessageReader[R](s3Client) _
+      withMessageReader[R] _
 
   def withMessageWorkerFixtures[R] =
     withActorSystem[R] and
-      withLocalSqsQueue[R] and
       withMetricsSender[R] _ and
+      withLocalStackSqsQueue[R] and
       withLocalS3Bucket[R] and
-      withMessageWorker[R](
-        sqsClient,
-        s3Client
-      ) _
+      withMessageWorker[R] _
+
+  def withMessageWorkerFixturesAndMockedMetrics[R] =
+    withActorSystem[R] and
+      withMockMetricSender[R] and
+      withLocalStackSqsQueue[R] and
+      withLocalS3Bucket[R] and
+      withMessageWorker[R] _
 
 }

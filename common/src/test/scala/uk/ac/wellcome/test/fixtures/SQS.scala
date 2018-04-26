@@ -66,7 +66,6 @@ trait SQS extends ImplicitLogging {
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
-
       sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
       queue
     },
