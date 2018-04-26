@@ -21,7 +21,7 @@ import akka.actor.ActorSystem
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class SQSWorkerTest
-  extends FunSpec
+    extends FunSpec
     with MockitoSugar
     with Eventually
     with fixtures.Akka
@@ -29,9 +29,9 @@ class SQSWorkerTest
     with fixtures.MetricsSender {
 
   def withSqsWorker[R](
-                        actors: ActorSystem,
-                        queue: Queue,
-                        metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
+    actors: ActorSystem,
+    queue: Queue,
+    metrics: MetricsSender)(testWith: TestWith[SQSWorker, R]) = {
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker =

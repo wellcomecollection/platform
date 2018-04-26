@@ -10,7 +10,7 @@ import uk.ac.wellcome.metrics
 import scala.concurrent.Future
 
 trait MetricsSender
-  extends Logging
+    extends Logging
     with ImplicitLogging
     with MockitoSugar
     with CloudWatch
@@ -20,7 +20,11 @@ trait MetricsSender
     withActorSystem { actorSystem =>
       withCloudWatchClient { cloudWatchClient =>
         fixture[metrics.MetricsSender, R](
-          create = new metrics.MetricsSender(awsNamespace, flushInterval, cloudWatchClient, actorSystem)
+          create = new metrics.MetricsSender(
+            awsNamespace,
+            flushInterval,
+            cloudWatchClient,
+            actorSystem)
         )
       }
     }
