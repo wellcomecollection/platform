@@ -1,5 +1,8 @@
 package uk.ac.wellcome.models
 
+import io.circe.{Decoder, Encoder, Json}
+import cats.syntax.either._
+
 sealed trait License {
   val licenseType: String
   val label: String
@@ -7,7 +10,7 @@ sealed trait License {
   val ontologyType: String = "License"
 }
 
-object License extends Logging {
+object License {
   implicit val licenseEncoder = Encoder.instance[License](
     license =>
       Json.obj(
@@ -33,7 +36,6 @@ object License extends Logging {
       case s: String if s == License_PDM.licenseType => License_PDM
       case licenseType =>
         val errorMessage = s"$licenseType is not a valid licenseType"
-        error(errorMessage)
         throw new Exception(errorMessage)
     }
   }

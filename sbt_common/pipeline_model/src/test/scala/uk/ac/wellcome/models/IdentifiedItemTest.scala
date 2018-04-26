@@ -1,5 +1,7 @@
 package uk.ac.wellcome.models
 
+import org.scalatest.{FunSpec, Matchers}
+
 class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
 
   val identifiedItemJson: String =

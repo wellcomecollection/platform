@@ -28,7 +28,8 @@ lazy val common = project
   .enablePlugins(DockerComposePlugin)
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
-lazy val common_pipeline_model = doSharedLibrarySetup(project, "sbt_common/pipeline_model")
+lazy val pipeline_model = doSharedLibrarySetup(project, "sbt_common/pipeline_model")
+  .settings(libraryDependencies ++= Dependencies.pipelineModelDependencies)
 
 // We still inherit from the main common because we need the models it
 // contains (e.g. IdentifiedWork) to construct display models.
@@ -90,6 +91,7 @@ lazy val snapshot_generator = doMainProjectSetup(project, "data_api/snapshot_gen
 lazy val root = (project in file("."))
   .aggregate(
     common,
+    pipeline_model,
     common_display,
     common_elasticsearch,
     api,
