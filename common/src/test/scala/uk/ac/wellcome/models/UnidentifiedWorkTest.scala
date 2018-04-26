@@ -69,15 +69,13 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "ontologyType": "Subject",
       |      "concepts" : [
       |        {
       |          "label" : "concept",
-      |          "qualifierType" : null,
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "ontologyType" : "Concept"
       |        }
-      |      ]
+      |      ],
+      |      "ontologyType": "Subject"
       |    }
       |  ],
       |  "contributors": [
@@ -96,9 +94,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "ontologyType": "Concept",
-      |      "qualifierType": null,
-      |      "type": "Concept"
+      |      "ontologyType": "Concept"
       |    }
       |  ],
       |  "thumbnail": {

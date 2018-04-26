@@ -75,9 +75,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "concepts" : [
       |        {
       |          "label" : "concept",
-      |          "qualifierType" : null,
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "ontologyType" : "Concept"
       |        }
       |      ]
       |    }
@@ -98,9 +96,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "ontologyType": "Concept",
-      |      "qualifierType": null,
-      |      "type": "Concept"
+      |      "ontologyType": "Concept"
       |    }
       |  ],
       |  "thumbnail": {

@@ -130,7 +130,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "label": "${p.label}"
     }"""
 
-  def concept(con: AbstractConcept) =
+  def concept(con: Concept) =
     s"""
     {
       "type": "${con.ontologyType}",
@@ -138,7 +138,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def concepts(concepts: List[AbstractConcept]) =
+  def concepts(concepts: List[Concept]) =
     concepts
       .map { concept(_) }
       .mkString(",")
