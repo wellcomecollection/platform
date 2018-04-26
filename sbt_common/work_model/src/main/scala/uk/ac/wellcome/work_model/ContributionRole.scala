@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.work_model
 
 case class ContributionRole(
   label: String,

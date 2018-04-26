@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.work_model
 
 /** An identifier received from one of the original sources */
 case class SourceIdentifier(

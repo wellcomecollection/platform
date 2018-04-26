@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.work_model
 
 /** A representation of a work in our ontology */
 trait Work extends Versioned {

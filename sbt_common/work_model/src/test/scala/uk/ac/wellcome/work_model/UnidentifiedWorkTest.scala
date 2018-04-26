@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.work_model
 
 class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 

@@ -1,10 +1,13 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.work_model
 
-class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
+import org.scalatest.{FunSpec, Matchers}
 
-  val unidentifiedItemJson: String =
+class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
+
+  val identifiedItemJson: String =
     s"""
       |{
+      |  "canonicalId": "canonicalId",
       |  "sourceIdentifier": {
       |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |      "ontologyType": "Item",
@@ -48,23 +51,24 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
     value = "value"
   )
 
-  val unidentifiedItem = UnidentifiedItem(
+  val identifiedItem = IdentifiedItem(
+    canonicalId = "canonicalId",
     sourceIdentifier = identifier,
     identifiers = List(identifier),
     locations = List(location)
   )
 
-  it("should serialise an unidentified Item as JSON") {
-    val result = JsonUtil.toJson(unidentifiedItem)
+  it("should serialise an identified Item as JSON") {
+    val result = JsonUtil.toJson(identifiedItem)
 
     result.isSuccess shouldBe true
-    assertJsonStringsAreEqual(result.get, unidentifiedItemJson)
+    assertJsonStringsAreEqual(result.get, identifiedItemJson)
   }
 
-  it("should deserialize a JSON string as a unidentified Item") {
-    val result = JsonUtil.fromJson[UnidentifiedItem](unidentifiedItemJson)
+  it("should deserialize a JSON string as a identified Item") {
+    val result = JsonUtil.fromJson[IdentifiedItem](identifiedItemJson)
 
     result.isSuccess shouldBe true
-    result.get shouldBe unidentifiedItem
+    result.get shouldBe identifiedItem
   }
 }
