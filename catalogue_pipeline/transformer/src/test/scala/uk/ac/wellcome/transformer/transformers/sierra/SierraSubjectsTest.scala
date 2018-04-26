@@ -124,6 +124,53 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       expectedSubjects)
   }
 
+  it("returns subjects for multiple 650 tags with different subfields") {
+    val bibData = SierraBibData(
+      id = "b1234567",
+      title = Some("A pack of published puffins in Paris"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A1 Content"),
+            MarcSubfield(tag = "z", content = "Z1 Content")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "A2 Content"),
+            MarcSubfield(tag = "v", content = "V2 Content")
+          )
+        )
+      )
+    )
+
+    val expectedSubjects =
+      List(
+        Subject(
+          label = "A1 Content - Z1 Content",
+          concepts = List(
+            Concept(label = "A1 Content"),
+            Place(label = "Z1 Content")
+          )),
+        Subject(
+          label = "A2 Content - V2 Content",
+          concepts = List(
+            Concept(label = "A2 Content"),
+            Concept(label = "V2 Content")
+          ))
+      )
+
+    assertExtractsSubjects(bibData, expectedSubjects)
+  }
+
   it("returns subjects with primary concept Period for tag 648") {
     val expectedSubjects =
       List(
