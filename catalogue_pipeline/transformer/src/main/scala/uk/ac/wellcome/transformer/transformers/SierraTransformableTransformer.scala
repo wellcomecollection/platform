@@ -1,14 +1,13 @@
 package uk.ac.wellcome.transformer.transformers
 
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.transformer.transformers.sierra._
-import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]

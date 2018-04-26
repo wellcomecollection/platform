@@ -3,8 +3,8 @@ package uk.ac.wellcome.display.models
 import io.circe.Json
 import io.circe.parser._
 import org.scalatest.Suite
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 

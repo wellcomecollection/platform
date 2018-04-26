@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.models
 
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.work_model.IdentifiedWork
 
 case class ResultList(
   results: List[IdentifiedWork],

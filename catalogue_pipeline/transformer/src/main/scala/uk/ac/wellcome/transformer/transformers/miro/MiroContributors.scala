@@ -2,9 +2,9 @@ package uk.ac.wellcome.transformer.transformers.miro
 
 import java.io.InputStream
 
-import uk.ac.wellcome.models.{Agent, Contributor, Unidentifiable}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.utils.JsonUtil.toMap
+import uk.ac.wellcome.work_model.{Agent, Contributor, Unidentifiable}
 
 import scala.io.Source
 

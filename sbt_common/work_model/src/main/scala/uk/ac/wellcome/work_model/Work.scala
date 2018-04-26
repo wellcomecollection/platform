@@ -1,5 +1,7 @@
 package uk.ac.wellcome.work_model
 
+import uk.ac.wellcome.models.Versioned
+
 /** A representation of a work in our ontology */
 trait Work extends Versioned {
   val title: Option[String]

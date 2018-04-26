@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.Language
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.transformer.source.SierraBibData
+import uk.ac.wellcome.work_model.Language
 
 trait SierraLanguage {
 

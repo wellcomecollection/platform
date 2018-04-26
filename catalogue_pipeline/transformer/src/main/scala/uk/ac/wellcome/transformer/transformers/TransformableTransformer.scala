@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
-import uk.ac.wellcome.models.UnidentifiedWork
 import uk.ac.wellcome.models.transformable.Transformable
+import uk.ac.wellcome.work_model.UnidentifiedWork
 
 import scala.reflect.ClassTag
 import scala.util.Try

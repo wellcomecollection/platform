@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.{DigitalLocation, Location, PhysicalLocation}
+import uk.ac.wellcome.work_model.{DigitalLocation, Location, PhysicalLocation}
 
 @ApiModel(
   value = "Location",

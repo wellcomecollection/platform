@@ -1,11 +1,9 @@
 package uk.ac.wellcome.transformer.transformers
 
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  CalmTransformableData
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, CalmTransformableData}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 
 import scala.util.Try
 

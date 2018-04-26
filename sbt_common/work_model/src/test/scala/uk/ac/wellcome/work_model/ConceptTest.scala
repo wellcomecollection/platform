@@ -1,12 +1,13 @@
 package uk.ac.wellcome.work_model
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
 
-  val concept = Concept(label = "Woodwork"),
+  val concept = Concept(label = "Woodwork")
   val expectedJson = s"""{
-        "type": "Concept",
         "ontologyType": "Concept",
         "label": "Woodwork",
         "qualifierType": null
@@ -18,7 +19,7 @@ class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
   }
 
   it("deserialises JSON as Concepts") {
-      val parsedConcept = fromJson[AbstractConcept](expectedJson).get
+      val parsedConcept = fromJson[Concept](expectedJson).get
       parsedConcept shouldBe concept
   }
 }

@@ -3,14 +3,10 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.Guice
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{
-  DisplaySerialisationTestBase,
-  WorksIncludes,
-  WorksUtil
-}
+import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksIncludes, WorksUtil}
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.models.{IdentifiedItem, IdentifiedWork, PhysicalLocation}
 import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.work_model.{IdentifiedItem, IdentifiedWork, PhysicalLocation}
 
 class DisplayLocationsV1SerialisationTest
     extends FunSpec

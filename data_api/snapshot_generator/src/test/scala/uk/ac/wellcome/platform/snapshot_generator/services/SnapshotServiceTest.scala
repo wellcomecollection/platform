@@ -20,8 +20,7 @@ import uk.ac.wellcome.models.IdentifierSchemes.sierraSystemNumber
 import uk.ac.wellcome.models.{
   IdentifiedWork,
   IdentifierSchemes,
-  Period,
-  SourceIdentifier
+  Period
 }
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{

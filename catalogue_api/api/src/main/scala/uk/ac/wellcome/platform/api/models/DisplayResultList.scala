@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.models
 
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.work_model.IdentifiedWork
 
 @ApiModel(
   value = "ResultList",

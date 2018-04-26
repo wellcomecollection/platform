@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.idminter.database
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier}
 
 import scala.util.{Failure, Success}
 

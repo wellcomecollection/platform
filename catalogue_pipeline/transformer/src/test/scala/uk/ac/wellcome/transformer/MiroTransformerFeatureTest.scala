@@ -2,17 +2,16 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.{UnidentifiedWork}
-import uk.ac.wellcome.models.transformable.{MiroTransformable}
-import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS}
+import uk.ac.wellcome.models.transformable.MiroTransformable
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures.{MessageInfo, S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.test.fixtures.MessageInfo
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model.UnidentifiedWork
 
 class MiroTransformerFeatureTest
     extends FunSpec

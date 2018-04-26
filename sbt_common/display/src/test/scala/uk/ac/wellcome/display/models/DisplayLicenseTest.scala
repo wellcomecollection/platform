@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.work_model.License_CCBY
 
 class DisplayLicenseTest extends FunSpec with Matchers {
 

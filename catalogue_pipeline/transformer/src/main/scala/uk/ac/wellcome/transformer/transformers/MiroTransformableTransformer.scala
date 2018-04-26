@@ -6,6 +6,7 @@ import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.transformer.transformers.miro.MiroContributors
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model._
 
 import scala.io.Source
 import scala.util.Try

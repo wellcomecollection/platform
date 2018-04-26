@@ -1,15 +1,12 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import com.twitter.inject.Logging
-import scala.util.{Failure, Success}
-import uk.ac.wellcome.models.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedItem
-}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedItem}
+
+import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
   def extractItemData(

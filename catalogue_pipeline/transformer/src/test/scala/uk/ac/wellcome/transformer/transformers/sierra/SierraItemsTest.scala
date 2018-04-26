@@ -1,17 +1,14 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import java.time.Instant
+
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedItem
-}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.test.utils.SierraData
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.test.utils.SierraData
 import uk.ac.wellcome.transformer.source.{SierraItemData, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedItem}
 
 class SierraItemsTest extends FunSpec with Matchers with SierraData {
 

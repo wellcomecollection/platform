@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.Period
+import uk.ac.wellcome.work_model.Period
 
 @ApiModel(
   value = "Period",

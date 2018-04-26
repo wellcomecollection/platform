@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.work_model._
 
 trait SierraContributors extends MarcUtils {
 

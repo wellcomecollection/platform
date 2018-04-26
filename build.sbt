@@ -46,6 +46,7 @@ lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasti
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
+  .dependsOn(work_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
@@ -53,14 +54,17 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
 lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
+  .dependsOn(work_model % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
 lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
+  .dependsOn(work_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
+  .dependsOn(work_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
@@ -84,6 +88,7 @@ lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierr
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
+  .dependsOn(work_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)

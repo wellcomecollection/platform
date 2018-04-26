@@ -3,7 +3,7 @@ package uk.ac.wellcome.display.models.v2
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models.DisplayAbstractAgent
-import uk.ac.wellcome.models.{AbstractAgent, Contributor, Displayable}
+import uk.ac.wellcome.work_model.{AbstractAgent, Contributor, Displayable}
 
 @ApiModel(
   value = "Contributor",

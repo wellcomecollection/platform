@@ -12,8 +12,9 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import scala.concurrent.duration._
+import uk.ac.wellcome.work_model._
 
+import scala.concurrent.duration._
 import scala.util.Try
 
 class IdEmbedderTests

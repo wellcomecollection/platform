@@ -1,5 +1,10 @@
 package uk.ac.wellcome.work_model
 
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
+
 class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
 
   val unidentifiedItemJson: String =

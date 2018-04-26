@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.WorkType
 import uk.ac.wellcome.transformer.source.SierraBibData
+import uk.ac.wellcome.work_model.WorkType
 
 trait SierraWorkType {
 

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.DigitalLocation
+import uk.ac.wellcome.work_model.DigitalLocation
 
 class MiroTransformableTransformerCopyrightTest
     extends FunSpec
