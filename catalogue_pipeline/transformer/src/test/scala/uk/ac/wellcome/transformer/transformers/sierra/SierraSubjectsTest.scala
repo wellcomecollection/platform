@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.{Concept, Period, Place, Subject}
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraSubjectsTest extends FunSpec with Matchers {
 
@@ -20,11 +24,11 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       List(
         Subject(
           label = "A Content",
-          concepts = List(
-            Concept(label = "A Content"))))
+          concepts = List(Concept(label = "A Content"))))
 
     assertExtractsSubjects(
-      bibData("650",
+      bibData(
+        "650",
         List(
           MarcSubfield(tag = "a", content = "A Content")
         )),
@@ -36,32 +40,35 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       List(
         Subject(
           label = "A Content - V Content",
-          concepts = List(
-            Concept(label = "A Content"),
-            Concept(label = "V Content"))))
+          concepts =
+            List(Concept(label = "A Content"), Concept(label = "V Content"))))
 
-    assertExtractsSubjects(bibData("650",
-      List(
-        MarcSubfield(tag = "a", content = "A Content"),
-        MarcSubfield(tag = "v", content = "V Content")
-      )),
+    assertExtractsSubjects(
+      bibData(
+        "650",
+        List(
+          MarcSubfield(tag = "a", content = "A Content"),
+          MarcSubfield(tag = "v", content = "V Content")
+        )),
       expectedSubjects)
   }
 
-  it("subfield a is always first concept when returning subjects for tag 650 with subfields a, v") {
+  it(
+    "subfield a is always first concept when returning subjects for tag 650 with subfields a, v") {
     val expectedSubjects =
       List(
         Subject(
           label = "A Content - V Content",
-          concepts = List(
-            Concept(label = "A Content"),
-            Concept(label = "V Content"))))
+          concepts =
+            List(Concept(label = "A Content"), Concept(label = "V Content"))))
 
-    assertExtractsSubjects(bibData("650",
-      List(
-        MarcSubfield(tag = "v", content = "V Content"),
-        MarcSubfield(tag = "a", content = "A Content")
-      )),
+    assertExtractsSubjects(
+      bibData(
+        "650",
+        List(
+          MarcSubfield(tag = "v", content = "V Content"),
+          MarcSubfield(tag = "a", content = "A Content")
+        )),
       expectedSubjects)
   }
 
@@ -77,13 +84,15 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           )))
 
     assertExtractsSubjects(
-      bibData("650",
+      bibData(
+        "650",
         List(
           MarcSubfield(tag = "a", content = "A Content"),
           MarcSubfield(tag = "x", content = "X Content"),
           MarcSubfield(tag = "v", content = "V Content")
         )),
-      expectedSubjects)
+      expectedSubjects
+    )
   }
 
   it("returns subjects for tag 650 with subfields a, y") {
@@ -97,7 +106,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           )))
 
     assertExtractsSubjects(
-      bibData("650",
+      bibData(
+        "650",
         List(
           MarcSubfield(tag = "y", content = "Y Content"),
           MarcSubfield(tag = "a", content = "A Content")
@@ -116,7 +126,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           )))
 
     assertExtractsSubjects(
-      bibData("650",
+      bibData(
+        "650",
         List(
           MarcSubfield(tag = "z", content = "Z Content"),
           MarcSubfield(tag = "a", content = "A Content")
@@ -183,13 +194,15 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           )))
 
     assertExtractsSubjects(
-      bibData("648",
+      bibData(
+        "648",
         List(
           MarcSubfield(tag = "a", content = "A Content"),
           MarcSubfield(tag = "x", content = "X Content"),
           MarcSubfield(tag = "v", content = "V Content")
         )),
-      expectedSubjects)
+      expectedSubjects
+    )
   }
 
   it("returns subjects with primary concept Place for tag 651") {
@@ -204,18 +217,21 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           )))
 
     assertExtractsSubjects(
-      bibData("651",
+      bibData(
+        "651",
         List(
           MarcSubfield(tag = "x", content = "X Content"),
           MarcSubfield(tag = "a", content = "A Content"),
           MarcSubfield(tag = "v", content = "V Content")
         )),
-      expectedSubjects)
+      expectedSubjects
+    )
   }
 
   private val transformer = new SierraSubjects {}
 
-  private def assertExtractsSubjects(bibData: SierraBibData, expected: List[Subject]) = {
+  private def assertExtractsSubjects(bibData: SierraBibData,
+                                     expected: List[Subject]) = {
     transformer.getSubjects(bibData = bibData) shouldBe expected
   }
 

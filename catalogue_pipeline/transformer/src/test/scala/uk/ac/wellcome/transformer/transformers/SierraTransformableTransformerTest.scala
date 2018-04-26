@@ -716,7 +716,8 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.isSuccess shouldBe true
 
-    transformedSierraRecord.get.get.subjects shouldBe List(Subject(content, List(Concept(content))))
+    transformedSierraRecord.get.get.subjects shouldBe List(
+      Subject(content, List(Concept(content))))
   }
 
 }
