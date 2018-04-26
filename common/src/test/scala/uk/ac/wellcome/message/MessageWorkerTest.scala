@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
 class MessageWorkerTest
-  extends FunSpec
+    extends FunSpec
     with MockitoSugar
     with Eventually
     with Matchers

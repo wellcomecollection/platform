@@ -3,10 +3,7 @@ package uk.ac.wellcome.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sns.model.{
-  SubscribeRequest,
-  SubscribeResult
-}
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
@@ -92,11 +89,11 @@ trait Messaging
   }
 
   def withMessageWorker[R](
-      actorSystem: ActorSystem,
-      metricsSender: metrics.MetricsSender,
-      queue: Queue,
-      bucket: S3.Bucket
-    )(testWith: TestWith[ExampleMessageWorker, R]) = {
+    actorSystem: ActorSystem,
+    metricsSender: metrics.MetricsSender,
+    queue: Queue,
+    bucket: S3.Bucket
+  )(testWith: TestWith[ExampleMessageWorker, R]) = {
 
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 

@@ -15,10 +15,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try
 
-object JsonUtil
-    extends AutoDerivation
-    with TimeInstances
-    with Logging {
+object JsonUtil extends AutoDerivation with TimeInstances with Logging {
 
   implicit val customConfig: Configuration =
     Configuration.default.withDefaults

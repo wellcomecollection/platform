@@ -67,7 +67,8 @@ class S3ObjectStore[T] @Inject()(
       sourcedObject)
   }
 
-  def get(s3ObjectLocation: S3ObjectLocation)(implicit decoder: Decoder[T]): Future[T] = {
+  def get(s3ObjectLocation: S3ObjectLocation)(
+    implicit decoder: Decoder[T]): Future[T] = {
     val bucket = s3ObjectLocation.bucket
     val key = s3ObjectLocation.key
 
