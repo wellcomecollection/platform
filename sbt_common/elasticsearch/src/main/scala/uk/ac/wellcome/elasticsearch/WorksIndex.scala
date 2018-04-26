@@ -62,6 +62,12 @@ class WorksIndex @Inject()(client: HttpClient,
     keywordField("ontologyType")
   )
 
+  def subject(fieldName: String) = objectField(fieldName).fields(
+    textField("label"),
+    keywordField("ontologyType"),
+    concept("concepts")
+  )
+
   def concept(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType"),
@@ -150,7 +156,7 @@ class WorksIndex @Inject()(client: HttpClient,
         textField("english").analyzer(EnglishLanguageAnalyzer)),
       date("createdDate"),
       contributors,
-      concept("subjects"),
+      subject("subjects"),
       concept("genres"),
       labelledTextField("placesOfPublication"),
       items,

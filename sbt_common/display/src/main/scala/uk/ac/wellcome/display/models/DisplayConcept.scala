@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.AbstractConcept
+import uk.ac.wellcome.models.Concept
 
 @ApiModel(
   value = "Concept",
@@ -17,7 +17,7 @@ case class DisplayConcept(
 }
 
 case object DisplayConcept {
-  def apply(concept: AbstractConcept): DisplayConcept = DisplayConcept(
+  def apply(concept: Concept): DisplayConcept = DisplayConcept(
     label = concept.label
   )
 }
