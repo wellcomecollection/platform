@@ -72,7 +72,8 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "concepts" : [
       |        {
       |          "label" : "concept",
-      |          "ontologyType" : "Concept"
+      |          "ontologyType" : "Concept",
+      |          "type" : "Concept"
       |        }
       |      ],
       |      "ontologyType": "Subject"
