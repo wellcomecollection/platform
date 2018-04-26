@@ -1,9 +1,11 @@
 package uk.ac.wellcome.test.fixtures
 
-
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
+import com.amazonaws.services.cloudwatch.{
+  AmazonCloudWatch,
+  AmazonCloudWatchClientBuilder
+}
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.twitter.inject.Logging
 import org.scalatest.concurrent.Eventually
