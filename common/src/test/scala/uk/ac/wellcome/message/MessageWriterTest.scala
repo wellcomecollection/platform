@@ -21,8 +21,7 @@ class MessageWriterTest
     with IntegrationPatience
     with Inside {
 
-  it(
-    "sends a message and returns a publish attempt with the id of the request") {
+  it("sends messages") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         val s3Config = S3Config(bucketName = bucket.name)
@@ -50,20 +49,22 @@ class MessageWriterTest
 
           val pointer = fromJson[MessagePointer](messages.head.message)
 
-          inside(pointer) {
-            case Success(MessagePointer(S3ObjectLocation(bucketName, _))) =>
-              bucketName shouldBe bucket.name
-          }
+          pointer shouldBe a[Success[_]]
+          val messagePointer = pointer.get
 
-          getContentFromS3(bucket)
-            .map(fromJson[ExampleObject])
-            .map(_.get) should contain(message)
+          inside(messagePointer) {
+            case MessagePointer(S3ObjectLocation(bucketName, key)) => {
+              bucketName shouldBe bucket.name
+
+              getContentFromS3(bucket, key) shouldBe toJson(message).get
+            }
+          }
         }
       }
     }
   }
 
-  it("returns a failed future if it fails to publish the message pointer") {
+  it("returns a failed future if it fails to publish to sns") {
     withLocalS3Bucket { bucket =>
       val s3Config = S3Config(bucketName = bucket.name)
       val snsConfig = SNSConfig(topicArn = "invalid-topic")

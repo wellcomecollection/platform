@@ -67,22 +67,16 @@ class S3ObjectStore[T] @Inject()(
       sourcedObject)
   }
 
-  def get(uri: S3ObjectLocation)(implicit decoder: Decoder[T]): Future[T] = {
-    uri match {
-      case S3ObjectLocation(bucket, key) => {
+  def get(s3ObjectLocation: S3ObjectLocation)(implicit decoder: Decoder[T]): Future[T] = {
+    val bucket = s3ObjectLocation.bucket
+    val key = s3ObjectLocation.key
 
-        if (bucket != s3Config.bucketName) {
-          debug(
-            s"Bucket name in URI ($bucket) does not match configured bucket (${s3Config.bucketName})")
-        }
-
-        S3ObjectStore.get[T](s3Client, bucket)(key)
-      }
-      case _ =>
-        Future.failed(
-          new RuntimeException(
-            s"Invalid URI scheme when trying to get from s3 $uri"))
+    if (bucket != s3Config.bucketName) {
+      debug(
+        s"Bucket name in S3ObjectLocation ($bucket) does not match configured bucket (${s3Config.bucketName})")
     }
+
+    S3ObjectStore.get[T](s3Client, bucket)(key)
   }
 }
 

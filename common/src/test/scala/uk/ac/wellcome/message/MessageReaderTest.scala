@@ -53,7 +53,7 @@ class MessageReaderTest
           val actualObjectFuture = messageReader.read(exampleMessage)
 
           whenReady(actualObjectFuture) { actualObject =>
-            expectedObject shouldBe actualObject
+            actualObject shouldBe expectedObject
           }
       }
     }
@@ -67,8 +67,6 @@ class MessageReaderTest
 
           s3Client.putObject(bucket.name, key, serialisedExampleObject)
 
-          val examplePointer =
-            MessagePointer(S3ObjectLocation(bucket.name, key))
           val serialisedExamplePointer = "Not even close to valid json."
 
           val exampleNotification = NotificationMessage(
