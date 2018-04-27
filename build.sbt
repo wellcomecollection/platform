@@ -33,20 +33,20 @@ lazy val common = project
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
 // It depends on common because it uses JsonUtil
-lazy val work_model = doSharedLibrarySetup(project, "sbt_common/work_model")
+lazy val internal_model = doSharedLibrarySetup(project, "sbt_common/internal_model")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.pipelineModelDependencies)
 
 lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
@@ -54,17 +54,17 @@ lazy val api = doServiceSetup(project, "catalogue_api/api")
   .settings(libraryDependencies ++= Dependencies.apiDependencies)
 
 lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
   .settings(libraryDependencies ++= Dependencies.ingestorDependencies)
 
 lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
@@ -88,7 +88,7 @@ lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierr
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
-  .dependsOn(work_model % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
   .dependsOn(common_elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
@@ -96,7 +96,7 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 lazy val root = (project in file("."))
   .aggregate(
     common,
-    work_model,
+    internal_model,
     common_display,
     common_elasticsearch,
     api,
