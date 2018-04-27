@@ -15,6 +15,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.transformer.modules.TransformerWorkerModule
+import uk.ac.wellcome.transformer.modules._
 
 object ServerMain extends Server
 
@@ -31,7 +32,8 @@ class Server extends HttpServer {
     SNSClientModule,
     TransformerWorkerModule,
     S3ClientModule,
-    S3ConfigModule
+    S3ConfigModule,
+    UnidentifiedWorkKeyPrefixGeneratorModule
   )
   override def configureHttp(router: HttpRouter) {
     router

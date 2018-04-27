@@ -47,49 +47,38 @@ class CalmTransformerFeatureTest
             bucket = bucket
           )
 
+          sqsClient.sendMessage(
+            queue.url,
+            JsonUtil.toJson(calmHybridRecordMessage).get
+          )
+
           val flags: Map[String, String] = Map(
             "aws.metrics.namespace" -> "sierra-transformer"
           ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
             queue)
 
           withServer(flags) { _ =>
-            sqsClient.sendMessage(
-              queue.url,
-              JsonUtil.toJson(calmHybridRecordMessage).get
-            )
-
             eventually {
               val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages should have size 1
-              assertSNSMessageContainsCalmDataWith(
-                snsMessage = snsMessages.head,
-                AccessStatus = Some("public")
+              snsMessages.size should be >= 1
+
+              val sourceIdentifier = SourceIdentifier(
+                identifierScheme = IdentifierSchemes.calmPlaceholder,
+                ontologyType = "Work",
+                value = "value"
               )
+
+              snsMessages.map { snsMessage =>
+                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+
+                actualWork.sourceIdentifier shouldBe sourceIdentifier
+                actualWork.title shouldBe Some("placeholder title")
+                actualWork.identifiers shouldBe List(sourceIdentifier)
+              }
             }
           }
         }
       }
     }
-  }
-
-  private def assertSNSMessageContainsCalmDataWith(
-    snsMessage: MessageInfo,
-    AccessStatus: Option[String]): Any = {
-
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.calmPlaceholder,
-      ontologyType = "Work",
-      value = "value"
-    )
-
-    //currently for calm data we only output hardcoded sample values
-    snsMessage.message shouldBe JsonUtil
-      .toJson(
-        UnidentifiedWork(
-          title = Some("placeholder title"),
-          sourceIdentifier = sourceIdentifier,
-          version = 1,
-          identifiers = List(sourceIdentifier)))
-      .get
   }
 }

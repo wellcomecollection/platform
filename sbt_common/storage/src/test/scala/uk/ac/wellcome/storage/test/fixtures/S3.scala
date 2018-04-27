@@ -4,14 +4,18 @@ import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.twitter.inject.Logging
-import io.circe.Json
+import io.circe.{Decoder, Json}
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
+import uk.ac.wellcome.message.MessagePointer
+import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
-import scala.util.Random
+import scala.util.{Random, Success, Try}
+import uk.ac.wellcome.utils.JsonUtil._
 
 object S3 {
 
@@ -25,7 +29,7 @@ object S3 {
 
 }
 
-trait S3 extends Logging with Eventually with ImplicitLogging {
+trait S3 extends Logging with Eventually with Matchers with ImplicitLogging {
 
   import S3._
 
@@ -78,6 +82,18 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
 
   def getContentFromS3(bucket: Bucket, key: String): String = {
     IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
+  }
+
+  def getObjectFromS3[T](snsMessage: MessageInfo)(implicit decoder: Decoder[T]): T = {
+    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
+    tryMessagePointer shouldBe a[Success[_]]
+
+    val messagePointer = tryMessagePointer.get
+
+    val tryT = fromJson[T](getContentFromS3(Bucket(messagePointer.src.bucket), messagePointer.src.key))
+    tryT shouldBe a[Success[_]]
+
+    tryT.get
   }
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {

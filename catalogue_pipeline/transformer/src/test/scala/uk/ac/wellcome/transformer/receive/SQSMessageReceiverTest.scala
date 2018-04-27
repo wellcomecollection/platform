@@ -2,8 +2,10 @@ package uk.ac.wellcome.transformer.receive
 
 import java.time.Instant
 
+import scala.concurrent.duration._
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import com.google.inject.Inject
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -11,6 +13,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -18,6 +21,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier,
@@ -27,14 +33,17 @@ import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.SNS.Topic
+import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
+
 
 class SQSMessageReceiverTest
     extends FunSpec
@@ -74,10 +83,22 @@ class SQSMessageReceiverTest
     maybeSnsWriter: Option[SNSWriter] = None
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
+    val s3Config = S3Config(bucket.name)
+
+    val s3ObjectStore =
+      new S3ObjectStore[UnidentifiedWork](
+        s3Client,
+        s3Config,
+        new UnidentifiedWorkKeyPrefixGenerator())
+
     val snsWriter =
       maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topic.arn)))
+
+    val messageWriter =
+      new MessageWriter[UnidentifiedWork](snsWriter, s3Config, s3ObjectStore)
+
     val recordReceiver = new SQSMessageReceiver(
-      snsWriter = snsWriter,
+      messageWriter = messageWriter,
       s3Client = s3Client,
       s3Config = S3Config(bucket.name),
       metricsSender = metricsSender
@@ -86,7 +107,7 @@ class SQSMessageReceiverTest
     testWith(recordReceiver)
   }
 
-  it("receives a message and send it to SNS client") {
+  it("receives a message and sends it to SNS client") {
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
@@ -109,16 +130,20 @@ class SQSMessageReceiverTest
             val future = recordReceiver.receiveMessage(calmSqsMessage)
 
             whenReady(future) { _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size 1
-              messages.head.message shouldBe JsonUtil.toJson(work).get
-              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages.size should be >= 1
+
+              snsMessages.map { snsMessage =>
+                getObjectFromS3[UnidentifiedWork](snsMessage)
+                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              }
             }
           }
         }
       }
     }
   }
+
   it("receives a message and add the version to the transformed work") {
     val id = "5005005"
     val title = "A pot of possums"
@@ -152,18 +177,19 @@ class SQSMessageReceiverTest
             )
 
             whenReady(future) { _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size 1
-              messages.head.message shouldBe JsonUtil
-                .toJson(
-                  UnidentifiedWork(
-                    title = Some(title),
-                    sourceIdentifier = sourceIdentifier,
-                    version = version,
-                    identifiers = List(sourceIdentifier, sierraIdentifier)
-                  ))
-                .get
-              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages.size should be >= 1
+
+              snsMessages.map { snsMessage =>
+                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+
+                actualWork.title shouldBe Some(title)
+                actualWork.sourceIdentifier shouldBe sourceIdentifier
+                actualWork.version shouldBe version
+                actualWork.identifiers shouldBe List(sourceIdentifier, sierraIdentifier)
+
+                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              }
             }
           }
         }
@@ -222,8 +248,7 @@ class SQSMessageReceiverTest
     }
   }
 
-  it(
-    "returns a failed future if it's unable to transform the transformable object") {
+  it("fails if it's unable to perform a transformation") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
@@ -255,8 +280,7 @@ class SQSMessageReceiverTest
     }
   }
 
-  it("should return a failed future if it's unable to publish the work") {
-
+  it("fails if it's unable to publish the work") {
     val id = "1001001"
     val sierraTransformable: Transformable =
       SierraTransformable(

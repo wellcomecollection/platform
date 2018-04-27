@@ -16,6 +16,7 @@ import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
+
 class SierraTransformerFeatureTest
     extends FunSpec
     with Matchers
@@ -76,10 +77,7 @@ class SierraTransformerFeatureTest
               )
 
               snsMessages.map { snsMessage =>
-                val actualWork =
-                  JsonUtil
-                    .fromJson[UnidentifiedWork](snsMessage.message)
-                    .get
+                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
 
                 actualWork.sourceIdentifier shouldBe sourceIdentifier
                 actualWork.title shouldBe Some(title)
