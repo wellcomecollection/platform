@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.snapshot_generator.flow
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
-import uk.ac.wellcome.display.models.{AllWorksIncludes, DisplayWork, WorksIncludes}
+import uk.ac.wellcome.display.models.{
+  AllWorksIncludes,
+  DisplayWork,
+  WorksIncludes
+}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 import scala.concurrent.ExecutionContext
