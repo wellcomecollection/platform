@@ -8,11 +8,10 @@ import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.work_model._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.duration._
 import scala.util.Try

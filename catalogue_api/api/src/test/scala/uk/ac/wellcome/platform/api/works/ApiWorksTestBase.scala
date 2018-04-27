@@ -5,12 +5,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.Server
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.versions.ApiVersions
-import uk.ac.wellcome.work_model.IdentifiedWork
 
 trait ApiWorksTestBase
     extends FunSpec

@@ -1,10 +1,10 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
+class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   private val license_CCBYJson =
     s"""{
@@ -14,30 +14,29 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
             "ontologyType": "License"
           }"""
 
-  // TRIVIA: On 18 April 1930, the BBC had a slow news day.  The bulletin
-  // read "There is no news", followed by 15 minutes of piano music.
-  val publicationDate = "18 April 1930"
+  // TRIVIA: This is an extract from Marco Polo's diaries, in which he
+  // mistakes a rhinoceros for a unicorn.
+  val physicalDescription =
+    "Hair like that of a buffalo, feet like those of an elephant"
 
-  // TRIVIA: This isn't describing a book, but instead the allocation
-  // of disk space inside Microsoft SQL Server.
-  val extent = "A collection of eight physically contiguous pages"
+  // TRIVIA: This is based on Harry Potter, when we first meet Dobby.
+  val extent = "Both socks pulled up to their highest extent"
 
-  // TRIVIA: This is how Willem de Vlamingh, a Dutch scientist, described
-  // seeing the quokka when exploring near Australia.
-  val physicalDescription = "A kind of rat as big as a cat"
+  // TRIVIA: on 3 July 1998, LNER 4468 "Mallard" set the world speed record
+  // for steam locomotives, reaching 126 mph.
+  val publicationDate = "3 July 1938"
 
-  // wow very language such doge much javascript
-  // (In the future, everything will compile to JavaScript.)
+  // Reskitkish is a fictional language from the "Wayfarers" series of novels,
+  // and requires large lungs to speak effectively.
   val language = Language(
-    id = "dog",
-    label = "Dogescript"
+    id = "res",
+    label = "Reskitkish"
   )
 
-  // TRIVIA: This is the distance travelled by the Opportunity Mars rover,
-  // as of 10 January 2018.
-  val dimensions = "45 km (28 mi)"
+  // According to Google Maps, the distance between 183 and 215 Euston Road.
+  val dimensions = "308 ft"
 
-  val identifiedWorkJson: String =
+  val unidentifiedWorkJson: String =
     s"""
       |{
       |  "title": "title",
@@ -59,7 +58,6 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    "label": "label",
       |    "ontologyType" : "WorkType"
       |  },
-      |  "canonicalId": "canonicalId",
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
       |  "extent": "$extent",
@@ -71,14 +69,14 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "subjects": [
       |    {
       |      "label": "subject",
-      |      "ontologyType": "Subject",
       |      "concepts" : [
       |        {
       |          "label" : "concept",
       |          "ontologyType" : "Concept",
       |          "type" : "Concept"
       |        }
-      |      ]
+      |      ],
+      |      "ontologyType": "Subject"
       |    }
       |  ],
       |  "contributors": [
@@ -110,7 +108,6 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  },
       |  "items": [
       |    {
-      |      "canonicalId": "canonicalId",
       |      "sourceIdentifier": {
       |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
       |        "ontologyType": "Item",
@@ -136,7 +133,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "ontologyType": "Item"
       |    }
       |  ],
-      |  "publishers": [
+      |  "publishers" : [
       |    {
       |      "agent" : {
       |        "label" : "MIT Press",
@@ -145,21 +142,23 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |      "type" : "Unidentifiable"
       |    }
       |  ],
+      |  "visible":true,
       |  "publicationDate": {
       |    "label": "$publicationDate",
       |    "ontologyType": "Period"
       |  },
-      |  "placesOfPublication": [{
-      |   "label": "Spain",
-      |   "ontologyType": "Place"
-      |  }],
+      |  "placesOfPublication": [
+      |   {
+      |     "label": "Madrid",
+      |     "ontologyType": "Place"
+      |   }
+      |  ],
       |   "language": {
       |     "id": "${language.id}",
       |     "label": "${language.label}",
       |     "ontologyType": "Language"
       |   },
       |   "dimensions": "$dimensions",
-      |  "visible":true,
       |  "ontologyType": "Work"
       |}
     """.stripMargin
@@ -182,8 +181,7 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     value = "value"
   )
 
-  val item = IdentifiedItem(
-    canonicalId = "canonicalId",
+  val item = UnidentifiedItem(
     sourceIdentifier = itemIdentifier,
     identifiers = List(itemIdentifier),
     locations = List(location)
@@ -193,15 +191,14 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     label = "MIT Press"
   )
 
+  val publishers = List(Unidentifiable(publisher))
+
   val workType = WorkType(
     id = "id",
     label = "label"
   )
 
-  val publishers = List(Unidentifiable(publisher))
-
-  val identifiedWork = IdentifiedWork(
-    canonicalId = "canonicalId",
+  val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
     sourceIdentifier = workIdentifier,
     version = 1,
@@ -213,33 +210,37 @@ class IdentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
     subjects = List(Subject("subject", List(Concept("concept")))),
-    contributors = List(Contributor(agent = Unidentifiable(Agent("47")))),
+    contributors = List(
+      Contributor(
+        agent = Unidentifiable(Agent("47"))
+      )),
     genres = List(Concept("genre")),
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
     publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(Place(label = "Spain")),
+    placesOfPublication = List(Place("Madrid")),
     language = Some(language),
     dimensions = Some(dimensions)
   )
 
-  it("should serialise an identified Item as Work") {
-    val result = toJson(identifiedWork)
+  it("should serialise an unidentified Work as JSON") {
+    val result = toJson(unidentifiedWork)
 
     result.isSuccess shouldBe true
-    assertJsonStringsAreEqual(result.get, identifiedWorkJson)
+
+    assertJsonStringsAreEqual(result.get, unidentifiedWorkJson)
   }
 
-  it("should deserialize a JSON string as a identified Item") {
-    val result = fromJson[IdentifiedWork](identifiedWorkJson)
+  it("should deserialize a JSON string as a unidentified Work") {
+    val result = fromJson[UnidentifiedWork](unidentifiedWorkJson)
 
     result.isSuccess shouldBe true
-    result.get shouldBe identifiedWork
+    result.get shouldBe unidentifiedWork
   }
 
   it("should have an ontology type 'Work' when serialised to JSON") {
-    val jsonString = toJson(identifiedWork).get
+    val jsonString = toJson(unidentifiedWork).get
 
     jsonString.contains("""ontologyType":"Work"""") should be(true)
   }

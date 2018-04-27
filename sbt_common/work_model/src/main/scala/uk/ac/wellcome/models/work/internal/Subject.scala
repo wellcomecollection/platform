@@ -1,4 +1,4 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
 case class Subject(label: String,
                    concepts: List[AbstractConcept],

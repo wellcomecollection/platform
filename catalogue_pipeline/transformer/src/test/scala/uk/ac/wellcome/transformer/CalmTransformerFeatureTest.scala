@@ -3,12 +3,12 @@ package uk.ac.wellcome.transformer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 
 class CalmTransformerFeatureTest
     extends FunSpec

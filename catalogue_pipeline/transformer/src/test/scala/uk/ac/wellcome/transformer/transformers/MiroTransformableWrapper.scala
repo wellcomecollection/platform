@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.work_model.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 
 /** MiroTransformable looks for several fields in the source JSON -- if they're
   *  missing or have the wrong values, it rejects the record.

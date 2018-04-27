@@ -1,8 +1,7 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 class LicenseTest extends FunSpec with Matchers {
 

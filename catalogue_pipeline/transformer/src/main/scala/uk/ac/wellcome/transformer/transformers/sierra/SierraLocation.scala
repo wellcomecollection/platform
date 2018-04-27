@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
+import uk.ac.wellcome.models.work.internal.PhysicalLocation
 import uk.ac.wellcome.transformer.source.SierraItemData
-import uk.ac.wellcome.work_model.PhysicalLocation
 
 trait SierraLocation {
   def getLocation(itemData: SierraItemData): Option[PhysicalLocation] =

@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import uk.ac.wellcome.display.models.DisplayConcept
-import uk.ac.wellcome.work_model.Subject
+import uk.ac.wellcome.models.work.internal.Subject
 
 case class DisplaySubject(label: String,
                           concepts: List[DisplayConcept],

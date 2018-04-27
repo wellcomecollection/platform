@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.WorkType
 import uk.ac.wellcome.transformer.source.{SierraBibData, SierraMaterialType}
-import uk.ac.wellcome.work_model.WorkType
 
 class SierraWorkTypeTest extends FunSpec with Matchers {
 

@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 import uk.ac.wellcome.versions.ApiVersions
-import uk.ac.wellcome.work_model.IdentifiedWork
 
 class ApiV2WorksTestInvisible extends ApiWorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)

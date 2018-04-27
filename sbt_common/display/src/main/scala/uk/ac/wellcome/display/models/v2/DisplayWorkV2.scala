@@ -3,7 +3,7 @@ package uk.ac.wellcome.display.models.v2
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.work_model.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 @ApiModel(
   value = "Work",

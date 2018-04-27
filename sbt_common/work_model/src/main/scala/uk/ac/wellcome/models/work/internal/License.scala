@@ -1,7 +1,7 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
-import io.circe.{Decoder, Encoder, Json}
 import cats.syntax.either._
+import io.circe.{Decoder, Encoder, Json}
 
 sealed trait License {
   val licenseType: String

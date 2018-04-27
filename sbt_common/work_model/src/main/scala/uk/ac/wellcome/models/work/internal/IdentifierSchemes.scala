@@ -1,7 +1,7 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
-import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
+import io.circe.{Decoder, Encoder, HCursor, Json}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.

@@ -2,10 +2,11 @@ package uk.ac.wellcome.transformer.transformers
 
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.transformer.transformers.sierra._
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 
 import scala.util.{Success, Try}
 
@@ -39,7 +40,7 @@ class SierraTransformableTransformer
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(
-            UnidentifiedWork(
+            internal.UnidentifiedWork(
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,

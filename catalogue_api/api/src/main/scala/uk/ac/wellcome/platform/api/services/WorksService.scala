@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.api.services
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.models.ResultList
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.IdentifiedWork
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}

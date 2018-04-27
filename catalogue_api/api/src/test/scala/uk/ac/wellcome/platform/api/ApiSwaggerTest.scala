@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.api
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.versions.ApiVersions
-import uk.ac.wellcome.work_model.IdentifiedWork
 
 import scala.collection.JavaConversions._
 

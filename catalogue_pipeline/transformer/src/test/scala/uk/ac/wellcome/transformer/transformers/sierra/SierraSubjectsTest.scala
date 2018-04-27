@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.{Concept, Period, Place, Subject}
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.work_model.{Concept, Period, Place, Subject}
 
 class SierraSubjectsTest extends FunSpec with Matchers {
 

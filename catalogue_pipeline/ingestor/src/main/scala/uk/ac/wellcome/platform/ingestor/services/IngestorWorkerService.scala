@@ -6,10 +6,10 @@ import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
 import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.{IdentifiedWork, IdentifierSchemes}
 
 import scala.concurrent.Future
 

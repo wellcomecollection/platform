@@ -3,12 +3,12 @@ package uk.ac.wellcome.platform.idminter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.SQSMessage
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 
 import scala.collection.JavaConversions._
 

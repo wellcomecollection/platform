@@ -10,8 +10,8 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.work_model.IdentifiedWork
 import org.scalacheck.ScalacheckShapeless._
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 class WorksIndexTest
     extends FunSpec

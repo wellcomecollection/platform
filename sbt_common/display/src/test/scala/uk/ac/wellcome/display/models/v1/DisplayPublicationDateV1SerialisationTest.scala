@@ -5,8 +5,8 @@ import com.google.inject.Guice
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, Period}
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.work_model.{IdentifiedWork, Period}
 
 class DisplayPublicationDateV1SerialisationTest
     extends FunSpec

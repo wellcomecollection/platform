@@ -1,6 +1,6 @@
 package uk.ac.wellcome.display.models
 
-import uk.ac.wellcome.work_model._
+import uk.ac.wellcome.models.work.internal._
 
 trait WorksUtil {
 

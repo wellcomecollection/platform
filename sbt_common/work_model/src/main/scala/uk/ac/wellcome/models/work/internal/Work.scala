@@ -1,4 +1,4 @@
-package uk.ac.wellcome.work_model
+package uk.ac.wellcome.models.work.internal
 
 import uk.ac.wellcome.models.Versioned
 
