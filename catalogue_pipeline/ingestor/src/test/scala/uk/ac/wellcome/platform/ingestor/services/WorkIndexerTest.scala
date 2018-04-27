@@ -5,17 +5,17 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{
+import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
   IdentifierSchemes,
   SourceIdentifier
 }
-import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 class WorkIndexerTest
     extends FunSpec

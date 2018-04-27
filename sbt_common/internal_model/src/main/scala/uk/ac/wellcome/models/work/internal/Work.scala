@@ -1,6 +1,6 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.work.internal
 
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.Versioned
 
 /** A representation of a work in our ontology */
 trait Work extends Versioned {

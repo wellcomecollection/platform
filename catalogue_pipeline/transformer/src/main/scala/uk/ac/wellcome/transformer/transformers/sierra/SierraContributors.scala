@@ -1,6 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
 trait SierraContributors extends MarcUtils {
@@ -78,7 +79,7 @@ trait SierraContributors extends MarcUtils {
         ontologyType = "Person"
       )
 
-      Contributor[MaybeDisplayable[Person]](
+      internal.Contributor[MaybeDisplayable[Person]](
         agent = agent,
         roles = roles
       )
@@ -107,7 +108,7 @@ trait SierraContributors extends MarcUtils {
         ontologyType = "Organisation"
       )
 
-      Contributor[MaybeDisplayable[Organisation]](
+      internal.Contributor[MaybeDisplayable[Organisation]](
         agent = agent,
         roles = roles
       )

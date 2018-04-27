@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.PhysicalLocation
+import uk.ac.wellcome.models.work.internal.PhysicalLocation
 import uk.ac.wellcome.transformer.source.SierraItemData
 
 trait SierraLocation {

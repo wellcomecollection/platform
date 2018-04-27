@@ -1,13 +1,10 @@
 package uk.ac.wellcome.transformer.transformers
-import java.io.InputStream
-
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.MiroTransformable
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.transformer.transformers.miro.MiroContributors
-import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.io.Source
 import scala.util.Try
 
 class MiroTransformableTransformer
@@ -23,7 +20,7 @@ class MiroTransformableTransformer
       val (title, description) = getTitleAndDescription(miroData)
 
       Some(
-        UnidentifiedWork(
+        internal.UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
             identifierScheme = IdentifierSchemes.miroImageNumber,

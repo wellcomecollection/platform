@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.WorksUtil
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 import uk.ac.wellcome.utils.JsonUtil._
 

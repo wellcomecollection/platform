@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.work.internal
 
 sealed trait Location {
   val locationType: String

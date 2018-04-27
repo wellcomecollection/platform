@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal.Period
 import uk.ac.wellcome.test.utils.SierraData
-import uk.ac.wellcome.models.Period
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
   SierraBibData,

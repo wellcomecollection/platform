@@ -14,7 +14,7 @@ import javax.inject.Inject
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{DisplayWork, WorksIncludes}
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_generator.flow.{
   DisplayWorkToJsonStringFlow,
   IdentifiedWorkToVisibleDisplayWork,

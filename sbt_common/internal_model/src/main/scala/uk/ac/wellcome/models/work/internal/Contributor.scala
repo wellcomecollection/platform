@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.work.internal
 
 case class Contributor[+T <: IdentityState[AbstractAgent]](
   agent: T,

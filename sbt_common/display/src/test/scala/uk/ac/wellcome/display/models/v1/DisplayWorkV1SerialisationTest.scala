@@ -9,7 +9,7 @@ import uk.ac.wellcome.display.models.{
   WorksUtil
 }
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayWorkV1SerialisationTest

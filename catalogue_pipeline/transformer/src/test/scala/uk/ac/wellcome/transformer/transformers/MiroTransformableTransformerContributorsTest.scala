@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
-import org.scalatest.{FunSpec, FunSuite}
-import uk.ac.wellcome.models.{Agent, Contributor, Unidentifiable}
+import org.scalatest.FunSpec
+import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
 
 class MiroTransformableTransformerContributorsTest
     extends FunSpec

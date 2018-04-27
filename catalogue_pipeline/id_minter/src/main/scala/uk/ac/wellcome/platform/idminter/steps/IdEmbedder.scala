@@ -5,15 +5,14 @@ import com.twitter.inject.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe.{Json, _}
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import uk.ac.wellcome.models.Identified
 
 class IdEmbedder @Inject()(metricsSender: MetricsSender,
                            identifierGenerator: IdentifierGenerator)

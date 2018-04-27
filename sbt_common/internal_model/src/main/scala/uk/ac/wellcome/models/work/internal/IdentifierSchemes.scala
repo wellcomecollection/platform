@@ -1,13 +1,12 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.models.work.internal
 
-import com.twitter.inject.Logging
-import io.circe.{Decoder, Encoder, HCursor, Json}
 import cats.syntax.either._
+import io.circe.{Decoder, Encoder, HCursor, Json}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
   */
-object IdentifierSchemes extends Logging {
+object IdentifierSchemes {
   sealed trait IdentifierScheme
 
   // Corresponds to the image number in Miro, e.g. V00127563.
@@ -71,7 +70,6 @@ object IdentifierSchemes extends Logging {
       .find(_.toString == identifierScheme)
       .getOrElse {
         val errorMessage = s"$identifierScheme is not a valid identifierScheme"
-        error(errorMessage)
         throw new Exception(errorMessage)
       }
   }

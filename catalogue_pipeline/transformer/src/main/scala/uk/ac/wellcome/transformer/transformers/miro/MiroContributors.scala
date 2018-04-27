@@ -2,7 +2,8 @@ package uk.ac.wellcome.transformer.transformers.miro
 
 import java.io.InputStream
 
-import uk.ac.wellcome.models.{Agent, Contributor, Unidentifiable}
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.utils.JsonUtil.toMap
 
@@ -62,7 +63,7 @@ trait MiroContributors {
     val creators = primaryCreators ++ secondaryCreators ++ contributorCreators
 
     creators.map { agent: Unidentifiable[Agent] =>
-      Contributor(agent = agent)
+      internal.Contributor(agent = agent)
     }
   }
 }

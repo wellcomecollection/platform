@@ -7,7 +7,7 @@ import com.twitter.inject.Logging
 import javax.inject.Singleton
 import scalikejdbc._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.SourceIdentifier
+import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking

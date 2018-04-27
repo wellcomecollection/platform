@@ -8,7 +8,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.models.{
+import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
   IdentifierSchemes,
   SourceIdentifier

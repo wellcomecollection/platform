@@ -1,20 +1,19 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import java.util.concurrent.TimeoutException
-import javax.inject.{Inject, Singleton}
 
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.http.index.IndexResponse
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
+import javax.inject.{Inject, Singleton}
 import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 

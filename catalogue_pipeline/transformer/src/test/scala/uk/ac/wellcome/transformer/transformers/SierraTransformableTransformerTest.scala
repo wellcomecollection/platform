@@ -4,19 +4,14 @@ import java.time.Instant
 import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.test.utils.SierraData
-import uk.ac.wellcome.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  SierraItemData,
-  VarField
-}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraTransformableTransformerTest
