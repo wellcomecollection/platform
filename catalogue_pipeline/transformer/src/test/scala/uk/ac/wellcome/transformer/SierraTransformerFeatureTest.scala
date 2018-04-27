@@ -10,6 +10,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.test.fixtures.Messaging
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
@@ -23,6 +24,7 @@ class SierraTransformerFeatureTest
     with SQS
     with SNS
     with S3
+    with Messaging
     with fixtures.Server
     with Eventually
     with ExtendedPatience
@@ -77,7 +79,7 @@ class SierraTransformerFeatureTest
               )
 
               snsMessages.map { snsMessage =>
-                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+                val actualWork = get[UnidentifiedWork](snsMessage)
 
                 actualWork.sourceIdentifier shouldBe sourceIdentifier
                 actualWork.title shouldBe Some(title)

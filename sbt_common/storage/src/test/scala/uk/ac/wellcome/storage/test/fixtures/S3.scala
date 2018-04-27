@@ -14,7 +14,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
-import scala.util.{Random, Success, Try}
+import scala.util.{Random, Success}
 import uk.ac.wellcome.utils.JsonUtil._
 
 object S3 {

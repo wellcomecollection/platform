@@ -32,6 +32,9 @@ class Server extends HttpServer {
     SQSReaderModule,
     SNSConfigModule,
     SNSClientModule,
+    S3ConfigModule,
+    S3ClientModule,
+    JsonKeyPrefixGeneratorModule,
     AmazonCloudWatchModule
   )
 

@@ -15,19 +15,29 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.message.{MessagePointer, MessageReader, MessageWorker}
 import uk.ac.wellcome.metrics
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
+import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.Future
 import com.amazonaws.services.sns.model.UnsubscribeRequest
+import com.amazonaws.services.sqs.model.Message
+import uk.ac.wellcome.sns.NotificationMessage
+import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.util.Success
 
 trait Messaging
-    extends Akka
+  extends Akka
     with MetricsSender
     with SQS
     with SNS
@@ -52,16 +62,16 @@ trait Messaging
   case class ExampleObject(name: String)
 
   class ExampleMessageWorker(
-    sqsReader: SQSReader,
-    messageReader: MessageReader[ExampleObject],
-    actorSystem: ActorSystem,
-    metricsSender: metrics.MetricsSender
-  ) extends MessageWorker[ExampleObject](
-        sqsReader,
-        messageReader,
-        actorSystem,
-        metricsSender
-      ) {
+                              sqsReader: SQSReader,
+                              messageReader: MessageReader[ExampleObject],
+                              actorSystem: ActorSystem,
+                              metricsSender: metrics.MetricsSender
+                            ) extends MessageWorker[ExampleObject](
+    sqsReader,
+    messageReader,
+    actorSystem,
+    metricsSender
+  ) {
 
     var calledWith: Option[ExampleObject] = None
     def hasBeenCalled: Boolean = calledWith.nonEmpty
@@ -156,6 +166,50 @@ trait Messaging
     }
   }
 
+  implicit val messagePointerDecoder: Decoder[MessagePointer] =
+    deriveDecoder[MessagePointer]
+
+  implicit val messagePointerEncoder: Encoder[MessagePointer] =
+    deriveEncoder[MessagePointer]
+
+  def put[T](obj: T, location: S3ObjectLocation)(implicit encoder: Encoder[T]) = {
+    val serialisedExampleObject = toJson[T](obj).get
+
+    s3Client.putObject(
+      location.bucket,
+      location.key,
+      serialisedExampleObject
+    )
+
+    val examplePointer =
+      MessagePointer(S3ObjectLocation(
+        location.bucket,
+        location.key)
+      )
+
+    val serialisedExamplePointer = toJson(examplePointer).get
+
+    val exampleNotification = NotificationMessage(
+      MessageId = "MessageId",
+      TopicArn = "TopicArn",
+      Subject = "Subject",
+      Message = serialisedExamplePointer
+    )
+
+    toJson(exampleNotification).get
+  }
+
+  def get[T](snsMessage: MessageInfo)(implicit decoder: Decoder[T]): T = {
+    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
+    tryMessagePointer shouldBe a[Success[_]]
+
+    val messagePointer = tryMessagePointer.get
+
+    val tryT = fromJson[T](getContentFromS3(Bucket(messagePointer.src.bucket), messagePointer.src.key))
+    tryT shouldBe a[Success[_]]
+
+    tryT.get
+  }
   def withMessageWorkerFixtures[R](
     testWith: TestWith[(metrics.MetricsSender,
                         Queue,

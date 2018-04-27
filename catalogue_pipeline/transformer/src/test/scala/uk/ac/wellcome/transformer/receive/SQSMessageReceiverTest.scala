@@ -24,6 +24,7 @@ import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.test.fixtures.{Messaging, S3, SNS, SQS, TestWith}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier,
@@ -47,15 +48,16 @@ import scala.concurrent.Future
 
 class SQSMessageReceiverTest
     extends FunSpec
-    with Matchers
-    with SQS
-    with SNS
-    with S3
-    with Eventually
-    with ExtendedPatience
-    with MockitoSugar
-    with ScalaFutures
-    with TransformableMessageUtils {
+      with Matchers
+      with SQS
+      with SNS
+      with S3
+      with Messaging
+      with Eventually
+      with ExtendedPatience
+      with MockitoSugar
+      with ScalaFutures
+      with TransformableMessageUtils {
 
   val sourceIdentifier =
     SourceIdentifier(
@@ -134,7 +136,7 @@ class SQSMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                getObjectFromS3[UnidentifiedWork](snsMessage)
+                get[UnidentifiedWork](snsMessage)
                 snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
               }
             }
@@ -181,7 +183,7 @@ class SQSMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+                val actualWork = get[UnidentifiedWork](snsMessage)
 
                 actualWork.title shouldBe Some(title)
                 actualWork.sourceIdentifier shouldBe sourceIdentifier

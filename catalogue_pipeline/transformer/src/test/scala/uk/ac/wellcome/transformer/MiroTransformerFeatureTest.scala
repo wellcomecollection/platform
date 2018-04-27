@@ -2,8 +2,8 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.test.fixtures.{Messaging, S3, SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -16,15 +16,16 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 class MiroTransformerFeatureTest
     extends FunSpec
-    with Matchers
-    with SQS
-    with SNS
-    with S3
-    with fixtures.Server
-    with Eventually
-    with ExtendedPatience
-    with MiroTransformableWrapper
-    with TransformableMessageUtils {
+      with Matchers
+      with SQS
+      with SNS
+      with S3
+      with Messaging
+      with fixtures.Server
+      with Eventually
+      with ExtendedPatience
+      with MiroTransformableWrapper
+      with TransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"
@@ -67,7 +68,7 @@ class MiroTransformerFeatureTest
               snsMessages.length shouldBe >=(1)
 
               snsMessages.map { snsMessage =>
-                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+                val actualWork = get[UnidentifiedWork](snsMessage)
 
                 actualWork.identifiers.head.value shouldBe miroID
                 actualWork.title shouldBe Some(title)

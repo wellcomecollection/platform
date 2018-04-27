@@ -18,14 +18,15 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 class CalmTransformerFeatureTest
     extends FunSpec
-    with Matchers
-    with SQS
-    with SNS
-    with S3
-    with fixtures.Server
-    with Eventually
-    with ExtendedPatience
-    with TransformableMessageUtils {
+      with Matchers
+      with SQS
+      with SNS
+      with S3
+      with Messaging
+      with fixtures.Server
+      with Eventually
+      with ExtendedPatience
+      with TransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
     val calmTransformable =
@@ -69,7 +70,7 @@ class CalmTransformerFeatureTest
               )
 
               snsMessages.map { snsMessage =>
-                val actualWork = getObjectFromS3[UnidentifiedWork](snsMessage)
+                val actualWork = get[UnidentifiedWork](snsMessage)
 
                 actualWork.sourceIdentifier shouldBe sourceIdentifier
                 actualWork.title shouldBe Some("placeholder title")
