@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.snapshot_generator.services
 
 import java.io.File
-import java.lang.RuntimeException
 
 import akka.actor.ActorSystem
 import akka.stream.alpakka.s3.S3Exception
@@ -16,13 +15,10 @@ import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.IdentifierSchemes.sierraSystemNumber
-import uk.ac.wellcome.models.{IdentifiedWork, IdentifierSchemes, Period}
+import uk.ac.wellcome.models.work.internal.IdentifierSchemes.sierraSystemNumber
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
