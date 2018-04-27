@@ -15,7 +15,7 @@ trait CloudWatch extends Logging with ImplicitLogging {
   protected val awsNamespace: String = "test"
 
   private val localCloudWatchEndpointUrl: String = "http://localhost:4582"
-  private val regionName: String = "localhost"
+  private val regionName: String = "eu-west-1"
 
   protected val flushInterval: FiniteDuration = 1 second
 
@@ -31,15 +31,5 @@ trait CloudWatch extends Logging with ImplicitLogging {
     .withEndpointConfiguration(
       new EndpointConfiguration(localCloudWatchEndpointUrl, regionName))
     .build()
-
-  def withCloudWatchClient[R] =
-    fixture[AmazonCloudWatch, R](
-      create = AmazonCloudWatchClientBuilder
-        .standard()
-        .withCredentials(credentials)
-        .withEndpointConfiguration(
-          new EndpointConfiguration(localCloudWatchEndpointUrl, regionName))
-        .build()
-    )
 
 }

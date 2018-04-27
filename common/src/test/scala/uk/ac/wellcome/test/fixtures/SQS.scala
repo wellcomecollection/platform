@@ -15,12 +15,9 @@ import scala.util.Random
 
 object SQS {
 
-  class Queue(val url: String) extends AnyVal {
-    override def toString = s"SQS.Queue($url)"
-  }
-
-  object Queue {
-    def apply(url: String): Queue = new Queue(url)
+  case class Queue(url: String, arn: String) {
+    override def toString = s"SQS.Queue(url = $url, name = $name)"
+    def name = url.split("/").toList.last
   }
 
 }
@@ -29,10 +26,17 @@ trait SQS extends ImplicitLogging {
 
   import SQS._
 
-  private val sqsEndpointUrl = "http://localhost:9324"
+  protected val sqsInternalEndpointUrl = "http://sqs:9324"
+  protected val sqsEndpointUrl = "http://localhost:9324"
 
   private val accessKey = "access"
   private val secretKey = "secret"
+
+  def endpoint(queue: Queue) =
+    s"aws-sqs://${queue.name}?amazonSQSEndpoint=$sqsInternalEndpointUrl&accessKey=&secretKey="
+
+  def localStackEndpoint(queue: Queue) =
+    s"sqs://${queue.name}"
 
   def sqsLocalFlags(queue: Queue) = Map(
     "aws.sqs.endpoint" -> sqsEndpointUrl,
@@ -56,10 +60,14 @@ trait SQS extends ImplicitLogging {
   def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
-      val url = sqsClient.createQueue(queueName).getQueueUrl
-
-      sqsClient.setQueueAttributes(url, Map("VisibilityTimeout" -> "1"))
-      Queue(url)
+      val response = sqsClient.createQueue(queueName)
+      val arn = sqsClient
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getAttributes
+        .get("QueueArn")
+      val queue = Queue(response.getQueueUrl, arn)
+      sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
+      queue
     },
     destroy = { queue =>
       safeCleanup(queue) { url =>
@@ -69,7 +77,46 @@ trait SQS extends ImplicitLogging {
     }
   )
 
+  val localStackSqsClient: AmazonSQS = AmazonSQSClientBuilder
+    .standard()
+    .withCredentials(credentials)
+    .withEndpointConfiguration(
+      new EndpointConfiguration("http://localhost:4576", "localhost"))
+    .build()
+
+  def withLocalStackSqsQueue[R] = fixture[Queue, R](
+    create = {
+      val queueName: String = Random.alphanumeric take 10 mkString
+      val response = localStackSqsClient.createQueue(queueName)
+      val arn = localStackSqsClient
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getAttributes
+        .get("QueueArn")
+      val queue = Queue(response.getQueueUrl, arn)
+
+      localStackSqsClient
+        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
+      queue
+    },
+    destroy = { queue =>
+      safeCleanup(queue) { url =>
+        localStackSqsClient.purgeQueue(
+          new PurgeQueueRequest().withQueueUrl(queue.url))
+      }
+      localStackSqsClient.deleteQueue(queue.url)
+    }
+  )
+
   object TestSqsMessage {
+    def apply(messageBody: String) =
+      SQSMessage(
+        subject = Some("subject"),
+        messageType = "messageType",
+        topic = "topic",
+        body = messageBody,
+        timestamp = "timestamp"
+      )
+
     def apply() =
       SQSMessage(
         subject = Some("subject"),

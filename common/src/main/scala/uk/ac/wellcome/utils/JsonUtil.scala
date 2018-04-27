@@ -1,12 +1,16 @@
 package uk.ac.wellcome.utils
 
+import java.net.{URI, URISyntaxException}
+import java.time.Instant
+import java.time.format.DateTimeParseException
+
 import cats.syntax.either._
 import com.twitter.inject.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.java8.time.TimeInstances
 import io.circe.parser.decode
 import io.circe.syntax._
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.util.Try

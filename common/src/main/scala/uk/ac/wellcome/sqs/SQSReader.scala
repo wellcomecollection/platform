@@ -31,7 +31,13 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
           debug(s"Looking for new messages at ${sqsConfig.queueUrl}")
         }
         ms <- receiveMessages()
+        _ <- Future.successful {
+          debug(s"Processing new messages $ms")
+        }
         _ <- Future.sequence { ms.map { processAndDeleteMessage(_, process) } }
+        _ <- Future.successful {
+          debug(s"Processed new messages $ms")
+        }
       } yield {
         val messageIds = ms.map { _.getMessageId }
 
@@ -39,8 +45,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
           info(
             s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
         } else {
-          debug(
-            s"Received messages $messageIds from queue ${sqsConfig.queueUrl}")
+          debug(s"No messages from queue ${sqsConfig.queueUrl}")
         }
 
         ()

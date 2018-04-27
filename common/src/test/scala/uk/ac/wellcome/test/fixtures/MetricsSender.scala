@@ -1,5 +1,6 @@
 package uk.ac.wellcome.test.fixtures
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.twitter.inject.Logging
 import org.mockito.Matchers.{any, anyString}
@@ -16,18 +17,14 @@ trait MetricsSender
     with CloudWatch
     with Akka {
 
-  def withMetricsSender[R](cloudWatchClient: AmazonCloudWatch) =
-    withActorSystem { actorSystem =>
-      withCloudWatchClient { cloudWatchClient =>
-        fixture[metrics.MetricsSender, R](
-          create = new metrics.MetricsSender(
-            awsNamespace,
-            flushInterval,
-            cloudWatchClient,
-            actorSystem)
-        )
-      }
-    }
+  def withMetricsSender[R](actorSystem: ActorSystem) =
+    fixture[metrics.MetricsSender, R](
+      create = new metrics.MetricsSender(
+        awsNamespace,
+        flushInterval,
+        cloudWatchClient,
+        actorSystem)
+    )
 
   def withMockMetricSender[R] = fixture[metrics.MetricsSender, R](
     create = {
