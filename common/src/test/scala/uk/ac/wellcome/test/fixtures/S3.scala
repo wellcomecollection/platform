@@ -79,12 +79,6 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
     IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
   }
 
-  def getContentFromS3(bucket: Bucket): Seq[String] = {
-    s3Client.listObjects(bucket.name).getObjectSummaries.map { obj =>
-      getContentFromS3(bucket, obj.getKey)
-    }
-  }.toSeq
-
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
     parse(getContentFromS3(bucket, key)).right.get
   }
