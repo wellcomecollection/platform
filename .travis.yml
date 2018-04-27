@@ -68,7 +68,7 @@ jobs:
 
     - stage: test
       env: TASK=sbt-common-test
-    - env: TASK=sbt-pipeline_model-test
+    - env: TASK=sbt-internal_model-test
     - env: TASK=sbt-display-test
     - env: TASK=sbt-elasticsearch-test
 
