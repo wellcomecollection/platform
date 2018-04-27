@@ -8,7 +8,6 @@ def doSharedSetup(project: Project, folder: String) =
     .dependsOn(common % "compile->compile;test->test")
     .settings(Common.settings: _*)
     .settings(Finatra.settings: _*)
-    .settings(Revolver.settings: _*)
     .settings(DockerCompose.settings: _*)
     .enablePlugins(DockerComposePlugin)
     .enablePlugins(JavaAppPackaging)
