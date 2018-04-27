@@ -41,6 +41,7 @@ class MiroTransformerFeatureTest
                 data = s"""{
                   "image_title": "$title",
                   "image_cleared": "N",
+                  "image_use_restrictions": "CC-0",
                   "image_copyright_cleared": "N",
                   "image_tech_file_size": ["100000"]
                 }"""
