@@ -17,8 +17,7 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-    parallelExecution in Test := false,
-    libraryDependencies ++= Dependencies.sharedDependencies
+    parallelExecution in Test := false
   ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
 }
 
