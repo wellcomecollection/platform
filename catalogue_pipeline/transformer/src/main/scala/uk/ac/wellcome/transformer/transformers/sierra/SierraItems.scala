@@ -3,7 +3,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedItem}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedItem
+}
 import uk.ac.wellcome.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
 

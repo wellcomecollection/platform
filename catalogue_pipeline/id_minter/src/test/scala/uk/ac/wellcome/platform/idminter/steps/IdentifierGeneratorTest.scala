@@ -8,8 +8,14 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier
+}
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  TableProvisioner
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
