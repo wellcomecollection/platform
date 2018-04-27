@@ -679,4 +679,45 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.dimensions shouldBe Some(dimensions)
   }
+
+  it("extracts subjects if present") {
+    val id = "9009009"
+    val content = "A content"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Dastardly Danish dogs draw dubious doughnuts",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "650",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$content"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.subjects shouldBe List(
+      Subject(content, List(Concept(content))))
+  }
+
 }
