@@ -68,6 +68,7 @@ lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
+  .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.recorderDependencies)
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
