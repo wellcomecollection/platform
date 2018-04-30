@@ -6,12 +6,12 @@ import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{S3Config, SQSConfig, SQSMessage}
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{Akka, S3, SQS, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.utils.JsonUtil._
@@ -19,10 +19,11 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 
 import collection.JavaConversions._

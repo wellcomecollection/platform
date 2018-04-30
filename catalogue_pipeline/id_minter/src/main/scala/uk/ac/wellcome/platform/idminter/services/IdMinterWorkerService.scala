@@ -5,9 +5,8 @@ import com.google.inject.Inject
 import io.circe.Json
 import io.circe.parser._
 import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorker}
+import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

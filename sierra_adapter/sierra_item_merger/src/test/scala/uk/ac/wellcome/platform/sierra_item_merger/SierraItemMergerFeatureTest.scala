@@ -2,14 +2,15 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3, SQS}
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 class SierraItemMergerFeatureTest
     extends FunSpec

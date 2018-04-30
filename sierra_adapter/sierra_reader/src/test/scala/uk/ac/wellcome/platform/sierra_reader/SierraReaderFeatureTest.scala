@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.sierra_reader
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.fixtures.{S3, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 

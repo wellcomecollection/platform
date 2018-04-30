@@ -1,17 +1,14 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
-import com.amazonaws.auth._
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model.PurgeQueueRequest
-import uk.ac.wellcome.models.aws.SQSMessage
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
-import uk.ac.wellcome.test.fixtures.ImplicitLogging
+import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.test.fixtures._
 
-import scala.util.Random
 import scala.collection.JavaConversions._
-
 import scala.util.Random
 
 object SQS {

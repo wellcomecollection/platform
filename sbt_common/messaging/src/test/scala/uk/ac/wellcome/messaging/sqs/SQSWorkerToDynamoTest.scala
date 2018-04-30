@@ -11,14 +11,13 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 
-import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.test.utils.ExtendedPatience

@@ -4,20 +4,17 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.{Id, Versioned}
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.platform.reindex_worker.models.{
-  CompletedReindexJob,
-  ReindexJob,
-  ReindexRecord
-}
+import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob, ReindexRecord}
 import uk.ac.wellcome.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
+
 import scala.collection.JavaConversions._
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 case class TestRecord(
