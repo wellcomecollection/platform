@@ -98,15 +98,17 @@ class IdMinterFeatureTest
                 sqsClient.sendMessage(queue.url, messageBody)
               }
 
+
+              def getWorksFromMessages(messages: List[MessageInfo]) =
+                messages.map(m => fromJson[IdentifiedWork](m.message).get)
+
               eventually {
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages.size should be >= messageCount
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages.length shouldBe >=(messageCount)
 
-                snsMessages.map { snsMessage =>
-                  val actualWork = get[IdentifiedWork](snsMessage)
-
-                  actualWork.title shouldBe Some(title)
-                  actualWork.identifiers.head.value shouldBe miroID
+                getWorksFromMessages(messages).foreach { work =>
+                  work.identifiers.head.value shouldBe miroID
+                  work.title shouldBe Some(title)
                 }
               }
             }
@@ -122,7 +124,11 @@ class IdMinterFeatureTest
         withIdentifiersDatabase { dbConfig =>
           withLocalS3Bucket { bucket =>
 
-            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ dbConfig.flags
+            val flags =
+              sqsLocalFlags(queue) ++
+              snsLocalFlags(topic) ++
+              dbConfig.flags ++
+              s3LocalFlags(bucket)
 
             withServer(flags) { _ =>
               sqsClient.sendMessage(queue.url, "not a json string")

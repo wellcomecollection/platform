@@ -8,7 +8,7 @@ import cats.syntax.either._
 import com.twitter.inject.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.java8.time.TimeInstances
-import io.circe.parser.decode
+import io.circe.parser._
 import io.circe.syntax._
 import io.circe.{Decoder, DecodingFailure, Encoder, Json}
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -27,6 +27,9 @@ object JsonUtil extends AutoDerivation with TimeInstances with Logging {
   def toMap[T](json: String)(
     implicit decoder: Decoder[T]): Try[Map[String, T]] =
     fromJson[Map[String, T]](json)
+
+  def fromJson(json: String): Try[Json] =
+    parse(json).toTry
 
   def fromJson[T](json: String)(implicit decoder: Decoder[T]): Try[T] =
     decode[T](json).toTry.recover {

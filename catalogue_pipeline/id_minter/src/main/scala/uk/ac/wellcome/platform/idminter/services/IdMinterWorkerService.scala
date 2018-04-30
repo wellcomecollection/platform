@@ -9,7 +9,8 @@ import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
 import uk.ac.wellcome.message.{MessageReader, MessageWorker}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.UnidentifiedWork
+import uk.ac.wellcome.models.License.createLicense
+import uk.ac.wellcome.models.{License, UnidentifiedWork}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -32,8 +33,8 @@ class IdMinterWorkerService @Inject()(
   override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"
 
-  override implicit val decoder: Decoder[Json] = Decoder.decodeString.emap { str =>
-    parse(str).left.map(_.toString)
+  override implicit val decoder: Decoder[Json] = Decoder.instanceTry[Json] { hCursor =>
+    Try(hCursor.value)
   }
 
   override def processMessage(json: Json): Future[Unit] =
