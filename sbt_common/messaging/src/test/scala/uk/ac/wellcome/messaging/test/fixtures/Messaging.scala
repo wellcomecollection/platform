@@ -14,12 +14,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics
 import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
-import uk.ac.wellcome.test.fixtures.{
-  Akka,
-  ImplicitLogging,
-  MetricsSender,
-  TestWith
-}
+import uk.ac.wellcome.test.fixtures.{Akka, ImplicitLogging, MetricsSender, S3, TestWith}
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global

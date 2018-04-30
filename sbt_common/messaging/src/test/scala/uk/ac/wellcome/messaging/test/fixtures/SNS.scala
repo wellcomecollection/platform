@@ -10,10 +10,9 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.annotation.JsonProperty
-import uk.ac.wellcome.test.fixtures.ImplicitLogging
+import uk.ac.wellcome.test.fixtures._
 
 import scala.util.Random
-import com.amazonaws.regions.Regions
 
 object SNS {
 
