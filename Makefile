@@ -20,6 +20,12 @@ include nginx/Makefile
 sbt-common-test:
 	$(call sbt_test,common)
 
+sbt-common-docker_compose_up:
+	$(call docker_compose_up,common/docker-compose.yml)
+
+sbt-common-docker_compose_down:
+	$(call docker_compose_down,common/docker-compose.yml)
+
 sbt-common-publish:
 	echo "Nothing to do!"
 
