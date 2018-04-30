@@ -1,20 +1,20 @@
 module "notebook_compute" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//ec2/asg?ref=v9.3.0"
-  name = "jupyter"
+  name   = "jupyter"
 
   # Ubuntu DLAMI
   image_id = "ami-0bc19972"
   key_name = "${var.key_name}"
 
   subnet_list = "${module.vpc.subnets}"
-  vpc_id = "${module.vpc.vpc_id}"
+  vpc_id      = "${module.vpc.vpc_id}"
 
-  use_spot = 1
+  use_spot   = 1
   spot_price = "0.4"
 
-  asg_min = "0"
+  asg_min     = "0"
   asg_desired = "0"
-  asg_max = "1"
+  asg_max     = "1"
 
   instance_type = "p2.xlarge"
 
@@ -35,8 +35,8 @@ data "template_file" "userdata" {
   template = "${file("userdata.sh.tpl")}"
 
   vars {
-    notebook_user = "jupyter"
-    notebook_port = "8888"
+    notebook_user   = "jupyter"
+    notebook_port   = "8888"
     hashed_password = "${var.hashed_password}"
   }
 }
