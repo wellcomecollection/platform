@@ -2,8 +2,10 @@ package uk.ac.wellcome.platform.recorder.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
+import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorkerToDynamo}
+import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.recorder.models.RecorderWorkEntry
@@ -23,6 +25,7 @@ class RecorderWorkerService @Inject()(
 
   implicit val decoder = Decoder[RecorderWorkEntry]
   implicit val encoder = Encoder[RecorderWorkEntry]
+  implicit val dynamoFormat = DynamoFormat[RecorderWorkEntry]
 
   override def store(work: UnidentifiedWork): Future[Unit] = {
 
@@ -32,6 +35,6 @@ class RecorderWorkerService @Inject()(
       existingEntry => if (existingEntry.work.version > newRecorderEntry.work.version) {
         existingEntry
       } else { newRecorderEntry }
-    )(metadata = EmptyMetadata())
+    )(SourceMetadata(sourceName = "transformer"))
   }
 }
