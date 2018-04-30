@@ -6,9 +6,9 @@ import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
+import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{S3Config, SQSConfig, SQSMessage}
-import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, S3, SQS, TestWith}

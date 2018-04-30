@@ -6,12 +6,12 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{S3Config, SQSMessage}
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sqs.{SQSReader, SQSWorker}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import io.circe.syntax._
 import uk.ac.wellcome.utils.JsonUtil._

@@ -11,6 +11,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{S3Config, SNSConfig, SQSMessage}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
@@ -20,7 +21,6 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.SNS.Topic
 import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS, TestWith}
