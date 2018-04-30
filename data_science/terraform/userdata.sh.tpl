@@ -9,7 +9,7 @@ cat << EOF > /home/${notebook_user}/.jupyter/jupyter_notebook_config.py
 
 c.NotebookApp.notebook_dir = u"/home/${notebook_user}/"
 c.NotebookApp.ip = "*"
-c.NotebookApp.port = "${notebook_port}"
+c.NotebookApp.port = ${notebook_port}
 c.NotebookApp.open_browser = False
 c.NotebookApp.password = u'${hashed_password}'
 
