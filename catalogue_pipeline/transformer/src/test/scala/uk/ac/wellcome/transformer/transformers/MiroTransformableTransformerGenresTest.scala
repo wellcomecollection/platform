@@ -47,7 +47,7 @@ class MiroTransformableTransformerGenresTest
       """,
       expectedGenres = List(
         Genre("etching", List(Concept("etching"))),
-        Genre("woodwork", List(Concept("woodwªork")))
+        Genre("woodwork", List(Concept("woodwork")))
       )
     )
   }
