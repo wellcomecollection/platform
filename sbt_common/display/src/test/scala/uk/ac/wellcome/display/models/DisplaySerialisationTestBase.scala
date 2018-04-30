@@ -6,7 +6,8 @@ import org.scalatest.Suite
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait DisplaySerialisationTestBase { this: Suite =>
+trait DisplaySerialisationTestBase {
+  this: Suite =>
 
   def items(its: List[IdentifiedItem]) =
     its
@@ -23,7 +24,9 @@ trait DisplaySerialisationTestBase { this: Suite =>
 
   def locations(locations: List[Location]) =
     locations
-      .map { location(_) }
+      .map {
+        location(_)
+      }
       .mkString(",")
 
   def location(loc: Location) = loc match {
@@ -140,21 +143,37 @@ trait DisplaySerialisationTestBase { this: Suite =>
 
   def concepts(concepts: List[AbstractConcept]) =
     concepts
-      .map { concept(_) }
+      .map {
+        concept(_)
+      }
       .mkString(",")
 
   def subject(s: Subject) =
     s"""
-  {
-    "label": "${s.label}",
-    "type" : "${s.ontologyType}",
-    "concepts": [ ${concepts(s.concepts)} ]
-   }
-   """
+    {
+      "label": "${s.label}",
+      "type" : "${s.ontologyType}",
+      "concepts": [ ${concepts(s.concepts)} ]
+    }
+    """
 
   def subjects(subjects: List[Subject]) =
     subjects
       .map { subject(_) }
+      .mkString(",")
+
+  def genre(g: Genre) =
+    s"""
+    {
+      "label": "${g.label}",
+      "type" : "${g.ontologyType}",
+      "concepts": [ ${concepts(g.concepts)} ]
+    }
+    """
+
+  def genres(genres: List[Genre]) =
+    genres
+      .map { genre(_) }
       .mkString(",")
 
   def contributor(c: Contributor[Displayable[AbstractAgent]]) =

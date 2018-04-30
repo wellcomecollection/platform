@@ -15,7 +15,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
-    extends TransformableTransformer[SierraTransformable]
+  extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraContributors
     with SierraDescription
@@ -32,12 +32,11 @@ class SierraTransformableTransformer
     with SierraPlaceOfPublication
     with SierraDimensions
     with SierraSubjects
+    with SierraGenres
     with Logging {
 
-  override def transformForType(
-    sierraTransformable: SierraTransformable,
-    version: Int
-  ): Try[Option[UnidentifiedWork]] = {
+  override def transformForType(sierraTransformable: SierraTransformable,
+                                version: Int): Try[Option[UnidentifiedWork]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
         info(s"Attempting to transform ${bibData.id}")
@@ -69,10 +68,10 @@ class SierraTransformableTransformer
               language = getLanguage(sierraBibData),
               contributors = getContributors(sierraBibData),
               dimensions = getDimensions(sierraBibData),
-              subjects = getSubjects(sierraBibData)
+              subjects = getSubjects(sierraBibData),
+              genres = getGenres(sierraBibData)
             ))
         }
-
       }
       // A merged record can have both bibs and items.  If we only have
       // the item data so far, we don't have enough to build a Work, so we

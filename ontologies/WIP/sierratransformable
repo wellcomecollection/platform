@@ -222,10 +222,12 @@
    * 
    * 
    * 1. For all bibliographic records use "marcTag": "655".
-   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order, seperated by a double hyphen ' - ' and type as "Genre".
+   * 2. If one of subfield v,x,y,z is populated. Populate platform "label" with concatenated subfields v,x,y,z in order,
+   %    seperated by a hyphen ' - ' and type as "Genre".
    * 3. Populate platform "concepts" with "label" from subfield "a".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 5. For other subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield "y" type as "Period", "v" as "Concept" and "z" as "Place".
+   * 5. For other subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield,
+   *    "y" type as "Period", "v" as "Concept" and "z" as "Place".
    *
    * Note: for genre a concept might have a authority but no assocaited id. We should still capture it as an id with no value. 
    *
@@ -260,7 +262,7 @@
 
 
 
-   /* Populate wwork:subjects topics, places and periods. Rules:
+   /* Populate work:subjects topics, places and periods. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "650", "648", "651".
    * 2. If more than one subfield is populated. Populate platform "label" with concatenated subfields v,x,y,z in

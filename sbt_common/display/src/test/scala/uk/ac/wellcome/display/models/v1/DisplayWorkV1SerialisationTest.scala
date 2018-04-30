@@ -22,7 +22,6 @@ class DisplayWorkV1SerialisationTest
   val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
   it("serialises a DisplayWorkV1 correctly") {
-
     val work = workWith(
       canonicalId = canonicalId,
       title = title,
@@ -188,10 +187,8 @@ class DisplayWorkV1SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [
-                          |       ${concept(
-                            workWithSubjects.subjects(0).concepts(0))},
-                          |       ${concept(
-                            workWithSubjects.subjects(1).concepts(0))} ],
+                          |       ${concept(workWithSubjects.subjects(0).concepts(0))},
+                          |       ${concept(workWithSubjects.subjects(1).concepts(0))} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
@@ -207,24 +204,26 @@ class DisplayWorkV1SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      genres = List(Concept("woodwork"), Concept("etching"))
+      genres = List(
+        Genre("label", List(Concept("woodwork"))),
+        Genre("label", List(Concept("etching"))))
     )
-    val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
+    val actualJson = objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
-                          |     "creators": [],
+                          |     "creators": [ ],
                           |     "subjects": [ ],
-                          |     "genres": [ ${concepts(workWithSubjects.genres)} ],
+                          |     "genres": [
+                          |             ${concept(workWithSubjects.genres(0).concepts(0))},
+                          |             ${concept(workWithSubjects.genres(1).concepts(0))} ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
-
   }
 
   it("includes a list of identifiers on DisplayWorkV1") {
