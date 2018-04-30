@@ -187,8 +187,10 @@ class DisplayWorkV1SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [
-                          |       ${concept(workWithSubjects.subjects(0).concepts(0))},
-                          |       ${concept(workWithSubjects.subjects(1).concepts(0))} ],
+                          |       ${concept(
+                            workWithSubjects.subjects(0).concepts(0))},
+                          |       ${concept(
+                            workWithSubjects.subjects(1).concepts(0))} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
@@ -208,7 +210,8 @@ class DisplayWorkV1SerialisationTest
         Genre("label", List(Concept("woodwork"))),
         Genre("label", List(Concept("etching"))))
     )
-    val actualJson = objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",
@@ -217,8 +220,10 @@ class DisplayWorkV1SerialisationTest
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [
-                          |             ${concept(workWithSubjects.genres(0).concepts(0))},
-                          |             ${concept(workWithSubjects.genres(1).concepts(0))} ],
+                          |             ${concept(
+                            workWithSubjects.genres(0).concepts(0))},
+                          |             ${concept(
+                            workWithSubjects.genres(1).concepts(0))} ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin

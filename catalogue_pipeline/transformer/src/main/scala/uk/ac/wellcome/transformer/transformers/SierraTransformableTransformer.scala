@@ -15,7 +15,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
-  extends TransformableTransformer[SierraTransformable]
+    extends TransformableTransformer[SierraTransformable]
     with SierraIdentifiers
     with SierraContributors
     with SierraDescription
@@ -35,8 +35,9 @@ class SierraTransformableTransformer
     with SierraGenres
     with Logging {
 
-  override def transformForType(sierraTransformable: SierraTransformable,
-                                version: Int): Try[Option[UnidentifiedWork]] = {
+  override def transformForType(
+    sierraTransformable: SierraTransformable,
+    version: Int): Try[Option[UnidentifiedWork]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
         info(s"Attempting to transform ${bibData.id}")

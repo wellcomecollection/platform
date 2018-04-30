@@ -28,7 +28,8 @@ case class MiroTransformableData(
   @JsonKey("image_innopac_id") innopacID: Option[String],
   @JsonKey("image_credit_line") creditLine: Option[String],
   @JsonKey("image_source_code") sourceCode: Option[String],
-  @JsonKey("image_library_ref_department") libraryRefDepartment: List[Option[String]] = Nil,
+  @JsonKey("image_library_ref_department") libraryRefDepartment: List[
+    Option[String]] = Nil,
   @JsonKey("image_library_ref_id") libraryRefId: List[Option[String]] = Nil,
   @JsonKey("image_award") award: List[Option[String]] = Nil,
   @JsonKey("image_award_date") awardDate: List[Option[String]] = Nil

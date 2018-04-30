@@ -21,8 +21,7 @@ class MiroTransformableTransformerGenresTest
         "image_title": "A goat grazes on some grass",
         "image_phys_format": "painting"
       """,
-      expectedGenres = List(Genre("painting", List(Concept("painting")))
-      )
+      expectedGenres = List(Genre("painting", List(Concept("painting"))))
     )
   }
 
@@ -32,8 +31,7 @@ class MiroTransformableTransformerGenresTest
         "image_title": "Grouchy geese are good as guards",
         "image_lc_genre": "sculpture"
       """,
-      expectedGenres = List(Genre("sculpture", List(Concept("sculpture")))
-      )
+      expectedGenres = List(Genre("sculpture", List(Concept("sculpture"))))
     )
   }
 
@@ -59,13 +57,14 @@ class MiroTransformableTransformerGenresTest
         "image_phys_format": "oil painting",
         "image_lc_genre": "oil painting"
       """,
-      expectedGenres = List(Genre("oil painting", List(Concept("oil painting"))))
+      expectedGenres =
+        List(Genre("oil painting", List(Concept("oil painting"))))
     )
   }
 
-  private def transformRecordAndCheckGenres(
-    data: String,
-    expectedGenres: List[Genre] = List()) = {
+  private def transformRecordAndCheckGenres(data: String,
+                                            expectedGenres: List[Genre] =
+                                              List()) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
   }
