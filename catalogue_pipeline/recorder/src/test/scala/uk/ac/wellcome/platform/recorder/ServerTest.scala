@@ -1,21 +1,15 @@
 package uk.ac.wellcome.platform.recorder
 
 import com.twitter.finagle.http.Status._
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTest
+import org.scalatest.FunSpec
 
-class ServerTest extends FeatureTest {
+class ServerTest extends FunSpec with fixtures.Server {
 
-  val server = new EmbeddedHttpServer(
-    new Server(),
-    flags = Map(
-      "aws.dynamo.tableName" -> "serverTestTable"
-    )
-  )
-
-  test("it shows the healthcheck message") {
-    server.httpGet(path = "/management/healthcheck",
-                   andExpect = Ok,
-                   withJsonBody = """{"message": "ok"}""")
+  it("shows the healthcheck message") {
+    withServer(flags = Map()) { server =>
+      server.httpGet(path = "/management/healthcheck",
+        andExpect = Ok,
+        withJsonBody = """{"message": "ok"}""")
+    }
   }
 }
