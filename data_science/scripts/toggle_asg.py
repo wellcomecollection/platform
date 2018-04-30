@@ -24,31 +24,30 @@ DATA_SCIENCE_ASG_TAGS = {
 
 def discover_asg_name(asg_client, desired_tags):
     """
-    Returns the name of the first autoscaling group whose tags match the
-    supplied input.
-
-    e.g. if you pass desired_tags={'data_science': 'true'}, it might find
-    an ASG whose tags are
-
-        {
-            'data_science': 'true',
-            'autoscaling': 'false',
-            'color': 'green'
-        }
-
+    Returns the name of the first autoscaling group whose tags exactly match
+    the supplied input.
     """
     # This API is paginated, but for now we assume we have less than 100 ASGs
     # to check!
     resp = asg_client.describe_auto_scaling_groups(MaxRecords=100)
 
     for asg_data in resp['AutoScalingGroups']:
+
+        # The structure of the response is a little awkward.  It's a list of
+        # entries of the form:
+        #
+        #   {'Key': '<KEY>',
+        #    'PropagateAtLaunch': (True|False),
+        #    'ResourceId': '<RESOURCE_ID>',
+        #    'ResourceType': 'auto-scaling-group',
+        #    'Value': '<VALUE>'}]
+        #
+        # We only care about the tag values, so we extract them into a
+        # Python dict.
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
-        for k, v in desired_tags.items():
-            if (k not in actual_tags) or (actual_tags[k] != v):
-                continue
-
-        return asg_data['AutoScalingGroupName']
+        if desired_tags == actual_tags:
+            return asg_data['AutoScalingGroupName']
 
     else:
         raise RuntimeError("Can't find an ASG with tags %r!" % desired_tags)
