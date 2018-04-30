@@ -6,8 +6,15 @@ import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable
+}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.storage.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures.S3.Bucket

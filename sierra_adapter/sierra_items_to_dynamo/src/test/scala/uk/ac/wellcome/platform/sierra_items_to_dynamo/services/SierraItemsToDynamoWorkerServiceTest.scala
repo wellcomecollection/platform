@@ -13,7 +13,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecord
+}
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import org.mockito.Matchers.any
