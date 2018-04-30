@@ -1,14 +1,16 @@
 # -*- encoding: utf-8
 
+import sys
+
 
 DATA_SCIENCE_ASG_TAGS = {
     'data_science': 'true',
 }
 
 
-def discover_asg_name(asg_client):
+def discover_data_science_asg(asg_client):
     """
-    Returns the name of the first autoscaling group whose tags exactly match
+    Return data about the first autoscaling group whose tags exactly match
     the supplied input.
     """
     # This API is paginated, but for now we assume we have less than 100 ASGs
@@ -31,9 +33,16 @@ def discover_asg_name(asg_client):
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
         if actual_tags == DATA_SCIENCE_ASG_TAGS:
-            return asg_data['AutoScalingGroupName']
+            return asg_data
 
     else:
-        raise RuntimeError(
-            "Can't find an ASG with tags %r!" % DATA_SCIENCE_ASG_TAGS
-        )
+        sys.exit("Can't find an ASG with tags %r!" % DATA_SCIENCE_ASG_TAGS)
+
+
+def discover_asg_name(asg_client):
+    """
+    Returns the name of the first autoscaling group whose tags exactly match
+    the supplied input.
+    """
+    asg_data = discover_data_science_asg(asg_client=asg_client)
+    return asg_data['AutoScalingGroupName']
