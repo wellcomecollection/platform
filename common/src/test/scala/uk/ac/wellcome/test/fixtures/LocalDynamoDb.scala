@@ -6,6 +6,9 @@ import com.amazonaws.services.dynamodbv2.{
   AmazonDynamoDB,
   AmazonDynamoDBClientBuilder
 }
+import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
+import org.scalatest.concurrent.Eventually
+
 
 import scala.util.Random
 import uk.ac.wellcome.models.{Id, Versioned}
@@ -20,7 +23,9 @@ object LocalDynamoDb {
 
 }
 
-trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
+trait LocalDynamoDb[T <: Versioned with Id]
+  extends ImplicitLogging
+    with Eventually {
 
   import LocalDynamoDb._
 
@@ -100,6 +105,11 @@ trait LocalDynamoDb[T <: Versioned with Id] extends ImplicitLogging {
             .withProvisionedThroughput(new ProvisionedThroughput()
               .withReadCapacityUnits(1L)
               .withWriteCapacityUnits(1L))))
+
+
+    eventually {
+      waitUntilActive(dynamoDbClient, table.name)
+    }
 
     table
   }
