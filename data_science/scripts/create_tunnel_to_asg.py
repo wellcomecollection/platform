@@ -67,4 +67,7 @@ if __name__ == '__main__':
 
     print('Connecting to instance %r' % public_dns)
 
-    subprocess.check_call(['ssh', '-i', key_path, 'ubuntu@%s' % public_dns])
+    try:
+        subprocess.check_call(['ssh', '-i', key_path, 'core@%s' % public_dns])
+    except subprocess.CalledProcessError as err:
+        sys.exit(err.returncode)
