@@ -16,9 +16,10 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.s3.S3ObjectLocation
-import uk.ac.wellcome.test.fixtures.{Messaging, S3, SNS, SQS}
+import uk.ac.wellcome.test.fixtures.{MessageInfo, Messaging, S3, SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 

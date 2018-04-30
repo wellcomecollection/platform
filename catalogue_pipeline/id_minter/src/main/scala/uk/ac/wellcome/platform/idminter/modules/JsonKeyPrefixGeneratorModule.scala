@@ -4,9 +4,7 @@ import javax.inject.Singleton
 import com.google.inject.{Inject, Provides}
 import com.twitter.inject.TwitterModule
 import io.circe.Json
-import uk.ac.wellcome.models.UnidentifiedWork
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, SourcedKeyPrefixGenerator}
+import uk.ac.wellcome.s3.KeyPrefixGenerator
 
 
 object JsonKeyPrefixGeneratorModule extends TwitterModule {

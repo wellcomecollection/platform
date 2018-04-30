@@ -42,8 +42,10 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 class SQSMessageReceiverTest
