@@ -23,14 +23,14 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.ingestor Ingestor"
   override val modules = Seq(
-    AkkaModule,
-    AmazonCloudWatchModule,
     AWSConfigModule,
-    ElasticClientModule,
-    IngestorWorkerModule,
-    SQSClientModule,
+    AmazonCloudWatchModule,
     SQSConfigModule,
+    SQSClientModule,
+    AkkaModule,
     SQSReaderModule,
+    IngestorWorkerModule,
+    ElasticClientModule,
     WorksIndexModule
   )
   flag[String]("es.index.v1", "V1 ES index name")
