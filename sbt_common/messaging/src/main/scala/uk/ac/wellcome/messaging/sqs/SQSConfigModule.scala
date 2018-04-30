@@ -4,7 +4,6 @@ import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.messaging.sqs.SQSConfig
 
 import scala.concurrent.duration._
 
