@@ -9,6 +9,19 @@ trait SierraGenres extends MarcUtils {
     getGenresForMarcTag(bibData, "655")
   }
 
+  // Populate wwork:genres
+  //
+  // Use MARC field "655"
+  //
+  // Each Genre type is populated with label and concepts
+  //
+  //   - Genre.label is concatenated subfields a,v,x,y,z in order separated by a hyphen ' - '.
+  //   - Genre.concepts is a List populated with subfield 'a', then Concepts from subfields v,x,y,z in order with types:
+  //       * v => Concept
+  //       * x => Concept
+  //       * y => Period
+  //       * z => Place
+  //
   private def getGenresForMarcTag(bibData: SierraBibData, marcTag: String) = {
     val subfieldsList =
       getMatchingSubfields(bibData, marcTag, List("a", "v", "x", "y", "z"))
