@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.finatra.modules
+package uk.ac.wellcome.messaging.sqs
 
 import javax.inject.Singleton
 

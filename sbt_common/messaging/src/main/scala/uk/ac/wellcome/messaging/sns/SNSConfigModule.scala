@@ -1,10 +1,9 @@
-package uk.ac.wellcome.messaging.finatra.modules
+package uk.ac.wellcome.messaging.sns
 
 import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.SNSConfig
 
 object SNSConfigModule extends TwitterModule {
   private val topicArn =

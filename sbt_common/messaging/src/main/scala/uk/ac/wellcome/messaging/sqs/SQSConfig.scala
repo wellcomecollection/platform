@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.aws
+package uk.ac.wellcome.messaging.sqs
 
 import scala.concurrent.duration.Duration
 

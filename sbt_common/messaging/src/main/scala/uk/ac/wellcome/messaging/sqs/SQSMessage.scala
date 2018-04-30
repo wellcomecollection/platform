@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models.aws
+package uk.ac.wellcome.messaging.sqs
 
 import io.circe.generic.extras.JsonKey
 

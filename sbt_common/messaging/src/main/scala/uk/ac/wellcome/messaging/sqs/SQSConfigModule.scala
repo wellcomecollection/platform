@@ -1,10 +1,10 @@
-package uk.ac.wellcome.messaging.finatra.modules
+package uk.ac.wellcome.messaging.sqs
 
 import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.SQSConfig
+import uk.ac.wellcome.messaging.sqs.SQSConfig
 
 import scala.concurrent.duration._
 
