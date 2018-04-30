@@ -1,7 +1,11 @@
 package uk.ac.wellcome.display.models
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  License_CCBY,
+  PhysicalLocation
+}
 
 class DisplayLocationTest extends FunSpec with Matchers {
 

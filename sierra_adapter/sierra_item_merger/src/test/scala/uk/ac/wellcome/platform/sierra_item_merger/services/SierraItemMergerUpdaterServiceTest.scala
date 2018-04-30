@@ -575,8 +575,10 @@ class SierraItemMergerUpdaterServiceTest
                 ))
                 .thenReturn(Future.failed(expectedException))
 
+              val s3Config = S3Config(bucketName = bucket.name)
               val failingVersionedHybridStore =
                 new VersionedHybridStore[SierraTransformable](
+                  s3Config = S3Config(bucketName = bucket.name),
                   sourcedObjectStore = new S3ObjectStore(
                     s3Client = s3Client,
                     s3Config = S3Config(bucketName = bucket.name),

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.s3
 
+import java.net.URI
+
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -27,7 +29,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -44,7 +46,9 @@ class S3ObjectStoreTest
         val expectedHash = "1770874231"
 
         val expectedKey = s"$prefix/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
+
+        actualKey shouldBe expectedUri
 
         val jsonFromS3 = getJsonFromS3(
           bucket,
@@ -61,7 +65,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "/foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -75,8 +79,9 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri =
+          S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -86,7 +91,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo/"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -100,8 +105,9 @@ class S3ObjectStoreTest
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
 
-        val expectedKey = s"foo/$expectedHash.json"
-        actualKey shouldBe expectedKey
+        val expectedUri =
+          S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+        actualKey shouldBe expectedUri
       }
     }
   }
@@ -111,7 +117,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name),
         new KeyPrefixGenerator[TestObject] {
@@ -139,7 +145,10 @@ class S3ObjectStoreTest
         }
       )
 
-      whenReady(objectStore.get("not/a/real/object").failed) { exception =>
+      whenReady(
+        objectStore
+          .get(S3ObjectLocation(bucket.name, "not/a/real/object"))
+          .failed) { exception =>
         exception shouldBe a[AmazonS3Exception]
         exception
           .asInstanceOf[AmazonS3Exception]

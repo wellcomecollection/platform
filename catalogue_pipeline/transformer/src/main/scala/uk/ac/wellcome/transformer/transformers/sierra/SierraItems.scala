@@ -1,15 +1,17 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import com.twitter.inject.Logging
-import scala.util.{Failure, Success}
-import uk.ac.wellcome.models.{
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier,
   UnidentifiedItem
 }
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
   def extractItemData(
@@ -31,7 +33,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
 
   def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
     info(s"Attempting to transform ${sierraItemData.id}")
-    UnidentifiedItem(
+    internal.UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         identifierScheme = IdentifierSchemes.sierraSystemNumber,
         ontologyType = "Item",

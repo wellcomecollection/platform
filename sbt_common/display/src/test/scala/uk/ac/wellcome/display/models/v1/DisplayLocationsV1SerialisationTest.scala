@@ -9,7 +9,11 @@ import uk.ac.wellcome.display.models.{
   WorksUtil
 }
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.models.{IdentifiedItem, IdentifiedWork, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedItem,
+  IdentifiedWork,
+  PhysicalLocation
+}
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayLocationsV1SerialisationTest

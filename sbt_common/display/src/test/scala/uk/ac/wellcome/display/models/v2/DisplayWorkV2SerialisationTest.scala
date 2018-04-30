@@ -9,7 +9,7 @@ import uk.ac.wellcome.display.models.{
   WorksUtil
 }
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayWorkV2SerialisationTest
@@ -183,7 +183,9 @@ class DisplayWorkV2SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      subjects = List(Concept("fish"), Concept("gardening"))
+      subjects = List(
+        Subject("label", List(Concept("fish"))),
+        Subject("label", List(Concept("gardening"))))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
@@ -192,7 +194,7 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title.get}",
                           |     "contributors": [],
-                          |     "subjects": [ ${concepts(
+                          |     "subjects": [ ${subjects(
                             workWithSubjects.subjects)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],

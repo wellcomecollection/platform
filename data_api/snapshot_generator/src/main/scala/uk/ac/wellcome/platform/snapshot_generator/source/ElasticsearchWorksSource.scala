@@ -8,7 +8,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.streams.ReactiveElastic._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
 object ElasticsearchWorksSource extends Logging {

@@ -1,14 +1,18 @@
 package uk.ac.wellcome.transformer.transformers
 
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
+import uk.ac.wellcome.transformer.source.SierraBibData
 import uk.ac.wellcome.transformer.transformers.sierra._
-import uk.ac.wellcome.transformer.source.{SierraBibData, SierraItemData}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
@@ -27,6 +31,7 @@ class SierraTransformableTransformer
     with SierraPublicationDate
     with SierraPlaceOfPublication
     with SierraDimensions
+    with SierraSubjects
     with Logging {
 
   override def transformForType(
@@ -39,7 +44,7 @@ class SierraTransformableTransformer
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(
-            UnidentifiedWork(
+            internal.UnidentifiedWork(
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
                 identifierScheme = IdentifierSchemes.sierraSystemNumber,
@@ -63,7 +68,8 @@ class SierraTransformableTransformer
               placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
               contributors = getContributors(sierraBibData),
-              dimensions = getDimensions(sierraBibData)
+              dimensions = getDimensions(sierraBibData),
+              subjects = getSubjects(sierraBibData)
             ))
         }
 

@@ -7,7 +7,7 @@ import uk.ac.wellcome.display.models.{
   DisplayWork,
   WorksIncludes
 }
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 import scala.concurrent.ExecutionContext
 

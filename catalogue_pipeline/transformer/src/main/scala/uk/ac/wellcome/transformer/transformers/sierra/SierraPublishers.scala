@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.{Agent, Organisation, Unidentifiable}
+import uk.ac.wellcome.models.work.internal.{Organisation, Unidentifiable}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraPublishers {

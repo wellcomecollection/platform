@@ -1,8 +1,8 @@
 package uk.ac.wellcome.transformer.transformers
 
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import uk.ac.wellcome.models._
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.internal._
 
 class MiroTransformableTransformerTest
     extends FunSpec

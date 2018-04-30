@@ -3,7 +3,7 @@ package uk.ac.wellcome.display.models
 import io.circe.Json
 import io.circe.parser._
 import org.scalatest.Suite
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
@@ -141,6 +141,20 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def concepts(concepts: List[AbstractConcept]) =
     concepts
       .map { concept(_) }
+      .mkString(",")
+
+  def subject(s: Subject) =
+    s"""
+  {
+    "label": "${s.label}",
+    "type" : "${s.ontologyType}",
+    "concepts": [ ${concepts(s.concepts)} ]
+   }
+   """
+
+  def subjects(subjects: List[Subject]) =
+    subjects
+      .map { subject(_) }
       .mkString(",")
 
   def contributor(c: Contributor[Displayable[AbstractAgent]]) =

@@ -1,13 +1,10 @@
 package uk.ac.wellcome.transformer.transformers
-import java.io.InputStream
-
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.MiroTransformable
+import uk.ac.wellcome.models.work.internal
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 import uk.ac.wellcome.transformer.transformers.miro.MiroContributors
-import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.io.Source
 import scala.util.Try
 
 class MiroTransformableTransformer
@@ -23,7 +20,7 @@ class MiroTransformableTransformer
       val (title, description) = getTitleAndDescription(miroData)
 
       Some(
-        UnidentifiedWork(
+        internal.UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
             identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -228,15 +225,20 @@ class MiroTransformableTransformer
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  private def getSubjects(miroData: MiroTransformableData): List[Concept] = {
-    val keywords: List[Concept] = miroData.keywords match {
+  private def getSubjects(miroData: MiroTransformableData): List[Subject] = {
+    val keywords: List[Subject] = miroData.keywords match {
       case Some(k) =>
-        k.map { Concept(_) }
+        k.map { keyword =>
+          Subject(label = keyword, concepts = List(Concept(keyword)))
+        }
       case None => List()
     }
 
-    val keywordsUnauth: List[Concept] = miroData.keywordsUnauth match {
-      case Some(k) => k.map { Concept(_) }
+    val keywordsUnauth: List[Subject] = miroData.keywordsUnauth match {
+      case Some(k) =>
+        k.map { keyword =>
+          Subject(label = keyword, concepts = List(Concept(keyword)))
+        }
       case None => List()
     }
 

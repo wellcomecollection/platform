@@ -1,21 +1,22 @@
 package uk.ac.wellcome.sqs
 
-import org.mockito.Matchers.{any, anyDouble, anyString, contains, matches}
+import org.mockito.Matchers.{any, anyDouble, anyString, matches}
 import org.mockito.Mockito.{never, times, verify, when}
+
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
+
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{SQSConfig, SQSMessage}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.fixtures
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import akka.actor.ActorSystem
 import uk.ac.wellcome.test.fixtures.SQS.Queue
 
@@ -23,21 +24,9 @@ class SQSWorkerTest
     extends FunSpec
     with MockitoSugar
     with Eventually
-    with Akka
-    with SQS {
-
-  def withMockMetricSender[R](testWith: TestWith[MetricsSender, R]): R = {
-    val metricsSender: MetricsSender = mock[MetricsSender]
-
-    when(
-      metricsSender
-        .timeAndCount[Unit](anyString, any[() => Future[Unit]].apply)
-    ).thenReturn(
-      Future.successful(())
-    )
-
-    testWith(metricsSender)
-  }
+    with fixtures.Akka
+    with fixtures.SQS
+    with fixtures.MetricsSender {
 
   def withSqsWorker[R](
     actors: ActorSystem,
@@ -69,7 +58,7 @@ class SQSWorkerTest
   def withFixtures[R] =
     withActorSystem[R] and
       withLocalSqsQueue[R] and
-      withMockMetricSender[R] _ and
+      withMockMetricSender[R] and
       withSqsWorker[R] _
 
   it("processes messages") {

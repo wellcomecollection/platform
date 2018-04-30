@@ -5,7 +5,8 @@ import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.s3.{S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
@@ -19,6 +20,7 @@ case class HybridRecord(
     with Id
 
 class VersionedHybridStore[T <: Id] @Inject()(
+  s3Config: S3Config,
   sourcedObjectStore: S3ObjectStore[T],
   versionedDao: VersionedDao
 ) {
@@ -99,10 +101,10 @@ class VersionedHybridStore[T <: Id] @Inject()(
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
 
-    val futureKey = sourcedObjectStore.put(sourcedObject)
+    val futureUri = sourcedObjectStore.put(sourcedObject)
 
-    futureKey.flatMap { key =>
-      versionedDao.updateRecord(f(key))
+    futureUri.flatMap {
+      case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
     }
   }
 
@@ -114,9 +116,13 @@ class VersionedHybridStore[T <: Id] @Inject()(
 
     dynamoRecord.flatMap {
       case Some(hybridRecord) => {
-        sourcedObjectStore.get(hybridRecord.s3key).map { s3Record =>
-          Some(VersionedHybridObject(hybridRecord, s3Record))
-        }
+        sourcedObjectStore
+          .get(
+            S3ObjectLocation(s3Config.bucketName, hybridRecord.s3key)
+          )
+          .map { s3Record =>
+            Some(VersionedHybridObject(hybridRecord, s3Record))
+          }
       }
       case None => Future.successful(None)
     }

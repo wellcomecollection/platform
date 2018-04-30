@@ -68,6 +68,10 @@ object Dependencies {
     "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
   )
 
+  val sharedDependencies = Seq(
+    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
@@ -86,22 +90,19 @@ object Dependencies {
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
-    "org.scalatest" %% "scalatest" % versions.scalatest % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
 
-  val commonDisplayDependencies: Seq[ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
-  ) ++ swaggerDependencies
+  val pipelineModelDependencies = circeDependencies
+
+  val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
   val commonElasticsearchDependencies = commonDependencies ++ esDependencies
 
-  val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq(
-    "org.scalatest" %% "scalatest" % versions.scalatest % "test"
-  ) ++ dynamoDependencies
+  val sierraAdapterCommonDependencies: Seq[ModuleID] = dynamoDependencies
 
   val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 

@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal._
 
 class DisplayWorkV1Test extends FunSpec with Matchers {
 

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.s3
 
+import java.net.URI
+
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
@@ -57,20 +59,31 @@ class S3ObjectStore[T] @Inject()(
   s3Config: S3Config,
   keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
-  def put(sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] = {
+  def put(sourcedObject: T)(
+    implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
     val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
+
     S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
       sourcedObject)
   }
 
-  def get(key: String)(implicit decoder: Decoder[T]): Future[T] = {
-    S3ObjectStore.get[T](s3Client, s3Config.bucketName)(key)
+  def get(s3ObjectLocation: S3ObjectLocation)(
+    implicit decoder: Decoder[T]): Future[T] = {
+    val bucket = s3ObjectLocation.bucket
+    val key = s3ObjectLocation.key
+
+    if (bucket != s3Config.bucketName) {
+      debug(
+        s"Bucket name in S3ObjectLocation ($bucket) does not match configured bucket (${s3Config.bucketName})")
+    }
+
+    S3ObjectStore.get[T](s3Client, bucket)(key)
   }
 }
 
 object S3ObjectStore extends Logging {
   def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
-    sourcedObject: T)(implicit encoder: Encoder[T]): Future[String] =
+    sourcedObject: T)(implicit encoder: Encoder[T]): Future[S3ObjectLocation] =
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
       val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
 
@@ -85,7 +98,7 @@ object S3ObjectStore extends Logging {
       s3Client.putObject(bucketName, key, content)
       info(s"Successfully PUT object to s3://$bucketName/$key")
 
-      key
+      S3ObjectLocation(bucketName, key)
     }
 
   def get[T](s3Client: AmazonS3, bucketName: String)(key: String)(

@@ -177,6 +177,30 @@ define sbt_build
 endef
 
 
+# Run docker-compose up.
+#
+# Args:
+#   $1 - Path to the docker-compose file.
+#
+define docker_compose_up
+    $(ROOT)/docker_run.py --dind --sbt --root -- \
+    		--net host \
+    		docker/compose:1.21.0 -f /repo/$(1) up
+endef
+
+
+# Run docker-compose down.
+#
+# Args:
+#   $1 - Path to the docker-compose file.
+#
+define docker_compose_down
+    $(ROOT)/docker_run.py --dind --sbt --root -- \
+        		--net host \
+        		docker/compose:1.21.0 -f /repo/$(1) down
+endef
+
+
 # Define a series of Make tasks (build, test, publish) for a Scala application.
 #
 # Args:
@@ -184,6 +208,12 @@ endef
 #	$2 - Root of the project's source code.
 #
 define __sbt_target_template
+$(1)-docker_compose_up:
+	$(call docker_compose_up,$(2)/docker-compose.yml)
+
+$(1)-docker_compose_down:
+	$(call docker_compose_down,$(2)/docker-compose.yml)
+
 $(1)-build:
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)

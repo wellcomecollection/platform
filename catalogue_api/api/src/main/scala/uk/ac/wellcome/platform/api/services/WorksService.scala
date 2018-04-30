@@ -1,10 +1,9 @@
 package uk.ac.wellcome.platform.api.services
 
-import javax.inject.{Inject, Singleton}
-
 import com.sksamuel.elastic4s.http.search.SearchHit
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.models.IdentifiedWork
+import javax.inject.{Inject, Singleton}
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.models.ResultList
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._

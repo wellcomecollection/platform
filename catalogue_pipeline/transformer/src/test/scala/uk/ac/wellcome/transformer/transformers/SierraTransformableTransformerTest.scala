@@ -4,19 +4,14 @@ import java.time.Instant
 import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.test.utils.SierraData
-import uk.ac.wellcome.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  SierraItemData,
-  VarField
-}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraTransformableTransformerTest
@@ -679,4 +674,45 @@ class SierraTransformableTransformerTest
 
     transformedSierraRecord.get.get.dimensions shouldBe Some(dimensions)
   }
+
+  it("extracts subjects if present") {
+    val id = "9009009"
+    val content = "A content"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Dastardly Danish dogs draw dubious doughnuts",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "650",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$content"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData =
+        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
+
+    val transformedSierraRecord =
+      transformer.transform(sierraTransformable, version = 1)
+
+    transformedSierraRecord.isSuccess shouldBe true
+
+    transformedSierraRecord.get.get.subjects shouldBe List(
+      Subject(content, List(Concept(content))))
+  }
+
 }

@@ -3,7 +3,12 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal.{
+  AbstractAgent,
+  Contributor,
+  Displayable,
+  IdentifiedWork
+}
 
 @ApiModel(
   value = "Work",
@@ -119,7 +124,9 @@ case object DisplayWorkV1 {
         contributor: Contributor[Displayable[AbstractAgent]] =>
           DisplayAbstractAgent(contributor.agent)
       },
-      subjects = work.subjects.map { DisplayConcept(_) },
+      subjects = work.subjects.flatMap { subject =>
+        subject.concepts.map { DisplayConcept(_) }
+      },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)

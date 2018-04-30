@@ -3,7 +3,7 @@ package uk.ac.wellcome.display.models.v2
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.models.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 @ApiModel(
   value = "Work",
@@ -55,7 +55,7 @@ case class DisplayWorkV2(
     dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
-  ) subjects: List[DisplayConcept] = List(),
+  ) subjects: List[DisplaySubject] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content.") genres: List[
@@ -121,7 +121,7 @@ case object DisplayWorkV2 {
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       contributors = work.contributors.map { DisplayContributor(_) },
-      subjects = work.subjects.map { DisplayConcept(_) },
+      subjects = work.subjects.map { DisplaySubject(_) },
       genres = work.genres.map { DisplayConcept(_) },
       identifiers =
         if (includes.identifiers)

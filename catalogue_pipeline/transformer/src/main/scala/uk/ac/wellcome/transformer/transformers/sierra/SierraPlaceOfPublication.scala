@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models._
+import uk.ac.wellcome.models.work.internal.Place
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
   SierraBibData,

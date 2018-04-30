@@ -1,7 +1,9 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.{IdentifierSchemes, SourceIdentifier}
-
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraIdentifiers extends SierraCheckDigits {
