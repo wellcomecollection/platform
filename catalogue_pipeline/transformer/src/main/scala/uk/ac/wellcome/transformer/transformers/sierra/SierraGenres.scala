@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{Genre, Concept, Period, Place}
+import uk.ac.wellcome.models.work.internal.{Concept, Genre, Period, Place}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraGenres extends MarcUtils {
@@ -10,7 +10,8 @@ trait SierraGenres extends MarcUtils {
   }
 
   private def getGenresForMarcTag(bibData: SierraBibData, marcTag: String) = {
-    val subfieldsList = getMatchingSubfields(bibData, marcTag, List("a", "v", "x", "y", "z"))
+    val subfieldsList =
+      getMatchingSubfields(bibData, marcTag, List("a", "v", "x", "y", "z"))
     subfieldsList.map(subfields => {
       val (subfieldsA, rest) = subfields.partition(_.tag == "a")
       val orderedSubfields = subfieldsA ++ rest
@@ -20,7 +21,7 @@ trait SierraGenres extends MarcUtils {
           case "y" => Period(label = subfield.content)
           case "z" => Place(label = subfield.content)
           case _ => Concept(label = subfield.content)
-        })
+      })
       Genre(label, concepts)
     })
   }

@@ -15,7 +15,8 @@ case class DisplayWorkV2(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: String,
   @ApiModelProperty(
-    value = "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description."
+    value =
+      "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description."
   ) title: String,
   @ApiModelProperty(
     dataType = "String",
@@ -31,7 +32,8 @@ case class DisplayWorkV2(
   ) workType: Option[DisplayWorkType] = None,
   @ApiModelProperty(
     dataType = "String",
-    value = "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
+    value =
+      "Number of physical pages, volumes, cassettes, total playing time, etc., of of each type of unit"
   ) extent: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
@@ -39,19 +41,23 @@ case class DisplayWorkV2(
   ) lettering: Option[String] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
-    value = "Relates the creation of a work to a date, when the date of creation does not cover a range."
+    value =
+      "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v2.DisplayContributor]",
-    value = "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
+    value =
+      "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) contributors: List[DisplayContributor] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
-    value = "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+    value =
+      "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayConcept",
-    value = "Relates a work to the general thesaurus-based concept that describes the work's content."
+    value =
+      "Relates a work to the general thesaurus-based concept that describes the work's content."
   ) subjects: List[DisplaySubject] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
@@ -59,7 +65,8 @@ case class DisplayWorkV2(
   ) genres: List[DisplayGenre] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLocation",
-    value = "Relates any thing to the location of a representative thumbnail image"
+    value =
+      "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
@@ -75,7 +82,8 @@ case class DisplayWorkV2(
   ) placesOfPublication: List[DisplayPlace] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
-    value = "Relates the publication of a work to a date when the work has been formally published."
+    value =
+      "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
@@ -87,8 +95,10 @@ case class DisplayWorkV2(
 ) extends DisplayWork {
   @ApiModelProperty(
     readOnly = true,
-    value = "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
-  ) @JsonProperty("type") val ontologyType: String = "Work"
+    value =
+      "A broad, top-level description of the form of a work: namely, whether it is a printed book, archive, painting, photograph, moving image, etc."
+  )
+  @JsonProperty("type") val ontologyType: String = "Work"
 }
 
 case object DisplayWorkV2 {

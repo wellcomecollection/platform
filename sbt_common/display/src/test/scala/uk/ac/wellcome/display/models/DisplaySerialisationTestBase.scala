@@ -6,8 +6,7 @@ import org.scalatest.Suite
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait DisplaySerialisationTestBase {
-  this: Suite =>
+trait DisplaySerialisationTestBase { this: Suite =>
 
   def items(its: List[IdentifiedItem]) =
     its

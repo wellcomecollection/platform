@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{Concept, Genre, Period, Place}
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraGenresTest extends FunSpec with Matchers {
 
@@ -32,7 +36,8 @@ class SierraGenresTest extends FunSpec with Matchers {
       List(
         Genre(
           label = "A Content - V Content",
-          concepts = List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts =
+            List(Concept(label = "A Content"), Concept(label = "V Content"))))
 
     assertExtractsGenres(
       bibData(
@@ -44,12 +49,14 @@ class SierraGenresTest extends FunSpec with Matchers {
       expectedGenres)
   }
 
-   it("subfield a is always first concept when returning subjects for tag 655 with subfields a, v") {
+  it(
+    "subfield a is always first concept when returning subjects for tag 655 with subfields a, v") {
     val expectedGenres =
       List(
         Genre(
           label = "A Content - V Content",
-          concepts = List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts =
+            List(Concept(label = "A Content"), Concept(label = "V Content"))))
 
     assertExtractsGenres(
       bibData(
@@ -172,7 +179,8 @@ class SierraGenresTest extends FunSpec with Matchers {
 
   private val transformer = new SierraGenres {}
 
-  private def assertExtractsGenres(bibData: SierraBibData, expected: List[Genre]) = {
+  private def assertExtractsGenres(bibData: SierraBibData,
+                                   expected: List[Genre]) = {
     transformer.getGenres(bibData) shouldBe expected
   }
 
