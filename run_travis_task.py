@@ -109,7 +109,10 @@ def main():
     publish_task = task.replace('-build', '-publish')
     publish_task = task.replace('-test', '-publish')
 
-    if _should_run_publish(task=task, travis_event_type=travis_event_type):
+    if _should_run_publish(
+        task=publish_task,
+        travis_event_type=travis_event_type
+    ):
         print("*** We're going to run the publish task")
         make(publish_task)
     else:
