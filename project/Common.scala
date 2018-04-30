@@ -19,7 +19,10 @@ object Common {
     ),
     parallelExecution in Test := false,
     libraryDependencies ++= Dependencies.sharedDependencies
-  ) ++ Search.settings ++ Swagger.settings ++ Finatra.settings
+  ) ++
+    Search.settings ++
+    Swagger.settings ++
+    Finatra.settings
 }
 
 object Swagger {
