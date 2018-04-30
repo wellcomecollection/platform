@@ -211,7 +211,8 @@ class DisplayWorkV2SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      genres = List(Concept("woodwork"), Concept("etching"))
+      genres =
+        List(Genre("genre", List(Concept("woodwork"), Concept("etching"))))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
@@ -222,13 +223,12 @@ class DisplayWorkV2SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "contributors": [],
                           |     "subjects": [ ],
-                          |     "genres": [ ${concepts(workWithSubjects.genres)} ],
+                          |     "genres": [ ${genres(workWithSubjects.genres)} ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
-
   }
 
   it("includes a list of identifiers on DisplayWorkV2") {

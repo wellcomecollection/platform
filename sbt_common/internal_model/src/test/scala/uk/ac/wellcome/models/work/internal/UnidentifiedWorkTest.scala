@@ -95,7 +95,14 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  "genres": [
       |    {
       |      "label": "genre",
-      |      "ontologyType": "Concept"
+      |      "ontologyType": "Genre",
+      |      "concepts" : [
+      |        {
+      |          "label" : "concept",
+      |          "ontologyType" : "Concept",
+      |          "type" : "Concept"
+      |        }
+      |      ]
       |    }
       |  ],
       |  "thumbnail": {
@@ -214,7 +221,7 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       Contributor(
         agent = Unidentifiable(Agent("47"))
       )),
-    genres = List(Concept("genre")),
+    genres = List(Genre("genre", List(Concept("concept")))),
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,

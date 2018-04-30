@@ -11,6 +11,24 @@ trait SierraSubjects extends MarcUtils {
       getSubjectsForMarcTag(bibData, "651")
   }
 
+  // Populate wwork:subjects
+  //
+  // Use MARC fields "650", "648", "651"
+  //
+  // Each Subject type is populated with label and concepts
+  //
+  //   - Subject.label is concatenated subfields a,v,x,y,z in order separated by a hyphen ' - '.
+  //   - Subject.concepts is a List populated with a primary Concept with label from subfield 'a', and
+  //     type:
+  //       650 => Concept
+  //       648 => Period
+  //       651 => Place
+  //     for subfields v,x,y,z Subject.concepts are populated in order with Concept.label and type:
+  //       * v => Concept
+  //       * x => Concept
+  //       * y => Period
+  //       * z => Place
+  //
   private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String) = {
     val subfieldsList = getMatchingSubfields(
       bibData,

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.Concept
+import uk.ac.wellcome.models.work.internal.{Concept, Genre}
 
 class MiroTransformableTransformerGenresTest
     extends FunSpec
@@ -11,7 +11,7 @@ class MiroTransformableTransformerGenresTest
   it("should have an empty genre list on records without keywords") {
     transformRecordAndCheckGenres(
       data = s""""image_title": "The giraffe's genre is gone'"""",
-      expectedGenres = List[Concept]()
+      expectedGenres = List[Genre]()
     )
   }
 
@@ -21,9 +21,7 @@ class MiroTransformableTransformerGenresTest
         "image_title": "A goat grazes on some grass",
         "image_phys_format": "painting"
       """,
-      expectedGenres = List(
-        Concept("painting")
-      )
+      expectedGenres = List(Genre("painting", List(Concept("painting"))))
     )
   }
 
@@ -33,9 +31,7 @@ class MiroTransformableTransformerGenresTest
         "image_title": "Grouchy geese are good as guards",
         "image_lc_genre": "sculpture"
       """,
-      expectedGenres = List(
-        Concept("sculpture")
-      )
+      expectedGenres = List(Genre("sculpture", List(Concept("sculpture"))))
     )
   }
 
@@ -48,8 +44,8 @@ class MiroTransformableTransformerGenresTest
         "image_lc_genre": "woodwork"
       """,
       expectedGenres = List(
-        Concept("etching"),
-        Concept("woodwork")
+        Genre("etching", List(Concept("etching"))),
+        Genre("woodwork", List(Concept("woodwork")))
       )
     )
   }
@@ -61,16 +57,14 @@ class MiroTransformableTransformerGenresTest
         "image_phys_format": "oil painting",
         "image_lc_genre": "oil painting"
       """,
-      expectedGenres = List(
-        Concept("oil painting")
-      )
+      expectedGenres =
+        List(Genre("oil painting", List(Concept("oil painting"))))
     )
   }
 
-  private def transformRecordAndCheckGenres(
-    data: String,
-    expectedGenres: List[Concept] = List()
-  ) = {
+  private def transformRecordAndCheckGenres(data: String,
+                                            expectedGenres: List[Genre] =
+                                              List()) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
   }

@@ -231,7 +231,8 @@ class MiroTransformableTransformer
         k.map { keyword =>
           Subject(label = keyword, concepts = List(Concept(keyword)))
         }
-      case None => List()
+      case None =>
+        List()
     }
 
     val keywordsUnauth: List[Subject] = miroData.keywordsUnauth match {
@@ -239,26 +240,19 @@ class MiroTransformableTransformer
         k.map { keyword =>
           Subject(label = keyword, concepts = List(Concept(keyword)))
         }
-      case None => List()
+      case None =>
+        List()
     }
 
     keywords ++ keywordsUnauth
   }
 
-  private def getGenres(miroData: MiroTransformableData): List[Concept] = {
+  private def getGenres(miroData: MiroTransformableData): List[Genre] = {
     // Populate the subjects field.  This is based on two fields in the XML,
     // <image_phys_format> and <image_lc_genre>.
-    val physFormat: List[Concept] = miroData.physFormat match {
-      case Some(f) => List(Concept(f))
-      case None => List()
-    }
-
-    val lcGenre: List[Concept] = miroData.lcGenre match {
-      case Some(g) => List(Concept(g))
-      case None => List()
-    }
-
-    (physFormat ++ lcGenre).distinct
+    (miroData.physFormat.toList ++ miroData.lcGenre.toList).map { g =>
+      Genre(label = g, concepts = List(Concept(g)))
+    }.distinct
   }
 
   private def getThumbnail(miroData: MiroTransformableData,

@@ -14,19 +14,22 @@ case class DisplayWorkV2(
   @ApiModelProperty(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: String,
-  @ApiModelProperty(value =
-    "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description.") title: String,
+  @ApiModelProperty(
+    value =
+      "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description."
+  ) title: String,
   @ApiModelProperty(
     dataType = "String",
-    value = "A description given to a thing.") description: Option[String] =
-    None,
+    value = "A description given to a thing."
+  ) description: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
-    value = "A description of specific physical characteristics of the work.") physicalDescription: Option[
-    String] = None,
+    value = "A description of specific physical characteristics of the work."
+  ) physicalDescription: Option[String] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayWorkType",
-    value = "The type of work.") workType: Option[DisplayWorkType] = None,
+    value = "The type of work."
+  ) workType: Option[DisplayWorkType] = None,
   @ApiModelProperty(
     dataType = "String",
     value =
@@ -34,8 +37,8 @@ case class DisplayWorkV2(
   ) extent: Option[String] = None,
   @ApiModelProperty(
     dataType = "String",
-    value = "Recording written text on a (usually visual) work.") lettering: Option[
-    String] = None,
+    value = "Recording written text on a (usually visual) work."
+  ) lettering: Option[String] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
     value =
@@ -58,8 +61,8 @@ case class DisplayWorkV2(
   ) subjects: List[DisplaySubject] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
-    value = "Relates a work to the genre that describes the work's content.") genres: List[
-    DisplayConcept] = List(),
+    value = "Relates a work to the genre that describes the work's content."
+  ) genres: List[DisplayGenre] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLocation",
     value =
@@ -122,7 +125,7 @@ case object DisplayWorkV2 {
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       contributors = work.contributors.map { DisplayContributor(_) },
       subjects = work.subjects.map { DisplaySubject(_) },
-      genres = work.genres.map { DisplayConcept(_) },
+      genres = work.genres.map { DisplayGenre(_) },
       identifiers =
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifier(_) })
