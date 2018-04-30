@@ -1,5 +1,5 @@
 module "notebook_compute" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ec2/asg?ref=fix-tags"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//ec2/asg?ref=v9.3.0"
   name = "jupyter"
 
   # Ubuntu DLAMI
