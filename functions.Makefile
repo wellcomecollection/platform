@@ -177,52 +177,69 @@ define sbt_build
 endef
 
 
-# Run docker-compose up.
+# Run a docker-compose command.
 #
 # Args:
-#   $1 - Path to the docker-compose file.
+#	$1 - "up" or "down".
+#	$2 - Path to the docker-compose file.
 #
-define docker_compose_up
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-    		--net host \
-    		docker/compose:1.21.0 -f /repo/$(1) up
+define docker_compose
+    $(ROOT)/docker_run.py --dind --sbt --root -- --net host \
+		docker/compose:1.21.0 -f /repo/$(2) $(1)
 endef
 
 
-# Run docker-compose down.
+# Define a series of Make tasks (build, test) for a Scala project.
 #
 # Args:
-#   $1 - Path to the docker-compose file.
+#	$1 - Name of the Make tasks
+#	$1 - Name of the project in sbt
+#	$2 - Root of the project's source code
 #
-define docker_compose_down
-    $(ROOT)/docker_run.py --dind --sbt --root -- \
-        		--net host \
-        		docker/compose:1.21.0 -f /repo/$(1) down
+define __sbt_project_template
+$(1)-docker_compose_up:
+	$(call docker_compose,up,$(3)/docker-compose.yml)
+
+$(1)-docker_compose_down:
+	$(call docker_compose,down,$(3)/docker-compose.yml)
+
+$(1)-test:
+	$(call sbt_test,$(2))
 endef
 
 
-# Define a series of Make tasks (build, test, publish) for a Scala application.
+# Define a series of Make tasks for a Scala *application*.
 #
 # Args:
 #	$1 - Name of the project in sbt.
 #	$2 - Root of the project's source code.
 #
-define __sbt_target_template
-$(1)-docker_compose_up:
-	$(call docker_compose_up,$(2)/docker-compose.yml)
-
-$(1)-docker_compose_down:
-	$(call docker_compose_down,$(2)/docker-compose.yml)
+define __sbt_app_template
+$(eval $(call __sbt_project_template,$(1),$(1),$(2)))
 
 $(1)-build:
 	$(call sbt_build,$(1))
 	$(call build_image,$(1),$(2)/Dockerfile)
 
-$(1)-test:
-	$(call sbt_test,$(1))
-
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))
+endef
+
+
+# Define a series of Make tasks for a Scala *library*.
+#
+# Args:
+#	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
+#
+define sbt_library_template
+$(eval $(call __sbt_project_template,sbt-$(1),$(1),$(2)))
+
+sbt-$(1)-build:
+	echo "The build task isn't defined for Scala libraries!"
+
+sbt-$(1)-publish:
+	echo "The publish task isn't defined for Scala libraries!"
 endef
 
 
@@ -335,7 +352,7 @@ define stack_setup
 # It can't actually be written that way because Make is very sensitive to
 # whitespace, but that's the general idea.
 
-$(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
+$(foreach proj,$(SBT_APPS),$(eval $(call __sbt_app_template,$(proj),$(STACK_ROOT)/$(proj))))
 $(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))

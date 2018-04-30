@@ -17,11 +17,7 @@ include sierra_adapter/Makefile
 include nginx/Makefile
 
 
-sbt-common-test:
-	$(call sbt_test,common)
-
-sbt-common-publish:
-	echo "Nothing to do!"
+$(eval $(call sbt_library_template,common,common))
 
 
 travistooling-test:
