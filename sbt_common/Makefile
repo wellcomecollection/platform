@@ -19,3 +19,9 @@ sbt-elasticsearch-test:
 
 sbt-elasticsearch-publish:
 	echo "Nothing to do!"
+
+sbt-elasticsearch-docker_compose_up:
+	$(call docker_compose_up,sbt_common/elasticsearch/docker-compose.yml)
+
+sbt-elasticsearch-docker_compose_down:
+	$(call docker_compose_down,sbt_common/elasticsearch/docker-compose.yml)
