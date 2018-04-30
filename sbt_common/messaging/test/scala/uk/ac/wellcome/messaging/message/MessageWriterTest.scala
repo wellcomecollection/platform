@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import io.circe.Json
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}

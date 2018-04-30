@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import org.mockito.Matchers.{any, anyDouble, anyString, contains, matches}
 import org.mockito.Mockito.{never, times, verify, when}

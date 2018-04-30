@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._

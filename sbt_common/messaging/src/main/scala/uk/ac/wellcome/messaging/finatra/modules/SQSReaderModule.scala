@@ -4,7 +4,7 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.SQSConfig
-import uk.ac.wellcome.sqs.SQSReader
+import uk.ac.wellcome.messaging.sqs.SQSReader
 
 object SQSReaderModule extends TwitterModule {
 

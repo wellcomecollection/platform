@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest._

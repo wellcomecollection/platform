@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
@@ -7,14 +7,14 @@ import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe._
 import io.circe.generic.semiauto._
-import uk.ac.wellcome.message.{MessageReader, MessageWorker}
+import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics
 import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.SNS.Topic
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

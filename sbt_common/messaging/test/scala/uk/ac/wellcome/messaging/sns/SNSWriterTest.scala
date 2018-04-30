@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sns
+package uk.ac.wellcome.messaging.sns
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
@@ -11,9 +11,6 @@ class SNSWriterTest
     with Matchers
     with SNS
     with IntegrationPatience {
-
-//  val topicArn = createTopicAndReturnArn("test-topic-name")
-//
 
   it(
     "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {

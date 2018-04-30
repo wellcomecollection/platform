@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns._
 import com.amazonaws.auth.BasicAWSCredentials

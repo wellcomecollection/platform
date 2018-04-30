@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import java.net.URI
 

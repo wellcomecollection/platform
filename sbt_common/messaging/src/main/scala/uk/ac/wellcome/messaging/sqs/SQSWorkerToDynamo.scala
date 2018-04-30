@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sqs
+package uk.ac.wellcome.messaging.sqs
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException

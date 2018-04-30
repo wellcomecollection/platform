@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sqs
+package uk.ac.wellcome.messaging.sqs
 
 import org.mockito.Matchers.{any, anyDouble, anyString, matches}
 import org.mockito.Mockito.{never, times, verify, when}

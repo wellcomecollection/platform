@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import java.net.URI
 
@@ -8,9 +8,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.models.aws.S3Config
 
 import io.circe.Encoder
+import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.sns.SNSWriter
 
 import scala.concurrent.{blocking, Future}
 

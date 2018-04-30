@@ -1,4 +1,4 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import akka.actor.ActorSystem
 import uk.ac.wellcome.utils.JsonUtil._
@@ -10,9 +10,9 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.duration._
 import io.circe.Decoder
-import uk.ac.wellcome.sqs.{SQSReader}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.sns.NotificationMessage
 
 abstract class MessageWorker[T](sqsReader: SQSReader,
                                 messageReader: MessageReader[T],

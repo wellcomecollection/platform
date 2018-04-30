@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sns
+package uk.ac.wellcome.messaging.sns
 
 case class NotificationMessage(
   MessageId: String,

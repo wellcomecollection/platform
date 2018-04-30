@@ -1,8 +1,8 @@
-package uk.ac.wellcome.message
+package uk.ac.wellcome.messaging.message
 
 import com.amazonaws.services.sqs
 import io.circe.Decoder
-import uk.ac.wellcome.sns.NotificationMessage
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
 import uk.ac.wellcome.s3.S3ObjectStore

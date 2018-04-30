@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sns
+package uk.ac.wellcome.messaging.sns
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest

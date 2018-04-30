@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sqs
+package uk.ac.wellcome.messaging.sqs
 
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
