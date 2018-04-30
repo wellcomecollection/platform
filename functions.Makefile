@@ -181,7 +181,7 @@ endef
 #
 # Args:
 #	$1 - "up" or "down".
-#   $2 - Path to the docker-compose file.
+#	$2 - Path to the docker-compose file.
 #
 define docker_compose
     $(ROOT)/docker_run.py --dind --sbt --root -- --net host \
