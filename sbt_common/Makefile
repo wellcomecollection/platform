@@ -1,21 +1,9 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
-sbt-internal_model-test:
-	$(call sbt_test_no_docker,internal_model)
+SBT_LIBS = \
+	display \
+	elasticsearch \
+	internal-model
 
-sbt-internal_model-publish:
-	echo "Nothing to do!"
-
-sbt-display-test:
-	$(call sbt_test_no_docker,common_display)
-
-sbt-display-publish:
-	echo "Nothing to do!"
-
-
-sbt-elasticsearch-test:
-	$(call sbt_test,common_elasticsearch)
-
-sbt-elasticsearch-publish:
-	echo "Nothing to do!"
+$(foreach lib_name,$(SBT_LIBS),$(eval $(call sbt_library_template,$(lib_name),sbt_common/$(lib_name))))
