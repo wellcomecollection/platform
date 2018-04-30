@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.idminter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.message.MessagePointer
-import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
@@ -11,7 +10,6 @@ import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConversions._
@@ -70,9 +68,6 @@ class IdMinterFeatureTest
 
                 sqsClient.sendMessage(queue.url, messageBody)
               }
-
-              def getWorksFromMessages(messages: List[MessageInfo]) =
-                messages.map(m => fromJson[IdentifiedWork](m.message).get)
 
               eventually {
                 val messages = listMessagesReceivedFromSNS(topic)
@@ -150,23 +145,6 @@ class IdMinterFeatureTest
       fromJson[IdentifiedWork](messageContent).get
     }
 
-  private def generateSqsMessage(MiroID: String): SQSMessage = {
-    val identifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", MiroID)
-
-    val work = UnidentifiedWork(
-      title = Some("A query about a queue of quails"),
-      sourceIdentifier = identifier,
-      version = 1,
-      identifiers = List(identifier))
-
-    SQSMessage(
-      Some("subject"),
-      JsonUtil.toJson(work).get,
-      "topic",
-      "messageType",
-      "timestamp")
-  }
 
   private def assertMessageIsNotDeleted(queue: Queue): Unit = {
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
