@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.modules
+package uk.ac.wellcome.messaging.finatra.modules
 
 import javax.inject.Singleton
 
@@ -7,7 +7,6 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.SQSClientModule.flag
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SNSClientModule extends TwitterModule {

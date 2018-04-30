@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.modules
+package uk.ac.wellcome.messaging.finatra.modules
 
 import com.amazonaws.services.sqs.AmazonSQS
 import com.google.inject.{Provides, Singleton}
