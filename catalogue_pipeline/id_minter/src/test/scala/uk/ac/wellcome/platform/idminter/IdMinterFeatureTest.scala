@@ -65,7 +65,6 @@ class IdMinterFeatureTest
                     key = s"$i.json"
                   )
                 )
-
                 sqsClient.sendMessage(queue.url, messageBody)
               }
 
@@ -73,7 +72,7 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(messageCount)
 
-                val works = getWorksFromMessages(messages)
+                val works = messages.map(message => get[IdentifiedWork](message))
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { work =>
                   work.identifiers.head.value shouldBe miroID
@@ -137,13 +136,6 @@ class IdMinterFeatureTest
       }
     }
   }
-
-  private def getWorksFromMessages(messages: List[MessageInfo]): List[IdentifiedWork] =
-    messages.map{ m =>
-      val messagePointer = fromJson[MessagePointer](m.message).get
-      val messageContent = getContentFromS3(Bucket(messagePointer.src.bucket), messagePointer.src.key)
-      fromJson[IdentifiedWork](messageContent).get
-    }
 
 
   private def assertMessageIsNotDeleted(queue: Queue): Unit = {
