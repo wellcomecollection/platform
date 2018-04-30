@@ -11,7 +11,7 @@ c.NotebookApp.notebook_dir = u"/home/${notebook_user}/"
 c.NotebookApp.ip = "*"
 c.NotebookApp.port = "${notebook_port}"
 c.NotebookApp.open_browser = False
-c.NotebookApp.password = u'${hashed_password}''
+c.NotebookApp.password = u'${hashed_password}'
 
 EOF
 
