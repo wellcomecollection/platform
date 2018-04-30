@@ -3,10 +3,10 @@ package uk.ac.wellcome.messaging.message
 import io.circe.Json
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.aws.SNSConfig
+import uk.ac.wellcome.models.aws.{S3Config, SNSConfig}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 

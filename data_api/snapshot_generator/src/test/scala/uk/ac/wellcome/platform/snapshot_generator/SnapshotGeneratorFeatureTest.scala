@@ -7,6 +7,9 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
@@ -20,8 +23,6 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
 }
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.SNS.Topic
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._

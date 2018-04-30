@@ -13,6 +13,7 @@ import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.{
   DynamoConfig,

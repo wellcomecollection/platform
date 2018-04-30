@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.idminter
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,

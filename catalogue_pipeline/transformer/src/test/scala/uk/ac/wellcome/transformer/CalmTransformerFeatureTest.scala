@@ -2,6 +2,7 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,

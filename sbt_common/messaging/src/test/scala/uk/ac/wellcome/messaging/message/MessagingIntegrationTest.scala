@@ -6,10 +6,10 @@ import org.scalatest.{FunSpec, Matchers}
 import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.concurrent.Eventually
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.aws.{S3Config, SNSConfig}
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.sns.SNSWriter
-import uk.ac.wellcome.test.fixtures.Messaging
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class MessagingIntegrationTest

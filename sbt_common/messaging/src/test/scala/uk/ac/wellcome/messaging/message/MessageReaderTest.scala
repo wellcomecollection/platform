@@ -8,6 +8,7 @@ import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.sns.NotificationMessage

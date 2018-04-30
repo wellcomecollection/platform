@@ -4,6 +4,7 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.platform.reindex_worker.models.{
@@ -11,7 +12,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SNS, SQS}
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
