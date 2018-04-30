@@ -3,22 +3,10 @@ package uk.ac.wellcome.platform.recorder
 import io.circe.Encoder
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
-
-case class RecorderWorkEntry(
-  id: String,
-  work: UnidentifiedWork
-) extends Id
-
-case object RecorderWorkEntry {
-  def apply(work: UnidentifiedWork): RecorderWorkEntry = RecorderWorkEntry(
-    id = s"${work.sourceIdentifier.identifierScheme}/${work.sourceIdentifier.value}",
-    work = work
-  )
-}
 
 class RecorderFeatureTest
     extends FunSpec
