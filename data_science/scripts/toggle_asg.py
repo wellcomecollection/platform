@@ -16,7 +16,7 @@ import sys
 import boto3
 import docopt
 
-from asg_utils import discover_asg_name
+from asg_utils import discover_asg_name, set_asg_size
 
 
 if __name__ == '__main__':
@@ -34,11 +34,8 @@ if __name__ == '__main__':
 
     asg_name = discover_asg_name(asg_client=asg_client)
 
-    print('Setting size of ASG group %r to %r' % (asg_name, desired_size))
-
-    asg_client.update_auto_scaling_group(
-        AutoScalingGroupName=asg_name,
-        MinSize=desired_size,
-        MaxSize=desired_size,
-        DesiredCapacity=desired_size,
+    set_asg_size(
+        asg_client=asg_client,
+        asg_name=asg_name,
+        desired_size=desired_size
     )

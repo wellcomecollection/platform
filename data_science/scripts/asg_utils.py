@@ -46,3 +46,17 @@ def discover_asg_name(asg_client):
     """
     asg_data = discover_data_science_asg(asg_client=asg_client)
     return asg_data['AutoScalingGroupName']
+
+
+def set_asg_size(asg_client, asg_name, desired_size):
+    """
+    Set the size of an ASG to ``desired_size``.
+    """
+    print('Setting size of ASG group %r to %r' % (asg_name, desired_size))
+
+    asg_client.update_auto_scaling_group(
+        AutoScalingGroupName=asg_name,
+        MinSize=desired_size,
+        MaxSize=desired_size,
+        DesiredCapacity=desired_size,
+    )
