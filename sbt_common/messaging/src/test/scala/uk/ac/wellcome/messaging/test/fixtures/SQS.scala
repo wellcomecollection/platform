@@ -7,6 +7,7 @@ import com.amazonaws.services.sqs.model.PurgeQueueRequest
 import uk.ac.wellcome.models.aws.SQSMessage
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
+import uk.ac.wellcome.test.fixtures.ImplicitLogging
 
 import scala.util.Random
 import scala.collection.JavaConversions._
