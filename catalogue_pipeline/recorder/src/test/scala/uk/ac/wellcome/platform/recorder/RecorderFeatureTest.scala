@@ -20,6 +20,8 @@ class RecorderFeatureTest
 
   implicit val encoder: Encoder[RecorderWorkEntry] = Encoder[RecorderWorkEntry]
 
+  // TODO Write a test that older works are ignored
+
   it("receives a transformed Work, and saves it to the VHS") {
     val title = "Not from Guildford after all"
 
