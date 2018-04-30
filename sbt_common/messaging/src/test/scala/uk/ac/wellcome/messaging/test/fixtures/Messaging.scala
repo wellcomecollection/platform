@@ -1,20 +1,17 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
-import io.circe._
 import io.circe.generic.semiauto._
 import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker}
-import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics
-import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
+import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
-import uk.ac.wellcome.test.fixtures.{Akka, ImplicitLogging, MetricsSender, S3, TestWith}
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
