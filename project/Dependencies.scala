@@ -102,6 +102,8 @@ object Dependencies {
 
   val commonElasticsearchDependencies = commonDependencies ++ esDependencies
 
+  val commonMessagingDependencies = commonDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = dynamoDependencies
 
   val apiDependencies = commonDependencies ++ commonElasticsearchDependencies

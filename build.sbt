@@ -43,6 +43,9 @@ lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasti
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
+lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
+  .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
