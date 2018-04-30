@@ -1,6 +1,6 @@
 module "notebook_compute" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//ec2/asg?ref=v9.2.0"
-  name   = "notebook_compute"
+  name   = "jupyter"
 
   # Ubuntu DLAMI
   image_id = "ami-0bc19972"
@@ -10,12 +10,18 @@ module "notebook_compute" {
   vpc_id      = "${module.vpc.vpc_id}"
 
   use_spot   = 1
-  spot_price = "0.35"
+  spot_price = "0.4"
 
+  asg_min     = "0"
   asg_desired = "0"
   asg_max     = "1"
 
   instance_type = "p2.xlarge"
+
+  user_data = <<EOF
+#!/bin/bash
+/home/ubuntu/anaconda2/bin/jupyter notebook
+EOF
 }
 
 # Scale down to 0 every night at 8pm
