@@ -6,6 +6,7 @@ include assets/Makefile
 include loris/Makefile
 include shared_infra/Makefile
 include data_api/Makefile
+include data_science/Makefile
 include catalogue_api/Makefile
 include catalogue_pipeline/Makefile
 include monitoring/Makefile
@@ -18,6 +19,12 @@ include nginx/Makefile
 
 sbt-common-test:
 	$(call sbt_test,common)
+
+sbt-common-docker_compose_up:
+	$(call docker_compose_up,common/docker-compose.yml)
+
+sbt-common-docker_compose_down:
+	$(call docker_compose_down,common/docker-compose.yml)
 
 sbt-common-publish:
 	echo "Nothing to do!"
