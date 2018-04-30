@@ -1,10 +1,24 @@
 package uk.ac.wellcome.platform.recorder
 
+import io.circe.Encoder
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
+
+case class RecorderWorkEntry(
+  id: String,
+  work: UnidentifiedWork
+) extends Id
+
+case object RecorderWorkEntry {
+  def apply(work: UnidentifiedWork): RecorderWorkEntry = RecorderWorkEntry(
+    id = s"${work.sourceIdentifier.identifierScheme}/${work.sourceIdentifier.value}",
+    work = work
+  )
+}
 
 class RecorderFeatureTest
     extends FunSpec
@@ -13,6 +27,10 @@ class RecorderFeatureTest
       with LocalVersionedHybridStore
       with Messaging
       with SQS {
+
+  implicit val workEncoder: Encoder[UnidentifiedWork] = Encoder[UnidentifiedWork]
+
+  implicit val encoder: Encoder[RecorderWorkEntry] = Encoder[RecorderWorkEntry]
 
   it("receives a transformed Work, and saves it to the VHS") {
     val title = "Not from Guildford after all"
@@ -30,7 +48,7 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withVersionedHybridStore(bucket = bucket, table = table) { _ =>
+          withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { _ =>
 
             val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(table)
             withServer(flags) { _ =>
@@ -45,7 +63,7 @@ class RecorderFeatureTest
               sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
-                assertStored[UnidentifiedWork](bucket, table, work)
+                assertStored[RecorderWorkEntry](bucket, table, RecorderWorkEntry(work))
               }
             }
           }
