@@ -96,9 +96,12 @@ object IdentifierSchemes {
       }
     }
 
-  implicit val identifierSchemeDynamoFormat = DynamoFormat.coercedXmap[IdentifierSchemes.IdentifierScheme, String, IllegalArgumentException](
-      createIdentifierScheme
-    )(
-      _.toString
-    )
+  implicit val identifierSchemeDynamoFormat = DynamoFormat.coercedXmap[
+    IdentifierSchemes.IdentifierScheme,
+    String,
+    IllegalArgumentException](
+    createIdentifierScheme
+  )(
+    _.toString
+  )
 }
