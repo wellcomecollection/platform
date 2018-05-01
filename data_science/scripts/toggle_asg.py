@@ -3,11 +3,12 @@
 """
 Start/stop all the instances in an autoscaling group.
 
-Usage: toggle_asg.py (--start | --stop)
+Usage: toggle_asg.py (--start | --stop) [--type=<INSTANCE_TYPE>]
 
 Actions:
-  --start           Start the autoscaling group (set the desired count to 1).
-  --stop            Stop the autoscaling group (set the desired count to 0).
+  --start                 Start the autoscaling group (set the desired count to 1).
+  --stop                  Stop the autoscaling group (set the desired count to 0).
+  --type=<INSTANCE_TYPE>  AWS Instance type (valid values: p2,t2) defaults to t2
 
 """
 
@@ -30,9 +31,12 @@ if __name__ == '__main__':
         print('Neither --start nor --stop flags supplied?  args=%r' % args)
         sys.exit(1)
 
+    instance_type = args['--type'] or 't2'
+    tag_name = 'jupyter-%s' % instance_type
+
     asg_client = boto3.client('autoscaling')
 
-    asg_name = discover_asg_name(asg_client=asg_client)
+    asg_name = discover_asg_name(asg_client=asg_client, tag_name=tag_name)
 
     set_asg_size(
         asg_client=asg_client,

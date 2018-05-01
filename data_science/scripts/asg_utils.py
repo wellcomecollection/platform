@@ -3,7 +3,7 @@
 import sys
 
 
-def discover_data_science_asg(asg_client):
+def discover_asg(asg_client, tag_name):
     """
     Return data about the first autoscaling group whose tags exactly match
     the supplied input.
@@ -27,19 +27,19 @@ def discover_data_science_asg(asg_client):
     for asg_data in resp['AutoScalingGroups']:
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
-        if ('name' in actual_tags) and (actual_tags['name'] == 'jupyter'):
+        if ('name' in actual_tags) and (actual_tags['name'] == tag_name):
             return asg_data
 
 
-    sys.exit("Can't find an ASG with tags %r!" % DATA_SCIENCE_ASG_TAGS)
+    sys.exit("Can't find an ASG with tag: %r!" % tag_name)
 
 
-def discover_asg_name(asg_client):
+def discover_asg_name(asg_client, tag_name):
     """
     Returns the name of the first autoscaling group whose tags exactly match
     the supplied input.
     """
-    asg_data = discover_data_science_asg(asg_client=asg_client)
+    asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
     return asg_data['AutoScalingGroupName']
 
 
