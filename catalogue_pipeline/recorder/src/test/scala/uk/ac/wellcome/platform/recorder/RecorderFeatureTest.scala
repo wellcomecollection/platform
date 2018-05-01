@@ -1,24 +1,26 @@
 package uk.ac.wellcome.platform.recorder
 
 import io.circe.Encoder
+import io.circe.generic.extras.semiauto.deriveEncoder
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 class RecorderFeatureTest
     extends FunSpec
       with Matchers
+      with ExtendedPatience
       with fixtures.Server
       with LocalVersionedHybridStore
       with Messaging
       with SQS {
 
-  implicit val workEncoder: Encoder[UnidentifiedWork] = Encoder[UnidentifiedWork]
-
-  implicit val encoder: Encoder[RecorderWorkEntry] = Encoder[RecorderWorkEntry]
+  implicit val encoder: Encoder[UnidentifiedWork] = deriveEncoder[UnidentifiedWork]
 
   // TODO Write a test that older works are ignored
 
@@ -46,6 +48,7 @@ class RecorderFeatureTest
             val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(table)
             withServer(flags) { _ =>
 
+              println(s"@@AWLC L49 encoder = ${encoder}")
               val messageBody = put[UnidentifiedWork](
                 obj = work,
                 location = S3ObjectLocation(
