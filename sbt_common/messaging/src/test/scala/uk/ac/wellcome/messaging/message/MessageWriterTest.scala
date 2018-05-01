@@ -4,8 +4,10 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation}
+import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Success
@@ -24,37 +26,25 @@ class MessageWriterTest
   it("sends messages") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        val s3Config = S3Config(bucketName = bucket.name)
-        val snsConfig = SNSConfig(topicArn = topic.arn)
-        val messageConfig = MessageConfig(
-          s3Config = s3Config,
-          snsConfig = snsConfig
-        )
+        withMessageWriter(bucket, topic) { messageWriter =>
+          val eventualAttempt = messageWriter.write(message, subject)
 
-        val messageWriter = new MessageWriter[ExampleObject](
-          messageConfig = messageConfig,
-          snsClient = snsClient,
-          s3Client = s3Client,
-          keyPrefixGenerator = keyPrefixGenerator
-        )
+          whenReady(eventualAttempt) { pointer =>
+            val messages = listMessagesReceivedFromSNS(topic)
+            messages should have size (1)
+            messages.head.subject shouldBe subject
 
-        val eventualAttempt = messageWriter.write(message, subject)
+            val pointer = fromJson[MessagePointer](messages.head.message)
 
-        whenReady(eventualAttempt) { pointer =>
-          val messages = listMessagesReceivedFromSNS(topic)
-          messages should have size (1)
-          messages.head.subject shouldBe subject
+            pointer shouldBe a[Success[_]]
+            val messagePointer = pointer.get
 
-          val pointer = fromJson[MessagePointer](messages.head.message)
+            inside(messagePointer) {
+              case MessagePointer(S3ObjectLocation(bucketName, key)) => {
+                bucketName shouldBe bucket.name
 
-          pointer shouldBe a[Success[_]]
-          val messagePointer = pointer.get
-
-          inside(messagePointer) {
-            case MessagePointer(S3ObjectLocation(bucketName, key)) => {
-              bucketName shouldBe bucket.name
-
-              getContentFromS3(bucket, key) shouldBe toJson(message).get
+                getContentFromS3(bucket, key) shouldBe toJson(message).get
+              }
             }
           }
         }
@@ -64,72 +54,39 @@ class MessageWriterTest
 
   it("returns a failed future if it fails to publish to SNS") {
     withLocalS3Bucket { bucket =>
-      val s3Config = S3Config(bucketName = bucket.name)
-      val snsConfig = SNSConfig(topicArn = "invalid-topic")
-      val messageConfig = MessageConfig(
-        s3Config = s3Config,
-        snsConfig = snsConfig
-      )
+      val topic = Topic(arn = "invalid-topic-arn")
+      withMessageWriter(bucket, topic) { messageWriter =>
+        val eventualAttempt = messageWriter.write(message, subject)
 
-      val messageWriter = new MessageWriter[ExampleObject](
-        messageConfig = messageConfig,
-        snsClient = snsClient,
-        s3Client = s3Client,
-        keyPrefixGenerator = keyPrefixGenerator
-      )
-
-      val eventualAttempt = messageWriter.write(message, subject)
-
-      whenReady(eventualAttempt.failed) { ex =>
-        ex shouldBe a[Throwable]
+        whenReady(eventualAttempt.failed) { ex =>
+          ex shouldBe a[Throwable]
+        }
       }
     }
   }
 
   it("returns a failed future if it fails to store message") {
     withLocalSnsTopic { topic =>
-      val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsConfig = SNSConfig(topicArn = topic.arn)
-      val messageConfig = MessageConfig(
-        s3Config = s3Config,
-        snsConfig = snsConfig
-      )
+      val bucket = Bucket(name = "invalid-bucket")
+      withMessageWriter(bucket, topic) { messageWriter =>
+        val eventualAttempt = messageWriter.write(message, subject)
 
-      val messageWriter = new MessageWriter[ExampleObject](
-        messageConfig = messageConfig,
-        snsClient = snsClient,
-        s3Client = s3Client,
-        keyPrefixGenerator = keyPrefixGenerator
-      )
-
-      val eventualAttempt = messageWriter.write(message, subject)
-
-      whenReady(eventualAttempt.failed) { ex =>
-        ex shouldBe a[Throwable]
+        whenReady(eventualAttempt.failed) { ex =>
+          ex shouldBe a[Throwable]
+        }
       }
     }
   }
 
   it("does not publish message pointer if it fails to store message") {
     withLocalSnsTopic { topic =>
-      val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsConfig = SNSConfig(topicArn = topic.arn)
-      val messageConfig = MessageConfig(
-        s3Config = s3Config,
-        snsConfig = snsConfig
-      )
+      val bucket = Bucket(name = "invalid-bucket")
+      withMessageWriter(bucket, topic) { messageWriter =>
+        val eventualAttempt = messageWriter.write(message, subject)
 
-      val messageWriter = new MessageWriter[ExampleObject](
-        messageConfig = messageConfig,
-        snsClient = snsClient,
-        s3Client = s3Client,
-        keyPrefixGenerator = keyPrefixGenerator
-      )
-
-      val eventualAttempt = messageWriter.write(message, subject)
-
-      whenReady(eventualAttempt.failed) { _ =>
-        listMessagesReceivedFromSNS(topic) should be('empty)
+        whenReady(eventualAttempt.failed) { _ =>
+          listMessagesReceivedFromSNS(topic) should be('empty)
+        }
       }
     }
   }

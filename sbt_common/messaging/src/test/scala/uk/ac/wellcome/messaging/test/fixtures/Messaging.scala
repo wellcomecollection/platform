@@ -7,7 +7,8 @@ import io.circe.generic.semiauto._
 import uk.ac.wellcome.messaging.message.{
   MessageConfig,
   MessageReader,
-  MessageWorker
+  MessageWorker,
+  MessageWriter
 }
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
@@ -120,6 +121,24 @@ trait Messaging
     } finally {
       testWorker.stop()
     }
+  }
+
+  def withMessageWriter[R](bucket: Bucket, topic: Topic)(testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+    val s3Config = S3Config(bucketName = bucket.name)
+    val snsConfig = SNSConfig(topicArn = topic.arn)
+    val messageConfig = MessageConfig(
+      s3Config = s3Config,
+      snsConfig = snsConfig
+    )
+
+    val messageWriter = new MessageWriter[ExampleObject](
+      messageConfig = messageConfig,
+      snsClient = snsClient,
+      s3Client = s3Client,
+      keyPrefixGenerator = keyPrefixGenerator
+    )
+
+    testWith(messageWriter)
   }
 
   def withMessageReaderFixtures[R](testWith: TestWith[(Bucket, Topic, MessageReader[ExampleObject]), R]) = {

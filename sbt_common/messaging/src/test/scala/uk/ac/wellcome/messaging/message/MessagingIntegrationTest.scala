@@ -7,10 +7,13 @@ import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
+
+import scala.concurrent.duration._
 
 class MessagingIntegrationTest
     extends FunSpec
@@ -23,31 +26,61 @@ class MessagingIntegrationTest
   val subject = "message-integration-test-subject"
 
   it("sends and receives messages") {
-    withMessageWorkerFixtures {
-      case (metrics, queue, bucket, worker) =>
-        withLocalStackSnsTopic { topic =>
-          withLocalStackSubscription(queue, topic) { _ =>
-            val s3Config = S3Config(bucketName = bucket.name)
-            val snsConfig = SNSConfig(topicArn = topic.arn)
-            val messageConfig = MessageConfig(
-              s3Config = s3Config,
-              snsConfig = snsConfig
-            )
+    withLocalStackMessageWriter { case (worker, messageWriter) =>
+      messageWriter.write(message = message, subject = subject)
 
-            val messageWriter = new MessageWriter[ExampleObject](
-              messageConfig = messageConfig,
-              snsClient = snsClient,
-              s3Client = s3Client,
-              keyPrefixGenerator = keyPrefixGenerator
-            )
+      eventually {
+        worker.calledWith shouldBe Some(message)
+      }
+    }
+  }
 
-            messageWriter.write(message = message, subject = subject)
+  private def withLocalStackMessageWriter[R](testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]), R]) = {
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        withLocalStackSqsQueue { queue =>
+          withLocalStackSnsTopic { topic =>
+            withLocalStackSubscription(queue, topic) { _ =>
+              withLocalS3Bucket { bucket =>
+                val s3Config = S3Config(bucketName = bucket.name)
+                val snsConfig = SNSConfig(topicArn = topic.arn)
 
-            eventually {
-              worker.calledWith shouldBe Some(message)
+                val messageConfig = MessageConfig(
+                  s3Config = s3Config,
+                  snsConfig = snsConfig
+                )
+
+                val messageReader = new MessageReader[ExampleObject](
+                  messageConfig = messageConfig,
+                  s3Client = s3Client,
+                  keyPrefixGenerator = keyPrefixGenerator
+                )
+
+                val sqsReader = new SQSReader(
+                  sqsClient = localStackSqsClient,
+                  sqsConfig = SQSConfig(queue.url, 1.second, 1)
+                )
+
+                val worker = new ExampleMessageWorker(
+                  sqsReader = sqsReader,
+                  messageReader = messageReader,
+                  actorSystem = actorSystem,
+                  metricsSender = metricsSender
+                )
+
+                val messageWriter = new MessageWriter[ExampleObject](
+                  messageConfig = messageConfig,
+                  snsClient = localStackSnsClient,
+                  s3Client = s3Client,
+                  keyPrefixGenerator = keyPrefixGenerator
+                )
+
+                testWith((worker, messageWriter))
+              }
             }
           }
         }
+      }
     }
   }
 }
