@@ -113,11 +113,13 @@ endef
 #   $2 - Path to the Dockerfile, relative to the root of the repo.
 #
 define build_image
-	$(ROOT)/docker_run.py \
-	    --dind -- \
-	    wellcome/image_builder:latest \
-            --project=$(1) \
-            --file=$(2)
+	$(eval RELEASE_ID = $(shell git rev-parse HEAD))
+	$(eval TAG = $(1):$(RELEASE_ID))
+	docker build --file=$(2) --tag=$(1) $(shell dirname $(2))
+	docker tag $(1) $(TAG)
+
+	mkdir -p $(ROOT)/.releases
+	echo "$(RELEASE_ID)" >> $(ROOT)/.releases/$(1)
 endef
 
 
