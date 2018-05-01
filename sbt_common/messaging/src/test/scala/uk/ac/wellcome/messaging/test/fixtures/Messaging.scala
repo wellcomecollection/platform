@@ -142,11 +142,11 @@ trait Messaging
     testWith(messageWriter)
   }
 
-  def withMessageReaderFixtures[R](testWith: TestWith[(Bucket, Topic, MessageReader[ExampleObject]), R]) = {
+  def withMessageReaderFixtures[R](testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
     withLocalS3Bucket { bucket =>
       withLocalSnsTopic { topic =>
         withMessageReader(bucket = bucket, topic = topic) { reader =>
-          testWith((bucket, topic, reader))
+          testWith((bucket, reader))
         }
       }
     }
@@ -156,7 +156,7 @@ trait Messaging
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures { case (bucket, _, messageReader) =>
+          withMessageReaderFixtures { case (bucket, messageReader) =>
             withMessageWorker(actorSystem, metricsSender, queue, messageReader) { worker =>
               testWith((metricsSender, queue, bucket, worker))
             }
@@ -170,7 +170,7 @@ trait Messaging
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures { case (bucket, _, messageReader) =>
+          withMessageReaderFixtures { case (bucket, messageReader) =>
             withMessageWorker(actorSystem, metricsSender, queue, messageReader) { worker =>
               testWith((metricsSender, queue, bucket, worker))
             }
