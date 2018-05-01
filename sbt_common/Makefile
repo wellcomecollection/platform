@@ -33,6 +33,12 @@ sbt-messaging-test:
 sbt-messaging-publish:
 	echo "Nothing to do!"
 
+sbt-messaging-docker_compose_up:
+	$(call docker_compose_up,sbt_common/messaging/docker-compose.yml)
+
+sbt-messaging-docker_compose_down:
+	$(call docker_compose_down,sbt_common/messaging/docker-compose.yml)
+
 
 sbt-storage-test:
 	$(call sbt_test,common_storage)
