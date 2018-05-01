@@ -1,4 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
 
 # Create jupyter user
 adduser ${notebook_user} --gecos "" --disabled-password
@@ -16,4 +19,4 @@ c.NotebookApp.password = u'${hashed_password}'
 EOF
 
 # Start notebook server
-runuser -l ${notebook_user} -c '/home/ubuntu/anaconda3/bin/jupyter notebook'
+runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'
