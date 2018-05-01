@@ -13,3 +13,8 @@ services:
     image: scality/s3server:mem-latest
     ports:
       - "33333:8000"
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4567-4583:4567-4583"
+      - "8080:8080"
