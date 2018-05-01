@@ -81,6 +81,10 @@ from travistooling.decisions import (
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
     ('travistooling/decisionmaker.py', 'loris-test', ExclusivelyAffectsAnotherTask, False),
+
+    # Changes to the data_science/scripts folder only trigger the format tests
+    ('data_science/scripts/foo.py', 'loris-test', IgnoredPath, False),
+    ('data_science/scripts/bar.py', 'travis-format', CheckedByTravisFormat, True),
 ])
 def test_does_file_affect_build_task(path, task, exc_class, is_significant):
     with pytest.raises(exc_class) as err:
