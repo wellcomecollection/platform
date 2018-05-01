@@ -106,20 +106,20 @@ define test_lambda
 endef
 
 
-# Build and tag a Docker image.
+# Build and tag a Docker image.  Requires three variables to be defined:
 #
-# Args:
-#   $1 - Name of the image.
-#   $2 - Path to the Dockerfile, relative to the root of the repo.
+#   NAME         Name of the project to build.
+#   DOCKERFILE   Path to the Dockerfile, relative to the repo root.
+#   BUILD_DIR    Path of the build directory.
 #
 define build_image
 	$(eval RELEASE_ID = $(shell git rev-parse HEAD))
-	$(eval TAG = $(1):$(RELEASE_ID))
-	docker build --file=$(2) --tag=$(1) $(shell dirname $(2))
-	docker tag $(1) $(TAG)
+	$(eval TAG = $(NAME):$(RELEASE_ID))
+	docker build --file=$(DOCKERFILE) --tag=$(NAME) $(BUILD_DIR)
+	docker tag $(NAME) $(TAG)
 
 	mkdir -p $(ROOT)/.releases
-	echo "$(RELEASE_ID)" >> $(ROOT)/.releases/$(1)
+	echo "$(RELEASE_ID)" >> $(ROOT)/.releases/$(NAME)
 endef
 
 
@@ -217,8 +217,11 @@ $(1)-docker_compose_down:
 	$(call docker_compose_down,$(2)/docker-compose.yml)
 
 $(1)-build:
-	$(call sbt_build,$(1))
-	$(call build_image,$(1),$(2)/Dockerfile)
+	$(eval NAME = $(1))
+	$(eval DOCKERFILE = $(2)/Dockerfile)
+	$(eval BUILD_DIR = $(shell dirname $(DOCKERFILE)))
+	# $(call sbt_build,$(1))
+	$(call build_image)
 
 $(1)-test:
 	$(call sbt_test,$(1))
@@ -303,7 +306,10 @@ endef
 #
 define __ecs_target_template
 $(1)-build:
-	$(call build_image,$(1),$(2))
+	$(eval NAME = $(1))
+	$(eval DOCKERFILE = $(2))
+	$(eval BUILD_DIR = $(shell dirname $(DOCKERFILE)))
+	$(call build_image)
 
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))
