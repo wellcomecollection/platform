@@ -36,42 +36,11 @@ class MessagingIntegrationTest
   }
 
   private def withLocalStackMessageWriter[R](testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]), R]) = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalStackSqsQueue { queue =>
-
-              withLocalS3Bucket { bucket =>
-                val s3Config = S3Config(bucketName = bucket.name)
-                val snsConfig = SNSConfig(topicArn = topic.arn)
-
-                val messageConfig = MessageConfig(
-                  s3Config = s3Config,
-                  snsConfig = snsConfig
-                )
-
-                val messageReader = new MessageReader[ExampleObject](
-                  messageConfig = messageConfig,
-                  s3Client = s3Client,
-                  keyPrefixGenerator = keyPrefixGenerator
-                )
-
-                val sqsReader = new SQSReader(
-                  sqsClient = localStackSqsClient,
-                  sqsConfig = SQSConfig(queue.url, 1.second, 1)
-                )
-
-                val worker = new ExampleMessageWorker(
-                  sqsReader = sqsReader,
-                  messageReader = messageReader,
-                  actorSystem = actorSystem,
-                  metricsSender = metricsSender
-                )
-
-                withMessageWriter(bucket, topic, localStackSnsClient) { messageWriter =>
-                  testWith((worker, messageWriter))
-                }
-              }
-            }
+    withMessageWorkerFixtures { case (metricsSender, queue, bucket, worker) =>
+      withLocalStackSnsTopic { topic =>
+        withLocalStackSubscription(queue, topic) { _ =>
+          withMessageWriter(bucket, topic, localStackSnsClient) { messageWriter =>
+            testWith((worker, messageWriter))
           }
         }
       }
