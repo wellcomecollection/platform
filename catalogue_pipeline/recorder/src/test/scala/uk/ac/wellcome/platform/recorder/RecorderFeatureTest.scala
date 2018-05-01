@@ -4,7 +4,7 @@ import io.circe.Encoder
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.recorder.models.RecorderWorkEntry
+import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
 

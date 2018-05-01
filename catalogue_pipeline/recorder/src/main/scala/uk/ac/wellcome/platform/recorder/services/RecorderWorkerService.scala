@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorkerToDynamo}
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.recorder.models.RecorderWorkEntry
+import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 
