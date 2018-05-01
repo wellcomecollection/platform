@@ -5,7 +5,8 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=sierra_reader
+ARG NAME
+ENV project=$NAME
 
 USER daemon
 CMD ["/run.sh"]
