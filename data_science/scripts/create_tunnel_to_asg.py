@@ -22,7 +22,7 @@ from os.path import expanduser
 import boto3
 import docopt
 
-from asg_utils import discover_data_science_asg
+from asg_utils import discover_asg
 
 
 def _default_ssh_key_path():
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     tag_name = 'jupyter-%s' % instance_type
 
     asg_client = boto3.client('autoscaling')
-    asg_data = discover_data_science_asg(asg_client=asg_client, tag_name=tag_name)
+    asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
 
     if len(asg_data['Instances']) == 0:
         sys.exit(
