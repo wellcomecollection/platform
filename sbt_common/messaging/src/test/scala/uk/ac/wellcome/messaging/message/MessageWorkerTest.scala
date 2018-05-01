@@ -23,7 +23,7 @@ class MessageWorkerTest
 
   it("processes messages") {
     withMessageWorkerFixtures {
-      case (_, metrics, queue, bucket, worker) =>
+      case (_, queue, bucket, worker) =>
         val key = "message-key"
 
         val exampleObject = ExampleObject("some value")
@@ -53,7 +53,7 @@ class MessageWorkerTest
 
   it("increments *_ProcessMessage metric when successful") {
     withMessageWorkerFixturesAndMockedMetrics {
-      case (_, metrics, queue, bucket, worker) =>
+      case (metrics, queue, bucket, worker) =>
         val key = "message-key"
 
         val exampleObject = ExampleObject("some value")
@@ -90,7 +90,7 @@ class MessageWorkerTest
 
   it("increments *_MessageProcessingFailure metric when not successful") {
     withMessageWorkerFixturesAndMockedMetrics {
-      case (_, metrics, queue, bucket, worker) =>
+      case (metrics, queue, bucket, worker) =>
         when(
           metrics.timeAndCount[Unit](
             anyString(),
@@ -130,7 +130,7 @@ class MessageWorkerTest
 
   it("increments *_MessageProcessingFailure metric unable to parse a message") {
     withMessageWorkerFixturesAndMockedMetrics {
-      case (_, metrics, queue, bucket, worker) =>
+      case (metrics, queue, bucket, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
 
         eventually {

@@ -18,11 +18,6 @@ class MessageWriterTest
     with IntegrationPatience
     with Inside {
 
-  val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-    new KeyPrefixGenerator[ExampleObject] {
-      override def generate(obj: ExampleObject): String = "/"
-    }
-
   val message = ExampleObject("A message sent in the MessageWriterTest")
   val subject = "message-writer-test-subject"
 
@@ -30,7 +25,7 @@ class MessageWriterTest
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
         val s3Config = S3Config(bucketName = bucket.name)
-        val snsConfig = SNSConfig(topic.arn)
+        val snsConfig = SNSConfig(topicArn = topic.arn)
         val messageConfig = MessageConfig(
           s3Config = s3Config,
           snsConfig = snsConfig
@@ -94,7 +89,7 @@ class MessageWriterTest
   it("returns a failed future if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsConfig = SNSConfig(topic.arn)
+      val snsConfig = SNSConfig(topicArn = topic.arn)
       val messageConfig = MessageConfig(
         s3Config = s3Config,
         snsConfig = snsConfig
@@ -118,7 +113,7 @@ class MessageWriterTest
   it("does not publish message pointer if it fails to store message") {
     withLocalSnsTopic { topic =>
       val s3Config = S3Config(bucketName = "invalid-bucket")
-      val snsConfig = SNSConfig(topic.arn)
+      val snsConfig = SNSConfig(topicArn = topic.arn)
       val messageConfig = MessageConfig(
         s3Config = s3Config,
         snsConfig = snsConfig

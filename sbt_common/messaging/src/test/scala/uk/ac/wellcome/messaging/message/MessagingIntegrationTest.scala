@@ -19,34 +19,32 @@ class MessagingIntegrationTest
     with Eventually
     with ExtendedPatience {
 
+  val message = ExampleObject("A message sent in the MessagingIntegrationTest")
+  val subject = "message-integration-test-subject"
+
   it("sends and receives messages") {
     withMessageWorkerFixtures {
-      case (_, metrics, queue, bucket, worker) =>
+      case (metrics, queue, bucket, worker) =>
         withLocalStackSnsTopic { topic =>
           withLocalStackSubscription(queue, topic) { _ =>
             val s3Config = S3Config(bucketName = bucket.name)
-
-            val snsConfig = SNSConfig(topic.arn)
-            val snsWriter = new SNSWriter(localStackSnsClient, snsConfig)
-
-            val s3ObjectStore = new S3ObjectStore[ExampleObject](
-              s3Client,
-              s3Config,
-              keyPrefixGenerator
+            val snsConfig = SNSConfig(topicArn = topic.arn)
+            val messageConfig = MessageConfig(
+              s3Config = s3Config,
+              snsConfig = snsConfig
             )
 
-            val messageWriter =
-              new MessageWriter[ExampleObject](
-                snsWriter,
-                s3Config,
-                s3ObjectStore)
+            val messageWriter = new MessageWriter[ExampleObject](
+              messageConfig = messageConfig,
+              snsClient = snsClient,
+              s3Client = s3Client,
+              keyPrefixGenerator = keyPrefixGenerator
+            )
 
-            val exampleObject = ExampleObject("some value")
-
-            messageWriter.write(exampleObject, "subject")
+            messageWriter.write(message = message, subject = subject)
 
             eventually {
-              worker.calledWith shouldBe Some(exampleObject)
+              worker.calledWith shouldBe Some(message)
             }
           }
         }
