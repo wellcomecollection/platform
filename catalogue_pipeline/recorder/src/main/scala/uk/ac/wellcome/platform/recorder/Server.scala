@@ -8,9 +8,10 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
-import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.recorder.modules.RecorderModule
+import uk.ac.wellcome.platform.recorder.modules.{
+  RecorderModule,
+  RecorderWorkEntryKeyPrefixGeneratorModule
+}
 
 object ServerMain extends Server
 
@@ -22,6 +23,7 @@ class Server extends HttpServer {
     DynamoClientModule,
     RecorderModule,
     MetricsSenderModule,
+    RecorderWorkEntryKeyPrefixGeneratorModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
