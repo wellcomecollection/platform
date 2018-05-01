@@ -3,10 +3,12 @@
 """
 Connect to the first instance in an autoscaling group.
 
-Usage: create_tunnel_to_asg.py --key=<KEY>
+Usage: create_tunnel_to_asg.py --key=<KEY> [--port=<PORT>]
 
 Actions:
-  --key=<KEY>   Path to an SSH key with access to the instances in the ASG.
+  --key=<KEY>     Path to an SSH key with access to the instances in the ASG.
+  --port=<PORT>   Local port to use for the remote Jupyter notebook
+                  (default: 8888).
 
 """
 
@@ -25,6 +27,8 @@ if __name__ == '__main__':
 
     key_path = os.path.abspath(args['--key'])
     assert os.path.exists(key_path)
+
+    port = args['--port'] or '8888'
 
     asg_client = boto3.client('autoscaling')
     asg_data = discover_data_science_asg(asg_client=asg_client)
@@ -68,6 +72,19 @@ if __name__ == '__main__':
     print('Connecting to instance %r' % public_dns)
 
     try:
-        subprocess.check_call(['ssh', '-i', key_path, 'ubuntu@%s' % public_dns])
+        subprocess.check_call([
+            'ssh',
+
+            # Use the provided SSH key to connect
+            '-i', key_path,
+
+            # Create a tunnel to port 8888 (Jupyter) on the remote host
+            # TODO: This is untested with a working Jupyter instance
+            # Test it before merging!
+            '-L', '%s:%s:8888' % (port, public_dns),
+
+            # Our data science AMI is based on Ubuntu
+            'ubuntu@%s' % public_dns
+        ])
     except subprocess.CalledProcessError as err:
         sys.exit(err.returncode)
