@@ -4,7 +4,7 @@ import sys
 
 
 DATA_SCIENCE_ASG_TAGS = {
-    'data_science': 'true',
+    'name': 'jupyter',
 }
 
 
