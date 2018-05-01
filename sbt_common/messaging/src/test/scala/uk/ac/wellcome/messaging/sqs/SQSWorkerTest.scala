@@ -12,6 +12,7 @@ import uk.ac.wellcome.test.fixtures
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.collection.JavaConversions._
 import akka.actor.ActorSystem
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
