@@ -77,7 +77,7 @@ trait Messaging
     def hasBeenCalled: Boolean = calledWith.nonEmpty
 
     override implicit val decoder: Decoder[ExampleObject] =
-      deriveDecoder[ExampleObject]
+        deriveDecoder[ExampleObject]
 
     override def processMessage(message: ExampleObject) = Future {
       calledWith = Some(message)
@@ -91,8 +91,13 @@ trait Messaging
       override def generate(obj: ExampleObject): String = "/"
     }
 
-  def withMessageReader[R](bucket: Bucket, topic: Topic)(
+  def withExampleObjectMessageReader[R](bucket: Bucket, topic: Topic)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
+    withMessageReader(bucket,topic,keyPrefixGenerator)(testWith)
+  }
+
+  def withMessageReader[T, R](bucket: Bucket, topic: Topic, keyPrefixGenerator: KeyPrefixGenerator[T])(
+    testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
@@ -102,7 +107,7 @@ trait Messaging
       snsConfig = snsConfig
     )
 
-    val testReader = new MessageReader[ExampleObject](
+    val testReader = new MessageReader[T](
       messageConfig = messageConfig,
       s3Client = s3Client,
       keyPrefixGenerator = keyPrefixGenerator
@@ -159,7 +164,7 @@ trait Messaging
     testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
     withLocalS3Bucket { bucket =>
       withLocalSnsTopic { topic =>
-        withMessageReader(bucket = bucket, topic = topic) { reader =>
+        withExampleObjectMessageReader(bucket = bucket, topic = topic) { reader =>
           testWith((bucket, reader))
         }
       }

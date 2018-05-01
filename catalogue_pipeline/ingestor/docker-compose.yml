@@ -11,3 +11,7 @@ elasticsearch:
     - "http.host=0.0.0.0"
     - "transport.host=0.0.0.0"
     - "cluster.name=wellcome"
+s3:
+  image: scality/s3server:mem-latest
+  ports:
+    - "33333:8000"

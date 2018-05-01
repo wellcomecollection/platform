@@ -28,11 +28,14 @@ class Server extends HttpServer {
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
+    S3ConfigModule,
+    S3ClientModule,
     AkkaModule,
     SQSReaderModule,
     IngestorWorkerModule,
     ElasticClientModule,
-    WorksIndexModule
+    WorksIndexModule,
+    IdentifiedWorkKeyPrefixGeneratorModule
   )
   flag[String]("es.index.v1", "V1 ES index name")
   flag[String]("es.index.v2", "V2 ES index name")
