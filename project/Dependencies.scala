@@ -103,6 +103,9 @@ object Dependencies {
 
   val commonElasticsearchDependencies = commonDependencies ++ esDependencies
 
+  // We use Circe for all our JSON serialisation, but our local SNS container
+  // returns YAML, and currently we use Jackson to parse that YAML.
+  // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
   val commonMessagingDependencies = commonDependencies ++ jacksonDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = dynamoDependencies

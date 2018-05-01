@@ -43,6 +43,9 @@ lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasti
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
+// Messaging depends on the S3ObjectStore for message pointers.  Currently
+// SOS lives in sbt-common, but we should remove this dependency when SOS
+// is moved into a separate library.
 lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
