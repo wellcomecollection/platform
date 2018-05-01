@@ -3,7 +3,7 @@
 """
 Connect to the first instance in an autoscaling group.
 
-Usage: create_tunnel_to_asg.py --key=<KEY> [--port=<PORT>]
+Usage: create_tunnel_to_asg.py [--key=<KEY>] [--port=<PORT>]
 
 Actions:
   --key=<KEY>     Path to an SSH key with access to the instances in the ASG.
@@ -16,16 +16,25 @@ import os
 import subprocess
 import sys
 
+from os.path import expanduser
+
 import boto3
 import docopt
 
 from asg_utils import discover_data_science_asg
 
 
+def _default_ssh_key_path():
+    return '%s/.ssh/wellcomedigitalplatform' % expanduser("~")
+
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
-    key_path = os.path.abspath(args['--key'])
+    key_path = args['--key'] or _default_ssh_key_path()
+
+    print(key_path)
+
     assert os.path.exists(key_path)
 
     port = args['--port'] or '8888'
