@@ -9,14 +9,18 @@ import uk.ac.wellcome.models.aws.S3Config
 
 object MessageConfigModule extends TwitterModule {
   private val topicArn = flag[String](
-    "aws.message.sns.topic.arn", "", "ARN of the SNS topic used for messaging")
+    "aws.message.sns.topic.arn",
+    "",
+    "ARN of the SNS topic used for messaging")
 
   private val bucketName =
     flag[String](
-      "aws.message.s3.bucketName", "",
+      "aws.message.s3.bucketName",
+      "",
       "Name of the S3 bucket holding messaging pointers")
   private val endpoint = flag[String](
-    "aws.message.s3.endpoint", "",
+    "aws.message.s3.endpoint",
+    "",
     "Endpoint of S3. The region will be used if the endpoint is not provided")
   private val accessKey =
     flag[String]("aws.message.s3.accessKey", "", "AccessKey to access S3")

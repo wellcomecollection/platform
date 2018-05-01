@@ -124,7 +124,10 @@ trait Messaging
     }
   }
 
-  def withMessageWriter[R](bucket: Bucket, topic: Topic, writerSnsClient: AmazonSNS = snsClient)(testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+  def withMessageWriter[R](bucket: Bucket,
+                           topic: Topic,
+                           writerSnsClient: AmazonSNS = snsClient)(
+    testWith: TestWith[MessageWriter[ExampleObject], R]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageConfig(
@@ -142,7 +145,8 @@ trait Messaging
     testWith(messageWriter)
   }
 
-  def withMessageReaderFixtures[R](testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
+  def withMessageReaderFixtures[R](
+    testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
     withLocalS3Bucket { bucket =>
       withLocalSnsTopic { topic =>
         withMessageReader(bucket = bucket, topic = topic) { reader =>
@@ -152,28 +156,48 @@ trait Messaging
     }
   }
 
-  def withMessageWorkerFixtures[R](testWith: TestWith[(metrics.MetricsSender, Queue, Bucket, ExampleMessageWorker), R]) = {
+  def withMessageWorkerFixtures[R](
+    testWith: TestWith[(metrics.MetricsSender,
+                        Queue,
+                        Bucket,
+                        ExampleMessageWorker),
+                       R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures { case (bucket, messageReader) =>
-            withMessageWorker(actorSystem, metricsSender, queue, messageReader) { worker =>
-              testWith((metricsSender, queue, bucket, worker))
-            }
+          withMessageReaderFixtures {
+            case (bucket, messageReader) =>
+              withMessageWorker(
+                actorSystem,
+                metricsSender,
+                queue,
+                messageReader) { worker =>
+                testWith((metricsSender, queue, bucket, worker))
+              }
           }
         }
       }
     }
   }
 
-  def withMessageWorkerFixturesAndMockedMetrics[R](testWith: TestWith[(metrics.MetricsSender, Queue, Bucket, ExampleMessageWorker), R]) = {
+  def withMessageWorkerFixturesAndMockedMetrics[R](
+    testWith: TestWith[(metrics.MetricsSender,
+                        Queue,
+                        Bucket,
+                        ExampleMessageWorker),
+                       R]) = {
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures { case (bucket, messageReader) =>
-            withMessageWorker(actorSystem, metricsSender, queue, messageReader) { worker =>
-              testWith((metricsSender, queue, bucket, worker))
-            }
+          withMessageReaderFixtures {
+            case (bucket, messageReader) =>
+              withMessageWorker(
+                actorSystem,
+                metricsSender,
+                queue,
+                messageReader) { worker =>
+                testWith((metricsSender, queue, bucket, worker))
+              }
           }
         }
       }

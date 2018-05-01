@@ -26,24 +26,29 @@ class MessagingIntegrationTest
   val subject = "message-integration-test-subject"
 
   it("sends and receives messages") {
-    withLocalStackMessageWriter { case (worker, messageWriter) =>
-      messageWriter.write(message = message, subject = subject)
+    withLocalStackMessageWriter {
+      case (worker, messageWriter) =>
+        messageWriter.write(message = message, subject = subject)
 
-      eventually {
-        worker.calledWith shouldBe Some(message)
-      }
+        eventually {
+          worker.calledWith shouldBe Some(message)
+        }
     }
   }
 
-  private def withLocalStackMessageWriter[R](testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]), R]) = {
-    withMessageWorkerFixtures { case (metricsSender, queue, bucket, worker) =>
-      withLocalStackSnsTopic { topic =>
-        withLocalStackSubscription(queue, topic) { _ =>
-          withMessageWriter(bucket, topic, localStackSnsClient) { messageWriter =>
-            testWith((worker, messageWriter))
+  private def withLocalStackMessageWriter[R](
+    testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]),
+                       R]) = {
+    withMessageWorkerFixtures {
+      case (metricsSender, queue, bucket, worker) =>
+        withLocalStackSnsTopic { topic =>
+          withLocalStackSubscription(queue, topic) { _ =>
+            withMessageWriter(bucket, topic, localStackSnsClient) {
+              messageWriter =>
+                testWith((worker, messageWriter))
+            }
           }
         }
-      }
     }
   }
 }
