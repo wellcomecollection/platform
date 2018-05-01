@@ -15,8 +15,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
-case class EmptyMetadata()
-
 class RecorderWorkerService @Inject()(
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry],
   reader: SQSReader,
