@@ -73,6 +73,7 @@ jobs:
     - env: TASK=sbt-internal_model-test
     - env: TASK=sbt-display-test
     - env: TASK=sbt-elasticsearch-test
+    - env: TASK=sbt-messaging-test
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test
