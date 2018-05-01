@@ -16,11 +16,13 @@ import scala.collection.JavaConversions._
 import akka.actor.ActorSystem
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest
     extends FunSpec
     with MockitoSugar
     with Eventually
+    with ExtendedPatience
     with fixtures.Akka
     with SQS
     with fixtures.MetricsSender {
