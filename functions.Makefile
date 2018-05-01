@@ -115,7 +115,7 @@ endef
 define build_image
 	$(eval RELEASE_ID = $(shell git rev-parse HEAD))
 	$(eval TAG = $(NAME):$(RELEASE_ID))
-	docker build --file=$(DOCKERFILE) --tag=$(NAME) $(BUILD_DIR)
+	docker build --file=$(DOCKERFILE) --tag=$(NAME) --build-arg NAME=$(NAME) $(BUILD_DIR)
 	docker tag $(NAME) $(TAG)
 
 	mkdir -p $(ROOT)/.releases
@@ -216,12 +216,23 @@ $(1)-docker_compose_up:
 $(1)-docker_compose_down:
 	$(call docker_compose_down,$(2)/docker-compose.yml)
 
-$(1)-build:
+
+# We use the same Dockerfile in all of our Finatra apps, but it has to
+# be inside the build context, so we can't just call it from the root.
+#
+# Instead, we silently copy it into the project directory at build time,
+# and then gitignore the result.  If the base Dockerfile changes, Make's
+# dependency resolution will update the copy.
+$(2)/.Dockerfile: $(ROOT)/finatra_service.Dockerfile
+	cp -p $(ROOT)/finatra_service.Dockerfile $(2)/.Dockerfile
+
+$(1)-build: $(2)/.Dockerfile
 	$(eval NAME = $(1))
-	$(eval DOCKERFILE = $(2)/Dockerfile)
-	$(eval BUILD_DIR = $(shell dirname $(DOCKERFILE)))
+	$(eval DOCKERFILE = $(2)/.Dockerfile)
+	$(eval BUILD_DIR = $(2))
 	# $(call sbt_build,$(1))
 	$(call build_image)
+
 
 $(1)-test:
 	$(call sbt_test,$(1))
