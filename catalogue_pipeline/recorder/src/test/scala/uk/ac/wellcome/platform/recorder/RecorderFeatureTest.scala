@@ -25,13 +25,16 @@ class RecorderFeatureTest
   it("receives a transformed Work, and saves it to the VHS") {
     val title = "Not from Guildford after all"
 
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      value = "V0237865",
+      ontologyType = "Work"
+    )
+
     val work = UnidentifiedWork(
       title = Some(title),
-      sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
-        value = "V0237865",
-        ontologyType = "Work"
-      ),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
       version = 1
     )
 
