@@ -3,8 +3,18 @@ package uk.ac.wellcome.platform.idminter
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.messaging.test.fixtures.{
+  MessageInfo,
+  Messaging,
+  SNS,
+  SQS
+}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -13,7 +23,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
 
 class IdMinterFeatureTest
-  extends FunSpec
+    extends FunSpec
     with SQS
     with SNS
     with S3
@@ -50,9 +60,9 @@ class IdMinterFeatureTest
           withIdentifiersDatabase { dbConfig =>
             val flags =
               sqsLocalFlags(queue) ++
-              snsLocalFlags(topic) ++
-              dbConfig.flags ++
-              s3LocalFlags(bucket)
+                snsLocalFlags(topic) ++
+                dbConfig.flags ++
+                s3LocalFlags(bucket)
 
             withServer(flags) { _ =>
               eventuallyTableExists(dbConfig)
@@ -86,7 +96,6 @@ class IdMinterFeatureTest
                 sqsClient.sendMessage(queue.url, messageBody)
               }
 
-
               def getWorksFromMessages(messages: List[MessageInfo]) =
                 messages.map(m => fromJson[IdentifiedWork](m.message).get)
 
@@ -111,12 +120,11 @@ class IdMinterFeatureTest
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
           withLocalS3Bucket { bucket =>
-
             val flags =
               sqsLocalFlags(queue) ++
-              snsLocalFlags(topic) ++
-              dbConfig.flags ++
-              s3LocalFlags(bucket)
+                snsLocalFlags(topic) ++
+                dbConfig.flags ++
+                s3LocalFlags(bucket)
 
             withServer(flags) { _ =>
               sqsClient.sendMessage(queue.url, "not a json string")
@@ -124,7 +132,10 @@ class IdMinterFeatureTest
               val miroId = "1234"
 
               val identifier =
-                SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", miroId)
+                SourceIdentifier(
+                  IdentifierSchemes.miroImageNumber,
+                  "Work",
+                  miroId)
 
               val work = UnidentifiedWork(
                 title = Some("A query about a queue of quails"),

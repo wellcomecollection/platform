@@ -6,7 +6,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -28,7 +31,8 @@ class IdMinterWorkerTest
       withLocalSnsTopic { topic =>
         withIdentifiersDatabase { dbConfig =>
           withLocalS3Bucket { bucket =>
-            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(bucket)++ dbConfig.flags
+            val flags = sqsLocalFlags(queue) ++ snsLocalFlags(topic) ++ s3LocalFlags(
+              bucket) ++ dbConfig.flags
 
             val identifiersDao = mock[IdentifiersDao]
 

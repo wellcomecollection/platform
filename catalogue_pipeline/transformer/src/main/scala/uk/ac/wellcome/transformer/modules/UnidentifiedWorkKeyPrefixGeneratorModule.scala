@@ -6,7 +6,6 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, SourcedKeyPrefixGenerator}
 
-
 object UnidentifiedWorkKeyPrefixGeneratorModule extends TwitterModule {
   @Provides
   @Singleton
@@ -14,7 +13,8 @@ object UnidentifiedWorkKeyPrefixGeneratorModule extends TwitterModule {
     new UnidentifiedWorkKeyPrefixGenerator()
 }
 
-class UnidentifiedWorkKeyPrefixGenerator extends KeyPrefixGenerator[UnidentifiedWork] {
+class UnidentifiedWorkKeyPrefixGenerator
+    extends KeyPrefixGenerator[UnidentifiedWork] {
   override def generate(obj: UnidentifiedWork): String = {
     obj.sourceIdentifier.value.reverse.slice(0, 2)
   }

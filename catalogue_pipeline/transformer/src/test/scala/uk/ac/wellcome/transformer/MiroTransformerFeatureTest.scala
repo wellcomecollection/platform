@@ -18,16 +18,16 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 class MiroTransformerFeatureTest
     extends FunSpec
-      with Matchers
-      with SQS
-      with SNS
-      with S3
-      with Messaging
-      with fixtures.Server
-      with Eventually
-      with ExtendedPatience
-      with MiroTransformableWrapper
-      with TransformableMessageUtils {
+    with Matchers
+    with SQS
+    with SNS
+    with S3
+    with Messaging
+    with fixtures.Server
+    with Eventually
+    with ExtendedPatience
+    with MiroTransformableWrapper
+    with TransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
     val miroID = "M0000001"

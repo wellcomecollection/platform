@@ -15,19 +15,20 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
-                                       idEmbedder: IdEmbedder,
-                                       writer: SNSWriter,
-                                       sqsReader: SQSReader,
-                                       messageReader: MessageReader[Json],
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
+  idEmbedder: IdEmbedder,
+  writer: SNSWriter,
+  sqsReader: SQSReader,
+  messageReader: MessageReader[Json],
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends MessageWorker[Json](sqsReader, messageReader, system, metrics) {
 
   override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"
 
-  override implicit val decoder: Decoder[Json] = Decoder.instanceTry[Json] { hCursor =>
-    Try(hCursor.value)
+  override implicit val decoder: Decoder[Json] = Decoder.instanceTry[Json] {
+    hCursor =>
+      Try(hCursor.value)
   }
 
   override def processMessage(json: Json): Future[Unit] =

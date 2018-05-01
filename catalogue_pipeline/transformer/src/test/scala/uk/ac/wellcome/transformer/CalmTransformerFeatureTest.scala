@@ -4,6 +4,11 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.CalmTransformable
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
@@ -19,15 +24,15 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 class CalmTransformerFeatureTest
     extends FunSpec
-      with Matchers
-      with SQS
-      with SNS
-      with S3
-      with Messaging
-      with fixtures.Server
-      with Eventually
-      with ExtendedPatience
-      with TransformableMessageUtils {
+    with Matchers
+    with SQS
+    with SNS
+    with S3
+    with Messaging
+    with fixtures.Server
+    with Eventually
+    with ExtendedPatience
+    with TransformableMessageUtils {
 
   it("transforms miro records and publishes the result to the given topic") {
     val calmTransformable =

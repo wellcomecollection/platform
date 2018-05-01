@@ -1,13 +1,21 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
+}
 import io.circe.{Decoder, Encoder}
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe.generic.semiauto._
-import uk.ac.wellcome.messaging.message.{MessagePointer, MessageReader, MessageWorker}
+import uk.ac.wellcome.messaging.message.{
+  MessagePointer,
+  MessageReader,
+  MessageWorker
+}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.message.{
   MessageConfig,
@@ -37,7 +45,7 @@ import scala.concurrent.duration._
 import scala.util.Success
 
 trait Messaging
-  extends Akka
+    extends Akka
     with MetricsSender
     with SQS
     with SNS
@@ -62,16 +70,16 @@ trait Messaging
   case class ExampleObject(name: String)
 
   class ExampleMessageWorker(
-                              sqsReader: SQSReader,
-                              messageReader: MessageReader[ExampleObject],
-                              actorSystem: ActorSystem,
-                              metricsSender: metrics.MetricsSender
-                            ) extends MessageWorker[ExampleObject](
-    sqsReader,
-    messageReader,
-    actorSystem,
-    metricsSender
-  ) {
+    sqsReader: SQSReader,
+    messageReader: MessageReader[ExampleObject],
+    actorSystem: ActorSystem,
+    metricsSender: metrics.MetricsSender
+  ) extends MessageWorker[ExampleObject](
+        sqsReader,
+        messageReader,
+        actorSystem,
+        metricsSender
+      ) {
 
     var calledWith: Option[ExampleObject] = None
     def hasBeenCalled: Boolean = calledWith.nonEmpty

@@ -6,7 +6,6 @@ import com.twitter.inject.TwitterModule
 import io.circe.Json
 import uk.ac.wellcome.s3.KeyPrefixGenerator
 
-
 object JsonKeyPrefixGeneratorModule extends TwitterModule {
   @Provides
   @Singleton

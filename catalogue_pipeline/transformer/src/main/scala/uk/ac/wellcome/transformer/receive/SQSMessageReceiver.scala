@@ -10,6 +10,12 @@ import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
@@ -31,18 +37,23 @@ import uk.ac.wellcome.transformer.transformers.{
 import uk.ac.wellcome.models.transformable._
 import uk.ac.wellcome.s3.S3ObjectStore
 import uk.ac.wellcome.storage.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSMessageReceiver @Inject()(messageWriter: MessageWriter[UnidentifiedWork],
-                                   s3Client: AmazonS3,
-                                   s3Config: S3Config,
-                                   metricsSender: MetricsSender)
-  extends Logging {
+class SQSMessageReceiver @Inject()(
+  messageWriter: MessageWriter[UnidentifiedWork],
+  s3Client: AmazonS3,
+  s3Config: S3Config,
+  metricsSender: MetricsSender)
+    extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
@@ -111,8 +122,11 @@ class SQSMessageReceiver @Inject()(messageWriter: MessageWriter[UnidentifiedWork
     }
   }
 
-  private def publishMessage(maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+  private def publishMessage(
+    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
     maybeWork.fold(Future.successful(())) { work =>
-      messageWriter.write(work, s"source: ${this.getClass.getSimpleName}.publishMessage")
+      messageWriter.write(
+        work,
+        s"source: ${this.getClass.getSimpleName}.publishMessage")
     }
 }
