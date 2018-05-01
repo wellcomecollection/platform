@@ -21,7 +21,7 @@ object MessageConfigModule extends TwitterModule {
   private val accessKey =
     flag[String]("aws.message.s3.accessKey", "", "AccessKey to access S3")
   private val secretKey =
-    flag[String]("aws.smessage.3.secretKey", "", "SecretKey to access S3")
+    flag[String]("aws.message.s3.secretKey", "", "SecretKey to access S3")
 
   @Singleton
   @Provides
