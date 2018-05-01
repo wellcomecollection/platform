@@ -11,17 +11,13 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.{
-  DynamoConfig,
-  SNSConfig,
-  SQSConfig,
-  SQSMessage
-}
+import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.sns.SNSWriter
-import uk.ac.wellcome.sqs.SQSReader
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table

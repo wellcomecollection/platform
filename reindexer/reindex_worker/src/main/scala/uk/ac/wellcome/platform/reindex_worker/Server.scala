@@ -10,6 +10,8 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
+import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.reindex_worker.modules.ReindexerWorkerModule
 
 object ServerMain extends Server

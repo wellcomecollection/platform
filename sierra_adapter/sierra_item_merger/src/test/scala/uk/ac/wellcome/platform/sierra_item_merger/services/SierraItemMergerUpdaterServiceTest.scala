@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.SierraTransformable
@@ -18,7 +19,7 @@ import uk.ac.wellcome.s3.{
   SourcedKeyPrefixGenerator
 }
 import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, SQS, TestWith}
+import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 

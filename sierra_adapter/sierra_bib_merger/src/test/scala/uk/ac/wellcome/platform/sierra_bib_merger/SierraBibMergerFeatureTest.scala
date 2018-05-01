@@ -9,10 +9,11 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.SourceMetadata
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.SQS.Queue
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

@@ -3,8 +3,9 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SQS}
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb
 
 import uk.ac.wellcome.dynamo._
 

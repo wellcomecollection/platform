@@ -12,7 +12,7 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao
 }
 import uk.ac.wellcome.platform.idminter.{fixtures, Server}
-import uk.ac.wellcome.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest

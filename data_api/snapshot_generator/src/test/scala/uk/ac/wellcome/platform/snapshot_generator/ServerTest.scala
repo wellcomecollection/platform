@@ -5,10 +5,11 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.FunSpec
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.SNS.Topic
-import uk.ac.wellcome.test.fixtures.SQS.Queue
-import uk.ac.wellcome.test.fixtures.{S3, SNS, SQS, TestWith}
+import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 
 class ServerTest
     extends FunSpec

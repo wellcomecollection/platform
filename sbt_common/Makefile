@@ -25,3 +25,10 @@ sbt-elasticsearch-docker_compose_up:
 
 sbt-elasticsearch-docker_compose_down:
 	$(call docker_compose_down,sbt_common/elasticsearch/docker-compose.yml)
+
+
+sbt-messaging-test:
+	$(call sbt_test,common_messaging)
+
+sbt-messaging-publish:
+	echo "Nothing to do!"

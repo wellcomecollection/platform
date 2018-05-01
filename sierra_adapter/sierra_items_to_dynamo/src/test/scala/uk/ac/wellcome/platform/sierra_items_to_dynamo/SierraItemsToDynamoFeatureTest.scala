@@ -4,20 +4,18 @@ import java.time.Instant
 
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
-import com.twitter.finatra.http.EmbeddedHttpServer
-import com.twitter.inject.server.FeatureTestMixin
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.aws.SQSMessage
-import uk.ac.wellcome.test.utils.{AmazonCloudWatchFlag, ExtendedPatience}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.dynamo._
-import io.circe.generic.extras.semiauto._
+import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecord
 }
-import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, SQS}
+import uk.ac.wellcome.test.fixtures.LocalDynamoDb
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec

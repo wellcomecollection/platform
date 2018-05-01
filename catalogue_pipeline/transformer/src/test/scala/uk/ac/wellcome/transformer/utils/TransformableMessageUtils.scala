@@ -3,15 +3,13 @@ package uk.ac.wellcome.transformer.utils
 import java.time.Instant
 
 import com.amazonaws.services.s3.AmazonS3
-import org.scalatest.Suite
+import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.models.aws.SQSMessage
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,
-  SierraTransformable,
-  Transformable
+  SierraTransformable
 }
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,

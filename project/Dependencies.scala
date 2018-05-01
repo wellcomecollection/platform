@@ -42,6 +42,7 @@ object Dependencies {
     "mysql" % "mysql-connector-java" % "6.0.6",
     "org.flywaydb" % "flyway-core" % "4.2.0"
   )
+
   val esDependencies: Seq[ModuleID] = Seq(
     "org.apache.logging.log4j" % "log4j-core" % versions.apacheLogging,
     "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
@@ -94,13 +95,18 @@ object Dependencies {
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ jacksonDependencies ++ circeDependencies
+  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ circeDependencies
 
   val pipelineModelDependencies = circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
   val commonElasticsearchDependencies = commonDependencies ++ esDependencies
+
+  // We use Circe for all our JSON serialisation, but our local SNS container
+  // returns YAML, and currently we use Jackson to parse that YAML.
+  // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
+  val commonMessagingDependencies = commonDependencies ++ jacksonDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = dynamoDependencies
 
