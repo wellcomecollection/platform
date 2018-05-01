@@ -39,8 +39,7 @@ class MessagingIntegrationTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalStackSqsQueue { queue =>
-          withLocalStackSnsTopic { topic =>
-            withLocalStackSubscription(queue, topic) { _ =>
+
               withLocalS3Bucket { bucket =>
                 val s3Config = S3Config(bucketName = bucket.name)
                 val snsConfig = SNSConfig(topicArn = topic.arn)
@@ -68,14 +67,9 @@ class MessagingIntegrationTest
                   metricsSender = metricsSender
                 )
 
-                val messageWriter = new MessageWriter[ExampleObject](
-                  messageConfig = messageConfig,
-                  snsClient = localStackSnsClient,
-                  s3Client = s3Client,
-                  keyPrefixGenerator = keyPrefixGenerator
-                )
-
-                testWith((worker, messageWriter))
+                withMessageWriter(bucket, topic, localStackSnsClient) { messageWriter =>
+                  testWith((worker, messageWriter))
+                }
               }
             }
           }

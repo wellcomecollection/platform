@@ -1,6 +1,7 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe.generic.semiauto._
@@ -123,7 +124,7 @@ trait Messaging
     }
   }
 
-  def withMessageWriter[R](bucket: Bucket, topic: Topic)(testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+  def withMessageWriter[R](bucket: Bucket, topic: Topic, writerSnsClient: AmazonSNS = snsClient)(testWith: TestWith[MessageWriter[ExampleObject], R]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageConfig(
@@ -133,7 +134,7 @@ trait Messaging
 
     val messageWriter = new MessageWriter[ExampleObject](
       messageConfig = messageConfig,
-      snsClient = snsClient,
+      snsClient = writerSnsClient,
       s3Client = s3Client,
       keyPrefixGenerator = keyPrefixGenerator
     )
