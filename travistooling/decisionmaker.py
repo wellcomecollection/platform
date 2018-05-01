@@ -51,7 +51,7 @@ def does_file_affect_build_task(path, task):
         'LICENSE',
         '.travis.yml',
         'run_travis_task.py',
-    ] or path.startswith(('misc/', 'ontologies/')):
+    ] or path.startswith(('misc/', 'ontologies/', 'data_science/scripts/')):
         raise IgnoredPath()
 
     # Some directories only affect one task.
