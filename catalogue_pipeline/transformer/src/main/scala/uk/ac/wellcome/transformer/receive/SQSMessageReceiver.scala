@@ -5,11 +5,12 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
+import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.message.MessageWriter
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SourceMetadata
+import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,

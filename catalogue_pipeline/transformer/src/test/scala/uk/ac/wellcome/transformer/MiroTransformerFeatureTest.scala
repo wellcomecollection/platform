@@ -2,7 +2,9 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.{Messaging, S3, SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
