@@ -51,11 +51,6 @@ trait Messaging
 
   case class ExampleObject(name: String)
 
-  val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-    new KeyPrefixGenerator[ExampleObject] {
-      override def generate(obj: ExampleObject): String = "/"
-    }
-
   class ExampleMessageWorker(
     sqsReader: SQSReader,
     messageReader: MessageReader[ExampleObject],
@@ -80,6 +75,11 @@ trait Messaging
       info("processMessage was called!")
     }
   }
+
+  val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
+    new KeyPrefixGenerator[ExampleObject] {
+      override def generate(obj: ExampleObject): String = "/"
+    }
 
   def withMessageReader[R](bucket: Bucket, topic: Topic)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
