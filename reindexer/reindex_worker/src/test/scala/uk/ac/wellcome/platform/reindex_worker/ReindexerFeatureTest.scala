@@ -141,7 +141,7 @@ class ReindexerFeatureTest
             eventually {
               val messages = listMessagesReceivedFromSNS(topic)
 
-              messages should have size 1
+              messages.size should be >= 1
 
               JsonUtil
                 .fromJson[CompletedReindexJob](
