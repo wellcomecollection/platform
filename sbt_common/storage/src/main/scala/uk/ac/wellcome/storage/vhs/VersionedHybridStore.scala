@@ -6,6 +6,7 @@ import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.storage.type_classes.HybridRecordEnricher
 import uk.ac.wellcome.s3.{S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._

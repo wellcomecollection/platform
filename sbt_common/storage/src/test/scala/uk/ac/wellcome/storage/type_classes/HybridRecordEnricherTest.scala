@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage.vhs
+package uk.ac.wellcome.storage.type_classes
 
 import org.scalatest.{FunSpec, Matchers}
 import shapeless.{the => sThe, _}
