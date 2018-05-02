@@ -2,7 +2,11 @@ package uk.ac.wellcome.transformer
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._

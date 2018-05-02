@@ -6,7 +6,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.platform.idminter.database.{FieldDescription, IdentifiersDao}
+import uk.ac.wellcome.platform.idminter.database.{
+  FieldDescription,
+  IdentifiersDao
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience

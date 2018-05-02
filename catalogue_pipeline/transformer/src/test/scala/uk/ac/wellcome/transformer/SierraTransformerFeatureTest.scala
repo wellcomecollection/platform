@@ -5,7 +5,11 @@ import java.time.Instant
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
@@ -54,7 +58,9 @@ class SierraTransformerFeatureTest
             val flags: Map[String, String] = Map(
               "aws.metrics.namespace" -> "sierra-transformer"
             ) ++ s3LocalFlags(storageBucket) ++ snsLocalFlags(topic) ++
-              sqsLocalFlags(queue) ++ messagingLocalFlags(messagingBucket, topic)
+              sqsLocalFlags(queue) ++ messagingLocalFlags(
+              messagingBucket,
+              topic)
 
             withServer(flags) { _ =>
               eventually {

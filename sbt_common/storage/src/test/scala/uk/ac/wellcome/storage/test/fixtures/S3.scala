@@ -36,7 +36,7 @@ trait S3 extends Logging with Eventually with Matchers with ImplicitLogging {
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
 
-  def s3LocalFlags(bucket: Bucket) =s3ClientLocalFlags ++  Map(
+  def s3LocalFlags(bucket: Bucket) = s3ClientLocalFlags ++ Map(
     "aws.s3.bucketName" -> bucket.name
   )
 

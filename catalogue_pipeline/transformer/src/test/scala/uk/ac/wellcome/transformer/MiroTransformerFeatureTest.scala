@@ -37,8 +37,7 @@ class MiroTransformerFeatureTest
                 message = createValidMiroTransformableJson(
                   MiroID = miroID,
                   MiroCollection = "foo",
-                  data =
-                    s"""{
+                  data = s"""{
                   "image_title": "$title",
                   "image_cleared": "N",
                   "image_use_restrictions": "CC-0",

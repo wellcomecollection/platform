@@ -9,7 +9,11 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier,

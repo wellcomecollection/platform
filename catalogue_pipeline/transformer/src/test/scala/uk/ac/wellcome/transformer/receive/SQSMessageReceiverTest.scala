@@ -20,7 +20,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -34,7 +38,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.duration._
 
 class SQSMessageReceiverTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with SQS
     with SNS
@@ -67,17 +71,21 @@ class SQSMessageReceiverTest
   )
 
   def withSQSMessageReceiver[R](
-                                 topic: Topic,
-                                 bucket: Bucket,
-                                 maybeSnsClient: Option[AmazonSNS] = None
-                               )(testWith: TestWith[SQSMessageReceiver, R]) = {
+    topic: Topic,
+    bucket: Bucket,
+    maybeSnsClient: Option[AmazonSNS] = None
+  )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageConfig(SNSConfig(topic.arn), s3Config)
 
     val messageWriter =
-      new MessageWriter[UnidentifiedWork](messageConfig, maybeSnsClient.getOrElse(snsClient), s3Client, new UnidentifiedWorkKeyPrefixGenerator())
+      new MessageWriter[UnidentifiedWork](
+        messageConfig,
+        maybeSnsClient.getOrElse(snsClient),
+        s3Client,
+        new UnidentifiedWorkKeyPrefixGenerator())
 
     val recordReceiver = new SQSMessageReceiver(
       messageWriter = messageWriter,
@@ -210,20 +218,19 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          withSQSMessageReceiver(topic, bucket) {
-            recordReceiver =>
-              val future = recordReceiver.receiveMessage(
-                createValidEmptySierraBibSQSMessage(
-                  id = "0101010",
-                  s3Client = s3Client,
-                  bucket = bucket
-                )
+          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(
+              createValidEmptySierraBibSQSMessage(
+                id = "0101010",
+                s3Client = s3Client,
+                bucket = bucket
               )
+            )
 
-              whenReady(future) { _ =>
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages shouldBe empty
-              }
+            whenReady(future) { _ =>
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages shouldBe empty
+            }
           }
         }
       }
@@ -286,13 +293,15 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          withSQSMessageReceiver(topic, bucket, Some(mockSnsClientFailPublishMessage)) {
-            recordReceiver =>
-              val future = recordReceiver.receiveMessage(message)
+          withSQSMessageReceiver(
+            topic,
+            bucket,
+            Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(message)
 
-              whenReady(future.failed) { x =>
-                x.getMessage should be("Failed publishing message")
-              }
+            whenReady(future.failed) { x =>
+              x.getMessage should be("Failed publishing message")
+            }
           }
         }
       }
