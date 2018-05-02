@@ -1,4 +1,4 @@
-package uk.ac.wellcome.s3
+package uk.ac.wellcome.storage.s3
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Sourced
