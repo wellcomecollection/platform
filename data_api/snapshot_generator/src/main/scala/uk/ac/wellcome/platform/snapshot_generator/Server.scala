@@ -18,6 +18,7 @@ import uk.ac.wellcome.platform.snapshot_generator.modules.{
   AkkaS3ClientModule,
   SnapshotGeneratorWorkerModule
 }
+import uk.ac.wellcome.storage.s3.S3ConfigModule
 
 object ServerMain extends Server
 

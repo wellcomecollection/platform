@@ -14,6 +14,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
 import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
+import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 
 object ServerMain extends Server
 

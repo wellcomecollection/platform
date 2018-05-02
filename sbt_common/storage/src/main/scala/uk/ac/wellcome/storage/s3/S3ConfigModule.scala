@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.modules
+package uk.ac.wellcome.storage.s3
 
 import javax.inject.Singleton
 
