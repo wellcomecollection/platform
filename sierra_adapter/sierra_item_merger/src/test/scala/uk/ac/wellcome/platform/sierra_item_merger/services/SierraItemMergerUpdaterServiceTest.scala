@@ -575,9 +575,8 @@ class SierraItemMergerUpdaterServiceTest
               List(bibId)
             )
 
-            whenReady(brokenService.update(itemRecord).failed) {
-              ex =>
-                ex shouldBe a[RuntimeException]
+            whenReady(brokenService.update(itemRecord).failed) { ex =>
+              ex shouldBe a[RuntimeException]
             }
           }
       }

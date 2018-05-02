@@ -34,7 +34,8 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val secretKey = "secret"
 
   def dynamoDbLocalEndpointFlags(table: Table, namespace: String = "") = {
-    val prefix = if (namespace != "") { s"aws.${namespace}.dynamo" } else { "aws.dynamo" }
+    val prefix =
+      if (namespace != "") { s"aws.${namespace}.dynamo" } else { "aws.dynamo" }
 
     Map(
       "aws.region" -> "localhost",
