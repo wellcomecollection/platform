@@ -7,7 +7,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.DynamoClientModule.flag
+import uk.ac.wellcome.storage.dynamo.DynamoClientModule.flag
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SQSClientModule extends TwitterModule {

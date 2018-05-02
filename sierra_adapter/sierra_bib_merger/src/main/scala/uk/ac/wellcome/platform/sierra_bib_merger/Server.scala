@@ -13,6 +13,7 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
+import uk.ac.wellcome.storage.dynamo.DynamoClientModule
 
 object ServerMain extends Server
 
