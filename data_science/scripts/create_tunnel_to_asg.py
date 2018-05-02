@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     key_path = args['--key'] or _default_ssh_key_path()
 
-    print('Using SSH key at path %r' % path)
+    print('Using SSH key at path %r' % key_path)
 
     assert os.path.exists(key_path)
 

@@ -11,8 +11,8 @@ module "compute" {
   use_spot   = 1
   spot_price = "0.4"
 
-  asg_min     = "${var.enabled ? 1 : 0}"
-  asg_desired = "1"
+  asg_min     = "0"
+  asg_desired = "${var.enabled ? 1 : 0}"
   asg_max     = "1"
 
   instance_type = "${var.instance_type}"
@@ -21,7 +21,7 @@ module "compute" {
 }
 
 data "template_file" "userdata" {
-  template = "${file("userdata.sh.tpl")}"
+  template = "${file("${path.module}/userdata.sh.tpl")}"
 
   vars {
     notebook_user   = "jupyter"
