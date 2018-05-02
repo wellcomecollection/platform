@@ -4,15 +4,20 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest._
 import io.circe.Decoder
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{S3, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  S3Config,
+  S3ObjectLocation,
+  S3ObjectStore
+}
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 

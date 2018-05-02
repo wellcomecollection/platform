@@ -8,10 +8,10 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import io.circe.generic.extras.semiauto._
 import scala.concurrent.Future
-import uk.ac.wellcome.dynamo._
 
 class SierraItemsToDynamoWorkerService @Inject()(
   reader: SQSReader,

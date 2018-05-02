@@ -9,8 +9,7 @@ import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.duration._

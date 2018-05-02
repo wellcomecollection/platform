@@ -32,3 +32,10 @@ sbt-messaging-test:
 
 sbt-messaging-publish:
 	echo "Nothing to do!"
+
+
+sbt-storage-test:
+	$(call sbt_test,common_storage)
+
+sbt-storage-publish:
+	echo "Nothing to do!"

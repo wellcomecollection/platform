@@ -15,7 +15,8 @@ import com.amazonaws.auth.{
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.{AWSConfig, S3Config}
+import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.storage.s3.S3Config
 
 object AkkaS3ClientModule extends TwitterModule {
   def akkaS3Settings(credentialsProvider: AWSCredentialsProvider,

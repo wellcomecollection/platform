@@ -15,9 +15,9 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 trait TransformableMessageUtils {
   def createValidCalmTramsformableJson(RecordID: String,

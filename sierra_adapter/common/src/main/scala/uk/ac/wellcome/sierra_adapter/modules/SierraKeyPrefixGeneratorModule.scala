@@ -5,7 +5,10 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, SourcedKeyPrefixGenerator}
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  SourcedKeyPrefixGenerator
+}
 
 object SierraKeyPrefixGeneratorModule extends TwitterModule {
 

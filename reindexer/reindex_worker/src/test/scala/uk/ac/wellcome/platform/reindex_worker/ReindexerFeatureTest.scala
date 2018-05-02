@@ -13,13 +13,13 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConversions._
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 case class TestRecord(
   id: String,

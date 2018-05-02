@@ -7,11 +7,10 @@ import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import uk.ac.wellcome.models.aws.S3Config
 
 import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{blocking, Future}

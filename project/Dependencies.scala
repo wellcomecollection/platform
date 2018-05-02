@@ -108,7 +108,9 @@ object Dependencies {
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
   val commonMessagingDependencies = commonDependencies ++ jacksonDependencies
 
-  val sierraAdapterCommonDependencies: Seq[ModuleID] = dynamoDependencies
+  val commonStorageDependencies = commonDependencies
+
+  val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 
   val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 

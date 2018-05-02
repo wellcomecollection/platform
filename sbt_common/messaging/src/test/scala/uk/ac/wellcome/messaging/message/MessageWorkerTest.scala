@@ -7,8 +7,8 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.s3.S3ObjectLocation
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future

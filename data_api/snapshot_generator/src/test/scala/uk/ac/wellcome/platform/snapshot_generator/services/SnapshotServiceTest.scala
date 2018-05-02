@@ -23,8 +23,9 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
   SnapshotJob
 }
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
-import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.versions.ApiVersions
 

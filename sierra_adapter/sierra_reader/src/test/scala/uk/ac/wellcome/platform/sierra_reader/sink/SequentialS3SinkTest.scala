@@ -9,9 +9,10 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
-import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future

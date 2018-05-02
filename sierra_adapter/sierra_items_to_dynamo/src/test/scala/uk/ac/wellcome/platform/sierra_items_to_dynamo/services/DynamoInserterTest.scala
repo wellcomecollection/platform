@@ -12,12 +12,16 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.type_classes.{
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 
 import scala.concurrent.Future
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.type_classes.{IdGetter, VersionGetter, VersionUpdater}
 
 class DynamoInserterTest
     extends FunSpec

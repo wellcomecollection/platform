@@ -6,7 +6,7 @@ import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
 
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

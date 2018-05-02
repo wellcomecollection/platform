@@ -5,9 +5,8 @@ import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb
-
-import uk.ac.wellcome.dynamo._
+import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 class ServerTest
     extends FunSpec
