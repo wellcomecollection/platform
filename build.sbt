@@ -50,6 +50,9 @@ lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging"
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
+lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
+  .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_display % "compile->compile;test->test")
