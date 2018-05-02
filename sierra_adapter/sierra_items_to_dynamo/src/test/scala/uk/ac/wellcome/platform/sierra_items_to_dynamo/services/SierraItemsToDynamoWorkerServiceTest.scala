@@ -12,7 +12,6 @@ import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecord
@@ -26,6 +25,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table

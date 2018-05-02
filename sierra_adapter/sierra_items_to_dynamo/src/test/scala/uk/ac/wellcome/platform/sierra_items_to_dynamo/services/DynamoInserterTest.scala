@@ -12,8 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.dynamo._
-import uk.ac.wellcome.storage.dynamo.UpdateExpressionGenerator
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 
 import scala.concurrent.Future

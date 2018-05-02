@@ -27,7 +27,7 @@ class VersionedHybridStoreTest
     with ExtendedPatience
     with LocalVersionedHybridStore {
 
-  import uk.ac.wellcome.dynamo._
+  import uk.ac.wellcome.storage.dynamo._
 
   def withFixtures[R] =
     withLocalS3Bucket[R] and
