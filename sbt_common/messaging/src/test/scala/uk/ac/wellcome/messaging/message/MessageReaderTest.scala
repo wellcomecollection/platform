@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest._
 import io.circe.Decoder
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{S3, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 import com.amazonaws.services.sqs.model.Message
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.exceptions.GracefulFailureException

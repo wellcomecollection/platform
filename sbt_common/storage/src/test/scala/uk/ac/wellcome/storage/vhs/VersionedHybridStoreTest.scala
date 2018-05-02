@@ -7,6 +7,7 @@ import uk.ac.wellcome.models.{Id, Sourced, Versioned}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 import com.gu.scanamo.syntax._
@@ -152,7 +153,7 @@ class VersionedHybridStoreTest
 
   it("does not allow transformation to a record with a different id") {
     withFixtures {
-      case (bucketName, _, hybridStore) =>
+      case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "8934",
           content = "Five fishing flinging flint"
