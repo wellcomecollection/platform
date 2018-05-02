@@ -441,7 +441,7 @@
    *  },
    */
 
-   /* Populate wwork:publicationEvents 260
+   /* Populate wwork:productionEvents 260
    * 
    * 1. For bibliographic records where "260" is populated
    * 2. Populate "places" from subfield "a" and type as "Place".
@@ -453,7 +453,7 @@
    *
    * Example:
    *
-   *  "publicationEvents": [
+   *  "productionEvents": [
    *    {
    *      "places": [
    *        {
@@ -477,7 +477,7 @@
    *          "type": "Agent"
    *        }
    *      ],
-   *      "type": "PublicationEvent"
+   *      "type": "ProductionEvent"
    *    },
    *    {
    *      "places": [
@@ -502,13 +502,13 @@
    *          "type": "Agent"
    *        }
    *      ],
-   *      "type": "PublicationEvent"
+   *      "type": "ProductionEvent"
    *    }
    *  ]
    *
    */
 
-   /* Populate wwork:publicationEvents 264
+   /* Populate wwork:productionEvents 264
    * 
    * 1. For bibliographic records where "264" is populated
    * 2. Populate "places" from subfield "a" and type as "Place".
@@ -518,7 +518,7 @@
    *
    * Example:
    *
-   *  "publicationEvents": [
+   *  "productionEvents": [
    *    {
    *      "places": [
    *        {
@@ -542,7 +542,7 @@
    *          "type": "Agent"
    *        }
    *      ],
-   *      "type": "PublicationEvent"
+   *      "type": "ProductionEvent"
    *    },
    *    {
    *      "places": [
@@ -567,7 +567,7 @@
    *          "type": "Agent"
    *        }
    *      ],
-   *      "type": "PublicationEvent"
+   *      "type": "ProductionEvent"
    *    }
    *  ]
    *
