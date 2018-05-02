@@ -32,8 +32,9 @@ object DynamoClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey(), secretKey())))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(accessKey(), secretKey())))
         .withEndpointConfiguration(
           new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
         .build()
