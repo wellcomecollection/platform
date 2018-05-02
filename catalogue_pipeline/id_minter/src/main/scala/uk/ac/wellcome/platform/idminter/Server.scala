@@ -4,12 +4,13 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule, SQSReaderModule}
 import uk.ac.wellcome.platform.idminter.modules._
+import uk.ac.wellcome.storage.s3.S3ClientModule
 
 object ServerMain extends Server
 

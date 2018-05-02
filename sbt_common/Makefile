@@ -45,3 +45,9 @@ sbt-storage-test:
 
 sbt-storage-publish:
 	echo "Nothing to do!"
+
+sbt-storage-docker_compose_up:
+	$(call docker_compose_up,sbt_common/storage/docker-compose.yml)
+
+sbt-storage-docker_compose_down:
+	$(call docker_compose_down,sbt_common/storage/docker-compose.yml)

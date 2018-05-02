@@ -1,10 +1,10 @@
 package uk.ac.wellcome.transformer.modules
 
-import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import javax.inject.Singleton
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, SourcedKeyPrefixGenerator}
+import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 
 object UnidentifiedWorkKeyPrefixGeneratorModule extends TwitterModule {
   @Provides

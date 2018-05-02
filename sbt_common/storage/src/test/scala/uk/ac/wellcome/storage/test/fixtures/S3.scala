@@ -9,8 +9,6 @@ import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.message.MessagePointer
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3
 
 class ServerTest
     extends FunSpec

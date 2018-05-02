@@ -21,25 +21,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
-import uk.ac.wellcome.s3.S3ObjectStore
-import uk.ac.wellcome.sns.{PublishAttempt, SNSWriter}
-import uk.ac.wellcome.test.fixtures.{Messaging, S3, SNS, SQS, TestWith}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{S3, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils

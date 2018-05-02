@@ -1,10 +1,10 @@
 package uk.ac.wellcome.platform.idminter.modules
 
-import javax.inject.Singleton
-import com.google.inject.{Inject, Provides}
+import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import io.circe.Json
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import javax.inject.Singleton
+import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 
 object JsonKeyPrefixGeneratorModule extends TwitterModule {
   @Provides

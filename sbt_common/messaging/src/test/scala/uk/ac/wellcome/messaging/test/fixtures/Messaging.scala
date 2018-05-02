@@ -1,41 +1,19 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.sns.model.{
-  SubscribeRequest,
-  SubscribeResult,
-  UnsubscribeRequest
-}
-import io.circe.{Decoder, Encoder}
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
-import io.circe.Decoder
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
+import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto._
-import uk.ac.wellcome.messaging.message.{
-  MessagePointer,
-  MessageReader,
-  MessageWorker
-}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.message.{
-  MessageConfig,
-  MessageReader,
-  MessageWorker,
-  MessageWriter
-}
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.message._
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics
-import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.models.aws.{S3Config, SQSConfig}
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
