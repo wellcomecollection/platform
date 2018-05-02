@@ -11,6 +11,7 @@ import org.scalatest.concurrent.Eventually
 
 import scala.util.Random
 import uk.ac.wellcome.models.{Id, Versioned}
+import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
 

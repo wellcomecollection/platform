@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.type_classes
 import org.scalatest.{FunSpec, Matchers}
 import shapeless.{the => sThe, _}
 import shapeless.syntax.singleton._
+import uk.ac.wellcome.storage.vhs.HybridRecord
 
 class HybridRecordEnricherTest extends FunSpec with Matchers {
 

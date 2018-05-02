@@ -8,6 +8,7 @@ import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
+import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
 import scala.util.Random
