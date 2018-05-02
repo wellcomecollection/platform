@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -17,9 +17,7 @@ import com.gu.scanamo.DynamoFormat
 import scala.collection.JavaConversions._
 
 object LocalDynamoDb {
-
   case class Table(name: String, index: String)
-
 }
 
 trait LocalDynamoDb[T <: Versioned with Id]

@@ -15,7 +15,8 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraRecord
 }
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec

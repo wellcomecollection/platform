@@ -17,9 +17,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

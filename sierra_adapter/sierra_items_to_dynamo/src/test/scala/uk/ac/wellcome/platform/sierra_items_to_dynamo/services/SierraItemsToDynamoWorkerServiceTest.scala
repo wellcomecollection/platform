@@ -26,9 +26,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.duration._
 

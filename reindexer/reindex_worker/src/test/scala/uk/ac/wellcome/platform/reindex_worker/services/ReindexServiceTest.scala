@@ -12,10 +12,10 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
-import uk.ac.wellcome.test.fixtures.{Akka, LocalDynamoDb, TestWith}
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.concurrent.duration._
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 class ReindexServiceTest
     extends FunSpec

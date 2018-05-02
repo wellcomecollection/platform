@@ -16,12 +16,12 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.models.{Id, Versioned}
 import shapeless.syntax.singleton._
 import shapeless.record._
 import shapeless.{Id => ShapelessId, _}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
