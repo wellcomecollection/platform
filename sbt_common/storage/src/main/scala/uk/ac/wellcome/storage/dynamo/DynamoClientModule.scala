@@ -25,25 +25,17 @@ object DynamoClientModule extends TwitterModule {
   @Singleton
   @Provides
   def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB = {
-    val standardDynamoDBClientBuilder = AmazonDynamoDBClientBuilder.standard
-    createAwsClient(awsConfig, standardDynamoDBClientBuilder)
-  }
-
-  private def createAwsClient[T <: AwsClientBuilder[_, _], J](
-    awsConfig: AWSConfig,
-    awsClientBuilder: AwsClientBuilder[T, J]): J = {
-    if (dynamoDbEndpoint().isEmpty) {
-      awsClientBuilder
-        .setRegion(awsConfig.region)
-      awsClientBuilder.build()
-    } else {
-      awsClientBuilder
-        .setEndpointConfiguration(
-          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
-      awsClientBuilder.withCredentials(
-        new AWSStaticCredentialsProvider(
+    val standardClient = AmazonDynamoDBClientBuilder.standard
+    if (dynamoDbEndpoint().isEmpty)
+      standardClient
+        .withRegion(awsConfig.region)
+        .build()
+    else
+      standardClient
+        .withCredentials(new AWSStaticCredentialsProvider(
           new BasicAWSCredentials(accessKey(), secretKey())))
-      awsClientBuilder.build()
-    }
+        .withEndpointConfiguration(
+          new EndpointConfiguration(dynamoDbEndpoint(), awsConfig.region))
+        .build()
   }
 }
