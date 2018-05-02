@@ -1,4 +1,4 @@
-package uk.ac.wellcome.dynamo
+package uk.ac.wellcome.storage.dynamo
 
 import java.time.Instant
 

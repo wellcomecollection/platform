@@ -1,4 +1,4 @@
-package uk.ac.wellcome.dynamo
+package uk.ac.wellcome.storage.dynamo
 
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.update.UpdateExpression
