@@ -15,7 +15,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.models.aws.DynamoConfig
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.models.{Id, Versioned}
 import shapeless.syntax.singleton._
 import shapeless.record._
