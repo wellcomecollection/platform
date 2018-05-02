@@ -8,8 +8,8 @@ import com.gu.scanamo.query.{KeyEquals, UniqueKey}
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.storage.type_classes.IdGetter
-import uk.ac.wellcome.type_classes.{VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{IdGetter, VersionGetter}
+import uk.ac.wellcome.type_classes.VersionUpdater
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
