@@ -3,48 +3,41 @@
 import sys
 
 
-DATA_SCIENCE_ASG_TAGS = {
-    'name': 'jupyter',
-}
-
-
-def discover_data_science_asg(asg_client):
+def discover_asg(asg_client, tag_name):
     """
-    Return data about the first autoscaling group whose tags exactly match
-    the supplied input.
+    Return data about the first autoscaling group whose tag "name" matches
+    the supplied tag_name.
     """
     # This API is paginated, but for now we assume we have less than 100 ASGs
     # to check!
     resp = asg_client.describe_auto_scaling_groups(MaxRecords=100)
 
+    # The structure of the response is a little awkward.  It's a list of
+    # entries of the form:
+    #
+    #   {'Key': '<KEY>',
+    #    'PropagateAtLaunch': (True|False),
+    #    'ResourceId': '<RESOURCE_ID>',
+    #    'ResourceType': 'auto-scaling-group',
+    #    'Value': '<VALUE>'}]
+    #
+    # We only care about the tag values, so we extract them into a
+    # Python dict.
     for asg_data in resp['AutoScalingGroups']:
-
-        # The structure of the response is a little awkward.  It's a list of
-        # entries of the form:
-        #
-        #   {'Key': '<KEY>',
-        #    'PropagateAtLaunch': (True|False),
-        #    'ResourceId': '<RESOURCE_ID>',
-        #    'ResourceType': 'auto-scaling-group',
-        #    'Value': '<VALUE>'}]
-        #
-        # We only care about the tag values, so we extract them into a
-        # Python dict.
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
-        if actual_tags == DATA_SCIENCE_ASG_TAGS:
+        if actual_tags.get('name') == tag_name:
             return asg_data
 
-    else:
-        sys.exit("Can't find an ASG with tags %r!" % DATA_SCIENCE_ASG_TAGS)
+    sys.exit("Can't find an ASG with name %r!" % tag_name)
 
 
-def discover_asg_name(asg_client):
+def discover_asg_name(asg_client, tag_name):
     """
     Returns the name of the first autoscaling group whose tags exactly match
     the supplied input.
     """
-    asg_data = discover_data_science_asg(asg_client=asg_client)
+    asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
     return asg_data['AutoScalingGroupName']
 
 
