@@ -2,7 +2,6 @@ package uk.ac.wellcome.messaging.message
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.storage.s3.S3ObjectLocation

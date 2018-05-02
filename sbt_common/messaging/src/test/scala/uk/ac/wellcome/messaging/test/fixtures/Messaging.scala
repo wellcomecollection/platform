@@ -7,7 +7,6 @@ import com.amazonaws.services.sns.model.{
   SubscribeResult,
   UnsubscribeRequest
 }
-import io.circe.generic.semiauto._
 import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
@@ -33,6 +32,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Success
+
 
 trait Messaging
     extends Akka
