@@ -13,7 +13,7 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.reindex_worker.modules.ReindexerWorkerModule
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
+import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
 
 object ServerMain extends Server
 
