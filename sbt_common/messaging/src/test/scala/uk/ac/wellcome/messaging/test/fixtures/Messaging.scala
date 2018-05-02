@@ -67,6 +67,11 @@ trait Messaging
       }
     )
 
+  def messagingLocalFlags(bucket: Bucket, topic: Topic) = Map(
+    "aws.message.sns.topic.arn" -> topic.arn,
+    "aws.message.s3.bucketName" -> bucket.name
+  ) ++ s3ClientLocalFlags
+
   case class ExampleObject(name: String)
 
   class ExampleMessageWorker(

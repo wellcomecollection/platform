@@ -33,47 +33,50 @@ class MiroTransformerFeatureTest
     val miroID = "M0000001"
     val title = "A guide for a giraffe"
 
-    withLocalSnsTopic { topicArn =>
+    withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { bucket =>
-          val miroHybridRecordMessage =
-            hybridRecordSqsMessage(
-              message = createValidMiroTransformableJson(
-                MiroID = miroID,
-                MiroCollection = "foo",
-                data = s"""{
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { messageBucket =>
+            val miroHybridRecordMessage =
+              hybridRecordSqsMessage(
+                message = createValidMiroTransformableJson(
+                  MiroID = miroID,
+                  MiroCollection = "foo",
+                  data =
+                    s"""{
                   "image_title": "$title",
                   "image_cleared": "N",
                   "image_use_restrictions": "CC-0",
                   "image_copyright_cleared": "N",
                   "image_tech_file_size": ["100000"]
                 }"""
-              ),
-              sourceName = "miro",
-              s3Client = s3Client,
-              bucket = bucket
+                ),
+                sourceName = "miro",
+                s3Client = s3Client,
+                bucket = storageBucket
+              )
+
+            sqsClient.sendMessage(
+              queue.url,
+              JsonUtil.toJson(miroHybridRecordMessage).get
             )
 
-          sqsClient.sendMessage(
-            queue.url,
-            JsonUtil.toJson(miroHybridRecordMessage).get
-          )
+            val flags: Map[String, String] = Map(
+              "aws.metrics.namespace" -> "sierra-transformer"
+            ) ++ s3LocalFlags(storageBucket) ++ snsLocalFlags(topic) ++
+              sqsLocalFlags(queue) ++ messagingLocalFlags(messageBucket, topic)
 
-          val flags: Map[String, String] = Map(
-            "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queue)
+            withServer(flags) { _ =>
+              eventually {
+                val snsMessages = listMessagesReceivedFromSNS(topic)
+                snsMessages.length shouldBe >=(1)
 
-          withServer(flags) { _ =>
-            eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages.length shouldBe >=(1)
+                snsMessages.map { snsMessage =>
+                  val actualWork = get[UnidentifiedWork](snsMessage)
 
-              snsMessages.map { snsMessage =>
-                val actualWork = get[UnidentifiedWork](snsMessage)
-
-                actualWork.identifiers.head.value shouldBe miroID
-                actualWork.title shouldBe Some(title)
+                  actualWork.identifiers.head.value shouldBe miroID
+                  actualWork.title shouldBe Some(title)
+                }
               }
             }
           }

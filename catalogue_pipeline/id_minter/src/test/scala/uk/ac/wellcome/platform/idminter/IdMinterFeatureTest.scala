@@ -62,7 +62,7 @@ class IdMinterFeatureTest
               sqsLocalFlags(queue) ++
                 snsLocalFlags(topic) ++
                 dbConfig.flags ++
-                s3LocalFlags(bucket)
+                messagingLocalFlags(bucket, topic)
 
             withServer(flags) { _ =>
               eventuallyTableExists(dbConfig)
@@ -124,7 +124,7 @@ class IdMinterFeatureTest
               sqsLocalFlags(queue) ++
                 snsLocalFlags(topic) ++
                 dbConfig.flags ++
-                s3LocalFlags(bucket)
+                messagingLocalFlags(bucket, topic)
 
             withServer(flags) { _ =>
               sqsClient.sendMessage(queue.url, "not a json string")

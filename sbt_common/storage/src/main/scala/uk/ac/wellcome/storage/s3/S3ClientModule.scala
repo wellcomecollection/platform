@@ -1,7 +1,6 @@
 package uk.ac.wellcome.storage.s3
 
 import javax.inject.Singleton
-
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}

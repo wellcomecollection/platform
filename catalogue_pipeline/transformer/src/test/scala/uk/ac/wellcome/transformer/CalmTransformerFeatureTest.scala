@@ -43,44 +43,46 @@ class CalmTransformerFeatureTest
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""")
 
-    withLocalSnsTopic { topicArn =>
+    withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { bucket =>
-          val calmHybridRecordMessage = hybridRecordSqsMessage(
-            message = JsonUtil.toJson(calmTransformable).get,
-            sourceName = "calm",
-            version = 1,
-            s3Client = s3Client,
-            bucket = bucket
-          )
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { messageBucket =>
+            val calmHybridRecordMessage = hybridRecordSqsMessage(
+              message = JsonUtil.toJson(calmTransformable).get,
+              sourceName = "calm",
+              version = 1,
+              s3Client = s3Client,
+              bucket = storageBucket
+            )
 
-          sqsClient.sendMessage(
-            queue.url,
-            JsonUtil.toJson(calmHybridRecordMessage).get
-          )
+            sqsClient.sendMessage(
+              queue.url,
+              JsonUtil.toJson(calmHybridRecordMessage).get
+            )
 
-          val flags: Map[String, String] = Map(
-            "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queue)
+            val flags: Map[String, String] = Map(
+              "aws.metrics.namespace" -> "sierra-transformer"
+            ) ++ s3LocalFlags(storageBucket) ++ snsLocalFlags(topic) ++
+              sqsLocalFlags(queue) ++ messagingLocalFlags(messageBucket, topic)
 
-          withServer(flags) { _ =>
-            eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages.size should be >= 1
+            withServer(flags) { _ =>
+              eventually {
+                val snsMessages = listMessagesReceivedFromSNS(topic)
+                snsMessages.size should be >= 1
 
-              val sourceIdentifier = SourceIdentifier(
-                identifierScheme = IdentifierSchemes.calmPlaceholder,
-                ontologyType = "Work",
-                value = "value"
-              )
+                val sourceIdentifier = SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.calmPlaceholder,
+                  ontologyType = "Work",
+                  value = "value"
+                )
 
-              snsMessages.map { snsMessage =>
-                val actualWork = get[UnidentifiedWork](snsMessage)
+                snsMessages.map { snsMessage =>
+                  val actualWork = get[UnidentifiedWork](snsMessage)
 
-                actualWork.sourceIdentifier shouldBe sourceIdentifier
-                actualWork.title shouldBe Some("placeholder title")
-                actualWork.identifiers shouldBe List(sourceIdentifier)
+                  actualWork.sourceIdentifier shouldBe sourceIdentifier
+                  actualWork.title shouldBe Some("placeholder title")
+                  actualWork.identifiers shouldBe List(sourceIdentifier)
+                }
               }
             }
           }

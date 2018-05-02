@@ -4,21 +4,23 @@ import java.time.Instant
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import org.mockito.Matchers.{any, anyString}
-import org.mockito.Mockito
-import org.mockito.Mockito.{verify, when}
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sns.model.PublishRequest
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.MessageWriter
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.message.{MessageConfig, MessageWriter}
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier,
@@ -44,12 +46,10 @@ import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SQSMessageReceiverTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with SQS
     with SNS
@@ -82,24 +82,17 @@ class SQSMessageReceiverTest
   )
 
   def withSQSMessageReceiver[R](
-    topic: Topic,
-    bucket: Bucket,
-    maybeSnsWriter: Option[SNSWriter] = None
-  )(testWith: TestWith[SQSMessageReceiver, R]) = {
+                                 topic: Topic,
+                                 bucket: Bucket,
+                                 maybeSnsClient: Option[AmazonSNS] = None
+                               )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
     val s3Config = S3Config(bucket.name)
 
-    val s3ObjectStore =
-      new S3ObjectStore[UnidentifiedWork](
-        s3Client,
-        s3Config,
-        new UnidentifiedWorkKeyPrefixGenerator())
-
-    val snsWriter =
-      maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topic.arn)))
+    val messageConfig = MessageConfig(SNSConfig(topic.arn), s3Config)
 
     val messageWriter =
-      new MessageWriter[UnidentifiedWork](snsWriter, s3Config, s3ObjectStore)
+      new MessageWriter[UnidentifiedWork](messageConfig, maybeSnsClient.getOrElse(snsClient), s3Client, new UnidentifiedWorkKeyPrefixGenerator())
 
     val recordReceiver = new SQSMessageReceiver(
       messageWriter = messageWriter,
@@ -232,9 +225,7 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val snsWriter = mockSNSWriter
-
-          withSQSMessageReceiver(topic, bucket, Some(snsWriter)) {
+          withSQSMessageReceiver(topic, bucket) {
             recordReceiver =>
               val future = recordReceiver.receiveMessage(
                 createValidEmptySierraBibSQSMessage(
@@ -244,9 +235,9 @@ class SQSMessageReceiverTest
                 )
               )
 
-              whenReady(future) { x =>
-                verify(snsWriter, Mockito.never())
-                  .writeMessage(anyString, any[String])
+              whenReady(future) { _ =>
+                val snsMessages = listMessagesReceivedFromSNS(topic)
+                snsMessages shouldBe empty
               }
           }
         }
@@ -310,9 +301,7 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          val snsWriter = mockFailPublishMessage
-
-          withSQSMessageReceiver(topic, bucket, Some(snsWriter)) {
+          withSQSMessageReceiver(topic, bucket, Some(mockSnsClientFailPublishMessage)) {
             recordReceiver =>
               val future = recordReceiver.receiveMessage(message)
 
@@ -325,18 +314,10 @@ class SQSMessageReceiverTest
     }
   }
 
-  private def mockSNSWriter = {
-    val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(Future { PublishAttempt(Right("1234")) })
-    mockSNS
-  }
-
-  private def mockFailPublishMessage = {
-    val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(
-        Future.failed(new RuntimeException("Failed publishing message")))
-    mockSNS
+  private def mockSnsClientFailPublishMessage = {
+    val mockSNSClient = mock[AmazonSNS]
+    when(mockSNSClient.publish(any[PublishRequest]))
+      .thenThrow(new RuntimeException("Failed publishing message"))
+    mockSNSClient
   }
 }

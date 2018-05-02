@@ -38,12 +38,15 @@ trait S3 extends Logging with Eventually with Matchers with ImplicitLogging {
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
 
-  def s3LocalFlags(bucket: Bucket) = Map(
+  def s3LocalFlags(bucket: Bucket) =s3ClientLocalFlags ++  Map(
+    "aws.s3.bucketName" -> bucket.name
+  )
+
+  def s3ClientLocalFlags = Map(
     "aws.s3.endpoint" -> localS3EndpointUrl,
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
-    "aws.region" -> "localhost",
-    "aws.s3.bucketName" -> bucket.name
+    "aws.region" -> "localhost"
   )
 
   private val credentials = new AWSStaticCredentialsProvider(
