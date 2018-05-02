@@ -8,7 +8,7 @@ import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger
-import uk.ac.wellcome.storage.VersionedHybridStore
+import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.utils.JsonUtil._

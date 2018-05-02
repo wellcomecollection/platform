@@ -8,7 +8,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader}
 import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.storage.VersionedHybridStore
+import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraBibMergerWorkerServiceTest

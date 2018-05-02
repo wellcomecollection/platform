@@ -4,7 +4,7 @@ import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.storage.HybridRecord
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.fixtures.{LocalDynamoDb, S3}
 
 class ServerTest

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.storage.test.fixtures
 
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
@@ -6,7 +6,7 @@ import io.circe.Encoder
 import org.scalatest.{Assertion, Matchers}
 import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.models.aws.{DynamoConfig, S3Config}
-import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.test.utils.JsonTestUtil

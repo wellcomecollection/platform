@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage
+package uk.ac.wellcome.storage.vhs
 
 import org.scalatest.{FunSpec, Matchers}
 import shapeless.{the => sThe, _}

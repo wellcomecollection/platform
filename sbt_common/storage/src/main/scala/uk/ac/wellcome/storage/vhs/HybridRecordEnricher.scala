@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage
+package uk.ac.wellcome.storage.vhs
 
 import shapeless.ops.hlist.{Collect, Prepend, Zip}
 import shapeless.{Id => ShapelessId, _}

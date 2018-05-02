@@ -18,8 +18,9 @@ import uk.ac.wellcome.s3.{
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }
-import uk.ac.wellcome.storage.{HybridRecord, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, TestWith}
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 

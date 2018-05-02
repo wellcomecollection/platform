@@ -9,7 +9,8 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.test.fixtures.{LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerFeatureTest

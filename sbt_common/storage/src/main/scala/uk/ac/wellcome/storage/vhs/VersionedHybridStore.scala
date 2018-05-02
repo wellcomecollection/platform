@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage
+package uk.ac.wellcome.storage.vhs
 
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat

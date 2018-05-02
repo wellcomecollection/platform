@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage
+package uk.ac.wellcome.storage.vhs
 
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.ScalaFutures

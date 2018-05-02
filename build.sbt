@@ -71,6 +71,7 @@ lazy val ingestor = doServiceSetup(project, "catalogue_pipeline/ingestor")
 lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.transformerDependencies)
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
@@ -99,10 +100,12 @@ lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/s
 
 lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraBibMergerDepedencies)
 
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraItemMergerDependencies)
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
