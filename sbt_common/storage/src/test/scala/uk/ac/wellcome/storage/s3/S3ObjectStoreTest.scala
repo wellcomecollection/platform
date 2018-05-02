@@ -1,4 +1,4 @@
-package uk.ac.wellcome.s3
+package uk.ac.wellcome.storage.s3
 
 import java.net.URI
 

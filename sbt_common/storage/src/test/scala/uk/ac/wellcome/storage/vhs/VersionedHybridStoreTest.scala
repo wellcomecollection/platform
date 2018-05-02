@@ -5,7 +5,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.models.{Id, Sourced, Versioned}
-import uk.ac.wellcome.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
 import com.gu.scanamo.syntax._

@@ -12,12 +12,12 @@ import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.s3.{
+import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }
-import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith

@@ -17,7 +17,7 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.s3.S3ObjectStore
+import uk.ac.wellcome.storage.s3.S3ObjectStore
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.transformer.transformers.{
   CalmTransformableTransformer,
