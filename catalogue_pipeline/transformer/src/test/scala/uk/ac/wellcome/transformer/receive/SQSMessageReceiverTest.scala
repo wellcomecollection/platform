@@ -16,7 +16,6 @@ import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.{
@@ -24,6 +23,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith

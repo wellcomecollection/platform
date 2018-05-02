@@ -10,9 +10,9 @@ import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
+  S3Config,
   S3ObjectLocation,
   S3ObjectStore
 }

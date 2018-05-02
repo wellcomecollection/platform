@@ -8,16 +8,16 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{Akka, S3, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 

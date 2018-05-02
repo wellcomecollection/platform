@@ -8,8 +8,8 @@ import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 

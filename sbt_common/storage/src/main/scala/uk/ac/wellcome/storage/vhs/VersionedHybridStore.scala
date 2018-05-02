@@ -4,9 +4,8 @@ import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models._
-import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
   IdGetter,
