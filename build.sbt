@@ -119,6 +119,7 @@ lazy val root = (project in file("."))
     common_display,
     common_elasticsearch,
     common_messaging,
+    common_storage,
     api,
     ingestor,
     transformer,
