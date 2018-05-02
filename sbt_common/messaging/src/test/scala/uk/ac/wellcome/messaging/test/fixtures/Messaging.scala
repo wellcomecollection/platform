@@ -18,8 +18,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.metrics
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._

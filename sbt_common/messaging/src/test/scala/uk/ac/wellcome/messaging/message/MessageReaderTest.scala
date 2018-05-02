@@ -16,7 +16,8 @@ import uk.ac.wellcome.storage.s3.{
   S3ObjectLocation,
   S3ObjectStore
 }
-import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 

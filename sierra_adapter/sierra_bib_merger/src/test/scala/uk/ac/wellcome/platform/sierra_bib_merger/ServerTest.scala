@@ -4,9 +4,8 @@ import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.S3
 
 class ServerTest
     extends FunSpec

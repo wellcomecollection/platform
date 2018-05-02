@@ -9,11 +9,10 @@ import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.VersionedDao
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]

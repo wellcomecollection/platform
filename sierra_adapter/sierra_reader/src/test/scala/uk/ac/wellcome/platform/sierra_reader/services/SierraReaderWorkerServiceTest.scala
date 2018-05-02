@@ -18,7 +18,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
-import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion

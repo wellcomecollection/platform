@@ -9,10 +9,11 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.aws.S3Config
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
-import uk.ac.wellcome.test.fixtures.{S3, TestWith}
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 
 class WindowManagerTest
     extends FunSpec

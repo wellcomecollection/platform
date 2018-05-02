@@ -22,7 +22,8 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
   SnapshotJob
 }
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
-import uk.ac.wellcome.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._

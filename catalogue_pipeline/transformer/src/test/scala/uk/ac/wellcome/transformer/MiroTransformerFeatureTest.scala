@@ -6,8 +6,8 @@ import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
