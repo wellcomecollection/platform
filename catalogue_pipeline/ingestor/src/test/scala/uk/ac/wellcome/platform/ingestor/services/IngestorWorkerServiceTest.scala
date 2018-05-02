@@ -14,18 +14,11 @@ import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.metrics.MetricsSender
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
-import uk.ac.wellcome.models.aws.SQSConfig
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
-import uk.ac.wellcome.s3.KeyPrefixGenerator
-import uk.ac.wellcome.sqs.SQSReader
-import uk.ac.wellcome.test.fixtures.{Messaging, S3, SQS}
+import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
+import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 import scala.concurrent.duration._
@@ -119,30 +112,32 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, identifiedWorkKeyPrefixGenerator) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+        withLocalSnsTopic { topic =>
+          withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-              service.processMessage(work)
+                service.processMessage(work)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV1,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV1,
+                  itemType = itemType)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV2,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV2,
+                  itemType = itemType)
+              }
             }
           }
         }
@@ -162,7 +157,8 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, identifiedWorkKeyPrefixGenerator) { messageReader =>
+        withLocalSnsTopic { topic =>
+        withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
               val service = new IngestorWorkerService(
@@ -189,6 +185,7 @@ class IngestorWorkerServiceTest
             }
           }
         }
+        }
       }
     }
   }
@@ -206,24 +203,26 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, identifiedWorkKeyPrefixGenerator) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-              indexNameV1,
-              indexNameV2,
-              identifiedWorkIndexer = workIndexer,
-              sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-              messageReader = messageReader,
-              system = actorSystem,
-              metrics = metricsSender
-            )
+        withLocalSnsTopic { topic =>
+          withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-              val future = service.processMessage(work)
+                val future = service.processMessage(work)
 
-              whenReady(future.failed) { ex =>
-                ex shouldBe a[GracefulFailureException]
-                ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                whenReady(future.failed) { ex =>
+                  ex shouldBe a[GracefulFailureException]
+                  ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                }
               }
             }
           }
@@ -256,21 +255,23 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, identifiedWorkKeyPrefixGenerator) { messageReader =>
+        withLocalSnsTopic { topic =>
+          withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
 
-          val service = new IngestorWorkerService(
-            "works-v1",
-            "works-v2",
-            identifiedWorkIndexer = brokenWorkIndexer,
-            sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-            messageReader = messageReader,
-            system = actorSystem,
-            metrics = metricsSender
-          )
+            val service = new IngestorWorkerService(
+              "works-v1",
+              "works-v2",
+              identifiedWorkIndexer = brokenWorkIndexer,
+              sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+              messageReader = messageReader,
+              system = actorSystem,
+              metrics = metricsSender
+            )
 
-          val future = service.processMessage(work)
-          whenReady(future.failed) { result =>
-            result shouldBe a[ConnectException]
+            val future = service.processMessage(work)
+            whenReady(future.failed) { result =>
+              result shouldBe a[ConnectException]
+            }
           }
         }
       }

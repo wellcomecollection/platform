@@ -4,7 +4,7 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.s3.KeyPrefixGenerator
+import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 
 
 object IdentifiedWorkKeyPrefixGeneratorModule extends TwitterModule {

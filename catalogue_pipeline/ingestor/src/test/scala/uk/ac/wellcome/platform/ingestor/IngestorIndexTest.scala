@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.ingestor
 
 import com.sksamuel.elastic4s.ElasticDsl.{deleteIndex, index}
+import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import com.sksamuel.elastic4s.http.ElasticDsl._
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.test.fixtures.{S3, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.storage.test.fixtures.S3
 
 class IngestorIndexTest
     extends FunSpec
