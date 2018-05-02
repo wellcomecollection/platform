@@ -4,7 +4,6 @@ import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.DynamoConfig
 
 object DynamoConfigModule extends TwitterModule {
   private val tableName =
