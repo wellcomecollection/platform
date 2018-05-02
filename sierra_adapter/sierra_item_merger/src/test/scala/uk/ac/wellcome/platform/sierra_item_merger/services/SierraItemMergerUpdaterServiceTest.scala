@@ -18,6 +18,7 @@ import uk.ac.wellcome.storage.s3.{
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -562,51 +563,23 @@ class SierraItemMergerUpdaterServiceTest
 
   it("returns a failed future if putting an item fails") {
     withLocalS3Bucket { bucket =>
-      withLocalDynamoDbTable { table =>
-        withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
-          hybridStore =>
-            withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-              val failingVersionedDao = mock[VersionedDao]
-              val expectedException = new RuntimeException("BOOOM!")
+      val table = Table(name = "doesnotexist", index = "missing")
+      withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+        brokenStore =>
+          withSierraUpdaterService(brokenStore) { brokenService =>
+            val bibId = "b242"
 
-              when(
-                failingVersionedDao.getRecord[HybridRecord](
-                  any[String]
-                )(
-                  any[DynamoFormat[HybridRecord]]
-                ))
-                .thenReturn(Future.failed(expectedException))
+            val itemRecord = sierraItemRecord(
+              "i000",
+              "2007-07-07T07:07:07Z",
+              List(bibId)
+            )
 
-              val s3Config = S3Config(bucketName = bucket.name)
-              val failingVersionedHybridStore =
-                new VersionedHybridStore[SierraTransformable](
-                  s3Config = S3Config(bucketName = bucket.name),
-                  sourcedObjectStore = new S3ObjectStore(
-                    s3Client = s3Client,
-                    s3Config = S3Config(bucketName = bucket.name),
-                    new SourcedKeyPrefixGenerator),
-                  versionedDao = failingVersionedDao
-                )
-
-              val failingUpdaterService = new SierraItemMergerUpdaterService(
-                failingVersionedHybridStore,
-                mock[MetricsSender]
-              )
-
-              val bibId = "b242"
-
-              val itemRecord = sierraItemRecord(
-                "i000",
-                "2007-07-07T07:07:07Z",
-                List(bibId)
-              )
-
-              whenReady(failingUpdaterService.update(itemRecord).failed) {
-                ex =>
-                  ex shouldBe expectedException
-              }
+            whenReady(brokenService.update(itemRecord).failed) {
+              ex =>
+                ex shouldBe a[RuntimeException]
             }
-        }
+          }
       }
     }
   }
