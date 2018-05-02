@@ -86,6 +86,7 @@ lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")

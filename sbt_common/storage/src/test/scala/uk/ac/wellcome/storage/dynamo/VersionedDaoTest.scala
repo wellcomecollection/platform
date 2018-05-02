@@ -1,4 +1,4 @@
-package uk.ac.wellcome.dynamo
+package uk.ac.wellcome.storage.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{

@@ -18,6 +18,7 @@ import uk.ac.wellcome.s3.{
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }
+import uk.ac.wellcome.storage.dynamo.VersionedDao
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
