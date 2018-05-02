@@ -8,14 +8,14 @@ module "id_minter" {
   release_id         = "${var.release_ids["id_minter"]}"
 
   env_vars = {
-    cluster_url      = "${module.identifiers_rds_cluster.host}"
-    db_port          = "${module.identifiers_rds_cluster.port}"
-    db_username      = "${module.identifiers_rds_cluster.username}"
-    db_password      = "${module.identifiers_rds_cluster.password}"
-    queue_url        = "${module.id_minter_queue.id}"
-    topic_arn        = "${module.es_ingest_topic.arn}"
-    message_bucket_name          = "${aws_s3_bucket.messages.id}"
-    sqs_max_messages = 10
+    cluster_url         = "${module.identifiers_rds_cluster.host}"
+    db_port             = "${module.identifiers_rds_cluster.port}"
+    db_username         = "${module.identifiers_rds_cluster.username}"
+    db_password         = "${module.identifiers_rds_cluster.password}"
+    queue_url           = "${module.id_minter_queue.id}"
+    topic_arn           = "${module.es_ingest_topic.arn}"
+    message_bucket_name = "${aws_s3_bucket.messages.id}"
+    sqs_max_messages    = 10
   }
 
   memory = 2048
