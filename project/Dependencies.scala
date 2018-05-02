@@ -95,7 +95,7 @@ object Dependencies {
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ akkaDependencies ++ dynamoDependencies ++ circeDependencies
+  ) ++ akkaDependencies ++ circeDependencies
 
   val pipelineModelDependencies = circeDependencies
 
@@ -108,7 +108,7 @@ object Dependencies {
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
   val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies
 
-  val commonStorageDependencies = commonDependencies ++ awsDependencies
+  val commonStorageDependencies = commonDependencies ++ awsDependencies ++ dynamoDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 
