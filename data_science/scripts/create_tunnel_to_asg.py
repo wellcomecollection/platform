@@ -3,13 +3,13 @@
 """
 Connect to the first instance in an autoscaling group.
 
-Usage: create_tunnel_to_asg.py [--key=<KEY>] [--port=<PORT>] [--type=<INSTANCE_TYPE>]
+Usage: create_tunnel_to_asg.py [--key=<KEY>] [--port=<PORT>] [--type=(p2 | t2)]
 
 Actions:
   --key=<KEY>             Path to an SSH key with access to the instances in the ASG.
   --port=<PORT>           Local port to use for the remote Jupyter notebook
                           (default: 8888).
-  --type=<INSTANCE_TYPE>  AWS Instance type (valid values: p2,t2) defaults to t2
+  --type=(p2 | t2)        AWS Instance type (valid values: p2,t2) defaults to t2
 
 """
 
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     key_path = args['--key'] or _default_ssh_key_path()
 
-    print(key_path)
+    print('Using SSH key at path %r' % path)
 
     assert os.path.exists(key_path)
 

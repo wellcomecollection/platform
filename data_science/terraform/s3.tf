@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "data_science" {
+resource "aws_s3_bucket" "jupyter" {
   bucket = "wellcomecollection-platform-jupyter"
   acl    = "private"
 

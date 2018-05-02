@@ -5,8 +5,8 @@ import sys
 
 def discover_asg(asg_client, tag_name):
     """
-    Return data about the first autoscaling group whose tags exactly match
-    the supplied input.
+    Return data about the first autoscaling group whose tag "name" matches
+    the supplied tag_name.
     """
     # This API is paginated, but for now we assume we have less than 100 ASGs
     # to check!
@@ -27,11 +27,11 @@ def discover_asg(asg_client, tag_name):
     for asg_data in resp['AutoScalingGroups']:
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
-        if ('name' in actual_tags) and (actual_tags['name'] == tag_name):
+        if actual_tags.get('name') == tag_name:
             return asg_data
 
 
-    sys.exit("Can't find an ASG with tag: %r!" % tag_name)
+    sys.exit("Can't find an ASG with name %r!" % tag_name)
 
 
 def discover_asg_name(asg_client, tag_name):

@@ -26,19 +26,14 @@ c.NotebookApp.password = u'${hashed_password}'
 
 EOF
 
-pip install pillow \
+/home/ubuntu/anaconda3/bin/pip install --upgrade pip
+
+/home/ubuntu/anaconda3/bin/pip install pillow \
             seaborn \
             scikit-learn \
             tqdm
 
-pip install jupyter \
-            boto3 \
-            requests \
-            s3fs==0.1.2 \
-            mock \
-            nose
-
-pip install s3contents
+/home/ubuntu/anaconda3/bin/pip install s3contents
 
 # Start notebook server
 runuser --login ${notebook_user} --command '/home/ubuntu/anaconda3/bin/jupyter notebook'

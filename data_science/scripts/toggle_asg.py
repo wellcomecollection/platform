@@ -3,12 +3,12 @@
 """
 Start/stop all the instances in an autoscaling group.
 
-Usage: toggle_asg.py (--start | --stop) [--type=<INSTANCE_TYPE>]
+Usage: toggle_asg.py (--start | --stop) [--type=(p2 | t2)]
 
 Actions:
   --start                 Start the autoscaling group (set the desired count to 1).
   --stop                  Stop the autoscaling group (set the desired count to 0).
-  --type=<INSTANCE_TYPE>  AWS Instance type (valid values: p2,t2) defaults to t2
+  --type=(p2 | t2)        AWS Instance type (valid values: p2,t2) defaults to t2
 
 """
 
