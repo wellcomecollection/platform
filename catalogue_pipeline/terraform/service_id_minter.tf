@@ -14,13 +14,14 @@ module "id_minter" {
     db_password      = "${module.identifiers_rds_cluster.password}"
     queue_url        = "${module.id_minter_queue.id}"
     topic_arn        = "${module.es_ingest_topic.arn}"
+    message_bucket_name          = "${aws_s3_bucket.messages.id}"
     sqs_max_messages = 10
   }
 
   memory = 2048
   cpu    = 512
 
-  env_vars_length = 7
+  env_vars_length = 8
 
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"

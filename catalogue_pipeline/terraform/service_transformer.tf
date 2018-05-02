@@ -14,10 +14,11 @@ module "transformer" {
     sns_arn              = "${module.id_minter_topic.arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "transformer"
-    bucket_name          = "${module.vhs_sourcedata.bucket_name}"
+    storage_bucket_name          = "${module.vhs_sourcedata.bucket_name}"
+    message_bucket_name          = "${aws_s3_bucket.messages.id}"
   }
 
-  env_vars_length = 4
+  env_vars_length = 5
 
   alb_priority = "108"
 
