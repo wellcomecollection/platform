@@ -8,7 +8,6 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.models.aws.AWSConfig
-import uk.ac.wellcome.storage.s3.S3Config
 
 object S3ClientModule extends TwitterModule {
 

@@ -16,13 +16,6 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
 
-case class HybridRecord(
-  id: String,
-  version: Int,
-  s3key: String
-) extends Versioned
-    with Id
-
 class VersionedHybridStore[T <: Id] @Inject()(
   s3Config: S3Config,
   sourcedObjectStore: S3ObjectStore[T],

@@ -4,7 +4,6 @@ import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.S3Config
 
 object S3ConfigModule extends TwitterModule {
 

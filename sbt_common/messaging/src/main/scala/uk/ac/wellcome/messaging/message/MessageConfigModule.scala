@@ -5,7 +5,7 @@ import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.models.aws.S3Config
+import uk.ac.wellcome.storage.s3.S3Config
 
 object MessageConfigModule extends TwitterModule {
   private val topicArn = flag[String](

@@ -1,4 +1,4 @@
-package uk.ac.wellcome
+package uk.ac.wellcome.storage
 
 import java.time.Instant
 
