@@ -12,7 +12,6 @@ def discover_asg(asg_client, tag_name):
     # to check!
     resp = asg_client.describe_auto_scaling_groups(MaxRecords=100)
 
-
     # The structure of the response is a little awkward.  It's a list of
     # entries of the form:
     #
@@ -29,7 +28,6 @@ def discover_asg(asg_client, tag_name):
 
         if actual_tags.get('name') == tag_name:
             return asg_data
-
 
     sys.exit("Can't find an ASG with name %r!" % tag_name)
 

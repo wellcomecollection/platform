@@ -19,7 +19,6 @@ import docopt
 
 from asg_utils import discover_asg_name, set_asg_size
 
-
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
