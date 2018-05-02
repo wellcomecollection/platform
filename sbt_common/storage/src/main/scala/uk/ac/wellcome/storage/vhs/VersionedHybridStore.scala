@@ -9,10 +9,10 @@ import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
   IdGetter,
-  VersionGetter
+  VersionGetter,
+  VersionUpdater
 }
 import uk.ac.wellcome.s3.{S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.type_classes.VersionUpdater
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
