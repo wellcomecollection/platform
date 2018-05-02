@@ -11,8 +11,11 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.aws.S3Config
-import uk.ac.wellcome.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  S3ObjectLocation,
+  S3ObjectStore
+}
 import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
