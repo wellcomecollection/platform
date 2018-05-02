@@ -1,5 +1,5 @@
 module "p2_compute" {
-  source = "dlami_asg"
+  source = "git::https://github.com/wellcometrust/terraform.git//terraform-modules/dlami_asg?ref=fix-userdata"
   name   = "jupyter-p2"
 
   key_name    = "${var.key_name}"
@@ -12,7 +12,7 @@ module "p2_compute" {
 }
 
 module "t2_compute" {
-  source = "dlami_asg"
+  source = "git::https://github.com/wellcometrust/terraform.git//terraform-modules/dlami_asg?ref=fix-userdata"
   name   = "jupyter-t2"
 
   key_name    = "${var.key_name}"
