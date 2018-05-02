@@ -18,25 +18,12 @@ object MessageConfigModule extends TwitterModule {
       "aws.message.s3.bucketName",
       "",
       "Name of the S3 bucket holding messaging pointers")
-  private val endpoint = flag[String](
-    "aws.message.s3.endpoint",
-    "",
-    "Endpoint of S3. The region will be used if the endpoint is not provided")
-  private val accessKey =
-    flag[String]("aws.message.s3.accessKey", "", "AccessKey to access S3")
-  private val secretKey =
-    flag[String]("aws.message.s3.secretKey", "", "SecretKey to access S3")
 
   @Singleton
   @Provides
   def providesMessageConfig(): MessageConfig = {
     val snsConfig = SNSConfig(topicArn = topicArn())
-    val s3Config = S3Config(
-      bucketName = bucketName(),
-      endpoint = endpoint(),
-      accessKey = accessKey(),
-      secretKey = secretKey()
-    )
+    val s3Config = S3Config(bucketName = bucketName())
     MessageConfig(snsConfig = snsConfig, s3Config = s3Config)
   }
 }
