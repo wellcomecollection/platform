@@ -93,6 +93,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .settings(libraryDependencies ++= Dependencies.reindexerDependencies)
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
