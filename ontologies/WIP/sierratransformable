@@ -153,9 +153,8 @@
    * 3. For "100" type as "Person" populate "prefix" from 100 subfield c and "numeration" from b 
    * 4. For "110" type as "Organisation"
    * 5. If subfield 0 contains a value use it to populate "identifiers". For people the "identifierScheme" will be lc-names. Note: I am seesing variable spaces in id's we most likely will need to remove these.
-   * 6. For subfield "d" and "f" type as "Period", for all other subfields provide no type
-   * 7. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX.
-   * 8. Populate roles "label" with the contents of subfield "e" for all entries.
+   * 6. If 700, 710 repeat with same rules where; 700 type Person, 710 type Organisation. Retain list order with 1XX first and then 7XX.
+   * 7. Populate roles "label" with the contents of subfield "e" for all entries.
    *
    *
    *
@@ -346,10 +345,11 @@
    /* Populate wwork:subjects people and organisations. Rules:
    * 
    * 1. For all bibliographic records use "marcTag": "600", "610".
-   * 2. Populate platform "label" concatenated with subfields "a","b" and "c" for "600" type as "Subject". For "610" just use sub-field "a". 
+   * 2. Populate platform "label" concatenated with subfields "a","b" and "c", "e" for "600" type as "Subject" follow with dash and then x,y,v and z seperated by a dash. For "610" with sub-field "a" and "e" follow with x,y,v and z seperated by a dash.
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Person" for "600", "Organisation" for "610".
    * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierScheme". 
-   * 5. For "600" subfield "b" populates "mumeration" and subfield "c" populates "prefixes".
+   * 5. For "600" subfield "b" populates "numeration" and subfield "c" populates "prefixes".
+   * 6. For 600 and 610 for subfields e,v,x,y,z populate "concepts" in order with a "label" and type as follows "e" subfield as type "ContributionRole", x subfield type as "Concept", "y" type as "Period", "v" as "Concept" and "z" as "Place".
    *
    *
    *
@@ -357,7 +357,7 @@
    *{
    *  "subjects": [
    *    {
-   *      "label": "Sir Jacobs, Philiips. II",
+   *      "label": "Sir Jacobs, Philiips. II, author.",
    *      "type": "Subject",
    *      "concepts": [
    *        {
@@ -373,7 +373,11 @@
    *              "value": "318290809"
    *            }
    *          ]
-   *        }
+   *        } ,
+            {
+              "label": "author .",
+   *          "type": "ContributionRole"
+            }
    *      ]
    *    }
    *  ]
@@ -382,7 +386,7 @@
    *{
    *  "subjects": [
    *    {
-   *      "label": "Wellcome Trust.",
+   *      "label": "Wellcome Trust, sponsor.",
    *      "type": "Subject",
    *      "concepts": [
    *        {

@@ -43,6 +43,11 @@ wwork:Concept rdf:type owl:Class ;
     rdfs:comment "A broad concept that forms part of a thesaurus-based classification of human knowledge."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
 
+wwork:Genre rdf:type owl:Class ;
+    rdfs:label "Genre"@en ;
+    rdfs:comment "A the genre or technique of the work."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
+
 wwork:Agent rdf:type owl:Class ;
     rdfs:label "Agent"@en ;
     rdfs:comment "A person, group, event or organisation."@en ;
@@ -136,9 +141,9 @@ wwork:subjects rdf:type owl:ObjectProperty ;
 
 wwork:genres rdf:type owl:ObjectProperty ;
     rdfs:label "genres"@en ;
-    rdfs:comment "Relates a work to the genre that describes the work's content."@en ;
+    rdfs:comment "Relates a work to its genres."@en ;
     rdfs:domain wwork:Work ;
-    rdfs:range wwork:Concept ;
+    rdfs:range wwork:Genre ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
     
 wwork:workType rdf:type owl:ObjectProperty ;
@@ -224,13 +229,6 @@ wwork:modifiedDate rdf:type owl:DatatypeProperty ;
 wwork:title rdf:type owl:DatatypeProperty ;
     rdfs:label "title"@en ;
     rdfs:comment "The title or other short label of a work, including labels not present in the actual work or item but applied by the cataloguer for the purposes of search or description."@en ;
-    rdfs:domain wwork:Work ;
-    rdfs:range rdf:langString ; 
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  
-        
-wwork:remainingTitle rdf:type owl:DatatypeProperty ;
-    rdfs:label "remainingTitle"@en ;
-    rdfs:comment "The remainder of the title not captured as part of the main title."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range rdf:langString ; 
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .  

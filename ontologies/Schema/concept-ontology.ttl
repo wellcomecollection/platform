@@ -62,13 +62,6 @@ wcon:narrower rdf:type owl:ObjectProperty ;
     rdfs:range wcon:Concept ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> .
     
-wcon:concept rdf:type owl:ObjectProperty ;
-    rdfs:label "concept"@en ;
-    rdfs:comment "Relates a qualified concept to the a concept that is being qualified."@en ;
-    rdfs:domain wcon:QualifiedConcept ;
-    rdfs:range wcon:Concept ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/concept> . 
-    
 wcon:concepts rdf:type owl:ObjectProperty ;
     rdfs:label "concepts"@en ;
     rdfs:comment "Relates a subject to a list of concepts."@en ;
