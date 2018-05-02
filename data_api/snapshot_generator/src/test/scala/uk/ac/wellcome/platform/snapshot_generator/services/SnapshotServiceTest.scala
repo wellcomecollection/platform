@@ -192,7 +192,7 @@ class SnapshotServiceTest
   it("completes a snapshot generation of an index with more than 10000 items") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
-        val works = (1 to 20000).map { id =>
+        val works = (1 to 11000).map { id =>
           workWith(
             canonicalId = id.toString,
             title = Random.alphanumeric.take(1500).mkString)
