@@ -51,7 +51,16 @@ trait Messaging
       }
     )
 
-  def messagingLocalFlags(bucket: Bucket, topic: Topic) =
+  def messagingLocalFlags(bucket: Bucket, topic: Topic, queue: Queue) =
+    messageReaderLocalFlags(bucket, queue) ++ messageWriterLocalFlags(bucket, topic)
+
+  def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
+    Map(
+      "aws.message.s3.bucketName" -> bucket.name,
+      "aws.message.sqs.queue.url" -> queue.url
+    ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
+
+  def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
     Map(
       "aws.message.sns.topic.arn" -> topic.arn,
       "aws.message.s3.bucketName" -> bucket.name

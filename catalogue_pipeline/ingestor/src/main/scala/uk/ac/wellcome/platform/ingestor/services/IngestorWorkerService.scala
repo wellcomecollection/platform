@@ -20,12 +20,10 @@ class IngestorWorkerService @Inject()(
   @Flag("es.index.v1") esIndexV1: String,
   @Flag("es.index.v2") esIndexV2: String,
   identifiedWorkIndexer: WorkIndexer,
-  sqsReader: SQSReader,
   messageReader: MessageReader[IdentifiedWork],
   system: ActorSystem,
   metrics: MetricsSender)
     extends MessageWorker[IdentifiedWork](
-      sqsReader,
       messageReader,
       system,
       metrics) {

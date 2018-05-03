@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.storage.test.fixtures.S3
 
 class IngestorIndexTest
@@ -15,6 +15,7 @@ class IngestorIndexTest
     with S3
     with Matchers
     with ScalaFutures
+    with Messaging
     with ElasticsearchFixtures {
 
   val indexNameV1 = "works-v1"
@@ -27,10 +28,10 @@ class IngestorIndexTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        val flags = sqsLocalFlags(queue) ++ esLocalFlags(
+        val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
           indexNameV1,
           indexNameV2,
-          itemType) ++ s3LocalFlags(bucket)
+          itemType)
 
         withServer(flags) { _ =>
           eventuallyIndexExists(indexNameV1)

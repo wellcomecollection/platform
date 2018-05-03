@@ -32,7 +32,6 @@ class Server extends HttpServer {
     IdMinterWorkerModule,
     AWSConfigModule,
     SQSClientModule,
-    SQSConfigModule,
     SQSReaderModule,
     SNSClientModule,
     S3ClientModule,
