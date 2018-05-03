@@ -20,8 +20,7 @@ cache:
   directories:
     - ~/.sbt
     - ~/.ivy2
-    - project/target/resolution-cache
-    - project/target/streams
+    - project/target
     - target
     - catalogue_api/api/target
     - catalogue_pipeline/common/target
