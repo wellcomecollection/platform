@@ -68,11 +68,7 @@ class SierraBibMergerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(
-            bucket,
-            namespace = "vhs") ++ dynamoDbLocalEndpointFlags(
-            table,
-            namespace = "vhs")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
@@ -109,11 +105,7 @@ class SierraBibMergerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(
-            bucket,
-            namespace = "vhs") ++ dynamoDbLocalEndpointFlags(
-            table,
-            namespace = "vhs")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
@@ -170,11 +162,7 @@ class SierraBibMergerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(
-            bucket,
-            namespace = "vhs") ++ dynamoDbLocalEndpointFlags(
-            table,
-            namespace = "vhs")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
@@ -230,11 +218,7 @@ class SierraBibMergerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(
-            bucket,
-            namespace = "vhs") ++ dynamoDbLocalEndpointFlags(
-            table,
-            namespace = "vhs")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
@@ -291,11 +275,7 @@ class SierraBibMergerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ s3LocalFlags(
-            bucket,
-            namespace = "vhs") ++ dynamoDbLocalEndpointFlags(
-            table,
-            namespace = "vhs")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
             withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
