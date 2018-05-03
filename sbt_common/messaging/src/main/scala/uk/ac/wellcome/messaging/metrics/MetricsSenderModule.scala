@@ -1,20 +1,18 @@
 package uk.ac.wellcome.messaging.metrics
 
 import akka.actor.ActorSystem
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.cloudwatch.{
-  AmazonCloudWatch,
-  AmazonCloudWatchClientBuilder
-}
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.google.inject.{Provides, Singleton}
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.finatra.modules.AkkaModule
 
 import scala.concurrent.duration._
 
 object MetricsSenderModule extends TwitterModule {
-  implicit val finteDurationFlaggable =
+  override val modules = Seq(AkkaModule, CloudWatchClientModule)
+
+  implicit val finoteDurationFlaggable =
     Flaggable.mandatory[FiniteDuration](config =>
       Duration.apply(config).asInstanceOf[FiniteDuration])
 
@@ -29,11 +27,6 @@ object MetricsSenderModule extends TwitterModule {
     "Interval within which metrics get flushed to cloudwatch. A short interval will result in an increased number of PutMetric requests."
   )
 
-  private val awsEndpoint = flag[String](
-    "aws.cloudWatch.endpoint",
-    "",
-    "Endpoint of AWS CloudWatch. If not set, it will use the region")
-
   @Provides
   @Singleton
   def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch,
@@ -42,20 +35,6 @@ object MetricsSenderModule extends TwitterModule {
       namespace = awsNamespace(),
       flushInterval = flushInterval(),
       amazonCloudWatch = amazonCloudWatch,
-      actorSystem = actorSystem)
-
-  @Provides
-  @Singleton
-  def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch = {
-    val standardCloudWatchClient = AmazonCloudWatchClientBuilder.standard
-    if (awsEndpoint().isEmpty) {
-      standardCloudWatchClient
-        .withRegion(awsConfig.region)
-        .build()
-    } else
-      standardCloudWatchClient
-        .withEndpointConfiguration(
-          new EndpointConfiguration(awsEndpoint(), awsConfig.region))
-        .build()
-  }
+      actorSystem = actorSystem
+    )
 }
