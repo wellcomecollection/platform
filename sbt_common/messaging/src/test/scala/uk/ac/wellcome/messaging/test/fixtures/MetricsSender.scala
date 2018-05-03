@@ -6,8 +6,8 @@ import com.twitter.inject.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.metrics
-import uk.ac.wellcome.test.fixtures.ImplicitLogging
+import uk.ac.wellcome.messaging.metrics
+import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.Future
 

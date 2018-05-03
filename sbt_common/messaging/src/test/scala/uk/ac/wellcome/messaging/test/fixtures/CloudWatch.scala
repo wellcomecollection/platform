@@ -14,12 +14,12 @@ trait CloudWatch extends ImplicitLogging {
   protected val awsNamespace: String = "test"
 
   protected val localCloudWatchEndpointUrl: String = "http://localhost:4582"
-  protected val regionName: String = "eu-west-1"
+  private val regionName: String = "eu-west-1"
 
   protected val flushInterval: FiniteDuration = 1 second
 
-  protected val accessKey: String = "accessKey1"
-  protected val secretKey: String = "verySecretKey1"
+  private val accessKey: String = "accessKey1"
+  private val secretKey: String = "verySecretKey1"
 
   def cloudWatchLocalFlags =
     Map(
