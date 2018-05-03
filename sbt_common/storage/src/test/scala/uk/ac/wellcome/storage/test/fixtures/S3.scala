@@ -7,6 +7,7 @@ import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.test.fixtures._
 
@@ -25,7 +26,7 @@ object S3 {
 
 }
 
-trait S3 extends Logging with Eventually with ImplicitLogging {
+trait S3 extends Logging with Eventually with Matchers with ImplicitLogging {
 
   import S3._
 
@@ -35,12 +36,15 @@ trait S3 extends Logging with Eventually with ImplicitLogging {
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
 
-  def s3LocalFlags(bucket: Bucket) = Map(
+  def s3LocalFlags(bucket: Bucket) = s3ClientLocalFlags ++ Map(
+    "aws.s3.bucketName" -> bucket.name
+  )
+
+  def s3ClientLocalFlags = Map(
     "aws.s3.endpoint" -> localS3EndpointUrl,
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
-    "aws.region" -> "localhost",
-    "aws.s3.bucketName" -> bucket.name
+    "aws.region" -> "localhost"
   )
 
   private val credentials = new AWSStaticCredentialsProvider(

@@ -36,12 +36,15 @@ trait SNS extends ImplicitLogging {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def snsLocalFlags(topic: Topic) = Map(
+  def snsLocalFlags(topic: Topic) = snsLocalClientFlags ++ Map(
+    "aws.sns.topic.arn" -> topic.arn
+  )
+
+  def snsLocalClientFlags = Map(
     "aws.sns.endpoint" -> localSNSEndpointUrl,
     "aws.sns.accessKey" -> accessKey,
     "aws.sns.secretKey" -> secretKey,
-    "aws.region" -> "localhost",
-    "aws.sns.topic.arn" -> topic.arn
+    "aws.region" -> "localhost"
   )
 
   private val credentials = new AWSStaticCredentialsProvider(

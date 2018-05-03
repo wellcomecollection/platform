@@ -8,8 +8,10 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.messaging.message.MessageConfigModule
+import uk.ac.wellcome.messaging.metrics.CloudWatchClientModule
 import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{
@@ -18,6 +20,7 @@ import uk.ac.wellcome.messaging.sqs.{
   SQSReaderModule
 }
 import uk.ac.wellcome.platform.idminter.modules._
+import uk.ac.wellcome.storage.s3.S3ClientModule
 
 object ServerMain extends Server
 
@@ -33,6 +36,10 @@ class Server extends HttpServer {
     SQSReaderModule,
     SNSConfigModule,
     SNSClientModule,
+    S3ClientModule,
+    MessageConfigModule,
+    JsonKeyPrefixGeneratorModule,
+    CloudWatchClientModule,
     MetricsSenderModule
   )
 

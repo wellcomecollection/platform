@@ -2,29 +2,33 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
-import io.circe.Decoder
-import io.circe.generic.semiauto._
-import uk.ac.wellcome.messaging.message.{
-  MessageConfig,
-  MessageReader,
-  MessageWorker,
-  MessageWriter
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
 }
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
+import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.metrics
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  S3Config,
+  S3ObjectLocation
+}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 import scala.concurrent.Future
-import com.amazonaws.services.sns.model.UnsubscribeRequest
+import scala.concurrent.duration._
+import scala.util.Success
 
 trait Messaging
     extends Akka
@@ -48,6 +52,12 @@ trait Messaging
         localStackSnsClient.unsubscribe(unsubscribeRequest)
       }
     )
+
+  def messagingLocalFlags(bucket: Bucket, topic: Topic) =
+    Map(
+      "aws.message.sns.topic.arn" -> topic.arn,
+      "aws.message.s3.bucketName" -> bucket.name
+    ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
 
   case class ExampleObject(name: String)
 
@@ -156,6 +166,45 @@ trait Messaging
     }
   }
 
+  def put[T](obj: T, location: S3ObjectLocation)(
+    implicit encoder: Encoder[T]) = {
+    val serialisedExampleObject = toJson[T](obj).get
+
+    s3Client.putObject(
+      location.bucket,
+      location.key,
+      serialisedExampleObject
+    )
+
+    val examplePointer =
+      MessagePointer(S3ObjectLocation(location.bucket, location.key))
+
+    val serialisedExamplePointer = toJson(examplePointer).get
+
+    val exampleNotification = NotificationMessage(
+      MessageId = "MessageId",
+      TopicArn = "TopicArn",
+      Subject = "Subject",
+      Message = serialisedExamplePointer
+    )
+
+    toJson(exampleNotification).get
+  }
+
+  def get[T](snsMessage: MessageInfo)(implicit decoder: Decoder[T]): T = {
+    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
+    tryMessagePointer shouldBe a[Success[_]]
+
+    val messagePointer = tryMessagePointer.get
+
+    val tryT = fromJson[T](
+      getContentFromS3(
+        Bucket(messagePointer.src.bucket),
+        messagePointer.src.key))
+    tryT shouldBe a[Success[_]]
+
+    tryT.get
+  }
   def withMessageWorkerFixtures[R](
     testWith: TestWith[(metrics.MetricsSender,
                         Queue,

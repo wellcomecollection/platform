@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
@@ -29,16 +30,17 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
-                                   s3Client: AmazonS3,
-                                   s3Config: S3Config,
-                                   metricsSender: MetricsSender)
+class SQSMessageReceiver @Inject()(
+  messageWriter: MessageWriter[UnidentifiedWork],
+  s3Client: AmazonS3,
+  s3Config: S3Config,
+  metricsSender: MetricsSender)
     extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
     metricsSender.timeAndCount(
-      "ingest-time",
+      "transform-time",
       () => {
         val futurePublishAttempt = for {
           hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
@@ -80,7 +82,8 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
 
   private def transformTransformable(
     transformable: Transformable,
-    version: Int): Try[Option[UnidentifiedWork]] = {
+    version: Int
+  ): Try[Option[UnidentifiedWork]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -102,13 +105,10 @@ class SQSMessageReceiver @Inject()(snsWriter: SNSWriter,
   }
 
   private def publishMessage(
-    maybeWork: Option[UnidentifiedWork]): Future[Option[PublishAttempt]] =
-    maybeWork.fold(Future.successful(None: Option[PublishAttempt])) { work =>
-      snsWriter
-        .writeMessage(
-          message = toJson(work).get,
-          subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
-        )
-        .map(publishAttempt => Some(publishAttempt))
+    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+    maybeWork.fold(Future.successful(())) { work =>
+      messageWriter.write(
+        work,
+        s"source: ${this.getClass.getSimpleName}.publishMessage")
     }
 }

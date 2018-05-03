@@ -4,18 +4,20 @@ import java.time.Instant
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import org.mockito.Matchers.{any, anyString}
-import org.mockito.Mockito
-import org.mockito.Mockito.{verify, when}
+import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sns.model.PublishRequest
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.message.{MessageConfig, MessageWriter}
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.metrics.MetricsSender
-import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.{
@@ -28,12 +30,11 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SQSMessageReceiverTest
@@ -42,6 +43,7 @@ class SQSMessageReceiverTest
     with SQS
     with SNS
     with S3
+    with Messaging
     with Eventually
     with ExtendedPatience
     with MockitoSugar
@@ -71,13 +73,22 @@ class SQSMessageReceiverTest
   def withSQSMessageReceiver[R](
     topic: Topic,
     bucket: Bucket,
-    maybeSnsWriter: Option[SNSWriter] = None
+    maybeSnsClient: Option[AmazonSNS] = None
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
 
-    val snsWriter =
-      maybeSnsWriter.getOrElse(new SNSWriter(snsClient, SNSConfig(topic.arn)))
+    val s3Config = S3Config(bucket.name)
+
+    val messageConfig = MessageConfig(SNSConfig(topic.arn), s3Config)
+
+    val messageWriter =
+      new MessageWriter[UnidentifiedWork](
+        messageConfig,
+        maybeSnsClient.getOrElse(snsClient),
+        s3Client,
+        new UnidentifiedWorkKeyPrefixGenerator())
+
     val recordReceiver = new SQSMessageReceiver(
-      snsWriter = snsWriter,
+      messageWriter = messageWriter,
       s3Client = s3Client,
       s3Config = S3Config(bucket.name),
       metricsSender = metricsSender
@@ -86,7 +97,7 @@ class SQSMessageReceiverTest
     testWith(recordReceiver)
   }
 
-  it("receives a message and send it to SNS client") {
+  it("receives a message and sends it to SNS client") {
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
@@ -109,16 +120,20 @@ class SQSMessageReceiverTest
             val future = recordReceiver.receiveMessage(calmSqsMessage)
 
             whenReady(future) { _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size 1
-              messages.head.message shouldBe JsonUtil.toJson(work).get
-              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages.size should be >= 1
+
+              snsMessages.map { snsMessage =>
+                get[UnidentifiedWork](snsMessage)
+                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              }
             }
           }
         }
       }
     }
   }
+
   it("receives a message and add the version to the transformed work") {
     val id = "5005005"
     val title = "A pot of possums"
@@ -152,18 +167,21 @@ class SQSMessageReceiverTest
             )
 
             whenReady(future) { _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
-              messages should have size 1
-              messages.head.message shouldBe JsonUtil
-                .toJson(
-                  UnidentifiedWork(
-                    title = Some(title),
-                    sourceIdentifier = sourceIdentifier,
-                    version = version,
-                    identifiers = List(sourceIdentifier, sierraIdentifier)
-                  ))
-                .get
-              messages.head.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages.size should be >= 1
+
+              snsMessages.map { snsMessage =>
+                val actualWork = get[UnidentifiedWork](snsMessage)
+
+                actualWork.title shouldBe Some(title)
+                actualWork.sourceIdentifier shouldBe sourceIdentifier
+                actualWork.version shouldBe version
+                actualWork.identifiers shouldBe List(
+                  sourceIdentifier,
+                  sierraIdentifier)
+
+                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+              }
             }
           }
         }
@@ -200,30 +218,26 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val snsWriter = mockSNSWriter
-
-          withSQSMessageReceiver(topic, bucket, Some(snsWriter)) {
-            recordReceiver =>
-              val future = recordReceiver.receiveMessage(
-                createValidEmptySierraBibSQSMessage(
-                  id = "0101010",
-                  s3Client = s3Client,
-                  bucket = bucket
-                )
+          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(
+              createValidEmptySierraBibSQSMessage(
+                id = "0101010",
+                s3Client = s3Client,
+                bucket = bucket
               )
+            )
 
-              whenReady(future) { x =>
-                verify(snsWriter, Mockito.never())
-                  .writeMessage(anyString, any[String])
-              }
+            whenReady(future) { _ =>
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              snsMessages shouldBe empty
+            }
           }
         }
       }
     }
   }
 
-  it(
-    "returns a failed future if it's unable to transform the transformable object") {
+  it("fails if it's unable to perform a transformation") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
@@ -255,8 +269,7 @@ class SQSMessageReceiverTest
     }
   }
 
-  it("should return a failed future if it's unable to publish the work") {
-
+  it("fails if it's unable to publish the work") {
     val id = "1001001"
     val sierraTransformable: Transformable =
       SierraTransformable(
@@ -280,33 +293,25 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          val snsWriter = mockFailPublishMessage
+          withSQSMessageReceiver(
+            topic,
+            bucket,
+            Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
+            val future = recordReceiver.receiveMessage(message)
 
-          withSQSMessageReceiver(topic, bucket, Some(snsWriter)) {
-            recordReceiver =>
-              val future = recordReceiver.receiveMessage(message)
-
-              whenReady(future.failed) { x =>
-                x.getMessage should be("Failed publishing message")
-              }
+            whenReady(future.failed) { x =>
+              x.getMessage should be("Failed publishing message")
+            }
           }
         }
       }
     }
   }
 
-  private def mockSNSWriter = {
-    val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(Future { PublishAttempt(Right("1234")) })
-    mockSNS
-  }
-
-  private def mockFailPublishMessage = {
-    val mockSNS = mock[SNSWriter]
-    when(mockSNS.writeMessage(anyString(), any[String]))
-      .thenReturn(
-        Future.failed(new RuntimeException("Failed publishing message")))
-    mockSNS
+  private def mockSnsClientFailPublishMessage = {
+    val mockSNSClient = mock[AmazonSNS]
+    when(mockSNSClient.publish(any[PublishRequest]))
+      .thenThrow(new RuntimeException("Failed publishing message"))
+    mockSNSClient
   }
 }

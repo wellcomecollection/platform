@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
@@ -10,7 +10,6 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.storage.test.fixtures.S3
-import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
@@ -22,6 +21,7 @@ class CalmTransformerFeatureTest
     with SQS
     with SNS
     with S3
+    with Messaging
     with fixtures.Server
     with Eventually
     with ExtendedPatience
@@ -36,60 +36,51 @@ class CalmTransformerFeatureTest
         RefNo = "RefNo1",
         data = """{"AccessStatus": ["public"]}""")
 
-    withLocalSnsTopic { topicArn =>
+    withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { bucket =>
-          val calmHybridRecordMessage = hybridRecordSqsMessage(
-            message = JsonUtil.toJson(calmTransformable).get,
-            sourceName = "calm",
-            version = 1,
-            s3Client = s3Client,
-            bucket = bucket
-          )
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { messageBucket =>
+            val calmHybridRecordMessage = hybridRecordSqsMessage(
+              message = JsonUtil.toJson(calmTransformable).get,
+              sourceName = "calm",
+              version = 1,
+              s3Client = s3Client,
+              bucket = storageBucket
+            )
 
-          val flags: Map[String, String] = Map(
-            "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queue)
-
-          withServer(flags) { _ =>
             sqsClient.sendMessage(
               queue.url,
               JsonUtil.toJson(calmHybridRecordMessage).get
             )
 
-            eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages should have size 1
-              assertSNSMessageContainsCalmDataWith(
-                snsMessage = snsMessages.head,
-                AccessStatus = Some("public")
-              )
+            val flags: Map[String, String] = Map(
+              "aws.metrics.namespace" -> "sierra-transformer"
+            ) ++ s3LocalFlags(storageBucket) ++
+              sqsLocalFlags(queue) ++ messagingLocalFlags(messageBucket, topic)
+
+            withServer(flags) { _ =>
+              eventually {
+                val snsMessages = listMessagesReceivedFromSNS(topic)
+                snsMessages.size should be >= 1
+
+                val sourceIdentifier = SourceIdentifier(
+                  identifierScheme = IdentifierSchemes.calmPlaceholder,
+                  ontologyType = "Work",
+                  value = "value"
+                )
+
+                snsMessages.map { snsMessage =>
+                  val actualWork = get[UnidentifiedWork](snsMessage)
+
+                  actualWork.sourceIdentifier shouldBe sourceIdentifier
+                  actualWork.title shouldBe Some("placeholder title")
+                  actualWork.identifiers shouldBe List(sourceIdentifier)
+                }
+              }
             }
           }
         }
       }
     }
-  }
-
-  private def assertSNSMessageContainsCalmDataWith(
-    snsMessage: MessageInfo,
-    AccessStatus: Option[String]): Any = {
-
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.calmPlaceholder,
-      ontologyType = "Work",
-      value = "value"
-    )
-
-    //currently for calm data we only output hardcoded sample values
-    snsMessage.message shouldBe JsonUtil
-      .toJson(
-        UnidentifiedWork(
-          title = Some("placeholder title"),
-          sourceIdentifier = sourceIdentifier,
-          version = 1,
-          identifiers = List(sourceIdentifier)))
-      .get
   }
 }

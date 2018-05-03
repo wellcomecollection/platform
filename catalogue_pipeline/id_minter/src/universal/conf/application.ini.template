@@ -8,3 +8,4 @@
 -aws.sqs.maxMessages=${sqs_max_messages}
 -aws.sns.topic.arn=${topic_arn}
 -aws.metrics.namespace=id-minter
+-aws.message.s3.bucketName=${message_bucket_name}

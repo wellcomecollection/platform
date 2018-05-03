@@ -2,12 +2,9 @@ package uk.ac.wellcome.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.MiroTransformable
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, SNS, SQS}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.test.fixtures.S3
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
@@ -20,6 +17,7 @@ class MiroTransformerFeatureTest
     with SQS
     with SNS
     with S3
+    with Messaging
     with fixtures.Server
     with Eventually
     with ExtendedPatience
@@ -30,89 +28,54 @@ class MiroTransformerFeatureTest
     val miroID = "M0000001"
     val title = "A guide for a giraffe"
 
-    val secondMiroID = "M0000002"
-    val secondTitle = "A song about a snake"
-
-    withLocalSnsTopic { topicArn =>
+    withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
-        withLocalS3Bucket { bucket =>
-          sendMiroImageToSQS(
-            miroID = miroID,
-            data = shouldNotTransformMessage(title),
-            bucket = bucket,
-            queue = queue
-          )
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { messageBucket =>
+            val miroHybridRecordMessage =
+              hybridRecordSqsMessage(
+                message = createValidMiroTransformableJson(
+                  MiroID = miroID,
+                  MiroCollection = "foo",
+                  data = s"""{
+                  "image_title": "$title",
+                  "image_cleared": "N",
+                  "image_use_restrictions": "CC-0",
+                  "image_copyright_cleared": "N",
+                  "image_tech_file_size": ["100000"]
+                }"""
+                ),
+                sourceName = "miro",
+                s3Client = s3Client,
+                bucket = storageBucket
+              )
 
-          sendMiroImageToSQS(
-            miroID = secondMiroID,
-            data = shouldTransformMessage(secondTitle),
-            bucket = bucket,
-            queue = queue
-          )
+            sqsClient.sendMessage(
+              queue.url,
+              JsonUtil.toJson(miroHybridRecordMessage).get
+            )
 
-          val flags: Map[String, String] = Map(
-            "aws.metrics.namespace" -> "sierra-transformer"
-          ) ++ s3LocalFlags(bucket) ++ snsLocalFlags(topicArn) ++ sqsLocalFlags(
-            queue)
+            val flags: Map[String, String] = Map(
+              "aws.metrics.namespace" -> "sierra-transformer"
+            ) ++ s3LocalFlags(storageBucket) ++
+              sqsLocalFlags(queue) ++ messagingLocalFlags(messageBucket, topic)
 
-          withServer(flags) { _ =>
-            eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topicArn)
-              snsMessages.length shouldBe >=(2)
+            withServer(flags) { _ =>
+              eventually {
+                val snsMessages = listMessagesReceivedFromSNS(topic)
+                snsMessages.length shouldBe >=(1)
 
-              assertSNSMessageContains(
-                snsMessages.head,
-                secondMiroID,
-                secondTitle)
+                snsMessages.map { snsMessage =>
+                  val actualWork = get[UnidentifiedWork](snsMessage)
+
+                  actualWork.identifiers.head.value shouldBe miroID
+                  actualWork.title shouldBe Some(title)
+                }
+              }
             }
           }
         }
       }
     }
   }
-
-  private def assertSNSMessageContains(snsMessage: MessageInfo,
-                                       miroID: String,
-                                       imageTitle: String) = {
-    val parsedWork =
-      JsonUtil.fromJson[UnidentifiedWork](snsMessage.message).get
-    parsedWork.identifiers.head.value shouldBe miroID
-    parsedWork.title shouldBe Some(imageTitle)
-  }
-
-  def shouldTransformMessage(imageTitle: String) =
-    buildJSONForWork(s""""image_title": "$imageTitle"""")
-
-  def shouldNotTransformMessage(imageTitle: String) = s"""{
-          "image_title": "$imageTitle",
-          "image_cleared": "N",
-          "image_copyright_cleared": "N",
-          "image_tech_file_size": ["100000"]
-        }"""
-
-  private def sendMiroImageToSQS(
-    miroID: String,
-    data: String,
-    bucket: Bucket,
-    queue: Queue
-  ) = {
-    val miroTransformable =
-      MiroTransformable(
-        sourceId = miroID,
-        MiroCollection = "Images-A",
-        data = data
-      )
-
-    val sqsMessage =
-      hybridRecordSqsMessage(
-        message = JsonUtil.toJson(miroTransformable).get,
-        sourceName = "miro",
-        version = 1,
-        s3Client = s3Client,
-        bucket = bucket
-      )
-
-    sqsClient.sendMessage(queue.url, JsonUtil.toJson(sqsMessage).get)
-  }
-
 }

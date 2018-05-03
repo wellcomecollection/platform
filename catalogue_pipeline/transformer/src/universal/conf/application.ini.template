@@ -1,5 +1,6 @@
 -aws.region=eu-west-1
 -aws.sqs.queue.url=${transformer_queue_id}
--aws.sns.topic.arn=${sns_arn}
 -aws.metrics.namespace=${metrics_namespace}
--aws.s3.bucketName=${bucket_name}
+-aws.s3.bucketName=${storage_bucket_name}
+-aws.message.sns.topic.arn=${sns_arn}
+-aws.message.s3.bucketName=${message_bucket_name}
