@@ -22,7 +22,6 @@ class ApiV2WorksTest extends ApiWorksTestBase {
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
         eventually {
-
           server.httpGet(
             path = s"/$apiPrefix/works",
             andExpect = Status.Ok,
@@ -102,6 +101,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           lettering = lettering,
           createdDate = period,
           creator = agent,
+          subjects = List(subject),
+          genres = List(genre),
           items = List(defaultItem),
           visible = true)
 
@@ -126,8 +127,40 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                | "lettering": "$lettering",
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
-               | "subjects": [ ],
-               | "genres": [ ],
+               | "subjects": [
+               |   { "label":"a subject",
+               |     "type":"Subject",
+               |     "concepts":[
+               |       {
+               |         "label": "${subject.concepts(0).label}",
+               |         "type":  "${subject.concepts(0).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${subject.concepts(1).label}",
+               |         "type":  "${subject.concepts(1).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${subject.concepts(2).label}",
+               |         "type":  "${subject.concepts(2).ontologyType}"
+               |       }]}
+               | ],
+               | "genres": [
+               |   { "label":"a genre",
+               |     "type":"Genre",
+               |     "concepts":[
+               |       {
+               |         "label": "${genre.concepts(0).label}",
+               |         "type":  "${genre.concepts(0).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${genre.concepts(1).label}",
+               |         "type":  "${genre.concepts(1).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${genre.concepts(2).label}",
+               |         "type":  "${genre.concepts(2).ontologyType}"
+               |       }]}
+               | ],
                | "publishers": [ ],
                | "placesOfPublication": [ ]
                |}
@@ -177,9 +210,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "returns the requested page of results when requested with page & pageSize") {
-
+  it("returns the requested page of results when requested with page & pageSize") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
@@ -356,8 +387,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it("includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
@@ -422,8 +452,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it("includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
@@ -591,8 +620,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it(
-    "includes the thumbnail field if available and we use the thumbnail include") {
+  it("includes the thumbnail field if available and we use the thumbnail include") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(

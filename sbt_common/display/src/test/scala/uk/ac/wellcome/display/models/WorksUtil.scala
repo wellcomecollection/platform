@@ -3,19 +3,26 @@ package uk.ac.wellcome.display.models
 import uk.ac.wellcome.models.work.internal._
 
 trait WorksUtil {
-
   val canonicalId = "1234"
   val title = "this is the first image title"
   val description = "this is a description"
   val lettering = "some lettering"
-
   val period = Period("the past")
   val agent = Agent("a person")
   val workType = WorkType(
     id = "1dz4yn34va",
     label = "An aggregation of angry archipelago aged ankylosaurs."
   )
-
+  val subject = Subject("a subject",
+      List(
+        Concept("a subject concept"),
+        Place("a subject place"),
+        Period("a subject period")))
+  val genre = Genre("a genre",
+      List(
+        Concept("a genre concept"),
+        Place("a genre place"),
+        Period("a genre period")))
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
     "Work",
@@ -108,6 +115,35 @@ trait WorksUtil {
       contributors = List(
         Contributor(agent = Unidentifiable(creator))
       ),
+      items = items,
+      visible = visible
+    )
+
+  def workWith(canonicalId: String,
+               title: String,
+               description: String,
+               lettering: String,
+               createdDate: Period,
+               creator: Agent,
+               subjects: List[Subject],
+               genres: List[Genre],
+               items: List[IdentifiedItem],
+               visible: Boolean): IdentifiedWork =
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId,
+      workType = Some(workType),
+      description = Some(description),
+      lettering = Some(lettering),
+      createdDate = Some(createdDate),
+      contributors = List(
+        Contributor(agent = Unidentifiable(creator))
+      ),
+      subjects = subjects,
+      genres = genres,
       items = items,
       visible = visible
     )
