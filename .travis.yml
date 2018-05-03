@@ -20,8 +20,7 @@ cache:
   directories:
     - ~/.sbt
     - ~/.ivy2
-    - project/target/resolution-cache
-    - project/target/streams
+    - project/target
     - target
     - catalogue_api/api/target
     - catalogue_pipeline/common/target
@@ -69,13 +68,19 @@ jobs:
       env: TASK=travis-format
     - env: TASK=travistooling-test
 
-    - stage: test
+    - stage: sbt-common-test
       env: TASK=sbt-common-test
     - env: TASK=sbt-internal_model-test
     - env: TASK=sbt-display-test
     - env: TASK=sbt-elasticsearch-test
     - env: TASK=sbt-messaging-test
     - env: TASK=sbt-storage-test
+
+    # Catalogue API stack
+    - stage: test
+      env: TASK=api-test
+    # (not under active development)
+    # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test
@@ -102,11 +107,6 @@ jobs:
     - env: TASK=sierra_item_merger-test
     - env: TASK=s3_demultiplexer-test
 
-    # Catalogue API stack
-    - env: TASK=api-test
-    # (not under active development)
-    # - env: TASK=api_docs-build
-
     # Shared infra stack
     - env: TASK=shared_infra-test
 
@@ -124,6 +124,7 @@ jobs:
 
 stages:
   - quicktest
+  - sbt-common-test
   - test
 
 # This has a Slack API token for posting messages about build failures to
