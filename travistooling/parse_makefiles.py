@@ -19,6 +19,12 @@ def get_projects(repo):
                 for proj in _get_projects_from_makefile(root=root, path=path):
                     yield proj
 
+    yield Project(
+        name='travistooling',
+        type='python_lib',
+        exclusive_path=None
+    )
+
 
 def _get_projects_from_makefile(root, path):
     contents = open(path).read()

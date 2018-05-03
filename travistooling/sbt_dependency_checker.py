@@ -14,6 +14,12 @@ def does_path_depend_on_library(path, library_name):
     configuration.  Parsing build.sbt is icky, and trying to get sbt to give
     up a dependency tree in a sensible format is slow and also icky.
 
+    It's not perfect -- in particular, it can't spot transitive dependencies.
+    For example, if app A depends on lib B, and lib B depends on lib C, then
+    changes to lib C won't be detected as significant here.
+
+    TODO: Make this better!
+
     >>> does_path_depend_on_library('catalogue_api/api', 'messaging')
     False
 
@@ -23,8 +29,7 @@ def does_path_depend_on_library(path, library_name):
     """
     try:
         subprocess.check_call([
-            'grep', '--recursive',
-            'import uk.ac.wellcome.%s' % library_name,
+            'grep', '-r', 'import uk.ac.wellcome.%s' % library_name,
             os.path.join(path, 'src', 'main', 'scala')
         ], stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError:
