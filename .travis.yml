@@ -77,9 +77,14 @@ jobs:
     - env: TASK=sbt-messaging-test
     - env: TASK=sbt-storage-test
 
-    # Catalogue pipeline stack
+    # Catalogue API stack
     - stage: test
-      env: TASK=transformer-test
+      env: TASK=api-test
+    # (not under active development)
+    # - env: TASK=api_docs-build
+
+    # Catalogue pipeline stack
+    - env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=id_minter-test
@@ -102,11 +107,6 @@ jobs:
     - env: TASK=sierra_bib_merger-test
     - env: TASK=sierra_item_merger-test
     - env: TASK=s3_demultiplexer-test
-
-    # Catalogue API stack
-    - env: TASK=api-test
-    # (not under active development)
-    # - env: TASK=api_docs-build
 
     # Shared infra stack
     - env: TASK=shared_infra-test
