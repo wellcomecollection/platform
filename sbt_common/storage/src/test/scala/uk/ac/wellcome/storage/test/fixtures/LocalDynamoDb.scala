@@ -40,7 +40,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
   def dynamoClientLocalFlags = Map(
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
     "aws.dynamoDb.accessKey" -> accessKey,
-    "aws.dynamoDb.secretKey" -> secretKey
+    "aws.dynamoDb.secretKey" -> secretKey,
     "aws.region" -> "localhost"
   )
 
