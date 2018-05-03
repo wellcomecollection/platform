@@ -160,7 +160,7 @@ trait Messaging
     testWith(messageWriter)
   }
 
-  def withMessageReaderFixtures[R](
+  def withExampleObjectMessageReaderFixtures[R](
     testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
     withLocalS3Bucket { bucket =>
       withLocalSnsTopic { topic =>
@@ -170,6 +170,55 @@ trait Messaging
       }
     }
   }
+
+  def withMessageWorkerFixtures[R](
+    testWith: TestWith[(metrics.MetricsSender,
+                        Queue,
+                        Bucket,
+                        ExampleMessageWorker),
+                       R]) = {
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        withLocalStackSqsQueue { queue =>
+          withExampleObjectMessageReaderFixtures {
+            case (bucket, messageReader) =>
+              withMessageWorker(
+                actorSystem,
+                metricsSender,
+                queue,
+                messageReader) { worker =>
+                testWith((metricsSender, queue, bucket, worker))
+              }
+          }
+        }
+      }
+    }
+  }
+
+  def withMessageWorkerFixturesAndMockedMetrics[R](
+    testWith: TestWith[(metrics.MetricsSender,
+                        Queue,
+                        Bucket,
+                        ExampleMessageWorker),
+                       R]) = {
+    withActorSystem { actorSystem =>
+      withMockMetricSender { metricsSender =>
+        withLocalStackSqsQueue { queue =>
+          withExampleObjectMessageReaderFixtures {
+            case (bucket, messageReader) =>
+              withMessageWorker(
+                actorSystem,
+                metricsSender,
+                queue,
+                messageReader) { worker =>
+                testWith((metricsSender, queue, bucket, worker))
+              }
+          }
+        }
+      }
+    }
+  }
+
 
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {
@@ -209,52 +258,5 @@ trait Messaging
     tryT shouldBe a[Success[_]]
 
     tryT.get
-  }
-  def withMessageWorkerFixtures[R](
-    testWith: TestWith[(metrics.MetricsSender,
-                        Queue,
-                        Bucket,
-                        ExampleMessageWorker),
-                       R]) = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures {
-            case (bucket, messageReader) =>
-              withMessageWorker(
-                actorSystem,
-                metricsSender,
-                queue,
-                messageReader) { worker =>
-                testWith((metricsSender, queue, bucket, worker))
-              }
-          }
-        }
-      }
-    }
-  }
-
-  def withMessageWorkerFixturesAndMockedMetrics[R](
-    testWith: TestWith[(metrics.MetricsSender,
-                        Queue,
-                        Bucket,
-                        ExampleMessageWorker),
-                       R]) = {
-    withActorSystem { actorSystem =>
-      withMockMetricSender { metricsSender =>
-        withLocalStackSqsQueue { queue =>
-          withMessageReaderFixtures {
-            case (bucket, messageReader) =>
-              withMessageWorker(
-                actorSystem,
-                metricsSender,
-                queue,
-                messageReader) { worker =>
-                testWith((metricsSender, queue, bucket, worker))
-              }
-          }
-        }
-      }
-    }
   }
 }

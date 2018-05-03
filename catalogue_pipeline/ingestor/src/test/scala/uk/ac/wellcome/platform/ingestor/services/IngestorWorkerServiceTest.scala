@@ -15,6 +15,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
@@ -48,6 +49,11 @@ class IngestorWorkerServiceTest
   val identifiedWorkKeyPrefixGenerator = new KeyPrefixGenerator[IdentifiedWork] {
     override def generate(obj: IdentifiedWork): String = ""
   }
+
+  // The ingestor doesn't send messages so doesn't need a topic.
+  // This is needed because MessageConfig (which is used be MessageReader) needs one
+  // TODO remove this once MessageConfig gets split into MessageReaderConfig and MessageWriterConfig
+  val topic = Topic("")
 
   def createMiroWork(
     canonicalId: String,
@@ -112,7 +118,7 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
+
           withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
               withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -141,7 +147,6 @@ class IngestorWorkerServiceTest
             }
           }
         }
-      }
     }
   }
 
@@ -157,7 +162,6 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
         withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -185,7 +189,6 @@ class IngestorWorkerServiceTest
             }
           }
         }
-        }
       }
     }
   }
@@ -203,7 +206,6 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
           withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
               withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -226,7 +228,6 @@ class IngestorWorkerServiceTest
               }
             }
           }
-        }
       }
     }
   }
@@ -255,7 +256,6 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
           withMessageReader[IdentifiedWork, Assertion](bucket, topic, identifiedWorkKeyPrefixGenerator) { messageReader =>
 
             val service = new IngestorWorkerService(
@@ -274,7 +274,6 @@ class IngestorWorkerServiceTest
             }
           }
         }
-      }
     }
   }
 }

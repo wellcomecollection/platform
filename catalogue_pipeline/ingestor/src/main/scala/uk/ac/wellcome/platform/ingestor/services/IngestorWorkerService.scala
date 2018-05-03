@@ -11,6 +11,7 @@ import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.util.Try
