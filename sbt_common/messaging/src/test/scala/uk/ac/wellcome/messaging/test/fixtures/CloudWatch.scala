@@ -12,10 +12,11 @@ import scala.concurrent.duration._
 
 trait CloudWatch extends ImplicitLogging {
   protected val awsNamespace: String = "test"
-  protected val flushInterval: FiniteDuration = 1 second
 
-  protected val localCloudWatchEndpointUrl = "http://localhost:4582"
-  protected val regionName = "eu-west-1"
+  protected val localCloudWatchEndpointUrl: String = "http://localhost:4582"
+  protected val regionName: String = "eu-west-1"
+
+  protected val flushInterval: FiniteDuration = 1 second
 
   protected val accessKey: String = "accessKey1"
   protected val secretKey: String = "verySecretKey1"
@@ -34,4 +35,5 @@ trait CloudWatch extends ImplicitLogging {
     .withEndpointConfiguration(
       new EndpointConfiguration(localCloudWatchEndpointUrl, regionName))
     .build()
+
 }
