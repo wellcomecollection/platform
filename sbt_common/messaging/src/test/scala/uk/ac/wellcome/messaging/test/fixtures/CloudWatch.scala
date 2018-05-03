@@ -6,11 +6,11 @@ import com.amazonaws.services.cloudwatch.{
   AmazonCloudWatch,
   AmazonCloudWatchClientBuilder
 }
-import org.scalatest.Suite
+import uk.ac.wellcome.test.fixtures.ImplicitLogging
 
 import scala.concurrent.duration._
 
-trait CloudWatch { this: Suite =>
+trait CloudWatch extends ImplicitLogging {
   protected val awsNamespace: String = "test"
   protected val flushInterval: FiniteDuration = 1 second
 
