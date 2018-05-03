@@ -13,8 +13,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._
 
-abstract class MessageWorker[T](sqsReader: SQSReader,
-                                messageReader: MessageReader[T],
+abstract class MessageWorker[T](messageReader: MessageReader[T],
                                 actorSystem: ActorSystem,
                                 metricsSender: MetricsSender)
     extends Logging {
@@ -33,15 +32,16 @@ abstract class MessageWorker[T](sqsReader: SQSReader,
 
   private def processMessages()(
     implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
-    sqsReader.retrieveAndDeleteMessages { message =>
-      for {
-        message <- messageReader.read(message)
-        _ <- Future.successful { debug(s"Processing message: $message") }
-        metricName = s"${workerName}_ProcessMessage"
-        _ <- metricsSender.timeAndCount(
-          metricName,
-          () => processMessage(message))
-      } yield ()
+    messageReader.readAndDelete { t =>
+
+      val metricName = s"${workerName}_ProcessMessage"
+
+      debug(s"Processing message: $t")
+      metricsSender.timeAndCount(
+        metricName = metricName,
+        fun = () => processMessage(t)
+      )
+
     } recover {
       case exception: Throwable => {
         logger.error(s"Failure while processing message.", exception)

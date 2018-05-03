@@ -38,7 +38,7 @@ class MessagingIntegrationTest
   private def withLocalStackMessageWriter[R](
     testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]),
                        R]) = {
-    withMessageWorkerFixtures {
+    withExampleObjectMessageWorkerFixtures {
       case (metricsSender, queue, bucket, worker) =>
         withLocalStackSnsTopic { topic =>
           withLocalStackSubscription(queue, topic) { _ =>

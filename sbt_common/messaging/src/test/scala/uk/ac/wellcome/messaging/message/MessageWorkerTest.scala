@@ -22,7 +22,7 @@ class MessageWorkerTest
     with Messaging {
 
   it("processes messages") {
-    withMessageWorkerFixtures {
+    withExampleObjectMessageWorkerFixtures {
       case (_, queue, bucket, worker) =>
         val key = "message-key"
 
