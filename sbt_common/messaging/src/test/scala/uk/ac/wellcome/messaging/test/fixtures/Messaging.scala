@@ -11,6 +11,7 @@ import uk.ac.wellcome.messaging.message.{
   MessageWorker,
   MessageWriter
 }
+import uk.ac.wellcome.messaging.metrics
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic

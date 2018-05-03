@@ -7,6 +7,7 @@ import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.metrics
+import uk.ac.wellcome.test.fixtures.ImplicitLogging
 
 import scala.concurrent.Future
 
