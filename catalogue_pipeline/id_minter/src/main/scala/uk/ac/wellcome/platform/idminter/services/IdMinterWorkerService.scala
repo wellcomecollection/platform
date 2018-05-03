@@ -26,10 +26,7 @@ class IdMinterWorkerService @Inject()(
   override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"
 
-  override implicit val decoder: Decoder[Json] = Decoder.instanceTry[Json] {
-    hCursor =>
-      Try(hCursor.value)
-  }
+  override implicit val decoder: Decoder[Json] = Decoder.decodeJson
 
   override def processMessage(json: Json): Future[Unit] =
     for {
