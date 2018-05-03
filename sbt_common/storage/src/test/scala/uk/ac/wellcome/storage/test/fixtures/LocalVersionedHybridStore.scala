@@ -25,6 +25,12 @@ trait LocalVersionedHybridStore
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
+  def vhsLocalFlags(bucket: Bucket, table: Table) =
+    Map(
+      "aws.vhs.s3.bucketName" -> bucket.name,
+      "aws.vhs.dynamo.tableName" -> table.name
+    ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
+
   def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
     testWith: TestWith[VersionedHybridStore[T], R]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
