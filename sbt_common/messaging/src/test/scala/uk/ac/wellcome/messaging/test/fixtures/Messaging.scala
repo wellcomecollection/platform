@@ -35,8 +35,7 @@ trait Messaging
     with MetricsSender
     with SQS
     with SNS
-    with S3
-    with ImplicitLogging {
+    with S3 {
 
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](

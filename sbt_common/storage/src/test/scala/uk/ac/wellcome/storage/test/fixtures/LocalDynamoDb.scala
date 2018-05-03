@@ -22,8 +22,7 @@ object LocalDynamoDb {
 }
 
 trait LocalDynamoDb[T <: Versioned with Id]
-    extends ImplicitLogging
-    with Eventually {
+    extends Eventually {
 
   import LocalDynamoDb._
 

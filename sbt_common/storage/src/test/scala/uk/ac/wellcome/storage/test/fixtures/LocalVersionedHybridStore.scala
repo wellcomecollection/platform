@@ -19,8 +19,7 @@ trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]
     with S3
     with JsonTestUtil
-    with Matchers
-    with ImplicitLogging {
+    with Matchers {
 
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
