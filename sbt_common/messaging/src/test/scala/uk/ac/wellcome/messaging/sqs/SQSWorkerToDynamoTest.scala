@@ -91,23 +91,27 @@ class SQSWorkerToDynamoTest
       }
     }
 
-  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
-    system: ActorSystem,
-    queue: Queue)(testWith: TestWith[TestWorker, R]) = {
-    val worker = testWorkFactory(queue, system)
-
-    try {
-      testWith(worker)
-    } finally {
-      worker.stop()
-    }
-  }
+  def withTestWorker[R](
+    testWorkFactory: TestWorkerFactory)(system: ActorSystem, queue: Queue) =
+    fixture[TestWorker, R](
+      create = {
+        testWorkFactory(queue, system)
+      },
+      destroy = { worker =>
+        worker.stop()
+      }
+    )
 
   def withFixtures[R](
-    testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory) =
-    withActorSystem[R] and
-      withLocalSqsQueue[R] and
-      withTestWorker[R](testWorkFactory) _
+    testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory
+  )(testWith: TestWith[(ActorSystem, Queue, TestWorker), R]): R =
+    withActorSystem[R] { actorSystem =>
+      withLocalSqsQueue[R] { q =>
+        withTestWorker[R](testWorkFactory)(actorSystem, q) { worker =>
+          testWith((actorSystem, q, worker))
+        }
+      }
+    }
 
   it("processes messages") {
     withFixtures() {
@@ -116,17 +120,6 @@ class SQSWorkerToDynamoTest
 
         eventually {
           worker.processCalled shouldBe true
-          worker.terminalFailure shouldBe false
-        }
-    }
-  }
-
-  it("fails gracefully when receiving a ConditionalCheckFailedException") {
-    withFixtures(conditionalCheckFailingTestWorkerFactory) {
-      case (_, queue, worker) =>
-        sqsClient.sendMessage(queue.url, testMessageJson)
-
-        eventually {
           worker.terminalFailure shouldBe false
         }
     }
@@ -153,16 +146,29 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  it(
-    "fails terminally when receiving an exception other than ConditionalCheckFailedException") {
-    withFixtures(terminalTestWorkerFactory) {
-      case (_, queue, worker) =>
-        sqsClient.sendMessage(queue.url, testMessageJson)
+  describe("with ConditionalCheckFailedException") {
+    it("fails gracefully") {
+      withFixtures(conditionalCheckFailingTestWorkerFactory) {
+        case (_, queue, worker) =>
+          sqsClient.sendMessage(queue.url, testMessageJson)
 
-        eventually {
-          worker.terminalFailure shouldBe true
-        }
+          eventually {
+            worker.terminalFailure shouldBe false
+          }
+      }
     }
   }
 
+  describe("without ConditionalCheckFailedException") {
+    it("fails terminally") {
+      withFixtures(terminalTestWorkerFactory) {
+        case (_, queue, worker) =>
+          sqsClient.sendMessage(queue.url, testMessageJson)
+
+          eventually {
+            worker.terminalFailure shouldBe true
+          }
+      }
+    }
+  }
 }

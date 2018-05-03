@@ -57,11 +57,17 @@ class SQSWorkerTest
     timestamp = "timestamp"
   )
 
-  def withFixtures[R] =
-    withActorSystem[R] and
-      withLocalSqsQueue[R] and
-      withMockMetricSender[R] and
-      withSqsWorker[R] _
+  def withFixtures[R](
+    testWith: TestWith[(ActorSystem, Queue, MetricsSender, SQSWorker), R]
+  ): R = withActorSystem[R] { actorSystem =>
+    withLocalSqsQueue[R] { q =>
+      withMockMetricSender[R] { metricsSender =>
+        withSqsWorker[R](actorSystem, q, metricsSender) { worker =>
+          testWith((actorSystem, q, metricsSender, worker))
+        }
+      }
+    }
+  }
 
   it("processes messages") {
     withFixtures {

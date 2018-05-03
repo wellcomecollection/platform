@@ -1,17 +1,18 @@
 package uk.ac.wellcome.test
 
+import com.twitter.inject.Logging
 import grizzled.slf4j.Logger
 
 import scala.util.Try
 
-package object fixtures extends FixtureComposers {
+package object fixtures extends Logging {
+
+  implicit val implicitLogger = logger
 
   type TestWith[T, R] = T => R
-
   type Fixture[L, R] = TestWith[L, R] => R
 
-  def safeCleanup[L](resource: L)(f: L => Unit)(
-    implicit logger: Logger): Unit = {
+  def safeCleanup[L](resource: L)(f: L => Unit): Unit = {
     Try {
       logger.debug(s"cleaning up resource=[$resource]")
       f(resource)
@@ -22,8 +23,7 @@ package object fixtures extends FixtureComposers {
 
   private val noop = (x: Any) => ()
 
-  def fixture[L, R](create: => L, destroy: L => Unit = noop)(
-    implicit logger: Logger): Fixture[L, R] =
+  def fixture[L, R](create: => L, destroy: L => Unit = noop): Fixture[L, R] =
     (testWith: TestWith[L, R]) => {
       val loan = create
       logger.debug(s"created test resource=[$loan]")
@@ -33,14 +33,4 @@ package object fixtures extends FixtureComposers {
         safeCleanup(loan) { destroy(_) }
       }
     }
-
-  implicit class ComposableFixture[L1, R](
-    private val thisFixture: Fixture[L1, R]) {
-
-    def and[T, L2](that: T)(
-      implicit fc: FixtureComposer[L1, L2, T, R]): Fixture[L2, R] =
-      fc.compose(thisFixture, that)
-
-  }
-
 }
