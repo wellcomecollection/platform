@@ -23,10 +23,7 @@ class IngestorWorkerService @Inject()(
   messageReader: MessageReader[IdentifiedWork],
   system: ActorSystem,
   metrics: MetricsSender)
-    extends MessageWorker[IdentifiedWork](
-      messageReader,
-      system,
-      metrics) {
+    extends MessageWorker[IdentifiedWork](messageReader, system, metrics) {
 
   override def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =

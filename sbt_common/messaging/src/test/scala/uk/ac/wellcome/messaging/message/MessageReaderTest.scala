@@ -12,19 +12,17 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
-
 class MessageReaderTest
     extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
-    with S3 with ExtendedPatience {
-
+    with S3
+    with ExtendedPatience {
 
   it("reads and deletes messages") {
     withExampleObjectMessageReaderFixtures {
       case (bucket, messageReader, queue) =>
-
         val key = "message-key"
         val exampleObject = ExampleObject("some value")
 

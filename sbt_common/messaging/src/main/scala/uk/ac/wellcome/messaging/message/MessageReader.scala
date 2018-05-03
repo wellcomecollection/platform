@@ -16,10 +16,10 @@ case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
 import scala.concurrent.Future
 
 class MessageReader[T] @Inject()(
-                                  messageReaderConfig: MessageReaderConfig,
-                                  s3Client: AmazonS3,
-                                  sqsClient: AmazonSQS,
-                                  keyPrefixGenerator: KeyPrefixGenerator[T]
+  messageReaderConfig: MessageReaderConfig,
+  s3Client: AmazonS3,
+  sqsClient: AmazonSQS,
+  keyPrefixGenerator: KeyPrefixGenerator[T]
 ) {
   val sqsReader = new SQSReader(sqsClient, messageReaderConfig.sqsConfig)
 

@@ -13,15 +13,15 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 case class MessageWriterConfig(
-                                snsConfig: SNSConfig,
-                                s3Config: S3Config
-                              )
+  snsConfig: SNSConfig,
+  s3Config: S3Config
+)
 
 class MessageWriter[T] @Inject()(
-                                  messageConfig: MessageWriterConfig,
-                                  snsClient: AmazonSNS,
-                                  s3Client: AmazonS3,
-                                  keyPrefixGenerator: KeyPrefixGenerator[T]
+  messageConfig: MessageWriterConfig,
+  snsClient: AmazonSNS,
+  s3Client: AmazonS3,
+  keyPrefixGenerator: KeyPrefixGenerator[T]
 ) extends Logging {
 
   private val sns = new SNSWriter(

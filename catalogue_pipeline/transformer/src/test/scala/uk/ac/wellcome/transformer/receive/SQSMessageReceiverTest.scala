@@ -12,7 +12,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.{MessageWriterConfig, MessageWriter}
+import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sqs.SQSMessage

@@ -33,7 +33,6 @@ abstract class MessageWorker[T](messageReader: MessageReader[T],
   private def processMessages()(
     implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
     messageReader.readAndDelete { t =>
-
       val metricName = s"${workerName}_ProcessMessage"
 
       debug(s"Processing message: $t")

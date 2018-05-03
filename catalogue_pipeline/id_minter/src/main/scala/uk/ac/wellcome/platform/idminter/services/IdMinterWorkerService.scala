@@ -18,11 +18,11 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
-                                       idEmbedder: IdEmbedder,
-                                       writer: MessageWriter[Json],
-                                       messageReader: MessageReader[Json],
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
+  idEmbedder: IdEmbedder,
+  writer: MessageWriter[Json],
+  messageReader: MessageReader[Json],
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends MessageWorker[Json](messageReader, system, metrics) {
 
   override lazy val poll = 100 milliseconds
