@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.fixtures
+package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
