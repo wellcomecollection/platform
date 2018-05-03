@@ -30,7 +30,6 @@ class Server extends HttpServer {
     AkkaModule,
     SQSClientModule,
     SQSConfigModule,
-    SNSConfigModule,
     SNSClientModule,
     TransformerWorkerModule,
     S3ClientModule,

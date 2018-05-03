@@ -57,7 +57,7 @@ class MiroTransformerFeatureTest
 
             val flags: Map[String, String] = Map(
               "aws.metrics.namespace" -> "sierra-transformer"
-            ) ++ s3LocalFlags(storageBucket) ++ snsLocalFlags(topic) ++
+            ) ++ s3LocalFlags(storageBucket) ++
               sqsLocalFlags(queue) ++ messagingLocalFlags(messageBucket, topic)
 
             withServer(flags) { _ =>
