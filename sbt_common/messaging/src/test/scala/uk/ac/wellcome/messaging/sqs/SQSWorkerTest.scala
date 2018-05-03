@@ -63,7 +63,7 @@ class SQSWorkerTest
     withLocalSqsQueue[R] { q =>
       withMockMetricSender[R] { metricsSender =>
         withSqsWorker[R](actorSystem, q, metricsSender) { worker =>
-          testWith((actorSystem,q,metricsSender,worker))
+          testWith((actorSystem, q, metricsSender, worker))
         }
       }
     }

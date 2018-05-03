@@ -33,12 +33,12 @@ class VersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withFixtures[R](
-    testWith: TestWith[(Bucket,Table,VersionedHybridStore[ExampleRecord]), R]
+    testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord]), R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withVersionedHybridStore[ExampleRecord, R](bucket, table) { vhs =>
-          testWith((bucket,table,vhs))
+          testWith((bucket, table, vhs))
         }
       }
     }

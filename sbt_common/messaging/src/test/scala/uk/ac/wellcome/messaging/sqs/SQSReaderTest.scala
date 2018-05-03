@@ -39,9 +39,10 @@ class SQSReaderTest
     testWith(sqsReader)
   }
 
-  def withFixtures[R](maxMessages: Int)(testWith: TestWith[(Queue,SQSReader), R]): R  = withLocalSqsQueue[R] { q =>
+  def withFixtures[R](maxMessages: Int)(
+    testWith: TestWith[(Queue, SQSReader), R]): R = withLocalSqsQueue[R] { q =>
     withSqsReader[R](maxMessages)(q) { reader =>
-      testWith((q,reader))
+      testWith((q, reader))
     }
   }
 

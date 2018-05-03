@@ -25,7 +25,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 case class TestObject(foo: String)
 
 class SQSWorkerToDynamoTest
-  extends FunSpec
+    extends FunSpec
     with MockitoSugar
     with Matchers
     with Eventually
@@ -50,10 +50,10 @@ class SQSWorkerToDynamoTest
   val testMessageJson = toJson(testMessage).get
 
   class TestWorker(queue: Queue, system: ActorSystem)
-    extends SQSWorkerToDynamo[TestObject](
-      new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-      system,
-      metricsSender) {
+      extends SQSWorkerToDynamo[TestObject](
+        new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+        system,
+        metricsSender) {
 
     override lazy val poll = 100 millisecond
 
@@ -91,20 +91,20 @@ class SQSWorkerToDynamoTest
       }
     }
 
-  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
-    system: ActorSystem,
-    queue: Queue) = fixture[TestWorker, R](
-    create = {
-      testWorkFactory(queue, system)
-    },
-    destroy = { worker =>
-      worker.stop()
-    }
-  )
+  def withTestWorker[R](
+    testWorkFactory: TestWorkerFactory)(system: ActorSystem, queue: Queue) =
+    fixture[TestWorker, R](
+      create = {
+        testWorkFactory(queue, system)
+      },
+      destroy = { worker =>
+        worker.stop()
+      }
+    )
 
   def withFixtures[R](
-                       testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory
-                     )(testWith: TestWith[(ActorSystem, Queue, TestWorker), R]): R =
+    testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory
+  )(testWith: TestWith[(ActorSystem, Queue, TestWorker), R]): R =
     withActorSystem[R] { actorSystem =>
       withLocalSqsQueue[R] { q =>
         withTestWorker[R](testWorkFactory)(actorSystem, q) { worker =>
