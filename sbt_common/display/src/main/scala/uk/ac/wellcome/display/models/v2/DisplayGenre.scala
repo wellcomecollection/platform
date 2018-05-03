@@ -10,8 +10,7 @@ case class DisplayGenre(label: String,
 
 object DisplayGenre {
   def apply(genre: Genre): DisplayGenre =
-    DisplayGenre(
-      label = genre.label,
-      concepts = genre.concepts.map { DisplayAbstractConcept(_) },
-      ontologyType = genre.ontologyType )
+    DisplayGenre(label = genre.label, concepts = genre.concepts.map {
+      DisplayAbstractConcept(_)
+    }, ontologyType = genre.ontologyType)
 }

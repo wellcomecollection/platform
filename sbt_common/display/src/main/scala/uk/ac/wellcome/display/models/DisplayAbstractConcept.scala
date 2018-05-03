@@ -26,10 +26,10 @@ case object DisplayAbstractConcept {
   description = "A broad concept"
 )
 case class DisplayConcept(
-                           @ApiModelProperty(
-                             dataType = "String"
-                           ) label: String
-                         ) extends DisplayAbstractConcept {
+  @ApiModelProperty(
+    dataType = "String"
+  ) label: String
+) extends DisplayAbstractConcept {
   @JsonProperty("type") val ontologyType: String = "Concept"
 }
 case object DisplayConcept {
@@ -43,10 +43,10 @@ case object DisplayConcept {
   description = "A period of time"
 )
 case class DisplayPeriod(
-                          @ApiModelProperty(
-                            dataType = "String"
-                          ) label: String
-                        ) extends DisplayAbstractConcept {
+  @ApiModelProperty(
+    dataType = "String"
+  ) label: String
+) extends DisplayAbstractConcept {
   @JsonProperty("type") val ontologyType: String = "Period"
 }
 case object DisplayPeriod {
@@ -60,10 +60,10 @@ case object DisplayPeriod {
   description = "A place"
 )
 case class DisplayPlace(
-                         @ApiModelProperty(
-                           dataType = "String"
-                         ) label: String
-                       ) extends DisplayAbstractConcept {
+  @ApiModelProperty(
+    dataType = "String"
+  ) label: String
+) extends DisplayAbstractConcept {
   @JsonProperty("type") val ontologyType: String = "Place"
 }
 case object DisplayPlace {

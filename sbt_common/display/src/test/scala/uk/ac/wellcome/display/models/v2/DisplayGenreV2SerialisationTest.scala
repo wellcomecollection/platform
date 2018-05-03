@@ -4,12 +4,14 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal.{Concept, Genre, Place}
 
-class DisplayGenreV2SerialisationTest extends FunSpec
-  with JsonMapperTestUtil {
+class DisplayGenreV2SerialisationTest extends FunSpec with JsonMapperTestUtil {
 
   it("serialises a DisplayGenre constructed from a Genre correctly") {
     assertObjectMapsToJson(
-      DisplayGenre(Genre("genreLabel", List(Concept("conceptLabel"), Place("placeLabel")))),
+      DisplayGenre(
+        Genre(
+          "genreLabel",
+          List(Concept("conceptLabel"), Place("placeLabel")))),
       expectedJson = s"""
          |  {
          |    "label" : "genreLabel",
@@ -25,6 +27,7 @@ class DisplayGenreV2SerialisationTest extends FunSpec
          |    ],
          |    "type" : "Genre"
          |  }
-          """.stripMargin)
+          """.stripMargin
+    )
   }
 }

@@ -104,7 +104,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           subjects = List(subject),
           genres = List(genre),
           items = List(defaultItem),
-          visible = true)
+          visible = true
+        )
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -210,7 +211,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("returns the requested page of results when requested with page & pageSize") {
+  it(
+    "returns the requested page of results when requested with page & pageSize") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
@@ -387,7 +389,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+  it(
+    "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
@@ -452,7 +455,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+  it(
+    "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
@@ -620,7 +624,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     }
   }
 
-  it("includes the thumbnail field if available and we use the thumbnail include") {
+  it(
+    "includes the thumbnail field if available and we use the thumbnail include") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(

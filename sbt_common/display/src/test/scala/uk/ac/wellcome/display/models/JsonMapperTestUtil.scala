@@ -11,7 +11,8 @@ trait JsonMapperTestUtil extends JsonTestUtil {
   val objectMapper: ObjectMapper = injector.getInstance(classOf[ObjectMapper])
 
   def assertObjectMapsToJson(displayObject: Any, expectedJson: String) = {
-    assertJsonStringsAreEqual(objectMapper.writeValueAsString(displayObject), expectedJson)
+    assertJsonStringsAreEqual(
+      objectMapper.writeValueAsString(displayObject),
+      expectedJson)
   }
 }
-

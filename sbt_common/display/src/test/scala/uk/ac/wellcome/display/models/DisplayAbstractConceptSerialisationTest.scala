@@ -1,10 +1,16 @@
 package uk.ac.wellcome.display.models
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Period, Place}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Period,
+  Place
+}
 
-class DisplayAbstractConceptSerialisationTest extends FunSpec
-  with JsonMapperTestUtil {
+class DisplayAbstractConceptSerialisationTest
+    extends FunSpec
+    with JsonMapperTestUtil {
 
   it("constructs a DisplayConcept from a Concept correctly") {
     assertObjectMapsToJson(
@@ -42,13 +48,14 @@ class DisplayAbstractConceptSerialisationTest extends FunSpec
     )
   }
 
-  it("serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
+  it(
+    "serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
     assertObjectMapsToJson(
       List[AbstractConcept](
         Concept("conceptLabel"),
         Place("placeLabel"),
         Period("periodLabel")
-      ).map( DisplayAbstractConcept(_) ),
+      ).map(DisplayAbstractConcept(_)),
       expectedJson = s"""
           | [
           |    {

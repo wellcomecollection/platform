@@ -1,8 +1,17 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, JsonMapperTestUtil, WorksIncludes, WorksUtil}
-import uk.ac.wellcome.models.work.internal.{IdentifiedItem, IdentifiedWork, PhysicalLocation}
+import uk.ac.wellcome.display.models.{
+  DisplaySerialisationTestBase,
+  JsonMapperTestUtil,
+  WorksIncludes,
+  WorksUtil
+}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedItem,
+  IdentifiedWork,
+  PhysicalLocation
+}
 
 class DisplayLocationsV2SerialisationTest
     extends FunSpec

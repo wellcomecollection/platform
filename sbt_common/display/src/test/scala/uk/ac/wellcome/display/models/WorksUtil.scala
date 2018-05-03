@@ -13,16 +13,18 @@ trait WorksUtil {
     id = "1dz4yn34va",
     label = "An aggregation of angry archipelago aged ankylosaurs."
   )
-  val subject = Subject("a subject",
-      List(
-        Concept("a subject concept"),
-        Place("a subject place"),
-        Period("a subject period")))
-  val genre = Genre("a genre",
-      List(
-        Concept("a genre concept"),
-        Place("a genre place"),
-        Period("a genre period")))
+  val subject = Subject(
+    "a subject",
+    List(
+      Concept("a subject concept"),
+      Place("a subject place"),
+      Period("a subject period")))
+  val genre = Genre(
+    "a genre",
+    List(
+      Concept("a genre concept"),
+      Place("a genre place"),
+      Period("a genre period")))
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
     "Work",
