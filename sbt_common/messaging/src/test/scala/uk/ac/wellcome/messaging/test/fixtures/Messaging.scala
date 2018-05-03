@@ -142,7 +142,7 @@ trait Messaging
                             testWith: TestWith[MessageWriter[ExampleObject], R]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
-    val messageConfig = MessageConfig(
+    val messageConfig = MessageWriterConfig(
       s3Config = s3Config,
       snsConfig = snsConfig
     )
