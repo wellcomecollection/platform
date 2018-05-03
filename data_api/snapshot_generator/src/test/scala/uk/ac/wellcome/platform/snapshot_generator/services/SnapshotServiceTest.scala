@@ -19,7 +19,10 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifierSchemes.sierraSystemNumber
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, SourceIdentifier}
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket

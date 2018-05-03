@@ -2,7 +2,12 @@ package uk.ac.wellcome.display.models
 
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Period, Place}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Period,
+  Place
+}
 
 class DisplayAbstractConceptSerialisationTest
     extends FunSpec
