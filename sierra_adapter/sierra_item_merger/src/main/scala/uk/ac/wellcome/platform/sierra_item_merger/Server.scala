@@ -27,7 +27,6 @@ class Server extends HttpServer {
     DynamoClientModule,
     VHSConfigModule,
     MetricsSenderModule,
-    VHSConfigModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
