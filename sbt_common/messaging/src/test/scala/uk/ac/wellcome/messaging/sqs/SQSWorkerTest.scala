@@ -5,7 +5,6 @@ import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.fixtures
@@ -14,7 +13,11 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import akka.actor.ActorSystem
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.messaging.test.fixtures.{
+  MetricsSender => MetricsSenderFixture,
+  SQS
+}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -25,7 +28,7 @@ class SQSWorkerTest
     with ExtendedPatience
     with fixtures.Akka
     with SQS
-    with fixtures.MetricsSender {
+    with MetricsSenderFixture {
 
   def withSqsWorker[R](
     actors: ActorSystem,

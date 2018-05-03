@@ -6,7 +6,7 @@ import io.circe.{Decoder, Json}
 import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker}
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.messaging.sqs.SQSReader
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

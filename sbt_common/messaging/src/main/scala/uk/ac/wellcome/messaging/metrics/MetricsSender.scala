@@ -1,4 +1,4 @@
-package uk.ac.wellcome.metrics
+package uk.ac.wellcome.messaging.metrics
 
 import java.util.Date
 

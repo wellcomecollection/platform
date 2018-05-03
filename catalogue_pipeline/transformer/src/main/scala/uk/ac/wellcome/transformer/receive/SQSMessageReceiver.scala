@@ -6,8 +6,9 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
+import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,

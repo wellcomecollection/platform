@@ -1,9 +1,5 @@
 package uk.ac.wellcome.models
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue
-import com.gu.scanamo.DynamoFormat
-import com.gu.scanamo.error.DynamoReadError
-
 trait Sourced extends Id {
   val sourceId: String
   val sourceName: String

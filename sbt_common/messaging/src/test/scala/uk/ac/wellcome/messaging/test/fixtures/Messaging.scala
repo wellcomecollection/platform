@@ -9,6 +9,7 @@ import com.amazonaws.services.sns.model.{
 }
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto._
+import uk.ac.wellcome.messaging.metrics
 import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}

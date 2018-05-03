@@ -5,7 +5,7 @@ import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.extras.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
