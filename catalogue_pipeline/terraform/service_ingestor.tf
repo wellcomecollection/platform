@@ -27,13 +27,14 @@ module "ingestor" {
     es_password       = "${var.es_config_ingestor["password"]}"
     es_protocol       = "${var.es_config_ingestor["protocol"]}"
     ingest_queue_id   = "${module.es_ingest_queue.id}"
+    message_bucket_name = "${aws_s3_bucket.messages.id}"
     metrics_namespace = "ingestor"
   }
 
   memory = "2048"
   cpu    = "512"
 
-  env_vars_length = 11
+  env_vars_length = 12
 
   alb_priority = 107
 
