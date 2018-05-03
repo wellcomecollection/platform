@@ -73,6 +73,11 @@ object Dependencies {
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   )
 
+  val scalacheckDependencies = Seq(
+    "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
@@ -92,23 +97,21 @@ object Dependencies {
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
-    "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
-    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
-    "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ akkaDependencies ++ dynamoDependencies ++ circeDependencies
+    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
+  ) ++ akkaDependencies ++ circeDependencies
 
   val pipelineModelDependencies = circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
-  val commonElasticsearchDependencies = commonDependencies ++ esDependencies
+  val commonElasticsearchDependencies = commonDependencies ++ esDependencies ++ scalacheckDependencies
 
   // We use Circe for all our JSON serialisation, but our local SNS container
   // returns YAML, and currently we use Jackson to parse that YAML.
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
   val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies
 
-  val commonStorageDependencies = commonDependencies ++ awsDependencies
+  val commonStorageDependencies = commonDependencies ++ awsDependencies ++ dynamoDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 
