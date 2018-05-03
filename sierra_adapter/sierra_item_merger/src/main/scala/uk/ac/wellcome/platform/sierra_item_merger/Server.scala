@@ -10,6 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
@@ -24,7 +25,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     DynamoClientModule,
     DynamoConfigModule,
-    AmazonCloudWatchModule,
+    MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,

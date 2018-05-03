@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.modules
+package uk.ac.wellcome.messaging.metrics
 
 import akka.actor.ActorSystem
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -9,12 +9,11 @@ import com.amazonaws.services.cloudwatch.{
 import com.google.inject.{Provides, Singleton}
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.AWSConfig
 
 import scala.concurrent.duration._
 
-object AmazonCloudWatchModule extends TwitterModule {
+object MetricsSenderModule extends TwitterModule {
   implicit val finteDurationFlaggable =
     Flaggable.mandatory[FiniteDuration](config =>
       Duration.apply(config).asInstanceOf[FiniteDuration])

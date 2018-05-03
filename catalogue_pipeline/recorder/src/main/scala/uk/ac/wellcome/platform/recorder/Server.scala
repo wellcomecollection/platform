@@ -6,6 +6,7 @@ import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceI
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
@@ -20,7 +21,7 @@ class Server extends HttpServer {
     DynamoConfigModule,
     DynamoClientModule,
     RecorderModule,
-    AmazonCloudWatchModule,
+    MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
