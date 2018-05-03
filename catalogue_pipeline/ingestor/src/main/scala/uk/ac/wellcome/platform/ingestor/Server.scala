@@ -11,6 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{
   SQSClientModule,
   SQSConfigModule,
@@ -24,7 +25,7 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.ingestor Ingestor"
   override val modules = Seq(
     AWSConfigModule,
-    AmazonCloudWatchModule,
+    MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
     AkkaModule,
