@@ -95,7 +95,7 @@ object Dependencies {
     "org.scalacheck" %% "scalacheck" % versions.scalaCheckVersion % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
-  ) ++ akkaDependencies ++ dynamoDependencies ++ circeDependencies
+  ) ++ awsDependencies ++ akkaDependencies ++ dynamoDependencies ++ circeDependencies
 
   val pipelineModelDependencies = circeDependencies
 
@@ -106,9 +106,9 @@ object Dependencies {
   // We use Circe for all our JSON serialisation, but our local SNS container
   // returns YAML, and currently we use Jackson to parse that YAML.
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
-  val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies
+  val commonMessagingDependencies = commonDependencies ++ jacksonDependencies
 
-  val commonStorageDependencies = commonDependencies ++ awsDependencies
+  val commonStorageDependencies = commonDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 

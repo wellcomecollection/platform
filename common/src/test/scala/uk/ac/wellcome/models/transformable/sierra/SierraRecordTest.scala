@@ -2,6 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra
 
 import java.time.Instant
 
+import com.amazonaws.services.kinesis.model.InvalidArgumentException
 import io.circe.ParsingFailure
 import org.scalatest.{FunSpec, Matchers}
 
@@ -46,7 +47,7 @@ class SierraRecordTest extends FunSpec with Matchers {
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
-      triedItemRecord.failed.get shouldBe a[IllegalArgumentException]
+      triedItemRecord.failed.get shouldBe a[InvalidArgumentException]
     }
 
     it("return a failure if bibIds is a list of non strings") {
@@ -57,7 +58,7 @@ class SierraRecordTest extends FunSpec with Matchers {
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
-      triedItemRecord.failed.get shouldBe a[IllegalArgumentException]
+      triedItemRecord.failed.get shouldBe a[InvalidArgumentException]
     }
 
     it("return a failure if bibIds is not a list") {
@@ -68,7 +69,7 @@ class SierraRecordTest extends FunSpec with Matchers {
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
-      triedItemRecord.failed.get shouldBe a[IllegalArgumentException]
+      triedItemRecord.failed.get shouldBe a[InvalidArgumentException]
     }
   }
 

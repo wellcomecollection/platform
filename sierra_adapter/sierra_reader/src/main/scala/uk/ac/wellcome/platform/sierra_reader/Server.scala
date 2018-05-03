@@ -10,7 +10,6 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_reader.modules.SierraReaderModule
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
@@ -22,7 +21,7 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.sierra_reader SierraReader"
   override val modules = Seq(
     SierraReaderModule,
-    MetricsSenderModule,
+    AmazonCloudWatchModule,
     AWSConfigModule,
     S3ClientModule,
     S3ConfigModule,

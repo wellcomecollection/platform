@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.extras.semiauto.deriveDecoder
-import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.platform.sierra_bib_merger.merger.BibMerger

@@ -1,6 +1,8 @@
 package uk.ac.wellcome.messaging.message
 
 import akka.actor.ActorSystem
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -8,7 +10,6 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.duration._
 import io.circe.Decoder
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._

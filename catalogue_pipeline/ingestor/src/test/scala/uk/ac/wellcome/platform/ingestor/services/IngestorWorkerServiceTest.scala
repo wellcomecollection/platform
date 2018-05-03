@@ -13,9 +13,9 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
   IdentifierSchemes,

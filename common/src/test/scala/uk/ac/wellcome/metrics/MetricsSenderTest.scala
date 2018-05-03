@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.metrics
+package uk.ac.wellcome.metrics
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit

@@ -10,7 +10,6 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.modules.SierraItemsToDynamoModule
 import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
@@ -24,7 +23,7 @@ class Server extends HttpServer {
     SierraItemsToDynamoModule,
     DynamoConfigModule,
     DynamoClientModule,
-    MetricsSenderModule,
+    AmazonCloudWatchModule,
     SQSConfigModule,
     SQSClientModule,
     AkkaModule

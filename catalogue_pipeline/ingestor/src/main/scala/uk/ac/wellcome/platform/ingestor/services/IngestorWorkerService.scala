@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._

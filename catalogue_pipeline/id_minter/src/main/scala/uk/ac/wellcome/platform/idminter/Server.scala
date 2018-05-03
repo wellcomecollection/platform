@@ -10,7 +10,6 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{
   SQSClientModule,
@@ -33,7 +32,7 @@ class Server extends HttpServer {
     SQSReaderModule,
     SNSConfigModule,
     SNSClientModule,
-    MetricsSenderModule
+    AmazonCloudWatchModule
   )
 
   override def configureHttp(router: HttpRouter) {

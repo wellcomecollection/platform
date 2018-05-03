@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.test.fixtures
+package uk.ac.wellcome.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
@@ -6,8 +6,7 @@ import com.twitter.inject.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.messaging.metrics
-import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.metrics
 
 import scala.concurrent.Future
 

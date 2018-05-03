@@ -5,8 +5,8 @@ import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sqs.SQSWorkerToDynamo
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.utils.GlobalExecutionContext._

@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.reindex_worker.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.messaging.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.reindex_worker.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.utils.AmazonCloudWatchFlag
 
-trait Server extends CloudWatch { this: Suite =>
+trait Server extends AmazonCloudWatchFlag { this: Suite =>
   def withServer[R](
     flags: Map[String, String],
     modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity
@@ -17,7 +17,7 @@ trait Server extends CloudWatch { this: Suite =>
         new AppServer(),
         flags = Map(
           "aws.region" -> "localhost"
-        ) ++ flags ++ cloudWatchLocalFlags
+        ) ++ flags ++ cloudWatchLocalEndpointFlag
       )
     )
 
