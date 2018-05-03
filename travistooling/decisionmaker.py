@@ -95,7 +95,14 @@ def does_file_affect_build_task(path, task):
             break
 
     else:  # pragma: no cover
-        raise RuntimeError("Unrecognised task: %s" % task)
+        if task == 'travis-format':
+            project = Project(
+                name='travis-format',
+                type='python_lib',
+                exclusive_path=None
+            )
+        else:
+            raise RuntimeError("Unrecognised task: %s" % task)
 
     # Changes to the sbt_common libraries should only be tested if the
     # application in question uses this library.
