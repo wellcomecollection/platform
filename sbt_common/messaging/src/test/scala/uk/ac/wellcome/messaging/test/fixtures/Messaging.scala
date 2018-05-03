@@ -9,8 +9,9 @@ import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe.generic.semiauto._
 import uk.ac.wellcome.messaging.message.{MessageConfig, MessageReader, MessageWorker, MessageWriter}
-import uk.ac.wellcome.messaging.metrics
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
+import uk.ac.wellcome.monitoring
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -21,9 +22,10 @@ import uk.ac.wellcome.storage.s3.{
 }
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -34,7 +36,7 @@ import com.amazonaws.services.sns.model.UnsubscribeRequest
 
 trait Messaging
     extends Akka
-    with MetricsSender
+    with MetricsSenderFixture
     with SQS
     with SNS
     with S3
@@ -67,7 +69,7 @@ trait Messaging
     sqsReader: SQSReader,
     messageReader: MessageReader[ExampleObject],
     actorSystem: ActorSystem,
-    metricsSender: metrics.MetricsSender
+    metricsSender: monitoring.MetricsSender
   ) extends MessageWorker[ExampleObject](
         sqsReader,
         messageReader,
@@ -122,7 +124,7 @@ trait Messaging
 
   def withMessageWorker[R](
     actorSystem: ActorSystem,
-    metricsSender: metrics.MetricsSender,
+    metricsSender: monitoring.MetricsSender,
     queue: Queue,
     messageReader: MessageReader[ExampleObject]
   )(testWith: TestWith[ExampleMessageWorker, R]) = {
@@ -177,7 +179,7 @@ trait Messaging
   }
 
   def withMessageWorkerFixtures[R](
-    testWith: TestWith[(metrics.MetricsSender,
+    testWith: TestWith[(monitoring.MetricsSender,
                         Queue,
                         Bucket,
                         ExampleMessageWorker),
@@ -201,7 +203,7 @@ trait Messaging
   }
 
   def withMessageWorkerFixturesAndMockedMetrics[R](
-    testWith: TestWith[(metrics.MetricsSender,
+    testWith: TestWith[(monitoring.MetricsSender,
                         Queue,
                         Bucket,
                         ExampleMessageWorker),

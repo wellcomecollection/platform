@@ -12,6 +12,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
+
 class MessageReader[T] @Inject()(
   messageConfig: MessageConfig,
   s3Client: AmazonS3,
