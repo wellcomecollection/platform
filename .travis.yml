@@ -69,7 +69,7 @@ jobs:
       env: TASK=travis-format
     - env: TASK=travistooling-test
 
-    - stage: test
+    - stage: sbt-common-test
       env: TASK=sbt-common-test
     - env: TASK=sbt-internal_model-test
     - env: TASK=sbt-display-test
@@ -78,7 +78,8 @@ jobs:
     - env: TASK=sbt-storage-test
 
     # Catalogue pipeline stack
-    - env: TASK=transformer-test
+    - stage: test
+      env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=id_minter-test
@@ -124,6 +125,7 @@ jobs:
 
 stages:
   - quicktest
+  - sbt-common-test
   - test
 
 # This has a Slack API token for posting messages about build failures to
