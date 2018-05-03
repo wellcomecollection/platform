@@ -21,13 +21,18 @@ class MessageReader[T] @Inject()(
                                   sqsConfig: SQSConfig
 
 ) {
+  val sqsReader = new SQSReader(sqsClient, sqsConfig)
+
+  val s3ObjectStore = new S3ObjectStore[T](
+    s3Client = s3Client,
+    s3Config = messageConfig.s3Config,
+    keyPrefixGenerator = keyPrefixGenerator
+  )
 
   def readAndDelete(f: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage],
     decoderT: Decoder[T]
   ): Future[Unit] = {
-    val sqsReader = new SQSReader(sqsClient, sqsConfig)
-
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
         t <- read(message)
@@ -36,13 +41,7 @@ class MessageReader[T] @Inject()(
     }
   }
 
-  val s3ObjectStore = new S3ObjectStore[T](
-    s3Client = s3Client,
-    s3Config = messageConfig.s3Config,
-    keyPrefixGenerator = keyPrefixGenerator
-  )
-
-  def read(message: sqs.model.Message)(
+  private def read(message: sqs.model.Message)(
     implicit decoderN: Decoder[NotificationMessage],
     decoderT: Decoder[T]
   ): Future[T] = {

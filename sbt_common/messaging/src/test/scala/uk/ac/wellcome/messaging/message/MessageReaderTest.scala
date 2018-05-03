@@ -6,10 +6,11 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.{S3ObjectLocation}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
 
@@ -19,7 +20,7 @@ class MessageReaderTest
     with Matchers
     with ScalaFutures
     with Messaging
-    with S3 {
+    with S3 with ExtendedPatience {
 
 
   it("reads and deletes messages") {
