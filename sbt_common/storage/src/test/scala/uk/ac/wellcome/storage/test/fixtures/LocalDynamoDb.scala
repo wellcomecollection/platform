@@ -33,14 +33,16 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def dynamoDbLocalEndpointFlags(table: Table) =
-    Map(
-      "aws.region" -> "localhost",
-      "aws.dynamo.tableName" -> table.name,
-      "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
-      "aws.dynamoDb.accessKey" -> accessKey,
-      "aws.dynamoDb.secretKey" -> secretKey
-    )
+  def dynamoDbLocalEndpointFlags(table: Table) = dynamoClientLocalFlags ++ Map(
+    "aws.dynamo.tableName" -> table.name
+  )
+
+  def dynamoClientLocalFlags = Map(
+    "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
+    "aws.dynamoDb.accessKey" -> accessKey,
+    "aws.dynamoDb.secretKey" -> secretKey,
+    "aws.region" -> "localhost"
+  )
 
   private val credentials = new AWSStaticCredentialsProvider(
     new BasicAWSCredentials(accessKey, secretKey))

@@ -1,11 +1,18 @@
 package uk.ac.wellcome.storage.vhs
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  S3Config,
+  S3ObjectLocation,
+  S3ObjectStore
+}
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
   IdGetter,
@@ -17,10 +24,22 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import scala.concurrent.Future
 
 class VersionedHybridStore[T <: Id] @Inject()(
-  s3Config: S3Config,
-  sourcedObjectStore: S3ObjectStore[T],
-  versionedDao: VersionedDao
+  vhsConfig: VHSConfig,
+  s3Client: AmazonS3,
+  keyPrefixGenerator: KeyPrefixGenerator[T],
+  dynamoDbClient: AmazonDynamoDB
 ) {
+
+  val sourcedObjectStore = new S3ObjectStore[T](
+    s3Client = s3Client,
+    s3Config = vhsConfig.s3Config,
+    keyPrefixGenerator = keyPrefixGenerator
+  )
+
+  val versionedDao = new VersionedDao(
+    dynamoDbClient = dynamoDbClient,
+    dynamoConfig = vhsConfig.dynamoConfig
+  )
 
   case class EmptyMetadata()
   private case class VersionedHybridObject(
@@ -115,7 +134,10 @@ class VersionedHybridStore[T <: Id] @Inject()(
       case Some(hybridRecord) => {
         sourcedObjectStore
           .get(
-            S3ObjectLocation(s3Config.bucketName, hybridRecord.s3key)
+            S3ObjectLocation(
+              bucket = vhsConfig.s3Config.bucketName,
+              key = hybridRecord.s3key
+            )
           )
           .map { s3Record =>
             Some(VersionedHybridObject(hybridRecord, s3Record))

@@ -14,8 +14,9 @@ import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
-import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
-import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.storage.dynamo.DynamoClientModule
+import uk.ac.wellcome.storage.s3.S3ClientModule
+import uk.ac.wellcome.storage.vhs.VHSConfigModule
 
 object ServerMain extends Server
 
@@ -23,7 +24,7 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.sierra_bib_merger SierraBibMerger"
   override val modules = Seq(
-    DynamoConfigModule,
+    VHSConfigModule,
     DynamoClientModule,
     SierraBibMergerModule,
     SierraKeyPrefixGeneratorModule,
@@ -31,7 +32,6 @@ class Server extends HttpServer {
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
-    S3ConfigModule,
     AkkaModule
   )
 
