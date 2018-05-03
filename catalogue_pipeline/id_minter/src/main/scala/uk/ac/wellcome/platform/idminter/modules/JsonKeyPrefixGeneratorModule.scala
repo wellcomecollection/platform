@@ -10,10 +10,10 @@ object JsonKeyPrefixGeneratorModule extends TwitterModule {
   @Provides
   @Singleton
   def provideKeyPrefixGenerator(): KeyPrefixGenerator[Json] =
-    new UnidentifiedWorkKeyPrefixGenerator()
+    new JsonKeyPrefixGenerator()
 }
 
-class UnidentifiedWorkKeyPrefixGenerator extends KeyPrefixGenerator[Json] {
+class JsonKeyPrefixGenerator extends KeyPrefixGenerator[Json] {
   override def generate(obj: Json): String = {
     obj.hashCode().toString
   }
