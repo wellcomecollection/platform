@@ -2,8 +2,8 @@ package uk.ac.wellcome.transformer.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
-import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.transformer.receive.SQSMessageReceiver
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

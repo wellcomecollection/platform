@@ -9,7 +9,7 @@ import com.amazonaws.services.cloudwatch.{
 import com.google.inject.{Provides, Singleton}
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.models.aws.AWSConfig
 
 import scala.concurrent.duration._

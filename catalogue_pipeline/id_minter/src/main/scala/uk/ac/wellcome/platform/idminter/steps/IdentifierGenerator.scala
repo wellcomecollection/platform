@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.Identifier

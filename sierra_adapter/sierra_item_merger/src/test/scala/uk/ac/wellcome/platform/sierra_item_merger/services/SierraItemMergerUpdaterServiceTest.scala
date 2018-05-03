@@ -6,8 +6,8 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.metrics.MetricsSender
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil

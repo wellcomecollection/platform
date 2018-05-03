@@ -10,7 +10,7 @@ import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord

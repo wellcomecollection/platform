@@ -7,7 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier

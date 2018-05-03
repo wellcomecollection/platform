@@ -5,7 +5,7 @@ import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.metrics.MetricsSender
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.fixtures
