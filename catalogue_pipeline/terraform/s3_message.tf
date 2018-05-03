@@ -6,8 +6,6 @@ resource "aws_s3_bucket" "messages" {
   bucket = "${local.messages_bucket_name}"
   acl    = "private"
 
-  policy = "${data.aws_iam_policy_document.allow_s3_messages_put_get.json}"
-
   lifecycle {
     prevent_destroy = true
   }
@@ -17,6 +15,8 @@ resource "aws_s3_bucket" "messages" {
     enabled = true
 
     expiration {
+      // SQS messages are kept in queues for 4 days and then discarded,
+      // so setting the expiration of messages in s3 to be the same
       days = 4
     }
   }
