@@ -3,8 +3,11 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import io.circe.{Decoder, Json}
-import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker}
-import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.messaging.message.{
+  MessageReader,
+  MessageWorker,
+  MessageWriter
+}
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
@@ -16,7 +19,7 @@ import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
   idEmbedder: IdEmbedder,
-  writer: SNSWriter,
+  writer: MessageWriter[Json],
   sqsReader: SQSReader,
   messageReader: MessageReader[Json],
   system: ActorSystem,
@@ -31,8 +34,8 @@ class IdMinterWorkerService @Inject()(
   override def processMessage(json: Json): Future[Unit] =
     for {
       identifiedJson <- idEmbedder.embedId(json)
-      _ <- writer.writeMessage(
-        message = identifiedJson.toString(),
+      _ <- writer.write(
+        message = identifiedJson,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

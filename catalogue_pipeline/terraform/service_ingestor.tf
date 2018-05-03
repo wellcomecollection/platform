@@ -17,23 +17,24 @@ module "ingestor" {
   release_id         = "${var.release_ids["ingestor"]}"
 
   env_vars = {
-    es_host           = "${data.template_file.es_cluster_host_ingestor.rendered}"
-    es_port           = "${var.es_config_ingestor["port"]}"
-    es_name           = "${var.es_config_ingestor["name"]}"
-    es_index_v1       = "${var.es_config_ingestor["index_v1"]}"
-    es_index_v2       = "${var.es_config_ingestor["index_v2"]}"
-    es_doc_type       = "${var.es_config_ingestor["doc_type"]}"
-    es_username       = "${var.es_config_ingestor["username"]}"
-    es_password       = "${var.es_config_ingestor["password"]}"
-    es_protocol       = "${var.es_config_ingestor["protocol"]}"
-    ingest_queue_id   = "${module.es_ingest_queue.id}"
-    metrics_namespace = "ingestor"
+    es_host             = "${data.template_file.es_cluster_host_ingestor.rendered}"
+    es_port             = "${var.es_config_ingestor["port"]}"
+    es_name             = "${var.es_config_ingestor["name"]}"
+    es_index_v1         = "${var.es_config_ingestor["index_v1"]}"
+    es_index_v2         = "${var.es_config_ingestor["index_v2"]}"
+    es_doc_type         = "${var.es_config_ingestor["doc_type"]}"
+    es_username         = "${var.es_config_ingestor["username"]}"
+    es_password         = "${var.es_config_ingestor["password"]}"
+    es_protocol         = "${var.es_config_ingestor["protocol"]}"
+    ingest_queue_id     = "${module.es_ingest_queue.id}"
+    message_bucket_name = "${aws_s3_bucket.messages.id}"
+    metrics_namespace   = "ingestor"
   }
 
   memory = "2048"
   cpu    = "512"
 
-  env_vars_length = 11
+  env_vars_length = 12
 
   alb_priority = 107
 

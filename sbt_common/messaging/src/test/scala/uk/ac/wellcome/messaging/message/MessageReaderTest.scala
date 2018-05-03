@@ -32,7 +32,7 @@ class MessageReaderTest
 
   describe("reads a NotificationMessage from an sqs.model.Message") {
     it("converts to type T") {
-      withMessageReaderFixtures {
+      withExampleObjectMessageReaderFixtures {
         case (bucket, messageReader) =>
           val key = "key.json"
           val expectedObject = ExampleObject("some value")
@@ -65,7 +65,7 @@ class MessageReaderTest
     }
 
     it("fail gracefully when NotificationMessage cannot be deserialised") {
-      withMessageReaderFixtures {
+      withExampleObjectMessageReaderFixtures {
         case (bucket, messageReader) =>
           val key = "key.json"
           val expectedObject = ExampleObject("some value")
@@ -96,7 +96,7 @@ class MessageReaderTest
     }
 
     it("does not fail gracefully when the s3 object cannot be retrieved") {
-      withMessageReaderFixtures {
+      withExampleObjectMessageReaderFixtures {
         case (bucket, messageReader) =>
           val key = "key.json"
 

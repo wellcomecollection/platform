@@ -27,6 +27,11 @@ resource "aws_iam_role_policy" "ecs_ingestor_task_cloudwatch_metric" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
+resource "aws_iam_role_policy" "ingestor_s3_messages_get" {
+  role   = "${module.ingestor.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
+}
+
 # Role policies for the ID minter
 
 resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
@@ -39,7 +44,12 @@ resource "aws_iam_role_policy" "id_minter_cloudwatch" {
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-resource "aws_iam_role_policy" "id_minter_s3_messages" {
+resource "aws_iam_role_policy" "id_minter_s3_messages_get" {
   role   = "${module.id_minter.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
+}
+
+resource "aws_iam_role_policy" "id_minter_s3_messages_put" {
+  role   = "${module.id_minter.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
 }
