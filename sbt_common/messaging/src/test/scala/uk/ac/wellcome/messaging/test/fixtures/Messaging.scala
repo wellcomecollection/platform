@@ -88,29 +88,27 @@ trait Messaging
       override def generate(obj: ExampleObject): String = "/"
     }
 
-  def withExampleObjectMessageReader[R](bucket: Bucket, topic: Topic, queue: Queue)(
+  def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
-    withMessageReader(bucket, topic, queue, keyPrefixGenerator)(testWith)
+    withMessageReader(bucket, queue, keyPrefixGenerator)(testWith)
   }
 
-  def withMessageReader[T, R](bucket: Bucket, topic: Topic, queue: Queue, keyPrefixGenerator: KeyPrefixGenerator[T])(
+  def withMessageReader[T, R](bucket: Bucket, queue: Queue, keyPrefixGenerator: KeyPrefixGenerator[T])(
     testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
-    val snsConfig = SNSConfig(topicArn = topic.arn)
     val sqsConfig = SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
 
-    val messageConfig = MessageConfig(
-      s3Config = s3Config,
-      snsConfig = snsConfig
+    val messageConfig = MessageReaderConfig(
+      sqsConfig = sqsConfig,
+      s3Config = s3Config
     )
 
     val testReader = new MessageReader[T](
-      messageConfig = messageConfig,
+      messageReaderConfig = messageConfig,
       s3Client = s3Client,
       keyPrefixGenerator = keyPrefixGenerator,
-      sqsClient = sqsClient,
-      sqsConfig = sqsConfig
+      sqsClient = sqsClient
     )
 
     testWith(testReader)
@@ -162,14 +160,12 @@ trait Messaging
   def withExampleObjectMessageReaderFixtures[R](
                                                  testWith: TestWith[(Bucket, MessageReader[ExampleObject], Queue), R]) = {
     withLocalS3Bucket { bucket =>
-      withLocalSnsTopic { topic =>
         withLocalStackSqsQueue { queue =>
-          withExampleObjectMessageReader(bucket = bucket, topic = topic, queue = queue) { reader =>
+          withExampleObjectMessageReader(bucket = bucket, queue = queue) { reader =>
             testWith((bucket, reader, queue))
           }
         }
       }
-    }
   }
 
   def withExampleObjectMessageWorkerFixtures[R](
