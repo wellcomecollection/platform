@@ -113,6 +113,8 @@ object Dependencies {
 
   val commonStorageDependencies = commonDependencies ++ awsDependencies ++ dynamoDependencies
 
+  val commonMonitoringDependencies = commonDependencies ++ awsDependencies
+
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 
   val apiDependencies = commonDependencies ++ commonElasticsearchDependencies

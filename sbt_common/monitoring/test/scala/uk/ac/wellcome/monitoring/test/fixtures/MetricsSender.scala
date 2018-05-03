@@ -1,7 +1,6 @@
-package uk.ac.wellcome.messaging.test.fixtures
+package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.twitter.inject.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
@@ -12,7 +11,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.Future
 
 trait MetricsSender
-    extends Logging
+  extends Logging
     with ImplicitLogging
     with MockitoSugar
     with CloudWatch

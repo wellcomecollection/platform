@@ -14,11 +14,9 @@ import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import akka.actor.ActorSystem
 import uk.ac.wellcome.messaging.metrics.MetricsSender
-import uk.ac.wellcome.messaging.test.fixtures.{
-  MetricsSender => MetricsSenderFixture,
-  SQS
-}
+import uk.ac.wellcome.messaging.test.fixtures.{SQS, MetricsSender => MetricsSenderFixture}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest
@@ -28,7 +26,7 @@ class SQSWorkerTest
     with ExtendedPatience
     with fixtures.Akka
     with SQS
-    with MetricsSenderFixture {
+    with test.fixtures.MetricsSender {
 
   def withSqsWorker[R](
     actors: ActorSystem,
