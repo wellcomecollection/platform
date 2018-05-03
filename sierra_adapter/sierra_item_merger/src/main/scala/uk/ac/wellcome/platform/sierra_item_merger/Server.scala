@@ -28,7 +28,6 @@ class Server extends HttpServer {
     VHSConfigModule,
     MetricsSenderModule,
     VHSConfigModule,
-    AmazonCloudWatchModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
