@@ -4,8 +4,8 @@
 -aws.rds.password=${db_password}
 -aws.rds.port=${db_port}
 -aws.rds.userName=${db_username}
--aws.sqs.queue.url=${queue_url}
--aws.sqs.maxMessages=${sqs_max_messages}
 -aws.metrics.namespace=id-minter
 -aws.message.s3.bucketName=${message_bucket_name}
 -aws.message.sns.topic.arn=${topic_arn}
+-aws.message.sqs.queue.url=${queue_url}
+-aws.message.sqs.maxMessages=${sqs_max_messages}
