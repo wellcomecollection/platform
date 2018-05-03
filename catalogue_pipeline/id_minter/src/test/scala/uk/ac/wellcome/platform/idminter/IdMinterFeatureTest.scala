@@ -33,7 +33,6 @@ class IdMinterFeatureTest
           withIdentifiersDatabase { dbConfig =>
             val flags =
               sqsLocalFlags(queue) ++
-                snsLocalFlags(topic) ++
                 dbConfig.flags ++
                 messagingLocalFlags(bucket, topic)
 
@@ -93,7 +92,6 @@ class IdMinterFeatureTest
           withLocalS3Bucket { bucket =>
             val flags =
               sqsLocalFlags(queue) ++
-                snsLocalFlags(topic) ++
                 dbConfig.flags ++
                 messagingLocalFlags(bucket, topic)
 
