@@ -1,5 +1,5 @@
 module "p2_compute" {
-  source = "dlami_asg"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//dlami_asg?ref=v9.5.0"
   name   = "jupyter-p2"
 
   key_name    = "${var.key_name}"
@@ -9,10 +9,12 @@ module "p2_compute" {
 
   vpc_id      = "${module.vpc.vpc_id}"
   vpc_subnets = "${module.vpc.subnets}"
+
+  default_environment = "tensorflow_p36"
 }
 
 module "t2_compute" {
-  source = "dlami_asg"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//dlami_asg?ref=v9.5.0"
   name   = "jupyter-t2"
 
   key_name    = "${var.key_name}"
@@ -20,4 +22,6 @@ module "t2_compute" {
 
   vpc_id      = "${module.vpc.vpc_id}"
   vpc_subnets = "${module.vpc.subnets}"
+
+  default_environment = "tensorflow_p36"
 }
