@@ -39,11 +39,13 @@ class SQSReaderTest
     testWith(sqsReader)
   }
 
-  def withFixtures[R](maxMessages: Int) =
-    withLocalSqsQueue[R] and withSqsReader[R](maxMessages) _
+  def withFixtures[R](maxMessages: Int)(testWith: TestWith[(Queue,SQSReader), R]): R  = withLocalSqsQueue[R] { q =>
+    withSqsReader[R](maxMessages)(q) { reader =>
+      testWith((q,reader))
+    }
+  }
 
-  it(
-    "should get messages from the SQS queue, limited by the maximum number of messages and return them") {
+  it("gets messages limited by the max messages") {
     withFixtures(maxMessages = 2) {
       case (queue, sqsReader) =>
         val messageStrings =
@@ -74,7 +76,7 @@ class SQSReaderTest
     }
   }
 
-  it("should return a failed future if reading from the SQS queue fails") {
+  it("fails if reading from the SQS queue fails") {
     withInvalidSqsReader { sqsReader =>
       val futureMessages =
         sqsReader.retrieveAndDeleteMessages(_ => Future.successful(()))
@@ -85,88 +87,87 @@ class SQSReaderTest
     }
   }
 
-  it(
-    "should return a failed future if processing one of the messages throws an exception - the failed message should not be deleted") {
-    withFixtures(maxMessages = 10) {
-      case (queue, sqsReader) =>
-        val failingMessage = "This message will fail"
-        val messageStrings = List(
-          "This is the first message",
-          failingMessage,
-          "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
+  describe("the failed message is not deleted") {
+    it("fails if processing one of the messages throws an exception") {
+      withFixtures(maxMessages = 10) {
+        case (queue, sqsReader) =>
+          val failingMessage = "This message will fail"
+          val messageStrings = List(
+            "This is the first message",
+            failingMessage,
+            "This is the final message")
+          messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
-        val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
-          if (message.getBody == failingMessage)
-            throw new RuntimeException(s"$failingMessage is not valid")
-          else Future.successful(())
-        }
-
-        whenReady(futureMessages.failed) { exception =>
-          exception shouldBe a[RuntimeException]
-        }
-
-        whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
-          _.size shouldBe 1
-        }
-    }
-  }
-
-  it(
-    "should return a failed future if processing one of the messages returns a failed future - the failed message should not be deleted") {
-    withFixtures(maxMessages = 10) {
-      case (queue, sqsReader) =>
-        val failingMessage = "This message will fail"
-        val messageStrings = List(
-          "This is the first message",
-          failingMessage,
-          "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
-
-        val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
-          if (message.getBody == failingMessage)
-            Future {
+          val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+            if (message.getBody == failingMessage)
               throw new RuntimeException(s"$failingMessage is not valid")
-            } else
-            Future.successful(())
-        }
+            else Future.successful(())
+          }
 
-        whenReady(futureMessages.failed) { exception =>
-          exception shouldBe a[RuntimeException]
-        }
+          whenReady(futureMessages.failed) { exception =>
+            exception shouldBe a[RuntimeException]
+          }
 
-        whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
-          _.size shouldBe 1
-        }
+          whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
+            _.size shouldBe 1
+          }
+      }
     }
-  }
 
-  it(
-    "should return a successful future but not delete the message if processing a message fails with GracefulFailureException") {
-    withFixtures(maxMessages = 10) {
-      case (queue, sqsReader) =>
-        val failingMessage = "This message will fail gracefully"
-        val messageStrings = List(
-          "This is the first message",
-          failingMessage,
-          "This is the final message")
-        messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
+    it("fails if processing one of the messages returns a failed future") {
+      withFixtures(maxMessages = 10) {
+        case (queue, sqsReader) =>
+          val failingMessage = "This message will fail"
+          val messageStrings = List(
+            "This is the first message",
+            failingMessage,
+            "This is the final message")
+          messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
 
-        val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
-          if (message.getBody == failingMessage)
-            Future {
-              throw GracefulFailureException(
-                new RuntimeException(s"$failingMessage is not valid"))
-            } else Future.successful(())
-        }
+          val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+            if (message.getBody == failingMessage)
+              Future {
+                throw new RuntimeException(s"$failingMessage is not valid")
+              } else
+              Future.successful(())
+          }
 
-        whenReady(futureMessages) { _ =>
-          // no need to assert anything. This is enough to assert that the future does not fail
-        }
+          whenReady(futureMessages.failed) { exception =>
+            exception shouldBe a[RuntimeException]
+          }
 
-        whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
-          _.size shouldBe 1
-        }
+          whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
+            _.size shouldBe 1
+          }
+      }
+    }
+
+    it("succeeds if processing a message fails with GracefulFailureException") {
+      withFixtures(maxMessages = 10) {
+        case (queue, sqsReader) =>
+          val failingMessage = "This message will fail gracefully"
+          val messageStrings = List(
+            "This is the first message",
+            failingMessage,
+            "This is the final message")
+          messageStrings.foreach(sqsClient.sendMessage(queue.url, _))
+
+          val futureMessages = sqsReader.retrieveAndDeleteMessages { message =>
+            if (message.getBody == failingMessage)
+              Future {
+                throw GracefulFailureException(
+                  new RuntimeException(s"$failingMessage is not valid"))
+              } else Future.successful(())
+          }
+
+          whenReady(futureMessages) { _ =>
+            // no need to assert anything. This is enough to assert that the future does not fail
+          }
+
+          whenReady(readMessagesAfterVisibilityTimeoutIs(sqsReader)) {
+            _.size shouldBe 1
+          }
+      }
     }
   }
 

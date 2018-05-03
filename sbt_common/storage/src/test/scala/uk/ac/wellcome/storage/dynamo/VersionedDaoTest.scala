@@ -48,7 +48,13 @@ class VersionedDaoTest
     testWith(dao)
   }
 
-  def withFixtures[R] = withLocalDynamoDbTable[R] and withVersionedDao[R] _
+  def withFixtures[R](testWith: TestWith[(Table,VersionedDao), R]): R = {
+    withLocalDynamoDbTable[R] { table =>
+      withVersionedDao[R](table) { versionedDao =>
+        testWith((table,versionedDao))
+      }
+    }
+  }
 
   describe("get a record") {
     it("returns a future of a record if its in dynamo") {

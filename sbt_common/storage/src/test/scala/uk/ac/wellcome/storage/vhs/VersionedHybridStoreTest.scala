@@ -13,6 +13,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.Assertion
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.annotation.Annotation
 
@@ -30,10 +32,16 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  def withFixtures[R] =
-    withLocalS3Bucket[R] and
-      withLocalDynamoDbTable[R] and
-      withVersionedHybridStore[ExampleRecord, R] _
+  def withFixtures[R](
+    testWith: TestWith[(Bucket,Table,VersionedHybridStore[ExampleRecord]), R]
+  ): R =
+    withLocalS3Bucket[R] { bucket =>
+      withLocalDynamoDbTable[R] { table =>
+        withVersionedHybridStore[ExampleRecord, R](bucket, table) { vhs =>
+          testWith((bucket,table,vhs))
+        }
+      }
+    }
 
   it("stores a versioned record if it has never been seen before") {
     withFixtures {
