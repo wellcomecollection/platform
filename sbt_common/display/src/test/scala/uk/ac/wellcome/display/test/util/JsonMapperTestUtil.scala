@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.test.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.inject.{Guice, Injector}

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.test.util
 
 import uk.ac.wellcome.models.work.internal._
 

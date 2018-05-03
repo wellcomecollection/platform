@@ -2,11 +2,8 @@ package uk.ac.wellcome.platform.api.services
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.WorksUtil
-import uk.ac.wellcome.platform.api.fixtures.{
-  ElasticsearchServiceFixture,
-  WorksServiceFixture
-}
+import uk.ac.wellcome.display.test.util.WorksUtil
+import uk.ac.wellcome.platform.api.fixtures.{ElasticsearchServiceFixture, WorksServiceFixture}
 
 class WorksServiceTest
     extends FunSpec
