@@ -6,7 +6,11 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -15,7 +19,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.collection.JavaConversions._
 
 class IngestorFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with JsonTestUtil
     with ScalaFutures
@@ -26,7 +30,8 @@ class IngestorFeatureTest
 
   val itemType = "work"
 
-  it("reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
+  it(
+    "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
     val sourceIdentifier =
       SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", "5678")
 
@@ -56,7 +61,8 @@ class IngestorFeatureTest
     }
   }
 
-  it("reads a sierra identified work from the queue and ingests it in the v2 index only") {
+  it(
+    "reads a sierra identified work from the queue and ingests it in the v2 index only") {
     val sourceIdentifier =
       SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Item", "5678")
 

@@ -77,7 +77,7 @@ trait Messaging
     def hasBeenCalled: Boolean = calledWith.nonEmpty
 
     override implicit val decoder: Decoder[ExampleObject] =
-        deriveDecoder[ExampleObject]
+      deriveDecoder[ExampleObject]
 
     override def processMessage(message: ExampleObject) = Future {
       calledWith = Some(message)
@@ -93,10 +93,12 @@ trait Messaging
 
   def withExampleObjectMessageReader[R](bucket: Bucket, topic: Topic)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
-    withMessageReader(bucket,topic,keyPrefixGenerator)(testWith)
+    withMessageReader(bucket, topic, keyPrefixGenerator)(testWith)
   }
 
-  def withMessageReader[T, R](bucket: Bucket, topic: Topic, keyPrefixGenerator: KeyPrefixGenerator[T])(
+  def withMessageReader[T, R](bucket: Bucket,
+                              topic: Topic,
+                              keyPrefixGenerator: KeyPrefixGenerator[T])(
     testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
@@ -164,8 +166,9 @@ trait Messaging
     testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
     withLocalS3Bucket { bucket =>
       withLocalSnsTopic { topic =>
-        withExampleObjectMessageReader(bucket = bucket, topic = topic) { reader =>
-          testWith((bucket, reader))
+        withExampleObjectMessageReader(bucket = bucket, topic = topic) {
+          reader =>
+            testWith((bucket, reader))
         }
       }
     }
@@ -218,7 +221,6 @@ trait Messaging
       }
     }
   }
-
 
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {

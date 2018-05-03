@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import io.circe.{Decoder, Json}
-import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker, MessageWriter}
+import uk.ac.wellcome.messaging.message.{
+  MessageReader,
+  MessageWorker,
+  MessageWriter
+}
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
@@ -14,12 +18,12 @@ import scala.concurrent.duration._
 import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
-                                       idEmbedder: IdEmbedder,
-                                       writer: MessageWriter[Json],
-                                       sqsReader: SQSReader,
-                                       messageReader: MessageReader[Json],
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
+  idEmbedder: IdEmbedder,
+  writer: MessageWriter[Json],
+  sqsReader: SQSReader,
+  messageReader: MessageReader[Json],
+  system: ActorSystem,
+  metrics: MetricsSender
 ) extends MessageWorker[Json](sqsReader, messageReader, system, metrics) {
 
   override lazy val poll = 100 milliseconds

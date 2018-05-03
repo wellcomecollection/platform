@@ -16,24 +16,33 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.Try
 
-class IngestorWorkerService @Inject()( @Flag("es.index.v1") esIndexV1: String,
-                                       @Flag("es.index.v2") esIndexV2: String,
-                                       identifiedWorkIndexer: WorkIndexer,
-                                       sqsReader: SQSReader,
-                                       messageReader: MessageReader[IdentifiedWork],
-                                       system: ActorSystem,
-                                       metrics: MetricsSender
-) extends MessageWorker[IdentifiedWork](sqsReader, messageReader, system, metrics) {
+class IngestorWorkerService @Inject()(
+  @Flag("es.index.v1") esIndexV1: String,
+  @Flag("es.index.v2") esIndexV2: String,
+  identifiedWorkIndexer: WorkIndexer,
+  sqsReader: SQSReader,
+  messageReader: MessageReader[IdentifiedWork],
+  system: ActorSystem,
+  metrics: MetricsSender)
+    extends MessageWorker[IdentifiedWork](
+      sqsReader,
+      messageReader,
+      system,
+      metrics) {
 
   override def processMessage(work: IdentifiedWork): Future[Unit] = {
-      val futureIndices: Future[List[String]] = Future.fromTry(Try(decideTargetIndices(work)))
-      futureIndices.flatMap( indices => {
-        val futureResults = indices.map(identifiedWorkIndexer.indexWork(work, _))
-        Future.sequence(futureResults).map { _ => () }
-      })
+    val futureIndices: Future[List[String]] =
+      Future.fromTry(Try(decideTargetIndices(work)))
+    futureIndices.flatMap(indices => {
+      val futureResults = indices.map(identifiedWorkIndexer.indexWork(work, _))
+      Future.sequence(futureResults).map { _ =>
+        ()
+      }
+    })
   }
 
-  override implicit val decoder: Decoder[IdentifiedWork] = deriveDecoder[IdentifiedWork]
+  override implicit val decoder: Decoder[IdentifiedWork] =
+    deriveDecoder[IdentifiedWork]
 
   // This method returns the indices where a work is to be ingested.
   // * Miro works are indexed in both v1 and v2 indices.

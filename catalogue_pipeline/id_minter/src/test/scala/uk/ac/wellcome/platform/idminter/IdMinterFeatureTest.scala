@@ -4,8 +4,18 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.messaging.test.fixtures.{
+  MessageInfo,
+  Messaging,
+  SNS,
+  SQS
+}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -71,7 +81,8 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(messageCount)
 
-                val works = messages.map(message => get[IdentifiedWork](message))
+                val works =
+                  messages.map(message => get[IdentifiedWork](message))
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { work =>
                   work.identifiers.head.value shouldBe miroID
@@ -134,7 +145,6 @@ class IdMinterFeatureTest
       }
     }
   }
-
 
   private def assertMessageIsNotDeleted(queue: Queue): Unit = {
     // After a message is read, it stays invisible for 1 second and then it gets sent again.
