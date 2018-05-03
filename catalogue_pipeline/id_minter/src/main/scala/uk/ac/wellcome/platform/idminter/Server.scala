@@ -11,8 +11,8 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.messaging.metrics.CloudWatchClientModule
-import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
+import uk.ac.wellcome.monitoring.CloudWatchClientModule
+import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{
   SQSClientModule,

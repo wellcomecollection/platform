@@ -8,7 +8,7 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.duration._
 import io.circe.Decoder
-import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._

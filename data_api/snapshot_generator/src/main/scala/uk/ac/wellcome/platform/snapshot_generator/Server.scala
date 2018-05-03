@@ -12,7 +12,7 @@ import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.metrics.MetricsSenderModule
+import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.snapshot_generator.modules.{

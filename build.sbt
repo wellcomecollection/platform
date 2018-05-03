@@ -55,7 +55,6 @@ lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging"
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
-
 // Storage depends on AWSConfig.
 lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
   .dependsOn(common % "compile->compile;test->test")
