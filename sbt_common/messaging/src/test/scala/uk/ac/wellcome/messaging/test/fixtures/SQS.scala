@@ -62,6 +62,13 @@ trait SQS extends Matchers {
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
+  val asyncSqsClient: AmazonSQSAsync = AmazonSQSAsyncClientBuilder
+    .standard()
+    .withCredentials(credentials)
+    .withEndpointConfiguration(
+      new EndpointConfiguration(sqsEndpointUrl, "localhost"))
+    .build()
+
   def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString

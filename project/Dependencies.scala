@@ -109,7 +109,9 @@ object Dependencies {
   // We use Circe for all our JSON serialisation, but our local SNS container
   // returns YAML, and currently we use Jackson to parse that YAML.
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
-  val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies
+  val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies ++ Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3
+  )
 
   val commonStorageDependencies = commonDependencies ++ awsDependencies ++ dynamoDependencies
 
