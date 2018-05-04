@@ -24,6 +24,8 @@ import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.messaging.test.fixtures
+import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +40,8 @@ class RecorderWorkerServiceTest
     with SQS
     with ScalaFutures
     with Messaging
-    with fixtures.MetricsSender {
+    with fixtures.MetricsSender
+    with ExtendedPatience {
 
   val title = "Whose umbrella did I find?"
 
@@ -63,13 +66,22 @@ class RecorderWorkerServiceTest
             val future = service.processMessage(work = work)
 
             whenReady(future) { _ =>
-              val actualRecords: List[RecorderWorkEntry] =
+              val actualRecords: List[HybridRecord] =
                 Scanamo
-                  .scan[RecorderWorkEntry](dynamoDbClient)(table.name)
+                  .scan[HybridRecord](dynamoDbClient)(table.name)
                   .map(_.right.get)
 
-              println(actualRecords)
-              1 shouldBe 0
+              actualRecords.size shouldBe 1
+
+              val hybridRecord: HybridRecord = actualRecords.head
+              hybridRecord.id shouldBe s"${work.sourceIdentifier.identifierScheme.toString}/${work.sourceIdentifier.value}"
+              hybridRecord.version shouldBe 1
+              
+              val content = getContentFromS3(
+                bucket = bucket,
+                key = hybridRecord.s3key
+              )
+              fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(work)
             }
           }
         }

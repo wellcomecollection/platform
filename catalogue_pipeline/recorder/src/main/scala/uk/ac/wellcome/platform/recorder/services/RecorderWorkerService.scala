@@ -17,6 +17,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
+case class EmptyMetadata()
+
 class RecorderWorkerService @Inject()(
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry],
   sqsReader: SQSReader,
@@ -35,6 +37,6 @@ class RecorderWorkerService @Inject()(
       //      existingEntry => if (existingEntry.work.version > newRecorderEntry.work.version) {
       //        existingEntry
       //      } else { newRecorderEntry }
-    )(SourceMetadata(sourceName = "transformer"))
+    )(EmptyMetadata())
   }
 }

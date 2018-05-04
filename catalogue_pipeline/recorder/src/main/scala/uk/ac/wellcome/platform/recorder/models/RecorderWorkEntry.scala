@@ -11,8 +11,8 @@ case class RecorderWorkEntry(
 
 case object RecorderWorkEntry {
   def apply(work: UnidentifiedWork): RecorderWorkEntry = RecorderWorkEntry(
-    sourceId = work.sourceIdentifier.identifierScheme.toString,
-    sourceName = work.sourceIdentifier.value,
+    sourceId = work.sourceIdentifier.value,
+    sourceName = work.sourceIdentifier.identifierScheme.toString,
     work = work
   )
 }
