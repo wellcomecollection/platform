@@ -9,6 +9,7 @@ import com.amazonaws.services.sns.model.{
 }
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
+import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.metrics
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
@@ -36,7 +37,7 @@ trait Messaging
     with SQS
     with SNS
     with S3
-    with ImplicitLogging {
+    with Matchers {
 
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](

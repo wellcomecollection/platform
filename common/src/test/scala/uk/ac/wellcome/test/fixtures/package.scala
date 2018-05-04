@@ -7,8 +7,6 @@ import scala.util.Try
 
 package object fixtures extends Logging {
 
-  implicit val implicitLogger = logger
-
   type TestWith[T, R] = T => R
   type Fixture[L, R] = TestWith[L, R] => R
 
@@ -17,7 +15,11 @@ package object fixtures extends Logging {
       logger.debug(s"cleaning up resource=[$resource]")
       f(resource)
     } recover {
-      case e => logger.warn(s"error cleaning up resource=[$resource]", e)
+      case e =>
+        logger.warn(
+          s"error cleaning up resource=[$resource]",
+          e
+        )
     }
   }
 

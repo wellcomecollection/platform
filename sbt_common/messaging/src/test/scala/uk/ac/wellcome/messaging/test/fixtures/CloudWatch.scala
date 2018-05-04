@@ -6,11 +6,10 @@ import com.amazonaws.services.cloudwatch.{
   AmazonCloudWatch,
   AmazonCloudWatchClientBuilder
 }
-import uk.ac.wellcome.test.fixtures.ImplicitLogging
 
 import scala.concurrent.duration._
 
-trait CloudWatch extends ImplicitLogging {
+trait CloudWatch {
   protected val awsNamespace: String = "test"
 
   protected val localCloudWatchEndpointUrl: String = "http://localhost:4582"

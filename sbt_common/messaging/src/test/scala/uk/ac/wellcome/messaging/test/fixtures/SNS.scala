@@ -26,7 +26,7 @@ object SNS {
 
 }
 
-trait SNS extends ImplicitLogging {
+trait SNS {
 
   import SNS._
 
