@@ -116,7 +116,9 @@ class VersionedHybridStore[T <: Id] @Inject()(
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
 
-    val futureUri = sourcedObjectStore.put(sourcedObject, keyPrefixGenerator.generate(sourcedObject))
+    val futureUri = sourcedObjectStore.put(
+      sourcedObject,
+      keyPrefixGenerator.generate(sourcedObject))
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
