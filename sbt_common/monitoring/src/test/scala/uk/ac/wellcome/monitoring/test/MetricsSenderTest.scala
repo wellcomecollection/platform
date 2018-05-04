@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.metrics
+package uk.ac.wellcome.monitoring.test
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -15,8 +15,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 
 class MetricsSenderTest
     extends FunSpec

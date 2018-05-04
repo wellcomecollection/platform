@@ -17,7 +17,6 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
-import uk.ac.wellcome.monitoring.test
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest
@@ -27,7 +26,7 @@ class SQSWorkerTest
     with ExtendedPatience
     with fixtures.Akka
     with SQS
-    with test.fixtures.MetricsSender {
+    with MetricsSenderFixture {
 
   def withSqsWorker[R](
     actors: ActorSystem,
