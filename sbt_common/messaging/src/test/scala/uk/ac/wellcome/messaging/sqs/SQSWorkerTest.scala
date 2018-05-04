@@ -16,7 +16,9 @@ import akka.actor.ActorSystem
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
+import uk.ac.wellcome.monitoring.test.fixtures.{
+  MetricsSender => MetricsSenderFixture
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest

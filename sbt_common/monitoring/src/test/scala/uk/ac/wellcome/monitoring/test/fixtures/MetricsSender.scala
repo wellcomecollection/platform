@@ -11,7 +11,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.Future
 
 trait MetricsSender
-  extends Logging
+    extends Logging
     with ImplicitLogging
     with MockitoSugar
     with CloudWatch

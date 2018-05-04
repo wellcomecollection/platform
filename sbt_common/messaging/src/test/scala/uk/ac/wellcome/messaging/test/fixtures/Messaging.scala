@@ -8,7 +8,12 @@ import uk.ac.wellcome.messaging.message._
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
 import io.circe.generic.semiauto._
-import uk.ac.wellcome.messaging.message.{MessageConfig, MessageReader, MessageWorker, MessageWriter}
+import uk.ac.wellcome.messaging.message.{
+  MessageConfig,
+  MessageReader,
+  MessageWorker,
+  MessageWriter
+}
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.monitoring
 import uk.ac.wellcome.messaging.sns.SNSConfig
@@ -25,14 +30,15 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
+import uk.ac.wellcome.monitoring.test.fixtures.{
+  MetricsSender => MetricsSenderFixture
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Success
 import com.amazonaws.services.sns.model.UnsubscribeRequest
-
 
 trait Messaging
     extends Akka

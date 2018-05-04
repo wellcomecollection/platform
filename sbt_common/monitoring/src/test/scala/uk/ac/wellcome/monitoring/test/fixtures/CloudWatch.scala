@@ -2,7 +2,10 @@ package uk.ac.wellcome.monitoring.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
+import com.amazonaws.services.cloudwatch.{
+  AmazonCloudWatch,
+  AmazonCloudWatchClientBuilder
+}
 import uk.ac.wellcome.test.fixtures.ImplicitLogging
 
 import scala.concurrent.duration._
