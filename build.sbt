@@ -40,7 +40,6 @@ lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
-
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 

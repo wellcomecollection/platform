@@ -38,13 +38,19 @@ class ExclusivelyAffectsThisTask(SignificantFile):
     message = 'Path is an exclusive dependency of this build task'
 
 
+class AppUsesThisScalaCommonLib(SignificantFile):
+    def __init__(self, library_name):
+        self.message = 'This app depends on the %s library' % library_name
+        super().__init__()
+
+
 class ExclusivelyAffectsAnotherTask(InsignificantFile):
     def __init__(self, other_task):
         self.message = (
             'Path is an exclusive dependency of a different build task (%s)' %
             (other_task,)
         )
-        super(ExclusivelyAffectsAnotherTask, self).__init__()
+        super().__init__()
 
 
 class CheckedByTravisFormat(SignificantFile):
@@ -61,3 +67,10 @@ class ScalaChangeAndNotScalaApp(InsignificantFile):
 
 class ChangesToTestsDontGetPublished(InsignificantFile):
     message = "Changes to test files don't need to be published"
+
+
+class AppDoesNotUseThisScalaCommonLib(InsignificantFile):
+    def __init__(self, library_name):
+        self.message = 'This app does not use the %s library' % library_name
+        super().__init__()
+

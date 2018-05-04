@@ -13,6 +13,8 @@ import collections
 import os
 
 from travistooling.decisions import (
+    AppDoesNotUseThisScalaCommonLib,
+    AppUsesThisScalaCommonLib,
     ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
     ExclusivelyAffectsAnotherTask,
@@ -27,6 +29,7 @@ from travistooling.decisions import (
 )
 from travistooling.git_utils import ROOT
 from travistooling.parse_makefiles import get_projects
+from travistooling.sbt_dependency_checker import does_path_depend_on_library
 
 
 # Cache the Makefile information in a global variable, so we only have to
@@ -60,7 +63,9 @@ def does_file_affect_build_task(path, task):
     # for the api Scala app, so changes in this directory cannot affect
     # any other task.
     exclusive_directories = {
-        os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
+        os.path.relpath(p.exclusive_path, start=ROOT): p.name
+        for p in PROJECTS
+        if p.exclusive_path is not None
     }
 
     for dir_name, task_prefix in exclusive_directories.items():
@@ -82,6 +87,45 @@ def does_file_affect_build_task(path, task):
     ):
         raise ChangesToTestsDontGetPublished()
 
+    # Now we need to start looking at projects on an individual basis.
+    project = None
+    for p in PROJECTS:
+        if task.startswith(p.name):
+            project = p
+            break
+
+    else:  # pragma: no cover
+        if task == 'travis-format':
+            project = Project(
+                name='travis-format',
+                type='python_lib',
+                exclusive_path=None
+            )
+        else:
+            raise RuntimeError("Unrecognised task: %s" % task)
+
+    # Changes to the sbt_common libraries should only be tested if the
+    # application in question uses this library.
+    if path.startswith('sbt_common/') and project.type == 'sbt_app':
+
+        # This directory has libraries of the form
+        #
+        #   sbt_common/display/...
+        #   sbt_common/elasticsearch/...
+        #
+        library_name = path.split('/')[1]
+
+        # This tells us where the exclusive code for this app exists.
+        project_dir = os.path.relpath(project.exclusive_path, start=ROOT)
+
+        if does_path_depend_on_library(
+            path=project_dir,
+            library_name=library_name
+        ):
+            raise AppUsesThisScalaCommonLib(library_name)
+        else:
+            raise AppDoesNotUseThisScalaCommonLib(library_name)
+
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith((
@@ -89,14 +133,12 @@ def does_file_affect_build_task(path, task):
         'common/',
         'project/',
         'build.sbt',
-        'sbt_common/'
+        'sbt_common/',
     )):
-        for project in PROJECTS:
-            if task.startswith(project.name):
-                if project.type == 'sbt_app':
-                    raise ScalaChangeAndIsScalaApp()
-                else:
-                    raise ScalaChangeAndNotScalaApp()
+        if project.type == 'sbt_app':
+            raise ScalaChangeAndIsScalaApp()
+        else:
+            raise ScalaChangeAndNotScalaApp()
 
     # Changes made in the travistooling directory only ever affect the
     # travistooling tests (but they're not defined in a Makefile).

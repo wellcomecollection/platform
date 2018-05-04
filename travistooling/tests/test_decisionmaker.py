@@ -7,6 +7,8 @@ from travistooling.decisionmaker import (
     should_run_build_task
 )
 from travistooling.decisions import (
+    AppDoesNotUseThisScalaCommonLib,
+    AppUsesThisScalaCommonLib,
     ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
     ExclusivelyAffectsAnotherTask,
@@ -63,14 +65,17 @@ from travistooling.decisions import (
     ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndNotScalaApp, False),
-    ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
-    ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
-    ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
+
+    # Changes to the sbt_common libraries are based on whether a particular
+    # app uses that file.
+    ('sbt_common/display/model.scala', 'id_minter-test', AppDoesNotUseThisScalaCommonLib, False),
+    ('sbt_common/display/model.scala', 'api-test', AppUsesThisScalaCommonLib, True),
+    ('sbt_common/messaging/message.scala', 'api-test', AppDoesNotUseThisScalaCommonLib, False),
 
     # Changes to Scala test files trigger a -test Scala task, but not
     # a -publish task.
-    ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
-    ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
+    ('common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_reader-publish', ChangesToTestsDontGetPublished, False),
+    ('common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_reader-test', ScalaChangeAndIsScalaApp, True),
 
     # Changes to Python test files never trigger a -publish task.
     ('lambda_conftest.py', 'loris-publish', ChangesToTestsDontGetPublished, False),
