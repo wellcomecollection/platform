@@ -22,7 +22,6 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier
 }
-import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
@@ -49,11 +48,6 @@ class IngestorWorkerServiceTest
       actorSystem = ActorSystem())
 
   val actorSystem = ActorSystem()
-
-  val identifiedWorkKeyPrefixGenerator =
-    new KeyPrefixGenerator[IdentifiedWork] {
-      override def generate(obj: IdentifiedWork): String = ""
-    }
 
   def createMiroWork(
     canonicalId: String,
@@ -120,8 +114,8 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
+          queue) { messageReader =>
+
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
               val service = new IngestorWorkerService(
@@ -163,10 +157,7 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
+        withMessageReader[IdentifiedWork, Assertion](bucket, topic) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
               val service = new IngestorWorkerService(
@@ -209,10 +200,7 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
+        withMessageReader[IdentifiedWork, Assertion](bucket, topic) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
               val service = new IngestorWorkerService(
@@ -261,10 +249,7 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
+        withMessageReader[IdentifiedWork, Assertion](bucket, topic) { messageReader =>
           val service = new IngestorWorkerService(
             "works-v1",
             "works-v2",
