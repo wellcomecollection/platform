@@ -220,6 +220,7 @@ trait Messaging
 
       }
     }
+  }
 
   implicit val messagePointerDecoder: Decoder[MessagePointer] =
     deriveDecoder[MessagePointer]
