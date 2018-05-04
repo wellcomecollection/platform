@@ -63,8 +63,7 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withLocalSnsTopic { topic =>
           withRecorderWorkerService(table, bucket, topic) { service =>
-            val future = service.processMessage(work = work)
-            whenReady(future) { _ =>
+            whenReady(service.processMessage(work = work)) { _ =>
               assertStoredSingleWork(bucket, table, work)
             }
           }
@@ -81,10 +80,8 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withLocalSnsTopic { topic =>
           withRecorderWorkerService(table, bucket, topic) { service =>
-            val newFuture = service.processMessage(work = newerWork)
-            whenReady(newFuture) { _ =>
-              val oldFuture = service.processMessage(work = olderWork)
-              whenReady(oldFuture) { _ =>
+            whenReady(service.processMessage(work = newerWork)) { _ =>
+              whenReady(service.processMessage(work = olderWork)) { _ =>
                 assertStoredSingleWork(bucket, table, newerWork)
               }
             }
@@ -94,7 +91,26 @@ class RecorderWorkerServiceTest
     }
   }
 
-  private def assertStoredSingleWork(bucket: Bucket, table: Table, expectedWork: UnidentifiedWork) = {
+  it("overwrites an older work with an newer work") {
+    val olderWork = work
+    val newerWork = work.copy(version = 10, title = Some("A nice new thing"))
+
+    withLocalDynamoDbTable { table =>
+      withLocalS3Bucket { bucket =>
+        withLocalSnsTopic { topic =>
+          withRecorderWorkerService(table, bucket, topic) { service =>
+            whenReady(service.processMessage(work = olderWork)) { _ =>
+              whenReady(service.processMessage(work = newerWork)) { _ =>
+                assertStoredSingleWork(bucket, table, newerWork, expectedVhsVersion = 2)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private def assertStoredSingleWork(bucket: Bucket, table: Table, expectedWork: UnidentifiedWork, expectedVhsVersion: Int = 1) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
         .scan[HybridRecord](dynamoDbClient)(table.name)
@@ -104,7 +120,7 @@ class RecorderWorkerServiceTest
 
     val hybridRecord: HybridRecord = actualRecords.head
     hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierScheme.toString}/${expectedWork.sourceIdentifier.value}"
-    hybridRecord.version shouldBe 1
+    hybridRecord.version shouldBe expectedVhsVersion
 
     val content = getContentFromS3(
       bucket = bucket,
