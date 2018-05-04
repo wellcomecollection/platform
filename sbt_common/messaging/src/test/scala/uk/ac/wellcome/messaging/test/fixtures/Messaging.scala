@@ -234,6 +234,9 @@ trait Messaging
   }
 
   def assertQueueEmpty(queue: Queue) = {
+    // The visibility timeout is set to 1 second for test queues.
+    // Wait for slightly longer than that to make sure that messages
+    // that fail processing become visible again before asserting.
     Thread.sleep(1500)
 
     val messages = sqsClient
@@ -248,6 +251,9 @@ trait Messaging
   }
 
   def assertQueueNotEmpty(queue: Queue) = {
+    // The visibility timeout is set to 1 second for test queues.
+    // Wait for slightly longer than that to make sure that messages
+    // that fail processing become visible again before asserting.
     Thread.sleep(1500)
 
     val messages = sqsClient

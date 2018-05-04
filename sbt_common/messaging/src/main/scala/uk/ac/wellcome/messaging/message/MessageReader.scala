@@ -29,15 +29,15 @@ class MessageReader[T] @Inject()(
     keyPrefixGenerator = keyPrefixGenerator
   )
 
-  def readAndDelete(f: T => Future[Unit])(
+  def readAndDelete(process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage],
     decoderT: Decoder[T]
   ): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
         t <- read(message)
-        r <- f(t)
-      } yield r
+        result <- process(t)
+      } yield result
     }
   }
 
