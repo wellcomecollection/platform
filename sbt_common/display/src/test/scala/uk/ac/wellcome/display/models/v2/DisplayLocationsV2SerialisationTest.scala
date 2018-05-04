@@ -1,29 +1,22 @@
 package uk.ac.wellcome.display.models.v2
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.inject.Guice
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.{
   DisplaySerialisationTestBase,
-  WorksIncludes,
-  WorksUtil
+  WorksIncludes
 }
-import uk.ac.wellcome.display.modules.DisplayJacksonModule
+import uk.ac.wellcome.display.test.util.{JsonMapperTestUtil, WorksUtil}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedItem,
   IdentifiedWork,
   PhysicalLocation
 }
-import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayLocationsV2SerialisationTest
     extends FunSpec
     with DisplaySerialisationTestBase
-    with JsonTestUtil
+    with JsonMapperTestUtil
     with WorksUtil {
-  val injector = Guice.createInjector(DisplayJacksonModule)
-
-  val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
   it("serialises a physical location correctly") {
     val physicalLocation = PhysicalLocation(

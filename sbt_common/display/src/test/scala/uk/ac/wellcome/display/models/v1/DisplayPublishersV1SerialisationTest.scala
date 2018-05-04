@@ -1,21 +1,15 @@
 package uk.ac.wellcome.display.models.v1
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.inject.Guice
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
-import uk.ac.wellcome.display.modules.DisplayJacksonModule
+import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
+import uk.ac.wellcome.display.test.util.{JsonMapperTestUtil, WorksUtil}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class DisplayPublishersV1SerialisationTest
     extends FunSpec
     with DisplaySerialisationTestBase
-    with JsonTestUtil
+    with JsonMapperTestUtil
     with WorksUtil {
-  val injector = Guice.createInjector(DisplayJacksonModule)
-
-  val objectMapper = injector.getInstance(classOf[ObjectMapper])
 
   it(
     "includes the publishers field with a mixture of agents/organisations/persons") {

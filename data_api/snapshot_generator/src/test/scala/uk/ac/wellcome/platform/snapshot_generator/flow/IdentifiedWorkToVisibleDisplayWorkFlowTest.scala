@@ -3,9 +3,10 @@ package uk.ac.wellcome.platform.snapshot_generator.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{AllWorksIncludes, WorksUtil}
+import uk.ac.wellcome.display.models.AllWorksIncludes
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.display.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

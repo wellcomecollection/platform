@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.api.works
 import com.sksamuel.elastic4s.Indexable
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{DisplaySerialisationTestBase, WorksUtil}
+import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
+import uk.ac.wellcome.display.test.util.WorksUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.Server

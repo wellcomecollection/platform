@@ -22,7 +22,6 @@ class ApiV2WorksTest extends ApiWorksTestBase {
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
         eventually {
-
           server.httpGet(
             path = s"/$apiPrefix/works",
             andExpect = Status.Ok,
@@ -102,8 +101,11 @@ class ApiV2WorksTest extends ApiWorksTestBase {
           lettering = lettering,
           createdDate = period,
           creator = agent,
+          subjects = List(subject),
+          genres = List(genre),
           items = List(defaultItem),
-          visible = true)
+          visible = true
+        )
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -126,8 +128,40 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                | "lettering": "$lettering",
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
-               | "subjects": [ ],
-               | "genres": [ ],
+               | "subjects": [
+               |   { "label":"a subject",
+               |     "type":"Subject",
+               |     "concepts":[
+               |       {
+               |         "label": "${subject.concepts(0).label}",
+               |         "type":  "${subject.concepts(0).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${subject.concepts(1).label}",
+               |         "type":  "${subject.concepts(1).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${subject.concepts(2).label}",
+               |         "type":  "${subject.concepts(2).ontologyType}"
+               |       }]}
+               | ],
+               | "genres": [
+               |   { "label":"a genre",
+               |     "type":"Genre",
+               |     "concepts":[
+               |       {
+               |         "label": "${genre.concepts(0).label}",
+               |         "type":  "${genre.concepts(0).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${genre.concepts(1).label}",
+               |         "type":  "${genre.concepts(1).ontologyType}"
+               |       },
+               |       {
+               |         "label": "${genre.concepts(2).label}",
+               |         "type":  "${genre.concepts(2).ontologyType}"
+               |       }]}
+               | ],
                | "publishers": [ ],
                | "placesOfPublication": [ ]
                |}
@@ -179,7 +213,6 @@ class ApiV2WorksTest extends ApiWorksTestBase {
 
   it(
     "returns the requested page of results when requested with page & pageSize") {
-
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createWorks(3)
