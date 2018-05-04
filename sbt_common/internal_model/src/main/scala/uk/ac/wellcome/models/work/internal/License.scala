@@ -28,13 +28,6 @@ object License {
       createLicense(licenseType)
   })
 
-  implicit val licenseDynamoFormat =
-    DynamoFormat.coercedXmap[License, String, IllegalArgumentException](
-      createLicense
-    )(
-      _.licenseType
-    )
-
   def createLicense(licenseType: String): License = {
     licenseType match {
       case s: String if s == License_CCBY.licenseType => License_CCBY

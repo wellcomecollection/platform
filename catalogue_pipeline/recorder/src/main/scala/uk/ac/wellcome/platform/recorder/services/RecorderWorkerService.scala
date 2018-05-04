@@ -10,6 +10,7 @@ import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -24,6 +25,8 @@ class RecorderWorkerService @Inject()(
 
   implicit val decoder: Decoder[UnidentifiedWork] = Decoder[UnidentifiedWork]
   implicit val encoder: Encoder[UnidentifiedWork] = Encoder[UnidentifiedWork]
+
+  implicit val evidence: DynamoFormat[RecorderWorkEntry] = DynamoFormat[RecorderWorkEntry]
 
   override def store(work: UnidentifiedWork): Future[Unit] = {
 
