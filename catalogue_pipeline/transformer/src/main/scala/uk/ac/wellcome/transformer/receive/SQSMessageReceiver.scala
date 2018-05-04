@@ -8,12 +8,21 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.models.SourceMetadata
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.transformer.transformers.{
+  CalmTransformableTransformer,
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 

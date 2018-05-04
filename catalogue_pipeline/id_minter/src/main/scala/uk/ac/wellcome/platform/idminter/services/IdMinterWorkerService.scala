@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.idminter.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import io.circe.{Decoder, Json}
-import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker, MessageWriter}
+import uk.ac.wellcome.messaging.message.{
+  MessageReader,
+  MessageWorker,
+  MessageWriter
+}
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
