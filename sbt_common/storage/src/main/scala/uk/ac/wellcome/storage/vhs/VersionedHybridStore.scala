@@ -32,8 +32,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
 
   val sourcedObjectStore = new S3ObjectStore[T](
     s3Client = s3Client,
-    s3Config = vhsConfig.s3Config,
-    keyPrefixGenerator = keyPrefixGenerator
+    s3Config = vhsConfig.s3Config
   )
 
   val versionedDao = new VersionedDao(
