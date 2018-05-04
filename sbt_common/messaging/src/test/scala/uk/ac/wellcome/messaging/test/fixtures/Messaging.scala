@@ -2,7 +2,9 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
+import com.amazonaws.services.sns.model.UnsubscribeRequest
+import io.circe.Encoder
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._

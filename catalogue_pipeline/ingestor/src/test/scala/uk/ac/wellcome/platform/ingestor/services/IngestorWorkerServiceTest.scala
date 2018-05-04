@@ -125,6 +125,7 @@ class IngestorWorkerServiceTest
             work,
             indexName = esIndexV2,
             itemType = itemType)
+
         }
       }
     }
