@@ -8,10 +8,9 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.platform.recorder.modules.{
-  RecorderModule,
-  RecorderWorkEntryKeyPrefixGeneratorModule
-}
+import uk.ac.wellcome.platform.recorder.modules.{RecorderModule, RecorderWorkEntryKeyPrefixGeneratorModule}
+import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
+import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 
 object ServerMain extends Server
 

@@ -9,6 +9,7 @@ import com.amazonaws.services.sns.model.{
 }
 import io.circe.Encoder
 import org.scalatest.Matchers
+import uk.ac.wellcome.messaging.metrics
 import uk.ac.wellcome.messaging.message._
 import io.circe.Decoder
 import io.circe.generic.semiauto._
@@ -227,46 +228,6 @@ trait Messaging
 
   implicit val messagePointerEncoder: Encoder[MessagePointer] =
     deriveEncoder[MessagePointer]
-
-  def put[T](obj: T, location: S3ObjectLocation)(
-    implicit encoder: Encoder[T]) = {
-    val serialisedExampleObject = toJson[T](obj).get
-
-    s3Client.putObject(
-      location.bucket,
-      location.key,
-      serialisedExampleObject
-    )
-
-    val examplePointer =
-      MessagePointer(S3ObjectLocation(location.bucket, location.key))
-
-    val serialisedExamplePointer = toJson(examplePointer).get
-
-    val exampleNotification = NotificationMessage(
-      MessageId = "MessageId",
-      TopicArn = "TopicArn",
-      Subject = "Subject",
-      Message = serialisedExamplePointer
-    )
-
-    toJson(exampleNotification).get
-  }
-
-  def get[T](snsMessage: MessageInfo)(implicit decoder: Decoder[T]): T = {
-    val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
-    tryMessagePointer shouldBe a[Success[_]]
-
-    val messagePointer = tryMessagePointer.get
-
-    val tryT = fromJson[T](
-      getContentFromS3(
-        Bucket(messagePointer.src.bucket),
-        messagePointer.src.key))
-    tryT shouldBe a[Success[_]]
-
-    tryT.get
-  }
 
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {
