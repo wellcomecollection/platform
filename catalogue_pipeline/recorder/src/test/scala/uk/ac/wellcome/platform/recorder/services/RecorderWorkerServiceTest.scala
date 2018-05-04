@@ -6,10 +6,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.messaging.test.fixtures
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -30,7 +30,7 @@ class RecorderWorkerServiceTest
     with SQS
     with ScalaFutures
     with Messaging
-    with fixtures.MetricsSender
+    with MetricsSenderFixture
     with ExtendedPatience {
 
   val title = "Whose umbrella did I find?"

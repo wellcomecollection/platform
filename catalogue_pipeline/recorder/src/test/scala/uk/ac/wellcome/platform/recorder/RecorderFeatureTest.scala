@@ -20,9 +20,6 @@ class RecorderFeatureTest
       with Messaging {
 
   implicit val decoder: Decoder[UnidentifiedWork] = deriveDecoder[UnidentifiedWork]
-//  implicit val encoder: Encoder[UnidentifiedWork] = deriveEncoder[UnidentifiedWork]
-
-  // TODO Write a test that older works are ignored
 
   it("receives a transformed Work, and saves it to the VHS") {
     val title = "Not from Guildford after all"
