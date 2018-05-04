@@ -12,7 +12,6 @@ import scala.concurrent.Future
 
 trait MetricsSender
     extends Logging
-    with ImplicitLogging
     with MockitoSugar
     with CloudWatch
     with Akka {

@@ -21,9 +21,7 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb[T <: Versioned with Id]
-    extends ImplicitLogging
-    with Eventually {
+trait LocalDynamoDb[T <: Versioned with Id] extends Eventually {
 
   import LocalDynamoDb._
 

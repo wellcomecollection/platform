@@ -2,8 +2,9 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-
-import io.circe.{Encoder}
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
+import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
 import io.circe.Decoder
@@ -46,7 +47,7 @@ trait Messaging
     with SQS
     with SNS
     with S3
-    with ImplicitLogging {
+    with Matchers {
 
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](

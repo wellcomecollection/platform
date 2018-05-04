@@ -20,7 +20,7 @@ object SQS {
 
 }
 
-trait SQS extends ImplicitLogging {
+trait SQS {
 
   import SQS._
 
