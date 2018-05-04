@@ -30,12 +30,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Success
 
-trait Messaging
-    extends Akka
-    with MetricsSender
-    with SQS
-    with SNS
-    with S3 {
+trait Messaging extends Akka with MetricsSender with SQS with SNS with S3 {
 
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](
