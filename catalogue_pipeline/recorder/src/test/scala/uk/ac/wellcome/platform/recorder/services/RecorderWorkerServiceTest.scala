@@ -9,19 +9,18 @@ import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.dynamo.VersionedDao
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.metrics.MetricsSender
-import uk.ac.wellcome.models.aws.DynamoConfig
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
-import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

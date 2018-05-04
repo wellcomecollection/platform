@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.recorder
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
-import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 
 class ServerTest
   extends FunSpec

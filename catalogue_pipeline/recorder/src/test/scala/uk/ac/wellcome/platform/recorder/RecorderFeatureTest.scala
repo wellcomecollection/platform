@@ -6,8 +6,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
-import uk.ac.wellcome.s3.S3ObjectLocation
-import uk.ac.wellcome.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -47,8 +47,6 @@ class RecorderFeatureTest
 
             val flags = sqsLocalFlags(queue) ++ s3LocalFlags(bucket) ++ dynamoDbLocalEndpointFlags(table)
             withServer(flags) { _ =>
-
-              println(s"@@AWLC L49 encoder = ${encoder}")
               val messageBody = put[UnidentifiedWork](
                 obj = work,
                 location = S3ObjectLocation(
