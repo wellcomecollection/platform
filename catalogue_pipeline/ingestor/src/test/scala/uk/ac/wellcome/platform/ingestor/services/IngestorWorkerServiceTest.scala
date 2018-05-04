@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import java.net.ConnectException
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -11,12 +12,9 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -24,6 +22,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.duration._
+
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -37,6 +36,71 @@ class IngestorWorkerServiceTest
     with WorksUtil {
 
   val itemType = "work"
+
+  val metricsSender: MetricsSender =
+    new MetricsSender(
+      namespace = "reindexer-tests",
+      flushInterval = 100 milliseconds,
+      amazonCloudWatch = mock[AmazonCloudWatch],
+      actorSystem = ActorSystem())
+
+  val actorSystem = ActorSystem()
+
+  // The ingestor doesn't send messages so doesn't need a topic.
+  // This is needed because MessageConfig (which is used be MessageReader) needs one
+  // TODO remove this once MessageConfig gets split into MessageReaderConfig and MessageWriterConfig
+  val topic = Topic("")
+
+  def createMiroWork(
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
+    createWork(
+      canonicalId,
+      sourceId,
+      title,
+      IdentifierSchemes.miroImageNumber,
+      visible,
+      version)
+
+  def createSierraWork(
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
+    createWork(
+      canonicalId,
+      sourceId,
+      title,
+      IdentifierSchemes.sierraSystemNumber,
+      visible,
+      version)
+
+  def createWork(canonicalId: String,
+                 sourceId: String,
+                 title: String,
+                 identifierScheme: IdentifierSchemes.IdentifierScheme,
+                 visible: Boolean = true,
+                 version: Int = 1): IdentifiedWork = {
+    val sourceIdentifier = SourceIdentifier(
+      identifierScheme = identifierScheme,
+      ontologyType = "Work",
+      value = sourceId
+    )
+
+    IdentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = version,
+      identifiers = List(sourceIdentifier),
+      canonicalId = canonicalId,
+      visible = visible)
+  }
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
     val miroSourceIdentifier = SourceIdentifier(
@@ -74,6 +138,9 @@ class IngestorWorkerServiceTest
     )
 
     val work = createWork().copy(sourceIdentifier = sierraSourceIdentifier)
+
+    val workIndexer =
+      new WorkIndexer(itemType, elasticClient, metricsSender)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
