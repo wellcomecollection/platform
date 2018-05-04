@@ -121,7 +121,7 @@ class S3ObjectStoreTest
 
   it("throws an exception when retrieving a missing object") {
     withLocalS3Bucket { bucket =>
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )
