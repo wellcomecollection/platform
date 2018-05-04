@@ -2,7 +2,7 @@ package uk.ac.wellcome.transformer.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.messaging.test.fixtures.CloudWatch
+import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.transformer.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.TestWith
 

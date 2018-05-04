@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.message.{
   MessageWriter
 }
 import uk.ac.wellcome.messaging.sqs.SQSReader
-import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

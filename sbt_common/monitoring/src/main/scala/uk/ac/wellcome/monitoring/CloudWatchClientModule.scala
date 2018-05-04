@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.metrics
+package uk.ac.wellcome.monitoring
 
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.cloudwatch.{

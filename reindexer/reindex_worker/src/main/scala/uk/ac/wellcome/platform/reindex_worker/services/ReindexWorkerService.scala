@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
   ReindexJob

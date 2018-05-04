@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
 import javax.inject.Inject
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
@@ -10,7 +9,7 @@ import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.metrics.MetricsSender
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord

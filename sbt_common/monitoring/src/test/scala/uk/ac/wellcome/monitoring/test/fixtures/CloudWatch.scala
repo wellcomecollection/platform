@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.test.fixtures
+package uk.ac.wellcome.monitoring.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration

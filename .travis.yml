@@ -37,6 +37,7 @@ cache:
     - sbt_common/elasticsearch/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
+    - sbt_common/monitoring/target
     - sbt_common/storage/target
 
     - sierra_adapter/common/target
@@ -75,6 +76,7 @@ jobs:
     - env: TASK=sbt-elasticsearch-test
     - env: TASK=sbt-messaging-test
     - env: TASK=sbt-storage-test
+    - env: TASK=sbt-monitoring-test
 
     # Catalogue API stack
     - stage: test

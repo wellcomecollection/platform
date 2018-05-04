@@ -40,6 +40,13 @@ sbt-messaging-docker_compose_down:
 	$(call docker_compose_down,sbt_common/messaging/docker-compose.yml)
 
 
+sbt-monitoring-test:
+	$(call sbt_test,common_monitoring)
+
+sbt-monitoring-publish:
+	echo "Nothing to do!"
+
+
 sbt-storage-test:
 	$(call sbt_test,common_storage)
 

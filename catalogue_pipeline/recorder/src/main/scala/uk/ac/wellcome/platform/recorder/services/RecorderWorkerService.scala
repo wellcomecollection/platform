@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.recorder.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import io.circe.Decoder
-import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorkerToDynamo}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future

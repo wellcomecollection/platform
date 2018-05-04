@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.metrics
+package uk.ac.wellcome.monitoring
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch

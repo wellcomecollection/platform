@@ -1,12 +1,11 @@
-package uk.ac.wellcome.messaging.test.fixtures
+package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.twitter.inject.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.messaging.metrics
+import uk.ac.wellcome.monitoring
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.Future
@@ -18,17 +17,17 @@ trait MetricsSender
     with Akka {
 
   def withMetricsSender[R](actorSystem: ActorSystem) =
-    fixture[metrics.MetricsSender, R](
-      create = new metrics.MetricsSender(
+    fixture[monitoring.MetricsSender, R](
+      create = new monitoring.MetricsSender(
         awsNamespace,
         flushInterval,
         cloudWatchClient,
         actorSystem)
     )
 
-  def withMockMetricSender[R] = fixture[metrics.MetricsSender, R](
+  def withMockMetricSender[R] = fixture[monitoring.MetricsSender, R](
     create = {
-      val metricsSender = mock[metrics.MetricsSender]
+      val metricsSender = mock[monitoring.MetricsSender]
 
       when(
         metricsSender

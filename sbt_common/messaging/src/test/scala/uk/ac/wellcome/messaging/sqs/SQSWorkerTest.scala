@@ -13,12 +13,12 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import akka.actor.ActorSystem
-import uk.ac.wellcome.messaging.metrics.MetricsSender
-import uk.ac.wellcome.messaging.test.fixtures.{
-  MetricsSender => MetricsSenderFixture,
-  SQS
-}
+import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test.fixtures.{
+  MetricsSender => MetricsSenderFixture
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest

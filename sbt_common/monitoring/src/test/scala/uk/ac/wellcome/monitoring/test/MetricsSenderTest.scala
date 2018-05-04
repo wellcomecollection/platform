@@ -1,4 +1,4 @@
-package uk.ac.wellcome.messaging.metrics
+package uk.ac.wellcome.monitoring.test
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -10,12 +10,13 @@ import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{Future, Promise}
 
 class MetricsSenderTest
     extends FunSpec
@@ -30,7 +31,7 @@ class MetricsSenderTest
   val actorSystem = ActorSystem()
 
   describe("timeAndCount") {
-    it("should record the time and count of a successful future") {
+    it("records the time and count of a successful future") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
@@ -62,7 +63,7 @@ class MetricsSenderTest
       }
     }
 
-    it("should record the time and count of a failed future") {
+    it("records the time and count of a failed future") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
@@ -92,7 +93,7 @@ class MetricsSenderTest
       }
     }
 
-    it("should group 20 MetricDatum into one PutMetricDataRequest") {
+    it("groups 20 MetricDatum into one PutMetricDataRequest") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
@@ -117,7 +118,7 @@ class MetricsSenderTest
       }
     }
 
-    it("should take at least one second to make 150 PutMetricData requests") {
+    it("takes at least one second to make 150 PutMetricData requests") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender("test", 2 second, amazonCloudWatch, actorSystem)
@@ -152,7 +153,7 @@ class MetricsSenderTest
   }
 
   describe("incrementCount") {
-    it("should putMetricData with the correct value") {
+    it("calls putMetricData with the correct value") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender(
@@ -176,7 +177,7 @@ class MetricsSenderTest
   }
 
   describe("sendTime") {
-    it("should putMetricData with the correct value") {
+    it("calls putMetricData with the correct value") {
       val amazonCloudWatch = mock[AmazonCloudWatch]
       val metricsSender =
         new MetricsSender(
