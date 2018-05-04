@@ -2,7 +2,7 @@ package uk.ac.wellcome.messaging.message
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import com.amazonaws.services.s3.AmazonS3
@@ -14,7 +14,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -29,7 +29,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
   it("reads messages off a queue, processes them and deletes them") {
 
-    withMessageStreamFixtures { case (bucket, messageStream, queue) =>
+    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq)) =>
       val key = "message-key"
       val exampleObject = ExampleObject("some value")
 
@@ -63,7 +63,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures {
-      case (bucket, messageStream, queue) =>
+      case (bucket, messageStream, QueuePair(queue, dlq)) =>
         sqsClient.sendMessage(
           queue.url,
           "not valid json"
@@ -84,14 +84,15 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
         eventually {
           received shouldBe Nil
 
-          assertQueueNotEmpty(queue)
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
         }
     }
   }
 
   it("does not fails gracefully when the s3 object cannot be retrieved") {
     withMessageStreamFixtures {
-      case (bucket, messageStream, queue) =>
+      case (bucket, messageStream, QueuePair(queue, dlq)) =>
         val key = "key.json"
 
         // Do NOT put S3 object here
@@ -127,25 +128,70 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
         messageStream.foreach(f)
 
         eventually {
+          // TODO what do graceful and non graceful failure means in this case?
           //          throwable shouldBe a[AmazonS3Exception]
 
           received shouldBe Nil
 
-          assertQueueNotEmpty(queue)
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
         }
     }
   }
 
   it("continues reading if processing of some messages fails ") {
+    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq)) =>
+      val key = "message-key"
+      val exampleObject = ExampleObject("some value")
 
+      sqsClient.sendMessage(
+        queue.url,
+        "not valid json"
+      )
+
+      val firstNotice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+
+      sqsClient.sendMessage(
+        queue.url,
+        firstNotice
+      )
+
+      sqsClient.sendMessage(
+        queue.url,
+        "another not valid json"
+      )
+
+      val secondNotice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+
+      sqsClient.sendMessage(
+        queue.url,
+        secondNotice
+      )
+
+      var received: List[ExampleObject] = Nil
+      val f = (o: ExampleObject) => {
+
+        synchronized {
+          received = o :: received
+        }
+
+        Future.successful(())
+      }
+      messageStream.foreach(f)
+
+      eventually {
+        received shouldBe List(exampleObject, exampleObject)
+
+        assertQueueEmpty(queue)
+        assertQueueHasSize(dlq, 2)
+      }
+    }
   }
 
-  // TODO what do graceful and non graceful failure means in this case?
-
-  def withMessageStreamFixtures[R](testWith: TestWith[(Bucket, MessageStream[ExampleObject], Queue), R]) = {
+  def withMessageStreamFixtures[R](testWith: TestWith[(Bucket, MessageStream[ExampleObject], QueuePair), R]) = {
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>
-        withLocalStackSqsQueue { queue =>
+        withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
           val s3Config = S3Config(bucketName = bucket.name)
           val sqsConfig = SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
 
@@ -155,7 +201,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
           )
 
           val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig, keyPrefixGenerator)
-          testWith((bucket, stream, queue))
+          testWith((bucket, stream, queuePair))
         }
       }
     }
@@ -163,7 +209,11 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
   class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig, keyPrefixGenerator: KeyPrefixGenerator[T]) {
     implicit val system = actorSystem
-    implicit val materialiser = ActorMaterializer()
+    val decider: Supervision.Decider = {
+      case _: Exception => Supervision.Resume
+      case _            => Supervision.Stop
+    }
+    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
 
     val s3ObjectStore = new S3ObjectStore[T](
       s3Client = s3Client,
