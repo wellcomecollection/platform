@@ -233,40 +233,6 @@ trait Messaging
     }
   }
 
-  def assertQueueEmpty(queue: Queue) = {
-    // The visibility timeout is set to 1 second for test queues.
-    // Wait for slightly longer than that to make sure that messages
-    // that fail processing become visible again before asserting.
-    Thread.sleep(1500)
-
-    val messages = sqsClient
-      .receiveMessage(
-        new ReceiveMessageRequest(queue.url)
-          .withMaxNumberOfMessages(1)
-      )
-      .getMessages
-      .toList
-
-    messages shouldBe empty
-  }
-
-  def assertQueueNotEmpty(queue: Queue) = {
-    // The visibility timeout is set to 1 second for test queues.
-    // Wait for slightly longer than that to make sure that messages
-    // that fail processing become visible again before asserting.
-    Thread.sleep(1500)
-
-    val messages = sqsClient
-      .receiveMessage(
-        new ReceiveMessageRequest(queue.url)
-          .withMaxNumberOfMessages(1)
-      )
-      .getMessages
-      .toList
-
-    messages should not be empty
-  }
-
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {
     val serialisedExampleObject = toJson[T](obj).get

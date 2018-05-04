@@ -24,10 +24,6 @@ class IdEmbedderTests
     with MockitoSugar
     with JsonTestUtil
     with ExtendedPatience {
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(3, Seconds)),
-    interval = scaled(Span(50, Millis))
-  )
 
   private val metricsSender =
     new MetricsSender(
