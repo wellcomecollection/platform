@@ -112,8 +112,7 @@ trait Messaging
 
     val testReader = new MessageReader[T](
       messageConfig = messageConfig,
-      s3Client = s3Client,
-      keyPrefixGenerator = keyPrefixGenerator
+      s3Client = s3Client
     )
 
     testWith(testReader)

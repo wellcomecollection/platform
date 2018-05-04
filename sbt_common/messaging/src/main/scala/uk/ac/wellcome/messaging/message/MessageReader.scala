@@ -6,22 +6,19 @@ import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
-
+import uk.ac.wellcome.storage.s3.S3ObjectReader
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
 class MessageReader[T] @Inject()(
   messageConfig: MessageConfig,
-  s3Client: AmazonS3,
-  keyPrefixGenerator: KeyPrefixGenerator[T]
+  s3Client: AmazonS3
 ) {
 
-  val s3ObjectStore = new S3ObjectStore[T](
+  val s3ObjectReader = new S3ObjectReader[T](
     s3Client = s3Client,
-    s3Config = messageConfig.s3Config,
-    keyPrefixGenerator = keyPrefixGenerator
+    s3Config = messageConfig.s3Config
   )
 
   def read(message: sqs.model.Message)(
@@ -36,8 +33,7 @@ class MessageReader[T] @Inject()(
     for {
       messagePointer <- Future.fromTry[MessagePointer](
         deserialisedMessagePointerAttempt)
-      deserialisedObject <- s3ObjectStore.get(messagePointer.src)
+      deserialisedObject <- s3ObjectReader.get(messagePointer.src)
     } yield deserialisedObject
   }
-
 }
