@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.recorder.services
 
 import akka.actor.ActorSystem
+import com.amazonaws.AmazonServiceException
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
@@ -104,6 +105,32 @@ class RecorderWorkerServiceTest
                 assertStoredSingleWork(bucket, table, newerWork, expectedVhsVersion = 2)
               }
             }
+          }
+        }
+      }
+    }
+  }
+
+  it("returns a failed Future if saving to S3 fails") {
+    withLocalDynamoDbTable { table =>
+      val badBucket = Bucket(name = "bad-bukkit")
+      withLocalSnsTopic { topic =>
+        withRecorderWorkerService(table, badBucket, topic) { service =>
+          whenReady(service.processMessage(work = work).failed) { err =>
+            err shouldBe a[AmazonServiceException]
+          }
+        }
+      }
+    }
+  }
+
+  it("returns a failed Future if saving to DynamoDB fails") {
+    val badTable = Table(name = "bad-table", index = "bad-index")
+    withLocalS3Bucket { bucket =>
+      withLocalSnsTopic { topic =>
+        withRecorderWorkerService(badTable, bucket, topic) { service =>
+          whenReady(service.processMessage(work = work).failed) { err =>
+            err shouldBe a[AmazonServiceException]
           }
         }
       }
