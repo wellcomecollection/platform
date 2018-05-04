@@ -64,29 +64,53 @@ class RecorderWorkerServiceTest
         withLocalSnsTopic { topic =>
           withRecorderWorkerService(table, bucket, topic) { service =>
             val future = service.processMessage(work = work)
-
             whenReady(future) { _ =>
-              val actualRecords: List[HybridRecord] =
-                Scanamo
-                  .scan[HybridRecord](dynamoDbClient)(table.name)
-                  .map(_.right.get)
-
-              actualRecords.size shouldBe 1
-
-              val hybridRecord: HybridRecord = actualRecords.head
-              hybridRecord.id shouldBe s"${work.sourceIdentifier.identifierScheme.toString}/${work.sourceIdentifier.value}"
-              hybridRecord.version shouldBe 1
-              
-              val content = getContentFromS3(
-                bucket = bucket,
-                key = hybridRecord.s3key
-              )
-              fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(work)
+              assertStoredSingleWork(bucket, table, work)
             }
           }
         }
       }
     }
+  }
+
+  it("doesn't overwrite a newer work with an older work") {
+    val olderWork = work
+    val newerWork = work.copy(version = 10, title = Some("A nice new thing"))
+
+    withLocalDynamoDbTable { table =>
+      withLocalS3Bucket { bucket =>
+        withLocalSnsTopic { topic =>
+          withRecorderWorkerService(table, bucket, topic) { service =>
+            val newFuture = service.processMessage(work = newerWork)
+            whenReady(newFuture) { _ =>
+              val oldFuture = service.processMessage(work = olderWork)
+              whenReady(oldFuture) { _ =>
+                assertStoredSingleWork(bucket, table, newerWork)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private def assertStoredSingleWork(bucket: Bucket, table: Table, expectedWork: UnidentifiedWork) = {
+    val actualRecords: List[HybridRecord] =
+      Scanamo
+        .scan[HybridRecord](dynamoDbClient)(table.name)
+        .map(_.right.get)
+
+    actualRecords.size shouldBe 1
+
+    val hybridRecord: HybridRecord = actualRecords.head
+    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierScheme.toString}/${expectedWork.sourceIdentifier.value}"
+    hybridRecord.version shouldBe 1
+
+    val content = getContentFromS3(
+      bucket = bucket,
+      key = hybridRecord.s3key
+    )
+    fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(expectedWork)
   }
 
   private def withRecorderWorkerService(table: Table, bucket: Bucket, topic: Topic)(
