@@ -6,7 +6,7 @@ module "p2_compute" {
   bucket_name = "${aws_s3_bucket.jupyter.id}"
 
   instance_type = "p2.xlarge"
-  spot_price = "0.5"
+  spot_price    = "0.5"
 
   vpc_id      = "${module.vpc.vpc_id}"
   vpc_subnets = "${module.vpc.subnets}"
