@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.recorder
 
-import io.circe.Encoder
-import io.circe.generic.extras.semiauto.deriveEncoder
+import io.circe.{Decoder, Encoder}
+import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
@@ -17,10 +17,10 @@ class RecorderFeatureTest
       with ExtendedPatience
       with fixtures.Server
       with LocalVersionedHybridStore
-      with Messaging
-      with SQS {
+      with Messaging {
 
-  implicit val encoder: Encoder[UnidentifiedWork] = deriveEncoder[UnidentifiedWork]
+  implicit val decoder: Decoder[UnidentifiedWork] = deriveDecoder[UnidentifiedWork]
+//  implicit val encoder: Encoder[UnidentifiedWork] = deriveEncoder[UnidentifiedWork]
 
   // TODO Write a test that older works are ignored
 

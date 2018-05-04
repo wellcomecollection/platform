@@ -26,7 +26,6 @@ class Server extends HttpServer {
     RecorderModule,
     MetricsSenderModule,
     RecorderWorkEntryKeyPrefixGeneratorModule,
-    UnidentifiedWorkKeyPrefixGeneratorModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
