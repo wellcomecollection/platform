@@ -6,6 +6,7 @@ import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceI
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.messaging.message.MessageConfigModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.recorder.modules.{RecorderModule, RecorderWorkEntryKeyPrefixGeneratorModule}
@@ -20,10 +21,12 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.recorder Recorder"
   override val modules = Seq(
     VHSConfigModule,
+    MessageConfigModule,
     DynamoClientModule,
     RecorderModule,
     MetricsSenderModule,
     RecorderWorkEntryKeyPrefixGeneratorModule,
+    UnidentifiedWorkKeyPrefixGeneratorModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
