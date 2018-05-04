@@ -112,12 +112,11 @@ trait Messaging
 
   def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
-    withMessageReader(bucket, queue, keyPrefixGenerator)(testWith)
+    withMessageReader(bucket, queue)(testWith)
   }
 
   def withMessageReader[T, R](bucket: Bucket,
-                              queue: Queue,
-                              keyPrefixGenerator: KeyPrefixGenerator[T])(
+                              queue: Queue)(
     testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
@@ -132,9 +131,8 @@ trait Messaging
     )
 
     val testReader = new MessageReader[T](
-      messageReaderConfig = messageConfig,
+      messageConfig = messageConfig,
       s3Client = s3Client,
-      keyPrefixGenerator = keyPrefixGenerator,
       sqsClient = sqsClient
     )
 
