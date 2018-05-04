@@ -8,8 +8,6 @@ import scala.util.Try
 
 package object fixtures extends Logging {
 
-  implicit val implicitLogger = logger
-
   type TestWith[T, R] = T => R
   type Fixture[L, R] = TestWith[L, R] => R
 
