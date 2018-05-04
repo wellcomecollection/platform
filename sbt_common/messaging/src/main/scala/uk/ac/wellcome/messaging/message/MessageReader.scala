@@ -1,21 +1,21 @@
 package uk.ac.wellcome.messaging.message
 
+
 import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQS
-import io.circe.Decoder
-import uk.ac.wellcome.messaging.sns.NotificationMessage
+import com.amazonaws.services.sqs
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
+import io.circe.Decoder
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config}
-import uk.ac.wellcome.storage.s3.S3ObjectStore
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
 
+import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
 
-import scala.concurrent.Future
 
 class MessageReader[T] @Inject()(
   messageReaderConfig: MessageReaderConfig,
