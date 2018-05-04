@@ -2,7 +2,10 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
-import com.amazonaws.services.sqs.model.{PurgeQueueRequest, ReceiveMessageRequest}
+import com.amazonaws.services.sqs.model.{
+  PurgeQueueRequest,
+  ReceiveMessageRequest
+}
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import org.scalatest.Matchers
