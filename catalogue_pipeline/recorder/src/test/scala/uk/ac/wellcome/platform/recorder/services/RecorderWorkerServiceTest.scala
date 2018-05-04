@@ -1,35 +1,24 @@
 package uk.ac.wellcome.platform.recorder.services
 
-import akka.actor.ActorSystem
 import com.amazonaws.AmazonServiceException
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import org.scalatest.Assertion
+import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.MessageReader
-import uk.ac.wellcome.messaging.metrics.MetricsSender
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
+import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import uk.ac.wellcome.messaging.test.fixtures
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.messaging.test.fixtures
 import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class RecorderWorkerServiceTest
