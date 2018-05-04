@@ -10,10 +10,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.message.MessageReader
 import uk.ac.wellcome.messaging.metrics.MetricsSender
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
@@ -21,6 +23,7 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.messaging.test.fixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,7 +36,9 @@ class RecorderWorkerServiceTest
     with Akka
     with LocalVersionedHybridStore
     with SQS
-    with ScalaFutures {
+    with ScalaFutures
+    with Messaging
+    with fixtures.MetricsSender {
 
   val title = "Whose umbrella did I find?"
 
@@ -50,56 +55,56 @@ class RecorderWorkerServiceTest
     version = 2
   )
 
-  def withRecorderWorkerService(table: Table, bucket: Bucket)(
-    testWith: TestWith[RecorderWorkerService, Assertion]) = {
-    withActorSystem { actorSystem =>
-      val metricsSender = new MetricsSender(
-        namespace = "recorder-worker-service-test",
-        flushInterval = 100 milliseconds,
-        amazonCloudWatch = mock[AmazonCloudWatch],
-        actorSystem = actorSystem
-      )
+  it("returns a successful Future if the Work is recorded successfully") {
+    withLocalDynamoDbTable { table =>
+      withLocalS3Bucket { bucket =>
+        withLocalSnsTopic { topic =>
+          withRecorderWorkerService(table, bucket, topic) { service =>
+            val future = service.processMessage(work = work)
 
-      withLocalSqsQueue { queue =>
-        withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { versionedHybridStore =>
-          val workerService = new RecorderWorkerService(
-            versionedHybridStore = versionedHybridStore,
-            reader = new SQSReader(
-              sqsClient = sqsClient,
-              sqsConfig = SQSConfig(
-                queueUrl = queue.url,
-                waitTime = 1 second,
-                maxMessages = 1
-              )
-            ),
-            system = actorSystem,
-            metrics = metricsSender
-          )
+            whenReady(future) { _ =>
+              val actualRecords: List[RecorderWorkEntry] =
+                Scanamo
+                  .scan[RecorderWorkEntry](dynamoDbClient)(table.name)
+                  .map(_.right.get)
 
-          try {
-            testWith(workerService)
-          } finally {
-            workerService.stop()
+              println(actualRecords)
+              1 shouldBe 0
+            }
           }
         }
       }
     }
   }
 
-  it("returns a successful Future if the Work is recorded successfully") {
-    withLocalDynamoDbTable { table =>
-      withLocalS3Bucket { bucket =>
-        withRecorderWorkerService(table, bucket) { service =>
-          val future = service.store(work = work)
+  private def withRecorderWorkerService(table: Table, bucket: Bucket, topic: Topic)(
+    testWith: TestWith[RecorderWorkerService, Assertion]) = {
+    withMessageReader[UnidentifiedWork, Unit](bucket, topic) { messageReader =>
+      withActorSystem { actorSystem =>
+        withMetricsSender(actorSystem) { metricsSender =>
+          withLocalSqsQueue { queue =>
+            withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { versionedHybridStore =>
+              val workerService = new RecorderWorkerService(
+                versionedHybridStore = versionedHybridStore,
+                sqsReader = new SQSReader(
+                  sqsClient = sqsClient,
+                  sqsConfig = SQSConfig(
+                    queueUrl = queue.url,
+                    waitTime = 1 second,
+                    maxMessages = 1
+                  )
+                ),
+                messageReader = messageReader,
+                system = actorSystem,
+                metrics = metricsSender
+              )
 
-          whenReady(future) { _ =>
-            val actualRecords: List[RecorderWorkEntry] =
-              Scanamo
-                .scan[RecorderWorkEntry](dynamoDbClient)(table.name)
-                .map(_.right.get)
-
-            println(actualRecords)
-            1 shouldBe 0
+              try {
+                testWith(workerService)
+              } finally {
+                workerService.stop()
+              }
+            }
           }
         }
       }
