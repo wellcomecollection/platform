@@ -28,7 +28,6 @@ class Server extends HttpServer {
   override val modules = Seq(
     AWSConfigModule,
     MetricsSenderModule,
-    SQSConfigModule,
     SQSClientModule,
     MessageConfigModule,
     S3ConfigModule,

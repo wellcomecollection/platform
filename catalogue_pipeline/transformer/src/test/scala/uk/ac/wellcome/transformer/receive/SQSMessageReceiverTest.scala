@@ -12,7 +12,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.{MessageConfig, MessageWriter}
+import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sqs.SQSMessage
@@ -78,7 +78,7 @@ class SQSMessageReceiverTest
 
     val s3Config = S3Config(bucket.name)
 
-    val messageConfig = MessageConfig(SNSConfig(topic.arn), s3Config)
+    val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
 
     val messageWriter =
       new MessageWriter[UnidentifiedWork](

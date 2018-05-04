@@ -55,11 +55,6 @@ class IngestorWorkerServiceTest
       override def generate(obj: IdentifiedWork): String = ""
     }
 
-  // The ingestor doesn't send messages so doesn't need a topic.
-  // This is needed because MessageConfig (which is used be MessageReader) needs one
-  // TODO remove this once MessageConfig gets split into MessageReaderConfig and MessageWriterConfig
-  val topic = Topic("")
-
   def createMiroWork(
     canonicalId: String,
     sourceId: String,
@@ -125,7 +120,7 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
-          topic,
+          queue,
           identifiedWorkKeyPrefixGenerator) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -133,8 +128,6 @@ class IngestorWorkerServiceTest
                 indexNameV1,
                 indexNameV2,
                 identifiedWorkIndexer = workIndexer,
-                sqsReader =
-                  new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
                 messageReader = messageReader,
                 system = actorSystem,
                 metrics = metricsSender
@@ -172,7 +165,7 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
-          topic,
+          queue,
           identifiedWorkKeyPrefixGenerator) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -180,8 +173,6 @@ class IngestorWorkerServiceTest
                 indexNameV1,
                 indexNameV2,
                 identifiedWorkIndexer = workIndexer,
-                sqsReader =
-                  new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
                 messageReader = messageReader,
                 system = actorSystem,
                 metrics = metricsSender
@@ -220,7 +211,7 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
-          topic,
+          queue,
           identifiedWorkKeyPrefixGenerator) { messageReader =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
@@ -228,8 +219,6 @@ class IngestorWorkerServiceTest
                 indexNameV1,
                 indexNameV2,
                 identifiedWorkIndexer = workIndexer,
-                sqsReader =
-                  new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
                 messageReader = messageReader,
                 system = actorSystem,
                 metrics = metricsSender
@@ -274,14 +263,12 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
-          topic,
+          queue,
           identifiedWorkKeyPrefixGenerator) { messageReader =>
           val service = new IngestorWorkerService(
             "works-v1",
             "works-v2",
             identifiedWorkIndexer = brokenWorkIndexer,
-            sqsReader =
-              new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
             messageReader = messageReader,
             system = actorSystem,
             metrics = metricsSender

@@ -2,25 +2,28 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
+}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.message._
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
-import io.circe.Decoder
-import io.circe.generic.semiauto._
 import uk.ac.wellcome.messaging.message.{
-  MessageConfig,
   MessageReader,
   MessageWorker,
-  MessageWriter
+  MessageWriter,
+  _
 }
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.monitoring
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring
+import uk.ac.wellcome.monitoring.test.fixtures.{
+  MetricsSender => MetricsSenderFixture
+}
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3Config,
@@ -28,18 +31,13 @@ import uk.ac.wellcome.storage.s3.{
 }
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.monitoring.test.fixtures.{
-  MetricsSender => MetricsSenderFixture
-}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.Success
-import com.amazonaws.services.sns.model.UnsubscribeRequest
 
 trait Messaging
     extends Akka
@@ -64,7 +62,18 @@ trait Messaging
       }
     )
 
-  def messagingLocalFlags(bucket: Bucket, topic: Topic) =
+  def messagingLocalFlags(bucket: Bucket, topic: Topic, queue: Queue) =
+    messageReaderLocalFlags(bucket, queue) ++ messageWriterLocalFlags(
+      bucket,
+      topic)
+
+  def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
+    Map(
+      "aws.message.s3.bucketName" -> bucket.name,
+      "aws.message.sqs.queue.url" -> queue.url
+    ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
+
+  def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
     Map(
       "aws.message.sns.topic.arn" -> topic.arn,
       "aws.message.s3.bucketName" -> bucket.name
@@ -73,18 +82,17 @@ trait Messaging
   case class ExampleObject(name: String)
 
   class ExampleMessageWorker(
-    sqsReader: SQSReader,
     messageReader: MessageReader[ExampleObject],
     actorSystem: ActorSystem,
     metricsSender: monitoring.MetricsSender
   ) extends MessageWorker[ExampleObject](
-        sqsReader,
         messageReader,
         actorSystem,
         metricsSender
       ) {
 
     var calledWith: Option[ExampleObject] = None
+
     def hasBeenCalled: Boolean = calledWith.nonEmpty
 
     override implicit val decoder: Decoder[ExampleObject] =
@@ -102,28 +110,32 @@ trait Messaging
       override def generate(obj: ExampleObject): String = "/"
     }
 
-  def withExampleObjectMessageReader[R](bucket: Bucket, topic: Topic)(
+  def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
-    withMessageReader(bucket, topic, keyPrefixGenerator)(testWith)
+    withMessageReader(bucket, queue, keyPrefixGenerator)(testWith)
   }
 
   def withMessageReader[T, R](bucket: Bucket,
-                              topic: Topic,
+                              queue: Queue,
                               keyPrefixGenerator: KeyPrefixGenerator[T])(
     testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
-    val snsConfig = SNSConfig(topicArn = topic.arn)
+    val sqsConfig = SQSConfig(
+      queueUrl = queue.url,
+      waitTime = 1 millisecond,
+      maxMessages = 1)
 
-    val messageConfig = MessageConfig(
-      s3Config = s3Config,
-      snsConfig = snsConfig
+    val messageConfig = MessageReaderConfig(
+      sqsConfig = sqsConfig,
+      s3Config = s3Config
     )
 
     val testReader = new MessageReader[T](
-      messageConfig = messageConfig,
+      messageReaderConfig = messageConfig,
       s3Client = s3Client,
-      keyPrefixGenerator = keyPrefixGenerator
+      keyPrefixGenerator = keyPrefixGenerator,
+      sqsClient = sqsClient
     )
 
     testWith(testReader)
@@ -139,7 +151,6 @@ trait Messaging
     val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker = new ExampleMessageWorker(
-      sqsReader,
       messageReader,
       actorSystem,
       metricsSender
@@ -158,7 +169,7 @@ trait Messaging
     testWith: TestWith[MessageWriter[ExampleObject], R]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
-    val messageConfig = MessageConfig(
+    val messageConfig = MessageWriterConfig(
       s3Config = s3Config,
       snsConfig = snsConfig
     )
@@ -174,18 +185,18 @@ trait Messaging
   }
 
   def withExampleObjectMessageReaderFixtures[R](
-    testWith: TestWith[(Bucket, MessageReader[ExampleObject]), R]) = {
+    testWith: TestWith[(Bucket, MessageReader[ExampleObject], Queue), R]) = {
     withLocalS3Bucket { bucket =>
-      withLocalSnsTopic { topic =>
-        withExampleObjectMessageReader(bucket = bucket, topic = topic) {
+      withLocalStackSqsQueue { queue =>
+        withExampleObjectMessageReader(bucket = bucket, queue = queue) {
           reader =>
-            testWith((bucket, reader))
+            testWith((bucket, reader, queue))
         }
       }
     }
   }
 
-  def withMessageWorkerFixtures[R](
+  def withExampleObjectMessageWorkerFixtures[R](
     testWith: TestWith[(monitoring.MetricsSender,
                         Queue,
                         Bucket,
@@ -193,18 +204,14 @@ trait Messaging
                        R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalStackSqsQueue { queue =>
-          withExampleObjectMessageReaderFixtures {
-            case (bucket, messageReader) =>
-              withMessageWorker(
-                actorSystem,
-                metricsSender,
-                queue,
-                messageReader) { worker =>
+        withExampleObjectMessageReaderFixtures {
+          case (bucket, messageReader, queue) =>
+            withMessageWorker(actorSystem, metricsSender, queue, messageReader) {
+              worker =>
                 testWith((metricsSender, queue, bucket, worker))
-              }
-          }
+            }
         }
+
       }
     }
   }
@@ -217,18 +224,14 @@ trait Messaging
                        R]) = {
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>
-        withLocalStackSqsQueue { queue =>
-          withExampleObjectMessageReaderFixtures {
-            case (bucket, messageReader) =>
-              withMessageWorker(
-                actorSystem,
-                metricsSender,
-                queue,
-                messageReader) { worker =>
+        withExampleObjectMessageReaderFixtures {
+          case (bucket, messageReader, queue) =>
+            withMessageWorker(actorSystem, metricsSender, queue, messageReader) {
+              worker =>
                 testWith((metricsSender, queue, bucket, worker))
-              }
-          }
+            }
         }
+
       }
     }
   }

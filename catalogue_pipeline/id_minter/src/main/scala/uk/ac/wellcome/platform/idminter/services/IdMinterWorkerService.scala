@@ -20,11 +20,10 @@ import scala.util.Try
 class IdMinterWorkerService @Inject()(
   idEmbedder: IdEmbedder,
   writer: MessageWriter[Json],
-  sqsReader: SQSReader,
   messageReader: MessageReader[Json],
   system: ActorSystem,
   metrics: MetricsSender
-) extends MessageWorker[Json](sqsReader, messageReader, system, metrics) {
+) extends MessageWorker[Json](messageReader, system, metrics) {
 
   override lazy val poll = 100 milliseconds
   val snsSubject = "identified-item"

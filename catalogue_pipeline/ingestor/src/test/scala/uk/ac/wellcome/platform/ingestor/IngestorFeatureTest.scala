@@ -47,10 +47,10 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = sqsLocalFlags(queue) ++ esLocalFlags(
+            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
               indexNameV1,
               indexNameV2,
-              itemType) ++ s3LocalFlags(bucket)
+              itemType)
             withServer(flags) { _ =>
               assertElasticsearchEventuallyHasWork(work, indexNameV1, itemType)
               assertElasticsearchEventuallyHasWork(work, indexNameV2, itemType)
@@ -78,10 +78,10 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = sqsLocalFlags(queue) ++ esLocalFlags(
+            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
               indexNameV1,
               indexNameV2,
-              itemType) ++ s3LocalFlags(bucket)
+              itemType)
             withServer(flags) { _ =>
               assertElasticsearchEventuallyHasWork(work, indexNameV2, itemType)
               assertElasticsearchNeverHasWork(work, indexNameV1, itemType)
@@ -97,7 +97,7 @@ class IngestorFeatureTest
       withLocalS3Bucket { bucket =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = sqsLocalFlags(queue) ++ esLocalFlags(
+            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
               indexNameV1,
               indexNameV2,
               itemType) ++ s3LocalFlags(bucket)

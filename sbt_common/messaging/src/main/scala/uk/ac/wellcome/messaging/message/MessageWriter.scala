@@ -1,22 +1,24 @@
 package uk.ac.wellcome.messaging.message
 
-import java.net.URI
-
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
-
 import io.circe.Encoder
-import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.{blocking, Future}
+import scala.concurrent.Future
+
+case class MessageWriterConfig(
+  snsConfig: SNSConfig,
+  s3Config: S3Config
+)
 
 class MessageWriter[T] @Inject()(
-  messageConfig: MessageConfig,
+  messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3,
   keyPrefixGenerator: KeyPrefixGenerator[T]
@@ -35,9 +37,6 @@ class MessageWriter[T] @Inject()(
 
   def write(message: T, subject: String)(
     implicit encoder: Encoder[T]): Future[Unit] = {
-
-    val bucket = messageConfig.s3Config.bucketName
-
     for {
       location <- s3.put(message)
       pointer <- Future.fromTry(toJson(MessagePointer(location)))

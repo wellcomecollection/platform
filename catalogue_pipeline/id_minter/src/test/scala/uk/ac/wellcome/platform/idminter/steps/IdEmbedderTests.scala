@@ -10,7 +10,7 @@ import org.scalatest.time._
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.duration._
@@ -23,11 +23,7 @@ class IdEmbedderTests
     with BeforeAndAfterEach
     with MockitoSugar
     with JsonTestUtil
-    with PatienceConfiguration {
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(
-    timeout = scaled(Span(3, Seconds)),
-    interval = scaled(Span(50, Millis))
-  )
+    with ExtendedPatience {
 
   private val metricsSender =
     new MetricsSender(

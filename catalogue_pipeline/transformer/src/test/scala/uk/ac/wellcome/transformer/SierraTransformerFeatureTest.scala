@@ -58,7 +58,7 @@ class SierraTransformerFeatureTest
             val flags: Map[String, String] = Map(
               "aws.metrics.namespace" -> "sierra-transformer"
             ) ++ s3LocalFlags(storageBucket) ++
-              sqsLocalFlags(queue) ++ messagingLocalFlags(
+              sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messagingBucket,
               topic)
 

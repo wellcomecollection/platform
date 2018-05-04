@@ -4,9 +4,9 @@
 -es.index.v1=${es_index_v1}
 -es.index.v2=${es_index_v2}
 -es.type=${es_doc_type}
--aws.sqs.queue.url=${ingest_queue_id}
 -aws.metrics.namespace=${metrics_namespace}
 -es.username=${es_username}
 -es.password=${es_password}
 -es.protocol=${es_protocol}
 -aws.message.s3.bucketName=${message_bucket_name}
+-aws.message.sqs.queue.url=${ingest_queue_id}

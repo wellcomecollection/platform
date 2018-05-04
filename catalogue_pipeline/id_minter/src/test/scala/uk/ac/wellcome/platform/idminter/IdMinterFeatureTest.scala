@@ -42,9 +42,8 @@ class IdMinterFeatureTest
         withLocalS3Bucket { bucket =>
           withIdentifiersDatabase { dbConfig =>
             val flags =
-              sqsLocalFlags(queue) ++
-                dbConfig.flags ++
-                messagingLocalFlags(bucket, topic)
+              dbConfig.flags ++
+                messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
               eventuallyTableExists(dbConfig)
@@ -102,9 +101,8 @@ class IdMinterFeatureTest
         withIdentifiersDatabase { dbConfig =>
           withLocalS3Bucket { bucket =>
             val flags =
-              sqsLocalFlags(queue) ++
-                dbConfig.flags ++
-                messagingLocalFlags(bucket, topic)
+              dbConfig.flags ++
+                messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
               sqsClient.sendMessage(queue.url, "not a json string")
