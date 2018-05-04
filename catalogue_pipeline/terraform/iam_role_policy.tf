@@ -2,7 +2,7 @@
 
 resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
   role   = "${module.transformer.task_role_name}"
-  policy = "${module.id_minter_topic.publish_policy}"
+  policy = "${module.transformed_works_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "ecs_transformer_task_vhs" {
@@ -52,4 +52,21 @@ resource "aws_iam_role_policy" "id_minter_s3_messages_get" {
 resource "aws_iam_role_policy" "id_minter_s3_messages_put" {
   role   = "${module.id_minter.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
+}
+
+# Role policies for the Recorder
+
+resource "aws_iam_role_policy" "recorder_cloudwatch" {
+  role   = "${module.recorder.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
+resource "aws_iam_role_policy" "recorder_s3_messages_get" {
+  role   = "${module.recorder.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_get.json}"
+}
+
+resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
+  role   = "${module.recorder.task_role_name}"
+  policy = "${module.vhs_recorder.full_access_policy}"
 }
