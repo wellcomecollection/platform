@@ -1,6 +1,7 @@
 package uk.ac.wellcome.models.work.internal
 
 import cats.syntax.either._
+import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder, Json}
 
 sealed trait License {
@@ -26,6 +27,12 @@ object License {
     } yield {
       createLicense(licenseType)
   })
+
+  implicit val licenseDynamoFormat = DynamoFormat.coercedXmap[License, String, IllegalArgumentException](
+    createLicense
+  )(
+    _.licenseType
+  )
 
   def createLicense(licenseType: String): License = {
     licenseType match {

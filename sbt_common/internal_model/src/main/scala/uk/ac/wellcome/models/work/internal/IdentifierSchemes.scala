@@ -1,6 +1,7 @@
 package uk.ac.wellcome.models.work.internal
 
 import cats.syntax.either._
+import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder, HCursor, Json}
 
 /** This is the canonical version of our identifier schemes.  This contains
@@ -94,4 +95,10 @@ object IdentifierSchemes {
         Json.fromString(a.toString)
       }
     }
+
+  implicit val identifierSchemeDynamoFormat = DynamoFormat.coercedXmap[IdentifierSchemes.IdentifierScheme, String, IllegalArgumentException](
+      createIdentifierScheme
+    )(
+      _.toString
+    )
 }

@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
+import uk.ac.wellcome.dynamo._
 import uk.ac.wellcome.messaging.sqs.{SQSReader, SQSWorkerToDynamo}
 import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
@@ -23,9 +24,8 @@ class RecorderWorkerService @Inject()(
   metrics: MetricsSender
 ) extends SQSWorkerToDynamo[UnidentifiedWork](reader, system, metrics) {
 
-  implicit val decoder = Decoder[RecorderWorkEntry]
-  implicit val encoder = Encoder[RecorderWorkEntry]
-  implicit val dynamoFormat = DynamoFormat[RecorderWorkEntry]
+  implicit val decoder: Decoder[UnidentifiedWork] = Decoder[UnidentifiedWork]
+  implicit val encoder: Encoder[UnidentifiedWork] = Encoder[UnidentifiedWork]
 
   override def store(work: UnidentifiedWork): Future[Unit] = {
 
