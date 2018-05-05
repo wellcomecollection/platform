@@ -124,13 +124,13 @@ trait Messaging
       waitTime = 1 millisecond,
       maxMessages = 1)
 
-    val messageConfig = MessageReaderConfig(
+    val messageReaderConfig = MessageReaderConfig(
       sqsConfig = sqsConfig,
       s3Config = s3Config
     )
 
     val testReader = new MessageReader[T](
-      messageConfig = messageConfig,
+      messageReaderConfig = messageReaderConfig,
       s3Client = s3Client,
       sqsClient = sqsClient
     )
