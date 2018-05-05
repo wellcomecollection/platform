@@ -28,7 +28,7 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import scala.concurrent.duration._
 
 class IngestorWorkerServiceTest
-    extends FunSpec
+  extends FunSpec
     with ScalaFutures
     with Matchers
     with MockitoSugar
@@ -50,12 +50,12 @@ class IngestorWorkerServiceTest
   val actorSystem = ActorSystem()
 
   def createMiroWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String,
-    visible: Boolean = true,
-    version: Int = 1
-  ): IdentifiedWork =
+                      canonicalId: String,
+                      sourceId: String,
+                      title: String,
+                      visible: Boolean = true,
+                      version: Int = 1
+                    ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
@@ -65,12 +65,12 @@ class IngestorWorkerServiceTest
       version)
 
   def createSierraWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String,
-    visible: Boolean = true,
-    version: Int = 1
-  ): IdentifiedWork =
+                        canonicalId: String,
+                        sourceId: String,
+                        title: String,
+                        visible: Boolean = true,
+                        version: Int = 1
+                      ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
@@ -112,7 +112,6 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-<<<<<<< HEAD
         withMessageReader[IdentifiedWork, Assertion](
           bucket,
           queue) { messageReader =>
@@ -139,90 +138,31 @@ class IngestorWorkerServiceTest
                 work,
                 indexName = indexNameV2,
                 itemType = itemType)
-=======
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) {
-          messageReader =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-                val service = new IngestorWorkerService(
-                  indexNameV1,
-                  indexNameV2,
-                  identifiedWorkIndexer = workIndexer,
-                  sqsReader = new SQSReader(
-                    sqsClient,
-                    SQSConfig(queue.url, 1.second, 1)),
-                  messageReader = messageReader,
-                  system = actorSystem,
-                  metrics = metricsSender
-                )
-
-                service.processMessage(work)
-
-                assertElasticsearchEventuallyHasWork(
-                  work,
-                  indexName = indexNameV1,
-                  itemType = itemType)
-
-                assertElasticsearchEventuallyHasWork(
-                  work,
-                  indexName = indexNameV2,
-                  itemType = itemType)
-              }
->>>>>>> Apply auto-formatting rules
             }
+          }
         }
       }
     }
-  }
 
-  it("inserts an Sierra identified Work only into the v2 index") {
-    val work = createSierraWork(
-      canonicalId = "m7b2aqtw",
-      sourceId = "M000765",
-      title = "A monstrous monolith of moss"
-    )
+    it("inserts an Sierra identified Work only into the v2 index") {
+      val work = createSierraWork(
+        canonicalId = "m7b2aqtw",
+        sourceId = "M000765",
+        title = "A monstrous monolith of moss"
+      )
 
-    val workIndexer =
-      new WorkIndexer(itemType, elasticClient, metricsSender)
+      val workIndexer =
+        new WorkIndexer(itemType, elasticClient, metricsSender)
 
-    withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-<<<<<<< HEAD
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
-
-              service.processMessage(work)
-
-              assertElasticsearchNeverHasWork(
-                work,
-                indexName = indexNameV1,
-                itemType = itemType)
-
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV2,
-                itemType = itemType)
-=======
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) {
-          messageReader =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { bucket =>
+          withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
               withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
                 val service = new IngestorWorkerService(
                   indexNameV1,
                   indexNameV2,
                   identifiedWorkIndexer = workIndexer,
-                  sqsReader = new SQSReader(
-                    sqsClient,
-                    SQSConfig(queue.url, 1.second, 1)),
                   messageReader = messageReader,
                   system = actorSystem,
                   metrics = metricsSender
@@ -239,115 +179,93 @@ class IngestorWorkerServiceTest
                   work,
                   indexName = indexNameV2,
                   itemType = itemType)
+
               }
->>>>>>> Apply auto-formatting rules
             }
+          }
         }
       }
-    }
-  }
 
-  it("fails inserting a non sierra or miro identified work") {
-    val work = createWork(
-      canonicalId = "m7b2aqtw",
-      sourceId = "M000765",
-      title = "A monstrous monolith of moss",
-      identifierScheme = IdentifierSchemes.calmAltRefNo
-    )
+      it("fails inserting a non sierra or miro identified work") {
+        val work = createWork(
+          canonicalId = "m7b2aqtw",
+          sourceId = "M000765",
+          title = "A monstrous monolith of moss",
+          identifierScheme = IdentifierSchemes.calmAltRefNo
+        )
 
-    val workIndexer =
-      new WorkIndexer(itemType, elasticClient, metricsSender)
+        val workIndexer =
+          new WorkIndexer(itemType, elasticClient, metricsSender)
 
-    withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-<<<<<<< HEAD
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+        withLocalSqsQueue { queue =>
+          withLocalS3Bucket { bucket =>
+            withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+                withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                  val service = new IngestorWorkerService(
+                    indexNameV1,
+                    indexNameV2,
+                    identifiedWorkIndexer = workIndexer,
+                    messageReader = messageReader,
+                    system = actorSystem,
+                    metrics = metricsSender
+                  )
 
-              val future = service.processMessage(work)
+                  val future = service.processMessage(work)
 
-              whenReady(future.failed) { ex =>
-                ex shouldBe a[GracefulFailureException]
-                ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
-=======
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) {
-          messageReader =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-                val service = new IngestorWorkerService(
-                  indexNameV1,
-                  indexNameV2,
-                  identifiedWorkIndexer = workIndexer,
-                  sqsReader = new SQSReader(
-                    sqsClient,
-                    SQSConfig(queue.url, 1.second, 1)),
-                  messageReader = messageReader,
-                  system = actorSystem,
-                  metrics = metricsSender
-                )
+                  whenReady(future.failed) { ex =>
+                    ex shouldBe a[GracefulFailureException]
+                    ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
 
-                val future = service.processMessage(work)
-
-                whenReady(future.failed) { ex =>
-                  ex shouldBe a[GracefulFailureException]
-                  ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                  }
                 }
->>>>>>> Apply auto-formatting rules
               }
             }
+          }
         }
-      }
-    }
-  }
 
-  it("returns a failed Future if indexing into Elasticsearch fails") {
-    val brokenRestClient: RestClient = RestClient
-      .builder(new HttpHost("localhost", 9800, "http"))
-      .setHttpClientConfigCallback(
-        new ElasticCredentials("elastic", "changeme"))
-      .build()
+        it("returns a failed Future if indexing into Elasticsearch fails") {
+          val brokenRestClient: RestClient = RestClient
+            .builder(new HttpHost("localhost", 9800, "http"))
+            .setHttpClientConfigCallback(
+              new ElasticCredentials("elastic", "changeme"))
+            .build()
 
-    val brokenElasticClient: HttpClient =
-      HttpClient.fromRestClient(brokenRestClient)
+          val brokenElasticClient: HttpClient =
+            HttpClient.fromRestClient(brokenRestClient)
 
-    val brokenWorkIndexer = new WorkIndexer(
-      esType = "work",
-      elasticClient = brokenElasticClient,
-      metricsSender = metricsSender
-    )
+          val brokenWorkIndexer = new WorkIndexer(
+            esType = "work",
+            elasticClient = brokenElasticClient,
+            metricsSender = metricsSender
+          )
 
-    val work = createMiroWork(
-      canonicalId = "b4aurznb",
-      sourceId = "B000765",
-      title = "A broken beach of basilisks"
-    )
+          val work = createMiroWork(
+            canonicalId = "b4aurznb",
+            sourceId = "B000765",
+            title = "A broken beach of basilisks"
+          )
 
-    withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, topic) {
-          messageReader =>
-            val service = new IngestorWorkerService(
-              "works-v1",
-              "works-v2",
-              identifiedWorkIndexer = brokenWorkIndexer,
-              messageReader = messageReader,
-              system = actorSystem,
-              metrics = metricsSender
-            )
+          withLocalSqsQueue { queue =>
+            withLocalS3Bucket { bucket =>
+              withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+                messageReader =>
+                  val service = new IngestorWorkerService(
+                    "works-v1",
+                    "works-v2",
+                    identifiedWorkIndexer = brokenWorkIndexer,
+                    messageReader = messageReader,
+                    system = actorSystem,
+                    metrics = metricsSender
+                  )
 
-            val future = service.processMessage(work)
-            whenReady(future.failed) { result =>
-              result shouldBe a[ConnectException]
+                  val future = service.processMessage(work)
+                  whenReady(future.failed) { result =>
+                    result shouldBe a[ConnectException]
+                  }
+              }
             }
+          }
         }
       }
     }
