@@ -28,7 +28,7 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import scala.concurrent.duration._
 
 class IngestorWorkerServiceTest
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with Matchers
     with MockitoSugar
@@ -50,12 +50,12 @@ class IngestorWorkerServiceTest
   val actorSystem = ActorSystem()
 
   def createMiroWork(
-                      canonicalId: String,
-                      sourceId: String,
-                      title: String,
-                      visible: Boolean = true,
-                      version: Int = 1
-                    ): IdentifiedWork =
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
@@ -65,12 +65,12 @@ class IngestorWorkerServiceTest
       version)
 
   def createSierraWork(
-                        canonicalId: String,
-                        sourceId: String,
-                        title: String,
-                        visible: Boolean = true,
-                        version: Int = 1
-                      ): IdentifiedWork =
+    canonicalId: String,
+    sourceId: String,
+    title: String,
+    visible: Boolean = true,
+    version: Int = 1
+  ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
@@ -112,34 +112,32 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue) { messageReader =>
+        withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+          messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+                service.processMessage(work)
 
-              service.processMessage(work)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV1,
+                  itemType = itemType)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV1,
-                itemType = itemType)
-
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV2,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV2,
+                  itemType = itemType)
+              }
             }
-          }
         }
       }
     }
@@ -156,32 +154,34 @@ class IngestorWorkerServiceTest
 
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { bucket =>
-          withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-                val service = new IngestorWorkerService(
-                  indexNameV1,
-                  indexNameV2,
-                  identifiedWorkIndexer = workIndexer,
-                  messageReader = messageReader,
-                  system = actorSystem,
-                  metrics = metricsSender
-                )
+          withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+            messageReader =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+                withLocalElasticsearchIndex(itemType = itemType) {
+                  indexNameV2 =>
+                    val service = new IngestorWorkerService(
+                      indexNameV1,
+                      indexNameV2,
+                      identifiedWorkIndexer = workIndexer,
+                      messageReader = messageReader,
+                      system = actorSystem,
+                      metrics = metricsSender
+                    )
 
-                service.processMessage(work)
+                    service.processMessage(work)
 
-                assertElasticsearchNeverHasWork(
-                  work,
-                  indexName = indexNameV1,
-                  itemType = itemType)
+                    assertElasticsearchNeverHasWork(
+                      work,
+                      indexName = indexNameV1,
+                      itemType = itemType)
 
-                assertElasticsearchEventuallyHasWork(
-                  work,
-                  indexName = indexNameV2,
-                  itemType = itemType)
+                    assertElasticsearchEventuallyHasWork(
+                      work,
+                      indexName = indexNameV2,
+                      itemType = itemType)
 
+                }
               }
-            }
           }
         }
       }
@@ -199,27 +199,30 @@ class IngestorWorkerServiceTest
 
         withLocalSqsQueue { queue =>
           withLocalS3Bucket { bucket =>
-            withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
-              withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-                withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-                  val service = new IngestorWorkerService(
-                    indexNameV1,
-                    indexNameV2,
-                    identifiedWorkIndexer = workIndexer,
-                    messageReader = messageReader,
-                    system = actorSystem,
-                    metrics = metricsSender
-                  )
+            withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+              messageReader =>
+                withLocalElasticsearchIndex(itemType = itemType) {
+                  indexNameV1 =>
+                    withLocalElasticsearchIndex(itemType = itemType) {
+                      indexNameV2 =>
+                        val service = new IngestorWorkerService(
+                          indexNameV1,
+                          indexNameV2,
+                          identifiedWorkIndexer = workIndexer,
+                          messageReader = messageReader,
+                          system = actorSystem,
+                          metrics = metricsSender
+                        )
 
-                  val future = service.processMessage(work)
+                        val future = service.processMessage(work)
 
-                  whenReady(future.failed) { ex =>
-                    ex shouldBe a[GracefulFailureException]
-                    ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                        whenReady(future.failed) { ex =>
+                          ex shouldBe a[GracefulFailureException]
+                          ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
 
-                  }
+                        }
+                    }
                 }
-              }
             }
           }
         }
