@@ -115,8 +115,7 @@ trait Messaging
     withMessageReader(bucket, queue)(testWith)
   }
 
-  def withMessageReader[T, R](bucket: Bucket,
-                              queue: Queue)(
+  def withMessageReader[T, R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[T], R]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
