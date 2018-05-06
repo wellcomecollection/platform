@@ -29,7 +29,6 @@ class WorkIndexerTest
       mock[AmazonCloudWatch],
       ActorSystem())
 
-  val indexName = "works"
   val itemType = "work"
 
   val workIndexer =
@@ -38,7 +37,7 @@ class WorkIndexerTest
   it("inserts an identified Work into Elasticsearch") {
     val work = createVersionedWork()
 
-    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+    withLocalElasticsearchIndex(itemType) { indexName =>
       val future = workIndexer.indexWork(work, indexName)
 
       whenReady(future) { _ =>
@@ -53,7 +52,7 @@ class WorkIndexerTest
   it("only adds one record when the same ID is ingested multiple times") {
     val work = createVersionedWork()
 
-    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+    withLocalElasticsearchIndex(itemType) { indexName =>
       val future = Future.sequence(
         (1 to 2).map(_ => workIndexer.indexWork(work, indexName))
       )
@@ -71,7 +70,7 @@ class WorkIndexerTest
     val work = createVersionedWork(version = 3)
     val olderWork = work.copy(version = 1)
 
-    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+    withLocalElasticsearchIndex(itemType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
       val future = workIndexer.indexWork(olderWork, indexName)
@@ -92,7 +91,7 @@ class WorkIndexerTest
     val work = createVersionedWork(version = 3)
     val updatedWork = work.copy(title = Some("boring title"))
 
-    withLocalElasticsearchIndex(indexName, itemType) { _ =>
+    withLocalElasticsearchIndex(itemType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
       val future = workIndexer.indexWork(updatedWork, indexName)
