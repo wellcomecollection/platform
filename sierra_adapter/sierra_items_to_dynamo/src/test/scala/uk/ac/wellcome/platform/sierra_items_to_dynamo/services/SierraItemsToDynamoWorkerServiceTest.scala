@@ -19,6 +19,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
@@ -34,12 +35,11 @@ class SierraItemsToDynamoWorkerServiceTest
     with Eventually
     with ExtendedPatience
     with Akka
-    with LocalDynamoDb[SierraItemRecord]
     with MetricsSenderFixture
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
-    DynamoFormat[SierraItemRecord]
+      DynamoFormat[SierraItemRecord]
 
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,

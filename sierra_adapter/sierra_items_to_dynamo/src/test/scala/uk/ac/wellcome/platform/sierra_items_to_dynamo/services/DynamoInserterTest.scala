@@ -13,7 +13,6 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.type_classes.{
   IdGetter,
   VersionGetter,
@@ -28,13 +27,9 @@ class DynamoInserterTest
     extends FunSpec
     with Matchers
     with DynamoInserterFixture
-    with LocalDynamoDb[SierraItemRecord]
     with ScalaFutures
     with MockitoSugar
     with ExtendedPatience {
-
-  override lazy val evidence: DynamoFormat[SierraItemRecord] =
-    DynamoFormat[SierraItemRecord]
 
   it("ingests a json item into DynamoDB") {
     withLocalDynamoDbTable { table =>
