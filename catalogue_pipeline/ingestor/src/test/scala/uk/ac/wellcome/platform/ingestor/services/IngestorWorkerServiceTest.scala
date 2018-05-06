@@ -51,32 +51,14 @@ class IngestorWorkerServiceTest
 
   val actorSystem = ActorSystem()
 
-  def createMiroWork(sourceId: String): IdentifiedWork =
-    createWork(
-      sourceId = canonicalId,
-      identifierScheme = IdentifierSchemes.miroImageNumber
-    )
-
-  def createSierraWork(sourceId: String): IdentifiedWork =
-    createWork(
-      sourceId = sourceId,
-      identifierScheme = IdentifierSchemes.sierraSystemNumber
-    )
-
-  def createWork(sourceId: String,
-                 identifierScheme: IdentifierSchemes.IdentifierScheme): IdentifiedWork = {
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = identifierScheme,
-      ontologyType = "Work",
-      value = sourceId
-    )
-
-    val work = createWorks(count = 1).head
-    work.copy(sourceIdentifier = sourceIdentifier)
-  }
-
   it("inserts an Miro identified Work into v1 and v2 indices") {
-    val work: IdentifiedWork = createMiroWork(sourceId = "M000765")
+    val miroSourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "M000765"
+    )
+
+    val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
     val workIndexer =
       new WorkIndexer(itemType, elasticClient, metricsSender)
@@ -115,7 +97,13 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified Work only into the v2 index") {
-    val work = createSierraWork(sourceId = "M000765")
+    val sierraSourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "b1027467"
+    )
+
+    val work = createWork().copy(sourceIdentifier = sierraSourceIdentifier)
 
     val workIndexer =
       new WorkIndexer(itemType, elasticClient, metricsSender)
@@ -155,10 +143,13 @@ class IngestorWorkerServiceTest
   }
 
   it("fails inserting a non sierra or miro identified work") {
-    val work = createWork(
-      sourceId = "MS/237",
-      identifierScheme = IdentifierSchemes.calmAltRefNo
+    val calmSourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.calmAltRefNo,
+      ontologyType = "Work",
+      value = "MS/237"
     )
+
+    val work = createWork().copy(sourceIdentifier = calmSourceIdentifier)
 
     val workIndexer =
       new WorkIndexer(itemType, elasticClient, metricsSender)
