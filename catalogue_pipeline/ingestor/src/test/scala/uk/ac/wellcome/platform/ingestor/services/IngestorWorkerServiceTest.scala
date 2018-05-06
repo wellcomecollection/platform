@@ -52,34 +52,29 @@ class IngestorWorkerServiceTest
   def createMiroWork(
     canonicalId: String,
     sourceId: String,
-    title: String,
-    visible: Boolean = true
+    title: String
   ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
       title,
-      IdentifierSchemes.miroImageNumber,
-      visible)
+      IdentifierSchemes.miroImageNumber)
 
   def createSierraWork(
     canonicalId: String,
     sourceId: String,
-    title: String,
-    visible: Boolean = true
+    title: String
   ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
       title,
-      IdentifierSchemes.sierraSystemNumber,
-      visible)
+      IdentifierSchemes.sierraSystemNumber)
 
   def createWork(canonicalId: String,
                  sourceId: String,
                  title: String,
-                 identifierScheme: IdentifierSchemes.IdentifierScheme,
-                 visible: Boolean = true): IdentifiedWork = {
+                 identifierScheme: IdentifierSchemes.IdentifierScheme): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = identifierScheme,
       ontologyType = "Work",
@@ -91,7 +86,6 @@ class IngestorWorkerServiceTest
       sourceIdentifier = sourceIdentifier,
       identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
-      visible = visible,
       version = 1)
   }
 
