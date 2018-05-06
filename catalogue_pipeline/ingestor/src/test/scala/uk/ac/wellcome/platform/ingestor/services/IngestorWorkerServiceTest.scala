@@ -38,7 +38,7 @@ class IngestorWorkerServiceTest
     with Messaging
     with WorksUtil {
 
-  val esType = "work"
+  val itemType = "work"
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
     val miroSourceIdentifier = SourceIdentifier(
@@ -49,20 +49,20 @@ class IngestorWorkerServiceTest
 
     val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
-    withLocalElasticsearchIndex(esType = esType) { esIndexV1 =>
-      withLocalElasticsearchIndex(esType = esType) { esIndexV2 =>
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
           service.processMessage(work)
 
           assertElasticsearchEventuallyHasWork(
             work,
             indexName = indexNameV1,
-            esType = esType)
+            itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
             work,
             indexName = indexNameV2,
-            esType = esType)
+            itemType = itemType)
         }
       }
     }
@@ -77,20 +77,20 @@ class IngestorWorkerServiceTest
 
     val work = createWork().copy(sourceIdentifier = sierraSourceIdentifier)
 
-    withLocalElasticsearchIndex(esType = esType) { esIndexV1 =>
-      withLocalElasticsearchIndex(esType = esType) { esIndexV2 =>
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
           service.processMessage(work)
 
           assertElasticsearchNeverHasWork(
             work,
             indexName = indexNameV1,
-            esType = esType)
+            itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
             work,
             indexName = indexNameV2,
-            esType = esType)
+            itemType = itemType)
         }
       }
     }
@@ -105,8 +105,8 @@ class IngestorWorkerServiceTest
 
     val work = createWork().copy(sourceIdentifier = calmSourceIdentifier)
 
-    withLocalElasticsearchIndex(esType = esType) { esIndexV1 =>
-      withLocalElasticsearchIndex(esType = esType) { esIndexV2 =>
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
           val future = service.processMessage(work)
 
@@ -130,7 +130,7 @@ class IngestorWorkerServiceTest
       HttpClient.fromRestClient(brokenRestClient)
 
     val brokenWorkIndexer = new WorkIndexer(
-      esType = "work",
+      itemType = "work",
       elasticClient = brokenElasticClient,
       metricsSender = metricsSender
     )
@@ -143,7 +143,7 @@ class IngestorWorkerServiceTest
 
     val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
-    withWorkIndexer(esType, elasticClient = brokenElasticClient) { workIndexer =>
+    withWorkIndexer(itemType, elasticClient = brokenElasticClient) { workIndexer =>
       withIngestorWorkerService("works-v1", "works-v2", workIndexer) { service =>
         val future = service.processMessage(work)
         whenReady(future.failed) { result =>
@@ -158,7 +158,7 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[IngestorWorkerService, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer(esType, elasticClient, metricsSender) { workIndexer =>
+        withWorkIndexer(itemType, elasticClient, metricsSender) { workIndexer =>
           withIngestorWorkerService(esIndexV1, esIndexV2, actorSystem, metricsSender, workIndexer) { service =>
             testWith(service)
           }
@@ -176,7 +176,7 @@ class IngestorWorkerServiceTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
-          withWorkIndexer(esType, elasticClient, metricsSender) { workIndexer =>
+          withWorkIndexer(itemType, elasticClient, metricsSender) { workIndexer =>
             val service = new IngestorWorkerService(
               esIndexV1 = esIndexV1,
               esIndexV2 = esIndexV2,
