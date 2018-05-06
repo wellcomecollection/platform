@@ -22,6 +22,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 class ReindexWorkerServiceTest
     extends FunSpec
