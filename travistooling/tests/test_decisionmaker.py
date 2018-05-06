@@ -71,6 +71,7 @@ from travistooling.decisions import (
     # a -publish task.
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-test', UnrecognisedFile, True),
+    ('catalogue_pipeline/ingestor/src/test/scala/uk/ac/wellcome/platform/ingestor/fixtures/WorkIndexerFixtures.scala', 'ingestor-publish', ChangesToTestsDontGetPublished, False),
 
     # Changes to Python test files never trigger a -publish task.
     ('lambda_conftest.py', 'loris-publish', ChangesToTestsDontGetPublished, False),

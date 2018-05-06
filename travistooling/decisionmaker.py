@@ -54,6 +54,18 @@ def does_file_affect_build_task(path, task):
     ] or path.startswith(('misc/', 'ontologies/', 'data_science/scripts/')):
         raise IgnoredPath()
 
+    # If this is a test file and we're in a publish task, we can skip
+    # running the task.
+    if task.endswith('-publish') and (
+
+        # Scala test files
+        'src/test/scala/uk/ac/wellcome' in path or
+
+        # Python test files
+        path.endswith(('conftest.py', '.coveragerc'))
+    ):
+        raise ChangesToTestsDontGetPublished()
+
     # Some directories only affect one task.
     #
     # For example, the ``catalogue_api/api`` directory only contains code
@@ -69,18 +81,6 @@ def does_file_affect_build_task(path, task):
                 raise ExclusivelyAffectsThisTask()
             else:
                 raise ExclusivelyAffectsAnotherTask(task_prefix)
-
-    # If this is a test file and we're in a publish task, we can skip
-    # running the task.
-    if task.endswith('-publish') and (
-
-        # Scala test files
-        'src/test/scala/uk/ac/wellcome' in path or
-
-        # Python test files
-        path.endswith(('conftest.py', '.coveragerc'))
-    ):
-        raise ChangesToTestsDontGetPublished()
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
