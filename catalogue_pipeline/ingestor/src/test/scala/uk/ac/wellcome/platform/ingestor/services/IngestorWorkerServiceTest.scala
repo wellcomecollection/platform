@@ -22,6 +22,7 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
@@ -36,7 +37,8 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with S3
-    with Messaging {
+    with Messaging
+    with WorksUtil {
 
   val itemType = "work"
 
@@ -49,31 +51,19 @@ class IngestorWorkerServiceTest
 
   val actorSystem = ActorSystem()
 
-  def createMiroWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String
-  ): IdentifiedWork =
+  def createMiroWork(sourceId: String): IdentifiedWork =
     createWork(
-      canonicalId,
-      sourceId,
-      title,
-      IdentifierSchemes.miroImageNumber)
+      sourceId = canonicalId,
+      identifierScheme = IdentifierSchemes.miroImageNumber
+    )
 
-  def createSierraWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String
-  ): IdentifiedWork =
+  def createSierraWork(sourceId: String): IdentifiedWork =
     createWork(
-      canonicalId,
-      sourceId,
-      title,
-      IdentifierSchemes.sierraSystemNumber)
+      sourceId = sourceId,
+      identifierScheme = IdentifierSchemes.sierraSystemNumber
+    )
 
-  def createWork(canonicalId: String,
-                 sourceId: String,
-                 title: String,
+  def createWork(sourceId: String,
                  identifierScheme: IdentifierSchemes.IdentifierScheme): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = identifierScheme,
@@ -81,20 +71,12 @@ class IngestorWorkerServiceTest
       value = sourceId
     )
 
-    IdentifiedWork(
-      title = Some(title),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      canonicalId = canonicalId,
-      version = 1)
+    val work = createWorks(count = 1).head
+    work.copy(sourceIdentifier = sourceIdentifier)
   }
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
-    val work: IdentifiedWork = createMiroWork(
-      canonicalId = "m7b2aqtw",
-      sourceId = "M000765",
-      title = "A monstrous monolith of moss"
-    )
+    val work: IdentifiedWork = createMiroWork(sourceId = "M000765")
 
     val workIndexer =
       new WorkIndexer(itemType, elasticClient, metricsSender)
@@ -133,11 +115,7 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified Work only into the v2 index") {
-    val work = createSierraWork(
-      canonicalId = "m7b2aqtw",
-      sourceId = "M000765",
-      title = "A monstrous monolith of moss"
-    )
+    val work = createSierraWork(sourceId = "M000765")
 
     val workIndexer =
       new WorkIndexer(itemType, elasticClient, metricsSender)
@@ -178,9 +156,7 @@ class IngestorWorkerServiceTest
 
   it("fails inserting a non sierra or miro identified work") {
     val work = createWork(
-      canonicalId = "m7b2aqtw",
-      sourceId = "M000765",
-      title = "A monstrous monolith of moss",
+      sourceId = "MS/237",
       identifierScheme = IdentifierSchemes.calmAltRefNo
     )
 
@@ -232,11 +208,7 @@ class IngestorWorkerServiceTest
       metricsSender = metricsSender
     )
 
-    val work = createMiroWork(
-      canonicalId = "b4aurznb",
-      sourceId = "B000765",
-      title = "A broken beach of basilisks"
-    )
+    val work = createMiroWork(sourceId = "B000765")
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
