@@ -56,12 +56,12 @@ class SQSWorkerTest
   )
 
   def withFixtures[R](
-    testWith: TestWith[(ActorSystem, Queue, MetricsSender, SQSWorker), R]
+    testWith: TestWith[(Queue, MetricsSender, SQSWorker), R]
   ): R = withActorSystem[R] { actorSystem =>
     withLocalSqsQueue[R] { q =>
       withMockMetricSender[R] { metricsSender =>
         withSqsWorker[R](actorSystem, q, metricsSender) { worker =>
-          testWith((actorSystem, q, metricsSender, worker))
+          testWith((q, metricsSender, worker))
         }
       }
     }
@@ -69,7 +69,7 @@ class SQSWorkerTest
 
   it("processes messages") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (queue, metrics, worker) =>
         val json = toJson(ValidSqsMessage()).get
 
         sqsClient.sendMessage(queue.url, json)
@@ -88,7 +88,7 @@ class SQSWorkerTest
 
   it("does report an error when a runtime error occurs") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (queue, metrics, worker) =>
         when(
           metrics.timeAndCount[Unit](
             anyString(),
@@ -109,7 +109,7 @@ class SQSWorkerTest
 
   it("does not report an error when unable to parse a message") {
     withFixtures {
-      case (_, queue, metrics, worker) =>
+      case (queue, metrics, worker) =>
         sqsClient.sendMessage(queue.url, "this is not valid Json")
 
         eventually {
