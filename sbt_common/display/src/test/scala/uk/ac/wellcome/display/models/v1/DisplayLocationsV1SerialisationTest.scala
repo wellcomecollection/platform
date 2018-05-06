@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
   PhysicalLocation
 }
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayLocationsV1SerialisationTest
     extends FunSpec

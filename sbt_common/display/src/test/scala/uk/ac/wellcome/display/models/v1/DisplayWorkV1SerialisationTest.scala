@@ -7,7 +7,7 @@ import uk.ac.wellcome.display.models.{
 }
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.WorksUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV1SerialisationTest
     extends FunSpec
