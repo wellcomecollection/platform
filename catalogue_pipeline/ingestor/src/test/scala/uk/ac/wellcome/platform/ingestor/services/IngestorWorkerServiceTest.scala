@@ -158,28 +158,27 @@ class IngestorWorkerServiceTest
         withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
           messageReader =>
             withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-              withLocalElasticsearchIndex(itemType = itemType) {
-                indexNameV2 =>
-                  val service = new IngestorWorkerService(
-                    indexNameV1,
-                    indexNameV2,
-                    identifiedWorkIndexer = workIndexer,
-                    messageReader = messageReader,
-                    system = actorSystem,
-                    metrics = metricsSender
-                  )
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-                  service.processMessage(work)
+                service.processMessage(work)
 
-                  assertElasticsearchNeverHasWork(
-                    work,
-                    indexName = indexNameV1,
-                    itemType = itemType)
+                assertElasticsearchNeverHasWork(
+                  work,
+                  indexName = indexNameV1,
+                  itemType = itemType)
 
-                  assertElasticsearchEventuallyHasWork(
-                    work,
-                    indexName = indexNameV2,
-                    itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV2,
+                  itemType = itemType)
 
               }
             }
@@ -203,27 +202,25 @@ class IngestorWorkerServiceTest
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
           messageReader =>
-            withLocalElasticsearchIndex(itemType = itemType) {
-              indexNameV1 =>
-                withLocalElasticsearchIndex(itemType = itemType) {
-                  indexNameV2 =>
-                    val service = new IngestorWorkerService(
-                      indexNameV1,
-                      indexNameV2,
-                      identifiedWorkIndexer = workIndexer,
-                      messageReader = messageReader,
-                      system = actorSystem,
-                      metrics = metricsSender
-                    )
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-                    val future = service.processMessage(work)
+                val future = service.processMessage(work)
 
-                    whenReady(future.failed) { ex =>
-                      ex shouldBe a[GracefulFailureException]
-                      ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                whenReady(future.failed) { ex =>
+                  ex shouldBe a[GracefulFailureException]
+                  ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
 
-                    }
                 }
+              }
             }
         }
       }
