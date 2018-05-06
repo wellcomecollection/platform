@@ -1,7 +1,6 @@
 package uk.ac.wellcome.models.work.internal
 
 import cats.syntax.either._
-import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder, Json}
 
 sealed trait License {
