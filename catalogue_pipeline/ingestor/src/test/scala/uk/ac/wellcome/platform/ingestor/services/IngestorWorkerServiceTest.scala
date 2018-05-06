@@ -19,7 +19,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixture
+import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -34,7 +34,7 @@ class IngestorWorkerServiceTest
     with ElasticsearchFixtures
     with SQS
     with S3
-    with WorkIndexerFixture
+    with WorkIndexerFixtures
     with Messaging
     with WorksUtil {
 
@@ -132,7 +132,7 @@ class IngestorWorkerServiceTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val brokenWorkIndexer = new WorkIndexer(
-          itemType = "work",
+          esType = "work",
           elasticClient = brokenElasticClient,
           metricsSender = metricsSender
         )
@@ -165,8 +165,8 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[IngestorWorkerService, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer(itemType, elasticClient, metricsSender) { workIndexer =>
-          withIngestorWorkerService(esIndexV1, esIndexV2, actorSystem, metricsSender, workIndexer) { service =>
+        withWorkIndexer[R](itemType, elasticClient, metricsSender) { workIndexer =>
+          withIngestorWorkerService[R](esIndexV1, esIndexV2, actorSystem, metricsSender, workIndexer) { service =>
             testWith(service)
           }
         }
@@ -183,7 +183,7 @@ class IngestorWorkerServiceTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
-          withWorkIndexer(itemType, elasticClient, metricsSender) { workIndexer =>
+          withWorkIndexer[R](itemType, elasticClient, metricsSender) { workIndexer =>
             val service = new IngestorWorkerService(
               esIndexV1 = esIndexV1,
               esIndexV2 = esIndexV2,

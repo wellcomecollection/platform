@@ -7,7 +7,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFi
 import uk.ac.wellcome.platform.ingestor.services.WorkIndexer
 import uk.ac.wellcome.test.fixtures._
 
-trait WorkIndexerFixture extends Akka with MetricsSenderFixture { this: Suite =>
+trait WorkIndexerFixtures extends Akka with MetricsSenderFixture { this: Suite =>
   def withWorkIndexer[R](
     esType: String,
     elasticClient: HttpClient,
