@@ -1,17 +1,15 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier
 }
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   TableProvisioner
@@ -19,23 +17,17 @@ import uk.ac.wellcome.platform.idminter.database.{
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
     extends FunSpec
+    with Akka
     with fixtures.IdentifiersDatabase
+    with MetricsSenderFixture
     with Matchers
     with MockitoSugar {
-
-  private val metricsSender =
-    new MetricsSender(
-      "id_minter_test_metrics",
-      100 milliseconds,
-      mock[AmazonCloudWatch],
-      ActorSystem())
 
   case class IdentifierGeneratorFixtures(
     identifierGenerator: IdentifierGenerator,
@@ -57,18 +49,22 @@ class IdentifierGeneratorTest
         new IdentifiersDao(DB.connect(), identifiersTable)
       )
 
-      val identifierGenerator = new IdentifierGenerator(
-        identifiersDao,
-        metricsSender
-      )
+      withActorSystem { actorSystem =>
+        withMetricsSender(actorSystem) { metricsSender =>
+          val identifierGenerator = new IdentifierGenerator(
+            identifiersDao,
+            metricsSender
+          )
 
-      eventuallyTableExists(dbConfig)
+          eventuallyTableExists(dbConfig)
 
-      testWith(
-        IdentifierGeneratorFixtures(
-          identifierGenerator,
-          identifiersTable,
-          dbConfig))
+          testWith(
+            IdentifierGeneratorFixtures(
+              identifierGenerator,
+              identifiersTable,
+              dbConfig))
+        }
+      }
     }
 
   it("queries the database and return a matching canonical id") {
@@ -129,37 +125,42 @@ class IdentifierGeneratorTest
 
   it("returns a failure if it fails registering a new identifier") {
     val identifiersDao = mock[IdentifiersDao]
-    val identifierGenerator = new IdentifierGenerator(
-      identifiersDao,
-      metricsSender
-    )
 
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
-      "Work",
-      value = "1234"
-    )
-
-    val triedLookup = identifiersDao.lookupId(
-      sourceIdentifier = sourceIdentifier
-    )
-
-    when(triedLookup)
-      .thenReturn(Success(None))
-
-    val expectedException = new Exception("Noooo")
-
-    when(identifiersDao.saveIdentifier(any[Identifier]()))
-      .thenReturn(Failure(expectedException))
-
-    withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
-      val triedGeneratingId =
-        fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-          sourceIdentifier
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val identifierGenerator = new IdentifierGenerator(
+          identifiersDao,
+          metricsSender
         )
 
-      triedGeneratingId shouldBe a[Failure[_]]
-      triedGeneratingId.failed.get shouldBe expectedException
+        val sourceIdentifier = SourceIdentifier(
+          identifierScheme = IdentifierSchemes.miroImageNumber,
+          "Work",
+          value = "1234"
+        )
+
+        val triedLookup = identifiersDao.lookupId(
+          sourceIdentifier = sourceIdentifier
+        )
+
+        when(triedLookup)
+          .thenReturn(Success(None))
+
+        val expectedException = new Exception("Noooo")
+
+        when(identifiersDao.saveIdentifier(any[Identifier]()))
+          .thenReturn(Failure(expectedException))
+
+        withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
+          val triedGeneratingId =
+            fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+              sourceIdentifier
+            )
+
+          triedGeneratingId shouldBe a[Failure[_]]
+          triedGeneratingId.failed.get shouldBe expectedException
+        }
+      }
     }
   }
 
