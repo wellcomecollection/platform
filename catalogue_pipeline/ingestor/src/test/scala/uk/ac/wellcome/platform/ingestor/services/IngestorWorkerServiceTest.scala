@@ -199,7 +199,13 @@ class IngestorWorkerServiceTest
       metricsSender = metricsSender
     )
 
-    val work = createMiroWork(sourceId = "B000765")
+    val miroSourceIdentifier = SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "B000675"
+    )
+
+    val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
