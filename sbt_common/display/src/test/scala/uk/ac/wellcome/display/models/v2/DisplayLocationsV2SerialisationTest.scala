@@ -5,12 +5,13 @@ import uk.ac.wellcome.display.models.{
   DisplaySerialisationTestBase,
   WorksIncludes
 }
-import uk.ac.wellcome.display.test.util.{JsonMapperTestUtil, WorksUtil}
+import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedItem,
   IdentifiedWork,
   PhysicalLocation
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayLocationsV2SerialisationTest
     extends FunSpec

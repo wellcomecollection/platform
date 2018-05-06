@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.test.util
+package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
@@ -30,6 +30,9 @@ trait WorksUtil {
     "Work",
     "sourceIdentifierFromWorksUtil"
   )
+
+  def createWork(visible: Boolean = true): IdentifiedWork =
+    createWorks(count = 1, visible = visible).head
 
   def createWorks(count: Int,
                   start: Int = 1,
