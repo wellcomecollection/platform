@@ -68,7 +68,7 @@ class IngestorWorkerServiceTest
 
   it("inserts an Sierra identified Work only into the v2 index") {
     val sierraSourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierScheme = IdentifierSchemes.sierraSystemNumber,
       ontologyType = "Work",
       value = "b1027467"
     )
@@ -187,19 +187,16 @@ class IngestorWorkerServiceTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, R](bucket, queue) { messageReader =>
-          withWorkIndexer[R](itemType, elasticClient, metricsSender) {
-            workIndexer =>
-              val service = new IngestorWorkerService(
-                esIndexV1 = esIndexV1,
-                esIndexV2 = esIndexV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+          val service = new IngestorWorkerService(
+            esIndexV1 = esIndexV1,
+            esIndexV2 = esIndexV2,
+            identifiedWorkIndexer = workIndexer,
+            messageReader = messageReader,
+            system = actorSystem,
+            metrics = metricsSender
+          )
 
-              testWith(service)
-          }
+          testWith(service)
         }
       }
     }
