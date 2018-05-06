@@ -53,38 +53,33 @@ class IngestorWorkerServiceTest
     canonicalId: String,
     sourceId: String,
     title: String,
-    visible: Boolean = true,
-    version: Int = 1
+    visible: Boolean = true
   ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
       title,
       IdentifierSchemes.miroImageNumber,
-      visible,
-      version)
+      visible)
 
   def createSierraWork(
     canonicalId: String,
     sourceId: String,
     title: String,
-    visible: Boolean = true,
-    version: Int = 1
+    visible: Boolean = true
   ): IdentifiedWork =
     createWork(
       canonicalId,
       sourceId,
       title,
       IdentifierSchemes.sierraSystemNumber,
-      visible,
-      version)
+      visible)
 
   def createWork(canonicalId: String,
                  sourceId: String,
                  title: String,
                  identifierScheme: IdentifierSchemes.IdentifierScheme,
-                 visible: Boolean = true,
-                 version: Int = 1): IdentifiedWork = {
+                 visible: Boolean = true): IdentifiedWork = {
     val sourceIdentifier = SourceIdentifier(
       identifierScheme = identifierScheme,
       ontologyType = "Work",
@@ -94,10 +89,10 @@ class IngestorWorkerServiceTest
     IdentifiedWork(
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
-      version = version,
       identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
-      visible = visible)
+      visible = visible,
+      version = 1)
   }
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
