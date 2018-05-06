@@ -1,7 +1,5 @@
 package uk.ac.wellcome.storage.s3
 
-import java.net.URI
-
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
@@ -15,12 +13,10 @@ import scala.util.hashing.MurmurHash3
 
 class S3ObjectStore[T] @Inject()(
   s3Client: AmazonS3,
-  s3Config: S3Config,
-  keyPrefixGenerator: KeyPrefixGenerator[T]
+  s3Config: S3Config
 ) extends Logging {
-  def put(sourcedObject: T)(
+  def put(sourcedObject: T, keyPrefix: String)(
     implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
-    val keyPrefix = keyPrefixGenerator.generate(sourcedObject)
 
     S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
       sourcedObject)

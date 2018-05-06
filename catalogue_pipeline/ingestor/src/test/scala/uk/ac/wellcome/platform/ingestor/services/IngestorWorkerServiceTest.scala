@@ -22,7 +22,6 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier
 }
-import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
@@ -49,11 +48,6 @@ class IngestorWorkerServiceTest
       actorSystem = ActorSystem())
 
   val actorSystem = ActorSystem()
-
-  val identifiedWorkKeyPrefixGenerator =
-    new KeyPrefixGenerator[IdentifiedWork] {
-      override def generate(obj: IdentifiedWork): String = ""
-    }
 
   def createMiroWork(
     canonicalId: String,
@@ -118,34 +112,32 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+        withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+          messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-              service.processMessage(work)
+                service.processMessage(work)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV1,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV1,
+                  itemType = itemType)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV2,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV2,
+                  itemType = itemType)
+              }
             }
-          }
         }
       }
     }
@@ -163,34 +155,33 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+        withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+          messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-              service.processMessage(work)
+                service.processMessage(work)
 
-              assertElasticsearchNeverHasWork(
-                work,
-                indexName = indexNameV1,
-                itemType = itemType)
+                assertElasticsearchNeverHasWork(
+                  work,
+                  indexName = indexNameV1,
+                  itemType = itemType)
 
-              assertElasticsearchEventuallyHasWork(
-                work,
-                indexName = indexNameV2,
-                itemType = itemType)
+                assertElasticsearchEventuallyHasWork(
+                  work,
+                  indexName = indexNameV2,
+                  itemType = itemType)
+
+              }
             }
-          }
         }
       }
     }
@@ -209,29 +200,28 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-            withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-              val service = new IngestorWorkerService(
-                indexNameV1,
-                indexNameV2,
-                identifiedWorkIndexer = workIndexer,
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+        withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+          messageReader =>
+            withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+              withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+                val service = new IngestorWorkerService(
+                  indexNameV1,
+                  indexNameV2,
+                  identifiedWorkIndexer = workIndexer,
+                  messageReader = messageReader,
+                  system = actorSystem,
+                  metrics = metricsSender
+                )
 
-              val future = service.processMessage(work)
+                val future = service.processMessage(work)
 
-              whenReady(future.failed) { ex =>
-                ex shouldBe a[GracefulFailureException]
-                ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+                whenReady(future.failed) { ex =>
+                  ex shouldBe a[GracefulFailureException]
+                  ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierSchemes.calmAltRefNo}"
+
+                }
               }
             }
-          }
         }
       }
     }
@@ -261,23 +251,21 @@ class IngestorWorkerServiceTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](
-          bucket,
-          queue,
-          identifiedWorkKeyPrefixGenerator) { messageReader =>
-          val service = new IngestorWorkerService(
-            "works-v1",
-            "works-v2",
-            identifiedWorkIndexer = brokenWorkIndexer,
-            messageReader = messageReader,
-            system = actorSystem,
-            metrics = metricsSender
-          )
+        withMessageReader[IdentifiedWork, Assertion](bucket, queue) {
+          messageReader =>
+            val service = new IngestorWorkerService(
+              "works-v1",
+              "works-v2",
+              identifiedWorkIndexer = brokenWorkIndexer,
+              messageReader = messageReader,
+              system = actorSystem,
+              metrics = metricsSender
+            )
 
-          val future = service.processMessage(work)
-          whenReady(future.failed) { result =>
-            result shouldBe a[ConnectException]
-          }
+            val future = service.processMessage(work)
+            whenReady(future.failed) { result =>
+              result shouldBe a[ConnectException]
+            }
         }
       }
     }

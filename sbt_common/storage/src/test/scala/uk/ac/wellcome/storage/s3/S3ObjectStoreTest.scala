@@ -1,11 +1,8 @@
 package uk.ac.wellcome.storage.s3
 
-import java.net.URI
-
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil
@@ -30,15 +27,12 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore[TestObject](
         s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = prefix
-        }
+        S3Config(bucketName = bucket.name)
       )
 
       val testObject = TestObject(content = content)
 
-      val writtenToS3 = objectStore.put(testObject)
+      val writtenToS3 = objectStore.put(testObject, prefix)
 
       whenReady(writtenToS3) { actualKey =>
         val expectedJson = JsonUtil.toJson(testObject).get
@@ -66,14 +60,11 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore[TestObject](
         s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = prefix
-        }
+        S3Config(bucketName = bucket.name)
       )
 
       val testObject = TestObject(content = content)
-      val writtenToS3 = objectStore.put(testObject)
+      val writtenToS3 = objectStore.put(testObject, prefix)
 
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
@@ -92,14 +83,11 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore[TestObject](
         s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = prefix
-        }
+        S3Config(bucketName = bucket.name)
       )
 
       val testObject = TestObject(content = content)
-      val writtenToS3 = objectStore.put(testObject)
+      val writtenToS3 = objectStore.put(testObject, prefix)
 
       whenReady(writtenToS3) { actualKey =>
         val expectedHash = "1770874231"
@@ -118,15 +106,12 @@ class S3ObjectStoreTest
 
       val objectStore = new S3ObjectStore[TestObject](
         s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = prefix
-        }
+        S3Config(bucketName = bucket.name)
       )
 
       val testObject = TestObject(content = content)
 
-      val writtenToS3 = objectStore.put(testObject)
+      val writtenToS3 = objectStore.put(testObject, prefix)
 
       whenReady(writtenToS3.flatMap(objectStore.get)) { actualTestObject =>
         actualTestObject shouldBe testObject
@@ -136,12 +121,9 @@ class S3ObjectStoreTest
 
   it("throws an exception when retrieving a missing object") {
     withLocalS3Bucket { bucket =>
-      val objectStore = new S3ObjectStore(
+      val objectStore = new S3ObjectStore[TestObject](
         s3Client,
-        S3Config(bucketName = bucket.name),
-        new KeyPrefixGenerator[TestObject] {
-          override def generate(obj: TestObject): String = "doesnt_matter"
-        }
+        S3Config(bucketName = bucket.name)
       )
 
       whenReady(

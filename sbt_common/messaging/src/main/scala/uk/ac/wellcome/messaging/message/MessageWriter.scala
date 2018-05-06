@@ -31,14 +31,13 @@ class MessageWriter[T] @Inject()(
 
   private val s3 = new S3ObjectStore[T](
     s3Client = s3Client,
-    s3Config = messageConfig.s3Config,
-    keyPrefixGenerator = keyPrefixGenerator
+    s3Config = messageConfig.s3Config
   )
 
   def write(message: T, subject: String)(
     implicit encoder: Encoder[T]): Future[Unit] = {
     for {
-      location <- s3.put(message)
+      location <- s3.put(message, keyPrefixGenerator.generate(message))
       pointer <- Future.fromTry(toJson(MessagePointer(location)))
       publishAttempt <- sns.writeMessage(pointer, subject)
       _ = info(publishAttempt)

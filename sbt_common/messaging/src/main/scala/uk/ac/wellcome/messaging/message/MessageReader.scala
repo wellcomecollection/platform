@@ -8,7 +8,9 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config}
+import uk.ac.wellcome.storage.s3.S3ObjectStore
+
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
@@ -18,15 +20,13 @@ import scala.concurrent.Future
 class MessageReader[T] @Inject()(
   messageReaderConfig: MessageReaderConfig,
   s3Client: AmazonS3,
-  sqsClient: AmazonSQS,
-  keyPrefixGenerator: KeyPrefixGenerator[T]
+  sqsClient: AmazonSQS
 ) {
   val sqsReader = new SQSReader(sqsClient, messageReaderConfig.sqsConfig)
 
   val s3ObjectStore = new S3ObjectStore[T](
     s3Client = s3Client,
-    s3Config = messageReaderConfig.s3Config,
-    keyPrefixGenerator = keyPrefixGenerator
+    s3Config = messageReaderConfig.s3Config
   )
 
   def readAndDelete(process: T => Future[Unit])(
