@@ -31,8 +31,8 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWork(visible: Boolean = true, version: Int = 1): IdentifiedWork =
-    createWorks(count = 1, visible = visible, version = version).head
+  def createWork(visible: Boolean = true): IdentifiedWork =
+    createWorks(count = 1, visible = visible).head
 
   def createWorks(count: Int,
                   start: Int = 1,
