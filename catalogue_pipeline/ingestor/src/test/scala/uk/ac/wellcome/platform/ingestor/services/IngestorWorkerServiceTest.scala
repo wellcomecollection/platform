@@ -22,7 +22,6 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.JsonTestUtil
 
 import scala.concurrent.duration._
 
@@ -30,7 +29,6 @@ class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with JsonTestUtil
     with ElasticsearchFixtures
     with SQS
     with S3
@@ -51,7 +49,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { service =>
           service.processMessage(work)
 
           assertElasticsearchEventuallyHasWork(
@@ -79,7 +77,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { service =>
           service.processMessage(work)
 
           assertElasticsearchNeverHasWork(
@@ -107,7 +105,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) { service =>
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { service =>
           val future = service.processMessage(work)
 
           whenReady(future.failed) { ex =>
@@ -145,7 +143,7 @@ class IngestorWorkerServiceTest
 
         val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
-        withIngestorWorkerService(
+        withIngestorWorkerService[Assertion](
           esIndexV1 = "works-v1",
           esIndexV2 = "works-v2",
           actorSystem = actorSystem,
@@ -182,7 +180,7 @@ class IngestorWorkerServiceTest
     workIndexer: WorkIndexer)(testWith: TestWith[IngestorWorkerService, R]): R = {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, Assertion](bucket, queue) { messageReader =>
+        withMessageReader[IdentifiedWork, R](bucket, queue) { messageReader =>
           withWorkIndexer[R](itemType, elasticClient, metricsSender) { workIndexer =>
             val service = new IngestorWorkerService(
               esIndexV1 = esIndexV1,
