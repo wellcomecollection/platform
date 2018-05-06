@@ -3,11 +3,14 @@ package uk.ac.wellcome.platform.ingestor.fixtures
 import com.sksamuel.elastic4s.http.HttpClient
 import org.scalatest.Suite
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
+import uk.ac.wellcome.monitoring.test.fixtures.{
+  MetricsSender => MetricsSenderFixture
+}
 import uk.ac.wellcome.platform.ingestor.services.WorkIndexer
 import uk.ac.wellcome.test.fixtures._
 
-trait WorkIndexerFixtures extends Akka with MetricsSenderFixture { this: Suite =>
+trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
+  this: Suite =>
   def withWorkIndexer[R](
     esType: String,
     elasticClient: HttpClient,
@@ -21,7 +24,8 @@ trait WorkIndexerFixtures extends Akka with MetricsSenderFixture { this: Suite =
     testWith(workIndexer)
   }
 
-  def withWorkIndexerFixtures[R](esType: String, elasticClient: HttpClient)(testWith: TestWith[WorkIndexer, R]): R = {
+  def withWorkIndexerFixtures[R](esType: String, elasticClient: HttpClient)(
+    testWith: TestWith[WorkIndexer, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withWorkIndexer(esType, elasticClient, metricsSender) { workIndexer =>

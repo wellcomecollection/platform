@@ -163,35 +163,42 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[IngestorWorkerService, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer[R](itemType, elasticClient, metricsSender) { workIndexer =>
-          withIngestorWorkerService[R](esIndexV1, esIndexV2, actorSystem, metricsSender, workIndexer) { service =>
-            testWith(service)
-          }
+        withWorkIndexer[R](itemType, elasticClient, metricsSender) {
+          workIndexer =>
+            withIngestorWorkerService[R](
+              esIndexV1,
+              esIndexV2,
+              actorSystem,
+              metricsSender,
+              workIndexer) { service =>
+              testWith(service)
+            }
         }
       }
     }
   }
 
-  private def withIngestorWorkerService[R](
-    esIndexV1: String,
-    esIndexV2: String,
-    actorSystem: ActorSystem,
-    metricsSender: MetricsSender,
-    workIndexer: WorkIndexer)(testWith: TestWith[IngestorWorkerService, R]): R = {
+  private def withIngestorWorkerService[R](esIndexV1: String,
+                                           esIndexV2: String,
+                                           actorSystem: ActorSystem,
+                                           metricsSender: MetricsSender,
+                                           workIndexer: WorkIndexer)(
+    testWith: TestWith[IngestorWorkerService, R]): R = {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withMessageReader[IdentifiedWork, R](bucket, queue) { messageReader =>
-          withWorkIndexer[R](itemType, elasticClient, metricsSender) { workIndexer =>
-            val service = new IngestorWorkerService(
-              esIndexV1 = esIndexV1,
-              esIndexV2 = esIndexV2,
-              identifiedWorkIndexer = workIndexer,
-              messageReader = messageReader,
-              system = actorSystem,
-              metrics = metricsSender
-            )
+          withWorkIndexer[R](itemType, elasticClient, metricsSender) {
+            workIndexer =>
+              val service = new IngestorWorkerService(
+                esIndexV1 = esIndexV1,
+                esIndexV2 = esIndexV2,
+                identifiedWorkIndexer = workIndexer,
+                messageReader = messageReader,
+                system = actorSystem,
+                metrics = metricsSender
+              )
 
-            testWith(service)
+              testWith(service)
           }
         }
       }

@@ -41,17 +41,18 @@ class WorkIndexerTest
     val work = createVersionedWork()
 
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withWorkIndexerFixtures[Assertion](itemType, elasticClient) { workIndexer =>
-        val future = Future.sequence(
-          (1 to 2).map(_ => workIndexer.indexWork(work, indexName))
-        )
+      withWorkIndexerFixtures[Assertion](itemType, elasticClient) {
+        workIndexer =>
+          val future = Future.sequence(
+            (1 to 2).map(_ => workIndexer.indexWork(work, indexName))
+          )
 
-        whenReady(future) { _ =>
-          assertElasticsearchEventuallyHasWork(
-            work,
-            indexName = indexName,
-            itemType = itemType)
-        }
+          whenReady(future) { _ =>
+            assertElasticsearchEventuallyHasWork(
+              work,
+              indexName = indexName,
+              itemType = itemType)
+          }
       }
     }
   }
@@ -100,7 +101,6 @@ class WorkIndexerTest
   }
 
   def createVersionedWork(version: Int = 1): IdentifiedWork =
-    createWorks(count = 1)
-      .head
+    createWorks(count = 1).head
       .copy(version = version)
 }
