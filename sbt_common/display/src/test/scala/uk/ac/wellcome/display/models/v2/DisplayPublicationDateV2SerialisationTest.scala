@@ -2,8 +2,9 @@ package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
-import uk.ac.wellcome.display.test.util.{JsonMapperTestUtil, WorksUtil}
+import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, Period}
+import uk.ac.wellcome.models.work.test.WorksUtil
 
 class DisplayPublicationDateV2SerialisationTest
     extends FunSpec

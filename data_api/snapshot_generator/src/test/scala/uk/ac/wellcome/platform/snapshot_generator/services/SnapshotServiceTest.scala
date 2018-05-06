@@ -14,10 +14,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.AllWorksIncludes
-import uk.ac.wellcome.display.test.util.WorksUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifierSchemes.sierraSystemNumber
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, SourceIdentifier}
+import uk.ac.wellcome.models.work.test.WorksUtil
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
