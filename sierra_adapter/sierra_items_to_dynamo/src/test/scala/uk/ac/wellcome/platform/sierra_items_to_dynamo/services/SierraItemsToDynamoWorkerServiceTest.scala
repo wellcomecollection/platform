@@ -2,13 +2,9 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import java.time.Instant
 
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.models.transformable.sierra.{
@@ -17,14 +13,12 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
-import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
@@ -39,8 +33,9 @@ class SierraItemsToDynamoWorkerServiceTest
     with Matchers
     with Eventually
     with ExtendedPatience
-    with MockitoSugar
     with Akka
+    with LocalDynamoDb[SierraItemRecord]
+    with MetricsSenderFixture
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
@@ -55,41 +50,28 @@ class SierraItemsToDynamoWorkerServiceTest
   def withSierraWorkerService[R](
     testWith: TestWith[ServiceFixtures, R]): Unit = {
     withActorSystem { actorSystem =>
-      withDynamoInserter {
-        case (table, dynamoInserter) =>
+      withLocalDynamoDbTable { table =>
+        withDynamoInserter(table) { dynamoInserter =>
           withLocalSqsQueue { queue =>
-            val mockPutMetricDataResult = mock[PutMetricDataResult]
-            val mockCloudWatch = mock[AmazonCloudWatch]
+            withMetricsSender(actorSystem) { metricsSender =>
+              val sierraItemsToDynamoWorkerService =
+                new SierraItemsToDynamoWorkerService(
+                  reader =
+                    new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+                  system = actorSystem,
+                  metrics = metricsSender,
+                  dynamoInserter = dynamoInserter
+                )
 
-            when(mockCloudWatch.putMetricData(any()))
-              .thenReturn(mockPutMetricDataResult)
-            val mockMetrics = new MetricsSender(
-              "namespace",
-              100 milliseconds,
-              mockCloudWatch,
-              actorSystem
-            )
-
-            val sierraItemsToDynamoWorkerService =
-              new SierraItemsToDynamoWorkerService(
-                reader =
-                  new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
-                system = actorSystem,
-                metrics = mockMetrics,
-                dynamoInserter = new DynamoInserter(
-                  new VersionedDao(
-                    dynamoDbClient = dynamoDbClient,
-                    dynamoConfig = DynamoConfig(table.name)
-                  ))
-              )
-
-            testWith(
-              ServiceFixtures(
-                service = sierraItemsToDynamoWorkerService,
-                queue = queue,
-                table = table
-              ))
+              testWith(
+                ServiceFixtures(
+                  service = sierraItemsToDynamoWorkerService,
+                  queue = queue,
+                  table = table
+                ))
+            }
           }
+        }
       }
     }
   }
