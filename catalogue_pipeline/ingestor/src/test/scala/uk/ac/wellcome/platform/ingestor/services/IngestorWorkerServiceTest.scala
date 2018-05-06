@@ -12,7 +12,6 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
@@ -48,11 +47,6 @@ class IngestorWorkerServiceTest
       actorSystem = ActorSystem())
 
   val actorSystem = ActorSystem()
-
-  // The ingestor doesn't send messages so doesn't need a topic.
-  // This is needed because MessageConfig (which is used be MessageReader) needs one
-  // TODO remove this once MessageConfig gets split into MessageReaderConfig and MessageWriterConfig
-  val topic = Topic("")
 
   def createMiroWork(
     canonicalId: String,
