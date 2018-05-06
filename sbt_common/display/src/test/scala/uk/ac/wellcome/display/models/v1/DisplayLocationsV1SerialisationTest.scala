@@ -11,7 +11,6 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
   PhysicalLocation
 }
-import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayLocationsV1SerialisationTest
