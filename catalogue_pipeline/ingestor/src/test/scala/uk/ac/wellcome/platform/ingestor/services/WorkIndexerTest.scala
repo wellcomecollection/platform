@@ -7,11 +7,8 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -22,7 +19,8 @@ class WorkIndexerTest
     with ScalaFutures
     with Matchers
     with MockitoSugar
-    with ElasticsearchFixtures {
+    with ElasticsearchFixtures
+    with WorksUtil {
 
   val metricsSender: MetricsSender =
     new MetricsSender(
@@ -37,8 +35,8 @@ class WorkIndexerTest
   val workIndexer =
     new WorkIndexer(itemType, elasticClient, metricsSender)
 
-  it("should insert an identified Work into Elasticsearch") {
-    val work = createWork("5678", "1234", "An identified igloo")
+  it("inserts an identified Work into Elasticsearch") {
+    val work = createVersionedWork()
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       val future = workIndexer.indexWork(work, indexName)
@@ -52,9 +50,8 @@ class WorkIndexerTest
     }
   }
 
-  it(
-    "should add only one record when multiple records with same id are ingested") {
-    val work = createWork("5678", "1234", "A multiplicity of mice")
+  it("only adds one record when the same ID is ingested multiple times") {
+    val work = createVersionedWork()
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       val future = Future.sequence(
@@ -70,17 +67,17 @@ class WorkIndexerTest
     }
   }
 
-  it("does not add a work with a lower version") {
-    val work =
-      createWork("5678", "1234", "A multiplicity of mice", version = 3)
+  it("doesn't add a Work with a lower version") {
+    val work = createVersionedWork(version = 3)
+    val olderWork = work.copy(version = 1)
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
-      val future = workIndexer.indexWork(work.copy(version = 1), indexName)
+      val future = workIndexer.indexWork(olderWork, indexName)
 
       whenReady(future) { _ =>
-        // give elasticsearch enough time to ingest the work
+        // Give Elasticsearch enough time to ingest the work
         Thread.sleep(700)
 
         assertElasticsearchEventuallyHasWork(
@@ -91,17 +88,13 @@ class WorkIndexerTest
     }
   }
 
-  it("replaces a work with the same version") {
-    val work = createWork(
-      canonicalId = "5678",
-      sourceId = "1234",
-      title = "A multiplicity of mice",
-      version = 3)
+  it("replaces a Work with the same version") {
+    val work = createVersionedWork(version = 3)
+    val updatedWork = work.copy(title = Some("boring title"))
 
     withLocalElasticsearchIndex(indexName, itemType) { _ =>
       insertIntoElasticsearch(indexName = indexName, itemType = itemType, work)
 
-      val updatedWork = work.copy(title = Some("boring title"))
       val future = workIndexer.indexWork(updatedWork, indexName)
 
       whenReady(future) { _ =>
@@ -113,23 +106,8 @@ class WorkIndexerTest
     }
   }
 
-  def createWork(canonicalId: String,
-                 sourceId: String,
-                 title: String,
-                 visible: Boolean = true,
-                 version: Int = 1): IdentifiedWork = {
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
-      ontologyType = "Work",
-      value = sourceId
-    )
-
-    IdentifiedWork(
-      title = Some(title),
-      sourceIdentifier = sourceIdentifier,
-      version = version,
-      identifiers = List(sourceIdentifier),
-      canonicalId = canonicalId,
-      visible = visible)
-  }
+  def createVersionedWork(version: Int = 1): IdentifiedWork =
+    createWorks(count = 1)
+      .head
+      .copy(version = version)
 }
