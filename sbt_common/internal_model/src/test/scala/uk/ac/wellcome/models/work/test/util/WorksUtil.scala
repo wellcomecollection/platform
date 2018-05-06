@@ -31,6 +31,9 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
+  def createWork(visible: Boolean = true): IdentifiedWork =
+    createWorks(count = 1, visible = visible).head
+
   def createWorks(count: Int,
                   start: Int = 1,
                   visible: Boolean = true): Seq[IdentifiedWork] =
