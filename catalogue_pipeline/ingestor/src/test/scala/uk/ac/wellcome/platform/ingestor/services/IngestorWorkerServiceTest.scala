@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import java.net.ConnectException
 
+import akka.actor.ActorSystem
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -17,6 +18,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier
 }
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixture
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -54,12 +56,12 @@ class IngestorWorkerServiceTest
 
           assertElasticsearchEventuallyHasWork(
             work,
-            indexName = indexNameV1,
+            indexName = esIndexV1,
             itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
             work,
-            indexName = indexNameV2,
+            indexName = esIndexV2,
             itemType = itemType)
         }
       }
@@ -82,12 +84,12 @@ class IngestorWorkerServiceTest
 
           assertElasticsearchNeverHasWork(
             work,
-            indexName = indexNameV1,
+            indexName = esIndexV1,
             itemType = itemType)
 
           assertElasticsearchEventuallyHasWork(
             work,
-            indexName = indexNameV2,
+            indexName = esIndexV2,
             itemType = itemType)
         }
       }
@@ -127,25 +129,32 @@ class IngestorWorkerServiceTest
     val brokenElasticClient: HttpClient =
       HttpClient.fromRestClient(brokenRestClient)
 
-    val brokenWorkIndexer = new WorkIndexer(
-      itemType = "work",
-      elasticClient = brokenElasticClient,
-      metricsSender = metricsSender
-    )
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val brokenWorkIndexer = new WorkIndexer(
+          itemType = "work",
+          elasticClient = brokenElasticClient,
+          metricsSender = metricsSender
+        )
 
-    val miroSourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
-      ontologyType = "Work",
-      value = "B000675"
-    )
+        val miroSourceIdentifier = SourceIdentifier(
+          identifierScheme = IdentifierSchemes.miroImageNumber,
+          ontologyType = "Work",
+          value = "B000675"
+        )
 
-    val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
+        val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
 
-    withWorkIndexer(itemType, elasticClient = brokenElasticClient) { workIndexer =>
-      withIngestorWorkerService("works-v1", "works-v2", workIndexer) { service =>
-        val future = service.processMessage(work)
-        whenReady(future.failed) { result =>
-          result shouldBe a[ConnectException]
+        withIngestorWorkerService(
+          esIndexV1 = "works-v1",
+          esIndexV2 = "works-v2",
+          actorSystem = actorSystem,
+          metricsSender = metricsSender,
+          workIndexer = brokenWorkIndexer) { service =>
+          val future = service.processMessage(work)
+          whenReady(future.failed) { result =>
+            result shouldBe a[ConnectException]
+          }
         }
       }
     }
@@ -178,7 +187,7 @@ class IngestorWorkerServiceTest
             val service = new IngestorWorkerService(
               esIndexV1 = esIndexV1,
               esIndexV2 = esIndexV2,
-              workIndexer = workIndexer,
+              identifiedWorkIndexer = workIndexer,
               messageReader = messageReader,
               system = actorSystem,
               metrics = metricsSender
