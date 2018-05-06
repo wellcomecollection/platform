@@ -33,7 +33,8 @@ trait WorksUtil {
 
   def createWorks(count: Int,
                   start: Int = 1,
-                  visible: Boolean = true): Seq[IdentifiedWork] =
+                  visible: Boolean = true,
+                  version: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
         workWith(
@@ -44,7 +45,8 @@ trait WorksUtil {
           createdDate = Period(s"${idx}-${period.label}"),
           creator = Agent(s"${idx}-${agent.label}"),
           items = List(defaultItem),
-          visible = visible
+          visible = visible,
+          version = version
       ))
 
   def workWith(canonicalId: String, title: String): IdentifiedWork =
@@ -130,11 +132,12 @@ trait WorksUtil {
                subjects: List[Subject],
                genres: List[Genre],
                items: List[IdentifiedItem],
-               visible: Boolean): IdentifiedWork =
+               visible: Boolean,
+               version: Int): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
-      version = 1,
+      version = version,
       identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       workType = Some(workType),

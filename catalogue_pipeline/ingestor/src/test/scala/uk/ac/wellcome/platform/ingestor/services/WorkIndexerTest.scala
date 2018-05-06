@@ -107,7 +107,5 @@ class WorkIndexerTest
   }
 
   def createVersionedWork(version: Int = 1): IdentifiedWork =
-    createWorks(count = 1)
-      .head
-      .copy(version = version)
+    createWorks(count = 1, version = version).head
 }
