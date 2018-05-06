@@ -1,6 +1,5 @@
 package uk.ac.wellcome.messaging.message
 
-
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs
@@ -15,7 +14,6 @@ import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
-
 
 class MessageReader[T] @Inject()(
   messageReaderConfig: MessageReaderConfig,

@@ -14,7 +14,11 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -22,7 +26,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.duration._
-
 
 class IngestorWorkerServiceTest
     extends FunSpec
