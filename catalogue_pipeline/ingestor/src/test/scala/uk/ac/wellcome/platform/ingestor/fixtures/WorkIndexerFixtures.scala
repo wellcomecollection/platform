@@ -3,9 +3,7 @@ package uk.ac.wellcome.platform.ingestor.fixtures
 import com.sksamuel.elastic4s.http.HttpClient
 import org.scalatest.Suite
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.{
-  MetricsSender => MetricsSenderFixture
-}
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.ingestor.services.WorkIndexer
 import uk.ac.wellcome.test.fixtures._
 
