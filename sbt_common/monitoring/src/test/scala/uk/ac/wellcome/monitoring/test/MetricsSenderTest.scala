@@ -141,7 +141,8 @@ class MetricsSenderTest
 
         whenReady(Future.sequence(futures)) { _ =>
           eventually {
-            verify(amazonCloudWatch, times(150)).putMetricData(capture.capture())
+            verify(amazonCloudWatch, times(150))
+              .putMetricData(capture.capture())
 
             val putMetricDataRequests = capture.getAllValues
 

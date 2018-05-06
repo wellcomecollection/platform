@@ -192,7 +192,8 @@ trait Messaging
   }
 
   def withExampleObjectMessageWorkerFixtures[R](
-    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker), R]) = {
+    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
+                       R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withExampleObjectMessageReaderFixtures {
@@ -208,7 +209,8 @@ trait Messaging
   }
 
   def withMessageWorkerFixturesAndMockedMetrics[R](
-    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker), R]) = {
+    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
+                       R]) = {
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>
         withExampleObjectMessageReaderFixtures {

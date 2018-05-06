@@ -16,7 +16,8 @@ trait MetricsSenderFixture
     with CloudWatch
     with Akka {
 
-  def withMetricsSender[R](actorSystem: ActorSystem) = fixture[MetricsSender, R](
+  def withMetricsSender[R](actorSystem: ActorSystem) =
+    fixture[MetricsSender, R](
       create = new MetricsSender(
         namespace = awsNamespace,
         flushInterval = flushInterval,

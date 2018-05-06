@@ -39,7 +39,7 @@ class SierraItemsToDynamoWorkerServiceTest
     with ScalaFutures {
 
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
-      DynamoFormat[SierraItemRecord]
+    DynamoFormat[SierraItemRecord]
 
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,
@@ -56,8 +56,9 @@ class SierraItemsToDynamoWorkerServiceTest
             withMetricsSender(actorSystem) { metricsSender =>
               val sierraItemsToDynamoWorkerService =
                 new SierraItemsToDynamoWorkerService(
-                  reader =
-                    new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+                  reader = new SQSReader(
+                    sqsClient,
+                    SQSConfig(queue.url, 1.second, 1)),
                   system = actorSystem,
                   metrics = metricsSender,
                   dynamoInserter = dynamoInserter
