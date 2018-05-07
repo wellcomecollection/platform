@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.ingestor.services
 import java.net.ConnectException
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.sksamuel.elastic4s.http.HttpClient
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
@@ -39,66 +38,6 @@ class IngestorWorkerServiceTest
 
   val itemType = "work"
 
-  val metricsSender: MetricsSender =
-    new MetricsSender(
-      namespace = "reindexer-tests",
-      flushInterval = 100 milliseconds,
-      amazonCloudWatch = mock[AmazonCloudWatch],
-      actorSystem = ActorSystem())
-
-  val actorSystem = ActorSystem()
-
-  def createMiroWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String,
-    visible: Boolean = true,
-    version: Int = 1
-  ): IdentifiedWork =
-    createWork(
-      canonicalId,
-      sourceId,
-      title,
-      IdentifierSchemes.miroImageNumber,
-      visible,
-      version)
-
-  def createSierraWork(
-    canonicalId: String,
-    sourceId: String,
-    title: String,
-    visible: Boolean = true,
-    version: Int = 1
-  ): IdentifiedWork =
-    createWork(
-      canonicalId,
-      sourceId,
-      title,
-      IdentifierSchemes.sierraSystemNumber,
-      visible,
-      version)
-
-  def createWork(canonicalId: String,
-                 sourceId: String,
-                 title: String,
-                 identifierScheme: IdentifierSchemes.IdentifierScheme,
-                 visible: Boolean = true,
-                 version: Int = 1): IdentifiedWork = {
-    val sourceIdentifier = SourceIdentifier(
-      identifierScheme = identifierScheme,
-      ontologyType = "Work",
-      value = sourceId
-    )
-
-    IdentifiedWork(
-      title = Some(title),
-      sourceIdentifier = sourceIdentifier,
-      version = version,
-      identifiers = List(sourceIdentifier),
-      canonicalId = canonicalId,
-      visible = visible)
-  }
-
   it("inserts an Miro identified Work into v1 and v2 indices") {
     val miroSourceIdentifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -122,7 +61,6 @@ class IngestorWorkerServiceTest
             work,
             indexName = esIndexV2,
             itemType = itemType)
-
         }
       }
     }
@@ -136,9 +74,6 @@ class IngestorWorkerServiceTest
     )
 
     val work = createWork().copy(sourceIdentifier = sierraSourceIdentifier)
-
-    val workIndexer =
-      new WorkIndexer(itemType, elasticClient, metricsSender)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
