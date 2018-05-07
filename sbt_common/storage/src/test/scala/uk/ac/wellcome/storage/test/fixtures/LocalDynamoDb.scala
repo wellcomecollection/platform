@@ -2,7 +2,10 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
+import com.amazonaws.services.dynamodbv2.{
+  AmazonDynamoDB,
+  AmazonDynamoDBClientBuilder
+}
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.concurrent.Eventually
 
@@ -20,7 +23,7 @@ object LocalDynamoDb {
 }
 
 trait LocalDynamoDb[T <: Versioned with Id]
-  extends Eventually
+    extends Eventually
     with ExtendedPatience {
 
   import LocalDynamoDb._
