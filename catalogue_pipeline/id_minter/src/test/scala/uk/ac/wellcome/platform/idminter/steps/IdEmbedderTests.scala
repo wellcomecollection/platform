@@ -1,15 +1,13 @@
 package uk.ac.wellcome.platform.idminter.steps
 
-import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import io.circe.parser._
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.time._
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.monitoring.MetricsSender
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -20,26 +18,30 @@ class IdEmbedderTests
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with BeforeAndAfterEach
     with MockitoSugar
+    with Akka
     with JsonTestUtil
+    with MetricsSenderFixture
     with ExtendedPatience {
 
-  private val metricsSender =
-    new MetricsSender(
-      "id_minter_test_metrics",
-      100 milliseconds,
-      mock[AmazonCloudWatch],
-      ActorSystem())
-  private val mockIdentifierGenerator: IdentifierGenerator =
-    mock[IdentifierGenerator]
+  private def withIdEmbedder(
+    testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val identifierGenerator: IdentifierGenerator =
+          mock[IdentifierGenerator]
 
-  val idEmbedder = new IdEmbedder(
-    metricsSender,
-    mockIdentifierGenerator
-  )
+        val idEmbedder = new IdEmbedder(
+          metricsSender = metricsSender,
+          identifierGenerator = identifierGenerator
+        )
 
-  it("should set the canonicalId given by the IdentifierGenerator on the work") {
+        testWith((identifierGenerator, idEmbedder))
+      }
+    }
+  }
+
+  it("sets the canonicalId given by the IdentifierGenerator on the work") {
     val identifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       ontologyType = "Work",
@@ -53,30 +55,34 @@ class IdEmbedderTests
 
     val newCanonicalId = "5467"
 
-    setUpIdentifierGeneratorMock(
-      identifier,
-      originalWork.ontologyType,
-      newCanonicalId
-    )
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = identifier,
+          ontologyType = originalWork.ontologyType,
+          newCanonicalId = newCanonicalId
+        )
 
-    val newWorkFuture = idEmbedder.embedId(
-      json = parse(
-        toJson(originalWork).get
-      ).right.get
-    )
+        val newWorkFuture = idEmbedder.embedId(
+          json = parse(
+            toJson(originalWork).get
+          ).right.get
+        )
 
-    val expectedWork = IdentifiedWork(
-      canonicalId = newCanonicalId,
-      title = originalWork.title,
-      sourceIdentifier = originalWork.sourceIdentifier,
-      version = originalWork.version
-    )
+        val expectedWork = IdentifiedWork(
+          canonicalId = newCanonicalId,
+          title = originalWork.title,
+          sourceIdentifier = originalWork.sourceIdentifier,
+          version = originalWork.version
+        )
 
-    whenReady(newWorkFuture) { newWorkJson =>
-      assertJsonStringsAreEqual(
-        newWorkJson.toString(),
-        toJson(expectedWork).get
-      )
+        whenReady(newWorkFuture) { newWorkJson =>
+          assertJsonStringsAreEqual(
+            newWorkJson.toString(),
+            toJson(expectedWork).get
+          )
+        }
     }
   }
 
@@ -108,49 +114,54 @@ class IdEmbedderTests
     )
 
     val newWorkCanonicalId = "5467"
-
-    setUpIdentifierGeneratorMock(
-      workIdentifier,
-      originalWork.ontologyType,
-      newWorkCanonicalId
-    )
     val newCreatorCanonicalId = "8901"
 
-    setUpIdentifierGeneratorMock(
-      creatorIdentifier,
-      "Person",
-      newCreatorCanonicalId
-    )
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = workIdentifier,
+          ontologyType = originalWork.ontologyType,
+          newCanonicalId = newWorkCanonicalId
+        )
 
-    val newWorkFuture = idEmbedder.embedId(
-      json = parse(
-        toJson(originalWork).get
-      ).right.get
-    )
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = creatorIdentifier,
+          ontologyType = "Person",
+          newCanonicalId = newCreatorCanonicalId
+        )
 
-    val expectedWork = IdentifiedWork(
-      canonicalId = newWorkCanonicalId,
-      title = originalWork.title,
-      sourceIdentifier = originalWork.sourceIdentifier,
-      contributors = List(
-        Contributor(
-          agent = Identified(
-            agent = person,
-            canonicalId = newCreatorCanonicalId,
-            identifiers = List(creatorIdentifier)))
-      ),
-      version = originalWork.version
-    )
+        val newWorkFuture = idEmbedder.embedId(
+          json = parse(
+            toJson(originalWork).get
+          ).right.get
+        )
 
-    whenReady(newWorkFuture) { newWorkJson =>
-      assertJsonStringsAreEqual(
-        newWorkJson.toString(),
-        toJson(expectedWork).get
-      )
+        val expectedWork = IdentifiedWork(
+          canonicalId = newWorkCanonicalId,
+          title = originalWork.title,
+          sourceIdentifier = originalWork.sourceIdentifier,
+          contributors = List(
+            Contributor(
+              agent = Identified(
+                agent = person,
+                canonicalId = newCreatorCanonicalId,
+                identifiers = List(creatorIdentifier)))
+          ),
+          version = originalWork.version
+        )
+
+        whenReady(newWorkFuture) { newWorkJson =>
+          assertJsonStringsAreEqual(
+            newWorkJson.toString(),
+            toJson(expectedWork).get
+          )
+        }
     }
   }
 
-  it("should return a failed future if the call to IdentifierGenerator fails") {
+  it("returns a failed future if the call to IdentifierGenerator fails") {
     val identifier = SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
       ontologyType = "Work",
@@ -164,22 +175,25 @@ class IdEmbedderTests
 
     val expectedException = new Exception("Aaaaah something happened!")
 
-    when(
-      mockIdentifierGenerator
-        .retrieveOrGenerateCanonicalId(
-          identifier
-        )
-    ).thenReturn(Try(throw expectedException))
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        when(
+          identifierGenerator
+            .retrieveOrGenerateCanonicalId(
+              identifier
+            )
+        ).thenReturn(Try(throw expectedException))
 
-    val newWorkFuture =
-      idEmbedder.embedId(json = parse(toJson(originalWork).get).right.get)
+        val newWorkFuture =
+          idEmbedder.embedId(json = parse(toJson(originalWork).get).right.get)
 
-    whenReady(newWorkFuture.failed) { exception =>
-      exception shouldBe expectedException
+        whenReady(newWorkFuture.failed) { exception =>
+          exception shouldBe expectedException
+        }
     }
   }
 
-  it("should add canonicalIds to all items") {
+  it("adds canonicalIds to all items") {
     val identifier = SourceIdentifier(
       IdentifierSchemes.miroImageNumber,
       ontologyType = "Item",
@@ -209,57 +223,62 @@ class IdEmbedderTests
     val newItemCanonicalId1 = "item1-canonical-id"
     val newItemCanonicalId2 = "item2-canonical-id"
 
-    setUpIdentifierGeneratorMock(
-      identifier,
-      originalWork.ontologyType,
-      "work-canonical-id"
-    )
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = identifier,
+          ontologyType = originalWork.ontologyType,
+          newCanonicalId = "work-canonical-id"
+        )
 
-    setUpIdentifierGeneratorMock(
-      originalItem1.sourceIdentifier,
-      originalItem1.ontologyType,
-      newItemCanonicalId1
-    )
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = originalItem1.sourceIdentifier,
+          ontologyType = originalItem1.ontologyType,
+          newCanonicalId = newItemCanonicalId1
+        )
 
-    setUpIdentifierGeneratorMock(
-      originalItem2.sourceIdentifier,
-      originalItem2.ontologyType,
-      newItemCanonicalId2
-    )
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = originalItem2.sourceIdentifier,
+          ontologyType = originalItem2.ontologyType,
+          newCanonicalId = newItemCanonicalId2
+        )
 
-    val eventualWork = idEmbedder.embedId(
-      parse(
-        toJson(originalWork).get
-      ).right.get
-    )
+        val eventualWork = idEmbedder.embedId(
+          parse(
+            toJson(originalWork).get
+          ).right.get
+        )
 
-    val expectedItem1 = IdentifiedItem(
-      sourceIdentifier = originalItem1.sourceIdentifier,
-      canonicalId = newItemCanonicalId1
-    )
+        val expectedItem1 = IdentifiedItem(
+          sourceIdentifier = originalItem1.sourceIdentifier,
+          canonicalId = newItemCanonicalId1
+        )
 
-    val expectedItem2 = IdentifiedItem(
-      sourceIdentifier = originalItem2.sourceIdentifier,
-      canonicalId = newItemCanonicalId2
-    )
+        val expectedItem2 = IdentifiedItem(
+          sourceIdentifier = originalItem2.sourceIdentifier,
+          canonicalId = newItemCanonicalId2
+        )
 
-    whenReady(eventualWork) { json =>
-      val work = fromJson[IdentifiedWork](json.toString()).get
+        whenReady(eventualWork) { json =>
+          val work = fromJson[IdentifiedWork](json.toString()).get
 
-      val actualItem1 = work.items.head
-      val actualItem2 = work.items.tail.head
+          val actualItem1 = work.items.head
+          val actualItem2 = work.items.tail.head
 
-      assertJsonStringsAreEqual(
-        toJson(actualItem1).get,
-        toJson(expectedItem1).get
-      )
+          assertJsonStringsAreEqual(
+            toJson(actualItem1).get,
+            toJson(expectedItem1).get
+          )
 
-      assertJsonStringsAreEqual(
-        toJson(actualItem2).get,
-        toJson(expectedItem2).get
-      )
+          assertJsonStringsAreEqual(
+            toJson(actualItem2).get,
+            toJson(expectedItem2).get
+          )
+        }
     }
-
   }
 
   describe("unidentifiable objects should pass through unchanged") {
@@ -323,39 +342,43 @@ class IdEmbedderTests
       val newCanonicalId =
         generateMockCanonicalId(sourceIdentifier, ontologyType)
 
-      setUpIdentifierGeneratorMock(
-        sourceIdentifier,
-        ontologyType,
-        newCanonicalId
-      )
+      withIdEmbedder {
+        case (identifierGenerator, idEmbedder) =>
+          setUpIdentifierGeneratorMock(
+            mockIdentifierGenerator = identifierGenerator,
+            sourceIdentifier = sourceIdentifier,
+            ontologyType = ontologyType,
+            newCanonicalId = newCanonicalId
+          )
 
-      val inputJson = s"""
-      {
-        "sourceIdentifier": {
-          "identifierScheme": "${sourceIdentifier.identifierScheme}",
-          "ontologyType": "$ontologyType",
-          "value": "${sourceIdentifier.value}"
-        },
-        "ontologyType": "$ontologyType"
-      }
-      """
+          val inputJson = s"""
+        {
+          "sourceIdentifier": {
+            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "ontologyType": "$ontologyType",
+            "value": "${sourceIdentifier.value}"
+          },
+          "ontologyType": "$ontologyType"
+        }
+        """
 
-      val outputJson = s"""
-      {
-        "canonicalId": "$newCanonicalId",
-        "sourceIdentifier": {
-          "identifierScheme": "${sourceIdentifier.identifierScheme}",
-          "ontologyType": "$ontologyType",
-          "value": "${sourceIdentifier.value}"
-        },
-        "ontologyType": "$ontologyType"
-      }
-      """
+          val outputJson = s"""
+        {
+          "canonicalId": "$newCanonicalId",
+          "sourceIdentifier": {
+            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "ontologyType": "$ontologyType",
+            "value": "${sourceIdentifier.value}"
+          },
+          "ontologyType": "$ontologyType"
+        }
+        """
 
-      val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+          val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
 
-      whenReady(eventualJson) { json =>
-        assertJsonStringsAreEqual(json.toString, outputJson)
+          whenReady(eventualJson) { json =>
+            assertJsonStringsAreEqual(json.toString, outputJson)
+          }
       }
     }
 
@@ -373,47 +396,51 @@ class IdEmbedderTests
         ontologyType
       )
 
-      setUpIdentifierGeneratorMock(
-        sourceIdentifier,
-        ontologyType,
-        newCanonicalId
-      )
+      withIdEmbedder {
+        case (identifierGenerator, idEmbedder) =>
+          setUpIdentifierGeneratorMock(
+            mockIdentifierGenerator = identifierGenerator,
+            sourceIdentifier = sourceIdentifier,
+            ontologyType = ontologyType,
+            newCanonicalId = newCanonicalId
+          )
 
-      val inputJson = s"""
-      {
-        "ke": null,
-        "ki": "kiev",
-        "item": {
-          "sourceIdentifier": {
-            "identifierScheme": "${sourceIdentifier.identifierScheme}",
-            "ontologyType": "$ontologyType",
-            "value": "${sourceIdentifier.value}"
-          },
-          "ontologyType": "$ontologyType"
+          val inputJson = s"""
+        {
+          "ke": null,
+          "ki": "kiev",
+          "item": {
+            "sourceIdentifier": {
+              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "ontologyType": "$ontologyType",
+              "value": "${sourceIdentifier.value}"
+            },
+            "ontologyType": "$ontologyType"
+          }
         }
-      }
-      """
+        """
 
-      val outputJson = s"""
-      {
-        "ke": null,
-        "ki": "kiev",
-        "item": {
-          "canonicalId": "$newCanonicalId",
-          "sourceIdentifier": {
-            "identifierScheme": "${sourceIdentifier.identifierScheme}",
-            "ontologyType": "$ontologyType",
-            "value": "${sourceIdentifier.value}"
-          },
-          "ontologyType": "$ontologyType"
+          val outputJson = s"""
+        {
+          "ke": null,
+          "ki": "kiev",
+          "item": {
+            "canonicalId": "$newCanonicalId",
+            "sourceIdentifier": {
+              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "ontologyType": "$ontologyType",
+              "value": "${sourceIdentifier.value}"
+            },
+            "ontologyType": "$ontologyType"
+          }
         }
-      }
-      """
+        """
 
-      val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+          val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
 
-      whenReady(eventualJson) { json =>
-        assertJsonStringsAreEqual(json.toString, outputJson)
+          whenReady(eventualJson) { json =>
+            assertJsonStringsAreEqual(json.toString, outputJson)
+          }
       }
     }
   }
@@ -424,9 +451,11 @@ class IdEmbedderTests
   ): String =
     s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
 
-  private def setUpIdentifierGeneratorMock(sourceIdentifier: SourceIdentifier,
-                                           ontologyType: String,
-                                           newCanonicalId: String) = {
+  private def setUpIdentifierGeneratorMock(
+    mockIdentifierGenerator: IdentifierGenerator,
+    sourceIdentifier: SourceIdentifier,
+    ontologyType: String,
+    newCanonicalId: String) = {
     when(
       mockIdentifierGenerator
         .retrieveOrGenerateCanonicalId(
@@ -436,9 +465,12 @@ class IdEmbedderTests
   }
 
   private def assertIdEmbedderDoesNothing(jsonString: String) = {
-    val eventualJson = idEmbedder.embedId(parse(jsonString).right.get)
-    whenReady(eventualJson) { json =>
-      assertJsonStringsAreEqual(json.toString(), jsonString)
+    withIdEmbedder {
+      case (_, idEmbedder) =>
+        val eventualJson = idEmbedder.embedId(parse(jsonString).right.get)
+        whenReady(eventualJson) { json =>
+          assertJsonStringsAreEqual(json.toString(), jsonString)
+        }
     }
   }
 

@@ -9,20 +9,19 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait DynamoInserterFixture extends LocalDynamoDb[SierraItemRecord] {
+
   override lazy val evidence: DynamoFormat[SierraItemRecord] =
     DynamoFormat[SierraItemRecord]
 
-  def withDynamoInserter[R](
-    testWith: TestWith[(Table, DynamoInserter), R]): Unit = {
-    withLocalDynamoDbTable { table =>
-      val dynamoInserter = new DynamoInserter(
-        new VersionedDao(
-          dynamoDbClient,
-          dynamoConfig = DynamoConfig(table.name)
-        )
+  def withDynamoInserter[R](table: Table)(
+    testWith: TestWith[DynamoInserter, R]): Unit = {
+    val dynamoInserter = new DynamoInserter(
+      new VersionedDao(
+        dynamoDbClient,
+        dynamoConfig = DynamoConfig(table.name)
       )
+    )
 
-      testWith((table, dynamoInserter))
-    }
+    testWith(dynamoInserter)
   }
 }

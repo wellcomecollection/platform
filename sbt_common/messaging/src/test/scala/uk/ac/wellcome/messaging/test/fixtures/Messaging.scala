@@ -20,10 +20,8 @@ import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.monitoring
-import uk.ac.wellcome.monitoring.test.fixtures.{
-  MetricsSender => MetricsSenderFixture
-}
+import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3Config,
@@ -84,7 +82,7 @@ trait Messaging
   class ExampleMessageWorker(
     messageReader: MessageReader[ExampleObject],
     actorSystem: ActorSystem,
-    metricsSender: monitoring.MetricsSender
+    metricsSender: MetricsSender
   ) extends MessageWorker[ExampleObject](
         messageReader,
         actorSystem,
@@ -140,7 +138,7 @@ trait Messaging
 
   def withMessageWorker[R](
     actorSystem: ActorSystem,
-    metricsSender: monitoring.MetricsSender,
+    metricsSender: MetricsSender,
     queue: Queue,
     messageReader: MessageReader[ExampleObject]
   )(testWith: TestWith[ExampleMessageWorker, R]) = {
@@ -194,10 +192,7 @@ trait Messaging
   }
 
   def withExampleObjectMessageWorkerFixtures[R](
-    testWith: TestWith[(monitoring.MetricsSender,
-                        Queue,
-                        Bucket,
-                        ExampleMessageWorker),
+    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
                        R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -214,10 +209,7 @@ trait Messaging
   }
 
   def withMessageWorkerFixturesAndMockedMetrics[R](
-    testWith: TestWith[(monitoring.MetricsSender,
-                        Queue,
-                        Bucket,
-                        ExampleMessageWorker),
+    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
                        R]) = {
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>

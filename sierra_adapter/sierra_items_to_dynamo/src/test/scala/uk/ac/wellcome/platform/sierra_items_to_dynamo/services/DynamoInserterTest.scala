@@ -32,8 +32,8 @@ class DynamoInserterTest
     with ExtendedPatience {
 
   it("ingests a json item into DynamoDB") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "100001"
         val updatedDate = "2013-12-13T12:43:16Z"
 
@@ -56,12 +56,13 @@ class DynamoInserterTest
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(record.copy(version = 1)))
         }
+      }
     }
   }
 
   it("does not overwrite new data with old data") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "200002"
         val oldUpdatedDate = "2001-01-01T00:00:01Z"
         val newUpdatedDate = "2017-12-12T23:59:59Z"
@@ -94,12 +95,13 @@ class DynamoInserterTest
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(newRecord))
         }
+      }
     }
   }
 
   it("overwrites old data with new data") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -134,12 +136,13 @@ class DynamoInserterTest
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> s"$id") shouldBe Some(Right(newRecord.copy(version = 2)))
         }
+      }
     }
   }
 
   it("records unlinked bibIds") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -173,12 +176,13 @@ class DynamoInserterTest
             'id -> s"$id") shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b3"))))
         }
+      }
     }
   }
 
   it("adds new bibIds and records unlinked bibIds in the same update") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -212,12 +216,13 @@ class DynamoInserterTest
             'id -> s"$id") shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b1"))))
         }
+      }
     }
   }
 
   it("preserves existing unlinked bibIds in DynamoDB") {
-    withDynamoInserter {
-      case (table, dynamoInserter) =>
+    withLocalDynamoDbTable { table =>
+      withDynamoInserter(table) { dynamoInserter =>
         val id = "300003"
         val oldUpdatedDate = "2001-01-01T01:01:01Z"
         val newUpdatedDate = "2011-11-11T11:11:11Z"
@@ -254,11 +259,11 @@ class DynamoInserterTest
             Right(
               newRecord.copy(version = 1, unlinkedBibIds = List("b5", "b1"))))
         }
+      }
     }
   }
 
   it("fails if a dao returns an error when updating an item") {
-
     val record =
       SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
 

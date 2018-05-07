@@ -1,14 +1,11 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
-import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
@@ -16,7 +13,6 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import scala.concurrent.duration._
 
 class ReindexServiceTest
     extends FunSpec
@@ -24,7 +20,7 @@ class ReindexServiceTest
     with Matchers
     with Akka
     with LocalDynamoDb[TestRecord]
-    with MockitoSugar
+    with MetricsSenderFixture
     with ExtendedPatience {
 
   override lazy val evidence: DynamoFormat[TestRecord] =
@@ -45,25 +41,20 @@ class ReindexServiceTest
   private def withReindexService(table: Table)(
     testWith: TestWith[ReindexService, Assertion]) = {
     withActorSystem { actorSystem =>
-      val metricsSender = new MetricsSender(
-        namespace = "reindex-service-test",
-        flushInterval = 100 milliseconds,
-        amazonCloudWatch = mock[AmazonCloudWatch],
-        actorSystem = actorSystem
-      )
+      withMetricsSender(actorSystem) { metricsSender =>
+        val reindexService =
+          new ReindexService(
+            dynamoDBClient = dynamoDbClient,
+            dynamoConfig = DynamoConfig(table.name),
+            metricsSender = metricsSender,
+            versionedDao = new VersionedDao(
+              dynamoDbClient = dynamoDbClient,
+              DynamoConfig(table.name)),
+            indexName = table.index
+          )
 
-      val reindexService =
-        new ReindexService(
-          dynamoDBClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(table.name),
-          metricsSender = metricsSender,
-          versionedDao = new VersionedDao(
-            dynamoDbClient = dynamoDbClient,
-            DynamoConfig(table.name)),
-          indexName = table.index
-        )
-
-      testWith(reindexService)
+        testWith(reindexService)
+      }
     }
   }
 

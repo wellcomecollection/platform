@@ -3,7 +3,6 @@ package uk.ac.wellcome.transformer.receive
 import java.time.Instant
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -14,7 +13,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -25,21 +23,22 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.duration._
-
 class SQSMessageReceiverTest
     extends FunSpec
     with Matchers
+    with Akka
+    with MetricsSenderFixture
     with SQS
     with SNS
     with S3
@@ -63,19 +62,11 @@ class SQSMessageReceiverTest
     identifiers = List(sourceIdentifier)
   )
 
-  val metricsSender: MetricsSender = new MetricsSender(
-    namespace = "record-receiver-tests",
-    100 milliseconds,
-    mock[AmazonCloudWatch],
-    ActorSystem()
-  )
-
   def withSQSMessageReceiver[R](
     topic: Topic,
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
   )(testWith: TestWith[SQSMessageReceiver, R]) = {
-
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
@@ -87,14 +78,18 @@ class SQSMessageReceiverTest
         s3Client,
         new UnidentifiedWorkKeyPrefixGenerator())
 
-    val recordReceiver = new SQSMessageReceiver(
-      messageWriter = messageWriter,
-      s3Client = s3Client,
-      s3Config = S3Config(bucket.name),
-      metricsSender = metricsSender
-    )
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val recordReceiver = new SQSMessageReceiver(
+          messageWriter = messageWriter,
+          s3Client = s3Client,
+          s3Config = S3Config(bucket.name),
+          metricsSender = metricsSender
+        )
 
-    testWith(recordReceiver)
+        testWith(recordReceiver)
+      }
+    }
   }
 
   it("receives a message and sends it to SNS client") {
