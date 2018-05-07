@@ -14,6 +14,7 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
 
@@ -21,7 +22,9 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb[T <: Versioned with Id] extends Eventually {
+trait LocalDynamoDb[T <: Versioned with Id]
+    extends Eventually
+    with ExtendedPatience {
 
   import LocalDynamoDb._
 

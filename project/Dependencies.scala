@@ -100,7 +100,7 @@ object Dependencies {
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
   ) ++ akkaDependencies ++ circeDependencies
 
-  val pipelineModelDependencies = circeDependencies
+  val pipelineModelDependencies = circeDependencies ++ dynamoDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
