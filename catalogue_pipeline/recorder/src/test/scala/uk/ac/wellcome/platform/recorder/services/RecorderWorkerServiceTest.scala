@@ -7,9 +7,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.monitoring.test.fixtures.{MetricsSender => MetricsSenderFixture}
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -51,8 +52,8 @@ class RecorderWorkerServiceTest
   it("returns a successful Future if the Work is recorded successfully") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
-          withRecorderWorkerService(table, bucket, topic) { service =>
+        withLocalSqsQueue { queue =>
+          withRecorderWorkerService(table, bucket, queue) { service =>
             whenReady(service.processMessage(work = work)) { _ =>
               assertStoredSingleWork(bucket, table, work)
             }
@@ -68,8 +69,8 @@ class RecorderWorkerServiceTest
 
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
-          withRecorderWorkerService(table, bucket, topic) { service =>
+        withLocalSqsQueue { queue =>
+          withRecorderWorkerService(table, bucket, queue) { service =>
             whenReady(service.processMessage(work = newerWork)) { _ =>
               whenReady(service.processMessage(work = olderWork)) { _ =>
                 assertStoredSingleWork(bucket, table, newerWork)
@@ -87,8 +88,8 @@ class RecorderWorkerServiceTest
 
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withLocalSnsTopic { topic =>
-          withRecorderWorkerService(table, bucket, topic) { service =>
+        withLocalSqsQueue { queue =>
+          withRecorderWorkerService(table, bucket, queue) { service =>
             whenReady(service.processMessage(work = olderWork)) { _ =>
               whenReady(service.processMessage(work = newerWork)) { _ =>
                 assertStoredSingleWork(bucket, table, newerWork, expectedVhsVersion = 2)
@@ -103,8 +104,8 @@ class RecorderWorkerServiceTest
   it("returns a failed Future if saving to S3 fails") {
     withLocalDynamoDbTable { table =>
       val badBucket = Bucket(name = "bad-bukkit")
-      withLocalSnsTopic { topic =>
-        withRecorderWorkerService(table, badBucket, topic) { service =>
+      withLocalSqsQueue { queue =>
+        withRecorderWorkerService(table, badBucket, queue) { service =>
           whenReady(service.processMessage(work = work).failed) { err =>
             err shouldBe a[AmazonServiceException]
           }
@@ -116,8 +117,8 @@ class RecorderWorkerServiceTest
   it("returns a failed Future if saving to DynamoDB fails") {
     val badTable = Table(name = "bad-table", index = "bad-index")
     withLocalS3Bucket { bucket =>
-      withLocalSnsTopic { topic =>
-        withRecorderWorkerService(badTable, bucket, topic) { service =>
+      withLocalSqsQueue { queue =>
+        withRecorderWorkerService(badTable, bucket, queue) { service =>
           whenReady(service.processMessage(work = work).failed) { err =>
             err shouldBe a[AmazonServiceException]
           }
@@ -145,9 +146,9 @@ class RecorderWorkerServiceTest
     fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(expectedWork)
   }
 
-  private def withRecorderWorkerService(table: Table, bucket: Bucket, topic: Topic)(
+  private def withRecorderWorkerService(table: Table, bucket: Bucket, queue: Queue)(
     testWith: TestWith[RecorderWorkerService, Assertion]) = {
-    withMessageReader[UnidentifiedWork, Unit](bucket, topic) { messageReader =>
+    withMessageReader[UnidentifiedWork, Unit](bucket, queue) { messageReader =>
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>

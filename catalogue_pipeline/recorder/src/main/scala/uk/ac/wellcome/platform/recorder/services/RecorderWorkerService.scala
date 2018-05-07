@@ -23,7 +23,7 @@ class RecorderWorkerService @Inject()(
   messageReader: MessageReader[UnidentifiedWork],
   system: ActorSystem,
   metrics: MetricsSender
-) extends MessageWorker[UnidentifiedWork](sqsReader, messageReader, system, metrics) {
+) extends MessageWorker[UnidentifiedWork](messageReader, system, metrics) {
 
   implicit val decoder: Decoder[UnidentifiedWork] = deriveDecoder[UnidentifiedWork]
 

@@ -42,7 +42,7 @@ class RecorderFeatureTest
         withLocalDynamoDbTable { table =>
           withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { _ =>
 
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(bucket, queue)
             withServer(flags) { _ =>
               val messageBody = put[UnidentifiedWork](
                 obj = work,

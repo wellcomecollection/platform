@@ -2,10 +2,7 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.concurrent.Eventually
 
@@ -14,6 +11,7 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
 
@@ -21,7 +19,9 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb[T <: Versioned with Id] extends Eventually {
+trait LocalDynamoDb[T <: Versioned with Id]
+  extends Eventually
+    with ExtendedPatience {
 
   import LocalDynamoDb._
 
