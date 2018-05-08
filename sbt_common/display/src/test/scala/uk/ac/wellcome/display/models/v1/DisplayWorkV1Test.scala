@@ -335,7 +335,9 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val expectedGenres = genres
       .map { _.concepts }
       .flatten
-      .map { label => DisplayConceptV1(label) }
+      .map { label =>
+        DisplayConceptV1(label)
+      }
     displayWork.genres shouldBe expectedGenres
   }
 
@@ -369,7 +371,9 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val expectedSubjects = subjects
       .map { _.concepts }
       .flatten
-      .map { label => DisplayConceptV1(label) }
+      .map { label =>
+        DisplayConceptV1(label)
+      }
     displayWork.subjects shouldBe expectedSubjects
   }
 
