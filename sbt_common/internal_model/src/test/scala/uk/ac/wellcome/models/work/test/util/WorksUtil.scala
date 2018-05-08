@@ -19,12 +19,16 @@ trait WorksUtil {
       Concept("a subject concept"),
       Place("a subject place"),
       Period("a subject period")))
-  val genre = Genre(
-    "a genre",
-    List(
+
+  val genre = Genre[AbstractConcept](
+    label = "a genre created by WorksUtil",
+    concepts = List(
       Concept("a genre concept"),
       Place("a genre place"),
-      Period("a genre period")))
+      Period("a genre period")
+    )
+  )
+
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
     "Work",
@@ -131,7 +135,7 @@ trait WorksUtil {
                createdDate: Period,
                creator: Agent,
                subjects: List[Subject],
-               genres: List[Genre],
+               genres: List[Genre[AbstractConcept]],
                items: List[IdentifiedItem],
                visible: Boolean): IdentifiedWork =
     IdentifiedWork(
