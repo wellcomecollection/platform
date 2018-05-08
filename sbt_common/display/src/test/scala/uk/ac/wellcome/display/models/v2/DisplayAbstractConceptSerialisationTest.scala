@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil

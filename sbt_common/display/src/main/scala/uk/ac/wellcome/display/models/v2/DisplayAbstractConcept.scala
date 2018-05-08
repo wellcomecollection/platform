@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
