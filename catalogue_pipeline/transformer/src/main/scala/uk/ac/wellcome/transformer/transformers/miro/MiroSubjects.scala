@@ -15,7 +15,8 @@ trait MiroSubjects {
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  def getSubjects(miroData: MiroTransformableData): List[Subject[AbstractConcept]] = {
+  def getSubjects(
+    miroData: MiroTransformableData): List[Subject[AbstractConcept]] = {
     val keywords: List[Subject[AbstractConcept]] = miroData.keywords match {
       case Some(k) =>
         k.map { keyword =>
@@ -28,17 +29,18 @@ trait MiroSubjects {
         List()
     }
 
-    val keywordsUnauth: List[Subject[AbstractConcept]] = miroData.keywordsUnauth match {
-      case Some(k) =>
-        k.map { keyword =>
-          Subject[AbstractConcept](
-            label = keyword,
-            concepts = List(Concept(keyword))
-          )
-        }
-      case None =>
-        List()
-    }
+    val keywordsUnauth: List[Subject[AbstractConcept]] =
+      miroData.keywordsUnauth match {
+        case Some(k) =>
+          k.map { keyword =>
+            Subject[AbstractConcept](
+              label = keyword,
+              concepts = List(Concept(keyword))
+            )
+          }
+        case None =>
+          List()
+      }
 
     keywords ++ keywordsUnauth
   }

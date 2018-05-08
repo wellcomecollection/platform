@@ -6,10 +6,10 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class IdentifiedWorkTest
-  extends FunSpec
-  with Matchers
-  with JsonTestUtil
-  with WorksUtil {
+    extends FunSpec
+    with Matchers
+    with JsonTestUtil
+    with WorksUtil {
 
   private val license_CCBYJson =
     s"""{

@@ -236,8 +236,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
 
   private val transformer = new SierraSubjects {}
 
-  private def assertExtractsSubjects(bibData: SierraBibData,
-                                     expected: List[Subject[AbstractConcept]]) = {
+  private def assertExtractsSubjects(
+    bibData: SierraBibData,
+    expected: List[Subject[AbstractConcept]]) = {
     transformer.getSubjects(bibData = bibData) shouldBe expected
   }
 
