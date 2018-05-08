@@ -14,7 +14,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3Config,
@@ -28,7 +27,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.Success
+import scala.util.{Random, Success}
 
 trait Messaging
     extends Akka
@@ -262,5 +261,17 @@ trait Messaging
     tryT shouldBe a[Success[_]]
 
     tryT.get
+  }
+
+  def sendMessage(bucket: Bucket,
+                  queue: SQS.Queue,
+                  exampleObject: ExampleObject) = {
+    val key = Random.alphanumeric take 10 mkString
+    val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+
+    sqsClient.sendMessage(
+      queue.url,
+      notice
+    )
   }
 }

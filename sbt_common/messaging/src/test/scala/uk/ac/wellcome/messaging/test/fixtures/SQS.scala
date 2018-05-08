@@ -2,13 +2,11 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
-import com.amazonaws.services.sqs.model.{
-  PurgeQueueRequest,
-  ReceiveMessageRequest
-}
+import com.amazonaws.services.sqs.model._
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import org.scalatest.Matchers
+import uk.ac.wellcome.messaging.message.MessageReader
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.test.fixtures._
 
@@ -21,6 +19,7 @@ object SQS {
     override def toString = s"SQS.Queue(url = $url, name = $name)"
     def name = url.split("/").toList.last
   }
+  case class QueuePair(queue: Queue, dlq: Queue)
 
 }
 
@@ -62,6 +61,13 @@ trait SQS extends Matchers {
       new EndpointConfiguration(sqsEndpointUrl, "localhost"))
     .build()
 
+  val asyncSqsClient: AmazonSQSAsync = AmazonSQSAsyncClientBuilder
+    .standard()
+    .withCredentials(credentials)
+    .withEndpointConfiguration(
+      new EndpointConfiguration(sqsEndpointUrl, "localhost"))
+    .build()
+
   def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
@@ -81,6 +87,22 @@ trait SQS extends Matchers {
       sqsClient.deleteQueue(queue.url)
     }
   )
+
+  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]) =
+    withLocalSqsQueue { dlq =>
+      val queueName: String = Random.alphanumeric take 10 mkString
+      val response = sqsClient.createQueue(new CreateQueueRequest()
+        .withQueueName(queueName)
+        .withAttributes(Map(
+          "RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
+          "VisibilityTimeout" -> "1")))
+      val arn = sqsClient
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getAttributes
+        .get("QueueArn")
+      val queue = Queue(response.getQueueUrl, arn)
+      testWith(QueuePair(queue, dlq))
+    }
 
   val localStackSqsClient: AmazonSQS = AmazonSQSClientBuilder
     .standard()
@@ -133,37 +155,45 @@ trait SQS extends Matchers {
   }
 
   def assertQueueEmpty(queue: Queue) = {
-    // The visibility timeout is set to 1 second for test queues.
-    // Wait for slightly longer than that to make sure that messages
-    // that fail processing become visible again before asserting.
-    Thread.sleep(1500)
+    waitVisibilityTimeoutExipiry()
 
-    val messages = sqsClient
-      .receiveMessage(
-        new ReceiveMessageRequest(queue.url)
-          .withMaxNumberOfMessages(1)
-      )
-      .getMessages
-      .toList
+    val messages: List[Message] = getMessages(queue)
 
     messages shouldBe empty
   }
 
   def assertQueueNotEmpty(queue: Queue) = {
+    waitVisibilityTimeoutExipiry()
+
+    val messages: List[Message] = getMessages(queue)
+
+    messages should not be empty
+  }
+
+  def assertQueueHasSize(queue: Queue, size: Int) = {
+    waitVisibilityTimeoutExipiry()
+
+    val messages: List[Message] = getMessages(queue)
+
+    messages should have size size
+  }
+
+  private def waitVisibilityTimeoutExipiry() = {
     // The visibility timeout is set to 1 second for test queues.
     // Wait for slightly longer than that to make sure that messages
     // that fail processing become visible again before asserting.
     Thread.sleep(1500)
+  }
 
+  private def getMessages(queue: Queue) = {
     val messages = sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(queue.url)
-          .withMaxNumberOfMessages(1)
+          .withMaxNumberOfMessages(10)
       )
       .getMessages
       .toList
-
-    messages should not be empty
+    messages
   }
 
 }
