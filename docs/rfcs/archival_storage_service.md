@@ -27,11 +27,6 @@ We propose to build a storage service based on AWS S3 and DynamoDb.
   - Confirm checksums match from processing location
   - Create a `StorageManifest` describing the stored object
 
-
-
-
-...
-
 ### File formats
 
 We propose to use following file formats as mentioned above:
