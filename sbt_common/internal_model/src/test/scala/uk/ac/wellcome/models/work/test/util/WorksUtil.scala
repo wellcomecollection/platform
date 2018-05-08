@@ -13,7 +13,7 @@ trait WorksUtil {
     id = "1dz4yn34va",
     label = "An aggregation of angry archipelago aged ankylosaurs."
   )
-  val subject = Subject[AbstractConcept](
+  val subject = Subject[Unidentifiable[AbstractConcept]](
     label = "a subject created by WorksUtil",
     concept = List(
       Unidentifiable(Concept("a subject concept")),
