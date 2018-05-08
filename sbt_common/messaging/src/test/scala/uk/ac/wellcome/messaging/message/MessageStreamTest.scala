@@ -197,44 +197,18 @@ class MessageStreamTest
                         MetricsSender),
                        R]) = {
 
-    withActorSystem { actorSystem =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, _) =>
-            withMockMetricSender { metricsSender =>
-              withMessageStream(actorSystem, bucket, queue, metricsSender) {
-                stream =>
-                  testWith((bucket, stream, queuePair, metricsSender))
-              }
+      withActorSystem { actorSystem =>
+          withLocalS3Bucket { bucket =>
+            withLocalSqsQueueAndDlq {
+              case queuePair@QueuePair(queue, _) =>
+                withMockMetricSender { metricsSender =>
+                  withMessageStream[ExampleObject,R](actorSystem, bucket, queue, metricsSender) { stream =>
+                    testWith((bucket, stream, queuePair, metricsSender))
+                  }
 
             }
+          }
         }
       }
     }
-  }
-
-  private def withMessageStream[R](actorSystem: ActorSystem,
-                                   bucket: Bucket,
-                                   queue: SQS.Queue,
-                                   metricsSender: MetricsSender)(
-    testWith: TestWith[MessageStream[ExampleObject], R]) = {
-    val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      waitTime = 1 millisecond,
-      maxMessages = 1)
-
-    val messageConfig = MessageReaderConfig(
-      sqsConfig = sqsConfig,
-      s3Config = s3Config
-    )
-
-    val stream = new MessageStream[ExampleObject](
-      actorSystem,
-      asyncSqsClient,
-      s3Client,
-      messageConfig,
-      metricsSender)
-    testWith(stream)
-  }
 }

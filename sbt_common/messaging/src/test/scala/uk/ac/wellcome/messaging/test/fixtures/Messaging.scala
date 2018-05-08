@@ -217,6 +217,27 @@ trait Messaging
     }
   }
 
+  def withMessageStream[T,R](actorSystem: ActorSystem, bucket: Bucket, queue: SQS.Queue, metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R]) = {
+    val s3Config = S3Config(bucketName = bucket.name)
+    val sqsConfig = SQSConfig(
+      queueUrl = queue.url,
+      waitTime = 1 millisecond,
+      maxMessages = 1)
+
+    val messageConfig = MessageReaderConfig(
+      sqsConfig = sqsConfig,
+      s3Config = s3Config
+    )
+
+    val stream = new MessageStream[T](
+      actorSystem,
+      asyncSqsClient,
+      s3Client,
+      messageConfig,
+      metricsSender)
+    testWith(stream)
+  }
+
   implicit val messagePointerDecoder: Decoder[MessagePointer] =
     deriveDecoder[MessagePointer]
 
