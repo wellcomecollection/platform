@@ -147,7 +147,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       }
       .mkString(",")
 
-  def subject(s: Subject) =
+  def subject(s: Subject[AbstractConcept]) =
     s"""
     {
       "label": "${s.label}",
@@ -156,7 +156,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Subject]) =
+  def subjects(subjects: List[Subject[AbstractConcept]]) =
     subjects
       .map { subject(_) }
       .mkString(",")
