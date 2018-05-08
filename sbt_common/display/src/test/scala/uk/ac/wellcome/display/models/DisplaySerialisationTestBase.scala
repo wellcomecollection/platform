@@ -161,7 +161,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .map { subject(_) }
       .mkString(",")
 
-  def genre(g: Genre) =
+  def genre(g: Genre[AbstractConcept]) =
     s"""
     {
       "label": "${g.label}",
@@ -170,7 +170,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def genres(genres: List[Genre]) =
+  def genres(genres: List[Genre[AbstractConcept]]) =
     genres
       .map { genre(_) }
       .mkString(",")
