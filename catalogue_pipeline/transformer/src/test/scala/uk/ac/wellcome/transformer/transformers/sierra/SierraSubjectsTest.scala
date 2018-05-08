@@ -30,7 +30,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       List(
         Subject[AbstractConcept](
           label = "A Content",
-          concepts = List(Concept(label = "A Content"))))
+          concepts = List(Unidentifiable(Concept(label = "A Content")))))
 
     assertExtractsSubjects(
       bibData(
@@ -46,8 +46,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       List(
         Subject[AbstractConcept](
           label = "A Content - V Content",
-          concepts =
-            List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content")))))
 
     assertExtractsSubjects(
       bibData(
@@ -65,8 +66,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       List(
         Subject[AbstractConcept](
           label = "A Content - V Content",
-          concepts =
-            List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content")))))
 
     assertExtractsSubjects(
       bibData(
@@ -84,9 +86,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A Content - X Content - V Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Concept(label = "X Content"),
-            Concept(label = "V Content")
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "X Content")),
+            Unidentifiable(Concept(label = "V Content"))
           )))
 
     assertExtractsSubjects(
@@ -107,8 +109,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A Content - Y Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Period(label = "Y Content")
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Period(label = "Y Content"))
           )))
 
     assertExtractsSubjects(
@@ -127,8 +129,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A Content - Z Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Place(label = "Z Content")
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Place(label = "Z Content"))
           )))
 
     assertExtractsSubjects(
@@ -174,14 +176,14 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A1 Content - Z1 Content",
           concepts = List(
-            Concept(label = "A1 Content"),
-            Place(label = "Z1 Content")
+            Unidentifiable(Concept(label = "A1 Content")),
+            Unidentifiable(Place(label = "Z1 Content"))
           )),
         Subject[AbstractConcept](
           label = "A2 Content - V2 Content",
           concepts = List(
-            Concept(label = "A2 Content"),
-            Concept(label = "V2 Content")
+            Unidentifiable(Concept(label = "A2 Content")),
+            Unidentifiable(Concept(label = "V2 Content"))
           ))
       )
 
@@ -194,9 +196,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A Content - X Content - V Content",
           concepts = List(
-            Period(label = "A Content"),
-            Concept(label = "X Content"),
-            Concept(label = "V Content")
+            Unidentifiable(Period(label = "A Content")),
+            Unidentifiable(Concept(label = "X Content")),
+            Unidentifiable(Concept(label = "V Content"))
           )))
 
     assertExtractsSubjects(
@@ -217,9 +219,9 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         Subject[AbstractConcept](
           label = "A Content - X Content - V Content",
           concepts = List(
-            Place(label = "A Content"),
-            Concept(label = "X Content"),
-            Concept(label = "V Content")
+            Unidentifiable(Place(label = "A Content")),
+            Unidentifiable(Concept(label = "X Content")),
+            Unidentifiable(Concept(label = "V Content"))
           )))
 
     assertExtractsSubjects(
