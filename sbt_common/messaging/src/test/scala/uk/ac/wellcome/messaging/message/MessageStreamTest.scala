@@ -30,39 +30,46 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka with ScalaFutures with ExtendedPatience with MetricsSenderFixture {
+class MessageStreamTest
+    extends FunSpec
+    with Matchers
+    with Messaging
+    with Akka
+    with ScalaFutures
+    with ExtendedPatience
+    with MetricsSenderFixture {
 
   it("reads messages off a queue, processes them and deletes them") {
 
-    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
-      val key = "message-key"
-      val exampleObject = ExampleObject("some value")
+    withMessageStreamFixtures {
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        val key = "message-key"
+        val exampleObject = ExampleObject("some value")
 
-      val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
 
-      sqsClient.sendMessage(
-        queue.url,
-        notice
-      )
+        sqsClient.sendMessage(
+          queue.url,
+          notice
+        )
 
-      var received: List[ExampleObject] = Nil
-      val f = (o: ExampleObject) => {
+        var received: List[ExampleObject] = Nil
+        val f = (o: ExampleObject) => {
 
-        synchronized {
-          received = o :: received
+          synchronized {
+            received = o :: received
+          }
+
+          Future.successful(())
         }
+        messageStream.foreach("test-stream", f)
 
-        Future.successful(())
-      }
-      messageStream.foreach("test-stream",f)
+        eventually {
+          received shouldBe List(exampleObject)
 
-      eventually {
-        received shouldBe List(exampleObject)
-
-        assertQueueEmpty(queue)
-      }
+          assertQueueEmpty(queue)
+        }
     }
-
 
   }
 
@@ -84,11 +91,12 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
           Future.successful(())
         }
 
-        messageStream.foreach("test-stream",f)
+        messageStream.foreach("test-stream", f)
 
         eventually {
 
-          verify(metricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+          verify(metricsSender, never())
+            .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
           received shouldBe Nil
 
           assertQueueEmpty(queue)
@@ -132,10 +140,12 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
           Future.successful(())
         }
 
-        messageStream.foreach("test-stream",f)
+        messageStream.foreach("test-stream", f)
 
         eventually {
-          verify(metricsSender, times(1)).incrementCount(endsWith("_MessageProcessingFailure"), equalTo(1.0))
+          verify(metricsSender, times(1)).incrementCount(
+            endsWith("_MessageProcessingFailure"),
+            equalTo(1.0))
 
           received shouldBe Nil
 
@@ -146,111 +156,136 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
   }
 
   it("continues reading if processing of some messages fails ") {
-    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
-      val key = "message-key"
-      val exampleObject = ExampleObject("some value")
+    withMessageStreamFixtures {
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        val key = "message-key"
+        val exampleObject = ExampleObject("some value")
 
-      sqsClient.sendMessage(
-        queue.url,
-        "not valid json"
-      )
+        sqsClient.sendMessage(
+          queue.url,
+          "not valid json"
+        )
 
-      val firstNotice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        val firstNotice =
+          put(exampleObject, S3ObjectLocation(bucket.name, key))
 
-      sqsClient.sendMessage(
-        queue.url,
-        firstNotice
-      )
+        sqsClient.sendMessage(
+          queue.url,
+          firstNotice
+        )
 
-      sqsClient.sendMessage(
-        queue.url,
-        "another not valid json"
-      )
+        sqsClient.sendMessage(
+          queue.url,
+          "another not valid json"
+        )
 
-      val secondNotice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        val secondNotice =
+          put(exampleObject, S3ObjectLocation(bucket.name, key))
 
-      sqsClient.sendMessage(
-        queue.url,
-        secondNotice
-      )
+        sqsClient.sendMessage(
+          queue.url,
+          secondNotice
+        )
 
-      var received: List[ExampleObject] = Nil
-      val f = (o: ExampleObject) => {
+        var received: List[ExampleObject] = Nil
+        val f = (o: ExampleObject) => {
 
-        synchronized {
-          received = o :: received
+          synchronized {
+            received = o :: received
+          }
+
+          Future.successful(())
         }
+        messageStream.foreach("test-stream", f)
 
-        Future.successful(())
-      }
-      messageStream.foreach("test-stream",f)
+        eventually {
+          received shouldBe List(exampleObject, exampleObject)
 
-      eventually {
-        received shouldBe List(exampleObject, exampleObject)
-
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 2)
-      }
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 2)
+        }
     }
   }
 
-  def withMessageStreamFixtures[R](testWith: TestWith[(Bucket, MessageStream[ExampleObject], QueuePair, MetricsSender), R]) = {
+  def withMessageStreamFixtures[R](
+    testWith: TestWith[(Bucket,
+                        MessageStream[ExampleObject],
+                        QueuePair,
+                        MetricsSender),
+                       R]) = {
 
     withActorSystem { actorSystem =>
       withMockMetricSender { metricsSender =>
         withLocalS3Bucket { bucket =>
-          withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
-            val s3Config = S3Config(bucketName = bucket.name)
-            val sqsConfig = SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
+          withLocalSqsQueueAndDlq {
+            case queuePair @ QueuePair(queue, dlq) =>
+              val s3Config = S3Config(bucketName = bucket.name)
+              val sqsConfig = SQSConfig(
+                queueUrl = queue.url,
+                waitTime = 1 millisecond,
+                maxMessages = 1)
 
-            val messageConfig = MessageReaderConfig(
-              sqsConfig = sqsConfig,
-              s3Config = s3Config
-            )
+              val messageConfig = MessageReaderConfig(
+                sqsConfig = sqsConfig,
+                s3Config = s3Config
+              )
 
-            val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig, metricsSender)
-            testWith((bucket, stream, queuePair, metricsSender))
+              val stream = new MessageStream[ExampleObject](
+                actorSystem,
+                asyncSqsClient,
+                s3Client,
+                messageConfig,
+                metricsSender)
+              testWith((bucket, stream, queuePair, metricsSender))
           }
         }
       }
     }
   }
 
-  class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig, metricsSender: MetricsSender) {
+  class MessageStream[T](actorSystem: ActorSystem,
+                         sqsClient: AmazonSQSAsync,
+                         s3Client: AmazonS3,
+                         messageReaderConfig: MessageReaderConfig,
+                         metricsSender: MetricsSender) {
     implicit val system = actorSystem
     val decider: Supervision.Decider = {
       case _: Exception => Supervision.Resume
-      case _            => Supervision.Stop
+      case _ => Supervision.Stop
     }
-    implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withSupervisionStrategy(decider))
 
     val s3ObjectStore = new S3ObjectStore[T](
       s3Client = s3Client,
       s3Config = messageReaderConfig.s3Config
     )
 
-    def foreach(name: String,f: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Done] = SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
-      .mapAsyncUnordered(10) {
-        message =>
+    def foreach(name: String, f: T => Future[Unit])(
+      implicit decoderT: Decoder[T]): Future[Done] =
+      SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
+        .mapAsyncUnordered(10) { message =>
           val eventualMessage = for {
             t <- read(message)
             _ <- f(t)
           } yield message
 
-          eventualMessage.onFailure{
+          eventualMessage.onFailure {
             case exception: GracefulFailureException =>
               logger.warn(s"Failure processing message", exception)
             case exception: Exception =>
               logger.error(s"Failure while processing message.", exception)
-              metricsSender.incrementCount(s"${name}_MessageProcessingFailure", 1.0)
+              metricsSender.incrementCount(
+                s"${name}_MessageProcessingFailure",
+                1.0)
           }
 
           eventualMessage
-      }
-      .map { m =>
-        (m, MessageAction.Delete)
-      }
-      .runWith(SqsAckSink(messageReaderConfig.sqsConfig.queueUrl)(sqsClient))
+        }
+        .map { m =>
+          (m, MessageAction.Delete)
+        }
+        .runWith(SqsAckSink(messageReaderConfig.sqsConfig.queueUrl)(sqsClient))
 
     private def read(message: sqs.model.Message)(
       implicit decoderN: Decoder[NotificationMessage],

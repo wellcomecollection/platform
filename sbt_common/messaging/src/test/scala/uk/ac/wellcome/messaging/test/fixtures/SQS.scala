@@ -88,20 +88,20 @@ trait SQS extends Matchers {
     }
   )
 
-  def withLocalSqsQueueAndDlq[R](
-                                  testWith: TestWith[QueuePair, R]) =
+  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]) =
     withLocalSqsQueue { dlq =>
       val queueName: String = Random.alphanumeric take 10 mkString
-      val response = sqsClient.createQueue(new CreateQueueRequest().withQueueName(queueName)
-        .withAttributes(
-          Map("RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
-            "VisibilityTimeout" -> "1")))
+      val response = sqsClient.createQueue(new CreateQueueRequest()
+        .withQueueName(queueName)
+        .withAttributes(Map(
+          "RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
+          "VisibilityTimeout" -> "1")))
       val arn = sqsClient
         .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
-        testWith(QueuePair(queue, dlq))
+      testWith(QueuePair(queue, dlq))
     }
 
   val localStackSqsClient: AmazonSQS = AmazonSQSClientBuilder
