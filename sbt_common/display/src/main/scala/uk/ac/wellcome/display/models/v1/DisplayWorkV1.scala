@@ -62,11 +62,11 @@ case class DisplayWorkV1(
     dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
-  ) subjects: List[DisplayConcept] = List(),
+  ) subjects: List[DisplayConceptV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content."
-  ) genres: List[DisplayConcept] = List(),
+  ) genres: List[DisplayConceptV1] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLocation",
     value =
@@ -126,10 +126,10 @@ case object DisplayWorkV1 {
           DisplayAbstractAgent(contributor.agent)
       },
       subjects = work.subjects.flatMap { subject =>
-        subject.concepts.map { DisplayConcept(_) }
+        subject.concepts.map { DisplayConceptV1(_) }
       },
       genres = work.genres.flatMap { genre =>
-        genre.concepts.map { DisplayConcept(_) }
+        genre.concepts.map { DisplayConceptV1(_) }
       },
       identifiers =
         if (includes.identifiers)
