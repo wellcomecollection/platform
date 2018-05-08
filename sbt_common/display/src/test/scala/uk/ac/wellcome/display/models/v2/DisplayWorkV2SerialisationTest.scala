@@ -178,8 +178,8 @@ class DisplayWorkV2SerialisationTest
       identifiers = List(),
       canonicalId = "test_subject1",
       subjects = List(
-        Subject("label", List(Concept("fish"))),
-        Subject("label", List(Concept("gardening"))))
+        Subject("label", List(Unidentified(Concept("fish")))),
+        Subject("label", List(Unidentified(Concept("gardening")))))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
@@ -205,8 +205,13 @@ class DisplayWorkV2SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      genres =
-        List(Genre("genre", List(Concept("woodwork"), Concept("etching"))))
+      genres = List(Genre(
+        label = "genre",
+        concepts = List(
+          Unidentifiable(Concept("woodwork")),
+          Unidentifiable(Concept("etching"))
+        )
+      ))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
