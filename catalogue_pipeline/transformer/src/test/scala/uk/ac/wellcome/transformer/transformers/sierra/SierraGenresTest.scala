@@ -1,7 +1,13 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{Concept, Genre, Period, Place}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Genre,
+  Period,
+  Place
+}
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
   SierraBibData,
@@ -22,7 +28,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns genres for tag 655 with only subfield a") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content",
           concepts = List(Concept(label = "A Content"))))
 
@@ -34,7 +40,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a and v") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content - V Content",
           concepts =
             List(Concept(label = "A Content"), Concept(label = "V Content"))))
@@ -53,7 +59,7 @@ class SierraGenresTest extends FunSpec with Matchers {
     "subfield a is always first concept when returning subjects for tag 655 with subfields a, v") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content - V Content",
           concepts =
             List(Concept(label = "A Content"), Concept(label = "V Content"))))
@@ -71,7 +77,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns genres for tag 655 subfields a, v, and x") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content - X Content - V Content",
           concepts = List(
             Concept(label = "A Content"),
@@ -94,7 +100,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a, y") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content - Y Content",
           concepts = List(
             Concept(label = "A Content"),
@@ -114,7 +120,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a, z") {
     val expectedGenres =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A Content - Z Content",
           concepts = List(
             Concept(label = "A Content"),
@@ -161,13 +167,13 @@ class SierraGenresTest extends FunSpec with Matchers {
 
     val expectedSubjects =
       List(
-        Genre(
+        Genre[AbstractConcept](
           label = "A1 Content - Z1 Content",
           concepts = List(
             Concept(label = "A1 Content"),
             Place(label = "Z1 Content")
           )),
-        Genre(
+        Genre[AbstractConcept](
           label = "A2 Content - V2 Content",
           concepts = List(
             Concept(label = "A2 Content"),
@@ -180,7 +186,7 @@ class SierraGenresTest extends FunSpec with Matchers {
   private val transformer = new SierraGenres {}
 
   private def assertExtractsGenres(bibData: SierraBibData,
-                                   expected: List[Genre]) = {
+                                   expected: List[Genre[AbstractConcept]]) = {
     transformer.getGenres(bibData) shouldBe expected
   }
 
