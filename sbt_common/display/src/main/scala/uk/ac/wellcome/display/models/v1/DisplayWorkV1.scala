@@ -44,10 +44,10 @@ case class DisplayWorkV1(
     value = "Recording written text on a (usually visual) work."
   ) lettering: Option[String] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v1.DisplayPeriodV1",
     value =
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
-  ) createdDate: Option[DisplayPeriod] = None,
+  ) createdDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
@@ -59,14 +59,12 @@ case class DisplayWorkV1(
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
-  ) subjects: List[DisplayConcept] = List(),
+  ) subjects: List[DisplayConceptV1] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content."
-  ) genres: List[DisplayConcept] = List(),
+  ) genres: List[DisplayConceptV1] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLocation",
     value =
@@ -81,14 +79,14 @@ case class DisplayWorkV1(
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
+    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayPlaceV1]",
     value = "Show a list of places of publication."
-  ) placesOfPublication: List[DisplayPlace] = List(),
+  ) placesOfPublication: List[DisplayPlaceV1] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v1.DisplayPeriodV1",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
-  ) publicationDate: Option[DisplayPeriod] = None,
+  ) publicationDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
@@ -120,16 +118,16 @@ case object DisplayWorkV1 {
       physicalDescription = work.physicalDescription,
       extent = work.extent,
       lettering = work.lettering,
-      createdDate = work.createdDate.map { DisplayPeriod(_) },
+      createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
           DisplayAbstractAgent(contributor.agent)
       },
       subjects = work.subjects.flatMap { subject =>
-        subject.concepts.map { DisplayConcept(_) }
+        subject.concepts.map { DisplayConceptV1(_) }
       },
       genres = work.genres.flatMap { genre =>
-        genre.concepts.map { DisplayConcept(_) }
+        genre.concepts.map { DisplayConceptV1(_) }
       },
       identifiers =
         if (includes.identifiers)
@@ -146,8 +144,8 @@ case object DisplayWorkV1 {
           })
         else None,
       publishers = work.publishers.map(DisplayAbstractAgent(_)),
-      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
-      placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
+      publicationDate = work.publicationDate.map { DisplayPeriodV1(_) },
+      placesOfPublication = work.placesOfPublication.map { DisplayPlaceV1(_) },
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )

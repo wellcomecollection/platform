@@ -229,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val displayWork = DisplayWorkV1(work)
-    displayWork.publicationDate shouldBe Some(DisplayPeriod("c1900"))
+    displayWork.publicationDate shouldBe Some(DisplayPeriodV1("c1900"))
   }
 
   it("gets the physicalDescription from a Work") {
@@ -303,6 +303,78 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val displayLanguage = displayWork.language.get
     displayLanguage.id shouldBe language.id
     displayLanguage.label shouldBe language.label
+  }
+
+  it("treats genres as a list of Concepts") {
+    val genres = List[Genre[AbstractConcept]](
+      Genre(
+        label = "a genre created by DisplayWorkV1Test",
+        concepts = List(
+          Concept("a genre concept"),
+          Place("a genre place"),
+          Period("a genre period")
+        )
+      ),
+      Genre(
+        label = "a second genre created for DisplayWorkV1Test",
+        concepts = List(
+          Concept("a second generic concept")
+        )
+      )
+    )
+
+    val work = IdentifiedWork(
+      title = Some("A work with genres"),
+      canonicalId = "b225839r",
+      sourceIdentifier = sourceIdentifier,
+      genres = genres,
+      version = 1
+    )
+
+    val displayWork = DisplayWorkV1(work)
+    val expectedGenres = genres
+      .map { _.concepts }
+      .flatten
+      .map { label =>
+        DisplayConceptV1(label)
+      }
+    displayWork.genres shouldBe expectedGenres
+  }
+
+  it("treats subjects as a list of Concepts") {
+    val subjects = List[Subject[AbstractConcept]](
+      Subject(
+        label = "a subject created by DisplayWorkV1Test",
+        concepts = List(
+          Concept("a subject concept"),
+          Place("a subject place"),
+          Period("a subject period")
+        )
+      ),
+      Subject(
+        label = "a second subject created for DisplayWorkV1Test",
+        concepts = List(
+          Concept("a second generic concept")
+        )
+      )
+    )
+
+    val work = IdentifiedWork(
+      title = Some("A work with subjects"),
+      canonicalId = "nznaj8p5",
+      sourceIdentifier = sourceIdentifier,
+      subjects = subjects,
+      version = 1
+    )
+
+    val displayWork = DisplayWorkV1(work)
+    val expectedSubjects = subjects
+      .map { _.concepts }
+      .flatten
+      .map { label =>
+        DisplayConceptV1(label)
+      }
+    displayWork.subjects shouldBe expectedSubjects
   }
 
   it("gives a helpful error if you try to convert a work with visible=False") {

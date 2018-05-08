@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import uk.ac.wellcome.display.models.DisplayAbstractConcept
 import uk.ac.wellcome.models.work.internal.{AbstractConcept, Subject}
 
 case class DisplaySubject(label: String,

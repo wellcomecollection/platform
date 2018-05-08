@@ -40,12 +40,11 @@ case class DisplayWorkV2(
     value = "Recording written text on a (usually visual) work."
   ) lettering: Option[String] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v2.DisplayPeriod",
     value =
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriod] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayContributor]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) contributors: List[DisplayContributor] = List(),
@@ -55,12 +54,10 @@ case class DisplayWorkV2(
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayConcept",
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
   ) subjects: List[DisplaySubject] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayConcept]",
     value = "Relates a work to the genre that describes the work's content."
   ) genres: List[DisplayGenre] = List(),
   @ApiModelProperty(
@@ -73,15 +70,13 @@ case class DisplayWorkV2(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItem]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlace] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v2.DisplayPeriod",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriod] = None,
