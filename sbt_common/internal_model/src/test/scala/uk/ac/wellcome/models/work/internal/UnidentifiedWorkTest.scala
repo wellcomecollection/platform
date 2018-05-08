@@ -73,15 +73,25 @@ class UnidentifiedWorkTest
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject",
+      |      "label": "${subject.label}",
+      |      "ontologyType": "${subject.ontologyType}",
       |      "concepts" : [
       |        {
-      |          "label" : "concept",
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "label" : "${subject.concepts(0).label}",
+      |          "ontologyType" : "${subject.concepts(0).ontologyType}",
+      |          "type" : "${subject.concepts(0).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(1).label}",
+      |          "ontologyType" : "${subject.concepts(1).ontologyType}",
+      |          "type" : "${subject.concepts(1).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(2).label}",
+      |          "ontologyType" : "${subject.concepts(2).ontologyType}",
+      |          "type" : "${subject.concepts(2).ontologyType}"
       |        }
-      |      ],
-      |      "ontologyType": "Subject"
+      |      ]
       |    }
       |  ],
       |  "contributors": [
