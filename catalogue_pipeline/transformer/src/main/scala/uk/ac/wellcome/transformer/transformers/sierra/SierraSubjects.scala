@@ -46,10 +46,10 @@ trait SierraSubjects extends MarcUtils {
       val subjectLabel = orderedSubfields.map(_.content).mkString(" - ")
       val concepts = orderedSubfields.map(subfield =>
         subfield.tag match {
-          case "a" => primaryConcept(marcTag, subfield.content)
-          case "y" => Period(label = subfield.content)
-          case "z" => Place(label = subfield.content)
-          case _ => Concept(label = subfield.content)
+          case "a" => Unidentifiable(primaryConcept(marcTag, subfield.content))
+          case "y" => Unidentifiable(Period(label = subfield.content))
+          case "z" => Unidentifiable(Place(label = subfield.content))
+          case _ => Unidentifiable(Concept(label = subfield.content))
       })
       Subject[AbstractConcept](label = subjectLabel, concepts = concepts)
     })
