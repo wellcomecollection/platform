@@ -1,32 +1,22 @@
 package uk.ac.wellcome.messaging.message
 
-import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.alpakka.sqs.MessageAction
-import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.sqs
-import com.amazonaws.services.sqs.AmazonSQSAsync
-import io.circe.Decoder
 import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
@@ -301,67 +291,4 @@ class MessageStreamTest
       metricsSender)
     testWith(stream)
   }
-
-  class MessageStream[T](actorSystem: ActorSystem,
-                         sqsClient: AmazonSQSAsync,
-                         s3Client: AmazonS3,
-                         messageReaderConfig: MessageReaderConfig,
-                         metricsSender: MetricsSender) {
-      implicit val system = actorSystem
-      val decider: Supervision.Decider = {
-        case _: Exception => Supervision.Resume
-        case _ => Supervision.Stop
-      }
-      implicit val materializer = ActorMaterializer(
-        ActorMaterializerSettings(system).withSupervisionStrategy(decider))
-
-      val s3ObjectStore = new S3ObjectStore[T](
-        s3Client = s3Client,
-        s3Config = messageReaderConfig.s3Config
-      )
-
-      def foreach(name: String, f: T => Future[Unit])(
-        implicit decoderT: Decoder[T]): Future[Done] =
-        SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
-          .mapAsyncUnordered(10) { message =>
-            val eventualMessage = for {
-              t <- read(message)
-              _ <- f(t)
-            } yield message
-
-            eventualMessage.onFailure {
-              case exception: GracefulFailureException =>
-                logger.warn(s"Failure processing message", exception)
-              case exception: Exception =>
-                logger.error(s"Failure while processing message.", exception)
-                metricsSender.incrementCount(
-                  s"${name}_MessageProcessingFailure",
-                  1.0)
-            }
-            val metricName = s"${name}_ProcessMessage"
-            metricsSender.timeAndCount(metricName, () => eventualMessage)
-          }
-          .map { m =>
-            (m, MessageAction.Delete)
-          }
-          .runWith(SqsAckSink(messageReaderConfig.sqsConfig.queueUrl)(sqsClient))
-
-      private def read(message: sqs.model.Message)(
-        implicit decoderN: Decoder[NotificationMessage],
-        decoderT: Decoder[T]
-      ): Future[T] = {
-        val deserialisedMessagePointerAttempt = for {
-          notification <- fromJson[NotificationMessage](message.getBody)
-          deserialisedMessagePointer <- fromJson[MessagePointer](
-            notification.Message)
-        } yield deserialisedMessagePointer
-
-        for {
-          messagePointer <- Future.fromTry[MessagePointer](
-            deserialisedMessagePointerAttempt)
-          deserialisedObject <- s3ObjectStore.get(messagePointer.src)
-        } yield deserialisedObject
-      }
-
-    }
 }
