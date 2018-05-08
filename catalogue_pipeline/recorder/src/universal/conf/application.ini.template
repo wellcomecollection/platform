@@ -1,5 +1,5 @@
 -aws.message.sqs.queue.url=${recorder_queue_url}
 -aws.message.s3.bucketName=${message_bucket_name}
--aws.vhs.dynamo.tableName=${recorder_vhs_dynamo_table_name}
--aws.vhs.s3.bucketName=${recorder_vhs_bucket_name}
+-aws.vhs.dynamo.tableName=${vhs_recorder_dynamo_table_name}
+-aws.vhs.s3.bucketName=${vhs_recorder_bucket_name}
 -aws.metrics.namespace=${metrics_namespace}
