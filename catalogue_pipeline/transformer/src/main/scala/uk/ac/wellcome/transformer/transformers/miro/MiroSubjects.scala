@@ -1,6 +1,12 @@
 package uk.ac.wellcome.transformer.transformers.miro
 
-import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Subject}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  MaybeDisplayable,
+  Subject,
+  Unidentifiable
+}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 
 trait MiroSubjects {
@@ -16,13 +22,13 @@ trait MiroSubjects {
    *  have enough information in Miro to determine which ones those are.
    */
   def getSubjects(
-    miroData: MiroTransformableData): List[Subject[AbstractConcept]] = {
+    miroData: MiroTransformableData): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     val keywords: List[String] = miroData.keywords.getOrElse(List())
 
     val keywordsUnauth: List[String] = miroData.keywordsUnauth.getOrElse(List())
 
     (keywords ++ keywordsUnauth).map { keyword =>
-      Subject[AbstractConcept](
+      Subject[MaybeDisplayable[AbstractConcept]](
         label = keyword,
         concepts = List(Unidentifiable(Concept(keyword)))
       )
