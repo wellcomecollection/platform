@@ -2,20 +2,25 @@ package uk.ac.wellcome.messaging.message
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import io.circe.Decoder
+import org.mockito.Matchers.{anyDouble, endsWith, eq => equalTo}
+import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -25,11 +30,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka with ScalaFutures with ExtendedPatience {
+class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka with ScalaFutures with ExtendedPatience with MetricsSenderFixture {
 
   it("reads messages off a queue, processes them and deletes them") {
 
-    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq)) =>
+    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
       val key = "message-key"
       val exampleObject = ExampleObject("some value")
 
@@ -49,7 +54,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
         Future.successful(())
       }
-      messageStream.foreach(f)
+      messageStream.foreach("test-stream",f)
 
       eventually {
         received shouldBe List(exampleObject)
@@ -63,7 +68,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures {
-      case (bucket, messageStream, QueuePair(queue, dlq)) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         sqsClient.sendMessage(
           queue.url,
           "not valid json"
@@ -79,9 +84,11 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
           Future.successful(())
         }
 
-        messageStream.foreach(f)
+        messageStream.foreach("test-stream",f)
 
         eventually {
+
+          verify(metricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
           received shouldBe Nil
 
           assertQueueEmpty(queue)
@@ -92,7 +99,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
   it("does not fails gracefully when the s3 object cannot be retrieved") {
     withMessageStreamFixtures {
-      case (bucket, messageStream, QueuePair(queue, dlq)) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         val key = "key.json"
 
         // Do NOT put S3 object here
@@ -125,11 +132,10 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
           Future.successful(())
         }
 
-        messageStream.foreach(f)
+        messageStream.foreach("test-stream",f)
 
         eventually {
-          // TODO what do graceful and non graceful failure means in this case?
-          //          throwable shouldBe a[AmazonS3Exception]
+          verify(metricsSender, times(1)).incrementCount(endsWith("_MessageProcessingFailure"), equalTo(1.0))
 
           received shouldBe Nil
 
@@ -140,7 +146,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
   }
 
   it("continues reading if processing of some messages fails ") {
-    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq)) =>
+    withMessageStreamFixtures { case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
       val key = "message-key"
       val exampleObject = ExampleObject("some value")
 
@@ -177,7 +183,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
         Future.successful(())
       }
-      messageStream.foreach(f)
+      messageStream.foreach("test-stream",f)
 
       eventually {
         received shouldBe List(exampleObject, exampleObject)
@@ -188,26 +194,29 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
     }
   }
 
-  def withMessageStreamFixtures[R](testWith: TestWith[(Bucket, MessageStream[ExampleObject], QueuePair), R]) = {
+  def withMessageStreamFixtures[R](testWith: TestWith[(Bucket, MessageStream[ExampleObject], QueuePair, MetricsSender), R]) = {
+
     withActorSystem { actorSystem =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-          val s3Config = S3Config(bucketName = bucket.name)
-          val sqsConfig = SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
+      withMockMetricSender { metricsSender =>
+        withLocalS3Bucket { bucket =>
+          withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
+            val s3Config = S3Config(bucketName = bucket.name)
+            val sqsConfig = SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
 
-          val messageConfig = MessageReaderConfig(
-            sqsConfig = sqsConfig,
-            s3Config = s3Config
-          )
+            val messageConfig = MessageReaderConfig(
+              sqsConfig = sqsConfig,
+              s3Config = s3Config
+            )
 
-          val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig)
-          testWith((bucket, stream, queuePair))
+            val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig, metricsSender)
+            testWith((bucket, stream, queuePair, metricsSender))
+          }
         }
       }
     }
   }
 
-  class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig) {
+  class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig, metricsSender: MetricsSender) {
     implicit val system = actorSystem
     val decider: Supervision.Decider = {
       case _: Exception => Supervision.Resume
@@ -220,13 +229,23 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
       s3Config = messageReaderConfig.s3Config
     )
 
-    def foreach(f: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Done] = SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
+    def foreach(name: String,f: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Done] = SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
       .mapAsyncUnordered(10) {
         message =>
-          for {
+          val eventualMessage = for {
             t <- read(message)
             _ <- f(t)
           } yield message
+
+          eventualMessage.onFailure{
+            case exception: GracefulFailureException =>
+              logger.warn(s"Failure processing message", exception)
+            case exception: Exception =>
+              logger.error(s"Failure while processing message.", exception)
+              metricsSender.incrementCount(s"${name}_MessageProcessingFailure", 1.0)
+          }
+
+          eventualMessage
       }
       .map { m =>
         (m, MessageAction.Delete)
