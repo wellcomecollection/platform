@@ -15,7 +15,7 @@ trait WorksUtil {
   )
   val subject = Subject[Unidentifiable[AbstractConcept]](
     label = "a subject created by WorksUtil",
-    concept = List(
+    concepts = List(
       Unidentifiable(Concept("a subject concept")),
       Unidentifiable(Place("a subject place")),
       Unidentifiable(Period("a subject period"))))
