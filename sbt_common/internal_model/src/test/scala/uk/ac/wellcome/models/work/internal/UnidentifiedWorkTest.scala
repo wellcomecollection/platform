@@ -113,19 +113,28 @@ class UnidentifiedWorkTest
       |      "ontologyType": "${genre.ontologyType}",
       |      "concepts" : [
       |        {
-      |          "label" : "${genre.concepts(0).agent.label}",
-      |          "ontologyType" : "${genre.concepts(0).agent.ontologyType}",
-      |          "type" : "${genre.concepts(0).agent.ontologyType}"
+      |          "agent": {
+      |            "label" : "${genre.concepts(0).agent.label}",
+      |            "ontologyType" : "${genre.concepts(0).agent.ontologyType}",
+      |            "type" : "${genre.concepts(0).agent.ontologyType}"
+      |          },
+      |          "type": "Unidentifiable"
       |        },
       |        {
-      |          "label" : "${genre.concepts(1).agent.label}",
-      |          "ontologyType" : "${genre.concepts(1).agent.ontologyType}",
-      |          "type" : "${genre.concepts(1).agent.ontologyType}"
+      |          "agent": {
+      |            "label" : "${genre.concepts(1).agent.label}",
+      |            "ontologyType" : "${genre.concepts(1).agent.ontologyType}",
+      |            "type" : "${genre.concepts(1).agent.ontologyType}"
+      |          },
+      |          "type": "Unidentifiable"
       |        },
       |        {
-      |          "label" : "${genre.concepts(2).agent.label}",
-      |          "ontologyType" : "${genre.concepts(2).agent.ontologyType}",
-      |          "type" : "${genre.concepts(2).agent.ontologyType}"
+      |          "agent": {
+      |            "label" : "${genre.concepts(2).agent.label}",
+      |            "ontologyType" : "${genre.concepts(2).agent.ontologyType}",
+      |            "type" : "${genre.concepts(2).agent.ontologyType}"
+      |          },
+      |          "type": "Unidentifiable"
       |        }
       |      ]
       |    }
