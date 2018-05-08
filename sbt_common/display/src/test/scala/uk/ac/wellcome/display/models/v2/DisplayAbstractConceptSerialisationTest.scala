@@ -58,19 +58,19 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it("constructs a DisplayConcept from an identified") {
+  it("constructs a DisplayConcept from an identified Concept") {
     val concept = Identified(
       canonicalId = "uq4bt5us",
       identifiers = List(SourceIdentifier(
         identifierScheme = IdentifierSchemes.libraryOfCongressNames,
         ontologyType = "Concept",
         value = "lcsh/uq4"
-      ))
+      )),
       agent = Concept("conceptLabel")
     )
 
     assertObjectMapsToJson(
-      DisplayConcept(concept),
+      DisplayAbstractConcept(concept),
       expectedJson = s"""
          |  {
          |    "id": "${concept.canonicalId}",
@@ -85,7 +85,7 @@ class DisplayAbstractConceptSerialisationTest
   it(
     "serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
     assertObjectMapsToJson(
-      List[AbstractConcept](
+      List[Displayable[AbstractConcept]](
         Unidentifiable(Concept("conceptLabel")),
         Unidentifiable(Place("placeLabel")),
         Unidentifiable(Period("periodLabel"))

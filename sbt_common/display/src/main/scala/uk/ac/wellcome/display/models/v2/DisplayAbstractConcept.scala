@@ -93,6 +93,11 @@ case class DisplayPeriod(
 ) extends DisplayAbstractConcept {
   @JsonProperty("type") val ontologyType: String = "Period"
 }
+case object DisplayPeriod {
+  def apply(period: Period): DisplayPeriod = DisplayPeriod(
+    label = period.label
+  )
+}
 
 @ApiModel(
   value = "Place",
@@ -113,4 +118,9 @@ case class DisplayPlace(
   ) label: String
 ) extends DisplayAbstractConcept {
   @JsonProperty("type") val ontologyType: String = "Place"
+}
+case object DisplayPlace {
+  def apply(place: Place): DisplayPlace = DisplayPlace(
+    label = place.label
+  )
 }

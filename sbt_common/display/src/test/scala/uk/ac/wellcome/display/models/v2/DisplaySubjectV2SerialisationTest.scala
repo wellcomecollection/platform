@@ -7,24 +7,25 @@ import uk.ac.wellcome.models.work.internal._
 
 class DisplaySubjectV2SerialisationTest
     extends FunSpec
+    with DisplaySerialisationTestBase
     with JsonMapperTestUtil {
 
   it("serialises a DisplaySubject constructed from a Subject correctly") {
+    val concept0 = Unidentifiable(Concept("conceptLabel"))
+    val concept1 = Unidentifiable(Period("periodLabel"))
+    val concept2 = Identified(
+      canonicalId = "p4xe8u22",
+      identifiers = List(SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        value = "lcsh/p4x",
+        ontologyType = "Place"
+      )),
+      agent = Place("placeLabel")
+    )
+
     val subject = Subject(
       label = "subjectLabel",
-      concepts = List(
-        Unidentifiable(Concept("conceptLabel")),
-        Unidentifiable(Period("periodLabel")),
-        Identified(
-          canonicalId = "p4xe8u22",
-          identifiers = List(SourceIdentifier(
-            identifierScheme = IdentifierSchemes.libraryOfCongressNames,
-            value = "lcsh/p4x",
-            ontologyType = "Place"
-          )),
-          agent = Place("placeLabel")
-        )
-      )
+      concepts = List(concept0, concept1, concept2)
     )
 
     assertObjectMapsToJson(
@@ -34,18 +35,18 @@ class DisplaySubjectV2SerialisationTest
          |    "label" : "${subject.label}",
          |    "concepts" : [
          |      {
-         |        "label" : "${subject.concepts(0).agent.label}",
-         |        "type" : "${subject.concepts(0).agent.ontologyType}"
+         |        "label" : "${concept0.agent.label}",
+         |        "type" : "${concept0.agent.ontologyType}"
          |      },
          |      {
-         |        "label" : "${subject.concepts(1).agent.label}",
-         |        "type" : "${subject.concepts(1).agent.ontologyType}"
+         |        "label" : "${concept1.agent.label}",
+         |        "type" : "${concept1.agent.ontologyType}"
          |      },
          |      {
-         |        "id": "${subject.concepts(2).canonicalId}",
-         |        "identifiers": [${identifier(subject.concepts(2).identifiers(0))}],
-         |        "label" : "${subject.concepts(2).agent.label}",
-         |        "type" : "${subject.concepts(2).agent.ontologyType}"
+         |        "id": "${concept2.canonicalId}",
+         |        "identifiers": [${identifier(concept2.identifiers(0))}],
+         |        "label" : "${concept2.agent.label}",
+         |        "type" : "${concept2.agent.ontologyType}"
          |      }
          |    ],
          |    "type" : "${subject.ontologyType}"

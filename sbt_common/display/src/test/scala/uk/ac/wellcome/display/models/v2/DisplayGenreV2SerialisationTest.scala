@@ -11,21 +11,21 @@ class DisplayGenreV2SerialisationTest
   with JsonMapperTestUtil {
 
   it("serialises a DisplayGenre constructed from a Genre correctly") {
+    val concept0 = Unidentifiable(Concept("conceptLabel"))
+    val concept1 = Unidentifiable(Place("placeLabel"))
+    val concept2 = Identified(
+      canonicalId = "sqwyavpj",
+      identifiers = List(SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        value = "lcsh/sqw",
+        ontologyType = "Period"
+      )),
+      agent = Period("periodLabel")
+    )
+
     val genre = Genre(
       label = "genreLabel",
-      concepts = List(
-        Unidentifiable(Concept("conceptLabel")),
-        Unidentifiable(Place("placeLabel")),
-        Identified(
-          canonicalId = "sqwyavpj",
-          identifiers = List(SourceIdentifier(
-            identifierScheme = IdentifierSchemes.libraryOfCongressNames,
-            value = "lcsh/sqw",
-            ontologyType = "Period"
-          )),
-          agent = Period("periodLabel")
-        )
-      )
+      concepts = List(concept0, concept1, concept2)
     )
 
     assertObjectMapsToJson(
@@ -35,18 +35,18 @@ class DisplayGenreV2SerialisationTest
          |    "label" : "${genre.label}",
          |    "concepts" : [
          |      {
-         |        "label" : "${genre.concepts(0).agent.label}",
-         |        "type" : "${genre.concepts(0).agent.ontologyType}"
+         |        "label" : "${concept0.agent.label}",
+         |        "type" : "${concept0.agent.ontologyType}"
          |      },
          |      {
-         |        "label" : "${genre.concepts(1).agent.label}",
-         |        "type" : "${genre.concepts(1).agent.ontologyType}"
+         |        "label" : "${concept1.agent.label}",
+         |        "type" : "${concept1.agent.ontologyType}"
          |      },
          |      {
-         |        "id": "${genre.concepts(2).canonicalId}",
-         |        "identifiers": [${identifier(genre.concepts(2).identifiers(0))}],
-         |        "label" : "${genre.concepts(2).agent.label}",
-         |        "type" : "${genre.concepts(2).agent.ontologyType}"
+         |        "id": "${concept2.canonicalId}",
+         |        "identifiers": [${identifier(concept2.identifiers(0))}],
+         |        "label" : "${concept2.agent.label}",
+         |        "type" : "${concept2.agent.ontologyType}"
          |      }
          |    ],
          |    "type" : "${genre.ontologyType}"

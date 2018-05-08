@@ -48,7 +48,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
     assertDisplayConceptIsCorrect(
       concept = Identified(
-        id = "dj4kndg5",
+        canonicalId = "dj4kndg5",
         identifiers = List(sourceIdentifier),
         agent = Concept(label = "darkness")
       ),
@@ -69,7 +69,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
     assertDisplayConceptIsCorrect(
       concept = Identified(
-        id = "nrzbm3ah",
+        canonicalId = "nrzbm3ah",
         identifiers = List(sourceIdentifier),
         agent = Period(label = "never")
       ),
@@ -90,7 +90,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
     assertDisplayConceptIsCorrect(
       concept = Identified(
-        id = "axtswq4z",
+        canonicalId = "axtswq4z",
         identifiers = List(sourceIdentifier),
         agent = Place(label = "anywhere")
       ),
