@@ -10,8 +10,8 @@ module "recorder" {
   env_vars = {
     recorder_queue_url             = "${module.recorder_queue.id}"
     message_bucket_name            = "${aws_s3_bucket.messages.id}"
-    recorder_vhs_dynamo_table_name = "${module.vhs_recorder.table_name}"
-    recorder_vhs_bucket_name       = "${module.vhs_recorder.bucket_name}"
+    vhs_recorder_dynamo_table_name = "${module.vhs_recorder.table_name}"
+    vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
     metrics_namespace              = "recorder"
   }
 
