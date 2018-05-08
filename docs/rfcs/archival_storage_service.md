@@ -27,11 +27,25 @@ We propose to build a storage service based on AWS S3 and DynamoDb.
   - Confirm checksums match from processing location
   - Create a `StorageManifest` describing the stored object
 
+### Ingest
+
+We'll need to consider integrations with other services such as:
+
+- [archivematica](https://www.archivematica.org/en/)
+- [goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/)
+
+These services will need to provide accessions in the BagIt bag format, gzipped and uploaded to an S3 location.
+
+### Onward processing
+
+The architecture described here makes use of the "[https://github.com/wellcometrust/platform/tree/master/sbt_common/storage/src/main/scala/uk/ac/wellcome/storage/vhs](Versioned Hybrid Store)", so can via a dynamo event stream / lambda / sns mechanism publish update events further downstream to be consumed by the catalogue pipeline, or to feed another search index (like ElasticSearch), reindexing capability is already demonstrated by the Versioned Hybrid Store.
+
 ### Terminology
 
 - **Accession**: A BagIt "bag"
 - **SQS Autoscaling Service**: An ECS service autoscaling on SQS queue length as defined in https://github.com/wellcometrust/terraform-modules/tree/master/sqs_autoscaling_service
 - **Storage manifest**: A file describing the contents of an accession after ingest and containing a pointer to the stored accession.
+- **Versioned Hybrid Store**: A set of [https://github.com/wellcometrust/platform/tree/master/sbt_common/storage/src/main/scala/uk/ac/wellcome/storage/vhs](software libraries) wrapping interactions with dynamo and S3 to provide a transactional typed large object store.
 
 ### File formats
 
