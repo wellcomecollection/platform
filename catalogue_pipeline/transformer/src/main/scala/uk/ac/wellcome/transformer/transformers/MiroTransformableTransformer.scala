@@ -1,15 +1,16 @@
 package uk.ac.wellcome.transformer.transformers
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.models.work.internal
+
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MiroTransformableData
-import uk.ac.wellcome.transformer.transformers.miro.MiroContributors
+import uk.ac.wellcome.transformer.transformers.miro._
 
 import scala.util.Try
 
 class MiroTransformableTransformer
     extends TransformableTransformer[MiroTransformable]
-    with MiroContributors {
+    with MiroContributors
+    with MiroGenres {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType(miroTransformable: MiroTransformable,
@@ -20,7 +21,7 @@ class MiroTransformableTransformer
       val (title, description) = getTitleAndDescription(miroData)
 
       Some(
-        internal.UnidentifiedWork(
+        UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
             identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -245,14 +246,6 @@ class MiroTransformableTransformer
     }
 
     keywords ++ keywordsUnauth
-  }
-
-  private def getGenres(miroData: MiroTransformableData): List[Genre] = {
-    // Populate the subjects field.  This is based on two fields in the XML,
-    // <image_phys_format> and <image_lc_genre>.
-    (miroData.physFormat.toList ++ miroData.lcGenre.toList).map { g =>
-      Genre(label = g, concepts = List(Concept(g)))
-    }.distinct
   }
 
   private def getThumbnail(miroData: MiroTransformableData,
