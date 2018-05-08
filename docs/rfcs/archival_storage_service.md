@@ -38,7 +38,7 @@ These services will need to provide accessions in the BagIt bag format, gzipped 
 
 ### Onward processing
 
-The architecture described here makes use of the "[https://github.com/wellcometrust/platform/tree/master/sbt_common/storage/src/main/scala/uk/ac/wellcome/storage/vhs](Versioned Hybrid Store)", so can via a dynamo event stream / lambda / sns mechanism publish update events further downstream to be consumed by the catalogue pipeline, or to feed another search index (like ElasticSearch), reindexing capability is already demonstrated by the Versioned Hybrid Store.
+The architecture described here makes use of the "Versioned Hybrid Store", so can via a dynamo event stream / lambda / sns mechanism publish update events further downstream to be consumed by the catalogue pipeline, or to feed another search index (like ElasticSearch), reindexing capability is already demonstrated by the Versioned Hybrid Store.
 
 ### Terminology
 
