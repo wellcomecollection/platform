@@ -132,7 +132,7 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               subjects: List[Subject[AbstractConcept]],
+               subjects: List[Subject[Displayable[AbstractConcept]]],
                genres: List[Genre[Displayable[AbstractConcept]]],
                items: List[IdentifiedItem],
                visible: Boolean): IdentifiedWork =
