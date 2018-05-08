@@ -8,15 +8,18 @@ module "recorder" {
   release_id         = "${var.release_ids["recorder"]}"
 
   env_vars = {
-    queue_url           = "${module.recorder_queue.id}"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
-    sqs_max_messages    = 10
+    sns_arn                        = "${module.transformed_works_topic.arn}"
+    recorder_queue_id              = "${module.recorder_queue.id}"
+    message_bucket_name            = "${aws_s3_bucket.messages.id}"
+    recorder_vhs_dynamo_table_name = "${module.vhs_recorder.bucket_name}"
+    recorder_vhs_bucket_name       = "${module.vhs_recorder.table_name}"
+    metrics_namespace              = "recorder"
   }
+
+  env_vars_length = 6
 
   memory = 2048
   cpu    = 512
-
-  env_vars_length = 3
 
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"
