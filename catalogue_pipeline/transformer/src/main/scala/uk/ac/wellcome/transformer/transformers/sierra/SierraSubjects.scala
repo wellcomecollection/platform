@@ -1,11 +1,17 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{Concept, Period, Place, Subject}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Period,
+  Place,
+  Subject
+}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraSubjects extends MarcUtils {
 
-  def getSubjects(bibData: SierraBibData): List[Subject] = {
+  def getSubjects(bibData: SierraBibData): List[Subject[AbstractConcept]] = {
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")
@@ -45,7 +51,7 @@ trait SierraSubjects extends MarcUtils {
           case "z" => Place(label = subfield.content)
           case _ => Concept(label = subfield.content)
       })
-      Subject(subjectLabel, concepts)
+      Subject[AbstractConcept](label = subjectLabel, concepts = concepts)
     })
   }
 
