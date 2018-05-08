@@ -2,7 +2,12 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.AbstractConcept
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Displayable,
+  Identified,
+  Unidentifiable
+}
 
 @ApiModel(
   value = "Concept",
@@ -17,7 +22,11 @@ case class DisplayConceptV1(
 }
 
 case object DisplayConceptV1 {
-  def apply(concept: AbstractConcept): DisplayConceptV1 = DisplayConceptV1(
-    label = concept.label
-  )
+  def apply(concept: Displayable[AbstractConcept]): DisplayConceptV1 = {
+    val label = concept match {
+      case Identified(c: AbstractConcept, _, _) => c.label
+      case Unidentifiable(c: AbstractConcept) => c.label
+    }
+    DisplayConceptV1(label = label)
+  }
 }
