@@ -2,6 +2,7 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 
 @ApiModel(
@@ -10,14 +11,44 @@ import uk.ac.wellcome.models.work.internal._
 sealed trait DisplayAbstractConcept
 
 case object DisplayAbstractConcept {
-  def apply(abstractConcept: AbstractConcept): DisplayAbstractConcept =
+  def apply(abstractConcept: Displayable[AbstractConcept]): DisplayAbstractConcept =
     abstractConcept match {
-      case concept: Concept =>
-        DisplayConcept(concept.label)
-      case period: Period =>
-        DisplayPeriod(period.label)
-      case place: Place =>
-        DisplayPlace(place.label)
+      case Unidentifiable(concept: Concept) =>
+        DisplayConcept(
+          id = None,
+          identifiers = None,
+          label = concept.label
+        )
+      case Identified(concept: Concept, id, identifiers) =>
+        DisplayConcept(
+          id = Some(id),
+          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          label = concept.label
+        )
+      case Unidentifiable(period: Period) =>
+        DisplayPeriod(
+          id = None,
+          identifiers = None,
+          label = period.label
+        )
+      case Identified(period: Period, id, identifiers) =>
+        DisplayPeriod(
+          id = Some(id),
+          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          label = period.label
+        )
+      case Unidentifiable(place: Place) =>
+        DisplayPlace(
+          id = None,
+          identifiers = None,
+          label = place.label
+        )
+      case Identified(place: Place, id, identifiers) =>
+        DisplayPlace(
+          id = Some(id),
+          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          label = place.label
+        )
     }
 }
 
@@ -26,6 +57,15 @@ case object DisplayAbstractConcept {
   description = "A broad concept"
 )
 case class DisplayConcept(
+  @ApiModelProperty(
+    dataType = "String",
+    value = "The canonical identifier given to a thing"
+  ) id: Option[String] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    value =
+      "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+  ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
     dataType = "String"
   ) label: String
@@ -44,6 +84,15 @@ case object DisplayConcept {
 )
 case class DisplayPeriod(
   @ApiModelProperty(
+    dataType = "String",
+    value = "The canonical identifier given to a thing"
+  ) id: Option[String] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    value =
+      "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  @ApiModelProperty(
     dataType = "String"
   ) label: String
 ) extends DisplayAbstractConcept {
@@ -60,6 +109,15 @@ case object DisplayPeriod {
   description = "A place"
 )
 case class DisplayPlace(
+  @ApiModelProperty(
+    dataType = "String",
+    value = "The canonical identifier given to a thing"
+  ) id: Option[String] = None,
+  @ApiModelProperty(
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    value =
+      "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
+  ) identifiers: Option[List[DisplayIdentifier]] = None,
   @ApiModelProperty(
     dataType = "String"
   ) label: String
