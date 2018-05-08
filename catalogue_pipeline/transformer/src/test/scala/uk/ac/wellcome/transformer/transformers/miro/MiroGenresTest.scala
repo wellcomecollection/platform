@@ -1,21 +1,22 @@
-package uk.ac.wellcome.transformer.transformers
+package uk.ac.wellcome.transformer.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{Concept, Genre}
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre}
+import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 
-class MiroTransformableTransformerGenresTest
+class MiroGenresTest
     extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should have an empty genre list on records without keywords") {
+  it("has an empty genre list on records without keywords") {
     transformRecordAndCheckGenres(
       data = s""""image_title": "The giraffe's genre is gone'"""",
-      expectedGenres = List[Genre]()
+      expectedGenres = List()
     )
   }
 
-  it("should use the image_phys_format field if present") {
+  it("uses the image_phys_format field if present") {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A goat grazes on some grass",
@@ -25,7 +26,7 @@ class MiroTransformableTransformerGenresTest
     )
   }
 
-  it("should use the image_lc_genre field if present") {
+  it("uses the image_lc_genre field if present") {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "Grouchy geese are good as guards",
@@ -35,8 +36,7 @@ class MiroTransformableTransformerGenresTest
     )
   }
 
-  it(
-    "should use the image_phys_format and image_lc_genre fields if both present") {
+  it("uses the image_phys_format and image_lc_genre fields if both present") {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A gorilla and a gibbon in a garden",
@@ -50,7 +50,7 @@ class MiroTransformableTransformerGenresTest
     )
   }
 
-  it("should deduplicate entries in the genre field if necessary") {
+  it("deduplicates entries in the genre field") {
     transformRecordAndCheckGenres(
       data = s"""
         "image_title": "A duality of dancing dodos",
@@ -62,9 +62,10 @@ class MiroTransformableTransformerGenresTest
     )
   }
 
-  private def transformRecordAndCheckGenres(data: String,
-                                            expectedGenres: List[Genre] =
-                                              List()) = {
+  private def transformRecordAndCheckGenres(
+    data: String,
+    expectedGenres: List[Genre[AbstractConcept]] = List()
+  ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
   }

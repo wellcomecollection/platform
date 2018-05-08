@@ -1,15 +1,17 @@
 package uk.ac.wellcome.transformer.transformers
 import uk.ac.wellcome.models.transformable.MiroTransformable
-import uk.ac.wellcome.models.work.internal
+
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MiroTransformableData
-import uk.ac.wellcome.transformer.transformers.miro.MiroContributors
+import uk.ac.wellcome.transformer.transformers.miro._
 
 import scala.util.Try
 
 class MiroTransformableTransformer
     extends TransformableTransformer[MiroTransformable]
-    with MiroContributors {
+    with MiroContributors
+    with MiroGenres
+    with MiroSubjects {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType(miroTransformable: MiroTransformable,
@@ -20,7 +22,7 @@ class MiroTransformableTransformer
       val (title, description) = getTitleAndDescription(miroData)
 
       Some(
-        internal.UnidentifiedWork(
+        UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
             identifierScheme = IdentifierSchemes.miroImageNumber,
@@ -213,46 +215,6 @@ class MiroTransformableTransformer
         }
 
     miroIDList ++ sierraList ++ libraryRefsList
-  }
-
-  /* Populate the subjects field.  This is based on two fields in the XML,
-   *  <image_keywords> and <image_keywords_unauth>.  Both of these were
-   *  defined in part or whole by the human cataloguers, and in general do
-   *  not correspond to a controlled vocabulary.  (The latter was imported
-   *  directly from PhotoSoft.)
-   *
-   *  In some cases, these actually do correspond to controlled vocabs,
-   *  e.g. where keywords were pulled directly from Sierra -- but we don't
-   *  have enough information in Miro to determine which ones those are.
-   */
-  private def getSubjects(miroData: MiroTransformableData): List[Subject] = {
-    val keywords: List[Subject] = miroData.keywords match {
-      case Some(k) =>
-        k.map { keyword =>
-          Subject(label = keyword, concepts = List(Concept(keyword)))
-        }
-      case None =>
-        List()
-    }
-
-    val keywordsUnauth: List[Subject] = miroData.keywordsUnauth match {
-      case Some(k) =>
-        k.map { keyword =>
-          Subject(label = keyword, concepts = List(Concept(keyword)))
-        }
-      case None =>
-        List()
-    }
-
-    keywords ++ keywordsUnauth
-  }
-
-  private def getGenres(miroData: MiroTransformableData): List[Genre] = {
-    // Populate the subjects field.  This is based on two fields in the XML,
-    // <image_phys_format> and <image_lc_genre>.
-    (miroData.physFormat.toList ++ miroData.lcGenre.toList).map { g =>
-      Genre(label = g, concepts = List(Concept(g)))
-    }.distinct
   }
 
   private def getThumbnail(miroData: MiroTransformableData,

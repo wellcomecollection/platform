@@ -1,7 +1,8 @@
-package uk.ac.wellcome.transformer.transformers
+package uk.ac.wellcome.transformer.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 
 /** Tests that the Miro transformer extracts the "subjects" field correctly.
   *
@@ -9,19 +10,19 @@ import uk.ac.wellcome.models.work.internal._
   *  from Miro will need cleaning before it's presented in the API (casing,
   *  names, etc.) -- these tests will become more complicated.
   */
-class MiroTransformableTransformerSubjectsTest
+class MiroSubjectsTest
     extends FunSpec
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should have an empty subject list on records without keywords") {
+  it("puts an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
       data = s""""image_title": "A snail without a subject"""",
-      expectedSubjects = List[Subject]()
+      expectedSubjects = List()
     )
   }
 
-  it("should use the image_keywords field if present") {
+  it("uses the image_keywords field if present") {
     transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A scorpion with a strawberry",
@@ -35,7 +36,7 @@ class MiroTransformableTransformerSubjectsTest
     )
   }
 
-  it("should use the image_keywords_unauth field if present") {
+  it("uses the image_keywords_unauth field if present") {
     transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A sweet seal gives you a sycamore",
@@ -49,7 +50,7 @@ class MiroTransformableTransformerSubjectsTest
   }
 
   it(
-    "should use the image_keywords and image_keywords_unauth fields if both present") {
+    "uses the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A squid, a sponge and a stingray walk into a bar",
@@ -65,41 +66,9 @@ class MiroTransformableTransformerSubjectsTest
     )
   }
 
-  it("should create an Item for each Work") {
-    val title = "A woodcut of a Weevil"
-    val longTitle = "A wonderful woodcut of a weird weevil"
-    val descriptionBody = "Woodcut, by A.R. Thropod.  Welsh.  1789."
-    val description = s"$longTitle\\n\\n$descriptionBody"
-    val work = transformWork(data = s"""
-        "image_title": "$title",
-        "image_image_desc": "$description"
-      """)
-
-    val item = work.items.head
-
-    val identifier =
-      SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
-        ontologyType = "Item",
-        value = "M0000001")
-
-    item shouldBe UnidentifiedItem(
-      identifier,
-      List(identifier),
-      List(
-        DigitalLocation(
-          locationType = "iiif-image",
-          url =
-            "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
-          license = License_CCBY
-        )
-      )
-    )
-  }
-
   private def transformRecordAndCheckSubjects(
     data: String,
-    expectedSubjects: List[Subject] = List()
+    expectedSubjects: List[Subject[AbstractConcept]] = List()
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.subjects shouldBe expectedSubjects

@@ -129,8 +129,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
                | "subjects": [
-               |   { "label":"a subject",
-               |     "type":"Subject",
+               |   { "label": "${subject.label}",
+               |     "type": "${subject.ontologyType}",
                |     "concepts":[
                |       {
                |         "label": "${subject.concepts(0).label}",
@@ -146,8 +146,8 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                |       }]}
                | ],
                | "genres": [
-               |   { "label":"a genre",
-               |     "type":"Genre",
+               |   { "label": "${genre.label}",
+               |     "type": "${genre.ontologyType}",
                |     "concepts":[
                |       {
                |         "label": "${genre.concepts(0).label}",

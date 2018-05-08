@@ -1,10 +1,15 @@
 package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
+class UnidentifiedWorkTest
+    extends FunSpec
+    with Matchers
+    with JsonTestUtil
+    with WorksUtil {
 
   private val license_CCBYJson =
     s"""{
@@ -54,9 +59,9 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |    }
       |  ],
       |  "workType": {
-      |    "id": "id",
-      |    "label": "label",
-      |    "ontologyType" : "WorkType"
+      |    "id": "${workType.id}",
+      |    "label": "${workType.label}",
+      |    "ontologyType" : "${workType.ontologyType}"
       |  },
       |  "description": "description",
       |  "physicalDescription": "$physicalDescription",
@@ -68,15 +73,25 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject",
+      |      "label": "${subject.label}",
+      |      "ontologyType": "${subject.ontologyType}",
       |      "concepts" : [
       |        {
-      |          "label" : "concept",
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "label" : "${subject.concepts(0).label}",
+      |          "ontologyType" : "${subject.concepts(0).ontologyType}",
+      |          "type" : "${subject.concepts(0).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(1).label}",
+      |          "ontologyType" : "${subject.concepts(1).ontologyType}",
+      |          "type" : "${subject.concepts(1).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(2).label}",
+      |          "ontologyType" : "${subject.concepts(2).ontologyType}",
+      |          "type" : "${subject.concepts(2).ontologyType}"
       |        }
-      |      ],
-      |      "ontologyType": "Subject"
+      |      ]
       |    }
       |  ],
       |  "contributors": [
@@ -94,13 +109,23 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "genres": [
       |    {
-      |      "label": "genre",
-      |      "ontologyType": "Genre",
+      |      "label": "${genre.label}",
+      |      "ontologyType": "${genre.ontologyType}",
       |      "concepts" : [
       |        {
-      |          "label" : "concept",
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "label" : "${genre.concepts(0).label}",
+      |          "ontologyType" : "${genre.concepts(0).ontologyType}",
+      |          "type" : "${genre.concepts(0).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${genre.concepts(1).label}",
+      |          "ontologyType" : "${genre.concepts(1).ontologyType}",
+      |          "type" : "${genre.concepts(1).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${genre.concepts(2).label}",
+      |          "ontologyType" : "${genre.concepts(2).ontologyType}",
+      |          "type" : "${genre.concepts(2).ontologyType}"
       |        }
       |      ]
       |    }
@@ -200,11 +225,6 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
 
   val publishers = List(Unidentifiable(publisher))
 
-  val workType = WorkType(
-    id = "id",
-    label = "label"
-  )
-
   val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
     sourceIdentifier = workIdentifier,
@@ -216,12 +236,12 @@ class UnidentifiedWorkTest extends FunSpec with Matchers with JsonTestUtil {
     extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
-    subjects = List(Subject("subject", List(Concept("concept")))),
+    subjects = List(subject),
     contributors = List(
       Contributor(
         agent = Unidentifiable(Agent("47"))
       )),
-    genres = List(Genre("genre", List(Concept("concept")))),
+    genres = List(genre),
     thumbnail = Some(location),
     items = List(item),
     publishers = publishers,
