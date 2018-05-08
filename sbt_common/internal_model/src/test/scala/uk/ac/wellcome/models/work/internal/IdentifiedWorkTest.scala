@@ -75,13 +75,23 @@ class IdentifiedWorkTest
       |  },
       |  "subjects": [
       |    {
-      |      "label": "subject",
-      |      "ontologyType": "Subject",
+      |      "label": "${subject.label}",
+      |      "ontologyType": "${subject.ontologyType}",
       |      "concepts" : [
       |        {
-      |          "label" : "concept",
-      |          "ontologyType" : "Concept",
-      |          "type" : "Concept"
+      |          "label" : "${subject.concepts(0).label}",
+      |          "ontologyType" : "${subject.concepts(0).ontologyType}",
+      |          "type" : "${subject.concepts(0).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(1).label}",
+      |          "ontologyType" : "${subject.concepts(1).ontologyType}",
+      |          "type" : "${subject.concepts(1).ontologyType}"
+      |        },
+      |        {
+      |          "label" : "${subject.concepts(2).label}",
+      |          "ontologyType" : "${subject.concepts(2).ontologyType}",
+      |          "type" : "${subject.concepts(2).ontologyType}"
       |        }
       |      ]
       |    }
@@ -229,7 +239,7 @@ class IdentifiedWorkTest
     extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
-    subjects = List(Subject("subject", List(Concept("concept")))),
+    subjects = List(subject),
     contributors = List(Contributor(agent = Unidentifiable(Agent("47")))),
     genres = List(genre),
     thumbnail = Some(location),

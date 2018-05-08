@@ -226,7 +226,7 @@ class UnidentifiedWorkTest
     extent = Some(extent),
     lettering = Some("lettering"),
     createdDate = Some(Period("period")),
-    subjects = List(Subject("subject", List(Concept("concept")))),
+    subjects = List(subject),
     contributors = List(
       Contributor(
         agent = Unidentifiable(Agent("47"))
