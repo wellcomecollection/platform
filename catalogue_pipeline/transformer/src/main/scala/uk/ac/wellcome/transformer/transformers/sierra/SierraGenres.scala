@@ -1,6 +1,14 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Genre,
+  MaybeDisplayable,
+  Period,
+  Place,
+  Unidentifiable
+}
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraGenres extends MarcUtils {
@@ -31,9 +39,9 @@ trait SierraGenres extends MarcUtils {
       val label = orderedSubfields.map(_.content).mkString(" - ")
       val concepts = orderedSubfields.map(subfield =>
         subfield.tag match {
-          case "y" => MaybeDisplayable[Period](label = subfield.content)
-          case "z" => MaybeDisplayable[Place](label = subfield.content)
-          case _ => MaybeDisplayable[Concept](label = subfield.content)
+          case "y" => Unidentifiable(Period(label = subfield.content))
+          case "z" => Unidentifiable(Place(label = subfield.content))
+          case _ => Unidentifiable(Concept(label = subfield.content))
       })
       Genre[MaybeDisplayable[AbstractConcept]](
         label = label,

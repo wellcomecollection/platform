@@ -1,6 +1,12 @@
 package uk.ac.wellcome.transformer.transformers.miro
 
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Genre,
+  MaybeDisplayable,
+  Unidentifiable
+}
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 
 trait MiroGenres {
@@ -11,7 +17,7 @@ trait MiroGenres {
     (miroData.physFormat.toList ++ miroData.lcGenre.toList).map { label =>
       Genre[MaybeDisplayable[AbstractConcept]](
         label = label,
-        concepts = List(MaybeDisplayable[Concept](label))
+        concepts = List(Unidentifiable(Concept(label)))
       )
     }.distinct
   }
