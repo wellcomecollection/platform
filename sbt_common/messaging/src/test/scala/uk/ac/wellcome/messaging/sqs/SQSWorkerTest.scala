@@ -1,23 +1,22 @@
 package uk.ac.wellcome.messaging.sqs
 
+import akka.actor.ActorSystem
 import org.mockito.Matchers.{any, anyDouble, anyString, matches}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito._
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.fixtures
+import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.collection.JavaConversions._
-import akka.actor.ActorSystem
-import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SQSWorkerTest
     extends FunSpec
@@ -89,6 +88,7 @@ class SQSWorkerTest
   it("does report an error when a runtime error occurs") {
     withFixtures {
       case (queue, metrics, worker) =>
+        reset(metrics)
         when(
           metrics.timeAndCount[Unit](
             anyString(),

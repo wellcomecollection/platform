@@ -1,7 +1,7 @@
 package uk.ac.wellcome.messaging.message
 
-import org.mockito.Matchers.{any, anyDouble, anyString, contains, matches}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
@@ -91,6 +91,7 @@ class MessageWorkerTest
   it("increments *_MessageProcessingFailure metric when not successful") {
     withMessageWorkerFixturesAndMockedMetrics {
       case (metrics, queue, bucket, worker) =>
+        reset(metrics)
         when(
           metrics.timeAndCount[Unit](
             anyString(),
