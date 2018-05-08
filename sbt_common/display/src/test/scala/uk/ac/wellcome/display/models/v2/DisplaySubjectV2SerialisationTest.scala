@@ -16,7 +16,7 @@ class DisplaySubjectV2SerialisationTest
         Unidentifiable(Concept("conceptLabel")),
         Unidentifiable(Period("periodLabel")),
         Identified(
-          id = "p4xe8u22",
+          canonicalId = "p4xe8u22",
           identifiers = List(SourceIdentifier(
             identifierScheme = IdentifierSchemes.libraryOfCongressNames,
             value = "lcsh/p4x",
@@ -42,7 +42,7 @@ class DisplaySubjectV2SerialisationTest
          |        "type" : "${subject.concepts(1).agent.ontologyType}"
          |      },
          |      {
-         |        "id": "${subject.concepts(2).id}",
+         |        "id": "${subject.concepts(2).canonicalId}",
          |        "identifiers": [${identifier(subject.concepts(2).identifiers(0))}],
          |        "label" : "${subject.concepts(2).agent.label}",
          |        "type" : "${subject.concepts(2).agent.ontologyType}"

@@ -185,8 +185,8 @@ class DisplayWorkV1SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [
-                          |       ${concept(concept0)},
-                          |       ${concept(concept1)} ],
+                          |       ${concept(concept0.agent)},
+                          |       ${concept(concept1.agent)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]

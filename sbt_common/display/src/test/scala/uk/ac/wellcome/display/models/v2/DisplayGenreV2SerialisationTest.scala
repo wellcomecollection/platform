@@ -17,7 +17,7 @@ class DisplayGenreV2SerialisationTest
         Unidentifiable(Concept("conceptLabel")),
         Unidentifiable(Place("placeLabel")),
         Identified(
-          id = "sqwyavpj",
+          canonicalId = "sqwyavpj",
           identifiers = List(SourceIdentifier(
             identifierScheme = IdentifierSchemes.libraryOfCongressNames,
             value = "lcsh/sqw",
@@ -43,7 +43,7 @@ class DisplayGenreV2SerialisationTest
          |        "type" : "${genre.concepts(1).agent.ontologyType}"
          |      },
          |      {
-         |        "id": "${genre.concepts(2).id}",
+         |        "id": "${genre.concepts(2).canonicalId}",
          |        "identifiers": [${identifier(genre.concepts(2).identifiers(0))}],
          |        "label" : "${genre.concepts(2).agent.label}",
          |        "type" : "${genre.concepts(2).agent.ontologyType}"

@@ -67,13 +67,13 @@ class DisplayConceptTest extends FunSpec with Matchers {
       value = "lcsh/zbm"
     )
 
-    assertDisplayPeriodIsCorrect(
+    assertDisplayConceptIsCorrect(
       concept = Identified(
         id = "nrzbm3ah",
         identifiers = List(sourceIdentifier),
         agent = Period(label = "never")
       ),
-      expectedDisplayPeriod = DisplayPeriod(
+      expectedDisplayConcept = DisplayPeriod(
         id = Some("nrzbm3ah"),
         identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
         label = "never"
@@ -88,13 +88,13 @@ class DisplayConceptTest extends FunSpec with Matchers {
       value = "lcsh/axt"
     )
 
-    assertDisplayPlaceIsCorrect(
+    assertDisplayConceptIsCorrect(
       concept = Identified(
         id = "axtswq4z",
         identifiers = List(sourceIdentifier),
         agent = Place(label = "anywhere")
       ),
-      expectedDisplayPlace = DisplayPlace(
+      expectedDisplayConcept = DisplayPlace(
         id = Some("axtswq4z"),
         identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
         label = "anywhere"
@@ -103,7 +103,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
   }
 
   private def assertDisplayConceptIsCorrect(
-    concept: Displayable[Concept],
+    concept: Displayable[AbstractConcept],
     expectedDisplayConcept: DisplayAbstractConcept
   ) = {
     val displayConcept = DisplayAbstractConcept(concept)
