@@ -14,7 +14,7 @@ trait Work extends Versioned {
   val extent: Option[String]
   val lettering: Option[String]
   val createdDate: Option[Period]
-  val subjects: List[Subject[AbstractConcept]]
+  val subjects: List[Subject[IdentityState[AbstractConcept]]]
   val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val genres: List[Genre[IdentityState[AbstractConcept]]]
   val thumbnail: Option[Location]
@@ -37,7 +37,7 @@ case class UnidentifiedWork(
   extent: Option[String] = None,
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
-  subjects: List[Subject[AbstractConcept]] = Nil,
+  subjects: List[Subject[MaybeDisplayable[AbstractConcept]]] = Nil,
   contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = Nil,
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]] = Nil,
   thumbnail: Option[Location] = None,
@@ -63,7 +63,7 @@ case class IdentifiedWork(
   extent: Option[String] = None,
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
-  subjects: List[Subject[AbstractConcept]] = Nil,
+  subjects: List[Subject[Displayable[AbstractConcept]]] = Nil,
   contributors: List[Contributor[Displayable[AbstractAgent]]] = Nil,
   genres: List[Genre[Displayable[AbstractConcept]]] = Nil,
   thumbnail: Option[Location] = None,
