@@ -1,7 +1,13 @@
 package uk.ac.wellcome.transformer.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractConcept,
+  Concept,
+  Genre,
+  MaybeDisplayable,
+  Unidentifiable
+}
 import uk.ac.wellcome.transformer.transformers.MiroTransformableWrapper
 
 class MiroGenresTest
@@ -22,7 +28,7 @@ class MiroGenresTest
         "image_title": "A goat grazes on some grass",
         "image_phys_format": "painting"
       """,
-      expectedGenres = List(Genre("painting", List(Concept("painting"))))
+      expectedGenres = List(Genre("painting", List(Unidentifiable(Concept("painting")))))
     )
   }
 
@@ -32,7 +38,7 @@ class MiroGenresTest
         "image_title": "Grouchy geese are good as guards",
         "image_lc_genre": "sculpture"
       """,
-      expectedGenres = List(Genre("sculpture", List(Concept("sculpture"))))
+      expectedGenres = List(Genre("sculpture", List(Unidentifiable(Concept("sculpture")))))
     )
   }
 
@@ -44,8 +50,8 @@ class MiroGenresTest
         "image_lc_genre": "woodwork"
       """,
       expectedGenres = List(
-        Genre("etching", List(Concept("etching"))),
-        Genre("woodwork", List(Concept("woodwork")))
+        Genre("etching", List(Unidentifiable(Concept("etching")))),
+        Genre("woodwork", List(Unidentifiable(Concept("woodwork"))))
       )
     )
   }
@@ -58,13 +64,13 @@ class MiroGenresTest
         "image_lc_genre": "oil painting"
       """,
       expectedGenres =
-        List(Genre("oil painting", List(Concept("oil painting"))))
+        List(Genre("oil painting", List(Unidentifiable(Concept("oil painting")))))
     )
   }
 
   private def transformRecordAndCheckGenres(
     data: String,
-    expectedGenres: List[Genre[AbstractConcept]] = List()
+    expectedGenres: List[Genre[MaybeDisplayable[AbstractConcept]]] = List()
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres
