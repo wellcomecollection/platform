@@ -51,7 +51,8 @@ class MessageStream[T](actorSystem: ActorSystem,
       }
       .runWith(SqsAckSink(messageReaderConfig.sqsConfig.queueUrl)(sqsClient))
 
-  private def readAndProcess(streamName: String, message: Message, process: T => Future[Unit]) = {
+  private def readAndProcess(streamName: String, message: Message, process: T => Future[Unit])(
+    implicit decoderT: Decoder[T]) = {
     val processMessageFuture = for {
       t <- read(message)
       _ <- process(t)

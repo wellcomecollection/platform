@@ -1,5 +1,7 @@
 package uk.ac.wellcome.messaging.message
 
+import java.util.concurrent.ConcurrentLinkedQueue
+
 import akka.actor.ActorSystem
 import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
@@ -29,33 +31,26 @@ class MessageStreamTest
     with ExtendedPatience
     with MetricsSenderFixture {
 
+
+  def process(list: ConcurrentLinkedQueue[ExampleObject])(o: ExampleObject) = {
+    list.add(o)
+    Future.successful(())
+  }
+
   it("reads messages off a queue, processes them and deletes them") {
-
     withMessageStreamFixtures {
-      case (bucket, messageStream, QueuePair(queue, dlq)) =>
-        val key = "message-key"
-        val exampleObject = ExampleObject("some value")
+      case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+        val exampleObject1 = ExampleObject("some value 1")
+        sendMessage(bucket, queue, exampleObject1)
+        val exampleObject2 = ExampleObject("some value 2")
+        sendMessage(bucket, queue, exampleObject2)
 
-        val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-        sqsClient.sendMessage(
-          queue.url,
-          notice
-        )
-
-        var received: List[ExampleObject] = Nil
-        val f = (o: ExampleObject) => {
-
-          synchronized {
-            received = o :: received
-          }
-
-          Future.successful(())
-        }
-        messageStream.foreach("test-stream", f)
+        messageStream.foreach(streamName = "test-stream", process = process(received))
 
         eventually {
-          received shouldBe List(exampleObject)
+          received should contain theSameElementsAs List(exampleObject1, exampleObject2)
 
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
@@ -65,70 +60,50 @@ class MessageStreamTest
   }
 
   it("increments *_ProcessMessage metric when successful") {
-    withMessageStreamFixturesMockedMetrics {
+    withMessageStreamFixtures {
       case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
-        val key = "message-key"
         val exampleObject = ExampleObject("some value")
 
-        val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        sendMessage(bucket, queue, exampleObject)
 
-        sqsClient.sendMessage(
-          queue.url,
-          notice
-        )
-
-        var received: List[ExampleObject] = Nil
-        val f = (o: ExampleObject) => {
-
-          synchronized {
-            received = o :: received
-          }
-
-          Future.successful(())
-        }
-        messageStream.foreach("test-stream", f)
+        val received = new ConcurrentLinkedQueue[ExampleObject]()
+        messageStream.foreach(streamName = "test-stream", process = process(received))
 
         eventually {
-          verify(metricsSender, times(1)).timeAndCount(equalTo("test-stream_ProcessMessage"), any())
+          verify(metricsSender, times(1)).timeAndCount(equalTo("test-stream_ProcessMessage"), any[() => Future[Unit]]())
         }
     }
   }
 
     it("fails gracefully when NotificationMessage cannot be deserialised") {
-      withMessageStreamFixturesMockedMetrics {
+      withMessageStreamFixtures {
         case (_, messageStream, QueuePair(queue, dlq), metricsSender) =>
           sqsClient.sendMessage(
             queue.url,
             "not valid json"
           )
 
-          var received: List[ExampleObject] = Nil
-          val f = (o: ExampleObject) => {
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-            synchronized {
-              received = o :: received
-            }
-
-            Future.successful(())
-          }
-
-          messageStream.foreach("test-stream", f)
+          messageStream.foreach(streamName = "test-stream", process = process(received))
 
           eventually {
 
           verify(metricsSender, never())
             .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
-          received shouldBe Nil
+          received shouldBe empty
 
             assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+            assertQueueHasSize(dlq, size = 1)
           }
       }
     }
 
     it("does not fail gracefully when the s3 object cannot be retrieved") {
-      withMessageStreamFixturesMockedMetrics {
+      withMessageStreamFixtures {
         case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+          val streamName = "test-stream"
+
           val key = "key.json"
 
           // Do NOT put S3 object here
@@ -151,84 +126,56 @@ class MessageStreamTest
             serialisedExampleNotification
           )
 
-          var received: List[ExampleObject] = Nil
-          val f = (o: ExampleObject) => {
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-            synchronized {
-              received = o :: received
-            }
-
-            Future.successful(())
-          }
-
-          messageStream.foreach("test-stream", f)
+          messageStream.foreach(streamName = streamName, process = process(received))
 
         eventually {
           verify(metricsSender, times(3)).incrementCount(
             metricName = "test-stream_MessageProcessingFailure",
             count = 1.0)
 
-            received shouldBe Nil
+            received shouldBe empty
 
             assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+            assertQueueHasSize(dlq, size = 1)
           }
       }
     }
 
   it("continues reading if processing of some messages fails ") {
-      withMessageStreamFixtures {
-        case (bucket, messageStream, QueuePair(queue, dlq)) =>
-          val key = "message-key"
-          val exampleObject = ExampleObject("some value")
+    withMessageStreamFixtures {
+        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+          val exampleObject1 = ExampleObject("some value 1")
+          val exampleObject2 = ExampleObject("some value 2")
 
           sqsClient.sendMessage(
             queue.url,
             "not valid json"
           )
 
-          val firstNotice =
-            put(exampleObject, S3ObjectLocation(bucket.name, key))
-
-          sqsClient.sendMessage(
-            queue.url,
-            firstNotice
-          )
+          sendMessage(bucket, queue, exampleObject1)
 
           sqsClient.sendMessage(
             queue.url,
             "another not valid json"
           )
 
-          val secondNotice =
-            put(exampleObject, S3ObjectLocation(bucket.name, key))
+          sendMessage(bucket, queue, exampleObject2)
 
-          sqsClient.sendMessage(
-            queue.url,
-            secondNotice
-          )
-
-          var received: List[ExampleObject] = Nil
-          val f = (o: ExampleObject) => {
-
-            synchronized {
-              received = o :: received
-            }
-
-            Future.successful(())
-          }
-          messageStream.foreach("test-stream", f)
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
+          messageStream.foreach(streamName = "test-stream", process = process(received))
 
           eventually {
-            received shouldBe List(exampleObject, exampleObject)
+            received should contain theSameElementsAs List(exampleObject1, exampleObject2)
 
             assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 2)
+            assertQueueHasSize(dlq, size = 2)
           }
       }
     }
 
-    def withMessageStreamFixturesMockedMetrics[R](
+    def withMessageStreamFixtures[R](
                                       testWith: TestWith[(Bucket,
                                         MessageStream[ExampleObject],
                                         QueuePair,
@@ -238,33 +185,12 @@ class MessageStreamTest
       withActorSystem { actorSystem =>
           withLocalS3Bucket { bucket =>
             withLocalSqsQueueAndDlq {
-              case queuePair@QueuePair(queue, dlq) =>
+              case queuePair@QueuePair(queue, _) =>
                 withMockMetricSender { metricsSender =>
                   withMessageStream(actorSystem, bucket, queue, metricsSender) { stream =>
                     testWith((bucket, stream, queuePair, metricsSender))
                   }
 
-            }
-          }
-        }
-      }
-    }
-
-
-    def withMessageStreamFixtures[R](
-                                      testWith: TestWith[(Bucket,
-                                        MessageStream[ExampleObject],
-                                        QueuePair),
-                                        R]) = {
-
-      withActorSystem { actorSystem =>
-          withLocalS3Bucket { bucket =>
-            withLocalSqsQueueAndDlq {
-              case queuePair@QueuePair(queue, dlq) =>
-                withMetricsSender(actorSystem) { metricsSender =>
-                withMessageStream(actorSystem, bucket, queue, metricsSender) { stream =>
-                  testWith((bucket, stream, queuePair))
-                }
             }
           }
         }
