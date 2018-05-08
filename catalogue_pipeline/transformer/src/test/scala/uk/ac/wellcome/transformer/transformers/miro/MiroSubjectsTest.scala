@@ -28,11 +28,7 @@ class MiroSubjectsTest
         "image_title": "A scorpion with a strawberry",
         "image_keywords": ["animals", "arachnids", "fruit"]
       """,
-      expectedSubjects = List(
-        Subject(label = "animals", concepts = List(Concept("animals"))),
-        Subject(label = "arachnids", concepts = List(Concept("arachnids"))),
-        Subject(label = "fruit", concepts = List(Concept("fruit")))
-      )
+      expectedSubjectLabels = List("animals", "arachnids", "fruit")
     )
   }
 
@@ -42,10 +38,7 @@ class MiroSubjectsTest
         "image_title": "A sweet seal gives you a sycamore",
         "image_keywords_unauth": ["altruism", "mammals"]
       """,
-      expectedSubjects = List(
-        Subject(label = "altruism", concepts = List(Concept("altruism"))),
-        Subject(label = "mammals", concepts = List(Concept("mammals")))
-      )
+      expectedSubjectLabels = List("altruism", "mammals")
     )
   }
 
@@ -57,20 +50,18 @@ class MiroSubjectsTest
         "image_keywords": ["humour"],
         "image_keywords_unauth": ["marine creatures"]
       """,
-      expectedSubjects = List(
-        Subject(label = "humour", concepts = List(Concept("humour"))),
-        Subject(
-          label = "marine creatures",
-          concepts = List(Concept("marine creatures")))
-      )
+      expectedSubjectLabels = List("humour", "marine creatures")
     )
   }
 
   private def transformRecordAndCheckSubjects(
     data: String,
-    expectedSubjects: List[Subject[AbstractConcept]] = List()
+    expectedSubjectLabels: List[String] = List()
   ) = {
     val transformedWork = transformWork(data = data)
+    val expectedSubjects = expectedSubjectLabels.map { label =>
+      Subject(label = label, concepts = List(Concept(label)))
+    }
     transformedWork.subjects shouldBe expectedSubjects
   }
 }
