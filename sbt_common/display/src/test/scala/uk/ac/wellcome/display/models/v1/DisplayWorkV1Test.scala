@@ -229,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val displayWork = DisplayWorkV1(work)
-    displayWork.publicationDate shouldBe Some(DisplayPeriod("c1900"))
+    displayWork.publicationDate shouldBe Some(DisplayPeriodV1("c1900"))
   }
 
   it("gets the physicalDescription from a Work") {

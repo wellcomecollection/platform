@@ -47,7 +47,7 @@ case class DisplayWorkV1(
     dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
     value =
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
-  ) createdDate: Option[DisplayPeriod] = None,
+  ) createdDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
@@ -83,12 +83,12 @@ case class DisplayWorkV1(
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
     value = "Show a list of places of publication."
-  ) placesOfPublication: List[DisplayPlace] = List(),
+  ) placesOfPublication: List[DisplayPlaceV1] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
-  ) publicationDate: Option[DisplayPeriod] = None,
+  ) publicationDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
@@ -120,7 +120,7 @@ case object DisplayWorkV1 {
       physicalDescription = work.physicalDescription,
       extent = work.extent,
       lettering = work.lettering,
-      createdDate = work.createdDate.map { DisplayPeriod(_) },
+      createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
           DisplayAbstractAgent(contributor.agent)
@@ -146,8 +146,8 @@ case object DisplayWorkV1 {
           })
         else None,
       publishers = work.publishers.map(DisplayAbstractAgent(_)),
-      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
-      placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
+      publicationDate = work.publicationDate.map { DisplayPeriodV1(_) },
+      placesOfPublication = work.placesOfPublication.map { DisplayPlaceV1(_) },
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )
