@@ -24,7 +24,8 @@ class MessageStream[T](actorSystem: ActorSystem,
                        sqsClient: AmazonSQSAsync,
                        s3Client: AmazonS3,
                        messageReaderConfig: MessageReaderConfig,
-                       metricsSender: MetricsSender) extends Logging{
+                       metricsSender: MetricsSender)
+    extends Logging {
   val decider: Supervision.Decider = {
     case _: Exception => Supervision.Resume
     case _ => Supervision.Stop
@@ -44,15 +45,19 @@ class MessageStream[T](actorSystem: ActorSystem,
     SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
       .mapAsyncUnordered(10) { message =>
         val metricName = s"${streamName}_ProcessMessage"
-        metricsSender.timeAndCount(metricName, () => readAndProcess(streamName, message, process))
+        metricsSender.timeAndCount(
+          metricName,
+          () => readAndProcess(streamName, message, process))
       }
       .map { m =>
         (m, MessageAction.Delete)
       }
       .runWith(SqsAckSink(messageReaderConfig.sqsConfig.queueUrl)(sqsClient))
 
-  private def readAndProcess(streamName: String, message: Message, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T]) = {
+  private def readAndProcess(
+    streamName: String,
+    message: Message,
+    process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
     val processMessageFuture = for {
       t <- read(message)
       _ <- process(t)
