@@ -14,11 +14,11 @@ trait WorksUtil {
     label = "An aggregation of angry archipelago aged ankylosaurs."
   )
   val subject = Subject[AbstractConcept](
-    "a subject created by WorksUtil",
-    List(
-      Concept("a subject concept"),
-      Place("a subject place"),
-      Period("a subject period")))
+    label = "a subject created by WorksUtil",
+    concept = List(
+      Unidentifiable(Concept("a subject concept")),
+      Unidentifiable(Place("a subject place")),
+      Unidentifiable(Period("a subject period"))))
 
   val genre = Genre[Unidentifiable[AbstractConcept]](
     label = "an unidentified genre created by WorksUtil",
