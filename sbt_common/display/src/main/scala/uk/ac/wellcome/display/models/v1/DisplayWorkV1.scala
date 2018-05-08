@@ -44,7 +44,7 @@ case class DisplayWorkV1(
     value = "Recording written text on a (usually visual) work."
   ) lettering: Option[String] = None,
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v1.DisplayPeriodV1",
     value =
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriodV1] = None,
@@ -81,11 +81,11 @@ case class DisplayWorkV1(
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgent] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayPlace]",
+    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayPlaceV1]",
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlaceV1] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayPeriod",
+    dataType = "uk.ac.wellcome.display.models.v1.DisplayPeriodV1",
     value =
       "Relates the publication of a work to a date when the work has been formally published."
   ) publicationDate: Option[DisplayPeriodV1] = None,
