@@ -27,6 +27,12 @@ We propose to build a storage service based on AWS S3 and DynamoDb.
   - Confirm checksums match from processing location
   - Create a `StorageManifest` describing the stored object
 
+### Terminology
+
+- **Accession**: A BagIt "bag"
+- **SQS Autoscaling Service**: An ECS service autoscaling on SQS queue length as defined in https://github.com/wellcometrust/terraform-modules/tree/master/sqs_autoscaling_service
+- **Storage manifest**: A file describing the contents of an accession after ingest and containing a pointer to the stored accession.
+
 ### File formats
 
 We propose to use following file formats as mentioned above:
