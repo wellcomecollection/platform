@@ -10,9 +10,13 @@ class DisplayAbstractConceptSerialisationTest
     with DisplaySerialisationTestBase
     with JsonMapperTestUtil {
 
-  it("constructs a DisplayConcept from a Concept correctly") {
+  it("serialises an unidentified DisplayConcept") {
     assertObjectMapsToJson(
-      DisplayConcept(Unidentifiable(Concept("conceptLabel"))),
+      DisplayConcept(
+        id = None,
+        identifiers = None,
+        label = "conceptLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "conceptLabel",
@@ -22,9 +26,13 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it("serialises a DisplayPeriod constructed from a Period correctly") {
+  it("serialises an unidentified DisplayPeriod") {
     assertObjectMapsToJson(
-      DisplayPeriod(Unidentifiable(Period("periodLabel"))),
+      DisplayPeriod(
+        id = None,
+        identifiers = None,
+        label = "periodLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "periodLabel",
@@ -34,9 +42,13 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it("serialises a DisplayPlace constructed from a Place correctly") {
+  it("serialises an unidentified DisplayPlace") {
     assertObjectMapsToJson(
-      DisplayPlace(Unidentifiable(Place("placeLabel"))),
+      DisplayPlace(
+        id = None,
+        identifiers = None,
+        label = "placeLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "placeLabel",
@@ -48,7 +60,7 @@ class DisplayAbstractConceptSerialisationTest
 
   it("constructs a DisplayConcept from an identified") {
     val concept = Identified(
-      id = "uq4bt5us",
+      canonicalId = "uq4bt5us",
       identifiers = List(SourceIdentifier(
         identifierScheme = IdentifierSchemes.libraryOfCongressNames,
         ontologyType = "Concept",
@@ -61,36 +73,12 @@ class DisplayAbstractConceptSerialisationTest
       DisplayConcept(concept),
       expectedJson = s"""
          |  {
-         |    "id": "${concept.id}",
+         |    "id": "${concept.canonicalId}",
          |    "identifiers": [${concept.identifiers}],
          |    "label" : "${concept.agent.label}",
          |    "type"  : "${concept.agent.ontologyType}"
          |  }
           """.stripMargin
-    )
-  }
-
-  it("serialises a DisplayPeriod constructed from a Period correctly") {
-    assertObjectMapsToJson(
-      DisplayPeriod(Unidentifiable(Period("periodLabel"))),
-      expectedJson = s"""
-         |  {
-         |    "label" : "periodLabel",
-         |    "type"  : "Period"
-         |  }
-          """.stripMargin
-    )
-  }
-
-  it("serialises a DisplayPlace constructed from a Place correctly") {
-    assertObjectMapsToJson(
-      DisplayPlace(Unidentifiable(Place("placeLabel"))),
-      expectedJson = s"""
-         |  {
-         |    "label" : "placeLabel",
-         |    "type"  : "Place"
-         |  }
-         """.stripMargin
     )
   }
 

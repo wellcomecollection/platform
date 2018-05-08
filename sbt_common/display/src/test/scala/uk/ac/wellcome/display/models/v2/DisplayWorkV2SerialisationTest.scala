@@ -178,8 +178,8 @@ class DisplayWorkV2SerialisationTest
       identifiers = List(),
       canonicalId = "test_subject1",
       subjects = List(
-        Subject("label", List(Unidentified(Concept("fish")))),
-        Subject("label", List(Unidentified(Concept("gardening")))))
+        Subject("label", List(Unidentifiable(Concept("fish")))),
+        Subject("label", List(Unidentifiable(Concept("gardening")))))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
