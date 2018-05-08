@@ -197,18 +197,22 @@ class MessageStreamTest
                         MetricsSender),
                        R]) = {
 
-      withActorSystem { actorSystem =>
-          withLocalS3Bucket { bucket =>
-            withLocalSqsQueueAndDlq {
-              case queuePair@QueuePair(queue, _) =>
-                withMockMetricSender { metricsSender =>
-                  withMessageStream[ExampleObject,R](actorSystem, bucket, queue, metricsSender) { stream =>
-                    testWith((bucket, stream, queuePair, metricsSender))
-                  }
+    withActorSystem { actorSystem =>
+      withLocalS3Bucket { bucket =>
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, _) =>
+            withMockMetricSender { metricsSender =>
+              withMessageStream[ExampleObject, R](
+                actorSystem,
+                bucket,
+                queue,
+                metricsSender) { stream =>
+                testWith((bucket, stream, queuePair, metricsSender))
+              }
 
             }
-          }
         }
       }
     }
+  }
 }

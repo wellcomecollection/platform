@@ -217,7 +217,11 @@ trait Messaging
     }
   }
 
-  def withMessageStream[T,R](actorSystem: ActorSystem, bucket: Bucket, queue: SQS.Queue, metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R]) = {
+  def withMessageStream[T, R](
+    actorSystem: ActorSystem,
+    bucket: Bucket,
+    queue: SQS.Queue,
+    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig = SQSConfig(
       queueUrl = queue.url,

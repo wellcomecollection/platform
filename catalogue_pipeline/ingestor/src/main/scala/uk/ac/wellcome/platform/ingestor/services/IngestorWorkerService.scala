@@ -6,7 +6,11 @@ import com.twitter.inject.annotations.Flag
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.{MessageReader, MessageStream, MessageWorker}
+import uk.ac.wellcome.messaging.message.{
+  MessageReader,
+  MessageStream,
+  MessageWorker
+}
 import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
 import uk.ac.wellcome.monitoring.MetricsSender
@@ -21,9 +25,9 @@ class IngestorWorkerService @Inject()(
   @Flag("es.index.v2") esIndexV2: String,
   identifiedWorkIndexer: WorkIndexer,
   messageStream: MessageStream[IdentifiedWork],
-  system: ActorSystem){
+  system: ActorSystem) {
 
-  messageStream.foreach(this.getClass.getSimpleName,processMessage)
+  messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =

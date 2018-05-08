@@ -21,11 +21,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
-class MessageStream[T]@Inject()(actorSystem: ActorSystem,
-                       sqsClient: AmazonSQSAsync,
-                       s3Client: AmazonS3,
-                       messageReaderConfig: MessageReaderConfig,
-                       metricsSender: MetricsSender)
+class MessageStream[T] @Inject()(actorSystem: ActorSystem,
+                                 sqsClient: AmazonSQSAsync,
+                                 s3Client: AmazonS3,
+                                 messageReaderConfig: MessageReaderConfig,
+                                 metricsSender: MetricsSender)
     extends Logging {
   val decider: Supervision.Decider = {
     case _: Exception => Supervision.Resume
