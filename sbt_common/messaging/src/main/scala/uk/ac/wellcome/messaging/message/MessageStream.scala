@@ -24,11 +24,11 @@ class MessageStream[T](actorSystem: ActorSystem,
                        s3Client: AmazonS3,
                        messageReaderConfig: MessageReaderConfig,
                        metricsSender: MetricsSender) extends Logging{
-  implicit val system = actorSystem
   val decider: Supervision.Decider = {
     case _: Exception => Supervision.Resume
     case _ => Supervision.Stop
   }
+  implicit val system = actorSystem
   implicit val materializer = ActorMaterializer(
     ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   implicit val dispatcher = system.dispatcher
@@ -38,16 +38,16 @@ class MessageStream[T](actorSystem: ActorSystem,
     s3Config = messageReaderConfig.s3Config
   )
 
-  def foreach(name: String, f: T => Future[Unit])(
+  def foreach(name: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
     SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
       .mapAsyncUnordered(10) { message =>
-        val eventualMessage = for {
+        val processMessageFuture = for {
           t <- read(message)
-          _ <- f(t)
+          _ <- process(t)
         } yield message
 
-        eventualMessage.onFailure {
+        processMessageFuture.onFailure {
           case exception: GracefulFailureException =>
             logger.warn(s"Failure processing message", exception)
           case exception: Exception =>
@@ -57,7 +57,7 @@ class MessageStream[T](actorSystem: ActorSystem,
               1.0)
         }
         val metricName = s"${name}_ProcessMessage"
-        metricsSender.timeAndCount(metricName, () => eventualMessage)
+        metricsSender.timeAndCount(metricName, () => processMessageFuture)
       }
       .map { m =>
         (m, MessageAction.Delete)
