@@ -60,7 +60,7 @@ class MiroSubjectsTest
   ) = {
     val transformedWork = transformWork(data = data)
     val expectedSubjects = expectedSubjectLabels.map { label =>
-      Subject(label = label, concepts = List(Concept(label)))
+      Subject(label = label, concepts = List(Unidentifiable(Concept(label))))
     }
     transformedWork.subjects shouldBe expectedSubjects
   }
