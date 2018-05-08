@@ -17,31 +17,15 @@ trait MiroSubjects {
    */
   def getSubjects(
     miroData: MiroTransformableData): List[Subject[AbstractConcept]] = {
-    val keywords: List[Subject[AbstractConcept]] = miroData.keywords match {
-      case Some(k) =>
-        k.map { keyword =>
-          Subject[AbstractConcept](
-            label = keyword,
-            concepts = List(Concept(keyword))
-          )
-        }
-      case None =>
-        List()
+    val keywords: List[String] = miroData.keywords.getOrElse(List())
+
+    val keywordsUnauth: List[String] = miroData.keywordsUnauth.getOrElse(List())
+
+    (keywords ++ keywordsUnauth).map { keyword =>
+      Subject[AbstractConcept](
+        label = keyword,
+        concepts = List(Unidentifiable(Concept(keyword)))
+      )
     }
-
-    val keywordsUnauth: List[Subject[AbstractConcept]] =
-      miroData.keywordsUnauth match {
-        case Some(k) =>
-          k.map { keyword =>
-            Subject[AbstractConcept](
-              label = keyword,
-              concepts = List(Concept(keyword))
-            )
-          }
-        case None =>
-          List()
-      }
-
-    keywords ++ keywordsUnauth
   }
 }
