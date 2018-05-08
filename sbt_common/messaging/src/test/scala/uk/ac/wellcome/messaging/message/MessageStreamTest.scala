@@ -200,14 +200,14 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
             s3Config = s3Config
           )
 
-          val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig, keyPrefixGenerator)
+          val stream = new MessageStream[ExampleObject](actorSystem, asyncSqsClient, s3Client, messageConfig)
           testWith((bucket, stream, queuePair))
         }
       }
     }
   }
 
-  class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig, keyPrefixGenerator: KeyPrefixGenerator[T]) {
+  class MessageStream[T](actorSystem: ActorSystem, sqsClient: AmazonSQSAsync, s3Client: AmazonS3, messageReaderConfig: MessageReaderConfig) {
     implicit val system = actorSystem
     val decider: Supervision.Decider = {
       case _: Exception => Supervision.Resume
@@ -217,8 +217,7 @@ class MessageStreamTest extends FunSpec with Matchers with Messaging with Akka w
 
     val s3ObjectStore = new S3ObjectStore[T](
       s3Client = s3Client,
-      s3Config = messageReaderConfig.s3Config,
-      keyPrefixGenerator = keyPrefixGenerator
+      s3Config = messageReaderConfig.s3Config
     )
 
     def foreach(f: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Done] = SqsSource(messageReaderConfig.sqsConfig.queueUrl)(sqsClient)
