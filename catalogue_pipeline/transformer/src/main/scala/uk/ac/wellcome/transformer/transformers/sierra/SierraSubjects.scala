@@ -1,15 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  MaybeDisplayable,
-  Period,
-  Place,
-  Subject,
-  Unidentifiable
-}
-import uk.ac.wellcome.transformer.source.SierraBibData
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, MaybeDisplayable, Period, Place, Subject, Unidentifiable}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
 trait SierraSubjects extends MarcUtils {
 
@@ -20,52 +12,88 @@ trait SierraSubjects extends MarcUtils {
       getSubjectsForMarcTag(bibData, "651")
   }
 
-  // Populate wwork:subjects
+  // Populate wwork:subject
   //
-  // Use MARC fields "650", "648", "651"
+  // Use MARC field "650", "648" and "651".
   //
-  // Each Subject type is populated with label and concepts
+  // Within these MARC tags, we have:
   //
-  //   - Subject.label is concatenated subfields a,v,x,y,z in order separated by a hyphen ' - '.
-  //   - Subject.concepts is a List populated with a primary Concept with label from subfield 'a', and
-  //     type:
-  //       650 => Concept
-  //       648 => Period
-  //       651 => Place
-  //     for subfields v,x,y,z Subject.concepts are populated in order with Concept.label and type:
-  //       * v => Concept
-  //       * x => Concept
-  //       * y => Period
-  //       * z => Place
+  //    - a primary concept (subfield $a); and
+  //    - subdivisions (subfields $v, $x, $y and $z)
+  //
+  // The primary concept can be identified, and the subdivisions serve
+  // to add extra context.
+  //
+  // We construct the Subject as follows:
+  //
+  //    - label is the concatenation of $a, $v, $x, $y and $z in order,
+  //      separated by a hyphen ' - '.
+  //    - concepts is a List[Concept] populated in order of the subfields:
+  //
+  //        * $a => {Concept, Period, Place}
+  //          Optionally with an identifier.  We look in subfield $0 for the
+  //          identifier value, then second indicator for the authority.
+  //          These are decided as follows:
+  //
+  //            - 650 => Concept
+  //            - 648 => Period
+  //            - 651 => Place
+  //
+  //        * $v => Concept
+  //        * $x => Concept
+  //        * $y => Period
+  //        * $z => Place
+  //
+  //      Note that only concepts from subfield $a are identified; everything
+  //      else is unidentified.
   //
   private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String) = {
     val subfieldsList = getMatchingSubfields(
-      bibData,
-      marcTag = marcTag,
-      marcSubfieldTags = List("a", "v", "x", "y", "z"))
+      bibData, marcTag, marcSubfieldTags = List("a", "v", "x", "y", "z"))
+
     subfieldsList.map(subfields => {
-      val (subfieldsA, rest) = subfields.partition(_.tag == "a")
-      val orderedSubfields = subfieldsA ++ rest
-      val subjectLabel = orderedSubfields.map(_.content).mkString(" - ")
-      val concepts = orderedSubfields.map(subfield =>
-        subfield.tag match {
-          case "a" => Unidentifiable(primaryConcept(marcTag, subfield.content))
-          case "y" => Unidentifiable(Period(label = subfield.content))
-          case "z" => Unidentifiable(Place(label = subfield.content))
-          case _ => Unidentifiable(Concept(label = subfield.content))
-      })
+      val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
+
+      val label = getSubjectLabel(primarySubfields, subdivisionSubfields)
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(marcTag, primarySubfields) ++ getSubdivisions(subdivisionSubfields)
+
       Subject[MaybeDisplayable[AbstractConcept]](
-        label = subjectLabel,
+        label = label,
         concepts = concepts
       )
     })
   }
 
-  private def primaryConcept(marcTag: String, label: String) = {
-    marcTag match {
-      case "650" => Concept(label)
-      case "648" => Period(label)
-      case "651" => Place(label)
+  // Get the subject label.  This is populated by the label of subfield $a, followed
+  // by other subfields, in the order they come from MARC.  The labels are
+  // joined by " - ".
+  private def getSubjectLabel(primarySubfields: List[MarcSubfield], subdivisionSubfields: List[MarcSubfield]): String = {
+    val orderedSubfields = primarySubfields ++ subdivisionSubfields
+    orderedSubfields.map { _.content }.mkString(" - ")
+  }
+
+  // Extract the primary concept, which comes from subfield $a.  This is the
+  // only concept which might be identified.
+  private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[Concept]] = {
+    primarySubfields.map { subfield =>
+      marcTag match {
+        case "650" => Unidentifiable(Concept(label = subfield.content))
+        case "648" => Unidentifiable(Period(label = subfield.content))
+        case "651" => Unidentifiable(Place(label = subfield.content))
+      }
+
+    }
+  }
+
+  // Extract the subdivisions, which come from everything except subfield $a.
+  // These are never identified.  We preserve the order from MARC.
+  private def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[Unidentifiable[AbstractConcept]] = {
+    subdivisionSubfields.map { subfield =>
+      subfield.tag match {
+        case "v" | "w" => Unidentifiable(Concept(label = subfield.content))
+        case "y" => Unidentifiable(Period(label = subfield.content))
+        case "z" => Unidentifiable(Place(label = subfield.content))
+      }
     }
   }
 }
