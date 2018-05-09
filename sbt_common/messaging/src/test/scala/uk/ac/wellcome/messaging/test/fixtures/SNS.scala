@@ -117,7 +117,8 @@ trait SNS {
   }
 }
 
-case class Messages(topics: List[TopicInfo], messages: Option[List[MessageInfo]])
+case class Messages(topics: List[TopicInfo],
+                    messages: Option[List[MessageInfo]])
 case class TopicInfo(arn: String, name: String)
 case class MessageInfo(@JsonProperty(":id") messageId: String,
                        @JsonProperty(":message") message: String,

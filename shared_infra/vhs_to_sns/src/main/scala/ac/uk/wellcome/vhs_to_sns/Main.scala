@@ -34,10 +34,17 @@ class Main {
   def toMessagePointer(event: DynamodbEvent) = {
     val dynamoFormat = implicitly[DynamoFormat[HybridRecord]]
 
-    val buffer = event.getRecords.map(dynamoDbStreamRecord => dynamoFormat.read(new AttributeValue().withM(dynamoDbStreamRecord.getDynamodb.getNewImage)).right.get)
+    val buffer = event.getRecords.map(
+      dynamoDbStreamRecord =>
+        dynamoFormat
+          .read(new AttributeValue().withM(
+            dynamoDbStreamRecord.getDynamodb.getNewImage))
+          .right
+          .get)
 
     buffer.foreach(hybridRecord => {
-      val messagePointer = MessagePointer(S3ObjectLocation(sys.env.get("BUCKET_NAME").get, hybridRecord.s3key))
+      val messagePointer = MessagePointer(
+        S3ObjectLocation(sys.env.get("BUCKET_NAME").get, hybridRecord.s3key))
       snsClient.publish(
         sys.env.get("TOPIC_ARN").get,
         messagePointer.asJson.noSpaces
@@ -48,29 +55,36 @@ class Main {
   private def buildClient(config: Either[LocalEndpointConfig, AWSConfig]) = {
     val standardSnsClient = AmazonSNSClientBuilder.standard
     config match {
-      case Right(awsConfig) => standardSnsClient
-        .withRegion(awsConfig.region)
-        .build()
-      case Left(localEndpointConfig) => standardSnsClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(localEndpointConfig.accessKey, localEndpointConfig.secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(localEndpointConfig.endpoint, "localhost"))
-        .build()
+      case Right(awsConfig) =>
+        standardSnsClient
+          .withRegion(awsConfig.region)
+          .build()
+      case Left(localEndpointConfig) =>
+        standardSnsClient
+          .withCredentials(
+            new AWSStaticCredentialsProvider(
+              new BasicAWSCredentials(
+                localEndpointConfig.accessKey,
+                localEndpointConfig.secretKey)))
+          .withEndpointConfiguration(new EndpointConfiguration(
+            localEndpointConfig.endpoint,
+            "localhost"))
+          .build()
     }
 
   }
 }
 
-case class LocalEndpointConfig(endpoint: String, accessKey: String, secretKey: String)
+case class LocalEndpointConfig(endpoint: String,
+                               accessKey: String,
+                               secretKey: String)
 case class MessagePointer(src: S3ObjectLocation)
 case class HybridRecord(
-                         id: String,
-                         version: Int,
-                         s3key: String
-                       )
+  id: String,
+  version: Int,
+  s3key: String
+)
 case class S3ObjectLocation(bucket: String, key: String)
 case class AWSConfig(
-                      region: String
-                    )
+  region: String
+)
