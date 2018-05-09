@@ -21,7 +21,7 @@ trait SierraConcepts {
   protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
     subdivisionSubfields.map { subfield =>
       subfield.tag match {
-        case "v" | "w" => Unidentifiable(Concept(label = subfield.content))
+        case "v" | "x" => Unidentifiable(Concept(label = subfield.content))
         case "y" => Unidentifiable(Period(label = subfield.content))
         case "z" => Unidentifiable(Place(label = subfield.content))
       }
