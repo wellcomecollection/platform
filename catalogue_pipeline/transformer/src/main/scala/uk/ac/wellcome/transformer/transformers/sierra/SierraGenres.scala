@@ -64,16 +64,4 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
       buildPrimaryConcept[Concept](subfield)
     }
   }
-
-  // Extract the subdivisions, which come from everything except subfield $a.
-  // These are never identified.  We preserve the order from MARC.
-  private def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
-    subdivisionSubfields.map { subfield =>
-      subfield.tag match {
-        case "v" | "w" => Unidentifiable(Concept(label = subfield.content))
-        case "y" => Unidentifiable(Period(label = subfield.content))
-        case "z" => Unidentifiable(Place(label = subfield.content))
-      }
-    }
-  }
 }
