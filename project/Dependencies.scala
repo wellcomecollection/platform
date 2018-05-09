@@ -29,10 +29,6 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
 
-  val awsDependencies: Seq[ModuleID] = Seq(
-    "com.amazonaws" % "aws-java-sdk" % versions.aws
-  )
-
   val dynamoDependencies: Seq[ModuleID] = Seq(
     "com.gu" %% "scanamo" % versions.scanamo
   )
@@ -109,13 +105,22 @@ object Dependencies {
   // We use Circe for all our JSON serialisation, but our local SNS container
   // returns YAML, and currently we use Jackson to parse that YAML.
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
-  val commonMessagingDependencies = commonDependencies ++ awsDependencies ++ jacksonDependencies ++ Seq(
+  val commonMessagingDependencies = commonDependencies ++ jacksonDependencies ++ Seq(
+    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
+    "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
+    "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
+    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3
   )
 
-  val commonStorageDependencies = commonDependencies ++ awsDependencies ++ dynamoDependencies
+  val commonStorageDependencies = commonDependencies ++ dynamoDependencies ++ Seq(
+    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
+    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
+  )
 
-  val commonMonitoringDependencies = commonDependencies ++ awsDependencies
+  val commonMonitoringDependencies = commonDependencies ++ Seq(
+    "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
+  )
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 

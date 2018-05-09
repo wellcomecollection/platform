@@ -1,12 +1,8 @@
 package uk.ac.wellcome.messaging.sqs
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.cloudwatch.model.PutMetricDataResult
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException
 import io.circe.Decoder
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.Matchers
@@ -14,6 +10,7 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.fixtures._
@@ -31,29 +28,18 @@ class SQSWorkerToDynamoTest
     with Eventually
     with ExtendedPatience
     with Akka
+    with MetricsSenderFixture
     with SQS {
-
-  val mockPutMetricDataResult = mock[PutMetricDataResult]
-  val mockCloudWatch = mock[AmazonCloudWatch]
-
-  when(mockCloudWatch.putMetricData(any())).thenReturn(mockPutMetricDataResult)
-
-  private val metricsSender: MetricsSender =
-    new MetricsSender(
-      "namespace",
-      100 milliseconds,
-      mockCloudWatch,
-      ActorSystem())
 
   val testMessage = TestSqsMessage()
 
   val testMessageJson = toJson(testMessage).get
 
-  class TestWorker(queue: Queue, system: ActorSystem)
+  class TestWorker(metrics: MetricsSender, queue: Queue, system: ActorSystem)
       extends SQSWorkerToDynamo[TestObject](
         new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
         system,
-        metricsSender) {
+        metrics) {
 
     override lazy val poll = 100 millisecond
 
@@ -71,31 +57,38 @@ class SQSWorkerToDynamoTest
     }
   }
 
-  type TestWorkerFactory = (Queue, ActorSystem) => TestWorker
+  type TestWorkerFactory = (MetricsSender, Queue, ActorSystem) => TestWorker
 
-  def defaultTestWorkerFactory(queue: Queue, system: ActorSystem) =
-    new TestWorker(queue, system)
+  def defaultTestWorkerFactory(metrics: MetricsSender,
+                               queue: Queue,
+                               system: ActorSystem) =
+    new TestWorker(metrics, queue, system)
 
-  def conditionalCheckFailingTestWorkerFactory(queue: Queue,
+  def conditionalCheckFailingTestWorkerFactory(metrics: MetricsSender,
+                                               queue: Queue,
                                                system: ActorSystem) =
-    new TestWorker(queue, system) {
+    new TestWorker(metrics, queue, system) {
       override def store(record: TestObject): Future[Unit] = Future {
         throw new ConditionalCheckFailedException("Wrong!")
       }
     }
 
-  def terminalTestWorkerFactory(queue: Queue, system: ActorSystem) =
-    new TestWorker(queue, system) {
+  def terminalTestWorkerFactory(metrics: MetricsSender,
+                                queue: Queue,
+                                system: ActorSystem) =
+    new TestWorker(metrics, queue, system) {
       override def store(record: TestObject): Future[Unit] = Future {
         throw new RuntimeException("Wrong!")
       }
     }
 
-  def withTestWorker[R](
-    testWorkFactory: TestWorkerFactory)(system: ActorSystem, queue: Queue) =
+  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
+    metrics: MetricsSender,
+    queue: Queue,
+    system: ActorSystem) =
     fixture[TestWorker, R](
       create = {
-        testWorkFactory(queue, system)
+        testWorkFactory(metrics, queue, system)
       },
       destroy = { worker =>
         worker.stop()
@@ -106,9 +99,12 @@ class SQSWorkerToDynamoTest
     testWorkFactory: TestWorkerFactory = defaultTestWorkerFactory
   )(testWith: TestWith[(ActorSystem, Queue, TestWorker), R]): R =
     withActorSystem[R] { actorSystem =>
-      withLocalSqsQueue[R] { q =>
-        withTestWorker[R](testWorkFactory)(actorSystem, q) { worker =>
-          testWith((actorSystem, q, worker))
+      withMetricsSender(actorSystem) { metrics =>
+        withLocalSqsQueue[R] { queue =>
+          withTestWorker[R](testWorkFactory)(metrics, queue, actorSystem) {
+            worker =>
+              testWith((actorSystem, queue, worker))
+          }
         }
       }
     }
