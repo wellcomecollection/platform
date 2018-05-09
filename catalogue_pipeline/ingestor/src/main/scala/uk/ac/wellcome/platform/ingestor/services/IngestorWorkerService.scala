@@ -1,15 +1,11 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.message.{MessageReader, MessageWorker}
-import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -20,12 +16,12 @@ class IngestorWorkerService @Inject()(
   @Flag("es.index.v1") esIndexV1: String,
   @Flag("es.index.v2") esIndexV2: String,
   identifiedWorkIndexer: WorkIndexer,
-  messageReader: MessageReader[IdentifiedWork],
-  system: ActorSystem,
-  metrics: MetricsSender)
-    extends MessageWorker[IdentifiedWork](messageReader, system, metrics) {
+  messageStream: MessageStream[IdentifiedWork],
+  system: ActorSystem) {
 
-  override def processMessage(work: IdentifiedWork): Future[Unit] = {
+  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+
+  def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =
       Future.fromTry(Try(decideTargetIndices(work)))
     futureIndices.flatMap(indices => {
@@ -35,9 +31,9 @@ class IngestorWorkerService @Inject()(
       }
     })
   }
-
-  override implicit val decoder: Decoder[IdentifiedWork] =
-    deriveDecoder[IdentifiedWork]
+  def stop(): Future[Terminated] = {
+    system.terminate()
+  }
 
   // This method returns the indices where a work is to be ingested.
   // * Miro works are indexed in both v1 and v2 indices.

@@ -19,6 +19,7 @@ object SNSClientModule extends TwitterModule {
     flag[String]("aws.sns.accessKey", "", "AccessKey to access SNS")
   private val secretKey =
     flag[String]("aws.sns.secretKey", "", "SecretKey to access SNS")
+
   @Singleton
   @Provides
   def providesSNSClient(awsConfig: AWSConfig): AmazonSNS = {

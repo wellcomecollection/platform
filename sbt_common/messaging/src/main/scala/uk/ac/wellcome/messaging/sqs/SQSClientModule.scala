@@ -40,4 +40,21 @@ object SQSClientModule extends TwitterModule {
         .build()
   }
 
+  @Singleton
+  @Provides
+  def providesSQSAsyncClient(awsConfig: AWSConfig): AmazonSQSAsync = {
+    val sqsClientBuilder = AmazonSQSAsyncClientBuilder.standard
+    if (sqsEndpoint().isEmpty)
+      sqsClientBuilder
+        .withRegion(awsConfig.region)
+        .build()
+    else
+      sqsClientBuilder
+        .withEndpointConfiguration(
+          new EndpointConfiguration(sqsEndpoint(), awsConfig.region))
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(accessKey(), secretKey())))
+        .build()
+  }
+
 }

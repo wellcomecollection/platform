@@ -186,14 +186,17 @@ class IngestorWorkerServiceTest
     testWith: TestWith[IngestorWorkerService, R]): R = {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withMessageReader[IdentifiedWork, R](bucket, queue) { messageReader =>
+        withMessageStream[IdentifiedWork, R](
+          actorSystem,
+          bucket,
+          queue,
+          metricsSender) { messageStream =>
           val service = new IngestorWorkerService(
             esIndexV1 = esIndexV1,
             esIndexV2 = esIndexV2,
             identifiedWorkIndexer = workIndexer,
-            messageReader = messageReader,
-            system = actorSystem,
-            metrics = metricsSender
+            messageStream = messageStream,
+            system = actorSystem
           )
 
           testWith(service)
