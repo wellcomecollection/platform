@@ -1,31 +1,39 @@
 # Archival Storage Service
 
+**Last updated: 9 May 2018.**
+
 ## Problem Statement
 
-In order to provide archivists with reliable long term digital storage of both digitised and "born-digital" assets we need a service that can: 
+We need to provide a service for storing digital assets.
 
-- Ensure safe long term storage assets of digitised assets
-- Follow industry practises around file integrity and audit trails
-- Provide a scalable mechinsm for indetifying and retrieving content
+This service should:
+
+*   Ensure the safe, long-term (i.e. decades) storage of our digital assets
+*   Support both digitised and ["born-digital"][borndigital] assets
+*   Follow industry best-practices around file integrity and audit trails
+*   Provide a scalable mechanism for identifying, retrieving, and storing content
+
+[borndigital]: https://en.wikipedia.org/wiki/Born-digital
 
 ## Suggested Solution
 
-We propose to build a storage service based on AWS S3 and DynamoDb. 
+We will build a storage service based on Amazon S3 and DynamoDB.
 
-![archival storage service - page 1](https://user-images.githubusercontent.com/953792/39753255-0987d2fe-52b6-11e8-97ee-633ac09e1a9e.png)
+![archival storage service - page 1](storage_service.png)
 
-### Process flow
+-   New assets are uploaded to an Ingest bucket in S3.
+    These assets are gzip-compressed files in the [Bagit format][bagit], a common format for storing collections of digital files.
 
-- Work is uploaded in gzipped BagIt format to S3 to an "Ingest Bucket"
-- The S3 event stream triggers an AWS Lambda, translating the event to an SNS notification
-- The "Archival Service" picks up work as an [SQS Autoscaling Service](https://github.com/wellcometrust/terraform-modules/tree/master/sqs_autoscaling_service) subscribed to the topic.
-- The Archival Service performs the following operations:
-  - Obtain a filestream of the uploaded compressed artefact from its ingest location
-  - Stream the decompressed artefact to a processing location
-  - Confirm that files match those described by the BagIt metadata
-  - Move the BagIt folder to a storage location
-  - Confirm checksums match from processing location
-  - Create a `StorageManifest` describing the stored object
+-   The event stream from S3 triggers the Archival Storage Service, which:
+
+    1.  Retrieves a copy of the Bagit file from the Ingest bucket
+    2.  Decompresses the Bagit file, and copies it to a short-term Processing bucket.
+        It validates the file -- i.e., checks that the contents match those described by the Bagit metadata.
+    3.  Assuming the contents are correct, it copies the files to a long-term Storage bucket.
+    4.  It compares checksums between the short-term and long-term storage, to check the transfer was successful.
+    5.  It creates a storage manifest describing the stored object, and saves the manifest to the Versioned Hybrid Store (a transactional store for large objects using S3 and DynamoDB).
+
+[bagit]: https://en.wikipedia.org/wiki/BagIt
 
 ### Ingest
 
@@ -34,18 +42,19 @@ We'll need to consider integrations with other services such as:
 - [archivematica](https://www.archivematica.org/en/)
 - [goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/)
 
-These services will need to provide accessions in the BagIt bag format, gzipped and uploaded to an S3 location.
+These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket.
 
 ### Onward processing
 
-The architecture described here makes use of the "Versioned Hybrid Store", so can via a dynamo event stream / lambda / sns mechanism publish update events further downstream to be consumed by the catalogue pipeline, or to feed another search index (like ElasticSearch), reindexing capability is already demonstrated by the Versioned Hybrid Store.
+The Versioned Hybrid Store which holds the Storage Manifests provides an event stream of updates.
 
-### Terminology
+This event stream can be used to trigger downstream tasks, for example:
 
-- **Accession**: A BagIt "bag"
-- **SQS Autoscaling Service**: An ECS service autoscaling on SQS queue length as defined in https://github.com/wellcometrust/terraform-modules/tree/master/sqs_autoscaling_service
-- **Storage manifest**: A file describing the contents of an accession after ingest and containing a pointer to the stored accession.
-- **Versioned Hybrid Store**: A set of [https://github.com/wellcometrust/platform/tree/master/sbt_common/storage/src/main/scala/uk/ac/wellcome/storage/vhs](software libraries) wrapping interactions with dynamo and S3 to provide a transactional typed large object store.
+*   Sending a file for processing in our catalogue pipeline
+*   Feeding a search index (e.g. Elasticsearch)
+
+The Versioned Hybrid Store also includes the ability to "reindex" the entire data store.
+This triggers an update event for every item in the data store, allowing you to re-run a downstream pipeline.
 
 ### File formats
 
@@ -53,7 +62,7 @@ We propose to use following file formats as mentioned above:
 
 #### Storage Manifest
 
-The storage manifest is intended to provide a pointer to the stored accession, the location of any derivitaves and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession.
+The storage manifest provides a pointer to the stored accession, the location of any derivatives and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession.
 
 ```json
 {
@@ -69,11 +78,10 @@ The storage manifest is intended to provide a pointer to the stored accession, t
 
 An archival file format:
 
-```
-The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
+> The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
+>
+> - a “data” directory that includes the payload, or data files that comprise the digital content being preserved. Files can also be placed in subdirectories, but empty directories are not supported
+> - at least one manifest file that itemizes the filenames present in the “data” directory, as well as their checksums. The particular checksum algorithm is included as part of the manifest filename. For instance a manifest file with MD5 checksums is named “manifest-md5.txt”
+> - a “bagit.txt” file that identifies the directory as a bag, the version of the BagIt specification that it adheres to, and the character encoding used for tag files
 
-- a “data” directory that includes the payload, or data files that comprise the digital content being preserved. Files can also be placed in subdirectories, but empty directories are not supported
-- at least one manifest file that itemizes the filenames present in the “data” directory, as well as their checksums. The particular checksum algorithm is included as part of the manifest filename. For instance a manifest file with MD5 checksums is named “manifest-md5.txt”
-- a “bagit.txt” file that identifies the directory as a bag, the version of the BagIt specification that it adheres to, and the character encoding used for tag files
-```
-From: [BagIt](https://en.wikipedia.org/wiki/BagIt)
+From: [BagIt on Wikipedia](https://en.wikipedia.org/wiki/BagIt)
