@@ -127,6 +127,11 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
 
+lazy val vhs_to_sns = doSharedLibrarySetup(project, "shared_infra/vhs_to_sns")
+  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.vhsToSnsDependencies)
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -136,6 +141,7 @@ lazy val root = (project in file("."))
     common_messaging,
     common_monitoring,
     common_storage,
+    vhs_to_sns,
     api,
     ingestor,
     transformer,
