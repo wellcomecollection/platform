@@ -18,7 +18,7 @@ class MiroSubjectsTest
   it("puts an empty subject list on records without keywords") {
     transformRecordAndCheckSubjects(
       data = s""""image_title": "A snail without a subject"""",
-      expectedSubjects = List()
+      expectedSubjectLabels = List()
     )
   }
 
