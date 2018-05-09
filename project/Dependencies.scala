@@ -106,7 +106,6 @@ object Dependencies {
   // returns YAML, and currently we use Jackson to parse that YAML.
   // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
   val commonMessagingDependencies = commonDependencies ++ jacksonDependencies ++ Seq(
-    "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
