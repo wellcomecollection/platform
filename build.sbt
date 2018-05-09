@@ -20,6 +20,14 @@ def doSharedLibrarySetup(project: Project, folder: String) =
     .enablePlugins(DockerComposePlugin)
     .enablePlugins(JavaAppPackaging)
 
+def doLambdaSetup(project: Project, folder: String) =
+  project
+    .in(new File(folder))
+    .settings(Common.settings: _*)
+    .settings(DockerCompose.settings: _*)
+    .settings(retrieveManaged := true)
+    .enablePlugins(DockerComposePlugin)
+
 def doSharedSierraSetup(project: Project, folder: String) =
   doServiceSetup(project = project, folder = folder)
     .dependsOn(sierra_adapter_common % "compile->compile;test->test")
@@ -127,6 +135,20 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
 
+lazy val vhs_to_sns = doLambdaSetup(project, "shared_infra/vhs_to_sns")
+  .dependsOn(common_messaging % "test->test")
+  .settings(
+    mainClass in assembly := Some("uk.ac.wellcome.vhs_to_sns.Main"),
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
+    test in assembly := {}
+
+  )
+  .settings(libraryDependencies ++= Dependencies.vhsToSnsDependencies)
+
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -136,6 +158,7 @@ lazy val root = (project in file("."))
     common_messaging,
     common_monitoring,
     common_storage,
+    vhs_to_sns,
     api,
     ingestor,
     transformer,

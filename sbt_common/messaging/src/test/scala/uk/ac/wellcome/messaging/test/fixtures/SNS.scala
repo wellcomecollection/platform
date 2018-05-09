@@ -113,11 +113,12 @@ trait SNS {
 
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
     val messages = mapper.readValue(string, classOf[Messages])
-    messages.messages.filter(_.topic_arn == topic.arn)
+    messages.messages.getOrElse(Nil).filter(_.topic_arn == topic.arn)
   }
 }
 
-case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
+case class Messages(topics: List[TopicInfo],
+                    messages: Option[List[MessageInfo]])
 case class TopicInfo(arn: String, name: String)
 case class MessageInfo(@JsonProperty(":id") messageId: String,
                        @JsonProperty(":message") message: String,
