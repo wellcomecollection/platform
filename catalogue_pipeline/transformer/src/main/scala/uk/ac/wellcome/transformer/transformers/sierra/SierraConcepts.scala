@@ -61,13 +61,15 @@ trait SierraConcepts extends MarcUtils {
 
   // Extract the subdivisions, which come from everything except subfield $a.
   // These are never identified.  We preserve the order from MARC.
-  protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
-    subdivisionSubfields.map { subfield =>
+  protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[Unidentifiable[AbstractConcept]] = {
+    val concepts: List[AbstractConcept] = subdivisionSubfields.map { subfield =>
       subfield.tag match {
-        case "v" | "x" => Unidentifiable(Concept(label = subfield.content))
-        case "y" => Unidentifiable(Period(label = subfield.content))
-        case "z" => Unidentifiable(Place(label = subfield.content))
+        case "v" | "x" => Concept(label = subfield.content)
+        case "y" => Period(label = subfield.content)
+        case "z" => Place(label = subfield.content)
       }
     }
+
+    concepts.map { Unidentifiable(_) }
   }
 }
