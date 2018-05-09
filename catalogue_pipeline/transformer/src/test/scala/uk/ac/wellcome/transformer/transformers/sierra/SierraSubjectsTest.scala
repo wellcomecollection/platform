@@ -241,23 +241,25 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       varFields = List(
         VarField(
           fieldTag = "p",
-          marcTag = "655",
+          marcTag = "650",
           indicator1 = "",
 
           // LCSH heading
           indicator2 = "0",
           subfields = List(
+            MarcSubfield(tag = "a", content = "absence"),
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
         VarField(
           fieldTag = "p",
-          marcTag = "655",
+          marcTag = "650",
           indicator1 = "",
 
           // MESH heading
           indicator2 = "2",
           subfields = List(
+            MarcSubfield(tag = "a", content = "abolition"),
             MarcSubfield(tag = "0", content = "mesh/456")
           )
         )
@@ -277,11 +279,12 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       )
     )
 
-    val subject = transformer.getSubjects(bibData).head
-    val actualSourceIdentifiers = subject.concepts.map {
-      case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
-      case other => assert(false, other)
-    }
+    val actualSourceIdentifiers = transformer.getSubjects(bibData)
+      .map { _.concepts.head }
+      .map {
+        case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+        case other => assert(false, other)
+      }
 
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
