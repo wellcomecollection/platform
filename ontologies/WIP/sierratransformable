@@ -441,19 +441,19 @@
    *  },
    */
 
-   /* Populate wwork:productionEvents 260
+   /* Populate wwork:production 260
    * 
    * 1. For bibliographic records where "260" is populated
    * 2. Populate "places" from subfield "a" and type as "Place".
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "periods" from subfield "c" and type as "Periods"    
-   * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
-   * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
-   * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
+   * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "productionFunction" with "Manufacture".
+   * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "productionFunction" with "Manufacture".       
+   * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "productionFunction" with "Manufacture".
    *
    * Example:
    *
-   *  "productionEvents": [
+   *  "production": [
    *    {
    *      "places": [
    *        {
@@ -461,11 +461,11 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "function": {
+   *      "productionFunction": {
    *        "label": "Publication",
-   *        "type": "Function"
+   *        "type": "Concept"
    *      },
-   *      "startDates": [
+   *      "dates": [
    *        {
    *          "label": "2 May 2018",
    *          "type": "Period"
@@ -486,9 +486,9 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "function": {
+   *      "productionFunction": {
    *        "label": "Manufacture",
-   *        "type": "Function"
+   *        "type": "Concept"
    *      },
    *      "dates": [
    *        {
@@ -508,17 +508,17 @@
    *
    */
 
-   /* Populate wwork:productionEvents 264
+   /* Populate wwork:production 264
    * 
    * 1. For bibliographic records where "264" is populated
    * 2. Populate "places" from subfield "a" and type as "Place".
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "dates" from subfield "c" and type as "Periods"    
-   * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Function".
+   * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept".
    *
    * Example:
    *
-   *  "productionEvents": [
+   *  "production": [
    *    {
    *      "places": [
    *        {
@@ -526,9 +526,9 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "function": {
+   *      "productionFunction": {
    *        "label": "Publication",
-   *        "type": "Function"
+   *        "type": "Concept"
    *      },
    *      "dates": [
    *        {
@@ -551,11 +551,11 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "function": {
+   *      "productionFunction": {
    *        "label": "Manufacture",
    *        "type": "Function"
    *      },
-   *      "startDates": [
+   *      "dates": [
    *        {
    *          "label": "2 May 2018",
    *          "type": "Period"
