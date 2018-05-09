@@ -36,6 +36,7 @@ resource "aws_dynamodb_table" "table" {
     ignore_changes = [
       "read_capacity",
       "write_capacity",
+      "global_secondary_index", # ignore all as Terraform doesn't currently allow ignoring specifically global_secondary_index.write_capacity and global_secondary_index.read_capacity
     ]
   }
 }
