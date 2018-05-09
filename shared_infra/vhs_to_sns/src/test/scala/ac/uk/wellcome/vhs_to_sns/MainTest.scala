@@ -5,11 +5,9 @@ import com.amazonaws.services.lambda.runtime.events.DynamodbEvent
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent.DynamodbStreamRecord
 import com.gu.scanamo.DynamoFormat
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
-import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.utils.JsonUtil._
+import io.circe.parser._
+import io.circe.generic.auto._
 
 import scala.collection.JavaConversions._
 
@@ -40,7 +38,7 @@ class MainTest extends FunSpec with Messaging {
         eventually {
           val messages = listMessagesReceivedFromSNS(topic)
 
-          messages.map(message => fromJson[MessagePointer](message.message).get) should contain only (MessagePointer(S3ObjectLocation(bucketName, s3Key)))
+          messages.map(message => decode[MessagePointer](message.message).right.get) should contain only (MessagePointer(S3ObjectLocation(bucketName, s3Key)))
         }
       }
   }

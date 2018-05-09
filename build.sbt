@@ -25,6 +25,7 @@ def doLambdaSetup(project: Project, folder: String) =
     .in(new File(folder))
     .settings(Common.settings: _*)
     .settings(DockerCompose.settings: _*)
+    .settings(retrieveManaged := true)
     .enablePlugins(DockerComposePlugin)
 
 def doSharedSierraSetup(project: Project, folder: String) =
@@ -135,9 +136,18 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
 
 lazy val vhs_to_sns = doLambdaSetup(project, "shared_infra/vhs_to_sns")
-  .dependsOn(common_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(common_messaging % "test->test")
+  .settings(
+    mainClass in assembly := Some("uk.ac.wellcome.vhs_to_sns.Main"),
+    assemblyMergeStrategy in assembly := {
+      case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+      case x => MergeStrategy.first
+    },
+    test in assembly := {}
+
+  )
   .settings(libraryDependencies ++= Dependencies.vhsToSnsDependencies)
+
 
 lazy val root = (project in file("."))
   .aggregate(

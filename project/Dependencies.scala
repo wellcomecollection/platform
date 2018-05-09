@@ -119,8 +119,9 @@ object Dependencies {
 
   val vhsToSnsDependencies: Seq[ModuleID] = Seq(
     "com.amazonaws" % "aws-lambda-java-core" % "1.2.0",
-    "com.amazonaws" % "aws-lambda-java-events" % "2.1.0"
-  )
+    "com.amazonaws" % "aws-lambda-java-events" % "2.1.0",
+    "com.amazonaws" % "aws-java-sdk-sns" % versions.aws
+  ) ++ circeDependencies ++ dynamoDependencies
 
   val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
 
