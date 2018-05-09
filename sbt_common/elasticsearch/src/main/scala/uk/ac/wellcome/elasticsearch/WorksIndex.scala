@@ -65,36 +65,19 @@ class WorksIndex @Inject()(client: HttpClient,
   def subject(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType"),
-    concept("concepts")
+    identified("concepts", concept)
   )
 
   def genre(fieldName: String) = objectField(fieldName).fields(
     textField("label"),
     keywordField("ontologyType"),
-    concept("concepts")
+    identified("concepts", concept)
   )
 
-  def concept(fieldName: String) = objectField(fieldName).fields(
+  val concept = Seq(
     textField("label"),
     keywordField("ontologyType"),
-    keywordField("type"),
-    keywordField("qualifierType"),
-    objectField("qualifiers").fields(
-      textField("label"),
-      keywordField("ontologyType"),
-      keywordField("qualifierType")
-    ),
-    // Nested concept -- if qualified concept
-    objectField("concept").fields(
-      textField("label"),
-      keywordField("ontologyType"),
-      keywordField("qualifierType"),
-      objectField("qualifiers").fields(
-        textField("label"),
-        keywordField("ontologyType"),
-        keywordField("qualifierType")
-      )
-    )
+    keywordField("type")
   )
 
   def labelledTextField(fieldName: String) = objectField(fieldName).fields(
