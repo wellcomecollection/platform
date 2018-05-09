@@ -34,7 +34,7 @@ trait SierraConcepts extends MarcUtils {
           case None => None
           case Some("0") => Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
           case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
-          case _ => throw new RuntimeException("Unrecognised identifier scheme: ")
+          case Some(scheme) => throw new RuntimeException(s"Unrecognised identifier scheme: $scheme")
         }
 
         maybeIdentifierScheme match {
