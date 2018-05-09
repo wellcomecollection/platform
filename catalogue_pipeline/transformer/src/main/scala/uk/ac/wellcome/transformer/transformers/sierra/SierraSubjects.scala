@@ -55,7 +55,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(marcTag, primarySubfields) ++ getSubdivisions(subdivisionSubfields)
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(marcTag, primarySubfields, bibData = bibData) ++ getSubdivisions(subdivisionSubfields)
 
       Subject[MaybeDisplayable[AbstractConcept]](
         label = label,
@@ -66,12 +66,21 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.
-  private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
+  private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield], bibData: SierraBibData): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       marcTag match {
-        case "650" => buildPrimaryConcept[Concept](subfield)
-        case "648" => buildPrimaryConcept[Period](subfield)
-        case "651" => buildPrimaryConcept[Place](subfield)
+        case "650" => identifyPrimaryConcept(
+          concept = Concept(label = subfield.content),
+          bibData = bibData
+        )
+        case "648" => identifyPrimaryConcept(
+          concept = Period(label = subfield.content),
+          bibData = bibData
+        )
+        case "651" => identifyPrimaryConcept(
+          concept = Place(label = subfield.content),
+          bibData = bibData
+        )
       }
 
     }

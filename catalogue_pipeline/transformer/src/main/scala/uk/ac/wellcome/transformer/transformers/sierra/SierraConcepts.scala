@@ -13,8 +13,10 @@ trait SierraConcepts {
     orderedSubfields.map { _.content }.mkString(" - ")
   }
 
-  protected def buildPrimaryConcept[T <: AbstractConcept](subfield: MarcSubfield): MaybeDisplayable[AbstractConcept] =
-    Unidentifiable(T(label = subfield.content))
+  protected def buildPrimaryConcept[T <: AbstractConcept](
+    concept: AbstractConcept,
+    bibData: SierraBibData): MaybeDisplayable[AbstractConcept] =
+    Unidentifiable(agent = concept)
 
   // Extract the subdivisions, which come from everything except subfield $a.
   // These are never identified.  We preserve the order from MARC.

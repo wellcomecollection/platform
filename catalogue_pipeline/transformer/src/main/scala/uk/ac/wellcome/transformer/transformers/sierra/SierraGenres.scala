@@ -48,7 +48,7 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
       val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields) ++ getSubdivisions(subdivisionSubfields)
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields, bibData = bibData) ++ getSubdivisions(subdivisionSubfields)
 
       Genre[MaybeDisplayable[AbstractConcept]](
         label = label,
@@ -59,9 +59,12 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.
-  private def getPrimaryConcept(primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[Concept]] = {
+  private def getPrimaryConcept(primarySubfields: List[MarcSubfield], bibData: SierraBibData): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
-      buildPrimaryConcept[Concept](subfield)
+      identifyPrimaryConcept(
+        concept = Concept(label = subfield.content),
+        bibData = bibData
+      )
     }
   }
 }
