@@ -1,9 +1,11 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre, MaybeDisplayable, Period, Place, Unidentifiable}
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
+import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
 trait SierraGenres extends MarcUtils with SierraConcepts {
+
+  private val marcTag = "655"
 
   // Populate wwork:genres
   //
@@ -37,33 +39,35 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
   //
   def getGenres(
     bibData: SierraBibData): List[Genre[MaybeDisplayable[AbstractConcept]]] = {
-    getGenresForMarcTag(bibData, "655")
+    getGenresForMarcTag(bibData, marcTag)
   }
 
   private def getGenresForMarcTag(bibData: SierraBibData, marcTag: String) = {
-    val subfieldsList =
-      getMatchingSubfields(bibData, marcTag, List("a", "v", "x", "y", "z"))
+    val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
-    subfieldsList.map(subfields => {
+    marcVarFields.map { varField =>
+      val subfields = varField.subfields.filter { subfield =>
+        List("a", "v", "x", "y", "z").contains( subfield.tag )
+      }
       val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields, bibData = bibData) ++ getSubdivisions(subdivisionSubfields)
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields, varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
       Genre[MaybeDisplayable[AbstractConcept]](
         label = label,
         concepts = concepts
       )
-    })
+    }
   }
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.
-  private def getPrimaryConcept(primarySubfields: List[MarcSubfield], bibData: SierraBibData): List[MaybeDisplayable[AbstractConcept]] = {
+  private def getPrimaryConcept(primarySubfields: List[MarcSubfield], varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       identifyPrimaryConcept(
         concept = Concept(label = subfield.content),
-        bibData = bibData
+        varField = varField
       )
     }
   }
