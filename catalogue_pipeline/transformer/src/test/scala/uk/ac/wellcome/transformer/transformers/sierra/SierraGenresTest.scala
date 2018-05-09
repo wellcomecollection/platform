@@ -188,7 +188,7 @@ class SierraGenresTest extends FunSpec with Matchers {
 
   it(s"gets identifiers from subfield $$0") {
     val bibData = SierraBibData(
-      id = "b3478621",
+      id = "b9161816",
       title = Some("Impish iguanas inside igloos"),
       varFields = List(
         VarField(
@@ -199,6 +199,7 @@ class SierraGenresTest extends FunSpec with Matchers {
           // LCSH heading
           indicator2 = "0",
           subfields = List(
+            MarcSubfield(tag = "a", content = "absence"),
             MarcSubfield(tag = "0", content = "lcsh/123")
           )
         ),
@@ -210,6 +211,7 @@ class SierraGenresTest extends FunSpec with Matchers {
           // MESH heading
           indicator2 = "2",
           subfields = List(
+            MarcSubfield(tag = "a", content = "abolition"),
             MarcSubfield(tag = "0", content = "mesh/456")
           )
         )
@@ -229,13 +231,65 @@ class SierraGenresTest extends FunSpec with Matchers {
       )
     )
 
-    val genre = transformer.getGenres(bibData).head
-    val actualSourceIdentifiers = genre.concepts.map {
-      case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
-      case other => assert(false, other)
-    }
+    val actualSourceIdentifiers = transformer.getGenres(bibData)
+      .map { _.concepts.head }
+      .map {
+        case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+        case other => assert(false, other)
+      }
 
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
+  }
+
+  it(s"throws an error if it sees an unrecognised identifier scheme") {
+    val bibData = SierraBibData(
+      id = "b7816189",
+      title = Some("Under the universal umbrella"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "655",
+          indicator1 = "",
+          indicator2 = "7",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "absence"),
+            MarcSubfield(tag = "0", content = "u/xxx")
+          )
+        )
+      )
+    )
+
+    val caught = intercept[RuntimeException] {
+      transformer.getGenres(bibData)
+    }
+
+    caught.getMessage shouldEqual "Unrecognised identifier scheme: 7"
+  }
+
+  it(s"throws an error if it sees too many subfield $$0 instances") {
+    val bibData = SierraBibData(
+      id = "b0918723",
+      title = Some("Zig, zag, zero"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "655",
+          indicator1 = "",
+          indicator2 = "2",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "zany"),
+            MarcSubfield(tag = "0", content = "u/xxx"),
+            MarcSubfield(tag = "0", content = "u/yyy")
+          )
+        )
+      )
+    )
+
+    val caught = intercept[RuntimeException] {
+      transformer.getGenres(bibData)
+    }
+
+    caught.getMessage shouldEqual "Too many identifiers fields: List(MarcSubfield(0,u/xxx), MarcSubfield(0,u/yyy))"
   }
 
   private val transformer = new SierraGenres {}
