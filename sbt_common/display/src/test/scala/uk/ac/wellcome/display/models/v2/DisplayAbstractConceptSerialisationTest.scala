@@ -74,7 +74,7 @@ class DisplayAbstractConceptSerialisationTest
       expectedJson = s"""
          |  {
          |    "id": "${concept.canonicalId}",
-         |    "identifiers": [${concept.identifiers}],
+         |    "identifiers": [${identifier(concept.identifiers(0))}],
          |    "label" : "${concept.agent.label}",
          |    "type"  : "${concept.agent.ontologyType}"
          |  }
