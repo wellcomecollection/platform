@@ -447,9 +447,9 @@
    * 2. Populate "places" from subfield "a" and type as "Place".
    * 3. Populate "agents" from subfield "b" and type as "Agent"
    * 4. Populate "periods" from subfield "c" and type as "Periods"    
-   * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "productionFunction" with "Manufacture".
-   * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "productionFunction" with "Manufacture".       
-   * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "productionFunction" with "Manufacture".
+   * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
+   * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
+   * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
    *
    * Example:
    *
@@ -461,7 +461,7 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "productionFunction": {
+   *      "function": {
    *        "label": "Publication",
    *        "type": "Concept"
    *      },
@@ -486,7 +486,7 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "productionFunction": {
+   *      "function": {
    *        "label": "Manufacture",
    *        "type": "Concept"
    *      },
@@ -526,7 +526,7 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "productionFunction": {
+   *      "function": {
    *        "label": "Publication",
    *        "type": "Concept"
    *      },
@@ -551,7 +551,7 @@
    *          "type": "Place"
    *        }
    *      ],
-   *      "productionFunction": {
+   *      "function": {
    *        "label": "Manufacture",
    *        "type": "Function"
    *      },

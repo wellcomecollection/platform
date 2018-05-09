@@ -236,8 +236,8 @@ wwork:production rdf:type owl:DatatypeProperty ;
     rdfs:range wwork:ProductionEvent ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
     
-wwork:productionFunction rdf:type owl:DatatypeProperty ;
-    rdfs:label "productionFunction"@en ;
+wwork:function rdf:type owl:DatatypeProperty ;
+    rdfs:label "function"@en ;
     rdfs:comment "Relates a production event to a specific function."@en ;
     rdfs:domain wwork:ProductionEvent ;
     rdfs:range wwork:Concept ;
