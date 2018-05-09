@@ -91,6 +91,9 @@ def does_file_affect_build_task(path, task):
         'build.sbt',
         'sbt_common/'
     )):
+        if task == 'travistooling-test':
+            raise ScalaChangeAndNotScalaApp()
+
         for project in PROJECTS:
             if task.startswith(project.name):
                 if project.type == 'sbt_app':

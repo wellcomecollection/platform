@@ -63,6 +63,7 @@ from travistooling.decisions import (
     ('sierra_adapter/common/main.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndNotScalaApp, False),
+    ('sierra_adapter/common/main.scala', 'travistooling-test', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
     ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
