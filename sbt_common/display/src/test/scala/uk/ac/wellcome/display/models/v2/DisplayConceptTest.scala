@@ -52,7 +52,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
         identifiers = List(sourceIdentifier),
         agent = Concept(label = "darkness")
       ),
-      expectedDisplayConcept = DisplayPeriod(
+      expectedDisplayConcept = DisplayConcept(
         id = Some("dj4kndg5"),
         identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
         label = "darkness"
