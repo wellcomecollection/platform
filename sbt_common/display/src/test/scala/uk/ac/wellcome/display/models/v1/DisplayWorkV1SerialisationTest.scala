@@ -163,6 +163,9 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes subject information in DisplayWorkV1 serialisation") {
+    val concept0 = Unidentifiable(Concept("fish"))
+    val concept1 = Unidentifiable(Concept("gardening"))
+
     val workWithSubjects = IdentifiedWork(
       title = Some("A seal selling seaweed sandwiches in Scotland"),
       sourceIdentifier = sourceIdentifier,
@@ -170,8 +173,9 @@ class DisplayWorkV1SerialisationTest
       identifiers = List(),
       canonicalId = "test_subject1",
       subjects = List(
-        Subject("label", List(Concept("fish"))),
-        Subject("label", List(Concept("gardening"))))
+        Subject("label", List(concept0)),
+        Subject("label", List(concept1))
+      )
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
@@ -181,10 +185,8 @@ class DisplayWorkV1SerialisationTest
                           |     "title": "${workWithSubjects.title.get}",
                           |     "creators": [],
                           |     "subjects": [
-                          |       ${concept(
-                            workWithSubjects.subjects(0).concepts(0))},
-                          |       ${concept(
-                            workWithSubjects.subjects(1).concepts(0))} ],
+                          |       ${concept(concept0.agent)},
+                          |       ${concept(concept1.agent)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
@@ -194,30 +196,32 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes genre information in DisplayWorkV1 serialisation") {
-    val workWithSubjects = IdentifiedWork(
+    val concept0 = Unidentifiable(Concept("woodwork"))
+    val concept1 = Unidentifiable(Concept("etching"))
+
+    val wotkWithGenres = IdentifiedWork(
       title = Some("A guppy in a greenhouse"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
       genres = List(
-        Genre("label", List(Concept("woodwork"))),
-        Genre("label", List(Concept("etching"))))
+        Genre("label", List(concept0)),
+        Genre("label", List(concept1))
+      )
     )
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV1(workWithSubjects))
+      objectMapper.writeValueAsString(DisplayWorkV1(wotkWithGenres))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",
-                          |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
+                          |     "id": "${wotkWithGenres.canonicalId}",
+                          |     "title": "${wotkWithGenres.title.get}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [
-                          |             ${concept(
-                            workWithSubjects.genres(0).concepts(0))},
-                          |             ${concept(
-                            workWithSubjects.genres(1).concepts(0))} ],
+                          |             ${concept(concept0.agent)},
+                          |             ${concept(concept1.agent)} ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ]
                           |   }""".stripMargin

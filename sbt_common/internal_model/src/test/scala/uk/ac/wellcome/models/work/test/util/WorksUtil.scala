@@ -13,19 +13,21 @@ trait WorksUtil {
     id = "1dz4yn34va",
     label = "An aggregation of angry archipelago aged ankylosaurs."
   )
-  val subject = Subject[AbstractConcept](
-    "a subject created by WorksUtil",
-    List(
-      Concept("a subject concept"),
-      Place("a subject place"),
-      Period("a subject period")))
-
-  val genre = Genre[AbstractConcept](
-    label = "a genre created by WorksUtil",
+  val subject = Subject[Unidentifiable[AbstractConcept]](
+    label = "a subject created by WorksUtil",
     concepts = List(
-      Concept("a genre concept"),
-      Place("a genre place"),
-      Period("a genre period")))
+      Unidentifiable(Concept("a subject concept")),
+      Unidentifiable(Place("a subject place")),
+      Unidentifiable(Period("a subject period")))
+  )
+
+  val genre = Genre[Unidentifiable[AbstractConcept]](
+    label = "an unidentified genre created by WorksUtil",
+    concepts = List(
+      Unidentifiable(Concept("a genre concept")),
+      Unidentifiable(Place("a genre place")),
+      Unidentifiable(Period("a genre period")))
+  )
 
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,
@@ -132,8 +134,8 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               subjects: List[Subject[AbstractConcept]],
-               genres: List[Genre[AbstractConcept]],
+               subjects: List[Subject[Displayable[AbstractConcept]]],
+               genres: List[Genre[Displayable[AbstractConcept]]],
                items: List[IdentifiedItem],
                visible: Boolean): IdentifiedWork =
     IdentifiedWork(

@@ -3,15 +3,18 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import uk.ac.wellcome.models.work.internal.{
   AbstractConcept,
   Concept,
+  MaybeDisplayable,
   Period,
   Place,
-  Subject
+  Subject,
+  Unidentifiable
 }
 import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraSubjects extends MarcUtils {
 
-  def getSubjects(bibData: SierraBibData): List[Subject[AbstractConcept]] = {
+  def getSubjects(bibData: SierraBibData)
+    : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")
@@ -46,12 +49,15 @@ trait SierraSubjects extends MarcUtils {
       val subjectLabel = orderedSubfields.map(_.content).mkString(" - ")
       val concepts = orderedSubfields.map(subfield =>
         subfield.tag match {
-          case "a" => primaryConcept(marcTag, subfield.content)
-          case "y" => Period(label = subfield.content)
-          case "z" => Place(label = subfield.content)
-          case _ => Concept(label = subfield.content)
+          case "a" => Unidentifiable(primaryConcept(marcTag, subfield.content))
+          case "y" => Unidentifiable(Period(label = subfield.content))
+          case "z" => Unidentifiable(Place(label = subfield.content))
+          case _ => Unidentifiable(Concept(label = subfield.content))
       })
-      Subject[AbstractConcept](label = subjectLabel, concepts = concepts)
+      Subject[MaybeDisplayable[AbstractConcept]](
+        label = subjectLabel,
+        concepts = concepts
+      )
     })
   }
 

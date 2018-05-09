@@ -712,7 +712,7 @@ class SierraTransformableTransformerTest
     transformedSierraRecord.isSuccess shouldBe true
 
     transformedSierraRecord.get.get.subjects shouldBe List(
-      Subject(content, List(Concept(content))))
+      Subject(content, List(Unidentifiable(Concept(content)))))
   }
 
 }

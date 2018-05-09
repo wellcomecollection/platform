@@ -140,14 +140,14 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def concepts(concepts: List[AbstractConcept]) =
+  def concepts(concepts: List[Displayable[AbstractConcept]]) =
     concepts
-      .map {
-        concept(_)
+      .map { c =>
+        identifiedOrUnidentifiable(c, concept)
       }
       .mkString(",")
 
-  def subject(s: Subject[AbstractConcept]) =
+  def subject(s: Subject[Displayable[AbstractConcept]]) =
     s"""
     {
       "label": "${s.label}",
@@ -156,12 +156,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def subjects(subjects: List[Subject[AbstractConcept]]) =
+  def subjects(subjects: List[Subject[Displayable[AbstractConcept]]]) =
     subjects
       .map { subject(_) }
       .mkString(",")
 
-  def genre(g: Genre[AbstractConcept]) =
+  def genre(g: Genre[Displayable[AbstractConcept]]) =
     s"""
     {
       "label": "${g.label}",
@@ -170,7 +170,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
     """
 
-  def genres(genres: List[Genre[AbstractConcept]]) =
+  def genres(genres: List[Genre[Displayable[AbstractConcept]]]) =
     genres
       .map { genre(_) }
       .mkString(",")

@@ -221,6 +221,9 @@ $(1)-build:
 $(1)-test:
 	$(call sbt_test,$(1))
 
+$(1)-test-no_docker:
+	$(call sbt_test_no_docker,$(1))
+
 $(1)-publish: $(1)-build
 	$(call publish_service,$(1))
 endef

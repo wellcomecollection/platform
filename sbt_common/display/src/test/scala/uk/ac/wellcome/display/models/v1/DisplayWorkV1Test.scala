@@ -134,7 +134,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     }
   }
 
-  it("extracts creators from a Work with unidentified Contributors") {
+  it("extracts creators from a Work with Unidentifiable Contributors") {
     val work = IdentifiedWork(
       title = Some("Jumping over jackals in Japan"),
       sourceIdentifier = sourceIdentifier,
@@ -170,7 +170,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   it(
-    "extracts creators from a Work with a mixture of identified/unidentified Contributors") {
+    "extracts creators from a Work with a mixture of identified/Unidentifiable Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
       IdentifierSchemes.libraryOfCongressNames,
@@ -306,19 +306,26 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   it("treats genres as a list of Concepts") {
-    val genres = List[Genre[AbstractConcept]](
+    val concepts = List(
+      Concept("a genre concept"),
+      Place("a genre place"),
+      Period("a genre period"),
+      Concept("a second generic concept")
+    )
+
+    val genres = List[Genre[Displayable[AbstractConcept]]](
       Genre(
         label = "a genre created by DisplayWorkV1Test",
         concepts = List(
-          Concept("a genre concept"),
-          Place("a genre place"),
-          Period("a genre period")
+          Unidentifiable(concepts(0)),
+          Unidentifiable(concepts(1)),
+          Unidentifiable(concepts(2))
         )
       ),
       Genre(
         label = "a second genre created for DisplayWorkV1Test",
         concepts = List(
-          Concept("a second generic concept")
+          Unidentifiable(concepts(3))
         )
       )
     )
@@ -332,29 +339,34 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val displayWork = DisplayWorkV1(work)
-    val expectedGenres = genres
-      .map { _.concepts }
-      .flatten
-      .map { label =>
-        DisplayConceptV1(label)
+    val expectedGenres = concepts
+      .map { c: AbstractConcept =>
+        DisplayConceptV1(c.label)
       }
     displayWork.genres shouldBe expectedGenres
   }
 
   it("treats subjects as a list of Concepts") {
-    val subjects = List[Subject[AbstractConcept]](
+    val concepts = List(
+      Concept("a subject concept"),
+      Place("a subject place"),
+      Period("a subject period"),
+      Concept("a second generic concept")
+    )
+
+    val subjects = List[Subject[Displayable[AbstractConcept]]](
       Subject(
         label = "a subject created by DisplayWorkV1Test",
         concepts = List(
-          Concept("a subject concept"),
-          Place("a subject place"),
-          Period("a subject period")
+          Unidentifiable(concepts(0)),
+          Unidentifiable(concepts(1)),
+          Unidentifiable(concepts(2))
         )
       ),
       Subject(
         label = "a second subject created for DisplayWorkV1Test",
         concepts = List(
-          Concept("a second generic concept")
+          Unidentifiable(concepts(3))
         )
       )
     )
@@ -368,11 +380,9 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val displayWork = DisplayWorkV1(work)
-    val expectedSubjects = subjects
-      .map { _.concepts }
-      .flatten
-      .map { label =>
-        DisplayConceptV1(label)
+    val expectedSubjects = concepts
+      .map { c: AbstractConcept =>
+        DisplayConceptV1(c.label)
       }
     displayWork.subjects shouldBe expectedSubjects
   }

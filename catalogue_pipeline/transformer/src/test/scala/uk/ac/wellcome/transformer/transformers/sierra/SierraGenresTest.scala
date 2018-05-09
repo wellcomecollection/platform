@@ -5,8 +5,10 @@ import uk.ac.wellcome.models.work.internal.{
   AbstractConcept,
   Concept,
   Genre,
+  MaybeDisplayable,
   Period,
-  Place
+  Place,
+  Unidentifiable
 }
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
@@ -28,9 +30,9 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns genres for tag 655 with only subfield a") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content",
-          concepts = List(Concept(label = "A Content"))))
+          concepts = List(Unidentifiable(Concept(label = "A Content")))))
 
     assertExtractsGenres(
       bibData("655", List(MarcSubfield(tag = "a", content = "A Content"))),
@@ -40,10 +42,14 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a and v") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - V Content",
-          concepts =
-            List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content"))
+          )
+        )
+      )
 
     assertExtractsGenres(
       bibData(
@@ -59,10 +65,14 @@ class SierraGenresTest extends FunSpec with Matchers {
     "subfield a is always first concept when returning subjects for tag 655 with subfields a, v") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - V Content",
-          concepts =
-            List(Concept(label = "A Content"), Concept(label = "V Content"))))
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content"))
+          )
+        )
+      )
 
     assertExtractsGenres(
       bibData(
@@ -77,13 +87,14 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns genres for tag 655 subfields a, v, and x") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - X Content - V Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Concept(label = "X Content"),
-            Concept(label = "V Content")
-          )))
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "X Content")),
+            Unidentifiable(Concept(label = "V Content"))
+          )
+        ))
 
     assertExtractsGenres(
       bibData(
@@ -100,11 +111,11 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a, y") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - Y Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Period(label = "Y Content")
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Period(label = "Y Content"))
           )))
 
     assertExtractsGenres(
@@ -120,11 +131,11 @@ class SierraGenresTest extends FunSpec with Matchers {
   it("returns subjects for tag 655 with subfields a, z") {
     val expectedGenres =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - Z Content",
           concepts = List(
-            Concept(label = "A Content"),
-            Place(label = "Z Content")
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Place(label = "Z Content"))
           )))
 
     assertExtractsGenres(
@@ -167,17 +178,17 @@ class SierraGenresTest extends FunSpec with Matchers {
 
     val expectedSubjects =
       List(
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A1 Content - Z1 Content",
           concepts = List(
-            Concept(label = "A1 Content"),
-            Place(label = "Z1 Content")
+            Unidentifiable(Concept(label = "A1 Content")),
+            Unidentifiable(Place(label = "Z1 Content"))
           )),
-        Genre[AbstractConcept](
+        Genre[MaybeDisplayable[AbstractConcept]](
           label = "A2 Content - V2 Content",
           concepts = List(
-            Concept(label = "A2 Content"),
-            Concept(label = "V2 Content")
+            Unidentifiable(Concept(label = "A2 Content")),
+            Unidentifiable(Concept(label = "V2 Content"))
           ))
       )
     assertExtractsGenres(bibData, expectedSubjects)
@@ -185,8 +196,9 @@ class SierraGenresTest extends FunSpec with Matchers {
 
   private val transformer = new SierraGenres {}
 
-  private def assertExtractsGenres(bibData: SierraBibData,
-                                   expected: List[Genre[AbstractConcept]]) = {
+  private def assertExtractsGenres(
+    bibData: SierraBibData,
+    expected: List[Genre[MaybeDisplayable[AbstractConcept]]]) = {
     transformer.getGenres(bibData) shouldBe expected
   }
 

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.miro
 
-import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Subject}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MiroTransformableData
 
 trait MiroSubjects {
@@ -15,33 +15,18 @@ trait MiroSubjects {
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  def getSubjects(
-    miroData: MiroTransformableData): List[Subject[AbstractConcept]] = {
-    val keywords: List[Subject[AbstractConcept]] = miroData.keywords match {
-      case Some(k) =>
-        k.map { keyword =>
-          Subject[AbstractConcept](
-            label = keyword,
-            concepts = List(Concept(keyword))
-          )
-        }
-      case None =>
-        List()
+  def getSubjects(miroData: MiroTransformableData)
+    : List[Subject[Unidentifiable[Concept]]] = {
+    val keywords: List[String] = miroData.keywords.getOrElse(List())
+
+    val keywordsUnauth: List[String] =
+      miroData.keywordsUnauth.getOrElse(List())
+
+    (keywords ++ keywordsUnauth).map { keyword =>
+      Subject[Unidentifiable[Concept]](
+        label = keyword,
+        concepts = List(Unidentifiable(Concept(keyword)))
+      )
     }
-
-    val keywordsUnauth: List[Subject[AbstractConcept]] =
-      miroData.keywordsUnauth match {
-        case Some(k) =>
-          k.map { keyword =>
-            Subject[AbstractConcept](
-              label = keyword,
-              concepts = List(Concept(keyword))
-            )
-          }
-        case None =>
-          List()
-      }
-
-    keywords ++ keywordsUnauth
   }
 }

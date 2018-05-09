@@ -1,21 +1,22 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
+import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  Period,
-  Place
-}
+import uk.ac.wellcome.models.work.internal._
 
 class DisplayAbstractConceptSerialisationTest
     extends FunSpec
+    with DisplaySerialisationTestBase
     with JsonMapperTestUtil {
 
-  it("constructs a DisplayConcept from a Concept correctly") {
+  it("serialises an unidentified DisplayConcept") {
     assertObjectMapsToJson(
-      DisplayConcept(Concept("conceptLabel")),
+      DisplayConcept(
+        id = None,
+        identifiers = None,
+        label = "conceptLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "conceptLabel",
@@ -25,9 +26,13 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it("serialises a DisplayPeriod constructed from a Period correctly") {
+  it("serialises an unidentified DisplayPeriod") {
     assertObjectMapsToJson(
-      DisplayPeriod(Period("periodLabel")),
+      DisplayPeriod(
+        id = None,
+        identifiers = None,
+        label = "periodLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "periodLabel",
@@ -37,9 +42,13 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it("serialises a DisplayPlace constructed from a place correctly") {
+  it("serialises an unidentified DisplayPlace") {
     assertObjectMapsToJson(
-      DisplayPlace(Place("placeLabel")),
+      DisplayPlace(
+        id = None,
+        identifiers = None,
+        label = "placeLabel"
+      ),
       expectedJson = s"""
          |  {
          |    "label" : "placeLabel",
@@ -49,13 +58,38 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
+  it("constructs a DisplayConcept from an identified Concept") {
+    val concept = Identified(
+      canonicalId = "uq4bt5us",
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          ontologyType = "Concept",
+          value = "lcsh/uq4"
+        )),
+      agent = Concept("conceptLabel")
+    )
+
+    assertObjectMapsToJson(
+      DisplayAbstractConcept(concept),
+      expectedJson = s"""
+         |  {
+         |    "id": "${concept.canonicalId}",
+         |    "identifiers": [${identifier(concept.identifiers(0))}],
+         |    "label" : "${concept.agent.label}",
+         |    "type"  : "${concept.agent.ontologyType}"
+         |  }
+          """.stripMargin
+    )
+  }
+
   it(
     "serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
     assertObjectMapsToJson(
-      List[AbstractConcept](
-        Concept("conceptLabel"),
-        Place("placeLabel"),
-        Period("periodLabel")
+      List[Displayable[AbstractConcept]](
+        Unidentifiable(Concept("conceptLabel")),
+        Unidentifiable(Place("placeLabel")),
+        Unidentifiable(Period("periodLabel"))
       ).map(DisplayAbstractConcept(_)),
       expectedJson = s"""
           | [

@@ -133,16 +133,16 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                |     "type": "${subject.ontologyType}",
                |     "concepts":[
                |       {
-               |         "label": "${subject.concepts(0).label}",
-               |         "type":  "${subject.concepts(0).ontologyType}"
+               |         "label": "${subject.concepts(0).agent.label}",
+               |         "type":  "${subject.concepts(0).agent.ontologyType}"
                |       },
                |       {
-               |         "label": "${subject.concepts(1).label}",
-               |         "type":  "${subject.concepts(1).ontologyType}"
+               |         "label": "${subject.concepts(1).agent.label}",
+               |         "type":  "${subject.concepts(1).agent.ontologyType}"
                |       },
                |       {
-               |         "label": "${subject.concepts(2).label}",
-               |         "type":  "${subject.concepts(2).ontologyType}"
+               |         "label": "${subject.concepts(2).agent.label}",
+               |         "type":  "${subject.concepts(2).agent.ontologyType}"
                |       }]}
                | ],
                | "genres": [
@@ -150,16 +150,16 @@ class ApiV2WorksTest extends ApiWorksTestBase {
                |     "type": "${genre.ontologyType}",
                |     "concepts":[
                |       {
-               |         "label": "${genre.concepts(0).label}",
-               |         "type":  "${genre.concepts(0).ontologyType}"
+               |         "label": "${genre.concepts(0).agent.label}",
+               |         "type":  "${genre.concepts(0).agent.ontologyType}"
                |       },
                |       {
-               |         "label": "${genre.concepts(1).label}",
-               |         "type":  "${genre.concepts(1).ontologyType}"
+               |         "label": "${genre.concepts(1).agent.label}",
+               |         "type":  "${genre.concepts(1).agent.ontologyType}"
                |       },
                |       {
-               |         "label": "${genre.concepts(2).label}",
-               |         "type":  "${genre.concepts(2).ontologyType}"
+               |         "label": "${genre.concepts(2).agent.label}",
+               |         "type":  "${genre.concepts(2).agent.ontologyType}"
                |       }]}
                | ],
                | "publishers": [ ],
