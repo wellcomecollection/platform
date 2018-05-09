@@ -1,15 +1,7 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Concept,
-  Genre,
-  MaybeDisplayable,
-  Period,
-  Place,
-  Unidentifiable
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
   SierraBibData,
@@ -192,6 +184,58 @@ class SierraGenresTest extends FunSpec with Matchers {
           ))
       )
     assertExtractsGenres(bibData, expectedSubjects)
+  }
+
+  it(s"gets identifiers from subfield $$0") {
+    val bibData = SierraBibData(
+      id = "b3478621",
+      title = Some("Impish iguanas inside igloos"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "655",
+          indicator1 = "",
+
+          // LCSH heading
+          indicator2 = "0",
+          subfields = List(
+            MarcSubfield(tag = "0", content = "lcsh/123")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "655",
+          indicator1 = "",
+
+          // MESH heading
+          indicator2 = "2",
+          subfields = List(
+            MarcSubfield(tag = "0", content = "mesh/456")
+          )
+        )
+      )
+    )
+
+    val expectedSourceIdentifiers = List(
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.libraryOfCongressSubjectHeadings,
+        value = "lcsh/123",
+        ontologyType = "Concept"
+      ),
+      SourceIdentifier(
+        identifierScheme = IdentifierSchemes.medicalSubjectHeadings,
+        value = "mesh/456",
+        ontologyType = "Concept"
+      )
+    )
+
+    val genre = transformer.getGenres(bibData).head
+    val actualSourceIdentifiers = genre.concepts.map {
+      case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+      case other => assert(false, other)
+    }
+
+    expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
 
   private val transformer = new SierraGenres {}
