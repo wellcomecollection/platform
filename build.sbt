@@ -20,6 +20,13 @@ def doSharedLibrarySetup(project: Project, folder: String) =
     .enablePlugins(DockerComposePlugin)
     .enablePlugins(JavaAppPackaging)
 
+def doLambdaSetup(project: Project, folder: String) =
+  project
+    .in(new File(folder))
+    .settings(Common.settings: _*)
+    .settings(DockerCompose.settings: _*)
+    .enablePlugins(DockerComposePlugin)
+
 def doSharedSierraSetup(project: Project, folder: String) =
   doServiceSetup(project = project, folder = folder)
     .dependsOn(sierra_adapter_common % "compile->compile;test->test")
@@ -127,7 +134,7 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(common_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotConvertorDependencies)
 
-lazy val vhs_to_sns = doSharedLibrarySetup(project, "shared_infra/vhs_to_sns")
+lazy val vhs_to_sns = doLambdaSetup(project, "shared_infra/vhs_to_sns")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.vhsToSnsDependencies)
