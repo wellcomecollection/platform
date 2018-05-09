@@ -18,7 +18,7 @@ module "es_ingest_topic" {
   name   = "es_ingest"
 }
 
-module "id_minter_topic" {
+module "transformed_works_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "id_minter"
+  name   = "transformed_works"
 }

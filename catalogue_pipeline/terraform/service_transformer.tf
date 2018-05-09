@@ -11,7 +11,7 @@ module "transformer" {
   release_id         = "${var.release_ids["transformer"]}"
 
   env_vars = {
-    sns_arn              = "${module.id_minter_topic.arn}"
+    sns_arn              = "${module.transformed_works_topic.arn}"
     transformer_queue_id = "${module.transformer_queue.id}"
     metrics_namespace    = "transformer"
     storage_bucket_name  = "${module.vhs_sourcedata.bucket_name}"
