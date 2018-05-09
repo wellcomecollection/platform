@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, MaybeDisplayable, Period, Place, Subject, Unidentifiable}
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
-trait SierraSubjects extends MarcUtils {
+trait SierraSubjects extends MarcUtils with SierraConcepts {
 
   def getSubjects(bibData: SierraBibData)
     : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
@@ -54,7 +54,7 @@ trait SierraSubjects extends MarcUtils {
     subfieldsList.map(subfields => {
       val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
 
-      val label = getSubjectLabel(primarySubfields, subdivisionSubfields)
+      val label = getLabel(primarySubfields, subdivisionSubfields)
       val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(marcTag, primarySubfields) ++ getSubdivisions(subdivisionSubfields)
 
       Subject[MaybeDisplayable[AbstractConcept]](
@@ -62,14 +62,6 @@ trait SierraSubjects extends MarcUtils {
         concepts = concepts
       )
     })
-  }
-
-  // Get the subject label.  This is populated by the label of subfield $a, followed
-  // by other subfields, in the order they come from MARC.  The labels are
-  // joined by " - ".
-  private def getSubjectLabel(primarySubfields: List[MarcSubfield], subdivisionSubfields: List[MarcSubfield]): String = {
-    val orderedSubfields = primarySubfields ++ subdivisionSubfields
-    orderedSubfields.map { _.content }.mkString(" - ")
   }
 
   // Extract the primary concept, which comes from subfield $a.  This is the

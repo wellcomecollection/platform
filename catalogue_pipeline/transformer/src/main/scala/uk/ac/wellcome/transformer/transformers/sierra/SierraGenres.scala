@@ -3,7 +3,7 @@ package uk.ac.wellcome.transformer.transformers.sierra
 import uk.ac.wellcome.models.work.internal.{AbstractConcept, Concept, Genre, MaybeDisplayable, Period, Place, Unidentifiable}
 import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData}
 
-trait SierraGenres extends MarcUtils {
+trait SierraGenres extends MarcUtils with SierraConcepts {
 
   // Populate wwork:genres
   //
@@ -47,7 +47,7 @@ trait SierraGenres extends MarcUtils {
     subfieldsList.map(subfields => {
       val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
 
-      val label = getGenreLabel(primarySubfields, subdivisionSubfields)
+      val label = getLabel(primarySubfields, subdivisionSubfields)
       val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields) ++ getSubdivisions(subdivisionSubfields)
 
       Genre[MaybeDisplayable[AbstractConcept]](
@@ -55,14 +55,6 @@ trait SierraGenres extends MarcUtils {
         concepts = concepts
       )
     })
-  }
-
-  // Get the genre label.  This is populated by the label of subfield $a, followed
-  // by other subfields, in the order they come from MARC.  The labels are
-  // joined by " - ".
-  private def getGenreLabel(primarySubfields: List[MarcSubfield], subdivisionSubfields: List[MarcSubfield]): String = {
-    val orderedSubfields = primarySubfields ++ subdivisionSubfields
-    orderedSubfields.map { _.content }.mkString(" - ")
   }
 
   // Extract the primary concept, which comes from subfield $a.  This is the
