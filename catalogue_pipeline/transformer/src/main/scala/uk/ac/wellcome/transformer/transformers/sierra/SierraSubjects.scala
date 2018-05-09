@@ -74,7 +74,7 @@ trait SierraSubjects extends MarcUtils {
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.
-  private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[Concept]] = {
+  private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       marcTag match {
         case "650" => Unidentifiable(Concept(label = subfield.content))
@@ -87,7 +87,7 @@ trait SierraSubjects extends MarcUtils {
 
   // Extract the subdivisions, which come from everything except subfield $a.
   // These are never identified.  We preserve the order from MARC.
-  private def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[Unidentifiable[AbstractConcept]] = {
+  private def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
     subdivisionSubfields.map { subfield =>
       subfield.tag match {
         case "v" | "w" => Unidentifiable(Concept(label = subfield.content))
