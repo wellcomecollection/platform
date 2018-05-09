@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -146,32 +146,30 @@ class RecorderWorkerServiceTest
     fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(expectedWork)
   }
 
-  private def withRecorderWorkerService(table: Table, bucket: Bucket, queue: Queue)(
-    testWith: TestWith[RecorderWorkerService, Assertion]) = {
+  private def withRecorderWorkerService[R](table: Table, bucket: Bucket, queue: Queue)(
+    testWith: TestWith[RecorderWorkerService, R]) = {
     withMessageReader[UnidentifiedWork, Unit](bucket, queue) { messageReader =>
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
             withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { versionedHybridStore =>
-              val workerService = new RecorderWorkerService(
-                versionedHybridStore = versionedHybridStore,
-                sqsReader = new SQSReader(
-                  sqsClient = sqsClient,
-                  sqsConfig = SQSConfig(
-                    queueUrl = queue.url,
-                    waitTime = 1 second,
-                    maxMessages = 1
-                  )
-                ),
-                messageReader = messageReader,
-                system = actorSystem,
-                metrics = metricsSender
-              )
+              withMessageStream[UnidentifiedWork, R](
+                actorSystem,
+                bucket,
+                queue,
+                metricsSender) { messageStream =>
 
-              try {
-                testWith(workerService)
-              } finally {
-                workerService.stop()
+                val workerService = new RecorderWorkerService(
+                  versionedHybridStore = versionedHybridStore,
+                  messageStream = messageStream,
+                  system = actorSystem
+                )
+
+                try {
+                  testWith(workerService)
+                } finally {
+                  workerService.stop()
+                }
               }
             }
           }
