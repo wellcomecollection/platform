@@ -59,7 +59,9 @@ class SQSWorkerToDynamoTest
 
   type TestWorkerFactory = (MetricsSender, Queue, ActorSystem) => TestWorker
 
-  def defaultTestWorkerFactory(metrics: MetricsSender, queue: Queue, system: ActorSystem) =
+  def defaultTestWorkerFactory(metrics: MetricsSender,
+                               queue: Queue,
+                               system: ActorSystem) =
     new TestWorker(metrics, queue, system)
 
   def conditionalCheckFailingTestWorkerFactory(metrics: MetricsSender,
@@ -71,15 +73,19 @@ class SQSWorkerToDynamoTest
       }
     }
 
-  def terminalTestWorkerFactory(metrics: MetricsSender, queue: Queue, system: ActorSystem) =
+  def terminalTestWorkerFactory(metrics: MetricsSender,
+                                queue: Queue,
+                                system: ActorSystem) =
     new TestWorker(metrics, queue, system) {
       override def store(record: TestObject): Future[Unit] = Future {
         throw new RuntimeException("Wrong!")
       }
     }
 
-  def withTestWorker[R](
-    testWorkFactory: TestWorkerFactory)(metrics: MetricsSender, queue: Queue, system: ActorSystem) =
+  def withTestWorker[R](testWorkFactory: TestWorkerFactory)(
+    metrics: MetricsSender,
+    queue: Queue,
+    system: ActorSystem) =
     fixture[TestWorker, R](
       create = {
         testWorkFactory(metrics, queue, system)
@@ -95,8 +101,9 @@ class SQSWorkerToDynamoTest
     withActorSystem[R] { actorSystem =>
       withMetricsSender(actorSystem) { metrics =>
         withLocalSqsQueue[R] { queue =>
-          withTestWorker[R](testWorkFactory)(metrics, queue, actorSystem) { worker =>
-            testWith((actorSystem, queue, worker))
+          withTestWorker[R](testWorkFactory)(metrics, queue, actorSystem) {
+            worker =>
+              testWith((actorSystem, queue, worker))
           }
         }
       }
