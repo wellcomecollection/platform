@@ -195,7 +195,6 @@ class SierraGenresTest extends FunSpec with Matchers {
           fieldTag = "p",
           marcTag = "655",
           indicator1 = "",
-
           // LCSH heading
           indicator2 = "0",
           subfields = List(
@@ -207,7 +206,6 @@ class SierraGenresTest extends FunSpec with Matchers {
           fieldTag = "p",
           marcTag = "655",
           indicator1 = "",
-
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -231,7 +229,8 @@ class SierraGenresTest extends FunSpec with Matchers {
       )
     )
 
-    val actualSourceIdentifiers = transformer.getGenres(bibData)
+    val actualSourceIdentifiers = transformer
+      .getGenres(bibData)
       .map { _.concepts.head }
       .map {
         case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier

@@ -1,14 +1,19 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 trait SierraConcepts extends MarcUtils {
 
   // Get the label.  This is populated by the label of subfield $a, followed
   // by other subfields, in the order they come from MARC.  The labels are
   // joined by " - ".
-  protected def getLabel(primarySubfields: List[MarcSubfield], subdivisionSubfields: List[MarcSubfield]): String = {
+  protected def getLabel(primarySubfields: List[MarcSubfield],
+                         subdivisionSubfields: List[MarcSubfield]): String = {
     val orderedSubfields = primarySubfields ++ subdivisionSubfields
     orderedSubfields.map { _.content }.mkString(" - ")
   }
@@ -32,9 +37,12 @@ trait SierraConcepts extends MarcUtils {
         // https://www.loc.gov/marc/bibliographic/bd655.html
         val maybeIdentifierScheme = varField.indicator2 match {
           case None => None
-          case Some("0") => Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
+          case Some("0") =>
+            Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
           case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
-          case Some(scheme) => throw new RuntimeException(s"Unrecognised identifier scheme: $scheme")
+          case Some(scheme) =>
+            throw new RuntimeException(
+              s"Unrecognised identifier scheme: $scheme")
         }
 
         maybeIdentifierScheme match {
@@ -55,19 +63,23 @@ trait SierraConcepts extends MarcUtils {
         }
       }
 
-      case _ => throw new RuntimeException(s"Too many identifiers fields: $identifierSubfields")
+      case _ =>
+        throw new RuntimeException(
+          s"Too many identifiers fields: $identifierSubfields")
     }
   }
 
   // Extract the subdivisions, which come from everything except subfield $a.
   // These are never identified.  We preserve the order from MARC.
-  protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield]): List[Unidentifiable[AbstractConcept]] = {
-    val concepts: List[AbstractConcept] = subdivisionSubfields.map { subfield =>
-      subfield.tag match {
-        case "v" | "x" => Concept(label = subfield.content)
-        case "y" => Period(label = subfield.content)
-        case "z" => Place(label = subfield.content)
-      }
+  protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield])
+    : List[Unidentifiable[AbstractConcept]] = {
+    val concepts: List[AbstractConcept] = subdivisionSubfields.map {
+      subfield =>
+        subfield.tag match {
+          case "v" | "x" => Concept(label = subfield.content)
+          case "y" => Period(label = subfield.content)
+          case "z" => Place(label = subfield.content)
+        }
     }
 
     concepts.map { Unidentifiable(_) }

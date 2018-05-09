@@ -1,7 +1,11 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 trait SierraSubjects extends MarcUtils with SierraConcepts {
 
@@ -52,12 +56,17 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
     marcVarFields.map { varField =>
       val subfields = varField.subfields.filter { subfield =>
-        List("a", "v", "x", "y", "z").contains( subfield.tag )
+        List("a", "v", "x", "y", "z").contains(subfield.tag)
       }
-      val (primarySubfields, subdivisionSubfields) = subfields.partition { _.tag == "a" }
+      val (primarySubfields, subdivisionSubfields) = subfields.partition {
+        _.tag == "a"
+      }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(primarySubfields, varField = varField) ++ getSubdivisions(subdivisionSubfields)
+      val concepts
+        : List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(
+        primarySubfields,
+        varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
       Subject[MaybeDisplayable[AbstractConcept]](
         label = label,
@@ -68,21 +77,26 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.
-  private def getPrimaryConcept(primarySubfields: List[MarcSubfield], varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
+  private def getPrimaryConcept(
+    primarySubfields: List[MarcSubfield],
+    varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       varField.marcTag.get match {
-        case "650" => identifyPrimaryConcept(
-          concept = Concept(label = subfield.content),
-          varField = varField
-        )
-        case "648" => identifyPrimaryConcept(
-          concept = Period(label = subfield.content),
-          varField = varField
-        )
-        case "651" => identifyPrimaryConcept(
-          concept = Place(label = subfield.content),
-          varField = varField
-        )
+        case "650" =>
+          identifyPrimaryConcept(
+            concept = Concept(label = subfield.content),
+            varField = varField
+          )
+        case "648" =>
+          identifyPrimaryConcept(
+            concept = Period(label = subfield.content),
+            varField = varField
+          )
+        case "651" =>
+          identifyPrimaryConcept(
+            concept = Place(label = subfield.content),
+            varField = varField
+          )
       }
 
     }

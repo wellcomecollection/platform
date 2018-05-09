@@ -242,7 +242,6 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           fieldTag = "p",
           marcTag = "650",
           indicator1 = "",
-
           // LCSH heading
           indicator2 = "0",
           subfields = List(
@@ -254,7 +253,6 @@ class SierraSubjectsTest extends FunSpec with Matchers {
           fieldTag = "p",
           marcTag = "650",
           indicator1 = "",
-
           // MESH heading
           indicator2 = "2",
           subfields = List(
@@ -278,7 +276,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       )
     )
 
-    val actualSourceIdentifiers = transformer.getSubjects(bibData)
+    val actualSourceIdentifiers = transformer
+      .getSubjects(bibData)
       .map { _.concepts.head }
       .map {
         case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier

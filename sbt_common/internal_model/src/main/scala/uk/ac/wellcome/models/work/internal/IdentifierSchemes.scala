@@ -75,7 +75,8 @@ object IdentifierSchemes {
     libraryOfCongressNames,
     libraryOfCongressSubjectHeadings,
     marcCountries,
-    medicalSubjectHeadings)
+    medicalSubjectHeadings
+  )
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {
