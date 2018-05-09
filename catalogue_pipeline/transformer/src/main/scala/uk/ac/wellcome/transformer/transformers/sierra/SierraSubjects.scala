@@ -69,9 +69,9 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   private def getPrimaryConcept(marcTag: String, primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       marcTag match {
-        case "650" => Unidentifiable(Concept(label = subfield.content))
-        case "648" => Unidentifiable(Period(label = subfield.content))
-        case "651" => Unidentifiable(Place(label = subfield.content))
+        case "650" => buildPrimaryConcept[Concept](subfield)
+        case "648" => buildPrimaryConcept[Period](subfield)
+        case "651" => buildPrimaryConcept[Place](subfield)
       }
 
     }

@@ -1,5 +1,6 @@
 package uk.ac.wellcome.transformer.transformers.sierra
 
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.transformer.source.MarcSubfield
 
 trait SierraConcepts {
@@ -11,4 +12,7 @@ trait SierraConcepts {
     val orderedSubfields = primarySubfields ++ subdivisionSubfields
     orderedSubfields.map { _.content }.mkString(" - ")
   }
+
+  protected def buildPrimaryConcept[T <: AbstractConcept](subfield: MarcSubfield): MaybeDisplayable[AbstractConcept] =
+    Unidentifiable(T(label = subfield.content))
 }

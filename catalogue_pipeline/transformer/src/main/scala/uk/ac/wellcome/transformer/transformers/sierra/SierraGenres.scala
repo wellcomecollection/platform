@@ -61,7 +61,7 @@ trait SierraGenres extends MarcUtils with SierraConcepts {
   // only concept which might be identified.
   private def getPrimaryConcept(primarySubfields: List[MarcSubfield]): List[MaybeDisplayable[Concept]] = {
     primarySubfields.map { subfield =>
-      Unidentifiable(Concept(label = subfield.content))
+      buildPrimaryConcept[Concept](subfield)
     }
   }
 
