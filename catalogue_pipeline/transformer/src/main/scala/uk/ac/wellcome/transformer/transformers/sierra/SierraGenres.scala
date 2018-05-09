@@ -13,7 +13,8 @@ import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraGenres extends MarcUtils {
 
-  def getGenres(bibData: SierraBibData): List[Genre[MaybeDisplayable[AbstractConcept]]] = {
+  def getGenres(
+    bibData: SierraBibData): List[Genre[MaybeDisplayable[AbstractConcept]]] = {
     getGenresForMarcTag(bibData, "655")
   }
 

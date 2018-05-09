@@ -44,13 +44,12 @@ class SierraGenresTest extends FunSpec with Matchers {
       List(
         Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - V Content",
-          concepts =
-            List(
-              Unidentifiable(Concept(label = "A Content")),
-              Unidentifiable(Concept(label = "V Content"))
-            )
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content"))
           )
         )
+      )
 
     assertExtractsGenres(
       bibData(
@@ -68,13 +67,12 @@ class SierraGenresTest extends FunSpec with Matchers {
       List(
         Genre[MaybeDisplayable[AbstractConcept]](
           label = "A Content - V Content",
-          concepts =
-            List(
-              Unidentifiable(Concept(label = "A Content")),
-              Unidentifiable(Concept(label = "V Content"))
-            )
+          concepts = List(
+            Unidentifiable(Concept(label = "A Content")),
+            Unidentifiable(Concept(label = "V Content"))
           )
         )
+      )
 
     assertExtractsGenres(
       bibData(
@@ -95,7 +93,8 @@ class SierraGenresTest extends FunSpec with Matchers {
             Unidentifiable(Concept(label = "A Content")),
             Unidentifiable(Concept(label = "X Content")),
             Unidentifiable(Concept(label = "V Content"))
-          )))
+          )
+        ))
 
     assertExtractsGenres(
       bibData(
@@ -197,8 +196,9 @@ class SierraGenresTest extends FunSpec with Matchers {
 
   private val transformer = new SierraGenres {}
 
-  private def assertExtractsGenres(bibData: SierraBibData,
-                                   expected: List[Genre[MaybeDisplayable[AbstractConcept]]]) = {
+  private def assertExtractsGenres(
+    bibData: SierraBibData,
+    expected: List[Genre[MaybeDisplayable[AbstractConcept]]]) = {
     transformer.getGenres(bibData) shouldBe expected
   }
 

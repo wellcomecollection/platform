@@ -11,7 +11,8 @@ import uk.ac.wellcome.models.work.internal._
 sealed trait DisplayAbstractConcept
 
 case object DisplayAbstractConcept {
-  def apply(abstractConcept: Displayable[AbstractConcept]): DisplayAbstractConcept =
+  def apply(
+    abstractConcept: Displayable[AbstractConcept]): DisplayAbstractConcept =
     abstractConcept match {
       case Unidentifiable(concept: Concept) =>
         DisplayConcept(

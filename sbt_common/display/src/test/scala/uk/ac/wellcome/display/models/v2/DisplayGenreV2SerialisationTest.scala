@@ -6,20 +6,21 @@ import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayGenreV2SerialisationTest
-  extends FunSpec
-  with DisplaySerialisationTestBase
-  with JsonMapperTestUtil {
+    extends FunSpec
+    with DisplaySerialisationTestBase
+    with JsonMapperTestUtil {
 
   it("serialises a DisplayGenre constructed from a Genre correctly") {
     val concept0 = Unidentifiable(Concept("conceptLabel"))
     val concept1 = Unidentifiable(Place("placeLabel"))
     val concept2 = Identified(
       canonicalId = "sqwyavpj",
-      identifiers = List(SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
-        value = "lcsh/sqw",
-        ontologyType = "Period"
-      )),
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          value = "lcsh/sqw",
+          ontologyType = "Period"
+        )),
       agent = Period("periodLabel")
     )
 

@@ -28,7 +28,8 @@ class MiroGenresTest
         "image_title": "A goat grazes on some grass",
         "image_phys_format": "painting"
       """,
-      expectedGenres = List(Genre("painting", List(Unidentifiable(Concept("painting")))))
+      expectedGenres =
+        List(Genre("painting", List(Unidentifiable(Concept("painting")))))
     )
   }
 
@@ -38,7 +39,8 @@ class MiroGenresTest
         "image_title": "Grouchy geese are good as guards",
         "image_lc_genre": "sculpture"
       """,
-      expectedGenres = List(Genre("sculpture", List(Unidentifiable(Concept("sculpture")))))
+      expectedGenres =
+        List(Genre("sculpture", List(Unidentifiable(Concept("sculpture")))))
     )
   }
 
@@ -63,8 +65,8 @@ class MiroGenresTest
         "image_phys_format": "oil painting",
         "image_lc_genre": "oil painting"
       """,
-      expectedGenres =
-        List(Genre("oil painting", List(Unidentifiable(Concept("oil painting")))))
+      expectedGenres = List(
+        Genre("oil painting", List(Unidentifiable(Concept("oil painting")))))
     )
   }
 

@@ -61,11 +61,12 @@ class DisplayAbstractConceptSerialisationTest
   it("constructs a DisplayConcept from an identified Concept") {
     val concept = Identified(
       canonicalId = "uq4bt5us",
-      identifiers = List(SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
-        ontologyType = "Concept",
-        value = "lcsh/uq4"
-      )),
+      identifiers = List(
+        SourceIdentifier(
+          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          ontologyType = "Concept",
+          value = "lcsh/uq4"
+        )),
       agent = Concept("conceptLabel")
     )
 

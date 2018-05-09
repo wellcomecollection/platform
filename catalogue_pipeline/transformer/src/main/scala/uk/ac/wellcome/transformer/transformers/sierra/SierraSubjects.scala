@@ -13,7 +13,8 @@ import uk.ac.wellcome.transformer.source.SierraBibData
 
 trait SierraSubjects extends MarcUtils {
 
-  def getSubjects(bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
+  def getSubjects(bibData: SierraBibData)
+    : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651")

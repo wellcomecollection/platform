@@ -89,7 +89,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
             Unidentifiable(Concept(label = "A Content")),
             Unidentifiable(Concept(label = "X Content")),
             Unidentifiable(Concept(label = "V Content"))
-          )))
+          )
+        ))
 
     assertExtractsSubjects(
       bibData(
@@ -199,7 +200,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
             Unidentifiable(Period(label = "A Content")),
             Unidentifiable(Concept(label = "X Content")),
             Unidentifiable(Concept(label = "V Content"))
-          )))
+          )
+        ))
 
     assertExtractsSubjects(
       bibData(
@@ -222,7 +224,8 @@ class SierraSubjectsTest extends FunSpec with Matchers {
             Unidentifiable(Place(label = "A Content")),
             Unidentifiable(Concept(label = "X Content")),
             Unidentifiable(Concept(label = "V Content"))
-          )))
+          )
+        ))
 
     assertExtractsSubjects(
       bibData(

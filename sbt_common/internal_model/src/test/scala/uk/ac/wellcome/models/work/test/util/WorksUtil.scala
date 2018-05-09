@@ -18,14 +18,16 @@ trait WorksUtil {
     concepts = List(
       Unidentifiable(Concept("a subject concept")),
       Unidentifiable(Place("a subject place")),
-      Unidentifiable(Period("a subject period"))))
+      Unidentifiable(Period("a subject period")))
+  )
 
   val genre = Genre[Unidentifiable[AbstractConcept]](
     label = "an unidentified genre created by WorksUtil",
     concepts = List(
       Unidentifiable(Concept("a genre concept")),
       Unidentifiable(Place("a genre place")),
-      Unidentifiable(Period("a genre period"))))
+      Unidentifiable(Period("a genre period")))
+  )
 
   val sourceIdentifier = SourceIdentifier(
     IdentifierSchemes.miroImageNumber,

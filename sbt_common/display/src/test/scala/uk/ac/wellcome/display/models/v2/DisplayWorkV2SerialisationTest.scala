@@ -205,13 +205,14 @@ class DisplayWorkV2SerialisationTest
       version = 1,
       identifiers = List(),
       canonicalId = "test_subject1",
-      genres = List(Genre(
-        label = "genre",
-        concepts = List(
-          Unidentifiable(Concept("woodwork")),
-          Unidentifiable(Concept("etching"))
-        )
-      ))
+      genres = List(
+        Genre(
+          label = "genre",
+          concepts = List(
+            Unidentifiable(Concept("woodwork")),
+            Unidentifiable(Concept("etching"))
+          )
+        ))
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
