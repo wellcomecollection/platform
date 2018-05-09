@@ -13,10 +13,9 @@ trait SierraConcepts {
     orderedSubfields.map { _.content }.mkString(" - ")
   }
 
-  // Get the primary concept, which is based on subfield $a.  This may
-  // be identified.  We look in subfield $0 for the identifier value, then
-  // second indicator for the authority.
-  protected def buildPrimaryConcept[T <: AbstractConcept](
+  // Apply an identifier to the primary concept.  We look in subfield $0
+  // for the identifier value, then second indicator for the authority.
+  protected def identifyPrimaryConcept(
     concept: AbstractConcept,
     bibData: SierraBibData): MaybeDisplayable[AbstractConcept] =
     Unidentifiable(agent = concept)
