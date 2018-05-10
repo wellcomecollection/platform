@@ -1,6 +1,6 @@
-# Merger architecture
+# Maatcher architecture
 
-The merger receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
+The matcher receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
 
 This document has some notes on the proposed architecture.
 
@@ -55,8 +55,7 @@ This is our current schema:
 -   `tail_vertices` -- if the source component is a single vertex, a list of
     vertices which are the "tail" of a directed edge from this vertex.
 
--   `component_vertices` -- if this is a single vertex, a list of all the
-    vertices in the same connected component.
+-   `component_vertices` -- a list of all the vertices in the same connected component.
 
 -   `is_redirect` -- has this component been replaced and redirected to
     something else?
