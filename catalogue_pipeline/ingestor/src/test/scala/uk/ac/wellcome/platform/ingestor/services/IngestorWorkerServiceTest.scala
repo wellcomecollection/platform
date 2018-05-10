@@ -8,7 +8,7 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
@@ -121,7 +121,7 @@ class IngestorWorkerServiceTest
     val brokenRestClient: RestClient = RestClient
       .builder(new HttpHost("localhost", 9800, "http"))
       .setHttpClientConfigCallback(
-        new ElasticCredentials("elastic", "changeme"))
+        new ElasticClientConfig("elastic", "changeme"))
       .build()
 
     val brokenElasticClient: HttpClient =

@@ -5,7 +5,7 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.index.mappings.PutMappingResponse
 import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import org.elasticsearch.client.ResponseException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 

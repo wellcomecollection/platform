@@ -7,7 +7,7 @@ import org.elasticsearch.client.RestClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientConfig
 import uk.ac.wellcome.elasticsearch.{ElasticSearchIndex, WorksIndex}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -41,7 +41,7 @@ trait ElasticsearchFixtures
 
   val restClient: RestClient = RestClient
     .builder(new HttpHost("localhost", 9200, "http"))
-    .setHttpClientConfigCallback(new ElasticCredentials("elastic", "changeme"))
+    .setHttpClientConfigCallback(new ElasticClientConfig("elastic", "changeme"))
     .build()
 
   val elasticClient: HttpClient = HttpClient.fromRestClient(restClient)

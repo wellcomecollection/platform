@@ -1,27 +1,10 @@
 package uk.ac.wellcome.elasticsearch.finatra.modules
 
-import javax.inject.Singleton
 import com.google.inject.Provides
-import org.elasticsearch.client.RestClient
-import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import com.sksamuel.elastic4s.http.HttpClient
-import com.twitter.inject.TwitterModule
-import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
+import javax.inject.Singleton
 import org.apache.http.HttpHost
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
-
-class ElasticCredentials(username: String, password: String)
-    extends HttpClientConfigCallback {
-  val credentials = new UsernamePasswordCredentials(username, password)
-  val credentialsProvider = new BasicCredentialsProvider()
-  credentialsProvider.setCredentials(AuthScope.ANY, credentials)
-
-  override def customizeHttpClient(
-    httpClientBuilder: HttpAsyncClientBuilder): HttpAsyncClientBuilder = {
-    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
-  }
-}
+import org.elasticsearch.client.RestClient
 
 object ElasticClientModule extends TwitterModule {
   private val host = flag[String]("es.host", "localhost", "host name of ES")
