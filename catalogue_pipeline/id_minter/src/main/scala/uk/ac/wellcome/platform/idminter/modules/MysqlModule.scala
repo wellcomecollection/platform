@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import scalikejdbc.{AutoSession, ConnectionPool, DB}
+import scalikejdbc.{ConnectionPool, DB}
 
 object MysqlModule extends TwitterModule {
 
@@ -26,7 +26,6 @@ object MysqlModule extends TwitterModule {
       s"jdbc:mysql://${host()}:${port()}",
       userName(),
       password())
-    implicit val session = AutoSession
     DB.connect()
   }
 }

@@ -128,10 +128,6 @@ class IdentifierGeneratorTest
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val identifierGenerator = new IdentifierGenerator(
-          identifiersDao,
-          metricsSender
-        )
 
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.idminter.steps
 
 import io.circe.parser._
 import org.mockito.Mockito.when
-import org.scalatest.concurrent.{PatienceConfiguration, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
@@ -11,7 +11,6 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.duration._
 import scala.util.Try
 
 class IdEmbedderTests
