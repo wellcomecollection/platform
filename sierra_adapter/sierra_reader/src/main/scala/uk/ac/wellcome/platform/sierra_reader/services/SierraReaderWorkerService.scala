@@ -1,13 +1,13 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
+import com.twitter.inject.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
@@ -41,11 +41,9 @@ class WindowStream @Inject()(
 }
 
 class SierraReaderWorkerService @Inject()(
-  reader: SQSReader,
-  s3client: AmazonS3,
-  system: ActorSystem,
-  metrics: MetricsSender,
+  windowStream: WindowStream,
   windowManager: WindowManager,
+  s3client: AmazonS3,
   s3Config: S3Config,
   @Flag("reader.batchSize") batchSize: Int,
   resourceType: SierraResourceTypes.Value,
@@ -53,17 +51,19 @@ class SierraReaderWorkerService @Inject()(
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.fields") fields: String
-) extends SQSWorker(reader, system, metrics) {
+) extends Logging {
 
-  implicit val actorSystem = system
-  implicit val materialiser = ActorMaterializer()
-  implicit val executionContext = system.dispatcher
-
+  // This is the throttle rate for requests to Sierra, *not* the rate at
+  // which we fetch messages from SQS.
   val throttleRate = ThrottleRate(3, 1.second)
 
-  def processMessage(message: SQSMessage): Future[Unit] =
+  windowStream.foreach(
+    streamName = this.getClass.getSimpleName,
+    process = processMessage
+  )
+
+  def processMessage(window: String): Future[Unit] =
     for {
-      window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
