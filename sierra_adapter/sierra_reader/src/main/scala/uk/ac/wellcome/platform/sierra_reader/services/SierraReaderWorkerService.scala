@@ -7,19 +7,22 @@ import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import io.circe.syntax._
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
-import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
-import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
+import io.circe.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.platform.sierra_reader.modules.{
+  WindowManager,
+  WindowStatus
+}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
 class SierraReaderWorkerService @Inject()(
   system: ActorSystem,

@@ -1,25 +1,27 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
-import org.scalatest.{FunSpec, Matchers}
-import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSStream}
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import org.scalatest.FunSpec
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.collection.JavaConversions._
 import scala.concurrent.duration._
+import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+
+import collection.JavaConversions._
 
 class SierraReaderWorkerServiceTest
     extends FunSpec
@@ -257,7 +259,6 @@ class SierraReaderWorkerServiceTest
           "topic",
           "messageType",
           "timestamp")
-
       whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
