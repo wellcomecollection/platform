@@ -16,6 +16,7 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil.fromJson
 
 import scala.concurrent.Future
+import scala.util.Try
 
 class SQSStream[T] @Inject()(
   actorSystem: ActorSystem,
@@ -51,7 +52,7 @@ class SQSStream[T] @Inject()(
     message: Message,
     process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
     val processMessageFuture = for {
-      t <- read(message)
+      t <- Future.fromTry(read(message))
       _ <- process(t)
     } yield message
 
@@ -68,6 +69,6 @@ class SQSStream[T] @Inject()(
     processMessageFuture
   }
 
-  protected def read(message: sqs.model.Message)(implicit decoderT: Decoder[T]): Future[T] =
-    Future.fromTry(fromJson[T](message.getBody))
+  protected def read(message: sqs.model.Message)(implicit decoderT: Decoder[T]): Try[T] =
+    fromJson[T](message.getBody)
 }
