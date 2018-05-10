@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
@@ -20,6 +22,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class SierraReaderWorkerService @Inject()(
+  system: ActorSystem,
   sqsStream: SQSStream[String],
   windowManager: WindowManager,
   s3client: AmazonS3,
@@ -31,6 +34,10 @@ class SierraReaderWorkerService @Inject()(
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.fields") fields: String
 ) extends Logging {
+
+  implicit val actorSystem = system
+  implicit val materialiser = ActorMaterializer()
+  implicit val executionContext = system.dispatcher
 
   // This is the throttle rate for requests to Sierra, *not* the rate at
   // which we fetch messages from SQS.
