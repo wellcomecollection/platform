@@ -21,6 +21,11 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender) {
 
+  private val s3ObjectStore = new S3ObjectStore[T](
+    s3Client = s3Client,
+    s3Config = messageReaderConfig.s3Config
+  )
+
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,
     sqsClient = sqsClient,
@@ -35,11 +40,6 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
       process = (notification: NotificationMessage) => processMessagePointer(notification, process)
     )
   }
-
-  private val s3ObjectStore = new S3ObjectStore[T](
-    s3Client = s3Client,
-    s3Config = messageReaderConfig.s3Config
-  )
 
   private def processMessagePointer(notification: NotificationMessage,
                                     process: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Unit] =
