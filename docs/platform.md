@@ -16,7 +16,7 @@ There are 3 kinds of project currently in use:
 - Infrastructure description (`./infra`)
   - Using terraform (separated by stack where appropriate).
     It's expected that some services will share terraform state where there is a high degree of coupling.
-  - Making use of shared terraform modules from project root (`ecs_service` etc)
+  - Making use of shared terraform uk.ac.wellcome.finatra.modules from project root (`ecs_service` etc)
 
 - `Makefile`: Describing project specific tasks. Where steps fail they should exit with a non-zero exit code status.
   The following steps are expected:

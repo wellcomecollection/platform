@@ -2,22 +2,11 @@ package uk.ac.wellcome.transformer
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
-import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.transformer.modules.TransformerWorkerModule
-import uk.ac.wellcome.transformer.modules._
+import uk.ac.wellcome.finatra.modules.{DynamoConfigModule, MessageConfigModule, MetricsSenderModule, S3ClientModule, S3ConfigModule, SNSClientModule, SNSConfigModule, SQSClientModule, SQSConfigModule, _}
+import uk.ac.wellcome.storage.dynamo.DynamoConfigModule
+import modules.{AWSConfigModule, AkkaModule, TransformerWorkerModule, _}
 
 object ServerMain extends Server
 

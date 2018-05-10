@@ -14,7 +14,6 @@ import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
-  S3Config,
   S3ObjectStore,
   SourcedKeyPrefixGenerator
 }

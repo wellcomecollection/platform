@@ -8,8 +8,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
+import uk.ac.wellcome.finatra.modules.{SNSConfig, SQSConfig}
+import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader}
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord

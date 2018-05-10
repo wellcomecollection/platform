@@ -1,16 +1,14 @@
 package uk.ac.wellcome.messaging.message
 
 import akka.actor.ActorSystem
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.concurrent.Future
-import com.twitter.inject.Logging
-
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import io.circe.Decoder
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.utils.JsonUtil._
 
 abstract class MessageWorker[T](messageReader: MessageReader[T],
@@ -31,7 +29,9 @@ abstract class MessageWorker[T](messageReader: MessageReader[T],
   def processMessage(message: T): Future[Unit]
 
   private def processMessages()(
-    implicit decoderN: Decoder[NotificationMessage]): Future[Unit] = {
+    implicit decoderN: Decoder[NotificationMessage],
+    context: ExecutionContext
+  ): Future[Unit] = {
     messageReader.readAndDelete { t =>
       val metricName = s"${workerName}_ProcessMessage"
 

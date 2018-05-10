@@ -4,22 +4,13 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.message.MessagePointer
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{
-  MessageInfo,
-  Messaging,
-  SNS,
-  SQS
-}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.messaging.test.fixtures.{MessageInfo, Messaging, SNS, SQS}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.GlobalExecutionContext
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConversions._

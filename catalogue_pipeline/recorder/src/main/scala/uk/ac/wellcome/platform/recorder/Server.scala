@@ -4,14 +4,8 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.platform.recorder.modules.{RecorderModule, RecorderWorkEntryKeyPrefixGeneratorModule}
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
-import uk.ac.wellcome.storage.s3.S3ClientModule
+import uk.ac.wellcome.finatra.modules.{DynamoClientModule, MessageConfigModule, MetricsSenderModule, S3ClientModule, SQSClientModule, SQSConfigModule, VHSConfigModule, _}
+import modules.{AWSConfigModule, AkkaModule, RecorderModule, RecorderWorkEntryKeyPrefixGeneratorModule}
 import uk.ac.wellcome.storage.vhs.VHSConfigModule
 
 object ServerMain extends Server

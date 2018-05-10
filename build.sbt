@@ -40,7 +40,6 @@ lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
-
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
@@ -59,6 +58,13 @@ lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging"
 lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
+
+// Storage depends on AWSConfig.
+lazy val common_finatra = doSharedLibrarySetup(project, "sbt_common/finatra")
+  .dependsOn(common % "compile->compile;test->test")
+  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.commonFinatraDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -84,6 +90,7 @@ lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_finatra % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doSharedSierraSetup(project, "catalogue_pipeline/recorder")
@@ -136,6 +143,7 @@ lazy val root = (project in file("."))
     common_messaging,
     common_monitoring,
     common_storage,
+    common_finatra,
     api,
     ingestor,
     transformer,

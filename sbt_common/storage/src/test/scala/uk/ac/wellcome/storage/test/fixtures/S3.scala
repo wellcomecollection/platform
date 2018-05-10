@@ -3,16 +3,17 @@ package uk.ac.wellcome.storage.test.fixtures
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
-import com.twitter.inject.Logging
+import com.amazonaws.util.IOUtils
 import io.circe.Json
 import io.circe.parser.parse
-import org.apache.commons.io.IOUtils
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
 import scala.util.Random
+
+import grizzled.slf4j.Logging
+
 
 object S3 {
 

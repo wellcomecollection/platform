@@ -2,18 +2,11 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.modules.SierraItemsToDynamoModule
-import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
+import uk.ac.wellcome.finatra.modules.{DynamoClientModule, DynamoConfigModule, MetricsSenderModule, SQSClientModule, SQSConfigModule, _}
+import modules.{AkkaModule, SierraItemsToDynamoModule}
+import uk.ac.wellcome.storage.dynamo.DynamoConfigModule
 
 object ServerMain extends Server
 

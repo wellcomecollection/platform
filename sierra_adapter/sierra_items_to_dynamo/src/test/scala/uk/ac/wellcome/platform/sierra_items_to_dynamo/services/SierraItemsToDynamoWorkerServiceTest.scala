@@ -5,11 +5,12 @@ import java.time.Instant
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
+import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.finatra.modules.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord

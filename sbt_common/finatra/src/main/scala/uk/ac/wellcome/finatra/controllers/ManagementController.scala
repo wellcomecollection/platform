@@ -1,9 +1,8 @@
 package uk.ac.wellcome.finatra.controllers
 
-import javax.inject.{Inject, Singleton}
-
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class ManagementController @Inject()() extends Controller {

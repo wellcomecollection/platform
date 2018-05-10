@@ -1,7 +1,6 @@
 package uk.ac.wellcome.test
 
-import com.twitter.inject.Logging
-import grizzled.slf4j.Logger
+import grizzled.slf4j.Logging
 
 import scala.util.Try
 
@@ -12,11 +11,11 @@ package object fixtures extends Logging {
 
   def safeCleanup[L](resource: L)(f: L => Unit): Unit = {
     Try {
-      logger.debug(s"cleaning up resource=[$resource]")
+      debug(s"cleaning up resource=[$resource]")
       f(resource)
     } recover {
       case e =>
-        logger.warn(
+        warn(
           s"error cleaning up resource=[$resource]",
           e
         )
@@ -28,7 +27,8 @@ package object fixtures extends Logging {
   def fixture[L, R](create: => L, destroy: L => Unit = noop): Fixture[L, R] =
     (testWith: TestWith[L, R]) => {
       val loan = create
-      logger.debug(s"created test resource=[$loan]")
+      debug(s"created test resource=[$loan]")
+
       try {
         testWith(loan)
       } finally {

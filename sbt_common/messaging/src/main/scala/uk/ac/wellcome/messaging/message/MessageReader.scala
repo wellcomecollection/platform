@@ -7,13 +7,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
+import uk.ac.wellcome.messaging.sqs.SQSReader
+import uk.ac.wellcome.storage.s3.S3ObjectStore
 
-import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import scala.concurrent.{ExecutionContext, Future}
 
-case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
 
 class MessageReader[T] @Inject()(
   messageReaderConfig: MessageReaderConfig,
@@ -29,7 +27,8 @@ class MessageReader[T] @Inject()(
 
   def readAndDelete(process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage],
-    decoderT: Decoder[T]
+    decoderT: Decoder[T],
+    ec: ExecutionContext
   ): Future[Unit] = {
     sqsReader.retrieveAndDeleteMessages { message =>
       for {
@@ -41,7 +40,8 @@ class MessageReader[T] @Inject()(
 
   private def read(message: sqs.model.Message)(
     implicit decoderN: Decoder[NotificationMessage],
-    decoderT: Decoder[T]
+    decoderT: Decoder[T],
+    ec: ExecutionContext
   ): Future[T] = {
     val deserialisedMessagePointerAttempt = for {
       notification <- fromJson[NotificationMessage](message.getBody)

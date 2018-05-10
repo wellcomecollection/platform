@@ -3,19 +3,14 @@ package uk.ac.wellcome.messaging.message
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Encoder
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-
-case class MessageWriterConfig(
-  snsConfig: SNSConfig,
-  s3Config: S3Config
-)
 
 class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,

@@ -40,8 +40,7 @@ trait SQS extends Matchers {
     s"sqs://${queue.name}"
 
   def sqsLocalFlags(queue: Queue) = sqsLocalClientFlags ++ Map(
-    "aws.sqs.queue.url" -> queue.url,
-    "aws.sqs.waitTime" -> "1"
+    "aws.message.sqs.queue.url" -> queue.url
   )
 
   def sqsLocalClientFlags = Map(

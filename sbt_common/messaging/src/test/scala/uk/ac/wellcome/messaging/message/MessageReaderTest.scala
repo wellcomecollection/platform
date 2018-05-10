@@ -8,6 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.GlobalExecutionContext
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -19,6 +20,8 @@ class MessageReaderTest
     with Messaging
     with S3
     with ExtendedPatience {
+
+  implicit val context = GlobalExecutionContext.context
 
   it("reads and deletes messages") {
     withExampleObjectMessageReaderFixtures {

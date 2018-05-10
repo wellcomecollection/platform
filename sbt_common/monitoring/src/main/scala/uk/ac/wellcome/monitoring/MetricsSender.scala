@@ -4,17 +4,10 @@ import java.util.Date
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{
-  ActorMaterializer,
-  OverflowStrategy,
-  QueueOfferResult,
-  ThrottleMode
-}
+import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
-import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConversions._
@@ -22,12 +15,17 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-class MetricsSender @Inject()(
-  @Flag("aws.metrics.namespace") namespace: String,
-  @Flag("aws.metrics.flushInterval") flushInterval: FiniteDuration,
-  amazonCloudWatch: AmazonCloudWatch,
-  actorSystem: ActorSystem)
-    extends Logging {
+case class MetricsSenderConfig(
+  namespace: String,
+  flushInterval: FiniteDuration
+)
+
+class MetricsSender @Inject ()(
+    config: MetricsSenderConfig,
+    amazonCloudWatch: AmazonCloudWatch,
+    actorSystem: ActorSystem
+  ) {
+
   implicit val system = actorSystem
   implicit val materialiser = ActorMaterializer()
 
@@ -43,7 +41,7 @@ class MetricsSender @Inject()(
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(
-        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, flushInterval))(
+        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, config.flushInterval))(
         Keep.left)
       // Make sure we don't exceed aws rate limit
       .throttle(
@@ -56,7 +54,7 @@ class MetricsSender @Inject()(
           metricDataSeq =>
             amazonCloudWatch.putMetricData(
               new PutMetricDataRequest()
-                .withNamespace(namespace)
+                .withNamespace(config.namespace)
                 .withMetricData(metricDataSeq: _*)
           )))
       .run()

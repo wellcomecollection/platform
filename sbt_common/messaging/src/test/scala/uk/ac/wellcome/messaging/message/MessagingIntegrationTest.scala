@@ -6,10 +6,10 @@ import org.scalatest.{FunSpec, Matchers}
 import org.mockito.Matchers.{any, matches}
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.S3ObjectStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.duration._

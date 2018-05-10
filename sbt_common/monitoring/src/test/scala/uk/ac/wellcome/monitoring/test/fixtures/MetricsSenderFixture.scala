@@ -1,19 +1,19 @@
 package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.{MetricsSender, MetricsSenderConfig}
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.Future
 
 trait MetricsSenderFixture
-    extends Logging
+  extends Logging
     with MockitoSugar
     with CloudWatch
     with Akka {
@@ -21,8 +21,10 @@ trait MetricsSenderFixture
   def withMetricsSender[R](actorSystem: ActorSystem) =
     fixture[MetricsSender, R](
       create = new MetricsSender(
-        namespace = awsNamespace,
-        flushInterval = flushInterval,
+        MetricsSenderConfig(
+          namespace = awsNamespace,
+          flushInterval = flushInterval
+        ),
         amazonCloudWatch = cloudWatchClient,
         actorSystem = actorSystem
       )

@@ -1,11 +1,11 @@
-package uk.ac.wellcome.storage.vhs
+package uk.ac.wellcome.finatra.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
-
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.vhs.VHSConfig
 
 object VHSConfigModule extends TwitterModule {
   private val tableName = flag[String](

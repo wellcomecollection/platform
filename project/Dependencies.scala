@@ -16,6 +16,7 @@ object Dependencies {
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
     val jacksonYamlVersion = "2.8.8"
+    val scalaJacksonVersion = "2.9.5"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
@@ -57,7 +58,9 @@ object Dependencies {
   )
 
   val jacksonDependencies = Seq(
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test"
+    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion,
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % versions.scalaJacksonVersion % " test"
   )
 
   val swaggerDependencies = Seq(
@@ -73,27 +76,18 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   )
 
+  val loggingDependencies = Seq(
+    "org.clapper" %% "grizzled-slf4j" % "1.3.2"
+  )
+
   val commonDependencies: Seq[ModuleID] = Seq(
-    "com.twitter" %% "finatra-http" % versions.finatra,
-    "com.twitter" %% "finatra-httpclient" % versions.finatra,
-    "ch.qos.logback" % "logback-classic" % versions.logback,
-    "com.twitter" %% "finatra-http" % versions.finatra % "test",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
-    "com.twitter" %% "inject-server" % versions.finatra % "test",
-    "com.twitter" %% "inject-app" % versions.finatra % "test",
-    "com.twitter" %% "inject-core" % versions.finatra % "test",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test",
-    "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
-    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
+    "com.google.inject" % "guice" % versions.guice,
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
-    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
-  ) ++ akkaDependencies ++ circeDependencies
+    "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
+    "com.typesafe.akka" %% "akka-agent" % versions.akka % "test",
+    "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
+  ) ++ circeDependencies ++ loggingDependencies
 
   val pipelineModelDependencies = circeDependencies ++ dynamoDependencies
 
@@ -112,16 +106,35 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3
-  )
+  ) ++ loggingDependencies ++ jacksonDependencies
 
   val commonStorageDependencies = commonDependencies ++ dynamoDependencies ++ Seq(
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  )
+  ) ++ loggingDependencies
 
-  val commonMonitoringDependencies = commonDependencies ++ Seq(
+  val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
-  )
+  ) ++ akkaDependencies
+
+  val commonFinatraDependencies = commonDependencies ++ Seq(
+    "com.twitter" %% "finatra-http" % versions.finatra,
+    "com.twitter" %% "finatra-httpclient" % versions.finatra,
+    "ch.qos.logback" % "logback-classic" % versions.logback,
+    "com.twitter" %% "finatra-http" % versions.finatra % "test",
+    "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
+    "com.twitter" %% "inject-server" % versions.finatra % "test",
+    "com.twitter" %% "inject-app" % versions.finatra % "test",
+    "com.twitter" %% "inject-core" % versions.finatra % "test",
+    "com.twitter" %% "inject-modules" % versions.finatra % "test",
+    "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
+    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests"
+  ) ++ akkaDependencies
 
   val sierraAdapterCommonDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
@@ -137,16 +150,12 @@ object Dependencies {
 
   val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
-  val idminterDependencies = commonDependencies ++ mysqlDependencies ++ Seq(
+  val idminterDependencies = commonFinatraDependencies ++ mysqlDependencies ++ Seq(
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws,
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
-
-  val snapshotConvertorDependencies = commonDependencies ++ Seq(
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
-  )
 
   val recorderDependencies: Seq[ModuleID] = Seq()
 

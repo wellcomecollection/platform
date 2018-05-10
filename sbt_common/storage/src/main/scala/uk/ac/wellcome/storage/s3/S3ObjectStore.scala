@@ -2,7 +2,7 @@ package uk.ac.wellcome.storage.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.GlobalExecutionContext.context

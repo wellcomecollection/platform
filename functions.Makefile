@@ -254,7 +254,7 @@ $(1)-terraform-apply:
 # it's okay.
 #
 # This is slightly easier than using terraform on the command line, as paths
-# are different in/outside Docker, so you have to reload all your modules,
+# are different in/outside Docker, so you have to reload all your uk.ac.wellcome.finatra.modules,
 # which is slow and boring.
 #
 $(1)-terraform-import:

@@ -1,9 +1,9 @@
-package uk.ac.wellcome.storage.s3
-
-import javax.inject.Singleton
+package uk.ac.wellcome.finatra.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import javax.inject.Singleton
+import uk.ac.wellcome.storage.s3.S3Config
 
 object S3ConfigModule extends TwitterModule {
 

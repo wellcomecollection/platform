@@ -24,7 +24,7 @@ abstract class SQSWorkerToDynamo[T](
       t <- Future.fromTry(fromJson[T](message.body))
       _ <- store(t).recover {
         case e: ConditionalCheckFailedException =>
-          logger.warn(s"Processing $message failed a Conditional Update", e)
+          warn(s"Processing $message failed a Conditional Update", e)
           throw GracefulFailureException(e)
       }
     } yield ()

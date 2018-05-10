@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.{MetricsSender, MetricsSenderConfig}
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -33,8 +33,11 @@ class MetricsSenderTest
     it("records the time and count of a successful future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 1 second
+        )
         val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+          new MetricsSender(metricsSenderConfig, amazonCloudWatch, actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedResult = "foo"
@@ -67,8 +70,11 @@ class MetricsSenderTest
     it("records the time and count of a failed future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 1 second
+        )
         val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+          new MetricsSender(metricsSenderConfig, amazonCloudWatch, actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val timedFunction = () => Future { throw new RuntimeException() }
@@ -99,8 +105,11 @@ class MetricsSenderTest
     it("groups 20 MetricDatum into one PutMetricDataRequest") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 1 second
+        )
         val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+          new MetricsSender(metricsSenderConfig, amazonCloudWatch, actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val emptyFunction = () => Future.successful(())
@@ -126,8 +135,11 @@ class MetricsSenderTest
     it("takes at least one second to make 150 PutMetricData requests") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 2 second
+        )
         val metricsSender =
-          new MetricsSender("test", 2 second, amazonCloudWatch, actorSystem)
+          new MetricsSender(metricsSenderConfig, amazonCloudWatch, actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedDuration = (1 second).toMillis
@@ -164,10 +176,12 @@ class MetricsSenderTest
     it("calls putMetricData with the correct value") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 100 millisecond
+        )
         val metricsSender =
           new MetricsSender(
-            "test",
-            100 millisecond,
+            metricsSenderConfig,
             amazonCloudWatch,
             actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
@@ -190,10 +204,12 @@ class MetricsSenderTest
     it("calls putMetricData with the correct value") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
+        val metricsSenderConfig = MetricsSenderConfig(
+          "test", 100 millisecond
+        )
         val metricsSender =
           new MetricsSender(
-            "test",
-            100 milliseconds,
+            metricsSenderConfig,
             amazonCloudWatch,
             actorSystem)
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
