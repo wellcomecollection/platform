@@ -34,17 +34,21 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   )
 
   def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T], decoderN: Decoder[NotificationMessage]): Future[Done] = {
+    implicit decoderT: Decoder[T],
+    decoderN: Decoder[NotificationMessage]): Future[Done] = {
     sqsStream.foreach(
       streamName = streamName,
-      process = (notification: NotificationMessage) => processMessagePointer(notification, process)
+      process = (notification: NotificationMessage) =>
+        processMessagePointer(notification, process)
     )
   }
 
-  private def processMessagePointer(notification: NotificationMessage,
-                                    process: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Unit] =
+  private def processMessagePointer(
+    notification: NotificationMessage,
+    process: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Unit] =
     for {
-      messagePointer <- Future.fromTry(fromJson[MessagePointer](notification.Message))
+      messagePointer <- Future.fromTry(
+        fromJson[MessagePointer](notification.Message))
       deserialisedObject <- s3ObjectStore.get(messagePointer.src)
       _ <- process(deserialisedObject)
     } yield ()

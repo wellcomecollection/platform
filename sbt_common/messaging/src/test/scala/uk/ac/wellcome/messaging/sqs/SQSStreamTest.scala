@@ -143,9 +143,7 @@ class SQSStreamTest
     sqsClient.sendMessage(queue.url, toJson(obj).get)
 
   def withSQSStreamFixtures[R](
-    testWith: TestWith[(SQSStream[ExampleObject],
-                        QueuePair,
-                        MetricsSender),
+    testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender),
                        R]) = {
 
     withActorSystem { actorSystem =>

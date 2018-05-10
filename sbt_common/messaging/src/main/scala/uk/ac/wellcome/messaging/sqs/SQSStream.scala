@@ -18,11 +18,11 @@ import uk.ac.wellcome.utils.JsonUtil.fromJson
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSStream[T] @Inject()(
-  actorSystem: ActorSystem,
-  sqsClient: AmazonSQSAsync,
-  sqsConfig: SQSConfig,
-  metricsSender: MetricsSender) extends Logging {
+class SQSStream[T] @Inject()(actorSystem: ActorSystem,
+                             sqsClient: AmazonSQSAsync,
+                             sqsConfig: SQSConfig,
+                             metricsSender: MetricsSender)
+    extends Logging {
 
   val decider: Supervision.Decider = {
     case _: Exception => Supervision.Resume
@@ -69,6 +69,7 @@ class SQSStream[T] @Inject()(
     processMessageFuture
   }
 
-  private def read(message: sqs.model.Message)(implicit decoderT: Decoder[T]): Try[T] =
+  private def read(message: sqs.model.Message)(
+    implicit decoderT: Decoder[T]): Try[T] =
     fromJson[T](message.getBody)
 }
