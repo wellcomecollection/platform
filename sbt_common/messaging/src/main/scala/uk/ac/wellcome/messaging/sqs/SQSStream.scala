@@ -69,6 +69,6 @@ class SQSStream[T] @Inject()(
     processMessageFuture
   }
 
-  protected def read(message: sqs.model.Message)(implicit decoderT: Decoder[T]): Try[T] =
+  private def read(message: sqs.model.Message)(implicit decoderT: Decoder[T]): Try[T] =
     fromJson[T](message.getBody)
 }
