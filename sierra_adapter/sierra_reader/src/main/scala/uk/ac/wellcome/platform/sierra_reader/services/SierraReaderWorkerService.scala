@@ -1,47 +1,26 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
-import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.amazonaws.services.sqs
-import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
 import com.twitter.inject.Logging
-import io.circe.Decoder
+import com.twitter.inject.annotations.Flag
+import io.circe.syntax._
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
-import io.circe.syntax._
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
-
-class WindowStream @Inject()(
-  actorSystem: ActorSystem,
-  sqsClient: AmazonSQSAsync,
-  sqsConfig: SQSConfig,
-  metricsSender: MetricsSender
-) extends SQSStream[String](
-  actorSystem = actorSystem,
-  sqsClient = sqsClient,
-  sqsConfig = sqsConfig,
-  metricsSender = metricsSender
-) {
-
-  override def read(message: sqs.model.Message)(implicit decoderT: Decoder[String]): Future[String] =
-    Future.fromTry(WindowExtractor.extractWindow(message.getBody))
-}
 
 class SierraReaderWorkerService @Inject()(
-  windowStream: WindowStream,
+  sqsStream: SQSStream[String],
   windowManager: WindowManager,
   s3client: AmazonS3,
   s3Config: S3Config,
@@ -57,13 +36,14 @@ class SierraReaderWorkerService @Inject()(
   // which we fetch messages from SQS.
   val throttleRate = ThrottleRate(3, 1.second)
 
-  windowStream.foreach(
+  sqsStream.foreach(
     streamName = this.getClass.getSimpleName,
     process = processMessage
   )
 
-  def processMessage(window: String): Future[Unit] =
+  def processMessage(messageString: String): Future[Unit] =
     for {
+      window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
