@@ -134,8 +134,9 @@ object Dependencies {
 
   val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
-  val idminterDependencies
-    : Seq[ModuleID] = commonDependencies ++ mysqlDependencies
+  val idminterDependencies = commonDependencies ++ mysqlDependencies ++ Seq(
+    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
+  )
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
 
