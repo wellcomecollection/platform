@@ -2,25 +2,22 @@ package uk.ac.wellcome.messaging.message
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import akka.actor.ActorSystem
 import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSConfig
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation}
+import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
 
 class MessageStreamTest
     extends FunSpec

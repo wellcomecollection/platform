@@ -1,18 +1,11 @@
 package uk.ac.wellcome.messaging.message
 
-import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.utils.JsonUtil._
-import org.scalatest.{FunSpec, Matchers}
-import org.mockito.Matchers.{any, matches}
-import org.mockito.Mockito.{times, verify}
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-
-import scala.concurrent.duration._
+import uk.ac.wellcome.utils.JsonUtil._
 
 class MessagingIntegrationTest
     extends FunSpec

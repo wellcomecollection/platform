@@ -1,15 +1,15 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
+import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.auth.AWSStaticCredentialsProvider
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSMessage}
+import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.util.Random
 
 object SQS {
@@ -71,11 +71,11 @@ trait SQS extends Matchers {
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = sqsClient.createQueue(queueName)
       val arn = sqsClient
-        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
-      sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
+      sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
       queue
     },
     destroy = { queue =>
@@ -93,9 +93,9 @@ trait SQS extends Matchers {
         .withQueueName(queueName)
         .withAttributes(Map(
           "RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
-          "VisibilityTimeout" -> "1")))
+          "VisibilityTimeout" -> "1").asJava))
       val arn = sqsClient
-        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
@@ -114,13 +114,13 @@ trait SQS extends Matchers {
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = localStackSqsClient.createQueue(queueName)
       val arn = localStackSqsClient
-        .getQueueAttributes(response.getQueueUrl, List("QueueArn"))
+        .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
 
       localStackSqsClient
-        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1"))
+        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
       queue
     },
     destroy = { queue =>
@@ -155,7 +155,7 @@ trait SQS extends Matchers {
   def assertQueueEmpty(queue: Queue) = {
     waitVisibilityTimeoutExipiry()
 
-    val messages: List[Message] = getMessages(queue)
+    val messages = getMessages(queue)
 
     messages shouldBe empty
   }
@@ -163,7 +163,7 @@ trait SQS extends Matchers {
   def assertQueueNotEmpty(queue: Queue) = {
     waitVisibilityTimeoutExipiry()
 
-    val messages: List[Message] = getMessages(queue)
+    val messages = getMessages(queue)
 
     messages should not be empty
   }
@@ -171,7 +171,7 @@ trait SQS extends Matchers {
   def assertQueueHasSize(queue: Queue, size: Int) = {
     waitVisibilityTimeoutExipiry()
 
-    val messages: List[Message] = getMessages(queue)
+    val messages = getMessages(queue)
 
     messages should have size size
   }
@@ -190,7 +190,7 @@ trait SQS extends Matchers {
           .withMaxNumberOfMessages(10)
       )
       .getMessages
-      .toList
+      .asScala
     messages
   }
 

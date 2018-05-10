@@ -1,13 +1,11 @@
 package uk.ac.wellcome.messaging.sqs
 
-import javax.inject.Singleton
-
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule.flag
+import javax.inject.Singleton
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SQSClientModule extends TwitterModule {
