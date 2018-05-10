@@ -7,18 +7,16 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraItemRecord,
-  SierraRecord
-}
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
+import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table

@@ -6,11 +6,11 @@ import io.circe.Decoder
 import uk.ac.wellcome.messaging.sqs.SQSWorkerToDynamo
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSReader
-import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import io.circe.generic.extras.semiauto._
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 
 import scala.concurrent.Future
 

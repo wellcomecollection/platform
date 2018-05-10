@@ -8,9 +8,9 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.transformable.sierra.SierraRecord
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
+import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
