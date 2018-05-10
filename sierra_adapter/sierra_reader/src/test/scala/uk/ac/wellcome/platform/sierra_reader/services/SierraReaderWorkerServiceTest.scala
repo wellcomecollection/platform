@@ -258,7 +258,7 @@ class SierraReaderWorkerServiceTest
           "messageType",
           "timestamp")
 
-      whenReady(fixtures.worker.processMessage(message).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
 
@@ -287,7 +287,7 @@ class SierraReaderWorkerServiceTest
           "messageType",
           "timestamp")
 
-      whenReady(fixtures.worker.processMessage(message).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
       }
     }

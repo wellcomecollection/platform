@@ -23,7 +23,7 @@ import scala.concurrent.duration._
 
 class SierraReaderWorkerService @Inject()(
   system: ActorSystem,
-  sqsStream: SQSStream[String],
+  sqsStream: SQSStream[SQSMessage],
   windowManager: WindowManager,
   s3client: AmazonS3,
   s3Config: S3Config,
@@ -48,8 +48,9 @@ class SierraReaderWorkerService @Inject()(
     process = processMessage
   )
 
-  def processMessage(messageString: String): Future[Unit] =
+  def processMessage(sqsMessage: SQSMessage): Future[Unit] =
     for {
+      messageString <- Future(sqsMessage.body)
       window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
