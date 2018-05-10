@@ -33,8 +33,8 @@ We considered three storage options:
 -   Titan/JanusGraph (a DynamoDB-backed graph database)
 -   Storing graph information in SQL
 
-We decided to use SQL, specifically RDS, because the other options don't give us a reliable way updating the graph concurrently.
-SQL allows row level locking wich means we can lock on the rows that represent a connected subgraph, but still allow updates on the rest of the main graph.
+Neo4j seems to be difficult to run ourselves especially if we want to deploy it as a cluster and Titan/JanusGraph doesn't give us a reliable way of updating the graph concurrently.
+Therefore we decided to use SQL, specifically RDS. SQL allows row level locking wich means we can lock on the rows that represent a connected subgraph, but still allow updates on the rest of the main graph.
 Also, we already use RDS in the ID minter, and we know how it scales.
 
 The idea is to store the structure of the graph in SQL, but do all of the graph theory logic outside the database.
