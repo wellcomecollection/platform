@@ -50,8 +50,19 @@ object IdentifierSchemes {
     override def toString: String = "marc-countries"
   }
 
+  // Note: these are two different schemes.  The Library of Congress (LC)
+  // publishes Subject Headings and a Name Authority File, and they aren't
+  // the same!
   case object libraryOfCongressNames extends IdentifierScheme {
-    override def toString: String = "lc-names"
+    override def toString: String = "library-of-congress-names"
+  }
+
+  case object libraryOfCongressSubjectHeadings extends IdentifierScheme {
+    override def toString: String = "library-of-congress-subject-headings"
+  }
+
+  case object medicalSubjectHeadings extends IdentifierScheme {
+    override def toString: String = "medical-subject-headings"
   }
 
   private final val knownIdentifierSchemes = Seq(
@@ -62,7 +73,10 @@ object IdentifierSchemes {
     sierraSystemNumber,
     sierraIdentifier,
     libraryOfCongressNames,
-    marcCountries)
+    libraryOfCongressSubjectHeadings,
+    marcCountries,
+    medicalSubjectHeadings
+  )
 
   private def createIdentifierScheme(
     identifierScheme: String): IdentifierSchemes.IdentifierScheme = {

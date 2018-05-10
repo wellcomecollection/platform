@@ -19,6 +19,11 @@ trait MarcUtils {
           }
       }
 
+  def getMatchingVarFields(bibData: SierraBibData,
+                           marcTag: String): List[VarField] =
+    bibData.varFields
+      .filter { _.marcTag == Some(marcTag) }
+
   def getMatchingSubfields(bibData: SierraBibData,
                            marcTag: String,
                            marcSubfieldTag: String): List[List[MarcSubfield]] =
