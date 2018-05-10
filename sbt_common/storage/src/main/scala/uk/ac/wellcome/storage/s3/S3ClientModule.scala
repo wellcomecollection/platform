@@ -21,19 +21,27 @@ object S3ClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesS3Client(awsConfig: AWSConfig): AmazonS3 = {
+  def providesS3Client(awsConfig: AWSConfig): AmazonS3 =
+    buildS3Client(
+      awsConfig = awsConfig,
+      endpoint = endpoint(),
+      accessKey = accessKey(),
+      secretKey = secretKey()
+    )
+
+  def buildS3Client(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonS3 = {
     val standardClient = AmazonS3ClientBuilder.standard
-    if (endpoint().isEmpty)
+    if (endpoint.isEmpty)
       standardClient
         .withRegion(awsConfig.region)
         .build()
     else
       standardClient
         .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey(), secretKey())))
+          new BasicAWSCredentials(accessKey, secretKey)))
         .withPathStyleAccessEnabled(true)
         .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint(), awsConfig.region))
+          new EndpointConfiguration(endpoint, awsConfig.region))
         .build()
   }
 
