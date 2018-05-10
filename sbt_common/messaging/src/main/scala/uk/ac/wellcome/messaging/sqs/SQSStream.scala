@@ -60,7 +60,10 @@ class SQSStream[T] @Inject()(
         logger.warn(s"Failure processing message", exception)
       case exception: Exception =>
         logger.error(s"Failure while processing message.", exception)
-        metricsSender.incrementCount(s"${streamName}_MessageProcessingFailure")
+        metricsSender.incrementCount(
+          metricName = s"${streamName}_MessageProcessingFailure",
+          count = 1.0
+        )
     }
     processMessageFuture
   }
