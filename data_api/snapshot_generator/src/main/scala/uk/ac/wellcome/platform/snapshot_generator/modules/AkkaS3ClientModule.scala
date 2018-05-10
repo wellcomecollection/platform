@@ -42,25 +42,34 @@ object AkkaS3ClientModule extends TwitterModule {
   @Singleton
   @Provides
   def providesAkkaS3Client(awsConfig: AWSConfig,
-                           actorSystem: ActorSystem): S3Client = {
+                           actorSystem: ActorSystem): S3Client =
+    buildAkkaS3Client(
+      awsConfig = awsConfig,
+      actorSystem = actorSystem,
+      endpoint = endpoint(),
+      accessKey = accessKey(),
+      secretKey = secretKey()
+    )
+
+  def buildAkkaS3Client(awsConfig: AWSConfig, actorSystem: ActorSystem, endpoint: String, accessKey: String, secretKey: String): S3Client = {
     val regionProvider =
       new AwsRegionProvider {
         def getRegion: String = awsConfig.region
       }
 
-    val credentialsProvider = if (endpoint().isEmpty) {
+    val credentialsProvider = if (endpoint.isEmpty) {
       DefaultAWSCredentialsProviderChain.getInstance()
     } else {
       new AWSStaticCredentialsProvider(
-        new BasicAWSCredentials(accessKey(), secretKey())
+        new BasicAWSCredentials(accessKey, secretKey)
       )
     }
 
     val actorMaterializer = ActorMaterializer()(actorSystem)
-    val endpointUrl = if (endpoint().isEmpty) {
+    val endpointUrl = if (endpoint.isEmpty) {
       None
     } else {
-      Some(endpoint())
+      Some(endpoint)
     }
 
     val settings = akkaS3Settings(
