@@ -115,6 +115,26 @@ We receive an update to B telling us it now has edges B→A and B→D.
         DEF   | -      | ABCDEF      | true        | ABCDEF
         ABCDEF| -      | _           | false       | _
 
+4.  The output JSON is:
+    ```[json]
+    [
+        {
+            "winner": "ABCDEF",
+            "loosers":
+                [
+                    "A",
+                    "B",
+                    "C",
+                    "ABC",
+                    "D",
+                    "E",
+                    "F",
+                    "DEF"
+                ]
+        }
+    ]
+    ```
+
 ## Example 2
 
 What if we have two conflicting updates?
@@ -220,3 +240,22 @@ In this example A, B and C are connected into a component called ABC. We receive
             AB    | _      | _           | false       | _
             C     | _      | _           | false       | _
             ABC   | _      | _           | true        | AB
+
+7.  The output JSON is:
+    ```[json]
+    [
+        {
+            "winner": "AB",
+            "loosers":
+                [
+                    "A",
+                    "B",
+                    "ABC"
+                ]
+        },
+        {
+            "winner": "C",
+            "loosers": []
+        }
+    ]
+    ```
