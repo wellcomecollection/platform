@@ -1,4 +1,4 @@
-# Maatcher architecture
+# Matcher architecture
 
 The matcher receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
 
