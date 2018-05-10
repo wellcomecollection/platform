@@ -368,8 +368,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
       val lcshCode2 = "  lcsh2055034 "
       val lcshCode3 = " lc sh 2055034"
 
-      // See Sierra record b3017492
-      val lcshCode4 = "lcsh. 2055034.,"
+      // Based on an example from a real record; see Sierra b3017492.
+      val lcshCode4 = "lcsh 2055034.,"
 
       val varFields = List(
         VarField(
