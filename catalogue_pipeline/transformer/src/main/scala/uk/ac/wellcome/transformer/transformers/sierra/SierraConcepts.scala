@@ -30,11 +30,12 @@ trait SierraConcepts extends MarcUtils {
 
     identifierSubfields match {
       case Seq() => Unidentifiable(agent = concept)
-      case Seq(identifierSubfield) => maybeAddIdentifier[T](
-        concept = concept,
-        varField = varField,
-        identifierSubfield = identifierSubfield
-      )
+      case Seq(identifierSubfield) =>
+        maybeAddIdentifier[T](
+          concept = concept,
+          varField = varField,
+          identifierSubfield = identifierSubfield
+        )
       case _ =>
         throw new RuntimeException(
           s"Too many identifiers fields: $identifierSubfields")
@@ -57,8 +58,7 @@ trait SierraConcepts extends MarcUtils {
         Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
       case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
       case Some(scheme) =>
-        throw new RuntimeException(
-          s"Unrecognised identifier scheme: $scheme")
+        throw new RuntimeException(s"Unrecognised identifier scheme: $scheme")
     }
 
     maybeIdentifierScheme match {
