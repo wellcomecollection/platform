@@ -250,6 +250,14 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
+      val sqsMessage =
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
+
       whenReady(fixtures.worker.processMessage(message).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
@@ -271,6 +279,13 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
+      val sqsMessage =
+        SQSMessage(
+          Some("subject"),
+          message,
+          "topic",
+          "messageType",
+          "timestamp")
 
       whenReady(fixtures.worker.processMessage(message).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
