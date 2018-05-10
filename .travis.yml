@@ -109,10 +109,10 @@ jobs:
     - env: TASK=sierra_item_merger-test
     - env: TASK=s3_demultiplexer-test
 
-    # Shared infra stack
-    - env: TASK=shared_infra-test
-
     # (not under active development)
+
+    # Shared infra stack
+    # - env: TASK=shared_infra-test
 
     # nginx stack
     # - env: TASK=nginx-build
