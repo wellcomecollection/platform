@@ -85,12 +85,14 @@ trait SNS {
   )
 
   implicit val topicInfoDecoder: Decoder[TopicInfo] = deriveDecoder[TopicInfo]
-  implicit val snsResponseDecoder: Decoder[SNSResponse] = deriveDecoder[SNSResponse]
+  implicit val snsResponseDecoder: Decoder[SNSResponse] =
+    deriveDecoder[SNSResponse]
 
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.
-  implicit val messageInfoDecoder: Decoder[MessageInfo] = Decoder.forProduct4(
-    ":id", ":message", ":subject", ":topic_arn")(MessageInfo.apply)
+  implicit val messageInfoDecoder: Decoder[MessageInfo] =
+    Decoder.forProduct4(":id", ":message", ":subject", ":topic_arn")(
+      MessageInfo.apply)
 
   def listMessagesReceivedFromSNS(topic: Topic): Seq[MessageInfo] = {
     /*
@@ -115,13 +117,12 @@ trait SNS {
 
     val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
 
-    val snsResponse: SNSResponse = json
-      .right.get
+    val snsResponse: SNSResponse = json.right.get
       .as[SNSResponse]
-      .right.get
+      .right
+      .get
 
-    snsResponse
-      .messages
+    snsResponse.messages
       .filter { _.topicArn == topic.arn }
   }
 }
