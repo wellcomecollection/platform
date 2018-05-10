@@ -361,7 +361,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("combines identifiers with inconsistent spacing/punctuation from subfield $$0") {
+    it(
+      "combines identifiers with inconsistent spacing/punctuation from subfield $$0") {
       val name = "Wanda the watercress"
       val lcshCodeCanonical = "lcsh2055034"
       val lcshCode1 = "lcsh 2055034"
