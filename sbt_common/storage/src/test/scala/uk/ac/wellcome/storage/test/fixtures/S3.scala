@@ -1,14 +1,13 @@
 package uk.ac.wellcome.storage.test.fixtures
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
-import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
+import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.storage.s3.S3ClientModule
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
@@ -44,19 +43,15 @@ trait S3 extends Logging with Eventually {
     "aws.s3.endpoint" -> localS3EndpointUrl,
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> regionName
   )
 
-  private val credentials = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials(accessKey, secretKey))
-
-  val s3Client: AmazonS3 = AmazonS3ClientBuilder
-    .standard()
-    .withPathStyleAccessEnabled(true)
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(localS3EndpointUrl, regionName))
-    .build()
+  val s3Client: AmazonS3 = S3ClientModule.buildS3Client(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = localS3EndpointUrl,
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   def withLocalS3Bucket[R] =
     fixture[Bucket, R](
