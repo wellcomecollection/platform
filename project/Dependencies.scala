@@ -61,7 +61,7 @@ object Dependencies {
   )
 
   val swaggerDependencies = Seq(
-    "com.github.xiaodongw" %% "swagger-finatra" % "0.7.2"
+    "com.jakehschwartz" %% "finatra-swagger" % versions.finatra
   )
 
   val sharedDependencies = Seq(
