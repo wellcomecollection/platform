@@ -1,7 +1,6 @@
 -api.host=${api_host}
 -es.host=${es_host}
 -es.port=${es_port}
--es.name=${es_name}
 -es.index.v1=${es_index_v1}
 -es.index.v2=${es_index_v2}
 -es.type=${es_doc_type}
