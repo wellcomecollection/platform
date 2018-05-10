@@ -73,6 +73,12 @@ wwork:Contributor rdf:type owl:Class ;
     rdfs:comment "A contribution to a work."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
                     
+wwork:ProductionEvent rdf:type owl:Class ;
+    rdfs:label "ProductionEvent"@en ;
+    rdfs:comment "An event contributing to the production, publishing or distribution of a work."@en ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+  
+                    
 #######  Object properties ##### 
     
 
@@ -85,10 +91,17 @@ wwork:items rdf:type owl:ObjectProperty ;
 
 wwork:isPartOf rdf:type owl:ObjectProperty ;
     rdfs:label "isPartOf"@en ;
-    rdfs:comment "Relates an entity to one of which it forms a part."@en ;
+    rdfs:comment "Relates an work to its host work."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Work ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .
+    
+wwork:hasPart rdf:type owl:ObjectProperty ;
+    rdfs:label "hasPart"@en ;
+    rdfs:comment "Relates an work to its parts."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:Work ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .    
     
 wwork:isCopyOf rdf:type owl:ObjectProperty ;
     rdfs:label "isCopyOf"@en ;
@@ -214,7 +227,21 @@ wwork:classification rdf:type owl:DatatypeProperty ;
     rdfs:comment "Relates a work to its classifications."@en ;
     rdfs:domain wwork:Work ;
     rdfs:range wwork:Concept ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                                      
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:production rdf:type owl:DatatypeProperty ;
+    rdfs:label "provisionEvents"@en ;
+    rdfs:comment "Relates a work to its provision events."@en ;
+    rdfs:domain wwork:Work ;
+    rdfs:range wwork:ProductionEvent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> . 
+    
+wwork:function rdf:type owl:DatatypeProperty ;
+    rdfs:label "function"@en ;
+    rdfs:comment "Relates a production event to a specific function."@en ;
+    rdfs:domain wwork:ProductionEvent ;
+    rdfs:range wwork:Concept ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .                                              
     
 #######  Data properties #####  
                         

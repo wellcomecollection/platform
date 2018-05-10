@@ -441,40 +441,137 @@
    *  },
    */
 
-   /* Populate wwork:placeOfPublications
+   /* Populate wwork:production 260
    * 
    * 1. For bibliographic records where "260" is populated
-   * 2. Platform "placeOfPublication" "label" populate with 260 subfield "a"
-   * 3. Type as "Place"
-   * Ignore 4. Also for all bibliographic records use fixed field "country" to populate "placeOfPublication" with..
-   * Ignore 5. Platform "id" is populated from "code"
-   * 6. Platform "label" is populated from "name"
-   * 7. Type as "Place"
-   *
-   * Note: For now we have not pulled in the marc countries. American states seem to be valid entries for Marc countries: http://www.loc.gov/marc/countries/countries_code.html
-   *
+   * 2. Populate "places" from subfield "a" and type as "Place".
+   * 3. Populate "agents" from subfield "b" and type as "Agent"
+   * 4. Populate "periods" from subfield "c" and type as "Periods"    
+   * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
+   * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
+   * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
    *
    * Example:
    *
-   *    "placeOfPublication": [
+   *  "production": [
+   *    {
+   *      "places": [
    *        {
-   *        "label": "[Maryland] (James Street)",
-   *        "type": "Place" 
-   *        } ,
-   *        {
-   *        "id": "j9210jdd" ,
-   *        "label": "Maryland" ,
-   *        "type": "Place"
-   *        "identifiers" : {
-   *           "type" : "Identifier" ,
-   *           "identifierScheme": "marc-countries",
-   *           "value" : "mdu"
-   *         }
+   *          "label": "London",
+   *          "type": "Place"
    *        }
-   *       ],
+   *      ],
+   *      "function": {
+   *        "label": "Publication",
+   *        "type": "Concept"
+   *      },
+   *      "dates": [
+   *        {
+   *          "label": "2 May 2018",
+   *          "type": "Period"
+   *        }
+   *      ],
+   *      "agents": [
+   *        {
+   *          "label": "Amazon",
+   *          "type": "Agent"
+   *        }
+   *      ],
+   *      "type": "ProductionEvent"
+   *    },
+   *    {
+   *      "places": [
+   *        {
+   *          "label": "UK",
+   *          "type": "Place"
+   *        }
+   *      ],
+   *      "function": {
+   *        "label": "Manufacture",
+   *        "type": "Concept"
+   *      },
+   *      "dates": [
+   *        {
+   *          "label": "2 May 2018",
+   *          "type": "Period"
+   *        }
+   *      ],
+   *      "agents": [
+   *        {
+   *          "label": "Harper Collins",
+   *          "type": "Agent"
+   *        }
+   *      ],
+   *      "type": "ProductionEvent"
+   *    }
+   *  ]
    *
    */
 
+   /* Populate wwork:production 264
+   * 
+   * 1. For bibliographic records where "264" is populated
+   * 2. Populate "places" from subfield "a" and type as "Place".
+   * 3. Populate "agents" from subfield "b" and type as "Agent"
+   * 4. Populate "dates" from subfield "c" and type as "Periods"    
+   * 5. For the second indicator populate "function" as follows. 0 = "Production", 1="Publication", 2="Distribution", 3="Manufacture". Type as "Concept".
+   *
+   * Example:
+   *
+   *  "production": [
+   *    {
+   *      "places": [
+   *        {
+   *          "label": "London",
+   *          "type": "Place"
+   *        }
+   *      ],
+   *      "function": {
+   *        "label": "Publication",
+   *        "type": "Concept"
+   *      },
+   *      "dates": [
+   *        {
+   *          "label": "2 May 2018",
+   *          "type": "Period"
+   *        }
+   *      ],
+   *      "agents": [
+   *        {
+   *          "label": "Amazon",
+   *          "type": "Agent"
+   *        }
+   *      ],
+   *      "type": "ProductionEvent"
+   *    },
+   *    {
+   *      "places": [
+   *        {
+   *          "label": "UK",
+   *          "type": "Place"
+   *        }
+   *      ],
+   *      "function": {
+   *        "label": "Manufacture",
+   *        "type": "Function"
+   *      },
+   *      "dates": [
+   *        {
+   *          "label": "2 May 2018",
+   *          "type": "Period"
+   *        }
+   *      ],
+   *      "agents": [
+   *        {
+   *          "label": "Harper Collins",
+   *          "type": "Agent"
+   *        }
+   *      ],
+   *      "type": "ProductionEvent"
+   *    }
+   *  ]
+   *
+   */
 
 
    /* Populate wwork:publishers
