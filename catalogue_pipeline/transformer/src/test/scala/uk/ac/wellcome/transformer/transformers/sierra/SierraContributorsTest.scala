@@ -361,12 +361,16 @@ class SierraContributorsTest extends FunSpec with Matchers {
         expectedContributors = expectedContributors)
     }
 
-    it("gets an identifier with inconsistent spacing from subfield $$0") {
+    it(
+      "combines identifiers with inconsistent spacing/punctuation from subfield $$0") {
       val name = "Wanda the watercress"
       val lcshCodeCanonical = "lcsh2055034"
       val lcshCode1 = "lcsh 2055034"
       val lcshCode2 = "  lcsh2055034 "
       val lcshCode3 = " lc sh 2055034"
+
+      // Based on an example from a real record; see Sierra b3017492.
+      val lcshCode4 = "lcsh 2055034.,"
 
       val varFields = List(
         VarField(
@@ -378,7 +382,8 @@ class SierraContributorsTest extends FunSpec with Matchers {
             MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = lcshCode1),
             MarcSubfield(tag = "0", content = lcshCode2),
-            MarcSubfield(tag = "0", content = lcshCode3)
+            MarcSubfield(tag = "0", content = lcshCode3),
+            MarcSubfield(tag = "0", content = lcshCode4)
           )
         )
       )
