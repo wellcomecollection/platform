@@ -4,9 +4,12 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
+import com.amazonaws.services.sqs
+import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
+import io.circe.Decoder
+import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
@@ -15,14 +18,27 @@ import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.{
-  WindowManager,
-  WindowStatus
-}
+import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
+
+class WindowStream @Inject()(
+  actorSystem: ActorSystem,
+  sqsClient: AmazonSQSAsync,
+  sqsConfig: SQSConfig,
+  metricsSender: MetricsSender
+) extends SQSStream[String](
+  actorSystem = actorSystem,
+  sqsClient = sqsClient,
+  sqsConfig = sqsConfig,
+  metricsSender = metricsSender
+) {
+
+  override def read(message: sqs.model.Message)(implicit decoderT: Decoder[String]): Future[String] =
+    Future.fromTry(WindowExtractor.extractWindow(message.getBody))
+}
 
 class SierraReaderWorkerService @Inject()(
   reader: SQSReader,
