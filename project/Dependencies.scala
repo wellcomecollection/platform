@@ -53,7 +53,6 @@ object Dependencies {
     "io.circe" %% "circe-generic"% versions.circeVersion,
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
-    "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
   )
 
@@ -100,7 +99,9 @@ object Dependencies {
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
-  val commonElasticsearchDependencies = commonDependencies ++ esDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies = commonDependencies ++ esDependencies ++ scalacheckDependencies ++ Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
+  )
 
   // We use Circe for all our JSON serialisation, but our local SNS container
   // returns YAML, and currently we use Jackson to parse that YAML.
@@ -122,7 +123,9 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
   )
 
-  val sierraAdapterCommonDependencies: Seq[ModuleID] = Seq()
+  val sierraAdapterCommonDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
+  )
 
   val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
 
@@ -135,7 +138,8 @@ object Dependencies {
   val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
 
   val idminterDependencies = commonDependencies ++ mysqlDependencies ++ Seq(
-    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws
+    "com.amazonaws" % "aws-java-sdk-rds" % versions.aws,
+    "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
   val reindexerDependencies: Seq[ModuleID] = commonDependencies
