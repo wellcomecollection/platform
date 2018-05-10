@@ -171,6 +171,52 @@ different vertices).
 This results in an eventually consistent graph, which is as good as we can
 guarantee.
 
-## Example 2
+## Example 3
 
 What happens if we remove a link?
+
+![](matcher_example3.png)
+
+In this example A, B and C are connected into a component called ABC. We receive an update to C that causes ABC to be split.
+
+0.  The existing DB is as follows:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            A     | B      | ABC         | true        | ABC
+            B     | A      | ABC         | true        | ABC
+            C     | B      | ABC         | true        | ABC
+            ABC   | _      | _           | false       | _
+
+1.  Because we have an update that affects C, we read and acquire a lock on C from the database first:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            C     | B      | ABC         | true        | ABC
+
+2.  By looking at their connected components, we acquire a lock on all other vertices affected: A,B and ABC.
+3.  We update C to not redirect to ABC:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            C     | _      | _           | false       | _
+
+4.  We create a new component AB and redirect A and B to it:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            A     | B      | AB          | true        | AB
+            B     | A      | AB          | true        | AB
+            AB    | _      | _           | false       | _
+
+5.  We modify ABC to redirect to AB:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            ABC   | _      | _           | true        | AB
+
+    How do we choose where to redirect a subgraph that gets split? In this case AB seems the most reasonable choice because it's the biggest bit of the late ABC, but what about graphs that get split into same size bits?
+
+6.  The database ends up looking like this:
+
+            src   | tail_v | component_v | is_redirect | redirected_target
+            A     | B      | AB          | true        | AB
+            B     | A      | AB          | true        | AB
+            AB    | _      | _           | false       | _
+            C     | _      | _           | false       | _
+            ABC   | _      | _           | true        | AB
