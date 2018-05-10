@@ -9,7 +9,7 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.SierraRecord
+import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

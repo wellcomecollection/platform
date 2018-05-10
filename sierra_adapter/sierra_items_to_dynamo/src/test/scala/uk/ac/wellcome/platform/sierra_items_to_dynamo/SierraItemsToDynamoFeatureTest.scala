@@ -10,10 +10,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraItemRecord,
-  SierraRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table

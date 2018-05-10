@@ -1,9 +1,10 @@
-package uk.ac.wellcome.models.transformable.sierra
+package uk.ac.wellcome.sierra_adapter.models
 
 import java.time.Instant
 
 import io.circe.ParsingFailure
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
 import scala.util.{Failure, Success}
 
