@@ -32,7 +32,10 @@ object DynamoClientModule extends TwitterModule {
       secretKey = secretKey()
     )
 
-  def buildDynamoClient(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonDynamoDB = {
+  def buildDynamoClient(awsConfig: AWSConfig,
+                        endpoint: String,
+                        accessKey: String,
+                        secretKey: String): AmazonDynamoDB = {
     val standardClient = AmazonDynamoDBClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
@@ -40,8 +43,9 @@ object DynamoClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(
           new EndpointConfiguration(endpoint, awsConfig.region))
         .build()

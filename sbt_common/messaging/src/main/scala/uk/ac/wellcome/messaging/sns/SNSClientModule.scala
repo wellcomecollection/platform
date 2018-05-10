@@ -30,7 +30,10 @@ object SNSClientModule extends TwitterModule {
       secretKey = secretKey()
     )
 
-  def buildSNSClient(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonSNS = {
+  def buildSNSClient(awsConfig: AWSConfig,
+                     endpoint: String,
+                     accessKey: String,
+                     secretKey: String): AmazonSNS = {
     val standardClient = AmazonSNSClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
@@ -38,8 +41,9 @@ object SNSClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(
           new EndpointConfiguration(endpoint, awsConfig.region))
         .build()

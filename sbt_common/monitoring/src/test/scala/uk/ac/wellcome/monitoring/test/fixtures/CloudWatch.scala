@@ -19,8 +19,9 @@ trait CloudWatch {
       "aws.cloudWatch.endpoint" -> localCloudWatchEndpointUrl
     )
 
-  val cloudWatchClient: AmazonCloudWatch = CloudWatchClientModule.buildCloudWatchClient(
-    awsConfig = AWSConfig(region = regionName),
-    endpoint = localCloudWatchEndpointUrl
-  )
+  val cloudWatchClient: AmazonCloudWatch =
+    CloudWatchClientModule.buildCloudWatchClient(
+      awsConfig = AWSConfig(region = regionName),
+      endpoint = localCloudWatchEndpointUrl
+    )
 }

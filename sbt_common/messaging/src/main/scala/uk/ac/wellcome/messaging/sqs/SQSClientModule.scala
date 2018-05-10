@@ -33,7 +33,10 @@ object SQSClientModule extends TwitterModule {
       secretKey = secretKey()
     )
 
-  def buildSQSClient(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonSQS = {
+  def buildSQSClient(awsConfig: AWSConfig,
+                     endpoint: String,
+                     accessKey: String,
+                     secretKey: String): AmazonSQS = {
     val standardClient = AmazonSQSClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
@@ -41,8 +44,9 @@ object SQSClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(
           new EndpointConfiguration(endpoint, awsConfig.region))
         .build()
@@ -58,7 +62,10 @@ object SQSClientModule extends TwitterModule {
       secretKey = secretKey()
     )
 
-  def buildSQSAsyncClient(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonSQSAsync = {
+  def buildSQSAsyncClient(awsConfig: AWSConfig,
+                          endpoint: String,
+                          accessKey: String,
+                          secretKey: String): AmazonSQSAsync = {
     val standardClient = AmazonSQSAsyncClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
@@ -66,8 +73,9 @@ object SQSClientModule extends TwitterModule {
         .build()
     else
       standardClient
-        .withCredentials(new AWSStaticCredentialsProvider(
-          new BasicAWSCredentials(accessKey, secretKey)))
+        .withCredentials(
+          new AWSStaticCredentialsProvider(
+            new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(
           new EndpointConfiguration(endpoint, awsConfig.region))
         .build()

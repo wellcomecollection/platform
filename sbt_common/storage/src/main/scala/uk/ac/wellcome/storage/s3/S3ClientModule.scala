@@ -29,7 +29,10 @@ object S3ClientModule extends TwitterModule {
       secretKey = secretKey()
     )
 
-  def buildS3Client(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonS3 = {
+  def buildS3Client(awsConfig: AWSConfig,
+                    endpoint: String,
+                    accessKey: String,
+                    secretKey: String): AmazonS3 = {
     val standardClient = AmazonS3ClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
