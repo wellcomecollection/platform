@@ -15,7 +15,6 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
-    val jacksonYamlVersion = "2.8.8"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
@@ -55,10 +54,6 @@ object Dependencies {
     "io.circe" %% "circe-parser"% versions.circeVersion,
     "io.circe" %% "circe-optics" % versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
-  )
-
-  val jacksonDependencies = Seq(
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test"
   )
 
   val swaggerDependencies = Seq(
@@ -102,10 +97,7 @@ object Dependencies {
 
   val commonElasticsearchDependencies = commonDependencies ++ esDependencies ++ scalacheckDependencies
 
-  // We use Circe for all our JSON serialisation, but our local SNS container
-  // returns YAML, and currently we use Jackson to parse that YAML.
-  // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
-  val commonMessagingDependencies = commonDependencies ++ jacksonDependencies ++ Seq(
+  val commonMessagingDependencies = commonDependencies ++ Seq(
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
