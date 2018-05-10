@@ -3,10 +3,9 @@ package uk.ac.wellcome.platform.api
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.versions.ApiVersions
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
@@ -36,7 +35,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       tree
         .at("/paths")
         .fieldNames
-        .toList should contain only ("/works", "/works/{id}")
+        .asScala.toList should contain only ("/works", "/works/{id}")
     }
   }
 
@@ -58,7 +57,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   it("doesn't show DisplayWork in the definitions") {
     val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions").fieldNames.toList shouldNot contain("DisplayWork")
+    tree.at("/definitions").fieldNames.asScala.toList shouldNot contain("DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {
@@ -76,8 +75,6 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       "es.index.v1" -> "v1",
       "es.index.v2" -> "v2"
     )
-
-    implicit val jsonMapper = IdentifiedWork
 
     val response: Response = withServer(flags) { server =>
       server.httpGet(

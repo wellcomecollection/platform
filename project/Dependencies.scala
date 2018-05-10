@@ -144,7 +144,7 @@ object Dependencies {
   val recorderDependencies: Seq[ModuleID] = Seq()
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
+//    "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
 
   val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
