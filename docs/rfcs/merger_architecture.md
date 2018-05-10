@@ -1,8 +1,6 @@
 # Merger architecture
 
-The merger is a new application that we are planning to write in Q3 2018.
-
-It receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
+The merger receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
 
 This document has some notes on the proposed architecture.
 
@@ -13,7 +11,7 @@ The vertices are the source records, and there is a directed edge from X to Y if
 
 Each merged work is one of the connected components of this graph.
 
-![](relater_graph.png)
+![](matcher_graph.png)
 
 In this example, there are three works:
 
@@ -21,7 +19,7 @@ In this example, there are three works:
 -   A green work made of two source records
 -   A blue work that is a single source record
 
-The relater will receive updates to this graph, one vertex at a time.
+The matcher will receive updates to this graph, one vertex at a time.
 When it receives an update, it needs to tell us:
 
 -   Any new works which have been created
@@ -35,7 +33,9 @@ We considered three storage options:
 -   Titan/JanusGraph (a DynamoDB-backed graph database)
 -   Storing graph information in SQL
 
-We decided to use SQL, specifically RDS, as we already use it in the ID minter, and we know how it scales.
+We decided to use SQL, specifically RDS, because the other options don't give us a reliable way updating the graph concurrently.
+SQL allows row level locking wich means we can lock on the rows that represent a connected subgraph, but still allow updates on the rest of the main graph.
+Also, we already use RDS in the ID minter, and we know how it scales.
 
 The idea is to store the structure of the graph in SQL, but do all of the graph theory logic outside the database.
 Trying to do graph operations in SQL queries feels a step too far!
@@ -45,7 +45,7 @@ Trying to do graph operations in SQL queries feels a step too far!
 We can identify subgraphs/components by concatenating the sorted IDs of the vertices.
 For example, the graph below has three components: `A-B-C-D`, `E-F-G` and `H`.
 
-![](relater_component_ids.png)
+![](matcher_component_ids.png)
 
 This is our current schema:
 
@@ -71,7 +71,7 @@ This is our current schema:
 This is best illustrated with an example.
 Suppose we have the following graph:
 
-![](relater_example1.png)
+![](matcher_example1.png)
 
 We have two existing works: ABC and DEF.
 We receive an update to B telling us it now has edges B→A and B→D.
@@ -79,21 +79,23 @@ We receive an update to B telling us it now has edges B→A and B→D.
 0.  The existing DB is as follows:
 
         src   | tail_v | component_v | is_redirect | redirected_target
-        A     | B      | ABC         | -           | -
-        B     | A      | ABC         | -           | -
-        C     | B      | ABC         | -           | -
-        D     | F      | DEF         | -           | -
-        E     | D      | DEF         | -           | -
-        F     | -      | DEF         | -           | -
+        A     | B      | ABC         | true        | ABC
+        B     | A      | ABC         | true        | ABC
+        C     | B      | ABC         | true        | ABC
+        ABC   | _      | _           | false       | _
+        D     | F      | DEF         | true        | DEF
+        E     | D      | DEF         | true        | DEF
+        F     | -      | DEF         | true        | DEF
+        DEF   | -      | _           | false       | _
 
     (TODO: Should we have explicit redirects for single nodes?)
 
 1.  Because we have an update that affects A, B and D, we read those rows from
     the database first:
 
-        A     | B      | ABC         | -           | -
-        B     | A      | ABC         | -           | -
-        D     | F      | DEF         | -           | -
+        A     | B      | ABC         | true        | ABC
+        B     | A      | ABC         | true        | ABC
+        D     | F      | DEF         | true        | DEF    
 
 2.  By looking at their connected components, we can do a second read to gather
     all the vertices that might be affected: ABCDEF.
@@ -104,19 +106,15 @@ We receive an update to B telling us it now has edges B→A and B→D.
     back to the database.
 
         src   | tail_v | component_v | is_redirect | redirected_target
-        A     | B      | ABCDEF      | -           | -
-        B     | AD     | ABCDEF      | -           | -
-        C     | B      | ABCDEF      | -           | -
-        D     | F      | ABCDEF      | -           | -
-        E     | D      | ABCDEF      | -           | -
-        F     | -      | ABCDEF      | -           | -
-
-    Include two extra rows for the original components ABC and DEF, which now
-    redirect to ABCDEF:
-
-        src   | tail_v | component_v | is_redirect | redirected_target
-        ABC   | -      | -           | true        | ABCDEF
-        DEF   | -      | -           | true        | ABCDEF
+        A     | B      | ABCDEF      | true        | ABCDEF
+        B     | AD     | ABCDEF      | true        | ABCDEF
+        C     | B      | ABCDEF      | true        | ABCDEF
+        ABC   | D      | ABCDEF      | true        | ABCDEF
+        D     | F      | ABCDEF      | true        | ABCDEF
+        E     | D      | ABCDEF      | true        | ABCDEF
+        F     | -      | ABCDEF      | true        | ABCDEF
+        DEF   | -      | ABCDEF      | true        | ABCDEF
+        ABCDEF| -      | _           | false       | _
 
 ## Example 2
 
@@ -129,18 +127,20 @@ But let's suppose we have the following graph, and receive two updates that
 overlap (deliberately not numbered as there's no ordering on updates to
 different vertices).
 
-![](relater_example2.png)
+![](matcher_example2.png)
 
 0.  The existing DB is as follows:
 
             src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | ABC         | -           | -
-            B     | A      | ABC         | -           | -
-            C     | B      | ABC         | -           | -
-            D     | F      | DEF         | -           | -
-            E     | D      | DEF         | -           | -
-            F     | -      | DEF         | -           | -
-            G     | -      | G           | -           | -
+            A     | B      | ABC         | true        | ABC
+            B     | A      | ABC         | true        | ABC
+            C     | B      | ABC         | true        | ABC
+            ABC   | _      | _           | false       | _
+            D     | F      | DEF         | true        | DEF
+            E     | D      | DEF         | true        | DEF
+            F     | -      | DEF         | true        | DEF
+            DEF   | -      | _           | false       | _
+            G     | -      | G           | false       | -
 
 1.  Update (*) is processed, and it affects nodes B and E.
     So the worker handling (*) acquires a row-level lock on those two nodes.
@@ -149,14 +149,15 @@ different vertices).
     So the worker handling (**) F and G acquires a lock on those two rows.
 
             src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | ABC         | -           | -
-        *   B     | A      | ABC         | -           | -
-            C     | B      | ABC         | -           | -
-            D     | F      | DEF         | -           | -
-        *   E     | D      | DEF         | -           | -
-        **  F     | -      | DEF         | -           | -
-        **  G     | -      | G           | -           | -
-
+            A     | B      | ABC         | true        | ABC
+        *   B     | A      | ABC         | true        | ABC
+            C     | B      | ABC         | true        | ABC
+            ABC   | _      | _           | false       | _
+        *   D     | F      | DEF         | true        | DEF
+        **  E     | D      | DEF         | true        | DEF
+        **  F     | -      | DEF         | true        | DEF
+            DEF   | -      | _           | false       | _
+            G     | -      | G           | false       | -
 2.  Process (*) discovers that it affects vertices ABCDEF.
 
     Process (**) discovers that it affects vertices DEFG.
@@ -170,3 +171,7 @@ different vertices).
 
 This results in an eventually consistent graph, which is as good as we can
 guarantee.
+
+## Example 2
+
+What happens if we remove a link?
