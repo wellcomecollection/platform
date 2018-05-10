@@ -22,19 +22,26 @@ object SNSClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesSNSClient(awsConfig: AWSConfig): AmazonSNS = {
-    val standardSnsClient = AmazonSNSClientBuilder.standard
-    if (snsEndpoint().isEmpty)
-      standardSnsClient
+  def providesSNSClient(awsConfig: AWSConfig): AmazonSNS =
+    buildSNSClient(
+      awsConfig = awsConfig,
+      endpoint = snsEndpoint(),
+      accessKey = accessKey(),
+      secretKey = secretKey()
+    )
+
+  def buildSNSClient(awsConfig: AWSConfig, endpoint: String, accessKey: String, secretKey: String): AmazonSNS = {
+    val standardClient = AmazonSNSClientBuilder.standard
+    if (endpoint.isEmpty)
+      standardClient
         .withRegion(awsConfig.region)
         .build()
     else
-      standardSnsClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey(), secretKey())))
+      standardClient
+        .withCredentials(new AWSStaticCredentialsProvider(
+          new BasicAWSCredentials(accessKey, secretKey)))
         .withEndpointConfiguration(
-          new EndpointConfiguration(snsEndpoint(), awsConfig.region))
+          new EndpointConfiguration(endpoint, awsConfig.region))
         .build()
   }
 }
