@@ -1,10 +1,7 @@
 package uk.ac.wellcome.monitoring
 
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.cloudwatch.{
-  AmazonCloudWatch,
-  AmazonCloudWatchClientBuilder
-}
+import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.finatra.modules.AWSConfigModule
@@ -20,16 +17,22 @@ object CloudWatchClientModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch = {
+  def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch =
+    buildCloudWatchClient(
+      awsConfig = awsConfig,
+      endpoint = endpoint()
+    )
+
+  def buildCloudWatchClient(awsConfig: AWSConfig, endpoint: String): AmazonCloudWatch = {
     val standardClient = AmazonCloudWatchClientBuilder.standard
-    if (endpoint().isEmpty)
+    if (endpoint.isEmpty)
       standardClient
         .withRegion(awsConfig.region)
         .build()
     else
       standardClient
         .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint(), awsConfig.region))
+          new EndpointConfiguration(endpoint, awsConfig.region))
         .build()
   }
 }
