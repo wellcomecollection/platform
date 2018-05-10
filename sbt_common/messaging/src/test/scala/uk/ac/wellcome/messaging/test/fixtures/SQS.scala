@@ -1,13 +1,12 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.message.MessageReader
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSMessage}
+import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConversions._
@@ -30,6 +29,8 @@ trait SQS extends Matchers {
   protected val sqsInternalEndpointUrl = "http://sqs:9324"
   protected val sqsEndpointUrl = "http://localhost:9324"
 
+  private val regionName = "localhost"
+
   private val accessKey = "access"
   private val secretKey = "secret"
 
@@ -48,25 +49,22 @@ trait SQS extends Matchers {
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.sqs.accessKey" -> accessKey,
     "aws.sqs.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> regionName
   )
 
-  private val credentials = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials(accessKey, secretKey))
+  val sqsClient: AmazonSQS = SQSClientModule.buildSQSClient(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = sqsEndpointUrl,
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
-  val sqsClient: AmazonSQS = AmazonSQSClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(sqsEndpointUrl, "localhost"))
-    .build()
-
-  val asyncSqsClient: AmazonSQSAsync = AmazonSQSAsyncClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(sqsEndpointUrl, "localhost"))
-    .build()
+  val asyncSqsClient: AmazonSQSAsync = SQSClientModule.buildSQSAsyncClient(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = sqsEndpointUrl,
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
@@ -104,12 +102,12 @@ trait SQS extends Matchers {
       testWith(QueuePair(queue, dlq))
     }
 
-  val localStackSqsClient: AmazonSQS = AmazonSQSClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration("http://localhost:4576", "localhost"))
-    .build()
+  val localStackSqsClient: AmazonSQS = SQSClientModule.buildSQSClient(
+    awsConfig = AWSConfig(region = "localhost"),
+    endpoint = "http://localhost:4576",
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   def withLocalStackSqsQueue[R] = fixture[Queue, R](
     create = {
