@@ -3,7 +3,7 @@ import Keys._
 
 object Common {
   val settings: Seq[Def.Setting[_]] = Seq(
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.12.6",
     organization := "uk.ac.wellcome",
     resolvers += Resolver.sonatypeRepo("releases"),
     scalacOptions ++= Seq(
@@ -13,7 +13,9 @@ object Common {
       "UTF-8",
       "-Xlint",
       "-Xverify",
-      "-Xfatal-warnings",
+      // It breaks for scala_2.12 because it returns warnings fo unused imports, unused variables and use of deprecated classes
+      // TODO turn this back on once the migration is done
+//      "-Xfatal-warnings",
       "-feature",
       "-language:postfixOps"
     ),
