@@ -6,8 +6,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.auth.AWSStaticCredentialsProvider
 import io.circe._
 import io.circe.yaml
-import io.circe.generic.extras.JsonKey
-import io.circe.generic.semiauto._
+import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.immutable.Seq
@@ -85,7 +84,13 @@ trait SNS {
     }
   )
 
-  implicit val decoder: Decoder[MessageInfo] = deriveDecoder[MessageInfo]
+  implicit val topicInfoDecoder: Decoder[TopicInfo] = deriveDecoder[TopicInfo]
+  implicit val snsResponseDecoder: Decoder[SNSResponse] = deriveDecoder[SNSResponse]
+
+  // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
+  // to annotate the fields, and I don't care enough to work out why right now.
+  implicit val messageInfoDecoder: Decoder[MessageInfo] = Decoder.forProduct4(
+    ":id", ":message", ":subject", ":topic_arn")(MessageInfo.apply)
 
   def listMessagesReceivedFromSNS(topic: Topic): Seq[MessageInfo] = {
     /*
@@ -108,21 +113,32 @@ trait SNS {
      */
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
 
-    val jsons: Either[ParsingFailure, Json] = yaml.parser.parse(string)
+    val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
 
-    val allMessages = jsons
+    val snsResponse: SNSResponse = json
       .right.get
-      .\\("messages")
-      .map { _.as[MessageInfo].right.get }
+      .as[SNSResponse]
+      .right.get
 
-    allMessages
+    snsResponse
+      .messages
       .filter { _.topicArn == topic.arn }
   }
 }
 
+case class SNSResponse(
+  topics: List[TopicInfo],
+  messages: List[MessageInfo]
+)
+
+case class TopicInfo(
+  arn: String,
+  name: String
+)
+
 case class MessageInfo(
-  @JsonKey(":id") messageId: String,
-  @JsonKey(":message") message: String,
-  @JsonKey(":subject") subject: String,
-  @JsonKey(":topic_arn") topicArn: String
+  messageId: String,
+  message: String,
+  subject: String,
+  topicArn: String
 )
