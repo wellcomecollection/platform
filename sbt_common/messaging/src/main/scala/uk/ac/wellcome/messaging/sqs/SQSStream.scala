@@ -9,7 +9,7 @@ import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import grizzled.slf4j.Logging
+import com.twitter.inject.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
