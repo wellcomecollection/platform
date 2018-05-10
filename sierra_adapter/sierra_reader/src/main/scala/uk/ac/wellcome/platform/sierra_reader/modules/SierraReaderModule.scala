@@ -34,9 +34,6 @@ object SierraReaderModule extends TwitterModule {
     info("Terminating Sierra Bibs to SNS worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[SierraReaderWorkerService]
-
-    workerService.stop()
     system.terminate()
   }
 

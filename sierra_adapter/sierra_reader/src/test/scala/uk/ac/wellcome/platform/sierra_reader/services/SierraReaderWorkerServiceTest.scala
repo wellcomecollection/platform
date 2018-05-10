@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSStream}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -49,8 +49,17 @@ class SierraReaderWorkerServiceTest
         withLocalSqsQueue { queue =>
           withLocalS3Bucket { bucket =>
             val worker = new SierraReaderWorkerService(
-              reader =
-                new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+              system = actorSystem,
+              sqsStream = new SQSStream(
+                actorSystem = actorSystem,
+                sqsClient = asyncSqsClient,
+                sqsConfig = SQSConfig(
+                  queueUrl = queue.url,
+                  waitTime = 1.second,
+                  maxMessages = 1
+                ),
+                metricsSender = metricsSender
+              ),
               s3client = s3Client,
               s3Config = S3Config(bucket.name),
               windowManager = new WindowManager(
@@ -60,19 +69,13 @@ class SierraReaderWorkerServiceTest
                 resourceType),
               batchSize = batchSize,
               resourceType = resourceType,
-              system = actorSystem,
-              metrics = metricsSender,
               apiUrl = apiUrl,
               sierraOauthKey = "key",
               sierraOauthSecret = "secret",
               fields = fields
             )
 
-            try {
-              testWith(FixtureParams(worker, queue, bucket))
-            } finally {
-              worker.stop()
-            }
+            testWith(FixtureParams(worker, queue, bucket))
           }
         }
       }

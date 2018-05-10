@@ -5,15 +5,15 @@ import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
+import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
+import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.{
   WindowManager,
@@ -25,11 +25,10 @@ import scala.concurrent.duration._
 import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
 class SierraReaderWorkerService @Inject()(
-  reader: SQSReader,
-  s3client: AmazonS3,
   system: ActorSystem,
-  metrics: MetricsSender,
+  sqsStream: SQSStream[SQSMessage],
   windowManager: WindowManager,
+  s3client: AmazonS3,
   s3Config: S3Config,
   @Flag("reader.batchSize") batchSize: Int,
   resourceType: SierraResourceTypes.Value,
@@ -37,17 +36,25 @@ class SierraReaderWorkerService @Inject()(
   @Flag("sierra.oauthKey") sierraOauthKey: String,
   @Flag("sierra.oauthSecret") sierraOauthSecret: String,
   @Flag("sierra.fields") fields: String
-) extends SQSWorker(reader, system, metrics) {
+) extends Logging {
 
   implicit val actorSystem = system
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
+  // This is the throttle rate for requests to Sierra, *not* the rate at
+  // which we fetch messages from SQS.
   val throttleRate = ThrottleRate(3, 1.second)
 
-  def processMessage(message: SQSMessage): Future[Unit] =
+  sqsStream.foreach(
+    streamName = this.getClass.getSimpleName,
+    process = processMessage
+  )
+
+  def processMessage(sqsMessage: SQSMessage): Future[Unit] =
     for {
-      window <- Future.fromTry(WindowExtractor.extractWindow(message.body))
+      messageString <- Future(sqsMessage.body)
+      window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
