@@ -5,7 +5,10 @@ import java.time.Instant
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import cats.syntax.either._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 
 import scala.util.Try
 
