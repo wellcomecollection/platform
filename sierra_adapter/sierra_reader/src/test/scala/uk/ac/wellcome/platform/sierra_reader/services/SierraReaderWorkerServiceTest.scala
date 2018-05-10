@@ -1,27 +1,25 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
+import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import org.scalatest.FunSpec
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSStream}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.collection.JavaConversions._
 import scala.concurrent.duration._
-import org.scalatest.compatible.Assertion
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
-
-import collection.JavaConversions._
 
 class SierraReaderWorkerServiceTest
     extends FunSpec
@@ -49,8 +47,17 @@ class SierraReaderWorkerServiceTest
         withLocalSqsQueue { queue =>
           withLocalS3Bucket { bucket =>
             val worker = new SierraReaderWorkerService(
-              reader =
-                new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1)),
+              system = actorSystem,
+              sqsStream = new SQSStream(
+                actorSystem = actorSystem,
+                sqsClient = asyncSqsClient,
+                sqsConfig = SQSConfig(
+                  queueUrl = queue.url,
+                  waitTime = 1.second,
+                  maxMessages = 1
+                ),
+                metricsSender = metricsSender
+              ),
               s3client = s3Client,
               s3Config = S3Config(bucket.name),
               windowManager = new WindowManager(
@@ -60,19 +67,13 @@ class SierraReaderWorkerServiceTest
                 resourceType),
               batchSize = batchSize,
               resourceType = resourceType,
-              system = actorSystem,
-              metrics = metricsSender,
               apiUrl = apiUrl,
               sierraOauthKey = "key",
               sierraOauthSecret = "secret",
               fields = fields
             )
 
-            try {
-              testWith(FixtureParams(worker, queue, bucket))
-            } finally {
-              worker.stop()
-            }
+            testWith(FixtureParams(worker, queue, bucket))
           }
         }
       }
@@ -249,14 +250,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(message).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
 
@@ -277,15 +271,8 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
 
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(message).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
       }
     }
