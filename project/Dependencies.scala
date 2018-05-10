@@ -15,7 +15,6 @@ object Dependencies {
     val junitInterface = "0.11"
     val elastic4s = "5.6.5"
     val scanamo = "1.0.0-M3"
-    val jacksonYamlVersion = "2.8.8"
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
@@ -54,10 +53,6 @@ object Dependencies {
     "io.circe" %% "circe-generic-extras"% versions.circeVersion,
     "io.circe" %% "circe-parser"% versions.circeVersion,
     "io.circe" %% "circe-java8" % versions.circeVersion
-  )
-
-  val jacksonDependencies = Seq(
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % versions.jacksonYamlVersion % " test"
   )
 
   val swaggerDependencies = Seq(
@@ -103,15 +98,13 @@ object Dependencies {
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
-  // We use Circe for all our JSON serialisation, but our local SNS container
-  // returns YAML, and currently we use Jackson to parse that YAML.
-  // TODO: Rewrite the SNS fixture to use https://github.com/circe/circe-yaml
-  val commonMessagingDependencies = commonDependencies ++ jacksonDependencies ++ Seq(
+  val commonMessagingDependencies = commonDependencies ++ Seq(
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3
+    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
+    "io.circe" %% "circe-yaml" % "0.8.0"
   )
 
   val commonStorageDependencies = commonDependencies ++ dynamoDependencies ++ Seq(

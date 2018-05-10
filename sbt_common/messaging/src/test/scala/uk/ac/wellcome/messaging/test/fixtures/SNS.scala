@@ -4,14 +4,12 @@ import com.amazonaws.services.sns._
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.auth.AWSStaticCredentialsProvider
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.annotation.JsonProperty
+import io.circe._
+import io.circe.yaml
+import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.test.fixtures._
 
+import scala.collection.immutable.Seq
 import scala.util.Random
 
 object SNS {
@@ -86,12 +84,17 @@ trait SNS {
     }
   )
 
-  private val mapper =
-    (new ObjectMapper(new YAMLFactory()) with ScalaObjectMapper)
-      .registerModule(DefaultScalaModule)
-      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+  implicit val topicInfoDecoder: Decoder[TopicInfo] = deriveDecoder[TopicInfo]
+  implicit val snsResponseDecoder: Decoder[SNSResponse] =
+    deriveDecoder[SNSResponse]
 
-  def listMessagesReceivedFromSNS(topic: Topic): List[MessageInfo] = {
+  // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
+  // to annotate the fields, and I don't care enough to work out why right now.
+  implicit val messageInfoDecoder: Decoder[MessageInfo] =
+    Decoder.forProduct4(":id", ":message", ":subject", ":topic_arn")(
+      MessageInfo.apply)
+
+  def listMessagesReceivedFromSNS(topic: Topic): Seq[MessageInfo] = {
     /*
     This is a sample returned by the fake-sns implementation:
     ---
@@ -103,23 +106,40 @@ trait SNS {
     messages:
     - :id: acbca1e1-e3c5-4c74-86af-06a9418e8fe4
       :subject: Foo
-  :message: '{"identifiers":[{"source":"Miro","sourceId":"MiroID","value":"1234"}],"title":"some
-    image title","accessStatus":null}'
-  :topic_arn: arn:aws:sns:us-east-1:123456789012:id_minter
-  :structure:
-  :target_arn:
-  :received_at: 2017-04-18 13:20:45.289912607 +00:00
+      :message: '{"identifiers":[{"source":"Miro","sourceId":"MiroID","value":"1234"}],"title":"some
+        image title","accessStatus":null}'
+      :topic_arn: arn:aws:sns:us-east-1:123456789012:id_minter
+      :structure:
+      :target_arn:
+      :received_at: 2017-04-18 13:20:45.289912607 +00:00
      */
-
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-    val messages = mapper.readValue(string, classOf[Messages])
-    messages.messages.filter(_.topic_arn == topic.arn)
+
+    val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
+
+    val snsResponse: SNSResponse = json.right.get
+      .as[SNSResponse]
+      .right
+      .get
+
+    snsResponse.messages
+      .filter { _.topicArn == topic.arn }
   }
 }
 
-case class Messages(topics: List[TopicInfo], messages: List[MessageInfo])
-case class TopicInfo(arn: String, name: String)
-case class MessageInfo(@JsonProperty(":id") messageId: String,
-                       @JsonProperty(":message") message: String,
-                       @JsonProperty(":subject") subject: String,
-                       @JsonProperty(":topic_arn") topic_arn: String)
+case class SNSResponse(
+  topics: List[TopicInfo],
+  messages: List[MessageInfo]
+)
+
+case class TopicInfo(
+  arn: String,
+  name: String
+)
+
+case class MessageInfo(
+  messageId: String,
+  message: String,
+  subject: String,
+  topicArn: String
+)
