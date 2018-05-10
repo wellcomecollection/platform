@@ -1,6 +1,6 @@
 package uk.ac.wellcome.utils
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.ExecutionContext
 
 object GlobalExecutionContext {
   // This ensures we have enough threads when running in ECS.  If we use
@@ -10,5 +10,5 @@ object GlobalExecutionContext {
 
   implicit val context =
     ExecutionContext.fromExecutor(
-      new scala.concurrent.forkjoin.ForkJoinPool(64))
+      new java.util.concurrent.ForkJoinPool(64))
 }

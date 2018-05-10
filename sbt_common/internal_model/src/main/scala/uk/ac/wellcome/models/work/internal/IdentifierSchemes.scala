@@ -1,6 +1,5 @@
 package uk.ac.wellcome.models.work.internal
 
-import cats.syntax.either._
 import io.circe.{Decoder, Encoder, HCursor, Json}
 
 /** This is the canonical version of our identifier schemes.  This contains

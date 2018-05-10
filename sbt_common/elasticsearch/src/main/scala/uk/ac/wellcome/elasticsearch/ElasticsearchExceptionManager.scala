@@ -1,11 +1,10 @@
 package uk.ac.wellcome.elasticsearch
 
-import org.elasticsearch.client.ResponseException
-import io.circe.parser._
-import cats.syntax.either._
 import io.circe.optics.JsonPath._
+import io.circe.parser._
+import org.elasticsearch.client.ResponseException
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 trait ElasticsearchExceptionManager {
   def getErrorType(responseException: ResponseException): Option[String] = {

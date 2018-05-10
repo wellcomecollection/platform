@@ -17,7 +17,7 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
@@ -106,11 +106,11 @@ class MetricsSender @Inject()(
     val metricDatum = new MetricDatum()
       .withMetricName(metricName)
       .withDimensions(
-        dimensions.foldLeft(Nil: List[Dimension])((acc, pair) => {
+        dimensions.seq.foldLeft(Nil: List[Dimension])((acc, pair) => {
           val dimension =
             new Dimension().withName(pair._1).withValue(pair._2)
           dimension :: acc
-        }))
+        }).asJava)
       .withValue(time.toMillis.toDouble)
       .withUnit(StandardUnit.Milliseconds)
       .withTimestamp(new Date())

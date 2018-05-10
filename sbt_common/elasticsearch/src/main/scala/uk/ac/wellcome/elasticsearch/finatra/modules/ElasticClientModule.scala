@@ -28,8 +28,6 @@ object ElasticClientModule extends TwitterModule {
   private val port = flag[Int]("es.port", 9200, "port no of ES")
   private val protocol =
     flag[String]("es.protocol", "http", "protocol for talking to ES")
-  private val clusterName =
-    flag[String]("es.name", "elasticsearch", "cluster name")
   private val username = flag[String]("es.username", "elastic", "ES username")
   private val password = flag[String]("es.password", "changeme", "ES username")
 

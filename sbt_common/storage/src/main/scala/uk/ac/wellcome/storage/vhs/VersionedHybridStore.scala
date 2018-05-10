@@ -7,18 +7,8 @@ import com.gu.scanamo.DynamoFormat
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{
-  KeyPrefixGenerator,
-  S3Config,
-  S3ObjectLocation,
-  S3ObjectStore
-}
-import uk.ac.wellcome.storage.type_classes.{
-  HybridRecordEnricher,
-  IdGetter,
-  VersionGetter,
-  VersionUpdater
-}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.storage.type_classes.{HybridRecordEnricher, IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future

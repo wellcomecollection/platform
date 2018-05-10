@@ -1,12 +1,7 @@
 package uk.ac.wellcome.models.transformable
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
-import io.circe.Decoder
-import cats.syntax.functor._
 import uk.ac.wellcome.models.Sourced
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
