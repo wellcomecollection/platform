@@ -1,11 +1,8 @@
 package uk.ac.wellcome.monitoring.test.fixtures
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.cloudwatch.{
-  AmazonCloudWatch,
-  AmazonCloudWatchClientBuilder
-}
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
+import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.monitoring.CloudWatchClientModule
 
 import scala.concurrent.duration._
 
@@ -17,22 +14,13 @@ trait CloudWatch {
 
   protected val flushInterval: FiniteDuration = 1 second
 
-  private val accessKey: String = "accessKey1"
-  private val secretKey: String = "verySecretKey1"
-
   def cloudWatchLocalFlags =
     Map(
       "aws.cloudWatch.endpoint" -> localCloudWatchEndpointUrl
     )
 
-  private val credentials = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials(accessKey, secretKey))
-
-  val cloudWatchClient: AmazonCloudWatch = AmazonCloudWatchClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(localCloudWatchEndpointUrl, regionName))
-    .build()
-
+  val cloudWatchClient: AmazonCloudWatch = CloudWatchClientModule.buildCloudWatchClient(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = localCloudWatchEndpointUrl
+  )
 }
