@@ -1,12 +1,11 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns._
-import com.amazonaws.auth.BasicAWSCredentials
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.auth.AWSStaticCredentialsProvider
 import io.circe._
 import io.circe.yaml
 import io.circe.generic.semiauto.deriveDecoder
+import uk.ac.wellcome.messaging.sns.SNSClientModule
+import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.immutable.Seq
@@ -31,6 +30,8 @@ trait SNS {
   protected val snsInternalEndpointUrl = "http://sns:9292"
   protected val localSNSEndpointUrl = "http://localhost:9292"
 
+  private val regionName = "localhost"
+
   private val accessKey = "access"
   private val secretKey = "secret"
 
@@ -42,18 +43,15 @@ trait SNS {
     "aws.sns.endpoint" -> localSNSEndpointUrl,
     "aws.sns.accessKey" -> accessKey,
     "aws.sns.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> regionName
   )
 
-  private val credentials = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials(accessKey, secretKey))
-
-  val snsClient: AmazonSNS = AmazonSNSClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(localSNSEndpointUrl, "local"))
-    .build()
+  val snsClient: AmazonSNS = SNSClientModule.buildSNSClient(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = localSNSEndpointUrl,
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   def withLocalSnsTopic[R] = fixture[Topic, R](
     create = {
@@ -66,12 +64,12 @@ trait SNS {
     }
   )
 
-  val localStackSnsClient: AmazonSNS = AmazonSNSClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration("http://localhost:4575", "eu-west-2"))
-    .build()
+  val localStackSnsClient: AmazonSNS = SNSClientModule.buildSNSClient(
+    awsConfig = AWSConfig(region = "eu-west-2"),
+    endpoint = "http://localhost:4575",
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   def withLocalStackSnsTopic[R] = fixture[Topic, R](
     create = {
