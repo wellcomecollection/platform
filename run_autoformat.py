@@ -12,6 +12,18 @@ import sys
 from travistooling import branch_name, get_changed_paths, git, make
 
 
+def _run_task_for_extension(extension, task):
+    relevant_paths = [f for f in changed_paths if f.endswith(extension)]
+    if relevant_paths:
+        print('*** Running %s for the following paths:' % task)
+        for p in relevant_paths:
+            print(' - %s' % p)
+        make(task)
+    else:
+        print(
+            '*** Skipping %s as there are no affected files' % task)
+
+
 if __name__ == '__main__':
 
     # First get information about the currently running patch.
@@ -34,15 +46,7 @@ if __name__ == '__main__':
     ]
 
     for extension, format_task in extension_to_format_task:
-        relevant_paths = [f for f in changed_paths if f.endswith(extension)]
-        if relevant_paths:
-            print('*** Running %s for the following paths:' % format_task)
-            for p in relevant_paths:
-                print(' - %s' % p)
-            make(format_task)
-        else:
-            print(
-                '*** Skipping %s as there are no affected files' % format_task)
+        _run_task_for_extension(extension, format_task)
 
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
@@ -83,5 +87,4 @@ if __name__ == '__main__':
     ]
 
     for extension, lint_task in extension_to_lint_task:
-        if any(f.endswith(extension) in changed_paths):
-            make(lint_task)
+        _run_task_for_extension(extension, lint_task)
