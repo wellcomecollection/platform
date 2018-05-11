@@ -7,6 +7,9 @@ SBT_APPS    =
 ECS_TASKS   = slack_budget_bot
 LAMBDAS     = post_to_slack terraform_tracker
 
+SBT_DOCKER_LIBRARIES =
+SBT_NO_DOCKER_LIBRARIES =
+
 TF_NAME     = monitoring
 TF_PATH     = $(STACK_ROOT)
 TF_IS_PUBLIC_FACING = false

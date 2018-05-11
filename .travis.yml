@@ -71,8 +71,8 @@ jobs:
 
     - stage: sbt-common-test
       env: TASK=sbt-common-test
-    - env: TASK=sbt-internal_model-test
-    - env: TASK=sbt-display-test
+    - env: TASK=internal_model-test
+    - env: TASK=common_display-test
     - env: TASK=common_elasticsearch-test
     - env: TASK=common_messaging-test
     - env: TASK=common_storage-test

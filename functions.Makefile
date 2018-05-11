@@ -219,7 +219,7 @@ $(1)-publish: $(1)-build
 endef
 
 
-# Define a series of Make tasks for a Scala modules.
+# Define a series of Make tasks for a Scala libraries that use docker-compose for tests.
 #
 # Args:
 #	$1 - Name of the project in sbt.
@@ -234,7 +234,7 @@ $(1)-publish:
 endef
 
 
-# Define a series of Make tasks for a Scala libraries.
+# Define a series of Make tasks for a Scala modules that use docker-compose for tests.
 #
 # Args:
 #	$1 - Name of the project in sbt.
@@ -249,6 +249,19 @@ $(1)-docker_compose_down:
 
 $(1)-test:
 	$(call sbt_test,$(1))
+
+endef
+
+
+# Define a series of Make tasks for a Scala libraries.
+#
+# Args:
+#	$1 - Name of the project in sbt.
+#	$2 - Root of the project's source code.
+#
+define __sbt_library_template
+$(1)-test:
+	$(call sbt_test_no_docker,$(1))
 
 endef
 
@@ -343,6 +356,7 @@ endef
 #
 #	$SBT_APPS               A space delimited list of sbt apps in this stack
 #	$SBT_DOCKER_LIBRARIES   A space delimited list of sbt libraries  in this stack that use docker compose for tests
+#	$SBT_NO_DOCKER_LIBRARIES   A space delimited list of sbt libraries  in this stack that use docker compose for tests
 #	$ECS_TASKS              A space delimited list of ECS services
 #	$LAMBDAS                A space delimited list of Lambdas in this stack
 #
@@ -365,6 +379,7 @@ define stack_setup
 
 $(foreach proj,$(SBT_APPS),$(eval $(call __sbt_target_template,$(proj),$(STACK_ROOT)/$(proj))))
 $(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
+$(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
 $(foreach task,$(ECS_TASKS),$(eval $(call __ecs_target_template,$(task),$(STACK_ROOT)/$(task)/Dockerfile)))
 $(foreach lamb,$(LAMBDAS),$(eval $(call __lambda_target_template,$(lamb),$(STACK_ROOT)/$(lamb))))
 $(foreach name,$(TF_NAME),$(eval $(call __terraform_target_template,$(TF_NAME),$(TF_PATH),$(TF_IS_PUBLIC_FACING))))
