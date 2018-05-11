@@ -42,12 +42,6 @@ trait SierraConcepts extends MarcUtils {
     }
   }
 
-  protected def maybeFindIdentifier(
-    varField: VarField,
-    identifierSubfield: MarcSubfield): Some[SourceIdentifier] = {
-
-  }
-
   // If there's exactly one subfield $0 on the VarField, add an identifier
   // if possible.
   private def maybeAddIdentifier[T <: AbstractConcept](
