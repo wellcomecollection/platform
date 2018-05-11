@@ -9,27 +9,27 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
   ElasticsearchResponseExceptionMapper,
   GeneralExceptionMapper
 }
+import uk.ac.wellcome.platform.api.finatra.modules.ApiModule
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
-  override val modules = Seq(ElasticClientModule)
+  override val modules = Seq(ApiModule)
 
   flag(name = "api.host", default = "localhost:8888", help = "API hostname")
-  flag(name = "api.scheme", default = "https", help = "API prototocol scheme")
+  flag(name = "api.scheme", default = "https", help = "API protocol scheme")
   flag(name = "api.pageSize", default = 10, help = "API default page size")
 
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
-  flag(
+  flag[String](
     name = "api.prefix",
     default = "/" + apiName(),
     help = "API path prefix")
