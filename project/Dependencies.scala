@@ -92,8 +92,9 @@ object Dependencies {
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
-  val commonElasticsearchDependencies =
-    elasticsearchDependencies ++ scalacheckDependencies
+  val commonElasticsearchDependencies = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion
+  ) ++ elasticsearchDependencies ++ scalacheckDependencies
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
