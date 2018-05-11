@@ -37,11 +37,23 @@ object ElasticClientModule extends TwitterModule {
   @Provides
   def provideElasticClient(): HttpClient = {
     info(s"Building clientUri for ${host()}:${port()}")
+    buildElasticClient(
+      host = host(),
+      port = port(),
+      protocol = protocol(),
+      username = username(),
+      password = password()
+    )
+  }
 
+  def buildElasticClient(host: String,
+                         port: Int,
+                         protocol: String,
+                         username: String,
+                         password: String): HttpClient = {
     val restClient = RestClient
-      .builder(new HttpHost(host(), port(), protocol()))
-      .setHttpClientConfigCallback(
-        new ElasticCredentials(username(), password()))
+      .builder(new HttpHost(host, port, protocol))
+      .setHttpClientConfigCallback(new ElasticCredentials(username, password))
       // Needed for the snapshot_generator.
       // TODO Make this a flag
       .setMaxRetryTimeoutMillis(2000)

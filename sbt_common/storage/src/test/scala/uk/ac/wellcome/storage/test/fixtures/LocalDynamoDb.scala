@@ -1,11 +1,6 @@
 package uk.ac.wellcome.storage.test.fixtures
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2.{
-  AmazonDynamoDB,
-  AmazonDynamoDBClientBuilder
-}
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.concurrent.Eventually
 
@@ -14,6 +9,8 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
+import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.storage.dynamo.DynamoClientModule
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConversions._
@@ -31,6 +28,8 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
+  private val regionName = "localhost"
+
   private val accessKey = "access"
   private val secretKey = "secret"
 
@@ -42,18 +41,15 @@ trait LocalDynamoDb[T <: Versioned with Id]
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
     "aws.dynamoDb.accessKey" -> accessKey,
     "aws.dynamoDb.secretKey" -> secretKey,
-    "aws.region" -> "localhost"
+    "aws.region" -> regionName
   )
 
-  private val credentials = new AWSStaticCredentialsProvider(
-    new BasicAWSCredentials(accessKey, secretKey))
-
-  val dynamoDbClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
-    .standard()
-    .withCredentials(credentials)
-    .withEndpointConfiguration(
-      new EndpointConfiguration(dynamoDBEndPoint, "localhost"))
-    .build()
+  val dynamoDbClient: AmazonDynamoDB = DynamoClientModule.buildDynamoClient(
+    awsConfig = AWSConfig(region = regionName),
+    endpoint = dynamoDBEndPoint,
+    accessKey = accessKey,
+    secretKey = secretKey
+  )
 
   implicit val evidence: DynamoFormat[T]
 
