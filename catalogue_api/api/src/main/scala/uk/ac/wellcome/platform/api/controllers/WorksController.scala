@@ -11,7 +11,10 @@ import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{DisplayError, DisplayResultList}
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.versions.ApiVersions
