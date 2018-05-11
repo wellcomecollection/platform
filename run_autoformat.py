@@ -33,8 +33,15 @@ if __name__ == '__main__':
     ]
 
     for extension, format_task in extension_to_format_task:
-        if any(f.endswith(extension) in changed_paths):
+        relevant_paths = [f for f in changed_paths if f.endswith(extension)]
+        if relevant_paths:
+            print('*** Running %s for the following paths:' % format_task)
+            for p in relevant_paths:
+                print(' - %s' % p)
             make(format_task)
+        else:
+            print(
+                '*** Skipping %s as there are no affected files' % format_task)
 
     # If there are any changes, push to GitHub immediately and fail the
     # build.  This will abort the remaining jobs, and trigger a new build
