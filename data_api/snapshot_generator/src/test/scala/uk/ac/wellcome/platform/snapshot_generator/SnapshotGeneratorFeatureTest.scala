@@ -69,9 +69,6 @@ class SnapshotGeneratorFeatureTest
   it("completes a snapshot generation successfully") {
     withFixtures {
       case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
-        val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-          publicBucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
-
         // Create a collection of works.  These three differ by version,
         // if not anything more interesting!
         val works = (1 to 3).map { version =>

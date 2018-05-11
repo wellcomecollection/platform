@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator.flow
 import java.io.File
 import java.nio.file.Paths
 
-import akka.actor.ActorSystem
 import akka.stream.scaladsl.{FileIO, Flow, Keep, Sink, Source}
 import akka.stream.{ActorMaterializer, IOResult, Materializer}
 import akka.util.ByteString
@@ -13,7 +12,7 @@ import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 
 class StringToGzipFlowTest
     extends FunSpec
@@ -25,9 +24,6 @@ class StringToGzipFlowTest
 
   it("produces a gzip-compressed file from the lines") {
     withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
-      implicit val system: ActorSystem = actorSystem
       implicit val materializer: Materializer =
         ActorMaterializer()(actorSystem)
 
