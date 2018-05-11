@@ -12,7 +12,7 @@ object ApiV1Swagger extends Swagger
 object ApiV2Swagger extends Swagger
 
 @Singleton
-class SwaggerController @Inject()(
+class DocsController @Inject()(
   @Flag("api.scheme") apiScheme: String,
   @Flag("api.prefix") apiPrefix: String,
   @Flag("api.host") apiHost: String

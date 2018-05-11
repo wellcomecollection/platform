@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.github.xiaodongw.swagger.finatra.SwaggerSupport
+import com.jakehschwartz.finatra.swagger.SwaggerController
 import com.twitter.finatra.http.Controller
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
@@ -30,7 +30,7 @@ abstract class WorksController(apiPrefix: String,
                                defaultPageSize: Int,
                                worksService: WorksService)
     extends Controller
-    with SwaggerSupport {
+    with SwaggerController {
 
   val includesSwaggerParam: QueryParameter = new QueryParameter()
     .name("includes")
