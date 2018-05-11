@@ -6,6 +6,7 @@ In particular, it runs the 'make format' task, and if there are any changes,
 it pushes a new commit to your pull request and aborts the current build.
 """
 
+import os
 import sys
 
 from travistooling import branch_name, get_changed_paths, git, make
