@@ -1,60 +1,10 @@
 ROOT = $(shell git rev-parse --show-toplevel)
 include $(ROOT)/functions.Makefile
 
-sbt-internal_model-test:
-	$(call sbt_test_no_docker,internal_model)
+STACK_ROOT 	= sbt_common
 
-sbt-internal_model-publish:
-	echo "Nothing to do!"
+SBT_DOCKER_LIBRARIES = common_elasticsearch common_messaging common_monitoring common_storage
+SBT_NO_DOCKER_LIBRARIES = internal_model common_display
 
-sbt-display-test:
-	$(call sbt_test_no_docker,common_display)
-
-sbt-display-publish:
-	echo "Nothing to do!"
-
-
-sbt-elasticsearch-test:
-	$(call sbt_test,common_elasticsearch)
-
-sbt-elasticsearch-publish:
-	echo "Nothing to do!"
-
-sbt-elasticsearch-docker_compose_up:
-	$(call docker_compose_up,sbt_common/elasticsearch/docker-compose.yml)
-
-sbt-elasticsearch-docker_compose_down:
-	$(call docker_compose_down,sbt_common/elasticsearch/docker-compose.yml)
-
-
-sbt-messaging-test:
-	$(call sbt_test,common_messaging)
-
-sbt-messaging-publish:
-	echo "Nothing to do!"
-
-sbt-messaging-docker_compose_up:
-	$(call docker_compose_up,sbt_common/messaging/docker-compose.yml)
-
-sbt-messaging-docker_compose_down:
-	$(call docker_compose_down,sbt_common/messaging/docker-compose.yml)
-
-
-sbt-monitoring-test:
-	$(call sbt_test,common_monitoring)
-
-sbt-monitoring-publish:
-	echo "Nothing to do!"
-
-
-sbt-storage-test:
-	$(call sbt_test,common_storage)
-
-sbt-storage-publish:
-	echo "Nothing to do!"
-
-sbt-storage-docker_compose_up:
-	$(call docker_compose_up,sbt_common/storage/docker-compose.yml)
-
-sbt-storage-docker_compose_down:
-	$(call docker_compose_down,sbt_common/storage/docker-compose.yml)
+$(foreach library,$(SBT_DOCKER_LIBRARIES),$(eval $(call __sbt_library_docker_template,$(library),$(STACK_ROOT)/$(library))))
+$(foreach library,$(SBT_NO_DOCKER_LIBRARIES),$(eval $(call __sbt_library_template,$(library))))

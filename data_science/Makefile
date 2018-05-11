@@ -4,6 +4,9 @@ include $(ROOT)/functions.Makefile
 STACK_ROOT  = data_science
 
 SBT_APPS    =
+SBT_DOCKER_LIBRARIES =
+SBT_NO_DOCKER_LIBRARIES =
+
 ECS_TASKS   =
 LAMBDAS     =
 

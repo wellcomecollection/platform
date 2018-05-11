@@ -71,12 +71,12 @@ jobs:
 
     - stage: sbt-common-test
       env: TASK=sbt-common-test
-    - env: TASK=sbt-internal_model-test
-    - env: TASK=sbt-display-test
-    - env: TASK=sbt-elasticsearch-test
-    - env: TASK=sbt-messaging-test
-    - env: TASK=sbt-storage-test
-    - env: TASK=sbt-monitoring-test
+    - env: TASK=internal_model-test
+    - env: TASK=common_display-test
+    - env: TASK=common_elasticsearch-test
+    - env: TASK=common_messaging-test
+    - env: TASK=common_storage-test
+    - env: TASK=common_monitoring-test
 
     # Catalogue API stack
     - stage: test
@@ -101,7 +101,7 @@ jobs:
     - env: TASK=reindex_shard_generator-test
 
     # Sierra adapter stack
-    - env: TASK=sierra_common-test
+    - env: TASK=sierra_adapter_common-test
     - env: TASK=sierra_window_generator-test
     - env: TASK=sierra_reader-test
     - env: TASK=sierra_items_to_dynamo-test
