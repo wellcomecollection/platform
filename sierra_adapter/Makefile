@@ -7,6 +7,9 @@ SBT_APPS    = sierra_bib_merger \
               sierra_item_merger \
 			  sierra_items_to_dynamo \
 			  sierra_reader
+
+SBT_DOCKER_LIBRARIES = sierra_adapter_common
+
 ECS_TASKS   =
 LAMBDAS     = s3_demultiplexer sierra_window_generator
 
@@ -27,11 +30,3 @@ sierra_adapter_progress: $(ROOT)/.docker/sierra_adapter_progress
 		--volume $(ROOT)/$(STACK_ROOT):/src \
 		sierra_adapter_progress \
 		python /src/report_adapter_progress.py
-
-
-sierra_common-test:
-	$(call sbt_test,sierra_adapter_common)
-
-sierra_common-publish:
-	echo "Nothing to do!"
-
