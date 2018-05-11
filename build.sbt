@@ -33,7 +33,7 @@ lazy val common = project
 // It depends on common because it uses JsonUtil
 lazy val internal_model = doSharedLibrarySetup(project, "sbt_common/internal_model")
   .dependsOn(common % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.pipelineModelDependencies)
+  .settings(libraryDependencies ++= Dependencies.internalModelDependencies)
 
 lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
   .dependsOn(internal_model % "compile->compile;test->test")

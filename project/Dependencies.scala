@@ -22,7 +22,6 @@ object Dependencies {
     val jaxbVersion = "2.2.11"
   }
 
-
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
@@ -111,6 +110,8 @@ object Dependencies {
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
   )
+
+  val internalModelDependencies = dynamoDependencies
 
   // Application specific dependency groups
   val sierraAdapterCommonDependencies = Seq(
