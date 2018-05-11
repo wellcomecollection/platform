@@ -2,7 +2,6 @@ package uk.ac.wellcome.transformer.receive
 
 import java.time.Instant
 
-import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -18,11 +17,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3

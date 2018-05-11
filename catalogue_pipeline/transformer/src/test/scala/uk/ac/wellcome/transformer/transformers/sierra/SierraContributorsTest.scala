@@ -70,11 +70,14 @@ class SierraContributorsTest extends FunSpec with Matchers {
 
     val expectedContributors = List(
       Contributor(agent = Unidentifiable(Person("Sarah the soybean"))),
-      Contributor(agent = Unidentifiable(Person("Sam the squash"))),
+      Contributor(agent = Unidentifiable(Person("Sam the squash", Some("Sir")))),
       Contributor(agent = Unidentifiable(Organisation("Spinach Solicitors"))),
       Contributor(agent = Unidentifiable(Person("Sebastian the sugarsnap"))),
       Contributor(agent = Unidentifiable(Organisation("Shallot Swimmers")))
     )
+    transformAndCheckContributors(
+      varFields = varFields,
+      expectedContributors = expectedContributors)
   }
 
   describe("Person") {

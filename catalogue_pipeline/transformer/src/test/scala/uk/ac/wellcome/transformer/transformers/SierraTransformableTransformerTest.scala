@@ -563,7 +563,7 @@ class SierraTransformableTransformerTest
       value = "b90000092"
     )
 
-    transformedSierraRecord.get.get.sourceIdentifier
+    transformedSierraRecord.get.get.sourceIdentifier shouldBe expectedSourceIdentifier
   }
 
   it("uses the lang for the language field") {
