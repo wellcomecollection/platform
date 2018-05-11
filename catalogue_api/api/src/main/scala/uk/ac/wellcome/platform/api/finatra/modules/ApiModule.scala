@@ -6,7 +6,8 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig}
 
 object ApiModule extends TwitterModule {
-  private val hostname = flag[String]("es.host", "localhost", "host name of ES")
+  private val hostname =
+    flag[String]("es.host", "localhost", "host name of ES")
   private val hostPort = flag[Int]("es.port", 9200, "port no of ES")
   private val hostProtocol =
     flag[String]("es.protocol", "http", "protocol for talking to ES")

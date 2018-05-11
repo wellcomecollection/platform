@@ -23,8 +23,13 @@ class ElasticCredentials(username: String, password: String)
 object ElasticClientBuilder {
   def buildElasticClient(elasticConfig: ElasticConfig): HttpClient = {
     val restClient = RestClient
-      .builder(new HttpHost(elasticConfig.hostname, elasticConfig.hostPort, elasticConfig.hostProtocol))
-      .setHttpClientConfigCallback(new ElasticCredentials(elasticConfig.username, elasticConfig.password))
+      .builder(
+        new HttpHost(
+          elasticConfig.hostname,
+          elasticConfig.hostPort,
+          elasticConfig.hostProtocol))
+      .setHttpClientConfigCallback(
+        new ElasticCredentials(elasticConfig.username, elasticConfig.password))
       // Needed for the snapshot_generator.
       // TODO Make this a flag
       .setMaxRetryTimeoutMillis(2000)
