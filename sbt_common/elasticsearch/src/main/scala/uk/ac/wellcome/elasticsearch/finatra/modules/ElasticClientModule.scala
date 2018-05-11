@@ -1,6 +1,7 @@
 package uk.ac.wellcome.elasticsearch.finatra.modules
 
 import javax.inject.Singleton
+
 import com.google.inject.Provides
 import org.elasticsearch.client.RestClient
 import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
@@ -10,6 +11,7 @@ import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.HttpHost
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 
 class ElasticCredentials(username: String, password: String)
     extends HttpClientConfigCallback {
@@ -35,23 +37,19 @@ object ElasticClientModule extends TwitterModule {
   @Provides
   def provideElasticClient(): HttpClient = {
     info(s"Building clientUri for ${host()}:${port()}")
-    buildElasticClient(
-      host = host(),
-      port = port(),
-      protocol = protocol(),
+    buildElasticClient(ElasticConfig(
+      hostname = host(),
+      hostPort = port(),
+      hostProtocol = protocol(),
       username = username(),
       password = password()
-    )
+    ))
   }
 
-  def buildElasticClient(host: String,
-                         port: Int,
-                         protocol: String,
-                         username: String,
-                         password: String): HttpClient = {
+  def buildElasticClient(elasticConfig: ElasticConfig): HttpClient = {
     val restClient = RestClient
-      .builder(new HttpHost(host, port, protocol))
-      .setHttpClientConfigCallback(new ElasticCredentials(username, password))
+      .builder(new HttpHost(elasticConfig.hostname, elasticConfig.hostPort, elasticConfig.hostProtocol))
+      .setHttpClientConfigCallback(new ElasticCredentials(elasticConfig.username, elasticConfig.password))
       // Needed for the snapshot_generator.
       // TODO Make this a flag
       .setMaxRetryTimeoutMillis(2000)
