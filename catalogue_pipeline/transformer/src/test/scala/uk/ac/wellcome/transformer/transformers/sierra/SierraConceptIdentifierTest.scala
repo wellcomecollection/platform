@@ -20,11 +20,13 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
       ontologyType = ontologyType
     )
 
-    val actualSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
-      varField = varField,
-      identifierSubfield = identifierSubfield,
-      ontologyType = ontologyType
-    ).get
+    val actualSourceIdentifier = SierraConceptIdentifier
+      .maybeFindIdentifier(
+        varField = varField,
+        identifierSubfield = identifierSubfield,
+        ontologyType = ontologyType
+      )
+      .get
 
     actualSourceIdentifier shouldBe expectedSourceIdentifier
   }
@@ -39,11 +41,13 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
       ontologyType = ontologyType
     )
 
-    val actualSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
-      varField = varField,
-      identifierSubfield = identifierSubfield,
-      ontologyType = ontologyType
-    ).get
+    val actualSourceIdentifier = SierraConceptIdentifier
+      .maybeFindIdentifier(
+        varField = varField,
+        identifierSubfield = identifierSubfield,
+        ontologyType = ontologyType
+      )
+      .get
 
     actualSourceIdentifier shouldBe expectedSourceIdentifier
   }
@@ -87,11 +91,13 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
       ontologyType = "Item"
     )
 
-    val actualSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
-      varField = varField,
-      identifierSubfield = identifierSubfield,
-      ontologyType = "Item"
-    ).get
+    val actualSourceIdentifier = SierraConceptIdentifier
+      .maybeFindIdentifier(
+        varField = varField,
+        identifierSubfield = identifierSubfield,
+        ontologyType = "Item"
+      )
+      .get
 
     actualSourceIdentifier shouldBe expectedSourceIdentifier
   }
