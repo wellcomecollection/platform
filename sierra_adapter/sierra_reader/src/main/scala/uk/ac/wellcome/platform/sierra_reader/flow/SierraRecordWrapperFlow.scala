@@ -10,10 +10,8 @@ import io.circe.Json
 import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 
-import scala.concurrent.ExecutionContext
-
 object SierraRecordWrapperFlow extends Logging {
-  def apply()(implicit executionContext: ExecutionContext)
+  def apply()
     : Flow[Json, SierraRecord, NotUsed] =
     Flow.fromFunction({ json =>
       createSierraRecord(json)

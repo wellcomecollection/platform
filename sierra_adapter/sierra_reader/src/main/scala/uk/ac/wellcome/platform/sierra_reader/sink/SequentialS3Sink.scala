@@ -6,14 +6,13 @@ import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
 import io.circe.Json
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 object SequentialS3Sink extends Logging {
   def apply(client: AmazonS3,
             bucketName: String,
             keyPrefix: String = "",
-            offset: Int = 0)(implicit executionContext: ExecutionContext)
-    : Sink[(Json, Long), Future[Done]] = {
+            offset: Int = 0): Sink[(Json, Long), Future[Done]] = {
 
     Sink.foreach {
       case (json: Json, index: Long) => {

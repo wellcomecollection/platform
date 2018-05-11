@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_reader
 
 import com.twitter.finagle.http.Status._
-import com.twitter.inject.server.FeatureTest
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.S3

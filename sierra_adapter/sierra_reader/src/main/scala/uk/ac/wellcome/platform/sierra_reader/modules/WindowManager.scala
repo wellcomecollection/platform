@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 case class WindowStatus(id: Option[String], offset: Int)
@@ -31,7 +31,7 @@ class WindowManager @Inject()(
 
     val lastExistingKey = s3client
       .listObjects(s3Config.bucketName, buildWindowShard(window))
-      .getObjectSummaries
+      .getObjectSummaries.asScala
       .map { _.getKey() }
       .sorted
       .lastOption
