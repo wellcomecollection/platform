@@ -1,7 +1,6 @@
 package uk.ac.wellcome.test
 
 import com.twitter.inject.Logging
-import grizzled.slf4j.Logger
 
 import scala.util.Try
 
