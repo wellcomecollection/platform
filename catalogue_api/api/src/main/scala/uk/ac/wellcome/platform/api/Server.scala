@@ -53,7 +53,7 @@ class Server extends HttpServer {
       .filter[TraceIdMDCFilter[Request, Response]]
       .add[ManagementController]
       .add[ContextController]
-      .add[SwaggerController]
+      .add[DocsController]
       .add[V1WorksController]
       .add[V2WorksController]
       .exceptionMapper[GeneralExceptionMapper]
