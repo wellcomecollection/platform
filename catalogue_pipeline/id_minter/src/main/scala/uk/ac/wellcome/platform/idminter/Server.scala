@@ -13,7 +13,7 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
 import uk.ac.wellcome.messaging.sns.SNSClientModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSReaderModule}
-import uk.ac.wellcome.monitoring.{CloudWatchClientModule, MetricsSenderModule}
+import uk.ac.wellcome.monitoring.CloudWatchClientModule
 import uk.ac.wellcome.platform.idminter.modules._
 import uk.ac.wellcome.storage.s3.S3ClientModule
 
@@ -32,8 +32,7 @@ class Server extends HttpServer {
     S3ClientModule,
     MessageConfigModule,
     JsonKeyPrefixGeneratorModule,
-    CloudWatchClientModule,
-    MetricsSenderModule
+    CloudWatchClientModule
   )
 
   override def configureHttp(router: HttpRouter) {
