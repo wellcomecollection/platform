@@ -9,6 +9,5 @@ object GlobalExecutionContext {
   // https://github.com/wellcometrust/platform-api/issues/159 for details
 
   implicit val context =
-    ExecutionContext.fromExecutor(
-      new java.util.concurrent.ForkJoinPool(64))
+    ExecutionContext.fromExecutor(new java.util.concurrent.ForkJoinPool(64))
 }

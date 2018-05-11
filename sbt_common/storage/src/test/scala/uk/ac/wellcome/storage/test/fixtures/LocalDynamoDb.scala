@@ -113,7 +113,8 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private def deleteAllTables() = {
     dynamoDbClient
       .listTables()
-      .getTableNames.asScala
+      .getTableNames
+      .asScala
       .foreach(dynamoDbClient.deleteTable)
   }
 

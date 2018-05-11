@@ -128,7 +128,6 @@ class IdentifierGeneratorTest
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-
         val sourceIdentifier = SourceIdentifier(
           identifierScheme = IdentifierSchemes.miroImageNumber,
           "Work",

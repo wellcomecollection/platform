@@ -168,10 +168,9 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  private def sierraRecordData(
-    bibIds: List[String],
-    unlinkedBibIds: List[String] = List(),
-    modifiedDate: String): String = {
+  private def sierraRecordData(bibIds: List[String],
+                               unlinkedBibIds: List[String] = List(),
+                               modifiedDate: String): String = {
 
     val sierraItemRecord = SierraItemRecord(
       id = s"i111",

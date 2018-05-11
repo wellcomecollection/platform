@@ -73,7 +73,8 @@ trait SQS extends Matchers {
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
-      sqsClient.setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
+      sqsClient
+        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
       queue
     },
     destroy = { queue =>

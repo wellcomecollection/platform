@@ -11,8 +11,7 @@ import io.circe.optics.JsonPath.root
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 
 object SierraRecordWrapperFlow extends Logging {
-  def apply()
-    : Flow[Json, SierraRecord, NotUsed] =
+  def apply(): Flow[Json, SierraRecord, NotUsed] =
     Flow.fromFunction({ json =>
       createSierraRecord(json)
     })

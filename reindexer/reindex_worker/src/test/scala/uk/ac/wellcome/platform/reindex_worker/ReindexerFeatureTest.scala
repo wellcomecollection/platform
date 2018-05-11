@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.{Id, Versioned}
-import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  CompletedReindexJob,
+  ReindexJob,
+  ReindexRecord
+}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -123,7 +127,7 @@ class ReindexerFeatureTest
             "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
-              createReindexableData(queue, table)
+            createReindexableData(queue, table)
 
             val expectedMessage = CompletedReindexJob(
               shardId = shardName,
@@ -157,7 +161,7 @@ class ReindexerFeatureTest
             "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
-              createReindexableData(queue, table)
+            createReindexableData(queue, table)
 
             // We wait some time to ensure that the message is not processed
             Thread.sleep(5000)

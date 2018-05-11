@@ -15,7 +15,6 @@ class TableProvisionerTest
 
   it("should create the Identifiers table") {
     withIdentifiersDatabase { databaseConfig =>
-
       val databaseName = databaseConfig.databaseName
       val tableName = databaseConfig.tableName
 

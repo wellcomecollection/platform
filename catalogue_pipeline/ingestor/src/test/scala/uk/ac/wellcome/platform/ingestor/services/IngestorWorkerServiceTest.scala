@@ -12,7 +12,11 @@ import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures

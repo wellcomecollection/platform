@@ -9,7 +9,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  HybridRecord,
+  VHSConfig,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._

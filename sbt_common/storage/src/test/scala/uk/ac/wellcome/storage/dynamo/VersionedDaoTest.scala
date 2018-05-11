@@ -1,7 +1,10 @@
 package uk.ac.wellcome.storage.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{GetItemRequest, UpdateItemRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  GetItemRequest,
+  UpdateItemRequest
+}
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any

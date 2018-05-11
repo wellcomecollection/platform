@@ -31,7 +31,8 @@ class WindowManager @Inject()(
 
     val lastExistingKey = s3client
       .listObjects(s3Config.bucketName, buildWindowShard(window))
-      .getObjectSummaries.asScala
+      .getObjectSummaries
+      .asScala
       .map { _.getKey() }
       .sorted
       .lastOption

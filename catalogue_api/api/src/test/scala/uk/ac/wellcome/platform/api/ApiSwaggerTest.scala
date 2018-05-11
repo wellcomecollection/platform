@@ -35,7 +35,8 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       tree
         .at("/paths")
         .fieldNames
-        .asScala.toList should contain only ("/works", "/works/{id}")
+        .asScala
+        .toList should contain only ("/works", "/works/{id}")
     }
   }
 
@@ -57,7 +58,8 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   it("doesn't show DisplayWork in the definitions") {
     val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
-    tree.at("/definitions").fieldNames.asScala.toList shouldNot contain("DisplayWork")
+    tree.at("/definitions").fieldNames.asScala.toList shouldNot contain(
+      "DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {

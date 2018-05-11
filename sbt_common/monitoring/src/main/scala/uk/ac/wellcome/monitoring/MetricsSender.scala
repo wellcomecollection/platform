@@ -106,11 +106,13 @@ class MetricsSender @Inject()(
     val metricDatum = new MetricDatum()
       .withMetricName(metricName)
       .withDimensions(
-        dimensions.seq.foldLeft(Nil: List[Dimension])((acc, pair) => {
-          val dimension =
-            new Dimension().withName(pair._1).withValue(pair._2)
-          dimension :: acc
-        }).asJava)
+        dimensions.seq
+          .foldLeft(Nil: List[Dimension])((acc, pair) => {
+            val dimension =
+              new Dimension().withName(pair._1).withValue(pair._2)
+            dimension :: acc
+          })
+          .asJava)
       .withValue(time.toMillis.toDouble)
       .withUnit(StandardUnit.Milliseconds)
       .withTimestamp(new Date())
