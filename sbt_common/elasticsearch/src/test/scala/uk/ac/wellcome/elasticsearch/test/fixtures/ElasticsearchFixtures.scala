@@ -2,12 +2,10 @@ package uk.ac.wellcome.elasticsearch.test.fixtures
 
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import org.apache.http.HttpHost
-import org.elasticsearch.client.RestClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.elasticsearch.{ElasticSearchIndex, WorksIndex}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -25,26 +23,27 @@ trait ElasticsearchFixtures
     with JsonTestUtil { this: Suite =>
 
   private val esHost = "localhost"
-  private val esPort = "9200"
+  private val esPort = 9200
   private val esName = "wellcome"
 
   def esLocalFlags(indexNameV1: String,
                    indexNameV2: String,
                    itemType: String) = Map(
     "es.host" -> esHost,
-    "es.port" -> esPort,
+    "es.port" -> esPort.toString,
     "es.name" -> esName,
     "es.index.v1" -> indexNameV1,
     "es.index.v2" -> indexNameV2,
     "es.type" -> itemType
   )
 
-  val restClient: RestClient = RestClient
-    .builder(new HttpHost("localhost", 9200, "http"))
-    .setHttpClientConfigCallback(new ElasticCredentials("elastic", "changeme"))
-    .build()
-
-  val elasticClient: HttpClient = HttpClient.fromRestClient(restClient)
+  val elasticClient: HttpClient = ElasticClientModule.buildElasticClient(
+    host = esHost,
+    port = esPort,
+    protocol = "http",
+    username = "elastic",
+    password = "changeme"
+  )
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {
