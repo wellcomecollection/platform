@@ -87,7 +87,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     val actualSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
       identifierSubfield = identifierSubfield,
-      ontologyType = "Item
+      ontologyType = "Item"
     ).get
 
     actualSourceIdentifier shouldBe expectedSourceIdentifier
