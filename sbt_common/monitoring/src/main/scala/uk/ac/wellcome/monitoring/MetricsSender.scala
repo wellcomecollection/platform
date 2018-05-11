@@ -21,10 +21,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-class MetricsSender @Inject()(
-  flushInterval: FiniteDuration = 10 minutes,
-  amazonCloudWatch: AmazonCloudWatch,
-  actorSystem: ActorSystem)
+class MetricsSender @Inject()(flushInterval: FiniteDuration = 10 minutes,
+                              amazonCloudWatch: AmazonCloudWatch,
+                              actorSystem: ActorSystem)
     extends Logging {
   implicit val system = actorSystem
   implicit val materialiser = ActorMaterializer()
