@@ -18,7 +18,6 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFix
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil
@@ -170,9 +169,9 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   private def sierraRecordData(
-    bibIds: List[String] = List(),
+    bibIds: List[String],
     unlinkedBibIds: List[String] = List(),
-    modifiedDate: String = "2001-01-01T01:01:01Z"): String = {
+    modifiedDate: String): String = {
 
     val sierraItemRecord = SierraItemRecord(
       id = s"i111",
