@@ -60,9 +60,13 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
 
     processMessageFuture.onFailure {
       case exception: GracefulFailureException =>
-        logger.warn(s"Graceful failure processing message ${message.getMessageId}", exception)
+        logger.warn(
+          s"Graceful failure processing message ${message.getMessageId}",
+          exception)
       case exception: Exception =>
-        logger.error(s"Failure while processing message ${message.getMessageId}", exception)
+        logger.error(
+          s"Failure while processing message ${message.getMessageId}",
+          exception)
         metricsSender.incrementCount(
           metricName = s"${streamName}_MessageProcessingFailure",
           count = 1.0
