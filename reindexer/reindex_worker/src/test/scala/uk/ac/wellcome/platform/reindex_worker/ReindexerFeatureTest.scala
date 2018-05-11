@@ -1,25 +1,18 @@
 package uk.ac.wellcome.platform.reindex_worker
 
 import com.gu.scanamo.{DynamoFormat, Scanamo}
+import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.Matchers
-import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.{Id, Versioned}
-import uk.ac.wellcome.platform.reindex_worker.models.{
-  CompletedReindexJob,
-  ReindexJob,
-  ReindexRecord
-}
+import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob, ReindexRecord}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
-
-import scala.collection.JavaConversions._
 
 case class TestRecord(
   id: String,
@@ -130,7 +123,6 @@ class ReindexerFeatureTest
             "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
-            val expectedRecords =
               createReindexableData(queue, table)
 
             val expectedMessage = CompletedReindexJob(
@@ -165,7 +157,6 @@ class ReindexerFeatureTest
             "aws.dynamo.indexName" -> table.index)
 
           withServer(flags) { _ =>
-            val expectedRecords =
               createReindexableData(queue, table)
 
             // We wait some time to ensure that the message is not processed
