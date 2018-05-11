@@ -10,6 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
+import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
