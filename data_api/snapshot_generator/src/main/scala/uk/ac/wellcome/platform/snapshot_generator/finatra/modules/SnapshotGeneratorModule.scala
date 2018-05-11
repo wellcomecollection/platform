@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator.finatra
 import com.google.inject.{Provides, Singleton}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig}
 
 object SnapshotGeneratorModule extends TwitterModule {
   private val hostname = flag[String]("es.host", "localhost", "host name of ES")
