@@ -42,40 +42,32 @@ trait SierraConcepts extends MarcUtils {
     }
   }
 
+  protected def maybeFindIdentifier(
+    varField: VarField,
+    identifierSubfield: MarcSubfield): Some[SourceIdentifier] = {
+
+  }
+
   // If there's exactly one subfield $0 on the VarField, add an identifier
   // if possible.
   private def maybeAddIdentifier[T <: AbstractConcept](
     concept: T,
     varField: VarField,
     identifierSubfield: MarcSubfield): MaybeDisplayable[T] = {
+    val maybeSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
+      varField = varField,
+      identifierSubfield = identifierSubfield,
+      ontologyType = concept.ontologyType
+    )
 
-    // The mapping from indicator 2 to the identifier scheme is provided
-    // by the MARC spec.
-    // https://www.loc.gov/marc/bibliographic/bd655.html
-    val maybeIdentifierScheme = varField.indicator2 match {
-      case None => None
-      case Some("0") =>
-        Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
-      case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
-      case Some(scheme) =>
-        throw new RuntimeException(s"Unrecognised identifier scheme: $scheme")
-    }
-
-    maybeIdentifierScheme match {
+    maybeSourceIdentifier match {
       case None => Unidentifiable(agent = concept)
-      case Some(identifierScheme) => {
-        val sourceIdentifier = SourceIdentifier(
-          identifierScheme = identifierScheme,
-          value = identifierSubfield.content,
-          ontologyType = concept.ontologyType
-        )
-
+      case Some(sourceIdentifier) =>
         Identifiable(
           agent = concept,
           sourceIdentifier = sourceIdentifier,
           identifiers = List(sourceIdentifier)
         )
-      }
     }
   }
 
