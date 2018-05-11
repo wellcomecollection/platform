@@ -71,7 +71,7 @@ object Dependencies {
     "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests"
   )
 
   val elasticsearchDependencies = Seq(
