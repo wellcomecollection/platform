@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.snapshot_generator.modules
+package uk.ac.wellcome.platform.snapshot_generator.finatra.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}

@@ -1,17 +1,12 @@
-package uk.ac.wellcome.platform.snapshot_generator.modules
+package uk.ac.wellcome.platform.snapshot_generator.finatra.modules
 
 import javax.inject.Singleton
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import com.amazonaws.auth.{
-  AWSCredentialsProvider,
-  AWSStaticCredentialsProvider,
-  BasicAWSCredentials,
-  DefaultAWSCredentialsProviderChain
-}
+import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
+import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
