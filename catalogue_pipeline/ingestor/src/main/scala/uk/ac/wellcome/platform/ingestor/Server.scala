@@ -8,7 +8,6 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
@@ -19,6 +18,7 @@ import uk.ac.wellcome.platform.ingestor.finatra.modules.{
   IngestorWorkerModule,
   WorksIndexModule
 }
+import uk.ac.wellcome.platform.ingestor.controllers.ManagementController
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 
 object ServerMain extends Server

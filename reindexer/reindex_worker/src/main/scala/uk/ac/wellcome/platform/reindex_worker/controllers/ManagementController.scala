@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.controllers
+package uk.ac.wellcome.platform.reindex_worker.controllers
 
 import javax.inject.{Inject, Singleton}
 

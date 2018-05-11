@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.controllers
+package uk.ac.wellcome.platform.sierra_items_to_dynamo.controllers
 
 import javax.inject.{Inject, Singleton}
 

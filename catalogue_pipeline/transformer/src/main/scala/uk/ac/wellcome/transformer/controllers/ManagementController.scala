@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.controllers
+package uk.ac.wellcome.transformer.controllers
 
 import javax.inject.{Inject, Singleton}
 

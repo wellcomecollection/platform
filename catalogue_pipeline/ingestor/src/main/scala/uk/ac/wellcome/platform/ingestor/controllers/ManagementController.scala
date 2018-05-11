@@ -1,4 +1,4 @@
-package uk.ac.wellcome.finatra.controllers
+package uk.ac.wellcome.platform.ingestor.controllers
 
 import javax.inject.{Inject, Singleton}
 

@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.controllers
+package uk.ac.wellcome.platform.sierra_item_merger.controllers
 
 import javax.inject.{Inject, Singleton}
 
