@@ -1,8 +1,9 @@
-package uk.ac.wellcome.platform.ingestor.modules
+package uk.ac.wellcome.platform.ingestor.finatra.modules
+
+import javax.inject.Singleton
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 

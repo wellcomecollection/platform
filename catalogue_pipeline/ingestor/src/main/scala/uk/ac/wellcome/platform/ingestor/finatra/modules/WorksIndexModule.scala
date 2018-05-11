@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.ingestor.modules
+package uk.ac.wellcome.platform.ingestor.finatra.modules
 
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.ingestor.services.WorksIndexMappingCreatorService
