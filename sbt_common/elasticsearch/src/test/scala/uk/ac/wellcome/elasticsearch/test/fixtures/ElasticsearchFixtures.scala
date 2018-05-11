@@ -7,8 +7,7 @@ import org.elasticsearch.client.RestClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientConfig
-import uk.ac.wellcome.elasticsearch.{ElasticSearchIndex, WorksIndex}
+import uk.ac.wellcome.elasticsearch._
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -39,12 +38,14 @@ trait ElasticsearchFixtures
     "es.type" -> itemType
   )
 
-  val restClient: RestClient = RestClient
-    .builder(new HttpHost("localhost", 9200, "http"))
-    .setHttpClientConfigCallback(new ElasticClientConfig("elastic", "changeme"))
-    .build()
-
-  val elasticClient: HttpClient = HttpClient.fromRestClient(restClient)
+  val elasticClientConfig = ElasticClientConfig(
+    hostname = "localhost",
+    hostPort = 9200,
+    hostProtocol = "http",
+    elasticUsername = "elastic",
+    elasticPassword = "changeme"
+  )
+  val elasticClient: HttpClient = ElasticClientBuilder.buildHttpClient(elasticClientConfig)
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {

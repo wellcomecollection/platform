@@ -2,27 +2,20 @@ package uk.ac.wellcome.platform.api
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import io.swagger.models.Swagger
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
+import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.modules.ElasticClientConfigModule
 import uk.ac.wellcome.platform.api.controllers._
-import uk.ac.wellcome.platform.api.finatra.exceptions.{
-  CaseClassMappingExceptionWrapper,
-  ElasticsearchResponseExceptionMapper,
-  GeneralExceptionMapper
-}
+import uk.ac.wellcome.platform.api.finatra.exceptions.{CaseClassMappingExceptionWrapper, ElasticsearchResponseExceptionMapper, GeneralExceptionMapper}
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
-  override val modules = Seq(ElasticClientModule)
+  override val modules = Seq(ElasticClientConfigModule)
 
   flag(name = "api.host", default = "localhost:8888", help = "API hostname")
   flag(name = "api.scheme", default = "https", help = "API prototocol scheme")

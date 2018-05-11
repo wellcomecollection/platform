@@ -1,12 +1,12 @@
-package uk.ac.wellcome.elasticsearch.finatra.modules
+package uk.ac.wellcome.elasticsearch
 
-import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 
 
-class ElasticClientConfig(username: String, password: String)
+class ElasticClientCredentials(username: String, password: String)
     extends HttpClientConfigCallback {
   val credentials = new UsernamePasswordCredentials(username, password)
   val credentialsProvider = new BasicCredentialsProvider()

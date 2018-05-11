@@ -11,7 +11,7 @@ trait ElasticsearchServiceFixture extends ElasticsearchFixtures {
     testWith: TestWith[ElasticSearchService, Assertion]) = {
     val searchService = new ElasticSearchService(
       documentType = itemType,
-      elasticClient = elasticClient
+      elasticClientConfig = elasticClientConfig
     )
     testWith(searchService)
   }

@@ -5,8 +5,7 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
-import uk.ac.wellcome.finatra.modules.{MetricsSenderModule, S3ConfigModule, SNSClientModule, SNSConfigModule, SQSClientModule, SQSConfigModule, _}
+import uk.ac.wellcome.finatra.modules.{ElasticClientModule, MetricsSenderModule, S3ConfigModule, SNSClientModule, SNSConfigModule, SQSClientModule, SQSConfigModule, _}
 import modules.{AWSConfigModule, AkkaModule, AkkaS3ClientModule, SnapshotGeneratorWorkerModule}
 
 object ServerMain extends Server
