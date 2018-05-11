@@ -19,7 +19,7 @@ object SierraConceptIdentifier {
         Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
       case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
       case Some(scheme) =>
-        throw new RuntimeException(s"Unrecognised identifier scheme: $scheme")
+        throw new RuntimeException(s"Unrecognised identifier scheme: $scheme (${varField.subfields})")
     }
 
     maybeIdentifierScheme match {
