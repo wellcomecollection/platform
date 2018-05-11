@@ -43,7 +43,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
           () => readAndProcess(streamName, message, process))
       }
       .map { m =>
-        println(s"Deleting message ${m.getMessageId}")
+        info(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
       .runWith(SqsAckSink(sqsConfig.queueUrl)(sqsClient))
@@ -52,7 +52,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     streamName: String,
     message: Message,
     process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
-    println(s"Processing message ${message.getMessageId}")
+    info(s"Processing message ${message.getMessageId}")
     val processMessageFuture = for {
       t <- Future.fromTry(read(message))
       _ <- process(t)
