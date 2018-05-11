@@ -1,16 +1,12 @@
 package uk.ac.wellcome.elasticsearch.finatra.modules
 
-import javax.inject.Singleton
-
-import com.google.inject.Provides
-import org.elasticsearch.client.RestClient
-import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import com.sksamuel.elastic4s.http.HttpClient
-import com.twitter.inject.TwitterModule
-import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.HttpHost
+import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
 import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder
+import org.elasticsearch.client.RestClient
+import org.elasticsearch.client.RestClientBuilder.HttpClientConfigCallback
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 
 class ElasticCredentials(username: String, password: String)
@@ -25,27 +21,7 @@ class ElasticCredentials(username: String, password: String)
   }
 }
 
-object ElasticClientModule extends TwitterModule {
-  private val host = flag[String]("es.host", "localhost", "host name of ES")
-  private val port = flag[Int]("es.port", 9200, "port no of ES")
-  private val protocol =
-    flag[String]("es.protocol", "http", "protocol for talking to ES")
-  private val username = flag[String]("es.username", "elastic", "ES username")
-  private val password = flag[String]("es.password", "changeme", "ES username")
-
-  @Singleton
-  @Provides
-  def provideElasticClient(): HttpClient = {
-    info(s"Building clientUri for ${host()}:${port()}")
-    buildElasticClient(ElasticConfig(
-      hostname = host(),
-      hostPort = port(),
-      hostProtocol = protocol(),
-      username = username(),
-      password = password()
-    ))
-  }
-
+object ElasticClientModule {
   def buildElasticClient(elasticConfig: ElasticConfig): HttpClient = {
     val restClient = RestClient
       .builder(new HttpHost(elasticConfig.hostname, elasticConfig.hostPort, elasticConfig.hostProtocol))
