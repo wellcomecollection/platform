@@ -30,12 +30,10 @@ trait ApiWorksTestBase
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new Server,
-      flags = Map(
-        "es.host" -> "localhost",
-        "es.port" -> 9200.toString,
-        "es.index.v1" -> indexNameV1,
-        "es.index.v2" -> indexNameV2,
-        "es.type" -> itemType
+      flags = esLocalFlags(
+        indexNameV1 = indexNameV1,
+        indexNameV2 = indexNameV2,
+        itemType = itemType
       )
     )
 

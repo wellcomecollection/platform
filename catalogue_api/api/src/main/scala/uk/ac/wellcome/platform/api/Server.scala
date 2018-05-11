@@ -21,7 +21,7 @@ class Server extends HttpServer {
 
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
-  flag(
+  flag[String](
     name = "api.prefix",
     default = "/" + apiName(),
     help = "API path prefix")

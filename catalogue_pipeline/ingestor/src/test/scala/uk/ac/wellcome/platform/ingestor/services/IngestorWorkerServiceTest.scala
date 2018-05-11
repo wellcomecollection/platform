@@ -8,7 +8,7 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.ElasticCredentials
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}

@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.api.finatra.modules
 import com.google.inject.{Provides, Singleton}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.elasticsearch.ElasticConfig
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
+import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig}
 
 object ApiModule extends TwitterModule {
   private val hostname = flag[String]("es.host", "localhost", "host name of ES")
@@ -28,5 +27,5 @@ object ApiModule extends TwitterModule {
   @Singleton
   @Provides
   def providesElasticClient(elasticConfig: ElasticConfig): HttpClient =
-    ElasticClientModule.buildElasticClient(elasticConfig)
+    ElasticClientBuilder.buildElasticClient(elasticConfig)
 }
