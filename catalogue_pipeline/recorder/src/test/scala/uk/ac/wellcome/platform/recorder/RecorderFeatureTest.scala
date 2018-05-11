@@ -1,9 +1,9 @@
 package uk.ac.wellcome.platform.recorder
 
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.Decoder
+import io.circe.generic.extras.semiauto.deriveDecoder
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
