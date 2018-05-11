@@ -5,14 +5,13 @@ import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.platform.snapshot_generator.finatra.SnapshotGeneratorModule
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{AkkaS3ClientModule, SnapshotGeneratorWorkerModule}
-import uk.ac.wellcome.platform.snapshot_generator.modules.SnapshotGeneratorWorkerModule
 import uk.ac.wellcome.storage.s3.S3ConfigModule
 
 object ServerMain extends Server
@@ -36,7 +35,7 @@ class Server extends HttpServer {
     SNSConfigModule,
     S3ConfigModule,
     AkkaS3ClientModule,
-    ElasticClientModule,
+    SnapshotGeneratorModule,
     SnapshotGeneratorWorkerModule,
     AkkaModule
   )
