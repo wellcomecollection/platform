@@ -60,8 +60,11 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
   }
 
   it("throws an exception if it sees an unrecognised identifier scheme") {
-    val varField = baseVarField.copy(indicator2 = Some("8"))
     val identifierSubfield = MarcSubfield(tag = "0", content = "u/xxx")
+    val varField = baseVarField.copy(
+      indicator2 = Some("8"),
+      subfields = List(identifierSubfield)
+    )
 
     val caught = intercept[RuntimeException] {
       SierraConceptIdentifier.maybeFindIdentifier(
@@ -71,7 +74,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
       )
     }
 
-    caught.getMessage shouldEqual "Unrecognised identifier scheme: 8"
+    caught.getMessage shouldEqual s"Unrecognised identifier scheme: ${varField.indicator2.get} (${varField.subfields})"
   }
 
   it("passes through the ontology type") {
