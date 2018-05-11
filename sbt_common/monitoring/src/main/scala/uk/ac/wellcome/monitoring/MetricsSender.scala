@@ -14,7 +14,6 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
@@ -23,7 +22,7 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(
-  @Flag("aws.metrics.flushInterval") flushInterval: FiniteDuration,
+  flushInterval: FiniteDuration = 10 minutes,
   amazonCloudWatch: AmazonCloudWatch,
   actorSystem: ActorSystem)
     extends Logging {
