@@ -65,9 +65,9 @@ env:
 
 jobs:
   include:
-#    - stage: quicktest
-#      env: TASK=travis-format
-#    - env: TASK=travistooling-test
+    - stage: quicktest
+      env: TASK=travis-format
+    - env: TASK=travistooling-test
 
     - stage: sbt-common-test
       env: TASK=sbt-common-test
