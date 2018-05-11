@@ -22,6 +22,7 @@ object Dependencies {
     val jaxbVersion = "2.2.11"
   }
 
+  // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
     "com.typesafe.akka" %% "akka-agent" % versions.akka,
@@ -29,22 +30,8 @@ object Dependencies {
   )
 
   val dynamoDependencies: Seq[ModuleID] = Seq(
+    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.gu" %% "scanamo" % versions.scanamo
-  )
-
-  val mysqlDependencies: Seq[ModuleID] = Seq(
-    "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
-    "mysql" % "mysql-connector-java" % "6.0.6",
-    "org.flywaydb" % "flyway-core" % "4.2.0"
-  )
-
-  val esDependencies: Seq[ModuleID] = Seq(
-    "org.apache.logging.log4j" % "log4j-core" % versions.apacheLogging,
-    "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
-    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
-    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
   val circeDependencies = Seq(
@@ -68,7 +55,7 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   )
 
-  val commonDependencies: Seq[ModuleID] = Seq(
+  val finatraDependencies: Seq[ModuleID] = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
     "ch.qos.logback" % "logback-classic" % versions.logback,
@@ -84,70 +71,67 @@ object Dependencies {
     "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests"
+  )
+
+  val elasticsearchDependencies = Seq(
+    "org.apache.logging.log4j" % "log4j-core" % versions.apacheLogging,
+    "org.apache.logging.log4j" % "log4j-api" % versions.apacheLogging,
+    "com.sksamuel.elastic4s" %% "elastic4s-core" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
+    "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
+  )
+
+  // Internal Library dependency groups
+  val commonDependencies: Seq[ModuleID] = Seq(
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
-  ) ++ akkaDependencies ++ circeDependencies
-
-  val pipelineModelDependencies = circeDependencies ++ dynamoDependencies
+  ) ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
-  val commonElasticsearchDependencies = commonDependencies ++ esDependencies ++ scalacheckDependencies ++ Seq(
+  val commonElasticsearchDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
-  )
+  ) ++ elasticsearchDependencies ++ scalacheckDependencies
 
-  val commonMessagingDependencies = commonDependencies ++ Seq(
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
+  val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  )
+  ) ++ dynamoDependencies
 
-  val commonStorageDependencies = commonDependencies ++ dynamoDependencies ++ Seq(
-    "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
+  val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  )
+  ) ++ dynamoDependencies
 
-  val commonMonitoringDependencies = commonDependencies ++ Seq(
+  val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
   )
 
+  val internalModelDependencies = dynamoDependencies
+
+  // Application specific dependency groups
   val sierraAdapterCommonDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
-  val apiDependencies = commonDependencies ++ commonElasticsearchDependencies
-
-  val transformerDependencies
-    : Seq[ModuleID] = commonDependencies ++ akkaDependencies
-
-  val calmAdapterDependencies
-    : Seq[ModuleID] = commonDependencies ++ akkaDependencies
-
-  val ingestorDependencies = commonDependencies ++ commonElasticsearchDependencies
-
-  val idminterDependencies = commonDependencies ++ mysqlDependencies ++ Seq(
+  val idminterDependencies = Seq(
+    "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
+    "mysql" % "mysql-connector-java" % "6.0.6",
+    "org.flywaydb" % "flyway-core" % "4.2.0",
     "com.amazonaws" % "aws-java-sdk-rds" % versions.aws,
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
-  val reindexerDependencies: Seq[ModuleID] = commonDependencies
-
-  val snapshotConvertorDependencies = commonDependencies ++ Seq(
+  val snapshotGeneratorDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
   )
-
-  val recorderDependencies: Seq[ModuleID] = Seq()
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
-
-  val sierraBibMergerDepedencies: Seq[ModuleID] = commonDependencies
-
-  val sierraItemMergerDependencies: Seq[ModuleID] = commonDependencies
 }
