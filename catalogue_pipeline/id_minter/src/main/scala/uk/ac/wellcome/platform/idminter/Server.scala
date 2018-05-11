@@ -13,10 +13,7 @@ import uk.ac.wellcome.messaging.message.MessageConfigModule
 import uk.ac.wellcome.monitoring.CloudWatchClientModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.SNSClientModule
-import uk.ac.wellcome.messaging.sqs.{
-  SQSClientModule,
-  SQSReaderModule
-}
+import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSReaderModule}
 import uk.ac.wellcome.platform.idminter.controllers.ManagementController
 import uk.ac.wellcome.platform.idminter.modules._
 import uk.ac.wellcome.storage.s3.S3ClientModule
