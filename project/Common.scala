@@ -13,9 +13,7 @@ object Common {
       "UTF-8",
       "-Xlint",
       "-Xverify",
-      // It breaks for scala_2.12 because it returns warnings fo unused imports, unused variables and use of deprecated classes
-      // TODO turn this back on once the migration is done
-//      "-Xfatal-warnings",
+      "-Xfatal-warnings",
       "-feature",
       "-language:postfixOps"
     ),
