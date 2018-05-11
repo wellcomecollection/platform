@@ -6,13 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models.DisplayWork
 
-import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success, Try}
 
 object DisplayWorkToJsonStringFlow extends Logging {
 
-  def apply(mapper: ObjectMapper)(implicit executionContext: ExecutionContext)
-    : Flow[DisplayWork, String, NotUsed] =
+  def apply(mapper: ObjectMapper): Flow[DisplayWork, String, NotUsed] =
     Flow.fromFunction({ work =>
       Try(mapper.writeValueAsString(work)) match {
         case Success(s: String) => s

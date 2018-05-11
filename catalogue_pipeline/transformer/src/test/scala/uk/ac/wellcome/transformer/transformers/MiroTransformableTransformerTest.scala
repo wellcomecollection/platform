@@ -27,7 +27,7 @@ class MiroTransformableTransformerTest
 
         transformRecordAndCheckSierraSystemNumber(
           innopacId = innopacId,
-          expectedSierraNumber = s"b1234567${checkDigit}"
+          expectedSierraNumber = expectedSierraNumber
         )
       }
     }

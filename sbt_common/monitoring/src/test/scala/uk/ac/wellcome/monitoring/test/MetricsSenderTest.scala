@@ -14,7 +14,7 @@ import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
@@ -52,11 +52,11 @@ class MetricsSenderTest
             val putMetricDataRequest = capture.getValue
             val metricData = putMetricDataRequest.getMetricData
             metricData should have size 2
-            metricData.exists { metricDatum =>
+            metricData.asScala.exists { metricDatum =>
               (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "success"
             } shouldBe true
 
-            metricData.exists { metricDatum =>
+            metricData.asScala.exists { metricDatum =>
               (metricDatum.getValue >= 100) && (metricDatum.getMetricName == "bar")
             } shouldBe true
           }
@@ -84,11 +84,11 @@ class MetricsSenderTest
             val metricData = putMetricDataRequest.getMetricData
             metricData should have size 2
 
-            metricData.exists { metricDatum =>
+            metricData.asScala.exists { metricDatum =>
               (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "failure"
             } shouldBe true
 
-            metricData.exists { metricDatum =>
+            metricData.asScala.exists { metricDatum =>
               metricDatum.getMetricName == "bar"
             } shouldBe true
           }
@@ -116,8 +116,8 @@ class MetricsSenderTest
             val putMetricDataRequests = capture.getAllValues
             putMetricDataRequests should have size 2
 
-            putMetricDataRequests.head.getMetricData should have size 20
-            putMetricDataRequests.tail.head.getMetricData should have size 10
+            putMetricDataRequests.asScala.head.getMetricData should have size 20
+            putMetricDataRequests.asScala.tail.head.getMetricData should have size 10
           }
         }
       }
@@ -179,7 +179,7 @@ class MetricsSenderTest
         whenReady(metricFuture) { _ =>
           eventually {
             verify(amazonCloudWatch).putMetricData(capture.capture())
-            capture.getValue.getMetricData.head.getValue shouldBe expectedValue
+            capture.getValue.getMetricData.asScala.head.getValue shouldBe expectedValue
           }
         }
       }
@@ -205,7 +205,7 @@ class MetricsSenderTest
         whenReady(metricFuture) { _ =>
           eventually {
             verify(amazonCloudWatch).putMetricData(capture.capture())
-            capture.getValue.getMetricData.head.getValue shouldBe expectedValue.length
+            capture.getValue.getMetricData.asScala.head.getValue shouldBe expectedValue.length
           }
         }
       }

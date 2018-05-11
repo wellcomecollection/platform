@@ -1,22 +1,17 @@
 package uk.ac.wellcome.storage.vhs
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.{Id, Sourced, Versioned}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectStore}
+import uk.ac.wellcome.models.Id
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
-import com.gu.scanamo.syntax._
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import org.scalatest.Assertion
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-
-import scala.annotation.Annotation
 
 case class ExampleRecord(
   override val id: String,

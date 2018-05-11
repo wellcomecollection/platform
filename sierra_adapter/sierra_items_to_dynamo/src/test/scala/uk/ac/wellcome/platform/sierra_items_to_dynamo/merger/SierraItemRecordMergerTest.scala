@@ -131,7 +131,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
 
   private def sierraItemRecord(bibIds: List[String] = List(),
                                unlinkedBibIds: List[String] = List(),
-                               modifiedDate: String = "2001-01-01T01:01:01Z",
+                               modifiedDate: String,
                                version: Int = 1): SierraItemRecord = {
     SierraItemRecord(
       id = s"i111",

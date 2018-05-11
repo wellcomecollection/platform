@@ -1,15 +1,13 @@
 package uk.ac.wellcome.storage.dynamo
 
-import javax.inject.Singleton
-
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.services.dynamodbv2._
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.AWSConfig
+import javax.inject.Singleton
 import uk.ac.wellcome.finatra.modules.AWSConfigModule
-import com.amazonaws.services.dynamodbv2._
+import uk.ac.wellcome.models.aws.AWSConfig
 
 object DynamoClientModule extends TwitterModule {
   override val modules = Seq(AWSConfigModule)

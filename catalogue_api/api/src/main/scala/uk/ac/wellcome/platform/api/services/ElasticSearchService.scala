@@ -1,14 +1,11 @@
 package uk.ac.wellcome.platform.api.services
 
-import javax.inject.{Inject, Singleton}
-
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import javax.inject.{Inject, Singleton}
 
 import scala.concurrent.Future
 

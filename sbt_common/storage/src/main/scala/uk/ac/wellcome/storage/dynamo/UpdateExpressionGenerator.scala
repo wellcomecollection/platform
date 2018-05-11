@@ -1,13 +1,13 @@
 package uk.ac.wellcome.storage.dynamo
 
 import com.gu.scanamo.DynamoFormat
-import com.gu.scanamo.update.UpdateExpression
 import com.gu.scanamo.syntax._
-import shapeless.{HList, LabelledGeneric, Poly1, Poly2, Witness}
+import com.gu.scanamo.update.UpdateExpression
 import shapeless.labelled.FieldType
-import shapeless.ops.hlist.{LeftFolder, Mapper}
+import shapeless.ops.hlist.LeftFolder
 import shapeless.ops.record.Remover
 import shapeless.record._
+import shapeless.{HList, LabelledGeneric, Poly2, Witness}
 
 trait UpdateExpressionGenerator[T] {
   def generateUpdateExpression(t: T): Option[UpdateExpression]

@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.storage.s3.S3ClientModule
 import uk.ac.wellcome.test.fixtures._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.util.Random
 
 object S3 {
@@ -66,8 +66,9 @@ trait S3 extends Logging with Eventually {
       },
       destroy = { bucket: Bucket =>
         safeCleanup(s3Client) {
-          _.listObjects(bucket.name).getObjectSummaries.foreach { obj =>
-            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
+          _.listObjects(bucket.name).getObjectSummaries.asScala.foreach {
+            obj =>
+              safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
           }
         }
 

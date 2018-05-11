@@ -34,9 +34,6 @@ class WorkIndexer @Inject()(
 
   def indexWork(work: IdentifiedWork, esIndex: String): Future[Any] = {
 
-    // This is required for elastic4s, not Circe
-    implicit val jsonMapper = IdentifiedWork
-
     metricsSender.timeAndCount[Any](
       "ingestor-index-work",
       () => {

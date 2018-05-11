@@ -1,9 +1,7 @@
 package uk.ac.wellcome.storage.type_classes
 
 import shapeless._
-import shapeless.labelled.FieldType
 import shapeless.ops.record.Selector
-import shapeless.record._
 
 // Type class with a method for getting the version of an instance of T.
 //

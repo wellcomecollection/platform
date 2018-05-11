@@ -10,8 +10,6 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.concurrent.ExecutionContextExecutor
-
 class IdentifiedWorkToVisibleDisplayWorkFlowTest
     extends FunSpec
     with Matchers
@@ -22,8 +20,6 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
   it("creates V1 DisplayWorks from IdentifiedWorks") {
     withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
           toDisplayWork = DisplayWorkV1.apply)
@@ -46,8 +42,6 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
   it("creates V2 DisplayWorks from IdentifiedWorks") {
     withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
           toDisplayWork = DisplayWorkV2.apply)
@@ -70,8 +64,6 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
   it("suppresses IdentifiedWorks with visible = false") {
     withActorSystem { actorSystem =>
-      implicit val executionContext: ExecutionContextExecutor =
-        actorSystem.dispatcher
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
           toDisplayWork = DisplayWorkV1.apply)

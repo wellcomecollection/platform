@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_reader.sink
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Sink, Source}
 import io.circe.Json
 import io.circe.parser._
@@ -14,7 +13,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class SequentialS3SinkTest
@@ -31,7 +30,6 @@ class SequentialS3SinkTest
                        keyPrefix: String,
                        offset: Int = 0)(
     testWith: TestWith[Sink[(Json, Long), Future[Done]], Assertion]) = {
-    implicit val executionContext = actorSystem.dispatcher
     val sink = SequentialS3Sink(
       s3Client,
       bucketName = bucket.name,
@@ -61,7 +59,7 @@ class SequentialS3SinkTest
               val s3objects =
                 s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 1
-              s3objects.head.getKey() shouldBe "testA_0000.json"
+              s3objects.asScala.head.getKey() shouldBe "testA_0000.json"
 
               getJsonFromS3(bucket, "testA_0000.json") shouldBe json
             }
@@ -90,7 +88,7 @@ class SequentialS3SinkTest
               val s3objects =
                 s3Client.listObjects(bucket.name).getObjectSummaries
               s3objects should have size 3
-              s3objects.map {
+              s3objects.asScala.map {
                 _.getKey()
               } shouldBe List(
                 "testB_0000.json",
@@ -126,7 +124,7 @@ class SequentialS3SinkTest
             whenReady(futureDone) { _ =>
               val s3objects =
                 s3Client.listObjects(bucket.name).getObjectSummaries
-              s3objects.map {
+              s3objects.asScala.map {
                 _.getKey()
               } shouldBe List(
                 "testC_0003.json",

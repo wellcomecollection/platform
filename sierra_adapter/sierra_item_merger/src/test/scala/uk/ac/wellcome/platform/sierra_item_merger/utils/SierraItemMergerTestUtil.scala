@@ -7,7 +7,7 @@ trait SierraItemMergerTestUtil {
 
   private def itemRecordString(id: String,
                                updatedDate: String,
-                               bibIds: List[String] = List()) =
+                               bibIds: List[String]) =
     s"""
        |{
        |  "id": "$id",

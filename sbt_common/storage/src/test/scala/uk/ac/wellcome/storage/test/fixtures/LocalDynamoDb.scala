@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.storage.dynamo.DynamoClientModule
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 object LocalDynamoDb {
   case class Table(name: String, index: String)
@@ -114,6 +114,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
     dynamoDbClient
       .listTables()
       .getTableNames
+      .asScala
       .foreach(dynamoDbClient.deleteTable)
   }
 

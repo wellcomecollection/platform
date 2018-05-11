@@ -10,7 +10,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.concurrent.{blocking, Future}
 
 class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
@@ -68,7 +68,7 @@ class SQSReader @Inject()(sqsClient: AmazonSQS, sqsConfig: SQSConfig)
             .withMaxNumberOfMessages(sqsConfig.maxMessages)
         )
         .getMessages
-        .toList
+        .asScala
     }
   }
 

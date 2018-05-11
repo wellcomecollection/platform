@@ -21,7 +21,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
 
-import collection.JavaConversions._
+import collection.JavaConverters._
 
 class SierraReaderWorkerServiceTest
     extends FunSpec
@@ -118,7 +118,7 @@ class SierraReaderWorkerServiceTest
           s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
-        objects.map { _.getKey() } shouldBe pageNames
+        objects.asScala.map { _.getKey() } shouldBe pageNames
 
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
         getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
@@ -162,7 +162,7 @@ class SierraReaderWorkerServiceTest
           s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
-        objects.map { _.getKey() } shouldBe pageNames
+        objects.asScala.map { _.getKey() } shouldBe pageNames
 
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
         getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
@@ -225,7 +225,7 @@ class SierraReaderWorkerServiceTest
           s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
 
         // There are 157 item records in the Sierra wiremock so we expect 4 files
-        objects.map { _.getKey() } shouldBe pageNames
+        objects.asScala.map { _.getKey() } shouldBe pageNames
 
         // These two files were pre-populated -- we check the reader hasn't overwritten these
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0

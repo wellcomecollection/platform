@@ -16,7 +16,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 class IngestorFeatureTest
     extends FunSpec
@@ -128,7 +128,7 @@ class IngestorFeatureTest
                 sqsClient
                   .getQueueAttributes(
                     queue.url,
-                    List("ApproximateNumberOfMessagesNotVisible")
+                    List("ApproximateNumberOfMessagesNotVisible").asJava
                   )
                   .getAttributes
                   .get(

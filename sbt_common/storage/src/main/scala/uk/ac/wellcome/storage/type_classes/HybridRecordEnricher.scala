@@ -1,8 +1,7 @@
 package uk.ac.wellcome.storage.type_classes
 
-import shapeless.ops.hlist.{Collect, Prepend, Zip}
-import shapeless.{Id => ShapelessId, _}
-import uk.ac.wellcome.models.Id
+import shapeless._
+import shapeless.ops.hlist.Prepend
 import uk.ac.wellcome.storage.vhs.HybridRecord
 
 // Type class that returns a HList with all the fields from HybridRecord,

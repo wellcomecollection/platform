@@ -42,7 +42,6 @@ module "service" {
     api_host    = "${local.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_config["port"]}"
-    es_name     = "${var.es_config["name"]}"
     es_index_v1 = "${var.es_config["index_v1"]}"
     es_index_v2 = "${var.es_config["index_v2"]}"
     es_doc_type = "${var.es_config["doc_type"]}"

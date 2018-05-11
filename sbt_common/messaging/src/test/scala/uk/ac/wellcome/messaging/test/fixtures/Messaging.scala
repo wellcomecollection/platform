@@ -2,14 +2,17 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.UnsubscribeRequest
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult}
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
+}
+import io.circe.generic.semiauto._
+import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
+import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsSender
@@ -134,8 +137,6 @@ trait Messaging
     queue: Queue,
     messageReader: MessageReader[ExampleObject]
   )(testWith: TestWith[ExampleMessageWorker, R]) = {
-
-    val sqsReader = new SQSReader(sqsClient, SQSConfig(queue.url, 1.second, 1))
 
     val testWorker = new ExampleMessageWorker(
       messageReader,

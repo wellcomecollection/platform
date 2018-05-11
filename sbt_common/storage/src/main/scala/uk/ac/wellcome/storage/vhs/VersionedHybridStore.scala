@@ -9,7 +9,6 @@ import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
-  S3Config,
   S3ObjectLocation,
   S3ObjectStore
 }

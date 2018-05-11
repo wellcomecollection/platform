@@ -72,7 +72,7 @@ class MiroGenresTest
 
   private def transformRecordAndCheckGenres(
     data: String,
-    expectedGenres: List[Genre[MaybeDisplayable[AbstractConcept]]] = List()
+    expectedGenres: List[Genre[MaybeDisplayable[AbstractConcept]]]
   ) = {
     val transformedWork = transformWork(data = data)
     transformedWork.genres shouldBe expectedGenres

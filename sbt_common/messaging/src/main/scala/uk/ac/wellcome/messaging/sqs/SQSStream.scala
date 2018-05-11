@@ -58,7 +58,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       _ <- process(t)
     } yield message
 
-    processMessageFuture.onFailure {
+    processMessageFuture.failed.foreach {
       case exception: GracefulFailureException =>
         logger.warn(
           s"Graceful failure processing message ${message.getMessageId}",

@@ -8,8 +8,6 @@ import uk.ac.wellcome.platform.api.requests.{
   MultipleResultsRequest
 }
 
-import scala.language.existentials
-
 case class ResultResponse(
   @JsonProperty("@context") context: String,
   @JsonUnwrapped result: Any

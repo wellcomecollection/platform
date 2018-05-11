@@ -92,7 +92,7 @@ class SQSWorkerTest
         when(
           metrics.timeAndCount[Unit](
             anyString(),
-            any[() => Future[Unit]].apply
+            any[() => Future[Unit]]()
           )
         ).thenThrow(new RuntimeException)
 

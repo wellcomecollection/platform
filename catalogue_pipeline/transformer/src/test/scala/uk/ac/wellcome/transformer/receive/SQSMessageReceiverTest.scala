@@ -2,7 +2,6 @@ package uk.ac.wellcome.transformer.receive
 
 import java.time.Instant
 
-import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any

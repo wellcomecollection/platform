@@ -8,7 +8,6 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import io.swagger.models.Swagger
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.elasticsearch.finatra.modules.ElasticClientModule
 import uk.ac.wellcome.platform.api.controllers._
@@ -30,7 +29,7 @@ class Server extends HttpServer {
 
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")
-  private final val apiPrefix = flag(
+  flag(
     name = "api.prefix",
     default = "/" + apiName(),
     help = "API path prefix")

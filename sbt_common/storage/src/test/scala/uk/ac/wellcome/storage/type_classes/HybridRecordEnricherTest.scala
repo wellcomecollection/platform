@@ -1,9 +1,8 @@
 package uk.ac.wellcome.storage.type_classes
 
 import org.scalatest.{FunSpec, Matchers}
-import shapeless.{the => sThe, _}
 import shapeless.syntax.singleton._
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import shapeless.{the => sThe, _}
 
 class HybridRecordEnricherTest extends FunSpec with Matchers {
 
@@ -11,7 +10,6 @@ class HybridRecordEnricherTest extends FunSpec with Matchers {
 
   it("""generates a HList with all the fields from HybridRecord
       and extra fields from whatever type passed""") {
-    val gen = LabelledGeneric[HybridRecord]
     val hybridRecordEnricher = sThe[HybridRecordEnricher[Metadata]]
 
     val metadata = Metadata("something")

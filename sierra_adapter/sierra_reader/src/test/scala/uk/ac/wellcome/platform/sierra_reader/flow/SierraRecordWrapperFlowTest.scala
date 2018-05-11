@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_reader.flow
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.{ActorMaterializer, Materializer}
 import akka.stream.scaladsl.{Flow, Sink, Source}
 import io.circe.Json
 import io.circe.parser._
@@ -13,8 +12,6 @@ import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.concurrent.ExecutionContextExecutor
-
 class SierraRecordWrapperFlowTest
     extends FunSpec
     with Akka
@@ -24,9 +21,6 @@ class SierraRecordWrapperFlowTest
 
   private def withRecordWrapperFlow(actorSystem: ActorSystem)(
     testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
-    implicit val executionContext: ExecutionContextExecutor =
-      actorSystem.dispatcher
-
     val wrapperFlow = SierraRecordWrapperFlow()
 
     testWith(wrapperFlow)

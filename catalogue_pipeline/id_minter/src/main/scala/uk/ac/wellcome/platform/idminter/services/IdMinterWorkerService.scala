@@ -8,14 +8,12 @@ import uk.ac.wellcome.messaging.message.{
   MessageWorker,
   MessageWriter
 }
-import uk.ac.wellcome.messaging.sqs.SQSReader
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.Try
 
 class IdMinterWorkerService @Inject()(
   idEmbedder: IdEmbedder,

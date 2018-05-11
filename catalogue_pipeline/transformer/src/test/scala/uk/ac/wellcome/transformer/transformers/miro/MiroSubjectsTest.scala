@@ -56,7 +56,7 @@ class MiroSubjectsTest
 
   private def transformRecordAndCheckSubjects(
     data: String,
-    expectedSubjectLabels: List[String] = List()
+    expectedSubjectLabels: List[String]
   ) = {
     val transformedWork = transformWork(data = data)
     val expectedSubjects = expectedSubjectLabels.map { label =>

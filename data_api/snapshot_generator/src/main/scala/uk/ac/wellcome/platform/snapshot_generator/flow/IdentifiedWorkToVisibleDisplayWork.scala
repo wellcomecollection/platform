@@ -9,12 +9,9 @@ import uk.ac.wellcome.display.models.{
 }
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
-import scala.concurrent.ExecutionContext
-
 object IdentifiedWorkToVisibleDisplayWork {
   def apply[T <: DisplayWork](
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit executionContext: ExecutionContext)
+    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)
     : Flow[IdentifiedWork, T, NotUsed] =
     Flow[IdentifiedWork]
       .filter(_.visible)

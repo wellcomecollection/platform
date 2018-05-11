@@ -1,19 +1,17 @@
 package uk.ac.wellcome.messaging.sqs
 
 import com.amazonaws.services.sqs.model.Message
+import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import org.scalatest.Matchers
-import org.scalatest.FunSpec
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
-import scala.collection.JavaConversions._
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 class SQSReaderTest
     extends FunSpec

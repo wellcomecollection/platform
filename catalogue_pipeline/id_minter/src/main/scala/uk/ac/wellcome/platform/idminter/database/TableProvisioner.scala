@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.annotations.Flag
 import org.flywaydb.core.Flyway
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 class TableProvisioner @Inject()(@Flag("aws.rds.host") host: String,
                                  @Flag("aws.rds.port") port: String,
@@ -18,7 +18,7 @@ class TableProvisioner @Inject()(@Flag("aws.rds.host") host: String,
       userName,
       password)
     flyway.setPlaceholders(
-      Map("database" -> database, "tableName" -> tableName))
+      Map("database" -> database, "tableName" -> tableName).asJava)
     flyway.migrate()
   }
 

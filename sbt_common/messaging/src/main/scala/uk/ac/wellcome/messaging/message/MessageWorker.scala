@@ -1,17 +1,15 @@
 package uk.ac.wellcome.messaging.message
 
 import akka.actor.ActorSystem
+import com.twitter.inject.Logging
+import io.circe.Decoder
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import com.twitter.inject.Logging
-
 import scala.concurrent.duration._
-import io.circe.Decoder
-import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSReader
-import uk.ac.wellcome.utils.JsonUtil._
 
 abstract class MessageWorker[T](messageReader: MessageReader[T],
                                 actorSystem: ActorSystem,

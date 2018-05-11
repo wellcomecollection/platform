@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.idminter.database
 
-import org.scalatest.concurrent.Eventually
-import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.idminter.fixtures
-import scalikejdbc._
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 case class FieldDescription(field: String,
                             dataType: String,
@@ -18,9 +15,6 @@ class TableProvisionerTest
 
   it("should create the Identifiers table") {
     withIdentifiersDatabase { databaseConfig =>
-      val database = databaseConfig.database
-      val table = databaseConfig.table
-
       val databaseName = databaseConfig.databaseName
       val tableName = databaseConfig.tableName
 

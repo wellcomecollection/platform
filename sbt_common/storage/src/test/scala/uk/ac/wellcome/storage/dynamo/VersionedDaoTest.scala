@@ -2,9 +2,7 @@ package uk.ac.wellcome.storage.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{
-  ConditionalCheckFailedException,
   GetItemRequest,
-  PutItemRequest,
   UpdateItemRequest
 }
 import com.gu.scanamo.syntax._
@@ -14,13 +12,11 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.test.fixtures._
+import shapeless._
+import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.models.{Id, Versioned}
-import shapeless.syntax.singleton._
-import shapeless.record._
-import shapeless.{Id => ShapelessId, _}
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global

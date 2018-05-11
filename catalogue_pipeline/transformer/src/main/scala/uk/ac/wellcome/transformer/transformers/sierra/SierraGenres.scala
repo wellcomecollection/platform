@@ -4,10 +4,7 @@ import uk.ac.wellcome.models.work.internal.{
   AbstractConcept,
   Concept,
   Genre,
-  MaybeDisplayable,
-  Period,
-  Place,
-  Unidentifiable
+  MaybeDisplayable
 }
 import uk.ac.wellcome.transformer.source.{
   MarcSubfield,
