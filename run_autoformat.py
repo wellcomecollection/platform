@@ -12,8 +12,33 @@ from travistooling import branch_name, get_changed_paths, git, make
 
 
 if __name__ == '__main__':
-    make('format')
 
+    # First get information about the currently running patch.
+    # In particular, we want to know which files have actually changed.
+    travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
+
+    if travis_event_type == 'pull_request':
+        changed_paths = get_changed_paths('HEAD', 'master')
+    else:
+        git('fetch', 'origin')
+        changed_paths = get_changed_paths(os.environ['TRAVIS_COMMIT_RANGE'])
+
+    # Then run the 'format' tasks.  These are any tasks which might edit
+    # the code, and for which we might push changes.
+    extension_to_format_task = [
+        ('.tf', 'format-terraform'),
+        ('.scala', 'format-scala'),
+        ('.py', 'format-python'),
+        ('.json', 'format-json'),
+    ]
+
+    for extension, format_task in extension_to_format_task:
+        if any(f.endswith(extension) in changed_paths):
+            make(format_task)
+
+    # If there are any changes, push to GitHub immediately and fail the
+    # build.  This will abort the remaining jobs, and trigger a new build
+    # with the reformatted code.
     if get_changed_paths():
         print('*** There were changes from formatting, creating a commit')
 
@@ -41,4 +66,14 @@ if __name__ == '__main__':
     else:
         print('*** There were no changes from auto-formatting')
 
-    make('check-format')
+    # Finally, run the 'lint' tasks.  A failure in these tasks requires
+    # manual intervention, so we run them last to get any automatic fixes
+    # out of the way.
+    extension_to_lint_task = [
+        ('.py', 'lint-python'),
+        ('.ttl', 'lint-ontologies'),
+    ]
+
+    for extension, lint_task in extension_to_lint_task:
+        if any(f.endswith(extension) in changed_paths):
+            make(lint_task)
