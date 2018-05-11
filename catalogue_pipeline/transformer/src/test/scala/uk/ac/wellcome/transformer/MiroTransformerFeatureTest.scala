@@ -55,9 +55,7 @@ class MiroTransformerFeatureTest
               JsonUtil.toJson(miroHybridRecordMessage).get
             )
 
-            val flags: Map[String, String] = Map(
-              "aws.metrics.namespace" -> "sierra-transformer"
-            ) ++ s3LocalFlags(storageBucket) ++
+            val flags: Map[String, String] = s3LocalFlags(storageBucket) ++
               sqsLocalFlags(queue) ++ messageWriterLocalFlags(
               messageBucket,
               topic)

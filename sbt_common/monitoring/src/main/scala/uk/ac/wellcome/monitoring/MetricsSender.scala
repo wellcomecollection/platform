@@ -23,7 +23,6 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(
-  @Flag("aws.metrics.namespace") namespace: String,
   @Flag("aws.metrics.flushInterval") flushInterval: FiniteDuration,
   amazonCloudWatch: AmazonCloudWatch,
   actorSystem: ActorSystem)
@@ -56,7 +55,6 @@ class MetricsSender @Inject()(
           metricDataSeq =>
             amazonCloudWatch.putMetricData(
               new PutMetricDataRequest()
-                .withNamespace(namespace)
                 .withMetricData(metricDataSeq: _*)
           )))
       .run()

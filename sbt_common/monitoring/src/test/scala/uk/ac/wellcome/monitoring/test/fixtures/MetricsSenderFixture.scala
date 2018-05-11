@@ -21,7 +21,6 @@ trait MetricsSenderFixture
   def withMetricsSender[R](actorSystem: ActorSystem) =
     fixture[MetricsSender, R](
       create = new MetricsSender(
-        namespace = awsNamespace,
         flushInterval = flushInterval,
         amazonCloudWatch = cloudWatchClient,
         actorSystem = actorSystem
