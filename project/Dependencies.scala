@@ -97,7 +97,7 @@ object Dependencies {
 
   val commonElasticsearchDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
-  ) ++ elasticsearchDependencies ++ scalacheckDependencies ++ finatraDependencies
+  ) ++ elasticsearchDependencies ++ scalacheckDependencies
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
@@ -105,7 +105,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ dynamoDependencies ++ finatraDependencies
+  ) ++ dynamoDependencies
 
   val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
