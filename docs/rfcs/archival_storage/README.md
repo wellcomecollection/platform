@@ -1,6 +1,6 @@
 # Archival Storage Service
 
-**Last updated: 9 May 2018.**
+**Last updated: 14 May 2018.**
 
 ## Problem Statement
 
@@ -62,7 +62,9 @@ We propose to use following file formats as mentioned above:
 
 #### Storage Manifest
 
-The storage manifest provides a pointer to the stored accession, the location of any derivatives and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession.
+The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession.
+
+The storage manifest will include a serialization of the `bag-info.txt` file from the BagIt "bag".
 
 ```json
 {
@@ -70,13 +72,16 @@ The storage manifest provides a pointer to the stored accession, the location of
   "derivative_location": "s3://bucket/foo/bar",
   "title": "Some Title",
   "description": "Some Description",
+  "bag_it": {
+  "...": "..."
+  }
   "...": "..."
 }
 ```
 
 #### BagIt
 
-An archival file format:
+An archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
