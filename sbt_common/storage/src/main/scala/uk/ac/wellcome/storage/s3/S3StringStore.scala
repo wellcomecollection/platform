@@ -12,8 +12,8 @@ import scala.util.hashing.MurmurHash3
 class S3StringStore @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config
-) extends Logging {
-  def put(content: String, keyPrefix: String)(): Future[S3ObjectLocation] = {
+) extends Logging with S3Store[String] {
+  def put(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
     S3StringStore.put(s3Client, s3Config.bucketName)(keyPrefix)(content)
   }
 
