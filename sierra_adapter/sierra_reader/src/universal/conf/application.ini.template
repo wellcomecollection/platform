@@ -1,4 +1,5 @@
 -aws.sqs.queue.url=${windows_queue_url}
+-aws.sqs.parallelism=1
 -aws.metrics.namespace=${metrics_namespace}
 -sierra.apiUrl=${sierra_api_url}
 -sierra.oauthKey=${sierra_oauth_key}
