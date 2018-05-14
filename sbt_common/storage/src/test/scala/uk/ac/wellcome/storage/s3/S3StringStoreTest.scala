@@ -20,7 +20,7 @@ class S3StringStoreTest
   val content = "Some content!"
   val expectedHash = "1227282840"
 
-  it("stores a versioned object with path id/version/hash") {
+  it("stores a string with path id/version/hash") {
     withLocalS3Bucket { bucket =>
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "foo"
@@ -75,7 +75,7 @@ class S3StringStoreTest
     }
   }
 
-  it("retrieves a versioned object from s3") {
+  it("retrieves a string from s3") {
     withLocalS3Bucket { bucket =>
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "foo"
@@ -90,7 +90,7 @@ class S3StringStoreTest
     }
   }
 
-  it("throws an exception when retrieving a missing object") {
+  it("throws an exception when retrieving a missing key") {
     withLocalS3Bucket { bucket =>
       withS3StringObjectStore(bucket) { stringStore =>
         whenReady(
