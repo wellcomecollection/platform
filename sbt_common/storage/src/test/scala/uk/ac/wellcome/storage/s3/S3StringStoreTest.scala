@@ -25,7 +25,8 @@ class S3StringStoreTest
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "foo"
 
-        val writtenToS3 = stringStore.put(content = content, keyPrefix = prefix)
+        val writtenToS3 =
+          stringStore.put(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedKey = s"$prefix/$expectedHash.json"
@@ -45,7 +46,8 @@ class S3StringStoreTest
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "/foo"
 
-        val writtenToS3 = stringStore.put(content = content, keyPrefix = prefix)
+        val writtenToS3 =
+          stringStore.put(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -61,7 +63,8 @@ class S3StringStoreTest
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "foo/"
 
-        val writtenToS3 = stringStore.put(content = content, keyPrefix = prefix)
+        val writtenToS3 =
+          stringStore.put(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -77,7 +80,8 @@ class S3StringStoreTest
       withS3StringObjectStore(bucket) { stringStore =>
         val prefix = "foo"
 
-        val writtenToS3 = stringStore.put(content = content, keyPrefix = prefix)
+        val writtenToS3 =
+          stringStore.put(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3.flatMap(stringStore.get)) { actualContent =>
           actualContent shouldBe content
@@ -103,7 +107,8 @@ class S3StringStoreTest
     }
   }
 
-  private def withS3StringObjectStore(bucket: Bucket)(testWith: TestWith[S3StringStore, Assertion]) = {
+  private def withS3StringObjectStore(bucket: Bucket)(
+    testWith: TestWith[S3StringStore, Assertion]) = {
     val stringStore = new S3StringStore(
       s3Client = s3Client,
       s3Config = S3Config(bucketName = bucket.name)

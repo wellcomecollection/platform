@@ -68,14 +68,17 @@ class SQSMessageReceiver @Inject()(
   ) = {
     sourceMetadata.sourceName match {
       case "miro" =>
-        S3TypedObjectStore.get[MiroTransformable](s3Client, s3Config.bucketName)(
-          hybridRecord.s3key)
+        S3TypedObjectStore.get[MiroTransformable](
+          s3Client,
+          s3Config.bucketName)(hybridRecord.s3key)
       case "calm" =>
-        S3TypedObjectStore.get[CalmTransformable](s3Client, s3Config.bucketName)(
-          hybridRecord.s3key)
+        S3TypedObjectStore.get[CalmTransformable](
+          s3Client,
+          s3Config.bucketName)(hybridRecord.s3key)
       case "sierra" =>
-        S3TypedObjectStore.get[SierraTransformable](s3Client, s3Config.bucketName)(
-          hybridRecord.s3key)
+        S3TypedObjectStore.get[SierraTransformable](
+          s3Client,
+          s3Config.bucketName)(hybridRecord.s3key)
     }
   }
 

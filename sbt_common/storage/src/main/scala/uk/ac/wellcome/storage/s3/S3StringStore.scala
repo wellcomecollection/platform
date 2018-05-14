@@ -31,7 +31,8 @@ class S3StringStore @Inject()(
 }
 
 object S3StringStore extends Logging {
-  def put(s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(content: String): Future[S3ObjectLocation] = {
+  def put(s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
+    content: String): Future[S3ObjectLocation] = {
     val contentHash = MurmurHash3.stringHash(content, MurmurHash3.stringSeed)
 
     // Ensure that keyPrefix here is normalised for concatenating with contentHash
@@ -52,7 +53,8 @@ object S3StringStore extends Logging {
     }
   }
 
-  def get(s3Client: AmazonS3, bucketName: String)(key: String): Future[String] = {
+  def get(s3Client: AmazonS3, bucketName: String)(
+    key: String): Future[String] = {
     info(s"Attempting to GET object from s3://$bucketName/$key")
 
     val getObject = Future {
