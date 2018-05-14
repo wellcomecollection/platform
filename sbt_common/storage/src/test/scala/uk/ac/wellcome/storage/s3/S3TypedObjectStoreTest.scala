@@ -22,6 +22,9 @@ class S3TypedObjectStoreTest
     with ScalaFutures
     with ExtendedPatience {
 
+  val content = "Some content!"
+  val expectedHash = "1770874231"
+
   it("stores a versioned object with path id/version/hash") {
     withLocalS3Bucket { bucket =>
       withS3TypedObjectStore(bucket) { objectStore =>
@@ -34,7 +37,6 @@ class S3TypedObjectStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedJson = JsonUtil.toJson(testObject).get
-          val expectedHash = "1770874231"
 
           val expectedKey = s"$prefix/$expectedHash.json"
           val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
@@ -55,15 +57,12 @@ class S3TypedObjectStoreTest
   it("removes leading slashes from prefixes") {
     withLocalS3Bucket { bucket =>
       withS3TypedObjectStore(bucket) { objectStore =>
-        val content = "Some content!"
         val prefix = "/foo"
 
         val testObject = TestObject(content = content)
         val writtenToS3 = objectStore.put(testObject, prefix)
 
         whenReady(writtenToS3) { actualKey =>
-          val expectedHash = "1770874231"
-
           val expectedUri =
             S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
@@ -75,15 +74,12 @@ class S3TypedObjectStoreTest
   it("removes trailing slashes from prefixes") {
     withLocalS3Bucket { bucket =>
       withS3TypedObjectStore(bucket) { objectStore =>
-        val content = "Some content!"
         val prefix = "foo/"
 
         val testObject = TestObject(content = content)
         val writtenToS3 = objectStore.put(testObject, prefix)
 
         whenReady(writtenToS3) { actualKey =>
-          val expectedHash = "1770874231"
-
           val expectedUri =
             S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
@@ -95,7 +91,6 @@ class S3TypedObjectStoreTest
   it("retrieves a versioned object from s3") {
     withLocalS3Bucket { bucket =>
       withS3TypedObjectStore(bucket) { objectStore =>
-        val content = "Some content!"
         val prefix = "foo"
 
         val testObject = TestObject(content = content)
