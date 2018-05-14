@@ -1,11 +1,10 @@
 package uk.ac.wellcome.finatra.messaging
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
+import uk.ac.wellcome.messaging.sns.SNSClientFactory
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SNSClientModule extends TwitterModule {
@@ -22,29 +21,11 @@ object SNSClientModule extends TwitterModule {
   @Singleton
   @Provides
   def providesSNSClient(awsConfig: AWSConfig): AmazonSNS =
-    buildSNSClient(
-      awsConfig = awsConfig,
+    SNSClientFactory.create(
+      region = awsConfig.region,
       endpoint = snsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
     )
 
-  def buildSNSClient(awsConfig: AWSConfig,
-                     endpoint: String,
-                     accessKey: String,
-                     secretKey: String): AmazonSNS = {
-    val standardClient = AmazonSNSClientBuilder.standard
-    if (endpoint.isEmpty)
-      standardClient
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint, awsConfig.region))
-        .build()
-  }
 }

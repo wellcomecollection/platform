@@ -39,6 +39,7 @@ object MessageConfigModule extends TwitterModule {
   def providesMessageWriterConfig(): MessageWriterConfig = {
     val snsConfig = SNSConfig(topicArn = topicArn())
     val s3Config = S3Config(bucketName = bucketName())
+
     MessageWriterConfig(snsConfig = snsConfig, s3Config = s3Config)
   }
 
@@ -47,6 +48,7 @@ object MessageConfigModule extends TwitterModule {
   def providesMessageReaderConfig(): MessageReaderConfig = {
     val sqsConfig = SQSConfig(queueUrl(), waitTime() seconds, maxMessages())
     val s3Config = S3Config(bucketName = bucketName())
+
     MessageReaderConfig(sqsConfig = sqsConfig, s3Config = s3Config)
   }
 }

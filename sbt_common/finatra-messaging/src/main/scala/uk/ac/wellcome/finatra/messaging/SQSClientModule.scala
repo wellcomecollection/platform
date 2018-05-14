@@ -6,6 +6,7 @@ import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync, AmazonSQSAsyncClie
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
+import uk.ac.wellcome.messaging.sqs.SQSClientFactory
 import uk.ac.wellcome.models.aws.AWSConfig
 
 object SQSClientModule extends TwitterModule {
@@ -24,58 +25,20 @@ object SQSClientModule extends TwitterModule {
   @Singleton
   @Provides
   def providesSQSClient(awsConfig: AWSConfig): AmazonSQS =
-    buildSQSClient(
-      awsConfig = awsConfig,
+    SQSClientFactory.createSyncClient(
+      region = awsConfig.region,
       endpoint = sqsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
     )
-
-  def buildSQSClient(awsConfig: AWSConfig,
-                     endpoint: String,
-                     accessKey: String,
-                     secretKey: String): AmazonSQS = {
-    val standardClient = AmazonSQSClientBuilder.standard
-    if (endpoint.isEmpty)
-      standardClient
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint, awsConfig.region))
-        .build()
-  }
 
   @Singleton
   @Provides
   def providesSQSAsyncClient(awsConfig: AWSConfig): AmazonSQSAsync =
-    buildSQSAsyncClient(
-      awsConfig = awsConfig,
+    SQSClientFactory.createAsyncClient(
+      region = awsConfig.region,
       endpoint = sqsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
     )
-
-  def buildSQSAsyncClient(awsConfig: AWSConfig,
-                          endpoint: String,
-                          accessKey: String,
-                          secretKey: String): AmazonSQSAsync = {
-    val standardClient = AmazonSQSAsyncClientBuilder.standard
-    if (endpoint.isEmpty)
-      standardClient
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint, awsConfig.region))
-        .build()
-  }
 }
