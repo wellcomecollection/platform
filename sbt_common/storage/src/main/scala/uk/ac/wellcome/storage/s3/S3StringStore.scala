@@ -42,20 +42,20 @@ object S3StringStore extends Logging {
 
     val key = s"$prefix/$contentHash.json"
 
-    info(s"Attempting to PUT object to s3://$bucketName/$key")
+    info(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {
       s3Client.putObject(bucketName, key, content)
     }
 
     putObject.map { _ =>
-      info(s"Successfully PUT object to s3://$bucketName/$key")
+      info(s"Success: PUT object to s3://$bucketName/$key")
       S3ObjectLocation(bucketName, key)
     }
   }
 
   def get(s3Client: AmazonS3, bucketName: String)(
     key: String): Future[String] = {
-    info(s"Attempting to GET object from s3://$bucketName/$key")
+    info(s"Attempt: GET object from s3://$bucketName/$key")
 
     val getObject = Future {
       val s3Object = s3Client.getObject(bucketName, key)
@@ -63,7 +63,7 @@ object S3StringStore extends Logging {
     }
 
     getObject.map { s3ObjectContent =>
-      info(s"Successful GET object from s3://$bucketName/$key")
+      info(s"Success: GET object from s3://$bucketName/$key")
       s3ObjectContent
     }
   }
