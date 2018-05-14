@@ -60,6 +60,10 @@ lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
 
+lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra-messaging")
+  .dependsOn(common_messaging % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -84,6 +88,7 @@ lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
@@ -137,6 +142,7 @@ lazy val root = (project in file("."))
     common_messaging,
     common_monitoring,
     common_storage,
+    finatra_messaging,
     api,
     ingestor,
     transformer,
