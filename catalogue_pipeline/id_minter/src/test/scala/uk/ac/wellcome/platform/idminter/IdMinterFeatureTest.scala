@@ -145,14 +145,12 @@ class IdMinterFeatureTest
     // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
     Thread.sleep(2000)
 
-    eventually {
-      sqsClient
-        .getQueueAttributes(
-          queue.url,
-          List("ApproximateNumberOfMessagesNotVisible").asJava
-        )
-        .getAttributes
-        .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
-    }
+    sqsClient
+      .getQueueAttributes(
+        queue.url,
+        List("ApproximateNumberOfMessagesNotVisible").asJava
+      )
+      .getAttributes
+      .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
   }
 }
