@@ -31,6 +31,8 @@ object MessageConfigModule extends TwitterModule {
       "aws.message.sqs.maxMessages",
       10,
       "Maximum number of SQS messages to return")
+  val parallelism =
+    flag("aws.message.sqs.parallelism", 10, "How many messages to process at once")
 
   @Singleton
   @Provides
@@ -43,7 +45,12 @@ object MessageConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesMessageReaderConfig(): MessageReaderConfig = {
-    val sqsConfig = SQSConfig(queueUrl(), waitTime() seconds, maxMessages())
+    val sqsConfig = SQSConfig(
+      queueUrl = queueUrl(),
+      waitTime = waitTime() seconds,
+      maxMessages = maxMessages(),
+      parallelism = parallelism()
+    )
     val s3Config = S3Config(bucketName = bucketName())
     MessageReaderConfig(sqsConfig = sqsConfig, s3Config = s3Config)
   }
