@@ -1,4 +1,6 @@
-# METS Adapter
+# RFC 4: METS Adapter
+
+**Last updated: 14 May 2018.**
 
 ## Background
 

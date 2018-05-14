@@ -1,4 +1,6 @@
-# Matcher architecture
+# RFC 1: Matcher architecture
+
+**Last updated: 14 May 2018.**
 
 The matcher receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
 

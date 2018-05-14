@@ -1,4 +1,6 @@
-# Asset Access
+# RFC 3: Asset Access
+
+**Last updated: 14 May 2018.**
 
 ## Background
 
