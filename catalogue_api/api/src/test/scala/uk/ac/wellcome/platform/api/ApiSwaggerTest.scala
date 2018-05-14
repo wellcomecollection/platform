@@ -91,7 +91,24 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .toString shouldBe "\"#/definitions/Work\""
   }
 
+  // Because the Swagger should be the same on every request, we cache
+  // requests for the Swagger to save the time cost of starting a new
+  // server for every test/request.
+  //
+  var cachedResponses = Map[String, JsonNode]()
+
   def readTree(path: String): JsonNode = {
+    cachedResponses.get(path) match {
+      case Some(node) => node
+      case None => {
+        val newTree = readTreeFromServer(path)
+        cachedResponses += (path -> newTree)
+        newTree
+      }
+    }
+  }
+
+  def readTreeFromServer(path: String): JsonNode = {
     val flags = Map(
       "api.host" -> "test.host",
       "api.scheme" -> "http",
