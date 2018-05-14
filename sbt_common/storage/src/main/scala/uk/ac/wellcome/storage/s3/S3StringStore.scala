@@ -14,9 +14,8 @@ class S3StringStore @Inject()(
   s3Config: S3Config
 ) extends Logging
     with S3Store[String] {
-  def put(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
+  def put(content: String, keyPrefix: String): Future[S3ObjectLocation] =
     S3StringStore.put(s3Client, s3Config.bucketName)(keyPrefix)(content)
-  }
 
   def get(s3ObjectLocation: S3ObjectLocation): Future[String] = {
     val bucket = s3ObjectLocation.bucket
