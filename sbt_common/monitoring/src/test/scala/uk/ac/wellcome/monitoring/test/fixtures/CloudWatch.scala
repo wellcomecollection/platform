@@ -7,8 +7,6 @@ import uk.ac.wellcome.monitoring.CloudWatchClientModule
 import scala.concurrent.duration._
 
 trait CloudWatch {
-  protected val awsNamespace: String = "test"
-
   protected val localCloudWatchEndpointUrl: String = "http://localhost:4582"
   private val regionName: String = "eu-west-1"
 

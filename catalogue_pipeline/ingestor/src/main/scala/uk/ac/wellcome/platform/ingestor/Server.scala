@@ -11,7 +11,6 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSReaderModule}
 import uk.ac.wellcome.platform.ingestor.finatra.modules.{
   IdentifiedWorkKeyPrefixGeneratorModule,
@@ -19,6 +18,7 @@ import uk.ac.wellcome.platform.ingestor.finatra.modules.{
   IngestorWorkerModule,
   WorksIndexModule
 }
+import uk.ac.wellcome.monitoring.CloudWatchClientModule
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 
 object ServerMain extends Server
@@ -27,7 +27,7 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.ingestor Ingestor"
   override val modules = Seq(
     AWSConfigModule,
-    MetricsSenderModule,
+    CloudWatchClientModule,
     SQSClientModule,
     MessageConfigModule,
     S3ConfigModule,
