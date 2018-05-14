@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(content: String)
 
-class S3ObjectStoreTest
+class S3TypedObjectStoreTest
     extends FunSpec
     with S3
     with Matchers
@@ -25,7 +25,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore[TestObject](
+      val objectStore = new S3TypedObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )
@@ -58,7 +58,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "/foo"
 
-      val objectStore = new S3ObjectStore[TestObject](
+      val objectStore = new S3TypedObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )
@@ -81,7 +81,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo/"
 
-      val objectStore = new S3ObjectStore[TestObject](
+      val objectStore = new S3TypedObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )
@@ -104,7 +104,7 @@ class S3ObjectStoreTest
       val content = "Some content!"
       val prefix = "foo"
 
-      val objectStore = new S3ObjectStore[TestObject](
+      val objectStore = new S3TypedObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )
@@ -121,7 +121,7 @@ class S3ObjectStoreTest
 
   it("throws an exception when retrieving a missing object") {
     withLocalS3Bucket { bucket =>
-      val objectStore = new S3ObjectStore[TestObject](
+      val objectStore = new S3TypedObjectStore[TestObject](
         s3Client,
         S3Config(bucketName = bucket.name)
       )

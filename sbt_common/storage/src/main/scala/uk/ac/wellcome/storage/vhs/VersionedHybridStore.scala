@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3ObjectLocation,
-  S3ObjectStore
+  S3TypedObjectStore
 }
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
@@ -29,7 +29,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
   dynamoDbClient: AmazonDynamoDB
 ) {
 
-  val sourcedObjectStore = new S3ObjectStore[T](
+  val sourcedObjectStore = new S3TypedObjectStore[T](
     s3Client = s3Client,
     s3Config = vhsConfig.s3Config
   )

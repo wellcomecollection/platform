@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.transformable.{
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3TypedObjectStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.platform.transformer.transformers.{
   CalmTransformableTransformer,
@@ -68,13 +68,13 @@ class SQSMessageReceiver @Inject()(
   ) = {
     sourceMetadata.sourceName match {
       case "miro" =>
-        S3ObjectStore.get[MiroTransformable](s3Client, s3Config.bucketName)(
+        S3TypedObjectStore.get[MiroTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
       case "calm" =>
-        S3ObjectStore.get[CalmTransformable](s3Client, s3Config.bucketName)(
+        S3TypedObjectStore.get[CalmTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
       case "sierra" =>
-        S3ObjectStore.get[SierraTransformable](s3Client, s3Config.bucketName)(
+        S3TypedObjectStore.get[SierraTransformable](s3Client, s3Config.bucketName)(
           hybridRecord.s3key)
     }
   }
