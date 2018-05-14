@@ -9,7 +9,6 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
@@ -19,6 +18,7 @@ import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{
   AkkaS3ClientModule,
   SnapshotGeneratorWorkerModule
 }
+import uk.ac.wellcome.platform.snapshot_generator.controllers.ManagementController
 import uk.ac.wellcome.storage.s3.S3ConfigModule
 
 object ServerMain extends Server

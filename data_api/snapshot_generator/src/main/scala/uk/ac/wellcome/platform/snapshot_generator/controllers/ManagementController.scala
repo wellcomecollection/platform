@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.controllers
+package uk.ac.wellcome.platform.snapshot_generator.controllers
 
 import javax.inject.{Inject, Singleton}
 

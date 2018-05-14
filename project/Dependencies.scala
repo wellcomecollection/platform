@@ -55,19 +55,21 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   )
 
-  val finatraDependencies: Seq[ModuleID] = Seq(
+  val finatraDependencies = Seq(
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
-    "ch.qos.logback" % "logback-classic" % versions.logback,
     "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
+    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests"
+  )
+
+  val injectDependencies = Seq(
     "com.twitter" %% "inject-server" % versions.finatra % "test",
     "com.twitter" %% "inject-app" % versions.finatra % "test",
     "com.twitter" %% "inject-core" % versions.finatra % "test",
     "com.twitter" %% "inject-modules" % versions.finatra % "test",
     "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
-    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
@@ -85,10 +87,11 @@ object Dependencies {
 
   // Internal Library dependency groups
   val commonDependencies: Seq[ModuleID] = Seq(
+    "ch.qos.logback" % "logback-classic" % versions.logback,
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
-  ) ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
+  ) ++ injectDependencies ++ akkaDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
@@ -106,18 +109,21 @@ object Dependencies {
 
   val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  ) ++ dynamoDependencies
+  ) ++ dynamoDependencies ++ finatraDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
-  )
+  ) ++ finatraDependencies
 
   val internalModelDependencies = dynamoDependencies
 
   // Application specific dependency groups
+
+  val apiDependencies = finatraDependencies
+
   val sierraAdapterCommonDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
-  )
+  ) ++ finatraDependencies
 
   val idminterDependencies = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",

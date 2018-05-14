@@ -9,9 +9,9 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.platform.sierra_item_merger.controllers.ManagementController
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
 import uk.ac.wellcome.storage.dynamo.DynamoClientModule
