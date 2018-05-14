@@ -34,7 +34,3 @@ We propose to read from an S3 event stream for object creation and update events
 - **Convert to JSON** and store in an instance of the versioned hybrid store (VHS).
 - **PUT** records to an instance of the versioned hybrid store (VHS) and perform conditional updates on the VHS, based on last updated time of METS file.
 - From there METS will flow into the **catalogue pipeline**.
-
-### Terminology
-
-+- **Versioned Hybrid Store**: A set of [https://github.com/wellcometrust/platform/tree/master/sbt_common/storage/src/main/scala/uk/ac/wellcome/storage/vhs](software libraries) wrapping interactions with dynamo and S3 to provide a transactional typed large object store.
