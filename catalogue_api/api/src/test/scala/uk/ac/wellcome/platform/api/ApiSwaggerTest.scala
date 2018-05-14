@@ -56,6 +56,28 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .toString shouldBe "\"array\""
   }
 
+  it("shows the correct Subject model for v2") {
+    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    tree.at("/definitions/Subject").isObject shouldBe true
+    tree
+      .at("/definitions/Subject/properties/concepts/type")
+      .toString shouldBe "\"array\""
+    tree
+      .at("/definitions/Subject/properties/concepts/items/$ref")
+      .toString shouldBe "\"#/definitions/Concept\""
+  }
+
+  it("shows the correct Genre model for v2") {
+    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    tree.at("/definitions/Genre").isObject shouldBe true
+    tree
+      .at("/definitions/Genre/properties/concepts/type")
+      .toString shouldBe "\"array\""
+    tree
+      .at("/definitions/Genre/properties/concepts/items/$ref")
+      .toString shouldBe "\"#/definitions/Concept\""
+  }
+
   it("doesn't show DisplayWork in the definitions") {
     val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions").fieldNames.asScala.toList shouldNot contain(
