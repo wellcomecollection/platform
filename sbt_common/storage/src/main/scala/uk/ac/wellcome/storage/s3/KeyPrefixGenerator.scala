@@ -16,10 +16,11 @@ import uk.ac.wellcome.models.Sourced
 //
 //      KeyPrefixGenerator[SierraTransformable] < KeyPrefixGenerator[Sourced]
 //
-// In S3ObjectStore, we need a KeyPrefixGenerator[T], where T is usually some
-// subclass of Sourced (this is the way we use it, not a strict requirement).
-// This contravariance allows us to define a single KeyPrefixGenerator[Sourced]
-// and use it on all instances, even though T is some subclass of Sourced.
+// In S3TypedObjectStore, we need a KeyPrefixGenerator[T], where T is usually
+// some subclass of Sourced (this is the way we use it, not a strict
+// requirement).  This contravariance allows us to define a single
+// KeyPrefixGenerator[Sourced] and use it on all instances, even when T is a
+// subclass of Sourced.
 
 trait KeyPrefixGenerator[-T] {
   def generate(obj: T): String

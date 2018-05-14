@@ -6,7 +6,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.Encoder
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3TypedObjectStore}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -29,7 +29,7 @@ class MessageWriter[T] @Inject()(
     snsConfig = messageConfig.snsConfig
   )
 
-  private val s3 = new S3ObjectStore[T](
+  private val s3 = new S3TypedObjectStore[T](
     s3Client = s3Client,
     s3Config = messageConfig.s3Config
   )

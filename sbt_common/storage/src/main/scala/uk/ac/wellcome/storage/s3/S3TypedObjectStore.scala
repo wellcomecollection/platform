@@ -11,14 +11,14 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
-class S3ObjectStore[T] @Inject()(
+class S3TypedObjectStore[T] @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config
 ) extends Logging {
   def put(sourcedObject: T, keyPrefix: String)(
     implicit encoder: Encoder[T]): Future[S3ObjectLocation] = {
 
-    S3ObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
+    S3TypedObjectStore.put[T](s3Client, s3Config.bucketName)(keyPrefix)(
       sourcedObject)
   }
 
@@ -32,11 +32,11 @@ class S3ObjectStore[T] @Inject()(
         s"Bucket name in S3ObjectLocation ($bucket) does not match configured bucket (${s3Config.bucketName})")
     }
 
-    S3ObjectStore.get[T](s3Client, bucket)(key)
+    S3TypedObjectStore.get[T](s3Client, bucket)(key)
   }
 }
 
-object S3ObjectStore extends Logging {
+object S3TypedObjectStore extends Logging {
   def put[T](s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
     sourcedObject: T)(implicit encoder: Encoder[T]): Future[S3ObjectLocation] =
     Future.fromTry(JsonUtil.toJson(sourcedObject)).map { content =>
