@@ -1,13 +1,17 @@
 package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Displayable,
-  Genre
-}
+import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Displayable, Genre}
 
-case class DisplayGenre(label: String,
+@ApiModel(
+  value = "Genre",
+  description = "A genre"
+)
+case class DisplayGenre(@ApiModelProperty(
+  value = "A label given to a thing.")label: String,
+                        @ApiModelProperty(
+                          value = "Relates a genre to a list of concepts.")
                         concepts: List[DisplayAbstractConcept],
                         @JsonProperty("type") ontologyType: String = "Genre")
 

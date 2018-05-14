@@ -6,7 +6,7 @@ import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 
 @ApiModel(
-  value = "AbstractConcept"
+  value = "Concept"
 )
 sealed trait DisplayAbstractConcept
 
