@@ -2,14 +2,34 @@
 
 **Last updated: 14 May 2018.**
 
-The matcher receives source records/transformed Works, and it works out which source records correspond to the same Work in our pipeline.
+## Background
+
+Works are often related to one another, for example items in a box or plates in a portfolio.
+These relationships should be reflected in the way works are stored and searched.
+
+## Problem Statement
+
+Individual works can form part of larger works.
+Works that are related should be merged to form merged works.
+This is broken into two phases, a matching phase that identifies related works and a merging phase that merges those works
+into new merged works.  
+The matcher receives source records/transformed works, and it determines which source records correspond to the same work.
+The merger takes identified related works and merges them into new combined works.
+
+Each work has a unique persistent id, and this introduces additional complexity into the merging process because works 
+may have an identity as an individual item, and then later be merged -- both these ids need to remain valid and redirect 
+to the correct combined work.  Similarly, works can be combined and later split but should retain their identities so that
+they can still be found.
 
 This document has some notes on the proposed architecture.
+
+
+## Proposed Solution
 
 ## Model
 
 We model source records and their relationships as a graph.
-The vertices are the source records, and there is a directed edge from X to Y if information in the source record X tells us that it is related to Y.
+Vertices are source records, and there is a directed edge from X to Y if information in the source record X tells us that it is related to Y.
 
 Each merged work is one of the connected components of this graph.
 
@@ -25,22 +45,17 @@ The matcher will receive updates to this graph, one vertex at a time.
 When it receives an update, it needs to tell us:
 
 -   Any new works which have been created
--   Any old works which have been destroyed and need to be redirected (if two components emerge, or one component splits)
+-   Any old works which have been destroyed and need to be redirected (if two components merge, or one component splits)
 
 ## Storage
 
-We considered three storage options:
-
--   Neo4j (a filesystem-backed graph database)
--   Titan/JanusGraph (a DynamoDB-backed graph database)
--   Storing graph information in SQL
-
-Neo4j seems to be difficult to run ourselves especially if we want to deploy it as a cluster and Titan/JanusGraph doesn't give us a reliable way of updating the graph concurrently.
-Therefore we decided to use SQL, specifically RDS. SQL allows row level locking wich means we can lock on the rows that represent a connected subgraph, but still allow updates on the rest of the main graph.
-Also, we already use RDS in the ID minter, and we know how it scales.
-
-The idea is to store the structure of the graph in SQL, but do all of the graph theory logic outside the database.
-Trying to do graph operations in SQL queries feels a step too far!
+Each graph of related works that has been merged into a single work has an identity that should be preserved, 
+where the merged work supersedes the previous work the resource identity of the previous work should redirect to the new
+ merged work.
+Similarly when merged works are disconnected to create new individual works the resource identity of the previous merged work
+should ideally redirect.
+This implies storing the state of related works to enable the merging process to also emit updates to the identities of 
+all related merged works.
 
 ## Database schema
 
