@@ -2,7 +2,12 @@ package uk.ac.wellcome.finatra.messaging
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync, AmazonSQSAsyncClientBuilder, AmazonSQSClientBuilder}
+import com.amazonaws.services.sqs.{
+  AmazonSQS,
+  AmazonSQSAsync,
+  AmazonSQSAsyncClientBuilder,
+  AmazonSQSClientBuilder
+}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton

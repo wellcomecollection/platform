@@ -6,9 +6,9 @@ import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
 
 object SNSClientFactory {
   def create(region: String,
-                     endpoint: String,
-                     accessKey: String,
-                     secretKey: String): AmazonSNS = {
+             endpoint: String,
+             accessKey: String,
+             secretKey: String): AmazonSNS = {
     val standardClient = AmazonSNSClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
@@ -19,8 +19,7 @@ object SNSClientFactory {
         .withCredentials(
           new AWSStaticCredentialsProvider(
             new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint, region))
+        .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
         .build()
   }
 }

@@ -3,7 +3,10 @@ package uk.ac.wellcome.finatra.messaging
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
-import uk.ac.wellcome.messaging.message.{MessageReaderConfig, MessageWriterConfig}
+import uk.ac.wellcome.messaging.message.{
+  MessageReaderConfig,
+  MessageWriterConfig
+}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.storage.s3.S3Config
