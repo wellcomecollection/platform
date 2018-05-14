@@ -121,7 +121,8 @@ class S3TypedObjectStoreTest
     }
   }
 
-  private def withS3TypedObjectStore(bucket: Bucket)(testWith: TestWith[S3TypedObjectStore[TestObject], Assertion]) = {
+  private def withS3TypedObjectStore(bucket: Bucket)(
+    testWith: TestWith[S3TypedObjectStore[TestObject], Assertion]) = {
     val objectStore = new S3TypedObjectStore[TestObject](
       s3Client = s3Client,
       s3Config = S3Config(bucketName = bucket.name)
