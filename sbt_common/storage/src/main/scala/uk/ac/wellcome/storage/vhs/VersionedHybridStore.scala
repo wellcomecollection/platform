@@ -1,38 +1,23 @@
 package uk.ac.wellcome.storage.vhs
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
-import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{
-  KeyPrefixGenerator,
-  S3ObjectLocation,
-  S3TypeStore
-}
-import uk.ac.wellcome.storage.type_classes.{
-  HybridRecordEnricher,
-  IdGetter,
-  VersionGetter,
-  VersionUpdater
-}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
+import uk.ac.wellcome.storage.type_classes.{HybridRecordEnricher, IdGetter, VersionGetter, VersionUpdater}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
 
-class VersionedHybridStore[T <: Id] @Inject()(
-  vhsConfig: VHSConfig,
-  s3Client: AmazonS3,
-  keyPrefixGenerator: KeyPrefixGenerator[T],
-  dynamoDbClient: AmazonDynamoDB
-)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
 
-  val sourcedObjectStore = new S3TypeStore[T](
-    s3Client = s3Client,
-    s3Config = vhsConfig.s3Config
-  )
+class VersionedHybridStore[T <: Id, S <: S3ObjectStore[T]] @Inject()(
+                                                                      vhsConfig: VHSConfig,
+                                                                      s3ObjectStore: S,
+                                                                      keyPrefixGenerator: KeyPrefixGenerator[T],
+                                                                      dynamoDbClient: AmazonDynamoDB
+) {
 
   val versionedDao = new VersionedDao(
     dynamoDbClient = dynamoDbClient,
@@ -112,7 +97,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
       throw new IllegalArgumentException(
         "ID provided does not match ID in record.")
 
-    val futureUri = sourcedObjectStore.put(
+    val futureUri = s3ObjectStore.put(
       sourcedObject,
       keyPrefixGenerator.generate(sourcedObject))
 
@@ -128,7 +113,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
 
     dynamoRecord.flatMap {
       case Some(hybridRecord) => {
-        sourcedObjectStore
+        s3ObjectStore
           .get(
             S3ObjectLocation(
               bucket = vhsConfig.s3Config.bucketName,
