@@ -30,7 +30,7 @@ class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMess
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(S3ObjectLocation(storageS3Config.bucketName,hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(RedirectList(List(Redirect(workEntry.work.sourceIdentifier, List())))).get,
+        message = toJson(RedirectList(List(Redirect(target = workEntry.work.sourceIdentifier, sources = List())))).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
