@@ -2,18 +2,14 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
-import io.circe.Encoder
+import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{
-  HybridRecord,
-  VHSConfig,
-  VersionedHybridStore
-}
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -34,7 +30,7 @@ trait LocalVersionedHybridStore
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
   def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
-    testWith: TestWith[VersionedHybridStore[T], R]): R = {
+    testWith: TestWith[VersionedHybridStore[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(

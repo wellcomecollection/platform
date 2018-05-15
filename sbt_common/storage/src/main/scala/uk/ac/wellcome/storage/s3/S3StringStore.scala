@@ -9,10 +9,15 @@ import scala.concurrent.Future
 import scala.io.Source
 import scala.util.hashing.MurmurHash3
 
+trait ObjectStore[T] {
+  def put(in: T, keyPrefix: String): Future[S3ObjectLocation]
+  def get(s3ObjectLocation: S3ObjectLocation): Future[T]
+}
+
 class S3StringStore @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config
-) extends Logging {
+) extends Logging with ObjectStore[String]{
   def put(content: String, keyPrefix: String): Future[S3ObjectLocation] =
     S3StringStore.put(s3Client, s3Config.bucketName)(keyPrefix)(content)
 
