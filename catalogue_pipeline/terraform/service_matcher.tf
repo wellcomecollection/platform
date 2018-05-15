@@ -9,7 +9,7 @@ module "matcher" {
 
   env_vars = {
     queue_url             = "${module.matcher_queue.id}"
-    bucket_name       = "${module.vhs_recorder.bucket_name}"
+    vhs_bucket_name       = "${module.vhs_recorder.bucket_name}"
     metrics_namespace              = "matcher"
     topic_arn           = "${module.redirects_topic.arn}"
   }
