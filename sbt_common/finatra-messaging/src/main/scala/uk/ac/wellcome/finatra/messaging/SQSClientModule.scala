@@ -7,7 +7,6 @@ import javax.inject.Singleton
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
 import uk.ac.wellcome.models.aws.AWSConfig
 
-
 object SQSClientModule extends TwitterModule {
   override val modules = Seq(SQSConfigModule)
 

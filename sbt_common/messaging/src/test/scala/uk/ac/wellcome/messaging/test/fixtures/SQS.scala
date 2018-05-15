@@ -7,8 +7,6 @@ import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 
-
-
 import scala.collection.JavaConverters._
 import scala.util.Random
 
