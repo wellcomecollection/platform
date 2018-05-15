@@ -5,7 +5,7 @@ module "lambda_ecs_ec2_instance_tagger" {
 
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
-  timeout     = 10
+  timeout     = 25
 
   environment_variables = {
     BUCKET_NAME = "${var.infra_bucket}"
