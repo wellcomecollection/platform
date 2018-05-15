@@ -8,7 +8,7 @@ import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypedObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3StringStore, S3TypedObjectStore}
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -22,9 +22,13 @@ class MessageReader[T] @Inject()(
 ) {
   val sqsReader = new SQSReader(sqsClient, messageReaderConfig.sqsConfig)
 
-  val s3TypedObjectStore = new S3TypedObjectStore[T](
+  val s3StringStore = new S3StringStore(
     s3Client = s3Client,
     s3Config = messageReaderConfig.s3Config
+  )
+
+  val s3TypedObjectStore = new S3TypedObjectStore[T](
+    stringStore = s3StringStore
   )
 
   def readAndDelete(process: T => Future[Unit])(

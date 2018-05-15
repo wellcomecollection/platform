@@ -9,7 +9,7 @@ import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypedObjectStore
+import uk.ac.wellcome.storage.s3.{S3StringStore, S3TypedObjectStore}
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
@@ -21,9 +21,13 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender) {
 
-  private val s3TypedObjectStore = new S3TypedObjectStore[T](
+  private val s3StringStore = new S3StringStore(
     s3Client = s3Client,
     s3Config = messageReaderConfig.s3Config
+  )
+
+  private val s3TypedObjectStore = new S3TypedObjectStore[T](
+    stringStore = s3StringStore
   )
 
   private val sqsStream = new SQSStream[NotificationMessage](
