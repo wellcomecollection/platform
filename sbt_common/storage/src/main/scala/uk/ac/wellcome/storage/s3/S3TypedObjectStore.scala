@@ -12,8 +12,7 @@ import scala.concurrent.Future
 class S3TypedObjectStore[T] @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config
-) extends Logging
-    with S3Store[T] {
+) extends Logging {
 
   val stringStore = new S3StringStore(
     s3Client = s3Client,
