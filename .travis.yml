@@ -88,6 +88,7 @@ jobs:
     - env: TASK=transformer-test
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
+    - env: TASK=matcher-test
     - env: TASK=id_minter-test
 
     # Data API stack
