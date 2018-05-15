@@ -33,12 +33,7 @@ class MatcherMessageReceiver @Inject()(
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(
-          RedirectList(
-            List(
-              Redirect(
-                target = workEntry.work.sourceIdentifier,
-                sources = List())))).get,
+        message = toJson(RedirectFinder.redirects(workEntry.work)).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
