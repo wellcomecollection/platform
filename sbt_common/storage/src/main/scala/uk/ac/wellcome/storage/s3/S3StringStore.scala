@@ -1,6 +1,6 @@
 package uk.ac.wellcome.storage.s3
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.ByteArrayInputStream
 
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
@@ -9,17 +9,13 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.io.Source
-import scala.util.hashing.MurmurHash3
 
-trait ObjectStore[T] {
-  def put(in: T, keyPrefix: String): Future[S3ObjectLocation]
-  def get(s3ObjectLocation: S3ObjectLocation): Future[T]
-}
 
 class S3StringStore @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config
-) extends Logging with ObjectStore[String]{
+) extends Logging
+    with S3ObjectStore[String]{
   def put(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
     val is = new ByteArrayInputStream(content.getBytes)
 

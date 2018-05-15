@@ -123,13 +123,9 @@ class S3TypeStoreTest
 
   private def withS3TypeStore(bucket: Bucket)(
     testWith: TestWith[S3TypeStore[TestObject], Assertion]) = {
-    val s3StringStore = new S3StringStore(
+      val s3TypeStore = new S3TypeStore[TestObject](
       s3Client = s3Client,
       s3Config = S3Config(bucketName = bucket.name)
-    )
-
-    val s3TypeStore = new S3TypeStore[TestObject](
-      stringStore = s3StringStore
     )
 
     testWith(s3TypeStore)

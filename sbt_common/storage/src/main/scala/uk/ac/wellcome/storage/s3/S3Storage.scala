@@ -5,12 +5,12 @@ import java.io.InputStream
 import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.hashing.MurmurHash3
 
 object S3Storage extends Logging {
   def put(s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
-    is: InputStream): Future[S3ObjectLocation] = {
+    is: InputStream)(implicit ec: ExecutionContext): Future[S3ObjectLocation] = {
 
     // Currently hiding the stringification, so we can deal with it later if we need to
     val content = scala.io.Source.fromInputStream(is).mkString
@@ -35,7 +35,7 @@ object S3Storage extends Logging {
   }
 
   def get(s3Client: AmazonS3, bucketName: String)(
-    key: String): Future[InputStream] = {
+    key: String)(implicit ec: ExecutionContext): Future[InputStream] = {
     info(s"Attempt: GET object from s3://$bucketName/$key")
 
     val futureInputStream = Future {
