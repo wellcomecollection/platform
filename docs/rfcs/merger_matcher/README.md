@@ -1,6 +1,6 @@
 # RFC 1: Matcher architecture
 
-**Last updated: 14 May 2018.**
+**Last updated: 15 May 2018.**
 
 ## Background
 
@@ -26,6 +26,8 @@ This document has some notes on the proposed architecture.
 
 ## Proposed Solution
 
+This document has notes on the proposed architecture.
+
 ## Model
 
 We model source records and their relationships as a graph.
@@ -49,11 +51,11 @@ When it receives an update, it needs to tell us:
 
 ## Storage
 
-Each graph of related works that has been merged into a single work has an identity that should be preserved, 
-where the merged work supersedes the previous work the resource identity of the previous work should redirect to the new
- merged work.
-Similarly when merged works are disconnected to create new individual works the resource identity of the previous merged work
-should ideally redirect.
+Related works that have been merged into a single work have an identity that should be preserved, 
+where a merged work supersedes a previous work the resource identity of the previous work should redirect to the new
+ combined work. Similarly when merged works are disconnected to create new individual works the resource identity of the 
+ previous merged work should redirect.
+
 This implies storing the state of related works to enable the merging process to also emit updates to the identities of 
 all related merged works.
 
