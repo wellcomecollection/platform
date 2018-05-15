@@ -3,15 +3,13 @@ package uk.ac.wellcome.platform.recorder.services
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.message.MessageStream
+import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.recorder.models.RecorderWorkEntry
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-
-case class EmptyMetadata()
 
 class RecorderWorkerService @Inject()(
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry],
@@ -27,7 +25,7 @@ class RecorderWorkerService @Inject()(
       existingEntry => if (existingEntry.work.version > newRecorderEntry.work.version) {
         existingEntry
       } else { newRecorderEntry }
-    )(EmptyMetadata())
+    )()
   }
 
   def stop(): Future[Terminated] = {
