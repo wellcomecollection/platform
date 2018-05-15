@@ -62,13 +62,14 @@ class VersionedHybridStoreTest
         val content = "A thousand thinking thanes thanking a therapod"
         val inputStream = new ByteArrayInputStream(content.getBytes)
 
-        val future =  hybridStore.updateRecord("foo")(inputStream)(identity)()
+        val future =  hybridStore.updateRecord(id)(inputStream)(identity)()
 
         whenReady(future) { _ =>
           getContentFor(bucket, table, id) shouldBe content
         }
     }
   }
+
 
   it("stores a versioned record if it has never been seen before") {
     withS3TypeStoreFixtures {
