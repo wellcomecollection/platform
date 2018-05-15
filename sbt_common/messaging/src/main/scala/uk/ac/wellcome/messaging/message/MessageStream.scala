@@ -21,13 +21,9 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  messageReaderConfig: MessageReaderConfig,
                                  metricsSender: MetricsSender) {
 
-  private val s3StringStore = new S3StringStore(
+  private val s3TypeStore = new S3TypeStore[T](
     s3Client = s3Client,
     s3Config = messageReaderConfig.s3Config
-  )
-
-  private val s3TypeStore = new S3TypeStore[T](
-    stringStore = s3StringStore
   )
 
   private val sqsStream = new SQSStream[NotificationMessage](

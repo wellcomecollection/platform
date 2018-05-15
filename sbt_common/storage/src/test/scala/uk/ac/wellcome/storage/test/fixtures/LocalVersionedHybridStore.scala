@@ -6,7 +6,7 @@ import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3TypedObjectStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
@@ -30,7 +30,7 @@ trait LocalVersionedHybridStore
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
   def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
-    testWith: TestWith[VersionedHybridStore[T, S3TypedObjectStore[T]], R])(implicit encoder: Encoder[T], decoder: Decoder[T]): R = {
+    testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(implicit encoder: Encoder[T], decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
@@ -38,12 +38,12 @@ trait LocalVersionedHybridStore
       s3Config = s3Config
     )
 
-    val s3ObjectStore = new S3TypedObjectStore[T](
+    val s3ObjectStore = new S3TypeStore[T](
       s3Client = s3Client,
       s3Config = s3Config
     )
 
-    val store = new VersionedHybridStore[T, S3TypedObjectStore[T]](
+    val store = new VersionedHybridStore[T, S3TypeStore[T]](
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
       keyPrefixGenerator = new KeyPrefixGenerator[T] {

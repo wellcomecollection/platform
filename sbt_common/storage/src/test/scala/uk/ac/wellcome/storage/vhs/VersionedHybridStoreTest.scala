@@ -5,7 +5,7 @@ import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.storage.s3.S3TypedObjectStore
+import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -29,7 +29,7 @@ class VersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withFixtures[R](
-    testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypedObjectStore[ExampleRecord]]), R]
+    testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>

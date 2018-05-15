@@ -13,10 +13,10 @@ import scala.concurrent.Future
 
 
 class VersionedHybridStore[T <: Id, S <: S3ObjectStore[T]] @Inject()(
-                                                                      vhsConfig: VHSConfig,
-                                                                      s3ObjectStore: S,
-                                                                      keyPrefixGenerator: KeyPrefixGenerator[T],
-                                                                      dynamoDbClient: AmazonDynamoDB
+  vhsConfig: VHSConfig,
+  s3ObjectStore: S,
+  keyPrefixGenerator: KeyPrefixGenerator[T],
+  dynamoDbClient: AmazonDynamoDB
 ) {
 
   val versionedDao = new VersionedDao(
