@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3Config,
   S3StringStore,
-  S3TypedObjectStore
+  S3TypeStore
 }
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
@@ -39,7 +39,7 @@ class MessageWriter[T] @Inject()(
     s3Config = messageConfig.s3Config
   )
 
-  private val s3 = new S3TypedObjectStore[T](
+  private val s3 = new S3TypeStore[T](
     stringStore = s3StringStore
   )
 

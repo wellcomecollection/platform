@@ -8,7 +8,7 @@ import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{S3Config, S3StringStore, S3TypedObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3StringStore, S3TypeStore}
 
 import scala.concurrent.Future
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -27,7 +27,7 @@ class MessageReader[T] @Inject()(
     s3Config = messageReaderConfig.s3Config
   )
 
-  val s3TypedObjectStore = new S3TypedObjectStore[T](
+  val s3TypeStore = new S3TypeStore[T](
     stringStore = s3StringStore
   )
 
@@ -56,7 +56,7 @@ class MessageReader[T] @Inject()(
     for {
       messagePointer <- Future.fromTry[MessagePointer](
         deserialisedMessagePointerAttempt)
-      deserialisedObject <- s3TypedObjectStore.get(messagePointer.src)
+      deserialisedObject <- s3TypeStore.get(messagePointer.src)
     } yield deserialisedObject
   }
 }

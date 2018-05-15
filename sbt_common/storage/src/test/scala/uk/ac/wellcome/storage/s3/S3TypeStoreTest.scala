@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(content: String)
 
-class S3TypedObjectStoreTest
+class S3TypeStoreTest
     extends FunSpec
     with S3
     with Matchers
@@ -27,7 +27,7 @@ class S3TypedObjectStoreTest
 
   it("stores a versioned object with path id/version/hash") {
     withLocalS3Bucket { bucket =>
-      withS3TypedObjectStore(bucket) { objectStore =>
+      withS3TypeStore(bucket) { objectStore =>
         val content = "Some content!"
         val prefix = "foo"
 
@@ -56,7 +56,7 @@ class S3TypedObjectStoreTest
 
   it("removes leading slashes from prefixes") {
     withLocalS3Bucket { bucket =>
-      withS3TypedObjectStore(bucket) { objectStore =>
+      withS3TypeStore(bucket) { objectStore =>
         val prefix = "/foo"
 
         val testObject = TestObject(content = content)
@@ -73,7 +73,7 @@ class S3TypedObjectStoreTest
 
   it("removes trailing slashes from prefixes") {
     withLocalS3Bucket { bucket =>
-      withS3TypedObjectStore(bucket) { objectStore =>
+      withS3TypeStore(bucket) { objectStore =>
         val prefix = "foo/"
 
         val testObject = TestObject(content = content)
@@ -90,7 +90,7 @@ class S3TypedObjectStoreTest
 
   it("retrieves a versioned object from s3") {
     withLocalS3Bucket { bucket =>
-      withS3TypedObjectStore(bucket) { objectStore =>
+      withS3TypeStore(bucket) { objectStore =>
         val prefix = "foo"
 
         val testObject = TestObject(content = content)
@@ -106,7 +106,7 @@ class S3TypedObjectStoreTest
 
   it("throws an exception when retrieving a missing object") {
     withLocalS3Bucket { bucket =>
-      withS3TypedObjectStore(bucket) { objectStore =>
+      withS3TypeStore(bucket) { objectStore =>
         whenReady(
           objectStore
             .get(S3ObjectLocation(bucket.name, "not/a/real/object"))
@@ -121,17 +121,17 @@ class S3TypedObjectStoreTest
     }
   }
 
-  private def withS3TypedObjectStore(bucket: Bucket)(
-    testWith: TestWith[S3TypedObjectStore[TestObject], Assertion]) = {
+  private def withS3TypeStore(bucket: Bucket)(
+    testWith: TestWith[S3TypeStore[TestObject], Assertion]) = {
     val s3StringStore = new S3StringStore(
       s3Client = s3Client,
       s3Config = S3Config(bucketName = bucket.name)
     )
 
-    val s3TypedObjectStore = new S3TypedObjectStore[TestObject](
+    val s3TypeStore = new S3TypeStore[TestObject](
       stringStore = s3StringStore
     )
 
-    testWith(s3TypedObjectStore)
+    testWith(s3TypeStore)
   }
 }

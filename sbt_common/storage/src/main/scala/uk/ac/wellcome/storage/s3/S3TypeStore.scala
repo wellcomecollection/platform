@@ -8,7 +8,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
-class S3TypedObjectStore[T] @Inject()(
+class S3TypeStore[T] @Inject()(
   stringStore: S3StringStore
 ) extends Logging {
 

@@ -20,7 +20,7 @@ import uk.ac.wellcome.storage.s3.{
   S3Config,
   S3ObjectLocation,
   S3StringStore,
-  S3TypedObjectStore
+  S3TypeStore
 }
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.platform.transformer.transformers.{
@@ -73,11 +73,11 @@ class SQSMessageReceiver @Inject()(
   }
 
   val miroTransformableStore =
-    new S3TypedObjectStore[MiroTransformable](s3StringStore)
+    new S3TypeStore[MiroTransformable](s3StringStore)
   val calmTransformableStore =
-    new S3TypedObjectStore[CalmTransformable](s3StringStore)
+    new S3TypeStore[CalmTransformable](s3StringStore)
   val sierraTransformableStore =
-    new S3TypedObjectStore[SierraTransformable](s3StringStore)
+    new S3TypeStore[SierraTransformable](s3StringStore)
 
   private def getTransformable(
     hybridRecord: HybridRecord,

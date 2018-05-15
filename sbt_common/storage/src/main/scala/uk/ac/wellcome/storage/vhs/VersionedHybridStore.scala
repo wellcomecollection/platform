@@ -11,7 +11,7 @@ import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3ObjectLocation,
   S3StringStore,
-  S3TypedObjectStore
+  S3TypeStore
 }
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
@@ -35,7 +35,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Config = vhsConfig.s3Config
   )
 
-  val sourcedObjectStore = new S3TypedObjectStore[T](
+  val sourcedObjectStore = new S3TypeStore[T](
     stringStore = s3StringStore
   )
 
