@@ -78,9 +78,7 @@ trait SQS extends Matchers {
       queue
     },
     destroy = { queue =>
-      safeCleanup(queue) { url =>
-        sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
-      }
+      sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
       sqsClient.deleteQueue(queue.url)
     }
   )

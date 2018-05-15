@@ -98,7 +98,9 @@ class IdMinterFeatureTest
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
-              sqsClient.sendMessage(queue.url, "not a json string")
+              sqsClient.sendMessage(
+                queue.url,
+                "Not a valid JSON string or UnidentifiedWork")
 
               val miroId = "1234"
 

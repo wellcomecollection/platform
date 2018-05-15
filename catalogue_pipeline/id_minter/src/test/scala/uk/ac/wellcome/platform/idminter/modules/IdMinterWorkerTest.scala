@@ -33,7 +33,7 @@ class IdMinterWorkerTest
         withIdentifiersDatabase { dbConfig =>
           withLocalS3Bucket { bucket =>
             val flags =
-              sqsLocalFlags(queue) ++ messagingLocalFlags(bucket, topic, queue) ++ dbConfig.flags
+              messagingLocalFlags(bucket, topic, queue) ++ dbConfig.flags
 
             val identifiersDao = mock[IdentifiersDao]
 
