@@ -1,0 +1,4 @@
+-aws.sqs.queue.url=${queue_url}
+-aws.s3.bucketName=${vhs_bucket_name}
+-aws.metrics.namespace=${metrics_namespace}
+-aws.sns.topic.arn=${topic_arn}
