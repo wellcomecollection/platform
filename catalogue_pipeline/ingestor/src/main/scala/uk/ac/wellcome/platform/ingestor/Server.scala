@@ -11,8 +11,8 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.messaging.message.MessageConfigModule
+import uk.ac.wellcome.messaging.sqs.SQSClientModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSReaderModule}
 import uk.ac.wellcome.platform.ingestor.finatra.modules.{
   IdentifiedWorkKeyPrefixGeneratorModule,
   IngestorModule,
@@ -33,7 +33,6 @@ class Server extends HttpServer {
     S3ConfigModule,
     S3ClientModule,
     AkkaModule,
-    SQSReaderModule,
     IngestorWorkerModule,
     IngestorModule,
     WorksIndexModule,
