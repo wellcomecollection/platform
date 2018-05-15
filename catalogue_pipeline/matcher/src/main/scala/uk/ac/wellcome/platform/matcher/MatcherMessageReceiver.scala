@@ -1,13 +1,12 @@
 package uk.ac.wellcome.platform.matcher
 
 import akka.actor.{ActorSystem, Terminated}
-import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -18,8 +17,8 @@ case class Redirect(target: SourceIdentifier, sources: List[SourceIdentifier])
 
 class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMessage],
                              snsWriter: SNSWriter,
-                             s3Client: AmazonS3,
-                             storageS3Config: S3Config,
+                                       s3TypeStore: S3TypeStore[RecorderWorkEntry],
+                                       storageS3Config: S3Config,
                              actorSystem: ActorSystem) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
@@ -29,7 +28,7 @@ class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMess
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] = {
     for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](notificationMessage.Message))
-      workEntry <- S3ObjectStore.get[RecorderWorkEntry](s3Client, storageS3Config.bucketName)(hybridRecord.s3key)
+      workEntry <- s3TypeStore.get(S3ObjectLocation(storageS3Config.bucketName,hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
         message = toJson(RedirectList(List(Redirect(workEntry.work.sourceIdentifier, List())))).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
