@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.transformable.{
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypedObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3StringStore, S3TypedObjectStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.transformer.transformers.{
   CalmTransformableTransformer,
@@ -35,6 +35,11 @@ class SQSMessageReceiver @Inject()(
   s3Config: S3Config,
   metricsSender: MetricsSender)
     extends Logging {
+
+  val s3StringStore = new S3StringStore(
+    s3Client = s3Client,
+    s3Config = s3Config
+  )
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
@@ -62,23 +67,23 @@ class SQSMessageReceiver @Inject()(
     )
   }
 
+  val miroTransformableStore = new S3TypedObjectStore[MiroTransformable](s3StringStore)
+  val calmTransformableStore = new S3TypedObjectStore[CalmTransformable](s3StringStore)
+  val sierraTransformableStore = new S3TypedObjectStore[SierraTransformable](s3StringStore)
+
   private def getTransformable(
     hybridRecord: HybridRecord,
     sourceMetadata: SourceMetadata
   ) = {
+    val s3ObjectLocation = S3ObjectLocation(
+      bucket = s3Config.bucketName,
+      key = hybridRecord.s3key
+    )
+
     sourceMetadata.sourceName match {
-      case "miro" =>
-        S3TypedObjectStore.get[MiroTransformable](
-          s3Client,
-          s3Config.bucketName)(hybridRecord.s3key)
-      case "calm" =>
-        S3TypedObjectStore.get[CalmTransformable](
-          s3Client,
-          s3Config.bucketName)(hybridRecord.s3key)
-      case "sierra" =>
-        S3TypedObjectStore.get[SierraTransformable](
-          s3Client,
-          s3Config.bucketName)(hybridRecord.s3key)
+      case "miro" => miroTransformableStore.get(s3ObjectLocation)
+      case "calm" => calmTransformableStore.get(s3ObjectLocation)
+      case "sierra" => sierraTransformableStore.get(s3ObjectLocation)
     }
   }
 
