@@ -5,11 +5,11 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
-import io.circe.Decoder
+import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3StringStore, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
@@ -19,7 +19,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  sqsClient: AmazonSQSAsync,
                                  s3Client: AmazonS3,
                                  messageReaderConfig: MessageReaderConfig,
-                                 metricsSender: MetricsSender) {
+                                 metricsSender: MetricsSender)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
 
   private val s3TypeStore = new S3TypeStore[T](
     s3Client = s3Client,
@@ -34,8 +34,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   )
 
   def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T],
-    decoderN: Decoder[NotificationMessage]): Future[Done] = {
+    implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
     sqsStream.foreach(
       streamName = streamName,
       process = (notification: NotificationMessage) =>
@@ -45,7 +44,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
 
   private def processMessagePointer(
     notification: NotificationMessage,
-    process: T => Future[Unit])(implicit decoderT: Decoder[T]): Future[Unit] =
+    process: T => Future[Unit]): Future[Unit] =
     for {
       messagePointer <- Future.fromTry(
         fromJson[MessagePointer](notification.Message))

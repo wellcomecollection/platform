@@ -110,7 +110,7 @@ trait Messaging
   }
 
   def withMessageReader[T, R](bucket: Bucket, queue: Queue)(
-    testWith: TestWith[MessageReader[T], R]) = {
+    testWith: TestWith[MessageReader[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig = SQSConfig(
@@ -223,7 +223,7 @@ trait Messaging
     actorSystem: ActorSystem,
     bucket: Bucket,
     queue: SQS.Queue,
-    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R]) = {
+    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig = SQSConfig(
       queueUrl = queue.url,

@@ -8,7 +8,7 @@ import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3StreamStore, S3TypeStore}
+import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
@@ -78,6 +78,32 @@ trait LocalVersionedHybridStore
       s3ObjectStore = s3ObjectStore,
       keyPrefixGenerator = new KeyPrefixGenerator[InputStream] {
         override def generate(obj: InputStream): String = "/"
+      },
+      dynamoDbClient = dynamoDbClient
+    )
+
+    testWith(store)
+  }
+
+  def withStringVHS[R](bucket: Bucket, table: Table)(
+    testWith: TestWith[VersionedHybridStore[String, S3StringStore], R]): R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+    val dynamoConfig = DynamoConfig(table = table.name)
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config
+    )
+
+    val s3ObjectStore = new S3StringStore(
+      s3Client = s3Client,
+      s3Config = s3Config
+    )
+
+    val store = new VersionedHybridStore[String, S3StringStore](
+      vhsConfig = vhsConfig,
+      s3ObjectStore = s3ObjectStore,
+      keyPrefixGenerator = new KeyPrefixGenerator[String] {
+        override def generate(obj: String): String = "/"
       },
       dynamoDbClient = dynamoDbClient
     )
