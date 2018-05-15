@@ -97,6 +97,12 @@ lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
+lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
+  .dependsOn(common % "compile->compile;test->test")
+  .dependsOn(internal_model % "compile->compile;test->test")
+  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
+
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(common_messaging % "compile->compile;test->test")
@@ -147,6 +153,8 @@ lazy val root = (project in file("."))
     ingestor,
     transformer,
     id_minter,
+    recorder,
+    matcher,
     reindex_worker,
     sierra_adapter_common,
     sierra_reader,
