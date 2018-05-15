@@ -70,3 +70,20 @@ resource "aws_iam_role_policy" "ecs_recorder_task_vhs" {
   role   = "${module.recorder.task_role_name}"
   policy = "${module.vhs_recorder.full_access_policy}"
 }
+
+# Role policies for the Matcher
+
+resource "aws_iam_role_policy" "matcher_cloudwatch" {
+  role   = "${module.matcher.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
+resource "aws_iam_role_policy" "matcher_task_vhs" {
+  role   = "${module.matcher.task_role_name}"
+  policy = "${module.vhs_recorder.read_policy}"
+}
+
+resource "aws_iam_role_policy" "matcher_task_sns" {
+  role   = "${module.matcher.task_role_name}"
+  policy = "${module.redirects_topic.publish_policy}"
+}
