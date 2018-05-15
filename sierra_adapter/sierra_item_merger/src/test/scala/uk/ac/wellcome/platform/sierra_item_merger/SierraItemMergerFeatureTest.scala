@@ -29,7 +29,7 @@ class SierraItemMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id = "i1000001"
                 val bibId = "b1000001"
@@ -66,7 +66,7 @@ class SierraItemMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val bibId1 = "b1000001"
 

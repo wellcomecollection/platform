@@ -45,12 +45,8 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withVersionedHybridStore[RecorderWorkEntry, Unit](
-            bucket = bucket,
-            table = table) { _ =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
-              bucket,
-              queue)
+          withTypeVHS[RecorderWorkEntry, Unit](bucket = bucket, table = table) { _ =>
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(bucket, queue)
             withServer(flags) { _ =>
               val messageBody = put[UnidentifiedWork](
                 obj = work,

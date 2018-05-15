@@ -28,12 +28,23 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
+//  def withS3StreamStoreFixtures[R](
+//                                  testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3StreamStore]), R]
+//                                ): R =
+//    withLocalS3Bucket[R] { bucket =>
+//      withLocalDynamoDbTable[R] { table =>
+//        withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>
+//          testWith((bucket, table, vhs))
+//        }
+//      }
+//    }
+
   def withS3TypeStoreFixtures[R](
     testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
-        withVersionedHybridStore[ExampleRecord, R](bucket, table) { vhs =>
+        withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>
           testWith((bucket, table, vhs))
         }
       }

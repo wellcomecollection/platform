@@ -29,7 +29,7 @@ trait LocalVersionedHybridStore
       "aws.vhs.dynamo.tableName" -> table.name
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
-  def withVersionedHybridStore[T <: Id, R](bucket: Bucket, table: Table)(
+  def withTypeVHS[T <: Id, R](bucket: Bucket, table: Table)(
     testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(implicit encoder: Encoder[T], decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
@@ -54,6 +54,32 @@ trait LocalVersionedHybridStore
 
     testWith(store)
   }
+
+//  def withStreamVHS[R](bucket: Bucket, table: Table)(
+//    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
+//    val s3Config = S3Config(bucketName = bucket.name)
+//    val dynamoConfig = DynamoConfig(table = table.name)
+//    val vhsConfig = VHSConfig(
+//      dynamoConfig = dynamoConfig,
+//      s3Config = s3Config
+//    )
+//
+//    val s3ObjectStore = new S3StreamStore(
+//      s3Client = s3Client,
+//      s3Config = s3Config
+//    )
+//
+//    val store = new VersionedHybridStore[InputStream, S3StreamStore](
+//      vhsConfig = vhsConfig,
+//      s3ObjectStore = s3ObjectStore,
+//      keyPrefixGenerator = new KeyPrefixGenerator[T] {
+//        override def generate(obj: T): String = "/"
+//      },
+//      dynamoDbClient = dynamoDbClient
+//    )
+//
+//    testWith(store)
+//  }
 
   def assertStored[T <: Id](bucket: Bucket, table: Table, record: T)(
     implicit encoder: Encoder[T]) =

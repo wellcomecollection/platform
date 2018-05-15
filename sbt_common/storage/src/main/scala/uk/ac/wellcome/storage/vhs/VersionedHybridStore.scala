@@ -3,7 +3,6 @@ package uk.ac.wellcome.storage.vhs
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.type_classes.{HybridRecordEnricher, IdGetter, VersionGetter, VersionUpdater}
@@ -12,7 +11,7 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 import scala.concurrent.Future
 
 
-class VersionedHybridStore[T <: Id, S <: S3ObjectStore[T]] @Inject()(
+class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
   s3ObjectStore: S,
   keyPrefixGenerator: KeyPrefixGenerator[T],
@@ -86,20 +85,15 @@ class VersionedHybridStore[T <: Id, S <: S3ObjectStore[T]] @Inject()(
       maybeObject.map(_.s3Object)
     }
 
-  private def putObject[O](id: String, sourcedObject: T, f: (String) => O)(
+  private def putObject[O](id: String, t: T, f: (String) => O)(
     implicit dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
     versionGetter: VersionGetter[O],
     updateExpressionGenerator: UpdateExpressionGenerator[O]
   ) = {
-    if (sourcedObject.id != id)
-      throw new IllegalArgumentException(
-        "ID provided does not match ID in record.")
 
-    val futureUri = s3ObjectStore.put(
-      sourcedObject,
-      keyPrefixGenerator.generate(sourcedObject))
+    val futureUri = s3ObjectStore.put(t, keyPrefixGenerator.generate(t))
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
