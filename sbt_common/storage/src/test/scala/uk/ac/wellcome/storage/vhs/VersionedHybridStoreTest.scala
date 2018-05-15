@@ -28,7 +28,7 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  def withFixtures[R](
+  def withS3TypeStoreFixtures[R](
     testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
@@ -40,7 +40,7 @@ class VersionedHybridStoreTest
     }
 
   it("stores a versioned record if it has never been seen before") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "1111",
@@ -57,7 +57,7 @@ class VersionedHybridStoreTest
   }
 
   it("applies the given transformation to an existing record") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "1111",
@@ -80,7 +80,7 @@ class VersionedHybridStoreTest
   }
 
   it("updates DynamoDB and S3 if it sees a new version of a record") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (bucket, table, hybridStore) =>
         val record = ExampleRecord(
           id = "2222",
@@ -107,7 +107,7 @@ class VersionedHybridStoreTest
   }
 
   it("returns a future of None for a non-existent record") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (_, _, hybridStore) =>
         val future = hybridStore.getRecord(id = "does/notexist")
 
@@ -118,7 +118,7 @@ class VersionedHybridStoreTest
   }
 
   it("returns a future of Some[ExampleRecord] if the record exists") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "5555",
@@ -139,7 +139,7 @@ class VersionedHybridStoreTest
   }
 
   it("does not allow creation of records with a different id than indicated") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "8934",
@@ -156,7 +156,7 @@ class VersionedHybridStoreTest
   }
 
   it("does not allow transformation to a record with a different id") {
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (_, _, hybridStore) =>
         val record = ExampleRecord(
           id = "8934",
@@ -195,7 +195,7 @@ class VersionedHybridStoreTest
       number = 6
     )
 
-    withFixtures {
+    withS3TypeStoreFixtures {
       case (_, table, hybridStore) =>
         val future =
           hybridStore.updateRecord(record.id)(record)(identity)(data)
