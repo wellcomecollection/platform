@@ -9,6 +9,7 @@ import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3Config,
+  S3StringStore,
   S3TypedObjectStore
 }
 import uk.ac.wellcome.utils.GlobalExecutionContext.context
@@ -33,9 +34,13 @@ class MessageWriter[T] @Inject()(
     snsConfig = messageConfig.snsConfig
   )
 
-  private val s3 = new S3TypedObjectStore[T](
+  private val s3StringStore = new S3StringStore(
     s3Client = s3Client,
     s3Config = messageConfig.s3Config
+  )
+
+  private val s3 = new S3TypedObjectStore[T](
+    stringStore = s3StringStore
   )
 
   def write(message: T, subject: String)(
