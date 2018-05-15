@@ -1,18 +1,22 @@
 package uk.ac.wellcome.storage.test.fixtures
 
+import java.io.InputStream
+
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3StreamStore, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDb[HybridRecord]
@@ -55,31 +59,31 @@ trait LocalVersionedHybridStore
     testWith(store)
   }
 
-//  def withStreamVHS[R](bucket: Bucket, table: Table)(
-//    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
-//    val s3Config = S3Config(bucketName = bucket.name)
-//    val dynamoConfig = DynamoConfig(table = table.name)
-//    val vhsConfig = VHSConfig(
-//      dynamoConfig = dynamoConfig,
-//      s3Config = s3Config
-//    )
-//
-//    val s3ObjectStore = new S3StreamStore(
-//      s3Client = s3Client,
-//      s3Config = s3Config
-//    )
-//
-//    val store = new VersionedHybridStore[InputStream, S3StreamStore](
-//      vhsConfig = vhsConfig,
-//      s3ObjectStore = s3ObjectStore,
-//      keyPrefixGenerator = new KeyPrefixGenerator[T] {
-//        override def generate(obj: T): String = "/"
-//      },
-//      dynamoDbClient = dynamoDbClient
-//    )
-//
-//    testWith(store)
-//  }
+  def withStreamVHS[R](bucket: Bucket, table: Table)(
+    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+    val dynamoConfig = DynamoConfig(table = table.name)
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config
+    )
+
+    val s3ObjectStore = new S3StreamStore(
+      s3Client = s3Client,
+      s3Config = s3Config
+    )
+
+    val store = new VersionedHybridStore[InputStream, S3StreamStore](
+      vhsConfig = vhsConfig,
+      s3ObjectStore = s3ObjectStore,
+      keyPrefixGenerator = new KeyPrefixGenerator[InputStream] {
+        override def generate(obj: InputStream): String = "/"
+      },
+      dynamoDbClient = dynamoDbClient
+    )
+
+    testWith(store)
+  }
 
   def assertStored[T <: Id](bucket: Bucket, table: Table, record: T)(
     implicit encoder: Encoder[T]) =
@@ -96,5 +100,15 @@ trait LocalVersionedHybridStore
       .get
 
     getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
+  }
+
+  def getContentFor(bucket: Bucket, table: Table, id: String) = {
+    val hybridRecord = Scanamo
+      .get[HybridRecord](dynamoDbClient)(table.name)('id -> id)
+      .get
+      .right
+      .get
+
+    getContentFromS3(bucket, hybridRecord.s3key)
   }
 }

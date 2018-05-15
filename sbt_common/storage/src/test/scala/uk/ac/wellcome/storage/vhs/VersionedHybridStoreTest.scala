@@ -1,11 +1,13 @@
 package uk.ac.wellcome.storage.vhs
 
+import java.io.{ByteArrayInputStream, InputStream}
+
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.s3.{S3StreamStore, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -13,6 +15,8 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.util.Random
 
 case class ExampleRecord(
   override val id: String,
@@ -28,16 +32,16 @@ class VersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-//  def withS3StreamStoreFixtures[R](
-//                                  testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3StreamStore]), R]
-//                                ): R =
-//    withLocalS3Bucket[R] { bucket =>
-//      withLocalDynamoDbTable[R] { table =>
-//        withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>
-//          testWith((bucket, table, vhs))
-//        }
-//      }
-//    }
+  def withS3StreamStoreFixtures[R](
+                                  testWith: TestWith[(Bucket, Table, VersionedHybridStore[InputStream, S3StreamStore]), R]
+                                ): R =
+    withLocalS3Bucket[R] { bucket =>
+      withLocalDynamoDbTable[R] { table =>
+        withStreamVHS[R](bucket, table) { vhs =>
+          testWith((bucket, table, vhs))
+        }
+      }
+    }
 
   def withS3TypeStoreFixtures[R](
     testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
@@ -49,6 +53,22 @@ class VersionedHybridStoreTest
         }
       }
     }
+
+  it("stores an InputStream") {
+    withS3StreamStoreFixtures {
+      case (bucket, table, hybridStore) =>
+
+        val id = Random.nextString(5)
+        val content = "A thousand thinking thanes thanking a therapod"
+        val inputStream = new ByteArrayInputStream(content.getBytes)
+
+        val future =  hybridStore.updateRecord("foo")(inputStream)(identity)()
+
+        whenReady(future) { _ =>
+          getContentFor(bucket, table, id) shouldBe content
+        }
+    }
+  }
 
   it("stores a versioned record if it has never been seen before") {
     withS3TypeStoreFixtures {
@@ -145,45 +165,6 @@ class VersionedHybridStoreTest
 
         whenReady(getFuture) { result =>
           result shouldBe Some(record)
-        }
-    }
-  }
-
-  it("does not allow creation of records with a different id than indicated") {
-    withS3TypeStoreFixtures {
-      case (_, _, hybridStore) =>
-        val record = ExampleRecord(
-          id = "8934",
-          content = "Five fishing flinging flint"
-        )
-
-        val future =
-          hybridStore.updateRecord(id = "not_the_same_id")(record)(identity)()
-
-        whenReady(future.failed) { e: Throwable =>
-          e shouldBe a[IllegalArgumentException]
-        }
-    }
-  }
-
-  it("does not allow transformation to a record with a different id") {
-    withS3TypeStoreFixtures {
-      case (_, _, hybridStore) =>
-        val record = ExampleRecord(
-          id = "8934",
-          content = "Five fishing flinging flint"
-        )
-
-        val recordWithDifferentId = record.copy(id = "not_the_same_id")
-
-        val future = for {
-          _ <- hybridStore.updateRecord(record.id)(record)(identity)()
-          _ <- hybridStore.updateRecord(record.id)(record)(_ =>
-            recordWithDifferentId)()
-        } yield ()
-
-        whenReady(future.failed) { e: Throwable =>
-          e shouldBe a[IllegalArgumentException]
         }
     }
   }
