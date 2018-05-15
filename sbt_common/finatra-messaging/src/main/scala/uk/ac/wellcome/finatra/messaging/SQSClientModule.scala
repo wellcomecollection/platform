@@ -1,18 +1,12 @@
 package uk.ac.wellcome.finatra.messaging
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.sqs.{
-  AmazonSQS,
-  AmazonSQSAsync,
-  AmazonSQSAsyncClientBuilder,
-  AmazonSQSClientBuilder
-}
+import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
 import uk.ac.wellcome.models.aws.AWSConfig
+
 
 object SQSClientModule extends TwitterModule {
   override val modules = Seq(SQSConfigModule)

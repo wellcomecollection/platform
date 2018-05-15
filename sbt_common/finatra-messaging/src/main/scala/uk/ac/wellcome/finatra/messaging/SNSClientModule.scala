@@ -1,6 +1,6 @@
 package uk.ac.wellcome.finatra.messaging
 
-import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
+import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
