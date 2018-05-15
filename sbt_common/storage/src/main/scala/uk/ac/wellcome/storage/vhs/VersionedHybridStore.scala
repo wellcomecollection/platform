@@ -45,6 +45,8 @@ class VersionedHybridStore[T <: Id] @Inject()(
     s3Object: T
   )
 
+
+
   // Store a single record in DynamoDB.
   //
   // You pass it a record and optionally a case class containing some metadata (type M).

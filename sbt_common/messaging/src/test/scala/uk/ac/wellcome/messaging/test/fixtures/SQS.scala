@@ -3,9 +3,11 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSMessage}
+import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
+
+
 
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -50,15 +52,15 @@ trait SQS extends Matchers {
     "aws.region" -> regionName
   )
 
-  val sqsClient: AmazonSQS = SQSClientModule.buildSQSClient(
-    awsConfig = AWSConfig(region = regionName),
+  val sqsClient: AmazonSQS = SQSClientFactory.createSyncClient(
+    region = regionName,
     endpoint = sqsEndpointUrl,
     accessKey = accessKey,
     secretKey = secretKey
   )
 
-  val asyncSqsClient: AmazonSQSAsync = SQSClientModule.buildSQSAsyncClient(
-    awsConfig = AWSConfig(region = regionName),
+  val asyncSqsClient: AmazonSQSAsync = SQSClientFactory.createAsyncClient(
+    region = regionName,
     endpoint = sqsEndpointUrl,
     accessKey = accessKey,
     secretKey = secretKey
