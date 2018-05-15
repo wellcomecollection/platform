@@ -22,7 +22,7 @@ module "matcher" {
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"
 
-  alb_priority = 106
+  alb_priority = 108
 
   alb_cloudwatch_id          = "${module.catalogue_pipeline_cluster.alb_cloudwatch_id}"
   alb_listener_https_arn     = "${module.catalogue_pipeline_cluster.alb_listener_https_arn}"
