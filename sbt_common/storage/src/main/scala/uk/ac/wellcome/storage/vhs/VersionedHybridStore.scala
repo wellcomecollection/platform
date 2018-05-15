@@ -28,7 +28,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
   s3Client: AmazonS3,
   keyPrefixGenerator: KeyPrefixGenerator[T],
   dynamoDbClient: AmazonDynamoDB
-) {
+)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
 
   private val s3StringStore = new S3StringStore(
     s3Client = s3Client,
@@ -61,9 +61,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
   //
   def updateRecord[O, M](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
     metadata: M = EmptyMetadata())(
-    implicit decoder: Decoder[T],
-    encoder: Encoder[T],
-    enricher: HybridRecordEnricher.Aux[M, O],
+    implicit enricher: HybridRecordEnricher.Aux[M, O],
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
@@ -103,14 +101,13 @@ class VersionedHybridStore[T <: Id] @Inject()(
     }
   }
 
-  def getRecord(id: String)(implicit decoder: Decoder[T]): Future[Option[T]] =
+  def getRecord(id: String): Future[Option[T]] =
     getObject(id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
 
   private def putObject[O](id: String, sourcedObject: T, f: (String) => O)(
-    implicit encoder: Encoder[T],
-    dynamoFormat: DynamoFormat[O],
+    implicit dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
     versionGetter: VersionGetter[O],
@@ -129,8 +126,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
     }
   }
 
-  private def getObject(id: String)(
-    implicit decoder: Decoder[T]): Future[Option[VersionedHybridObject]] = {
+  private def getObject(id: String): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[HybridRecord]] =
       versionedDao.getRecord[HybridRecord](id = id)
