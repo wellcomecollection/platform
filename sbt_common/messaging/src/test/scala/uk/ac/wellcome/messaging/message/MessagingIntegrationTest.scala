@@ -28,7 +28,7 @@ class MessagingIntegrationTest
   }
 
   private def withLocalStackMessageWriter[R](
-    testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject]),
+    testWith: TestWith[(ExampleMessageWorker, MessageWriter[ExampleObject, S3TypeMessageSender[ExampleObject]]),
                        R]) = {
     withExampleObjectMessageWorkerFixtures {
       case (metricsSender, queue, bucket, worker) =>

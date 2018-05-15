@@ -2,11 +2,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{
-  SubscribeRequest,
-  SubscribeResult,
-  UnsubscribeRequest
-}
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
@@ -17,15 +13,14 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.{
-  KeyPrefixGenerator,
-  S3Config,
-  S3ObjectLocation
-}
+import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
+
+import uk.ac.wellcome.messaging.sns.SNSWriter
+
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -155,19 +150,19 @@ trait Messaging
   def withMessageWriter[R](bucket: Bucket,
                            topic: Topic,
                            writerSnsClient: AmazonSNS = snsClient)(
-    testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+    testWith: TestWith[MessageWriter[ExampleObject, S3TypeMessageSender[ExampleObject]], R]) = {
+
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
-    val messageConfig = MessageWriterConfig(
-      s3Config = s3Config,
-      snsConfig = snsConfig
-    )
+    val snsWriter = new SNSWriter(snsClient, snsConfig)
+    val s3StringStore = new S3StringStore(s3Client, s3Config)
+    val s3TypeStore = new S3TypeStore[ExampleObject](s3StringStore)
 
-    val messageWriter = new MessageWriter[ExampleObject](
-      messageConfig = messageConfig,
-      snsClient = writerSnsClient,
-      s3Client = s3Client,
-      keyPrefixGenerator = keyPrefixGenerator
+    val messageSender = new S3TypeMessageSender[ExampleObject](snsWriter, s3TypeStore)
+
+    val messageWriter = new MessageWriter[ExampleObject, S3TypeMessageSender[ExampleObject]](
+      snsWriter = snsWriter,
+      messageSender = messageSender
     )
 
     testWith(messageWriter)
@@ -230,17 +225,19 @@ trait Messaging
       waitTime = 1 millisecond,
       maxMessages = 1)
 
-    val messageConfig = MessageReaderConfig(
-      sqsConfig = sqsConfig,
-      s3Config = s3Config
-    )
+    val s3StringStore = new S3StringStore(s3Client, s3Config)
+
+    val s3TypeStore = new S3TypeStore[T](s3StringStore)
+
+    val messageRetriever = new S3TypeMessageRetriever[T](s3TypeStore)
 
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      s3Client,
-      messageConfig,
+      sqsConfig,
+      messageRetriever,
       metricsSender)
+
     testWith(stream)
   }
 
