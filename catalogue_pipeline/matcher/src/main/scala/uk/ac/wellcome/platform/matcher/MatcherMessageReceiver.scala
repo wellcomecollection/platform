@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.matcher
 
 import akka.actor.{ActorSystem, Terminated}
 import com.amazonaws.services.s3.AmazonS3
+import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
@@ -15,7 +16,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 case class RedirectList(redirects: List[Redirect])
 case class Redirect(target: SourceIdentifier, sources: List[SourceIdentifier])
 
-class MatcherMessageReceiver(messageStream: SQSStream[NotificationMessage],
+class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMessage],
                              snsWriter: SNSWriter,
                              s3Client: AmazonS3,
                              storageS3Config: S3Config,
