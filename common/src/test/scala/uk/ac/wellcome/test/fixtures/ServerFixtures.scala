@@ -2,9 +2,8 @@ package uk.ac.wellcome.test.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import com.twitter.inject.server.Ports
-import org.scalatest.concurrent.Eventually
 
-trait ServerFixtures extends Eventually {
+trait ServerFixtures {
   def newAppServer: () => Ports
   val defaultFlags: Map[String, String]
 
@@ -22,9 +21,7 @@ trait ServerFixtures extends Eventually {
     try {
       testWith(server)
     } finally {
-      eventually {
-        server.close()
-      }
+      server.close()
     }
   }
 }
