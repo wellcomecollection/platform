@@ -8,7 +8,8 @@ trait ServerFixtures {
   val defaultFlags: Map[String, String]
 
   def withServer[R](flags: Map[String, String],
-                    modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity)(testWith: TestWith[EmbeddedHttpServer, R]) = {
+                    modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer =
+                      identity)(testWith: TestWith[EmbeddedHttpServer, R]) = {
     val server: EmbeddedHttpServer = modifyServer(
       new EmbeddedHttpServer(
         newAppServer(),

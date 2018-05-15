@@ -8,5 +8,6 @@ import uk.ac.wellcome.test.fixtures.ServerFixtures
 trait Server extends ServerFixtures with CloudWatch { this: Suite =>
   def newAppServer: () => AppServer = () => new AppServer()
 
-  val defaultFlags: Map[String, String] = Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags
+  val defaultFlags
+    : Map[String, String] = Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags
 }
