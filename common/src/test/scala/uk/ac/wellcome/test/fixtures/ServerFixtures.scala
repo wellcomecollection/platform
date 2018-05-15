@@ -8,10 +8,13 @@ trait ServerFixtures extends Eventually {
   def newAppServer: () => Ports
   val defaultFlags: Map[String, String]
 
-  def withServer[R](flags: Map[String, String])(testWith: TestWith[EmbeddedHttpServer, R]) = {
-    val server: EmbeddedHttpServer = new EmbeddedHttpServer(
-      newAppServer(),
-      flags = flags ++ defaultFlags
+  def withServer[R](flags: Map[String, String],
+                    modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer = identity)(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer = modifyServer(
+      new EmbeddedHttpServer(
+        newAppServer(),
+        flags = flags ++ defaultFlags
+      )
     )
 
     server.start()
