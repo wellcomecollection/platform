@@ -7,7 +7,7 @@ import com.amazonaws.services.cloudwatch.{
 }
 
 object CloudWatchClientFactory {
-  def createClient(region: String, endpoint: String): AmazonCloudWatch = {
+  def create(region: String, endpoint: String): AmazonCloudWatch = {
     val standardClient = AmazonCloudWatchClientBuilder.standard
     if (endpoint.isEmpty)
       standardClient
