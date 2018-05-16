@@ -1,90 +1,133 @@
 # RFC 1: Matcher architecture
 
-**Last updated: 14 May 2018.**
+**Last updated: 15 May 2018.**
 
 ## Background
 
-Works are often related to one another, for example items in a box or plates in a portfolio.
-These relationships should be reflected in the way works are stored and searched.
+Items can be closely related, for example a book may be both a printed book and an eBook, or a painting can include a physical painting and photographs or xray
+imagery of the painting.
+Where works are so closely related that they represent or refer to the same 'thing' we wish to 
+merge them into combined works to aid understanding and searching.
 
 ## Problem Statement
 
-Individual works can form part of larger works.
-Works that are related should be merged to form merged works.
-This is broken into two phases, a matching phase that identifies related works and a merging phase that merges those works
-into new merged works.  
-The matcher receives source records/transformed works, and it determines which source records correspond to the same work.
-The merger takes identified related works and merges them into new combined works.
+Individual works can be merged to form larger combined works.
+The merging of works is broken into two phases
 
-Each work has a unique persistent id, and this introduces additional complexity into the merging process because works 
-may have an identity as an individual item, and then later be merged -- both these ids need to remain valid and redirect 
-to the correct combined work.  Similarly, works can be combined and later split but should retain their identities so that
-they can still be found.
+ * a matching/redirect phase that identifies works to be merged and tracks previously identified combined works.
+ * a merging phase that merges works to form new combined works.
+   
+The matcher/redirecter receives source identifiers for processed works along with source identifiers for works that should be merged, 
+and determines what changes to published works should be made.  Changes can include combining existing works and redirecting previously 
+published works that have been superseded by merging operations.
 
-This document has some notes on the proposed architecture.
+Each work has a unique persistent id, and this introduces additional complexity because works 
+may have an identity as an individual item, and then later be merged -- both ids need to remain valid and redirect 
+to the correct combined work.  Similarly, works can be combined and later split or further combined but should retain 
+their published identities so that the relevant combined work can still be found.
+
+The merger takes identified works and merges them into new combined works.
 
 
 ## Proposed Solution
 
+This document has notes on the proposed architecture.
+
 ## Model
 
-We model source records and their relationships as a graph.
-Vertices are source records, and there is a directed edge from X to Y if information in the source record X tells us that it is related to Y.
+A matching/redirecting phase is introduced to determine where works need to be combined, and to track where individual or 
+combined works have previously published ids that need to be preserved.  
 
-Each merged work is one of the connected components of this graph.
+The input to this phase is the source identity for a work and a list of the identities that make up the combined work. 
+The output is identifiers for each affected work, with redirection identifiers for existing works that need to change.
 
-![](matcher_graph.png)
-
-In this example, there are three works:
-
--   A red work made of three source records
--   A green work made of two source records
--   A blue work that is a single source record
-
-The matcher will receive updates to this graph, one vertex at a time.
-When it receives an update, it needs to tell us:
-
--   Any new works which have been created
--   Any old works which have been destroyed and need to be redirected (if two components merge, or one component splits)
+Works are identified by their source identifiers
 
 ## Storage
 
-Each graph of related works that has been merged into a single work has an identity that should be preserved, 
-where the merged work supersedes the previous work the resource identity of the previous work should redirect to the new
- merged work.
-Similarly when merged works are disconnected to create new individual works the resource identity of the previous merged work
-should ideally redirect.
+Related works that have been merged into a single work have an identity that should be preserved, 
+where a merged work supersedes a previous work the resource identity of the previous work should redirect to the new
+ combined work. Similarly when merged works are disconnected to create new individual works the resource identity of the 
+ previous merged work should redirect.
+
 This implies storing the state of related works to enable the merging process to also emit updates to the identities of 
-all related merged works.
+affected merged works.
 
 ## Database schema
 
-We can identify subgraphs/components by concatenating the sorted IDs of the vertices.
-For example, the graph below has three components: `A-B-C-D`, `E-F-G` and `H`.
+The id used for combined works is created by concatenating the sorted, namespaced source idenfifiers of their components.
+For example if a work A is edited to include work B this will be identified in the 'identifiers' field of A.
 
-![](matcher_component_ids.png)
+For example creating a combined work 'A-B' when processing work 'A' could give as input:
+```javascript
+{
+  A.identifiers : [ 
+    // A
+    { 
+      identifierScheme: 'sierra-system-number',
+      ontologyType: 'Work',
+      value: 's12345'
+    },
+    // B
+    {
+      identifierScheme: 'miro-image-number',
+      ontologyType: 'Work',
+      value: 's67890'
+    }
+  ]
+}
+```
+Note that `A.identifiers` includes the source identifier for  `A` itself.
+In the case that neither A or B has previously been identified as a part of a combined work the matcher/redirector 
+will output: 
+```javascript
+redirects = [ 
+  { 
+    target: 'sierra-system-number/s12345+miro-image-number/s67890' // A-B
+    sources: [ 'sierra-system-number/s12345', 'miro-image-number/s67890'] // A, B
+  }
+]
+```
+The identifiers used are generated to be unique from source identifers (`$identifierScheme/$identifierValue`), and 
+combined in a deterministic way for combined works [`$identifier1Scheme/$identifier1Value`, 
+`$identifier2Scheme/$identifier2Value`].`sortAlphabetical`.`concatenate("+")`
 
-This is our current schema:
+Where works have previously published identifiers the output of the matcher/redirector will be updates to the 
+existing works referenced by source ids.
 
--   `source_component` -- contains the identifier of a component.
-    This may be a single vertex.
+For example, suppose works `A`, `B`, and `A-B` have been previously created and `A` is 
+edited to additionally include `C`, then references to `A`, `B`, and the combined work `A-B` should be redirected to 
+the new combined work `A-B-C`.  In this case the output from the matcher/redirector would be:
+```javascript
+{
+  redirects: [ 
+    { 
+      target: 'sierra/A+miro/B+miro/C' // A-B-C
+      sources: [ 'sierra/A', 'miro/B', 'sierra/A+miro/B' ] // A, B, A-B
+    }
+  ]
+}
 
--   `tail_vertices` -- if the source component is a single vertex, a list of
-    vertices which are the "tail" of a directed edge from this vertex.
+```
 
--   `component_vertices` -- a list of all the vertices in the same connected component.
 
--   `is_redirect` -- has this component been replaced and redirected to
-    something else?
+## Concurrent updates and locking
 
--   `redirected_target` -- if so, the ID of the target it redirects to.
+While the required updates for a merged work are being found there cannot be changes to the records for participating 
+works.
+A locking mechanism is used to achieve this, with all participating works being locked for editing.
 
--   `version` -- we can version updates to source records, and so we can
-    version updates to the vertices on this graph.
+## Storage of combined works and locks
+
+Use dynamoDB with a works and a lock table.
+
+
+## Examples
+
+The matcher/redirector is best understood with examples.
 
 ## Example 1
 
-This is best illustrated with an example.
 Suppose we have the following graph:
 
 ![](matcher_example1.png)
