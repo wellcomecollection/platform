@@ -39,32 +39,11 @@ class SnapshotGeneratorFeatureTest
     with SNS
     with SQS
     with GzipUtils
-    with fixtures.Server
     with JsonTestUtil
     with ExtendedPatience
     with ElasticsearchFixtures {
 
   val itemType = "work"
-  def withFixtures[R](
-    testWith: TestWith[
-      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-      R]) =
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
-              withServer(flags) { server =>
-                testWith(
-                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
-              }
-            }
-          }
-        }
-      }
-    }
 
   it("completes a snapshot generation successfully") {
     withFixtures {
@@ -150,5 +129,42 @@ class SnapshotGeneratorFeatureTest
         }
     }
 
+  }
+
+  def withFixtures[R](
+                       testWith: TestWith[
+                         (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+                         R]) =
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+            withLocalS3Bucket { bucket =>
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+              withServer(flags) { server =>
+                testWith(
+                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
+              }
+            }
+          }
+        }
+      }
+    }
+
+  def withServer[R](flags: Map[String, String])(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = flags
+      )
+
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
+    }
   }
 }
