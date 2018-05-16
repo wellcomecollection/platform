@@ -36,13 +36,3 @@ module "service_scheduler" {
 
   infra_bucket = "${var.infra_bucket}"
 }
-
-module "update_ecs_service_size" {
-  source = "update_ecs_service_size"
-
-  service_scheduler_topic_arn = "${module.service_scheduler_topic.arn}"
-
-  lambda_error_alarm_arn = "${module.lambda_error_alarm.arn}"
-
-  infra_bucket = "${var.infra_bucket}"
-}
