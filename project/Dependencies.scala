@@ -83,6 +83,12 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
+  val testDependencies: Seq[ModuleID] = Seq(
+    "org.mockito" % "mockito-core" % versions.mockito % "test",
+    "com.novocode" % "junit-interface" % versions.junitInterface % "test",
+    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
+  )
+
   // Internal Library dependency groups
   val commonDependencies: Seq[ModuleID] = Seq(
     "org.mockito" % "mockito-core" % versions.mockito % "test",
@@ -102,7 +108,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ dynamoDependencies
+  ) ++ dynamoDependencies ++ testDependencies
 
   val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws

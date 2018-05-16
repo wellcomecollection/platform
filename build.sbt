@@ -50,7 +50,6 @@ lazy val common_monitoring = doSharedLibrarySetup(project, "sbt_common/monitorin
 
 // Messaging depends on the S3ObjectStore for message pointers and AWSConfig.
 lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
-  .dependsOn(common % "compile->compile;test->test")
   .dependsOn(common_monitoring % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
