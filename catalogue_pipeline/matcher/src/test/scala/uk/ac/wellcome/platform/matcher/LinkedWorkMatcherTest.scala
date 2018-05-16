@@ -4,12 +4,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
-class BahTest extends FunSpec with Matchers with MatcherFixtures {
+class LinkedWorkMatcherTest extends FunSpec with Matchers with MatcherFixtures {
 
-  val bah = new Bah()
+  val bah = new LinkedWorkMatcher()
 
   it("converts a work entry with no linked identifiers to a matched works list referencing itself") {
-    bah.buh(
+    bah.matchWork(
       RecorderWorkEntry(
         "sourceId",
         "sourceName",

@@ -15,12 +15,12 @@ case class MatchedWorksList(redirects: List[MatchedWorkIds])
 case class MatchedWorkIds(matchedWorkId: String, linkedWorkIds: List[String])
 
 class MatcherMessageReceiver @Inject()(
-  messageStream: SQSStream[NotificationMessage],
-  snsWriter: SNSWriter,
-  s3TypeStore: S3TypeStore[RecorderWorkEntry],
-  storageS3Config: S3Config,
-  actorSystem: ActorSystem,
-  bah: Bah) {
+                                        messageStream: SQSStream[NotificationMessage],
+                                        snsWriter: SNSWriter,
+                                        s3TypeStore: S3TypeStore[RecorderWorkEntry],
+                                        storageS3Config: S3Config,
+                                        actorSystem: ActorSystem,
+                                        linkedWorkMatcher: LinkedWorkMatcher) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
@@ -33,7 +33,7 @@ class MatcherMessageReceiver @Inject()(
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(bah.buh(workEntry)).get,
+        message = toJson(linkedWorkMatcher.matchWork(workEntry)).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
