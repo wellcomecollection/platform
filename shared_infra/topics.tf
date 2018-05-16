@@ -8,11 +8,6 @@ module "old_deployments" {
   name   = "old_deployments"
 }
 
-module "service_scheduler_topic" {
-  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "service_scheduler"
-}
-
 # Shared topic for terminating instances
 
 module "ec2_terminating_topic" {
