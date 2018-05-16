@@ -57,7 +57,8 @@ class MatcherMessageReceiverTest
           snsWriter,
           new S3TypeStore[RecorderWorkEntry](s3Client),
           storageS3Config,
-          actorSystem)
+          actorSystem,
+          new Bah)
         testWith(matcherMessageReceiver)
       }
     }
