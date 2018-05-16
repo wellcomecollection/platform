@@ -1,94 +1,52 @@
 package uk.ac.wellcome.platform.matcher
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
 
 class RedirectFinderTest extends FunSpec with Matchers {
 
   it("should redirect a work without identifiers and no existing redirects") {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.sierraSystemNumber,
-      "Work",
-      "editedWork")
+    val update = WorkUpdate(id = "A", linkedIds = List("A"))
 
-    val work = unidentifiedWork.copy(
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier))
+    val redirectList = RedirectFinder.redirects(update)
 
-    val redirectList = RedirectFinder.redirects(work)
-
-    redirectList shouldBe RedirectList(
-      List(Redirect(target = sourceIdentifier, sources = List()))
-    )
+    redirectList should have size 1
+    redirectList should contain theSameElementsAs List(Redirect("A", "A"))
   }
 
   it("should redirect a work with identifiers and no existing redirects") {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.sierraSystemNumber,
-      "Work",
-      "editedWork")
-    val linkedIdentifier = SourceIdentifier(
-      IdentifierSchemes.sierraSystemNumber,
-      "Work",
-      "linkedWork")
+    val update = WorkUpdate(id = "A", linkedIds = List("A", "B"))
 
-    val expectedCombinedIdentifier =
-      SourceIdentifier(
-        IdentifierSchemes.mergedWork,
-        "Work",
-        "sierra-system-number/editedWork+sierra-system-number/linkedWork")
+    val redirectList = RedirectFinder.redirects(update)
 
-    val work = unidentifiedWork.copy(
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier, linkedIdentifier))
-
-    val redirectList = RedirectFinder.redirects(work)
-
-    redirectList.redirects should have size 1
-    redirectList.redirects.head.target shouldBe expectedCombinedIdentifier
-    redirectList.redirects.head.sources should contain theSameElementsAs List(
-      sourceIdentifier,
-      linkedIdentifier)
-  }
-
-  it(
-    "should redirect a work with unordered identifiers and no existing redirects") {
-    val sourceIdentifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "editedWork")
-    val linkedIdentifier = SourceIdentifier(
-      IdentifierSchemes.sierraSystemNumber,
-      "Work",
-      "linkedWork")
-
-    val expectedCombinedIdentifier =
-      SourceIdentifier(
-        IdentifierSchemes.mergedWork,
-        "Work",
-        "miro-image-number/editedWork+sierra-system-number/linkedWork")
-
-    val work = unidentifiedWork.copy(
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(linkedIdentifier, sourceIdentifier))
-
-    val redirectList = RedirectFinder.redirects(work)
-
-    redirectList.redirects should have size 1
-    redirectList.redirects.head.target shouldBe expectedCombinedIdentifier
-    redirectList.redirects.head.sources should contain theSameElementsAs List(
-      sourceIdentifier,
-      linkedIdentifier)
-  }
-
-  private def unidentifiedWork = {
-    UnidentifiedWork(
-      sourceIdentifier =
-        SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "id"),
-      title = Some("Work"),
-      version = 1
+    redirectList should have size 3
+    redirectList should contain theSameElementsAs List(
+      Redirect("A", "A+B"),
+      Redirect("B", "A+B"),
+      Redirect("A+B", "A+B")
     )
   }
+
+  it("should redirect a work with unordered identifiers and no existing redirects") {
+    val update = WorkUpdate(id = "A", linkedIds = List("B", "A"))
+
+    val redirectList = RedirectFinder.redirects(update)
+
+    redirectList should have size 3
+    redirectList should contain theSameElementsAs List(
+      Redirect("A", "A+B"),
+      Redirect("B", "A+B"),
+      Redirect("A+B", "A+B")
+    )
+  }
+
+  //  it("A-B exists B is edited to create A-B-C") {
+  //    val sourceIdentifier = SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "editedWork")
+  //    val linkedIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "linkedWork")
+  //
+  //    List(
+  //        Redirect("A", "A-B"),
+  //        Redirect("B", "A-B"),
+  //        Redirect("AB", "A-B")
+  //     )
+//}
 }

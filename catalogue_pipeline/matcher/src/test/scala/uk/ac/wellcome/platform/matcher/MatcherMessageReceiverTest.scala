@@ -76,10 +76,9 @@ class MatcherMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val redirectList =
-                  fromJson[RedirectList](snsMessage.message).get
-                redirectList shouldBe RedirectList(List(
-                  Redirect(target = work.sourceIdentifier, sources = List())))
+                val redirectList = fromJson[MatchedWorksList](snsMessage.message).get
+                redirectList shouldBe MatchedWorksList(List(
+                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id"))))
               }
             }
           }
@@ -93,14 +92,8 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val sourceIdentifier = SourceIdentifier(
-            IdentifierSchemes.sierraSystemNumber,
-            "Work",
-            "editedWork")
-          val linkedIdentifier = SourceIdentifier(
-            IdentifierSchemes.sierraSystemNumber,
-            "Work",
-            "linkedWork")
+          val sourceIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "A")
+          val linkedIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "B")
           val work = unidentifiedWork.copy(
             sourceIdentifier = sourceIdentifier,
             identifiers = List(sourceIdentifier, linkedIdentifier))
@@ -114,18 +107,15 @@ class MatcherMessageReceiverTest
 
               snsMessages.map { snsMessage =>
                 val redirectList =
-                  fromJson[RedirectList](snsMessage.message).get
+                  fromJson[MatchedWorksList](snsMessage.message).get
 
-                val combinedIdentifier =
-                  SourceIdentifier(
-                    IdentifierSchemes.mergedWork,
-                    "Work",
-                    "sierra-system-number/editedWork+sierra-system-number/linkedWork")
-
-                redirectList shouldBe RedirectList(
-                  List(Redirect(
-                    target = combinedIdentifier,
-                    sources = List(sourceIdentifier, linkedIdentifier))))
+                redirectList shouldBe MatchedWorksList(List(
+                  MatchedWorkIds(
+                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
+                    linkedWorkIds = List(
+                      "sierra-system-number/A",
+                      "sierra-system-number/B",
+                      "sierra-system-number/A+sierra-system-number/B"))))
               }
             }
           }

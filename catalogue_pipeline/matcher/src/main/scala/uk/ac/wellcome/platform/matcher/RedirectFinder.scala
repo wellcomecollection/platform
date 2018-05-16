@@ -1,30 +1,17 @@
 package uk.ac.wellcome.platform.matcher
 
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
-
 object RedirectFinder {
 
-  def redirects(work: UnidentifiedWork): RedirectList = {
-    work.identifiers match {
-      case List(work.sourceIdentifier) =>
-        RedirectList(List(Redirect(work.sourceIdentifier, List())))
+  def redirects(work: WorkUpdate): List[Redirect] = {
+    work.linkedIds match {
+      case List(work.id) =>
+        List(Redirect(source = work.id, target = work.id))
       case _ =>
-        val combinedIdentifier = work.identifiers
-          .map(si => s"${si.identifierScheme}/${si.value}")
-          .sorted
-          .mkString("+")
-        RedirectList(
-          List(
-            Redirect(
-              target = SourceIdentifier(
-                IdentifierSchemes.mergedWork,
-                "Work",
-                combinedIdentifier),
-              sources = work.identifiers)))
+        val combinedIdentifier = work.linkedIds.sorted.mkString("+")
+        work.linkedIds.map(li => Redirect(source = li, target = combinedIdentifier)) :+
+          Redirect(source = combinedIdentifier, target = combinedIdentifier)
     }
   }
 }
+
+case class WorkUpdate(id :String, linkedIds: List[String])

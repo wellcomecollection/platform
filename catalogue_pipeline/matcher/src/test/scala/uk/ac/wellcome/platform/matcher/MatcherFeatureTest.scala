@@ -36,11 +36,14 @@ class MatcherFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
+          val identifier = SourceIdentifier(
+            IdentifierSchemes.sierraSystemNumber,
+            "Work",
+            "id")
+
           val work = UnidentifiedWork(
-            sourceIdentifier = SourceIdentifier(
-              IdentifierSchemes.sierraSystemNumber,
-              "Work",
-              "id"),
+            sourceIdentifier = identifier,
+            identifiers = List(identifier),
             title = Some("Work"),
             version = 1
           )
@@ -63,9 +66,9 @@ class MatcherFeatureTest
 
               snsMessages.map { snsMessage =>
                 val redirectList =
-                  fromJson[RedirectList](snsMessage.message).get
-                redirectList shouldBe RedirectList(List(
-                  Redirect(target = work.sourceIdentifier, sources = List())))
+                  fromJson[MatchedWorksList](snsMessage.message).get
+                redirectList shouldBe MatchedWorksList(List(
+                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id"))))
               }
             }
           }
