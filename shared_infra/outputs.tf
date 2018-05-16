@@ -41,3 +41,11 @@ output "terraform_apply_topic_name" {
 output "cloudfront_logs_bucket_domain_name" {
   value = "${aws_s3_bucket.cloudfront_logs.bucket_domain_name}"
 }
+
+output "travis_ci_id" {
+  value = "${aws_iam_access_key.travis_ci.id}"
+}
+
+output "travis_ci_encrypted_secret" {
+  value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
+}

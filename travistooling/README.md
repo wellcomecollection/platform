@@ -47,13 +47,13 @@ The secrets ZIP file contains three files:
 
 *   _secrets/id_rsa_
 
-    An SSH private key.  The corresponding public key should be added as a
-    deploy key to the platform repo with write access.  If you don't have
-    the existing key, you can create a new key pair with:
+    Create a new SSH key pair with no password (-N):
 
     ```console
     $ ssh-keygen -N "" -f secrets/id_rsa
     ```
+
+    This creates two files in secrets, a public and private key. Add the public key    to the repo as a deploy key with write access, and remove the old key.
 
 Once you have all of these files, you create the encrypted bundle by running:
 
