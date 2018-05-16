@@ -9,10 +9,14 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.messaging.{
+  SNSClientModule,
+  SNSConfigModule,
+  SQSClientModule,
+  SQSConfigModule
+}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.messaging.{SNSClientModule, SNSConfigModule}
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.reindex_worker.modules.ReindexerWorkerModule
 import uk.ac.wellcome.storage.dynamo.{DynamoClientModule, DynamoConfigModule}
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
