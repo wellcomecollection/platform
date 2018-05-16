@@ -3,25 +3,33 @@ package uk.ac.wellcome.platform.matcher
 object RedirectFinder {
 
   def redirects(work: WorkUpdate, existingRedirects: List[Redirect]): List[Redirect] = {
-    work.linkedIds match {
-      case List(work.id) =>
-        List(Redirect(source = work.id, target = work.id))
-      case _ =>
-        val maybeExistingRedirect: Option[Redirect] = existingRedirects.find(_.source == work.id)
-        maybeExistingRedirect match {
-          case Some(existingRedirect) => {
-            val combinedIdentifier = (existingRedirect.target.split("\\+") ++ work.linkedIds).distinct.sorted.mkString("+")
-            existingRedirects.filter(_.target == existingRedirect.target).map(_.copy(target = combinedIdentifier)) ++
-            work.linkedIds.filterNot(_ == work.id).map(linkedId => Redirect(source=linkedId, target = combinedIdentifier)) :+
-            Redirect(source = combinedIdentifier, target = combinedIdentifier)
-          }
-          case None => {
-            val combinedIdentifier = work.linkedIds.sorted.mkString("+")
-            work.linkedIds.map(li => Redirect(source = li, target = combinedIdentifier)) :+
-              Redirect(source = combinedIdentifier, target = combinedIdentifier)
-          }
-        }
-    }
+    val directlyAffectedExistingRedirects = existingRedirects.filter(redirect => work.linkedIds.contains(redirect.source))
+
+    val matchedWorkId = combinedIdentifier(work.linkedIds, directlyAffectedExistingRedirects)
+
+    (redirectToCombined(existingRedirects, matchedWorkId) ++
+      newRedirects(work.linkedIds, matchedWorkId) :+
+      selfRedirect(matchedWorkId)).distinct
+  }
+
+  private def selfRedirect(combinedIdentifier: String) = {
+    Redirect(source = combinedIdentifier, target = combinedIdentifier)
+  }
+
+  private def newRedirects(linkedIds: List[String], combinedIdentifier: String) = {
+    linkedIds.map(linkedId => Redirect(source = linkedId, target = combinedIdentifier))
+  }
+
+  private def redirectToCombined(existingRedirects: List[Redirect], combinedIdentifier: String) = {
+    existingRedirects.map(_.copy(target = combinedIdentifier))
+  }
+
+  private def combinedIdentifier(linkedIds: List[String], directlyAffectedRedirects: List[Redirect]) = {
+    (getParticipatingNodeIds(directlyAffectedRedirects) ++ linkedIds).distinct.sorted.mkString("+")
+  }
+
+  private def getParticipatingNodeIds(directlyAffectedRedirects: List[Redirect]) = {
+    directlyAffectedRedirects.flatMap(_.target.split("\\+"))
   }
 }
 
