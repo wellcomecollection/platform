@@ -68,7 +68,6 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-
           val work = unidentifiedWork
           sendSQS(queue, storageBucket, work)
 
@@ -78,7 +77,8 @@ class MatcherMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val redirectList = fromJson[RedirectList](snsMessage.message).get
+                val redirectList =
+                  fromJson[RedirectList](snsMessage.message).get
                 redirectList shouldBe RedirectList(List(
                   Redirect(target = work.sourceIdentifier, sources = List())))
               }
@@ -89,12 +89,19 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("sends a redirect to the component and combined works for a work with one identifier") {
+  it(
+    "sends a redirect to the component and combined works for a work with one identifier") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val sourceIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "editedWork")
-          val linkedIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "linkedWork")
+          val sourceIdentifier = SourceIdentifier(
+            IdentifierSchemes.sierraSystemNumber,
+            "Work",
+            "editedWork")
+          val linkedIdentifier = SourceIdentifier(
+            IdentifierSchemes.sierraSystemNumber,
+            "Work",
+            "linkedWork")
           val work = unidentifiedWork.copy(
             sourceIdentifier = sourceIdentifier,
             identifiers = List(sourceIdentifier, linkedIdentifier))
@@ -111,10 +118,13 @@ class MatcherMessageReceiverTest
                   fromJson[RedirectList](snsMessage.message).get
 
                 val combinedIdentifier =
-                  SourceIdentifier(IdentifierSchemes.mergedWork, "Work", "sierra-system-number/editedWork+sierra-system-number/linkedWork")
+                  SourceIdentifier(
+                    IdentifierSchemes.mergedWork,
+                    "Work",
+                    "sierra-system-number/editedWork+sierra-system-number/linkedWork")
 
-                redirectList shouldBe RedirectList(List(
-                  Redirect(
+                redirectList shouldBe RedirectList(
+                  List(Redirect(
                     target = combinedIdentifier,
                     sources = List(sourceIdentifier, linkedIdentifier))))
               }
@@ -125,7 +135,9 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def sendSQS(queue: SQS.Queue, storageBucket: Bucket, work: UnidentifiedWork) = {
+  private def sendSQS(queue: SQS.Queue,
+                      storageBucket: Bucket,
+                      work: UnidentifiedWork) = {
     val workSqsMessage: NotificationMessage =
       hybridRecordNotificationMessage(
         message = toJson(RecorderWorkEntry(work = work)).get,
@@ -140,10 +152,8 @@ class MatcherMessageReceiverTest
   }
 
   private def unidentifiedWork = {
-    val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.sierraSystemNumber,
-      "Work",
-      "id")
+    val sourceIdentifier =
+      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "id")
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
       title = Some("Work"),
