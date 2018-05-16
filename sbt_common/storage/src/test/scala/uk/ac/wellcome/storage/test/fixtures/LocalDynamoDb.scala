@@ -9,8 +9,7 @@ import uk.ac.wellcome.models.{Id, Versioned}
 import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
-import uk.ac.wellcome.models.aws.AWSConfig
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
+import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConverters._
@@ -28,7 +27,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
-  private val regionName = "localhost"
+  private val region = "localhost"
 
   private val accessKey = "access"
   private val secretKey = "secret"
@@ -41,11 +40,11 @@ trait LocalDynamoDb[T <: Versioned with Id]
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
     "aws.dynamoDb.accessKey" -> accessKey,
     "aws.dynamoDb.secretKey" -> secretKey,
-    "aws.region" -> regionName
+    "aws.region" -> region
   )
 
-  val dynamoDbClient: AmazonDynamoDB = DynamoClientModule.buildDynamoClient(
-    awsConfig = AWSConfig(region = regionName),
+  val dynamoDbClient: AmazonDynamoDB = DynamoClientFactory.create(
+    region = region,
     endpoint = dynamoDBEndPoint,
     accessKey = accessKey,
     secretKey = secretKey
