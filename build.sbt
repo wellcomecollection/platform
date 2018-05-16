@@ -91,6 +91,7 @@ lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
