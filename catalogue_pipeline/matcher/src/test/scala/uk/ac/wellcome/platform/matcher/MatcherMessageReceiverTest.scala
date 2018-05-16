@@ -72,13 +72,89 @@ class MatcherMessageReceiverTest
 
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages.size should be >= 1
+              assertMessageSent(topic, MatchedWorksList(List(
+                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id")))))
+              }
 
-              snsMessages.map { snsMessage =>
-                val redirectList = fromJson[MatchedWorksList](snsMessage.message).get
-                redirectList shouldBe MatchedWorksList(List(
-                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id"))))
+          }
+        }
+      }
+    }
+  }
+
+  it("redirects a work with one link and no existing redirects") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          val linkedIdentifier = sourceIdentifier("B")
+          val aIdentifier = sourceIdentifier("A")
+          val work = unidentifiedWork.copy(
+            sourceIdentifier = aIdentifier,
+            identifiers = List(aIdentifier, linkedIdentifier))
+
+          sendSQS(queue, storageBucket, work)
+
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            eventually {
+              assertMessageSent(topic, MatchedWorksList(List(
+                  MatchedWorkIds(
+                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
+                    linkedWorkIds = List(
+                      "sierra-system-number/A",
+                      "sierra-system-number/B",
+                      "sierra-system-number/A+sierra-system-number/B")))))
+
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("redirects a work with one link and existing redirects") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          val aIdentifier = sourceIdentifier("A")
+          val bIdentifier = sourceIdentifier("B")
+          val cIdentifier = sourceIdentifier("C")
+          val aWork = unidentifiedWork.copy(
+            sourceIdentifier = aIdentifier,
+            identifiers = List(aIdentifier, bIdentifier))
+
+          sendSQS(queue, storageBucket, aWork)
+
+          eventually {
+
+            assertMessageSent(topic, MatchedWorksList(List(
+                    MatchedWorkIds(
+                      matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
+                      linkedWorkIds = List(
+                        "sierra-system-number/A",
+                        "sierra-system-number/B",
+                        "sierra-system-number/A+sierra-system-number/B")))))
+
+            val bWork = unidentifiedWork.copy(
+              sourceIdentifier = bIdentifier,
+              identifiers = List(bIdentifier, cIdentifier))
+
+            sendSQS(queue, storageBucket, bWork)
+
+              eventually {
+
+                assertMessageSent(topic, MatchedWorksList(List(
+                  MatchedWorkIds(
+                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C",
+                    linkedWorkIds = List(
+                      "sierra-system-number/A",
+                      "sierra-system-number/B",
+                      "sierra-system-number/C",
+                      "sierra-system-number/A+sierra-system-number/B",
+                      "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"
+                    ))))
+                )
+
               }
             }
           }
@@ -87,41 +163,17 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it(
-    "sends a redirect to the component and combined works for a work with one identifier") {
-    withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queue =>
-        withLocalS3Bucket { storageBucket =>
-          val sourceIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "A")
-          val linkedIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "B")
-          val work = unidentifiedWork.copy(
-            sourceIdentifier = sourceIdentifier,
-            identifiers = List(sourceIdentifier, linkedIdentifier))
+  private def sourceIdentifier(id: String) = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", id)
 
-          sendSQS(queue, storageBucket, work)
+  private def assertMessageSent(topic: Topic, matchedWorksList: MatchedWorksList) = {
+    val snsMessages = listMessagesReceivedFromSNS(topic)
+    snsMessages.size should be >= 1
 
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages.size should be >= 1
-
-              snsMessages.map { snsMessage =>
-                val redirectList =
-                  fromJson[MatchedWorksList](snsMessage.message).get
-
-                redirectList shouldBe MatchedWorksList(List(
-                  MatchedWorkIds(
-                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
-                    linkedWorkIds = List(
-                      "sierra-system-number/A",
-                      "sierra-system-number/B",
-                      "sierra-system-number/A+sierra-system-number/B"))))
-              }
-            }
-          }
-        }
-      }
+    val actualMatchedWorkLists= snsMessages.map { snsMessage =>
+        fromJson[MatchedWorksList](snsMessage.message).get
     }
+      actualMatchedWorkLists should contain (matchedWorksList)
+
   }
 
   private def sendSQS(queue: SQS.Queue,
