@@ -1,9 +1,9 @@
-package uk.ac.wellcome.storage.dynamo
-
-import javax.inject.Singleton
+package uk.ac.wellcome.finatra.storage
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import javax.inject.Singleton
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 object DynamoConfigModule extends TwitterModule {
   private val tableName =

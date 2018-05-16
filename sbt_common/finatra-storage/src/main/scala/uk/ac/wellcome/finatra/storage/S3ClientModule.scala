@@ -1,12 +1,13 @@
-package uk.ac.wellcome.storage.s3
+package uk.ac.wellcome.finatra.storage
 
-import javax.inject.Singleton
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import javax.inject.Singleton
 import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.storage.s3.S3ClientFactory
 
 object S3ClientModule extends TwitterModule {
 
@@ -32,11 +33,11 @@ object S3ClientModule extends TwitterModule {
   def buildS3Client(awsConfig: AWSConfig,
                     endpoint: String,
                     accessKey: String,
-                    secretKey: String): AmazonS3 = S3ClientFactory.create(
-    region = awsConfig.region,
-    endpoint = endpoint,
-    accessKey = accessKey,
-    secretKey = secretKey
-  )
-
+                    secretKey: String): AmazonS3 =
+    S3ClientFactory.create(
+      region = awsConfig.region,
+      endpoint = endpoint,
+      accessKey = accessKey,
+      secretKey = secretKey
+    )
 }

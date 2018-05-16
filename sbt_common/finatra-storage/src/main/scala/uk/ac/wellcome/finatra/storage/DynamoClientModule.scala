@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage.dynamo
+package uk.ac.wellcome.finatra.storage
 
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
@@ -8,6 +8,7 @@ import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 import uk.ac.wellcome.finatra.modules.AWSConfigModule
 import uk.ac.wellcome.models.aws.AWSConfig
+import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
 
 object DynamoClientModule extends TwitterModule {
   override val modules = Seq(AWSConfigModule)
@@ -34,18 +35,12 @@ object DynamoClientModule extends TwitterModule {
                         endpoint: String,
                         accessKey: String,
                         secretKey: String): AmazonDynamoDB = {
-    val standardClient = AmazonDynamoDBClientBuilder.standard
-    if (endpoint.isEmpty)
-      standardClient
-        .withRegion(awsConfig.region)
-        .build()
-    else
-      standardClient
-        .withCredentials(
-          new AWSStaticCredentialsProvider(
-            new BasicAWSCredentials(accessKey, secretKey)))
-        .withEndpointConfiguration(
-          new EndpointConfiguration(endpoint, awsConfig.region))
-        .build()
+
+    DynamoClientFactory.create(
+      region = awsConfig.region,
+      endpoint = endpoint,
+      accessKey = accessKey,
+      secretKey = secretKey
+    )
   }
 }

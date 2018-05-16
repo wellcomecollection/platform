@@ -63,6 +63,10 @@ lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra-m
   .dependsOn(common_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
+lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra-storage")
+  .dependsOn(common_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
+
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
@@ -151,6 +155,7 @@ lazy val root = (project in file("."))
     common_monitoring,
     common_storage,
     finatra_messaging,
+    finatra_storage,
     api,
     ingestor,
     transformer,
