@@ -27,12 +27,3 @@ module "run_ecs_task" {
 
   infra_bucket = "${var.infra_bucket}"
 }
-
-module "service_scheduler" {
-  source = "service_scheduler"
-
-  service_scheduler_topic_publish_policy = "${module.service_scheduler_topic.publish_policy}"
-  lambda_error_alarm_arn                 = "${module.lambda_error_alarm.arn}"
-
-  infra_bucket = "${var.infra_bucket}"
-}
