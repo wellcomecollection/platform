@@ -8,7 +8,11 @@ import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.{S3Config, S3StringStore, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -51,7 +55,8 @@ class MatcherMessageReceiverTest
         val matcherMessageReceiver = new MatcherMessageReceiver(
           sqsStream,
           snsWriter,
-          new S3TypeStore[RecorderWorkEntry](new S3StringStore(s3Client, storageS3Config)),
+          new S3TypeStore[RecorderWorkEntry](
+            new S3StringStore(s3Client, storageS3Config)),
           storageS3Config,
           actorSystem)
         testWith(matcherMessageReceiver)

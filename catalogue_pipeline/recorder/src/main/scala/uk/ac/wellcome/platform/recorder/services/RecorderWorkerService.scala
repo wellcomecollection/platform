@@ -22,9 +22,10 @@ class RecorderWorkerService @Inject()(
     val newRecorderEntry = RecorderWorkEntry(work)
 
     versionedHybridStore.updateRecord(newRecorderEntry.id)(newRecorderEntry)(
-      existingEntry => if (existingEntry.work.version > newRecorderEntry.work.version) {
-        existingEntry
-      } else { newRecorderEntry }
+      existingEntry =>
+        if (existingEntry.work.version > newRecorderEntry.work.version) {
+          existingEntry
+        } else { newRecorderEntry }
     )()
   }
 

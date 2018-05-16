@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 
 class ServerTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.Server
     with LocalVersionedHybridStore
     with SQS {
@@ -17,7 +17,8 @@ class ServerTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { server =>
-            server.httpGet(path = "/management/healthcheck",
+            server.httpGet(
+              path = "/management/healthcheck",
               andExpect = Ok,
               withJsonBody = """{"message": "ok"}""")
           }

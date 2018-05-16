@@ -9,7 +9,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -26,25 +30,27 @@ class MatcherFeatureTest
     with S3
     with ExtendedPatience
     with Eventually
-    with CloudWatch{
-
+    with CloudWatch {
 
   it("receives a message with UnidentifiedWork") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           val work = UnidentifiedWork(
-            sourceIdentifier = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", "id"),
+            sourceIdentifier = SourceIdentifier(
+              IdentifierSchemes.sierraSystemNumber,
+              "Work",
+              "id"),
             title = Some("Work"),
             version = 1
           )
-          val workSqsMessage: NotificationMessage = hybridRecordNotificationMessage(
-            message = toJson(RecorderWorkEntry(
-              work = work)).get,
-            version = 1,
-            s3Client = s3Client,
-            bucket = storageBucket
-          )
+          val workSqsMessage: NotificationMessage =
+            hybridRecordNotificationMessage(
+              message = toJson(RecorderWorkEntry(work = work)).get,
+              version = 1,
+              s3Client = s3Client,
+              bucket = storageBucket
+            )
           sqsClient.sendMessage(
             queue.url,
             toJson(workSqsMessage).get
@@ -56,8 +62,10 @@ class MatcherFeatureTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val redirectList = fromJson[RedirectList](snsMessage.message).get
-                redirectList shouldBe RedirectList(List(Redirect(target = work.sourceIdentifier, sources = List())))
+                val redirectList =
+                  fromJson[RedirectList](snsMessage.message).get
+                redirectList shouldBe RedirectList(List(
+                  Redirect(target = work.sourceIdentifier, sources = List())))
               }
             }
           }
@@ -66,38 +74,41 @@ class MatcherFeatureTest
     }
   }
 
-    def hybridRecordNotificationMessage(message: String,
-                                        version: Int,
-                                        s3Client: AmazonS3,
-                                        bucket: Bucket) = {
-      val key = "recorder/1/testId/dshg548.json"
-      s3Client.putObject(bucket.name, key, message)
+  def hybridRecordNotificationMessage(message: String,
+                                      version: Int,
+                                      s3Client: AmazonS3,
+                                      bucket: Bucket) = {
+    val key = "recorder/1/testId/dshg548.json"
+    s3Client.putObject(bucket.name, key, message)
 
-      val hybridRecord = HybridRecord(
-        id = "testId",
-        version = version,
-        s3key = key
-      )
+    val hybridRecord = HybridRecord(
+      id = "testId",
+      version = version,
+      s3key = key
+    )
 
-      NotificationMessage(
-        "messageId",
-        "topicArn",
-        "subject",
-        toJson(hybridRecord).get
-      )
-    }
+    NotificationMessage(
+      "messageId",
+      "topicArn",
+      "subject",
+      toJson(hybridRecord).get
+    )
+  }
 
   def withMatcherServer[R](
-                     queue: Queue, bucket: Bucket, topic: Topic
-                   )(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    queue: Queue,
+    bucket: Bucket,
+    topic: Topic
+  )(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
         flags = Map(
           "aws.region" -> "localhost"
-        ) ++ cloudWatchLocalFlags ++ s3LocalFlags(bucket) ++ sqsLocalFlags(queue) ++ snsLocalFlags(topic)
-    )
+        ) ++ cloudWatchLocalFlags ++ s3LocalFlags(bucket) ++ sqsLocalFlags(
+          queue) ++ snsLocalFlags(topic)
+      )
 
     server.start()
 

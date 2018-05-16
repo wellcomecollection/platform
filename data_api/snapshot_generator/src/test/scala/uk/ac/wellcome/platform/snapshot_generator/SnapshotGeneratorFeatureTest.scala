@@ -132,9 +132,9 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-                       testWith: TestWith[
-                         (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-                         R]) =
+    testWith: TestWith[
+      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+      R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
@@ -152,7 +152,8 @@ class SnapshotGeneratorFeatureTest
       }
     }
 
-  def withServer[R](flags: Map[String, String])(testWith: TestWith[EmbeddedHttpServer, R]) = {
+  def withServer[R](flags: Map[String, String])(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),

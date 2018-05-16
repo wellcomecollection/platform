@@ -8,10 +8,10 @@ module "matcher" {
   release_id         = "${var.release_ids["matcher"]}"
 
   env_vars = {
-    queue_url             = "${module.matcher_queue.id}"
-    vhs_bucket_name       = "${module.vhs_recorder.bucket_name}"
-    metrics_namespace              = "matcher"
-    topic_arn           = "${module.redirects_topic.arn}"
+    queue_url         = "${module.matcher_queue.id}"
+    vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
+    metrics_namespace = "matcher"
+    topic_arn         = "${module.redirects_topic.arn}"
   }
 
   env_vars_length = 4
@@ -34,7 +34,6 @@ module "matcher" {
 
   max_capacity = 15
 }
-
 
 module "matcher_dynamo_to_sns" {
   source = "../../shared_infra/dynamo_to_sns"

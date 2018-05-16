@@ -8,7 +8,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -88,7 +92,11 @@ class RecorderWorkerServiceTest
           withRecorderWorkerService(table, bucket, queue) { service =>
             whenReady(service.processMessage(work = olderWork)) { _ =>
               whenReady(service.processMessage(work = newerWork)) { _ =>
-                assertStoredSingleWork(bucket, table, newerWork, expectedVhsVersion = 2)
+                assertStoredSingleWork(
+                  bucket,
+                  table,
+                  newerWork,
+                  expectedVhsVersion = 2)
               }
             }
           }
@@ -123,7 +131,10 @@ class RecorderWorkerServiceTest
     }
   }
 
-  private def assertStoredSingleWork(bucket: Bucket, table: Table, expectedWork: UnidentifiedWork, expectedVhsVersion: Int = 1) = {
+  private def assertStoredSingleWork(bucket: Bucket,
+                                     table: Table,
+                                     expectedWork: UnidentifiedWork,
+                                     expectedVhsVersion: Int = 1) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
         .scan[HybridRecord](dynamoDbClient)(table.name)
@@ -139,22 +150,26 @@ class RecorderWorkerServiceTest
       bucket = bucket,
       key = hybridRecord.s3key
     )
-    fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(expectedWork)
+    fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(
+      expectedWork)
   }
 
-  private def withRecorderWorkerService[R](table: Table, bucket: Bucket, queue: Queue)(
-    testWith: TestWith[RecorderWorkerService, R]) = {
+  private def withRecorderWorkerService[R](
+    table: Table,
+    bucket: Bucket,
+    queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
     withMessageReader[UnidentifiedWork, Unit](bucket, queue) { messageReader =>
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
-            withVersionedHybridStore[RecorderWorkEntry, Unit](bucket = bucket, table = table) { versionedHybridStore =>
+            withVersionedHybridStore[RecorderWorkEntry, Unit](
+              bucket = bucket,
+              table = table) { versionedHybridStore =>
               withMessageStream[UnidentifiedWork, R](
                 actorSystem,
                 bucket,
                 queue,
                 metricsSender) { messageStream =>
-
                 val workerService = new RecorderWorkerService(
                   versionedHybridStore = versionedHybridStore,
                   messageStream = messageStream,

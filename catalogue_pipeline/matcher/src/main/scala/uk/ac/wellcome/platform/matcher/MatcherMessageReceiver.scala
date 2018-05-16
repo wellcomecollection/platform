@@ -15,11 +15,12 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 case class RedirectList(redirects: List[Redirect])
 case class Redirect(target: SourceIdentifier, sources: List[SourceIdentifier])
 
-class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMessage],
-                             snsWriter: SNSWriter,
-                                       s3TypeStore: S3TypeStore[RecorderWorkEntry],
-                                       storageS3Config: S3Config,
-                             actorSystem: ActorSystem) {
+class MatcherMessageReceiver @Inject()(
+  messageStream: SQSStream[NotificationMessage],
+  snsWriter: SNSWriter,
+  s3TypeStore: S3TypeStore[RecorderWorkEntry],
+  storageS3Config: S3Config,
+  actorSystem: ActorSystem) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
@@ -27,10 +28,17 @@ class MatcherMessageReceiver @Inject()(messageStream: SQSStream[NotificationMess
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] = {
     for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](notificationMessage.Message))
-      workEntry <- s3TypeStore.get(S3ObjectLocation(storageS3Config.bucketName,hybridRecord.s3key))
+      hybridRecord <- Future.fromTry(
+        fromJson[HybridRecord](notificationMessage.Message))
+      workEntry <- s3TypeStore.get(
+        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(RedirectList(List(Redirect(target = workEntry.work.sourceIdentifier, sources = List())))).get,
+        message = toJson(
+          RedirectList(
+            List(
+              Redirect(
+                target = workEntry.work.sourceIdentifier,
+                sources = List())))).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
