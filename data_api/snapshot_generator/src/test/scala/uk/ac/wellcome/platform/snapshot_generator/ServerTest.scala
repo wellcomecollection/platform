@@ -34,9 +34,9 @@ class ServerTest
   }
 
   def withFixtures[R](
-                       testWith: TestWith[
-                         (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-                         R]) =
+    testWith: TestWith[
+      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+      R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
