@@ -67,8 +67,10 @@ class MatcherFeatureTest
               snsMessages.map { snsMessage =>
                 val redirectList =
                   fromJson[MatchedWorksList](snsMessage.message).get
-                redirectList shouldBe MatchedWorksList(List(
-                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id"))))
+                redirectList shouldBe MatchedWorksList(
+                  List(MatchedWorkIds(
+                    matchedWorkId = "sierra-system-number/id",
+                    linkedWorkIds = List("sierra-system-number/id"))))
               }
             }
           }

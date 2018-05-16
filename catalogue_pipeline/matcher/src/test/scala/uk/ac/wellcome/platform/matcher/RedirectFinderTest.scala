@@ -37,7 +37,8 @@ class RedirectFinderTest extends FunSpec with Matchers {
     )
   }
 
-  it("should redirect a work with unordered identifiers and no existing redirects") {
+  it(
+    "should redirect a work with unordered identifiers and no existing redirects") {
     val update = WorkUpdate(id = "A", linkedIds = List("B", "A"))
 
     val redirectList = RedirectFinder.redirects(update, List())
@@ -54,10 +55,7 @@ class RedirectFinderTest extends FunSpec with Matchers {
 
     val redirectList = RedirectFinder.redirects(
       update,
-      List(
-        Redirect("A", "A+B"),
-        Redirect("B", "A+B"),
-        Redirect("A+B", "A+B")))
+      List(Redirect("A", "A+B"), Redirect("B", "A+B"), Redirect("A+B", "A+B")))
 
     redirectList should contain theSameElementsAs List(
       Redirect("A", "A+B+C"),
@@ -99,10 +97,7 @@ class RedirectFinderTest extends FunSpec with Matchers {
 
     val redirectList = RedirectFinder.redirects(
       update,
-      List(
-        Redirect("A", "A+B"),
-        Redirect("B", "A+B"),
-        Redirect("A+B", "A+B")))
+      List(Redirect("A", "A+B"), Redirect("B", "A+B"), Redirect("A+B", "A+B")))
 
     redirectList should contain theSameElementsAs List(
       Redirect("A", "A+B"),
@@ -114,10 +109,9 @@ class RedirectFinderTest extends FunSpec with Matchers {
   it("preserves existing redirects for a work without identifiers") {
     val update = WorkUpdate(id = "A", linkedIds = List("A"))
 
-    val redirectList = RedirectFinder.redirects(update, List(
-      Redirect("A", "A+B"),
-      Redirect("B", "A+B"),
-      Redirect("A+B", "A+B")))
+    val redirectList = RedirectFinder.redirects(
+      update,
+      List(Redirect("A", "A+B"), Redirect("B", "A+B"), Redirect("A+B", "A+B")))
 
     redirectList should contain theSameElementsAs List(
       Redirect("A", "A+B"),
@@ -131,10 +125,7 @@ class RedirectFinderTest extends FunSpec with Matchers {
 
     val redirectList = RedirectFinder.redirects(
       update,
-      List(
-        Redirect("A", "A+B"),
-        Redirect("B", "A+B"),
-        Redirect("A+B", "A+B")))
+      List(Redirect("A", "A+B"), Redirect("B", "A+B"), Redirect("A+B", "A+B")))
 
     redirectList should contain theSameElementsAs List(
       Redirect("A", "A+B+C+D"),

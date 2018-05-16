@@ -73,9 +73,13 @@ class MatcherMessageReceiverTest
 
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             eventually {
-              assertMessageSent(topic, MatchedWorksList(List(
-                  MatchedWorkIds(matchedWorkId = "sierra-system-number/id", linkedWorkIds = List("sierra-system-number/id")))))
-              }
+              assertMessageSent(
+                topic,
+                MatchedWorksList(
+                  List(MatchedWorkIds(
+                    matchedWorkId = "sierra-system-number/id",
+                    linkedWorkIds = List("sierra-system-number/id")))))
+            }
 
           }
         }
@@ -97,13 +101,17 @@ class MatcherMessageReceiverTest
 
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             eventually {
-              assertMessageSent(topic, MatchedWorksList(List(
-                  MatchedWorkIds(
-                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
-                    linkedWorkIds = List(
-                      "sierra-system-number/A",
-                      "sierra-system-number/B",
-                      "sierra-system-number/A+sierra-system-number/B")))))
+              assertMessageSent(
+                topic,
+                MatchedWorksList(List(MatchedWorkIds(
+                  matchedWorkId =
+                    "sierra-system-number/A+sierra-system-number/B",
+                  linkedWorkIds = List(
+                    "sierra-system-number/A",
+                    "sierra-system-number/B",
+                    "sierra-system-number/A+sierra-system-number/B")
+                )))
+              )
 
             }
           }
@@ -117,43 +125,50 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-          val aIdentifier = sourceIdentifier("A")
-          val bIdentifier = sourceIdentifier("B")
-          val cIdentifier = sourceIdentifier("C")
-          val aWork = unidentifiedWork.copy(
-            sourceIdentifier = aIdentifier,
-            identifiers = List(aIdentifier, bIdentifier))
+            val aIdentifier = sourceIdentifier("A")
+            val bIdentifier = sourceIdentifier("B")
+            val cIdentifier = sourceIdentifier("C")
+            val aWork = unidentifiedWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier, bIdentifier))
 
-          sendSQS(queue, storageBucket, aWork)
+            sendSQS(queue, storageBucket, aWork)
 
-          eventually {
+            eventually {
 
-            assertMessageSent(topic, MatchedWorksList(List(
-                    MatchedWorkIds(
-                      matchedWorkId = "sierra-system-number/A+sierra-system-number/B",
-                      linkedWorkIds = List(
-                        "sierra-system-number/A",
-                        "sierra-system-number/B",
-                        "sierra-system-number/A+sierra-system-number/B")))))
+              assertMessageSent(
+                topic,
+                MatchedWorksList(List(MatchedWorkIds(
+                  matchedWorkId =
+                    "sierra-system-number/A+sierra-system-number/B",
+                  linkedWorkIds = List(
+                    "sierra-system-number/A",
+                    "sierra-system-number/B",
+                    "sierra-system-number/A+sierra-system-number/B")
+                )))
+              )
 
-            val bWork = unidentifiedWork.copy(
-              sourceIdentifier = bIdentifier,
-              identifiers = List(bIdentifier, cIdentifier))
+              val bWork = unidentifiedWork.copy(
+                sourceIdentifier = bIdentifier,
+                identifiers = List(bIdentifier, cIdentifier))
 
-            sendSQS(queue, storageBucket, bWork)
+              sendSQS(queue, storageBucket, bWork)
 
               eventually {
 
-                assertMessageSent(topic, MatchedWorksList(List(
-                  MatchedWorkIds(
-                    matchedWorkId = "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C",
+                assertMessageSent(
+                  topic,
+                  MatchedWorksList(List(MatchedWorkIds(
+                    matchedWorkId =
+                      "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C",
                     linkedWorkIds = List(
                       "sierra-system-number/A",
                       "sierra-system-number/B",
                       "sierra-system-number/C",
                       "sierra-system-number/A+sierra-system-number/B",
                       "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"
-                    ))))
+                    )
+                  )))
                 )
 
               }
@@ -164,16 +179,18 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def sourceIdentifier(id: String) = SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", id)
+  private def sourceIdentifier(id: String) =
+    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", id)
 
-  private def assertMessageSent(topic: Topic, matchedWorksList: MatchedWorksList) = {
+  private def assertMessageSent(topic: Topic,
+                                matchedWorksList: MatchedWorksList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
-    val actualMatchedWorkLists= snsMessages.map { snsMessage =>
-        fromJson[MatchedWorksList](snsMessage.message).get
+    val actualMatchedWorkLists = snsMessages.map { snsMessage =>
+      fromJson[MatchedWorksList](snsMessage.message).get
     }
-      actualMatchedWorkLists should contain (matchedWorksList)
+    actualMatchedWorkLists should contain(matchedWorksList)
 
   }
 
