@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sns._
 import io.circe._
 import io.circe.yaml
-import uk.ac.wellcome.messaging.sns.SNSClientModule
+import uk.ac.wellcome.messaging.sns.SNSClientFactory
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
@@ -30,7 +30,7 @@ trait SNS {
   protected val snsInternalEndpointUrl = "http://sns:9292"
   protected val localSNSEndpointUrl = "http://localhost:9292"
 
-  private val regionName = "localhost"
+  private val region = "localhost"
 
   private val accessKey = "access"
   private val secretKey = "secret"
@@ -43,11 +43,11 @@ trait SNS {
     "aws.sns.endpoint" -> localSNSEndpointUrl,
     "aws.sns.accessKey" -> accessKey,
     "aws.sns.secretKey" -> secretKey,
-    "aws.region" -> regionName
+    "aws.region" -> region
   )
 
-  val snsClient: AmazonSNS = SNSClientModule.buildSNSClient(
-    awsConfig = AWSConfig(region = regionName),
+  val snsClient: AmazonSNS = SNSClientFactory.create(
+    region = region,
     endpoint = localSNSEndpointUrl,
     accessKey = accessKey,
     secretKey = secretKey
