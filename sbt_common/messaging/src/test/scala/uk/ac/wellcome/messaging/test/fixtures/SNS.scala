@@ -2,12 +2,11 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns._
 import io.circe._
-import io.circe.generic.extras.Configuration
 import io.circe.yaml
-import io.circe.generic.extras.auto._
 import uk.ac.wellcome.messaging.sns.SNSClientModule
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.immutable.Seq
 import scala.util.Random
@@ -82,8 +81,6 @@ trait SNS {
       localStackSnsClient.deleteTopic(topic.arn)
     }
   )
-
-  implicit val customConfig: Configuration = Configuration.default.withDefaults
 
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.
