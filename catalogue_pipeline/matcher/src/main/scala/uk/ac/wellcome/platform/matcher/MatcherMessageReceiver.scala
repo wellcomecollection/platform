@@ -54,7 +54,7 @@ class MatcherMessageReceiver @Inject()(
       _ <- snsWriter.writeMessage(
         message = toJson(
           convertToMatchedWorks(
-            RedirectFinder.redirects(convert(workEntry.work)))).get,
+            RedirectFinder.redirects(convert(workEntry.work), List()))).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
