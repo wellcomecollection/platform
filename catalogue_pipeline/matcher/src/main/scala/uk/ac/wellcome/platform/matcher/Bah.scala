@@ -5,11 +5,9 @@ import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 
 class Bah {
   def buh(workEntry: RecorderWorkEntry) =
-    convertToMatchedWorks(
-      RedirectFinder.redirects(convert(workEntry.work), List()))
+    convertToMatchedWorks(RedirectFinder.redirects(convert(workEntry.work), List()))
 
-  private def convertToMatchedWorks(
-    redirects: List[Redirect]): MatchedWorksList = {
+  private def convertToMatchedWorks(redirects: List[Redirect]): MatchedWorksList = {
     MatchedWorksList(
       redirects
         .groupBy(_.target)
@@ -27,5 +25,4 @@ class Bah {
 
   private def buildId(sourceIdentifier: SourceIdentifier): String =
     s"${sourceIdentifier.identifierScheme}/${sourceIdentifier.value}"
-
 }
