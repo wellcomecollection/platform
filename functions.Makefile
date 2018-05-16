@@ -46,8 +46,8 @@ endif
 define terraform_plan
 	make uptodate-git
 	$(ROOT)/docker_run.py --aws -- \
-		--volume $(ROOT):/data \
-		--workdir /data/$(1) \
+		--volume $(ROOT):$(ROOT) \
+		--workdir $(ROOT)/$(1) \
 		--env OP=plan \
 		--env GET_TFVARS=true \
 		--env BUCKET_NAME=wellcomecollection-platform-infra \
@@ -65,8 +65,8 @@ endef
 define terraform_apply
 	make uptodate-git
 	$(ROOT)/docker_run.py --aws -- \
-		--volume $(ROOT):/data \
-		--workdir /data/$(1) \
+		--volume $(ROOT):$(ROOT) \
+		--workdir $(ROOT)/$(1) \
 		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
 		wellcome/terraform_wrapper:latest
