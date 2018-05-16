@@ -40,6 +40,7 @@ from travistooling.decisions import (
     ('Makefile', 'travistooling-test', IgnoredFileFormat, False),
     ('monitoring/Makefile', 'travistooling-test', IgnoredFileFormat, False),
     ('formatting.Makefile', 'travistooling-test', IgnoredFileFormat, False),
+    ('my_lambda/requirements.in', 'my_lambda-test', IgnoredFileFormat, False),
 
     # Terraform files are significant, but only in the travis-format task
     ('s3.tf', 'elasticdump-test', IgnoredFileFormat, False),
