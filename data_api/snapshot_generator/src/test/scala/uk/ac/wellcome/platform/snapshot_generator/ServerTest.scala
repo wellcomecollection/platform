@@ -18,13 +18,23 @@ class ServerTest
     with SNS
     with SQS
     with ScalaFutures
-    with ElasticsearchFixtures
-    with fixtures.Server {
+    with ElasticsearchFixtures {
   val itemType = "work"
+
+  it("shows the healthcheck message") {
+    withFixtures {
+      case (server, _, _, _, _, _) =>
+        server.httpGet(
+          path = "/management/healthcheck",
+          andExpect = Ok,
+          withJsonBody = """{"message": "ok"}""")
+    }
+  }
+
   def withFixtures[R](
-    testWith: TestWith[
-      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-      R]) =
+                       testWith: TestWith[
+                         (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+                         R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
@@ -42,13 +52,20 @@ class ServerTest
       }
     }
 
-  it("shows the healthcheck message") {
-    withFixtures {
-      case (server, _, _, _, _, _) =>
-        server.httpGet(
-          path = "/management/healthcheck",
-          andExpect = Ok,
-          withJsonBody = """{"message": "ok"}""")
+  def withServer[R](flags: Map[String, String])(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = flags
+      )
+
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
     }
   }
 }
