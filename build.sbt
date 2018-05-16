@@ -108,6 +108,10 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
+lazy val mets_reader = doServiceSetup(project, "mets_adapter/mets_reader")
+  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(common_storage % "compile->compile;test->test")
+
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
@@ -156,6 +160,7 @@ lazy val root = (project in file("."))
     recorder,
     matcher,
     reindex_worker,
+    mets_reader,
     sierra_adapter_common,
     sierra_reader,
     sierra_items_to_dynamo,
