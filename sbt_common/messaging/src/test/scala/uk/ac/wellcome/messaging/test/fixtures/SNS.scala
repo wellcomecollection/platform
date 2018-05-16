@@ -4,7 +4,6 @@ import com.amazonaws.services.sns._
 import io.circe._
 import io.circe.yaml
 import uk.ac.wellcome.messaging.sns.SNSClientFactory
-import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -64,8 +63,8 @@ trait SNS {
     }
   )
 
-  val localStackSnsClient: AmazonSNS = SNSClientModule.buildSNSClient(
-    awsConfig = AWSConfig(region = "eu-west-2"),
+  val localStackSnsClient: AmazonSNS = SNSClientFactory.create(
+    region = "eu-west-2",
     endpoint = "http://localhost:4575",
     accessKey = accessKey,
     secretKey = secretKey
