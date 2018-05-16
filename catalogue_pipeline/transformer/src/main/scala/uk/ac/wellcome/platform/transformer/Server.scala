@@ -35,7 +35,7 @@ class Server extends HttpServer {
     S3ClientModule,
     S3ConfigModule,
     MessageConfigModule,
-    UnidentifiedWorkKeyPrefixGeneratorModule
+    UnidentifiedWorkModule
   )
   override def configureHttp(router: HttpRouter) {
     router

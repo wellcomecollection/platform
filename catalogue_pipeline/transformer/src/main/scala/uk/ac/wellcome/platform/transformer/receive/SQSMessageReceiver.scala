@@ -19,7 +19,6 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.s3.{
   S3Config,
   S3ObjectLocation,
-  S3StringStore,
   S3TypeStore
 }
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -35,16 +34,11 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class SQSMessageReceiver @Inject()(
-  messageWriter: MessageWriter[UnidentifiedWork],
-  s3Client: AmazonS3,
-  s3Config: S3Config,
-  metricsSender: MetricsSender)
-    extends Logging {
-
-  val s3StringStore = new S3StringStore(
-    s3Client = s3Client,
-    s3Config = s3Config
-  )
+                                    messageWriter: MessageWriter[UnidentifiedWork],
+                                    s3Client: AmazonS3,
+                                    s3Config: S3Config,
+                                    metricsSender: MetricsSender)
+  extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
@@ -73,16 +67,19 @@ class SQSMessageReceiver @Inject()(
   }
 
   val miroTransformableStore =
-    new S3TypeStore[MiroTransformable](s3StringStore)
+    new S3TypeStore[MiroTransformable](s3Client = s3Client,
+      s3Config = s3Config)
   val calmTransformableStore =
-    new S3TypeStore[CalmTransformable](s3StringStore)
+    new S3TypeStore[CalmTransformable](s3Client = s3Client,
+      s3Config = s3Config)
   val sierraTransformableStore =
-    new S3TypeStore[SierraTransformable](s3StringStore)
+    new S3TypeStore[SierraTransformable](s3Client = s3Client,
+      s3Config = s3Config)
 
   private def getTransformable(
-    hybridRecord: HybridRecord,
-    sourceMetadata: SourceMetadata
-  ) = {
+                                hybridRecord: HybridRecord,
+                                sourceMetadata: SourceMetadata
+                              ) = {
     val s3ObjectLocation = S3ObjectLocation(
       bucket = s3Config.bucketName,
       key = hybridRecord.s3key
@@ -96,9 +93,9 @@ class SQSMessageReceiver @Inject()(
   }
 
   private def transformTransformable(
-    transformable: Transformable,
-    version: Int
-  ): Try[Option[UnidentifiedWork]] = {
+                                      transformable: Transformable,
+                                      version: Int
+                                    ): Try[Option[UnidentifiedWork]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -120,7 +117,7 @@ class SQSMessageReceiver @Inject()(
   }
 
   private def publishMessage(
-    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+                              maybeWork: Option[UnidentifiedWork]): Future[Unit] =
     maybeWork.fold(Future.successful(())) { work =>
       messageWriter.write(
         work,
