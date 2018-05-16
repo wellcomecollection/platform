@@ -33,6 +33,8 @@ cache:
 
     - data_api/snapshot_generator/target
 
+    - mets_adapter/mets_reader/target
+
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
     - sbt_common/internal_model/target
@@ -100,6 +102,9 @@ jobs:
     - env: TASK=reindex_job_creator-test
     - env: TASK=complete_reindex-test
     - env: TASK=reindex_shard_generator-test
+
+    # METS adapter stack
+    - env: TASK=mets_reader-test
 
     # Sierra adapter stack
     - env: TASK=sierra_adapter_common-test
