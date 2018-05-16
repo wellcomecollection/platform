@@ -8,6 +8,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -16,6 +17,7 @@ class ServerTest
     extends FunSpec
     with S3
     with SNS
+    with CloudWatch
     with SQS
     with ScalaFutures
     with ElasticsearchFixtures {
@@ -57,7 +59,7 @@ class ServerTest
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
-        flags = flags
+        flags = flags ++ cloudWatchLocalFlags
       )
 
     server.start()

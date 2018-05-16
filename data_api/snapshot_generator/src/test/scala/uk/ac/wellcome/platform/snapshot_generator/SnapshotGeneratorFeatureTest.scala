@@ -11,16 +11,10 @@ import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -38,6 +32,7 @@ class SnapshotGeneratorFeatureTest
     with S3
     with SNS
     with SQS
+    with CloudWatch
     with GzipUtils
     with JsonTestUtil
     with ExtendedPatience
@@ -157,7 +152,7 @@ class SnapshotGeneratorFeatureTest
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
-        flags = flags
+        flags = flags ++ cloudWatchLocalFlags
       )
 
     server.start()
