@@ -23,7 +23,6 @@ object VHSConfigModule extends TwitterModule {
   def providesVHSConfig(): VHSConfig = {
     val dynamoConfig = DynamoConfig(table = tableName())
     val s3Config = S3Config(bucketName = bucketName())
-
     VHSConfig(dynamoConfig = dynamoConfig, s3Config = s3Config)
   }
 }
