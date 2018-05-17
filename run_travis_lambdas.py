@@ -24,7 +24,10 @@ if __name__ == '__main__':
         try:
             subprocess.check_call(
                 ['python', 'run_travis_task.py'],
-                env={'TASK': '%s-%s' % (lambda_name, verb)}
+                env={
+                    'TASK': '%s-%s' % (lambda_name, verb),
+                    'TRAVIS_EVENT_TYPE': os.environ['TRAVIS_EVENT_TYPE'],
+                }
             )
         except subprocess.CalledProcessError:
             outcome = 'FAILED'
