@@ -8,6 +8,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -16,11 +17,22 @@ class ServerTest
     extends FunSpec
     with S3
     with SNS
+    with CloudWatch
     with SQS
     with ScalaFutures
-    with ElasticsearchFixtures
-    with fixtures.Server {
+    with ElasticsearchFixtures {
   val itemType = "work"
+
+  it("shows the healthcheck message") {
+    withFixtures {
+      case (server, _, _, _, _, _) =>
+        server.httpGet(
+          path = "/management/healthcheck",
+          andExpect = Ok,
+          withJsonBody = """{"message": "ok"}""")
+    }
+  }
+
   def withFixtures[R](
     testWith: TestWith[
       (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
@@ -42,13 +54,20 @@ class ServerTest
       }
     }
 
-  it("shows the healthcheck message") {
-    withFixtures {
-      case (server, _, _, _, _, _) =>
-        server.httpGet(
-          path = "/management/healthcheck",
-          andExpect = Ok,
-          withJsonBody = """{"message": "ok"}""")
+  def withServer[R](flags: Map[String, String])(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = flags ++ cloudWatchLocalFlags
+      )
+
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
     }
   }
 }

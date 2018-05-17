@@ -18,6 +18,11 @@ module "ecr_repository_recorder" {
   name   = "recorder"
 }
 
+module "ecr_repository_matcher" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "matcher"
+}
+
 module "ecr_repository_ingestor" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "ingestor"

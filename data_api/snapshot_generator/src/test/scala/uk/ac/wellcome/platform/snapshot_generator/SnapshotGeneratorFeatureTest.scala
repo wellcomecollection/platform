@@ -16,6 +16,7 @@ import uk.ac.wellcome.models.work.internal.{
   IdentifierSchemes,
   SourceIdentifier
 }
+import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
@@ -38,33 +39,13 @@ class SnapshotGeneratorFeatureTest
     with S3
     with SNS
     with SQS
+    with CloudWatch
     with GzipUtils
-    with fixtures.Server
     with JsonTestUtil
     with ExtendedPatience
     with ElasticsearchFixtures {
 
   val itemType = "work"
-  def withFixtures[R](
-    testWith: TestWith[
-      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-      R]) =
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
-          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
-              withServer(flags) { server =>
-                testWith(
-                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
-              }
-            }
-          }
-        }
-      }
-    }
 
   it("completes a snapshot generation successfully") {
     withFixtures {
@@ -150,5 +131,44 @@ class SnapshotGeneratorFeatureTest
         }
     }
 
+  }
+
+  def withFixtures[R](
+    testWith: TestWith[
+      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+      R]) =
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
+          withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
+            withLocalS3Bucket { bucket =>
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
+                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType) ++ Map(
+                "aws.region" -> "localhost")
+              withServer(flags) { server =>
+                testWith(
+                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
+              }
+            }
+          }
+        }
+      }
+    }
+
+  def withServer[R](flags: Map[String, String])(
+    testWith: TestWith[EmbeddedHttpServer, R]) = {
+    val server: EmbeddedHttpServer =
+      new EmbeddedHttpServer(
+        new Server(),
+        flags = flags ++ cloudWatchLocalFlags
+      )
+
+    server.start()
+
+    try {
+      testWith(server)
+    } finally {
+      server.close()
+    }
   }
 }

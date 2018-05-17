@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.recorder
+package uk.ac.wellcome.platform.matcher
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -9,34 +9,28 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.monitoring.MetricsSenderModule
+import uk.ac.wellcome.finatra.modules.{AWSConfigModule, AkkaModule}
+import uk.ac.wellcome.messaging.sns.{SNSClientModule, SNSConfigModule}
 import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
-import uk.ac.wellcome.platform.recorder.modules.{
-  RecorderModule,
-  RecorderWorkEntryKeyPrefixGeneratorModule
-}
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
-import uk.ac.wellcome.storage.s3.S3ClientModule
-import uk.ac.wellcome.storage.vhs.VHSConfigModule
+import uk.ac.wellcome.monitoring.MetricsSenderModule
+import uk.ac.wellcome.platform.matcher.modules.MatcherModule
+import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.recorder Recorder"
+    "uk.ac.wellcome.platform.matcher Matcher"
   override val modules = Seq(
-    VHSConfigModule,
-    MessageConfigModule,
-    DynamoClientModule,
-    RecorderModule,
     MetricsSenderModule,
-    RecorderWorkEntryKeyPrefixGeneratorModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
+    S3ConfigModule,
+    SNSConfigModule,
+    SNSClientModule,
+    MatcherModule,
     AkkaModule
   )
 

@@ -3,10 +3,10 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sns._
 import io.circe._
 import io.circe.yaml
-import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.messaging.sns.SNSClientModule
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.immutable.Seq
 import scala.util.Random
@@ -82,10 +82,6 @@ trait SNS {
     }
   )
 
-  implicit val topicInfoDecoder: Decoder[TopicInfo] = deriveDecoder[TopicInfo]
-  implicit val snsResponseDecoder: Decoder[SNSResponse] =
-    deriveDecoder[SNSResponse]
-
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.
   implicit val messageInfoDecoder: Decoder[MessageInfo] =
@@ -127,7 +123,7 @@ trait SNS {
 
 case class SNSResponse(
   topics: List[TopicInfo],
-  messages: List[MessageInfo]
+  messages: List[MessageInfo] = Nil
 )
 
 case class TopicInfo(

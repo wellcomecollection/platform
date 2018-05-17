@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.recorder.models
+package uk.ac.wellcome.models.recorder.internal
 
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
