@@ -52,7 +52,7 @@ class CheckedByTravisFormat(SignificantFile):
 
 
 class CheckedByTravisLambda(SignificantFile):
-    message = 'File format is chekced by the travis-lambda task'
+    message = 'File format is checked by the travis-lambda task'
 
 
 class ScalaChangeAndIsScalaApp(SignificantFile):
