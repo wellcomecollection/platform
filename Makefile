@@ -9,7 +9,7 @@ include data_api/Makefile
 include data_science/Makefile
 include catalogue_api/Makefile
 include catalogue_pipeline/Makefile
-include mets_adapter/Makefile
+include goobi_adapter/Makefile
 include monitoring/Makefile
 include ontologies/Makefile
 include reindexer/Makefile
