@@ -155,8 +155,7 @@ trait Messaging
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val snsWriter = new SNSWriter(snsClient, snsConfig)
-    val s3StringStore = new S3StringStore(s3Client, s3Config)
-    val s3TypeStore = new S3TypeStore[ExampleObject](s3StringStore)
+    val s3TypeStore = new S3TypeStore[ExampleObject](s3Client)
 
     val messageSender = new S3TypeMessageSender[ExampleObject](snsWriter, s3TypeStore)
 
@@ -171,7 +170,7 @@ trait Messaging
   def withExampleObjectMessageReaderFixtures[R](
     testWith: TestWith[(Bucket, MessageReader[ExampleObject], Queue), R]) = {
     withLocalS3Bucket { bucket =>
-      withLocalStackSqsQueue { queue =>
+      withLocalSqsQueue { queue =>
         withExampleObjectMessageReader(bucket = bucket, queue = queue) {
           reader =>
             testWith((bucket, reader, queue))
@@ -225,17 +224,16 @@ trait Messaging
       waitTime = 1 millisecond,
       maxMessages = 1)
 
-    val s3StringStore = new S3StringStore(s3Client, s3Config)
-
-    val s3TypeStore = new S3TypeStore[T](s3StringStore)
-
+    val s3TypeStore = new S3TypeStore[T](s3Client)
     val messageRetriever = new S3TypeMessageRetriever[T](s3TypeStore)
+
+    val messageReaderConfig = MessageReaderConfig(sqsConfig, s3Config)
 
     val stream = new MessageStream[T](
       actorSystem,
       asyncSqsClient,
-      sqsConfig,
-      messageRetriever,
+      s3Client,
+      messageReaderConfig,
       metricsSender)
 
     testWith(stream)

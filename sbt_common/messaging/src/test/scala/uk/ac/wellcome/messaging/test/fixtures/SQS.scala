@@ -66,31 +66,31 @@ trait SQS extends Matchers {
   def withLocalSqsQueue[R] = fixture[Queue, R](
     create = {
       val queueName: String = Random.alphanumeric take 10 mkString
-      val response = sqsClient.createQueue(queueName)
-      val arn = sqsClient
+      val response = localStackSqsClient.createQueue(queueName)
+      val arn = localStackSqsClient
         .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes
         .get("QueueArn")
       val queue = Queue(response.getQueueUrl, arn)
-      sqsClient
+      localStackSqsClient
         .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
       queue
     },
     destroy = { queue =>
-      sqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
-      sqsClient.deleteQueue(queue.url)
+      localStackSqsClient.purgeQueue(new PurgeQueueRequest().withQueueUrl(queue.url))
+      localStackSqsClient.deleteQueue(queue.url)
     }
   )
 
   def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]) =
     withLocalSqsQueue { dlq =>
       val queueName: String = Random.alphanumeric take 10 mkString
-      val response = sqsClient.createQueue(new CreateQueueRequest()
+      val response = localStackSqsClient.createQueue(new CreateQueueRequest()
         .withQueueName(queueName)
         .withAttributes(Map(
           "RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
           "VisibilityTimeout" -> "1").asJava))
-      val arn = sqsClient
+      val arn = localStackSqsClient
         .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes
         .get("QueueArn")
@@ -103,29 +103,6 @@ trait SQS extends Matchers {
     endpoint = "http://localhost:4576",
     accessKey = accessKey,
     secretKey = secretKey
-  )
-
-  def withLocalStackSqsQueue[R] = fixture[Queue, R](
-    create = {
-      val queueName: String = Random.alphanumeric take 10 mkString
-      val response = localStackSqsClient.createQueue(queueName)
-      val arn = localStackSqsClient
-        .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
-        .getAttributes
-        .get("QueueArn")
-      val queue = Queue(response.getQueueUrl, arn)
-
-      localStackSqsClient
-        .setQueueAttributes(queue.url, Map("VisibilityTimeout" -> "1").asJava)
-      queue
-    },
-    destroy = { queue =>
-      safeCleanup(queue) { url =>
-        localStackSqsClient.purgeQueue(
-          new PurgeQueueRequest().withQueueUrl(queue.url))
-      }
-      localStackSqsClient.deleteQueue(queue.url)
-    }
   )
 
   object TestSqsMessage {
