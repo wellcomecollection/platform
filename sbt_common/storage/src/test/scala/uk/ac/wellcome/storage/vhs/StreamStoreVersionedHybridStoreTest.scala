@@ -12,6 +12,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class StreamStoreVersionedHybridStoreTest
     extends FunSpec
@@ -22,6 +24,8 @@ class StreamStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
+  private def stringify(is: InputStream) =
+    scala.io.Source.fromInputStream(is).mkString
 
   def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket, Table, VersionedHybridStore[InputStream, S3StreamStore]), R]
@@ -47,6 +51,27 @@ class StreamStoreVersionedHybridStoreTest
 
           whenReady(future) { _ =>
             getContentFor(bucket, table, id) shouldBe content
+          }
+      }
+    }
+
+    it("retrieves an InputStream") {
+      withS3StreamStoreFixtures {
+        case (bucket, table, hybridStore) =>
+          val id = Random.nextString(5)
+          val content = "Five fishing flinging flint"
+          val inputStream = new ByteArrayInputStream(content.getBytes)
+
+          val putFuture =
+            hybridStore.updateRecord(id)(inputStream)(identity)()
+
+          val getFuture = putFuture.flatMap { _ =>
+            hybridStore.getRecord(id)
+          }
+
+
+          whenReady(getFuture) { result =>
+            result.map(stringify) shouldBe Some(content)
           }
       }
     }

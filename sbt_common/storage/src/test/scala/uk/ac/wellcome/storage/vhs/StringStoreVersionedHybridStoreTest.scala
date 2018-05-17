@@ -55,28 +55,6 @@ class StringStoreVersionedHybridStoreTest
     it("applies the given transformation to an existing record") {
       withS3StringStoreFixtures {
         case (bucket, table, hybridStore) =>
-
-          val id = Random.nextString(5)
-          val record = "One ocelot in orange"
-
-          val expectedRecord = "Two tapping turtles"
-
-          val t = (e: String) => expectedRecord
-
-          val future =
-            hybridStore
-              .updateRecord(id)(record)(identity)()
-              .flatMap(_ => hybridStore.updateRecord(id)(record)(t)())
-
-          whenReady(future) { _ =>
-            getContentFor(bucket, table, id) shouldBe expectedRecord
-          }
-      }
-    }
-
-    it("updates DynamoDB and S3 if it sees a new version of a record") {
-      withS3StringStoreFixtures {
-        case (bucket, table, hybridStore) =>
           val id = Random.nextString(5)
           val record = "Two teal turtles in Tenerife"
 

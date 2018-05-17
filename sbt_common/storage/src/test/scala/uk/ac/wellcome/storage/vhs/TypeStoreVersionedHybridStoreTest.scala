@@ -13,14 +13,16 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 case class ExampleRecord(
-  override val id: String,
-  content: String
-) extends Id
+                          override val id: String,
+                          content: String
+                        ) extends Id
 
 class TypeStoreVersionedHybridStoreTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with ExtendedPatience
@@ -29,8 +31,8 @@ class TypeStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3TypeStoreFixtures[R](
-    testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
-  ): R =
+                                  testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
+                                ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>
@@ -53,6 +55,27 @@ class TypeStoreVersionedHybridStoreTest
 
           whenReady(future) { _ =>
             getJsonFor(bucket, table, record) shouldBe toJson(record).get
+          }
+      }
+    }
+
+    it("retrieves the specified type") {
+      withS3TypeStoreFixtures {
+        case (bucket, table, hybridStore) =>
+          val id = Random.nextString(5)
+          val record = ExampleRecord(
+            id = Random.nextString(5),
+            content = "Hairy hyenas howling hatefully"
+          )
+          val putFuture =
+            hybridStore.updateRecord(id)(record)(identity)()
+
+          val getFuture = putFuture.flatMap { _ =>
+            hybridStore.getRecord(id)
+          }
+
+          whenReady(getFuture) { result =>
+            result shouldBe Some(record)
           }
       }
     }
