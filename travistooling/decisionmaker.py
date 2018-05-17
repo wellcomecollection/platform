@@ -15,6 +15,7 @@ import os
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
+    CheckedByTravisLambda,
     ExclusivelyAffectsAnotherTask,
     ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
@@ -42,6 +43,14 @@ def does_file_affect_build_task(path, task):
     ):
         raise CheckedByTravisFormat()
 
+    # And a quick catch-all of file types that might signify a change for
+    # travis-lambda-{test, publish}
+    if (
+        task.startswith('travis-lambda-') and
+        path.endswith(('requirements.txt', '.py'))
+    ):
+        raise CheckedByTravisLambda()
+
     # These extensions and paths never have an effect on tests.
     if path.endswith((
         '.in',
@@ -59,6 +68,7 @@ def does_file_affect_build_task(path, task):
         'LICENSE',
         '.travis.yml',
         'run_travis_task.py',
+        'run_travis_lambdas.py',
     ] or path.startswith(('misc/', 'ontologies/', 'data_science/scripts/')):
         raise IgnoredPath()
 
@@ -99,7 +109,7 @@ def does_file_affect_build_task(path, task):
         'build.sbt',
         'sbt_common/'
     )):
-        if task == 'travistooling-test':
+        if (task in 'travistooling-test') or task.startswith('travis-lambda'):
             raise ScalaChangeAndNotScalaApp()
 
         for project in PROJECTS:

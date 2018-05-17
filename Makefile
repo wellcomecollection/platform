@@ -25,6 +25,13 @@ sbt-common-publish:
 	echo "Nothing to do!"
 
 
+travis-lambda-test:
+	python run_travis_lambdas.py test
+
+travis-lambda-publish:
+	python run_travis_lambdas.py publish
+
+
 travistooling-test:
 	$(ROOT)/docker_run.py -- \
 		--volume $(ROOT):/data \
