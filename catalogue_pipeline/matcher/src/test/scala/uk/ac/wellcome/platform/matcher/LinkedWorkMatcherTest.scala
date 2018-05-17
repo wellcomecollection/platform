@@ -4,19 +4,23 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
-class LinkedWorkMatcherTest extends FunSpec with Matchers with MatcherFixtures {
+class LinkedWorkMatcherTest
+    extends FunSpec
+    with Matchers
+    with MatcherFixtures {
 
   val bah = new LinkedWorkMatcher()
 
-  it("converts a work entry with no linked identifiers to a matched works list referencing itself") {
+  it(
+    "converts a work entry with no linked identifiers to a matched works list referencing itself") {
     bah.matchWork(
-      RecorderWorkEntry(
-        "sourceId",
-        "sourceName",
-        anUnidentifiedSierraWork)
+      RecorderWorkEntry("sourceId", "sourceName", anUnidentifiedSierraWork)
     ) shouldBe
-    MatchedWorksList(List(MatchedWorkIds("sierra-system-number/id", List("sierra-system-number/id"))))
+      MatchedWorksList(
+        List(
+          MatchedWorkIds(
+            "sierra-system-number/id",
+            List("sierra-system-number/id"))))
   }
-
 
 }

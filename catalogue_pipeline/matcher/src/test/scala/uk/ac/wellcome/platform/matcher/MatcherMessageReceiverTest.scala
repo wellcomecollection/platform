@@ -67,7 +67,6 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-
           sendSQS(queue, storageBucket, anUnidentifiedSierraWork)
 
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
@@ -119,18 +118,17 @@ class MatcherMessageReceiverTest
     }
   }
 
-
   ignore("redirects a work with one link and existing redirects") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-          val aIdentifier = aSierraSourceIdentifier("A")
-          val bIdentifier = aSierraSourceIdentifier("B")
-          val cIdentifier = aSierraSourceIdentifier("C")
-          val aWork = anUnidentifiedSierraWork.copy(
-            sourceIdentifier = aIdentifier,
-            identifiers = List(aIdentifier, bIdentifier))
+            val aIdentifier = aSierraSourceIdentifier("A")
+            val bIdentifier = aSierraSourceIdentifier("B")
+            val cIdentifier = aSierraSourceIdentifier("C")
+            val aWork = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier, bIdentifier))
 
             sendSQS(queue, storageBucket, aWork)
 
@@ -179,7 +177,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(topic: Topic, matchedWorksList: MatchedWorksList) = {
+  private def assertMessageSent(topic: Topic,
+                                matchedWorksList: MatchedWorksList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 

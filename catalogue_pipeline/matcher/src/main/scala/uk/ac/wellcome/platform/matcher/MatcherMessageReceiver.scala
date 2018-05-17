@@ -15,12 +15,12 @@ case class MatchedWorksList(redirects: List[MatchedWorkIds])
 case class MatchedWorkIds(matchedWorkId: String, linkedWorkIds: List[String])
 
 class MatcherMessageReceiver @Inject()(
-                                        messageStream: SQSStream[NotificationMessage],
-                                        snsWriter: SNSWriter,
-                                        s3TypeStore: S3TypeStore[RecorderWorkEntry],
-                                        storageS3Config: S3Config,
-                                        actorSystem: ActorSystem,
-                                        linkedWorkMatcher: LinkedWorkMatcher) {
+  messageStream: SQSStream[NotificationMessage],
+  snsWriter: SNSWriter,
+  s3TypeStore: S3TypeStore[RecorderWorkEntry],
+  storageS3Config: S3Config,
+  actorSystem: ActorSystem,
+  linkedWorkMatcher: LinkedWorkMatcher) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 

@@ -5,7 +5,8 @@ import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 
 class LinkedWorkMatcher {
   def matchWork(workEntry: RecorderWorkEntry) =
-    asMatchedWorks(RedirectFinder.redirects(extractIdentifiers(workEntry.work), List()))
+    asMatchedWorks(
+      RedirectFinder.redirects(extractIdentifiers(workEntry.work), List()))
 
   private def asMatchedWorks(redirects: List[Redirect]): MatchedWorksList = {
     MatchedWorksList(
