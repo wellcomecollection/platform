@@ -42,12 +42,14 @@ trait LocalVersionedHybridStore
       s3Config = s3Config
     )
 
+    val keyPrefixGenerator = new KeyPrefixGenerator[T] {
+      override def generate(obj: T): String = "/"
+    }
+
     val store = new VersionedHybridStore[T](
       vhsConfig = vhsConfig,
       s3Client = s3Client,
-      keyPrefixGenerator = new KeyPrefixGenerator[T] {
-        override def generate(obj: T): String = "/"
-      },
+      keyPrefixGenerator = keyPrefixGenerator,
       dynamoDbClient = dynamoDbClient
     )
 

@@ -15,7 +15,11 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.finatra.storage.VHSModule
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  S3ClientModule,
+  VHSConfigModule
+}
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.recorder.modules.{
   RecorderModule,
@@ -28,14 +32,16 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.recorder Recorder"
   override val modules = Seq(
-    VHSModule,
+    RecorderWorkEntryKeyPrefixGeneratorModule,
     MessageConfigModule,
     RecorderModule,
     MetricsSenderModule,
-    RecorderWorkEntryKeyPrefixGeneratorModule,
     AWSConfigModule,
+    DynamoClientModule,
     SQSConfigModule,
     SQSClientModule,
+    S3ClientModule,
+    VHSConfigModule,
     AkkaModule
   )
 
