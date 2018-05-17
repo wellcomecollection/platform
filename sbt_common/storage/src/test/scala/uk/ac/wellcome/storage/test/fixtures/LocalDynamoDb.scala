@@ -27,7 +27,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
 
-  private val region = "localhost"
+  private val regionName = "localhost"
 
   private val accessKey = "access"
   private val secretKey = "secret"
@@ -40,11 +40,11 @@ trait LocalDynamoDb[T <: Versioned with Id]
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
     "aws.dynamoDb.accessKey" -> accessKey,
     "aws.dynamoDb.secretKey" -> secretKey,
-    "aws.region" -> region
+    "aws.region" -> regionName
   )
 
   val dynamoDbClient: AmazonDynamoDB = DynamoClientFactory.create(
-    region = region,
+    region = regionName,
     endpoint = dynamoDBEndPoint,
     accessKey = accessKey,
     secretKey = secretKey
