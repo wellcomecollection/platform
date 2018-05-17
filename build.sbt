@@ -98,7 +98,7 @@ lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
 lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
