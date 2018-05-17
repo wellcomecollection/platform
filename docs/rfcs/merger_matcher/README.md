@@ -65,7 +65,7 @@ This implies storing each work that is sees, along to the group of nodes it belo
 The group that each work belongs to should have an indentifier that is deterministic on the identifiers of the nodes that compose it.
 The group identifiers should be never exposed outside the matcher.
 
-Similalry, the matcher needs to be able to break connections if a link from one node to another is removes.
+Similarly, the matcher needs to be able to break connections if a link from one work to another is removed.
 This mean storing, for each work, the list of works directly referenced.
 
 ## Database schema
@@ -177,23 +177,15 @@ We receive an update to B telling us it now has edges B→A and B→D.
         F         | -     | ABCDEF
 
 4.  The output JSON is:
-    ```[json]
+```[json]
+{
+  "work-groups":[
     {
-    "work-groups":[
-        {
-            "identifiers":
-                [
-                    "A",
-                    "B",
-                    "C",
-                    "D",
-                    "E",
-                    "F"
-                ]
-        }
-    ]
+      "identifiers": [ "A", "B", "C", "D", "E", "F" ]
     }
-    ```
+  ]
+}
+```
 
 ## Example 2
 
@@ -248,7 +240,8 @@ This results in an eventually consistent graph, which is as good as we can
 guarantee.
 
 3. Eventually the output JSON is:
-    ```[json]
+
+```[json]
 {
   "work-groups": [
     {
@@ -256,7 +249,7 @@ guarantee.
     }
   ]
 }
-    ```
+```
 
 ## Example 3
 
@@ -298,7 +291,8 @@ In this example A, B and C are connected into a component called ABC. We receive
             C         | _     | C
 
 7.  The output JSON is:
-    ```[json]
+
+```[json]
 {
   "work-groups": [
     {
@@ -309,4 +303,4 @@ In this example A, B and C are connected into a component called ABC. We receive
     }
   ]
 }
-    ```
+```
