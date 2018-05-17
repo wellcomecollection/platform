@@ -33,7 +33,7 @@ cache:
 
     - data_api/snapshot_generator/target
 
-    - goobi_adapter/mets_reader/target
+    - goobi_adapter/goobi_reader/target
 
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
@@ -104,7 +104,7 @@ jobs:
     - env: TASK=reindex_shard_generator-test
 
     # Goobi adapter stack
-    - env: TASK=mets_reader-test
+    - env: TASK=goobi_reader-test
 
     # Sierra adapter stack
     - env: TASK=sierra_adapter_common-test

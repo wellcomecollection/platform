@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.mets_reader
+package uk.ac.wellcome.platform.goobi_reader
 
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec

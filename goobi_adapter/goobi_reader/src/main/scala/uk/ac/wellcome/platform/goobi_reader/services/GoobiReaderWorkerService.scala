@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.mets_reader.services
+package uk.ac.wellcome.platform.goobi_reader.services
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -10,7 +10,7 @@ import uk.ac.wellcome.messaging.sqs._
 
 import scala.concurrent.Future
 
-class MetsReaderWorkerService @Inject()(
+class GoobiReaderWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[SQSMessage]
 ) extends Logging {

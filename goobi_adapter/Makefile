@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT  = goobi_adapter
 
-SBT_APPS    = mets_reader
+SBT_APPS    = goobi_reader
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 

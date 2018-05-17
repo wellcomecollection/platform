@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.mets_reader
+package uk.ac.wellcome.platform.goobi_reader
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -17,7 +17,7 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.mets_reader METS reader"
+    "uk.ac.wellcome.platform.goobi_reader Goobi reader"
   override val modules = Seq(
     AkkaModule,
     MetricsSenderModule,

@@ -108,7 +108,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
-lazy val mets_reader = doServiceSetup(project, "goobi_adapter/mets_reader")
+lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
@@ -160,7 +160,7 @@ lazy val root = (project in file("."))
     recorder,
     matcher,
     reindex_worker,
-    mets_reader,
+    goobi_reader,
     sierra_adapter_common,
     sierra_reader,
     sierra_items_to_dynamo,

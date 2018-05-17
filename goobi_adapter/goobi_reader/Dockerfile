@@ -5,7 +5,7 @@ ADD target/universal/stage /opt/docker
 USER root
 RUN chown -R daemon:daemon /opt/docker
 
-ENV project=mets_reader
+ENV project=goobi_reader
 
 USER daemon
 CMD ["/run.sh"]
