@@ -92,7 +92,6 @@ lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.idminterDependencies)
 
 lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
@@ -109,7 +108,7 @@ lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")

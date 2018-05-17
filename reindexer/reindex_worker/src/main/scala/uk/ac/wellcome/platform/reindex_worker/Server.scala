@@ -19,8 +19,7 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
   DynamoConfigModule,
-  S3ClientModule,
-  S3ConfigModule
+  S3ClientModule
 }
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.reindex_worker.modules.ReindexerWorkerModule
@@ -39,7 +38,6 @@ class Server extends HttpServer {
     SNSClientModule,
     SNSConfigModule,
     S3ClientModule,
-    S3ConfigModule,
     ReindexerWorkerModule,
     AkkaModule
   )
