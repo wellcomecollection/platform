@@ -67,6 +67,7 @@ from travistooling.decisions import (
     ('sierra_adapter/common/main.scala', 'travistooling-test', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
     ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
+    ('sbt_common/display/model.scala', 'travis-lambda-test', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'sierra_adapter-publish', UnrecognisedFile, True),
 
     # Changes to Scala test files trigger a -test Scala task, but not
@@ -80,6 +81,10 @@ from travistooling.decisions import (
     ('lambda_conftest.py', 'post_to_slack-publish', ChangesToTestsDontGetPublished, False),
     ('shared_conftest.py', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
     ('reindex_job_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
+
+    # Changes to Lambdas trigger the travis-lambda-test task.
+    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-test', ExclusivelyAffectsThisTask, True),
+    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-publish', ExclusivelyAffectsThisTask, True),
 
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
