@@ -9,7 +9,7 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 import uk.ac.wellcome.storage.vhs.{VHSConfig, VersionedHybridStore}
 
-object VHSClientModule extends TwitterModule {
+object VHSModule extends TwitterModule {
   override val modules = Seq(
     DynamoClientModule,
     S3ClientModule,
