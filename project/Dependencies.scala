@@ -83,7 +83,7 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
   )
 
-  val testDependencies: Seq[ModuleID] = Seq(
+  val testDependencies = Seq(
     "org.mockito" % "mockito-core" % versions.mockito % "test",
     "com.novocode" % "junit-interface" % versions.junitInterface % "test",
     "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion

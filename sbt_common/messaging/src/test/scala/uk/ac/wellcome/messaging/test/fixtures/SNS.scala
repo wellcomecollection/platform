@@ -29,7 +29,7 @@ trait SNS {
   protected val snsInternalEndpointUrl = "http://sns:9292"
   protected val localSNSEndpointUrl = "http://localhost:9292"
 
-  private val region = "localhost"
+  private val regionName = "localhost"
 
   private val accessKey = "access"
   private val secretKey = "secret"
@@ -42,11 +42,11 @@ trait SNS {
     "aws.sns.endpoint" -> localSNSEndpointUrl,
     "aws.sns.accessKey" -> accessKey,
     "aws.sns.secretKey" -> secretKey,
-    "aws.region" -> region
+    "aws.region" -> regionName
   )
 
   val snsClient: AmazonSNS = SNSClientFactory.create(
-    region = region,
+    region = regionName,
     endpoint = localSNSEndpointUrl,
     accessKey = accessKey,
     secretKey = secretKey
