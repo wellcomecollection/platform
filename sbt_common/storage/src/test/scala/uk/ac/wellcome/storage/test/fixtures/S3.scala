@@ -30,7 +30,7 @@ trait S3 extends Logging with Eventually {
   import S3._
 
   protected val localS3EndpointUrl = "http://localhost:33333"
-  protected val regionName = "localhost"
+  private val regionName = "localhost"
 
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"

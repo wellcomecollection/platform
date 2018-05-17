@@ -4,7 +4,6 @@ import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sqs._
-import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConverters._
@@ -99,8 +98,8 @@ trait SQS extends Matchers {
       testWith(QueuePair(queue, dlq))
     }
 
-  val localStackSqsClient: AmazonSQS = SQSClientModule.buildSQSClient(
-    awsConfig = AWSConfig(region = "localhost"),
+  val localStackSqsClient: AmazonSQS = SQSClientFactory.createSyncClient(
+    region = "localhost",
     endpoint = "http://localhost:4576",
     accessKey = accessKey,
     secretKey = secretKey

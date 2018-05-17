@@ -9,9 +9,8 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.modules._
-import uk.ac.wellcome.messaging.message.MessageConfigModule
-import uk.ac.wellcome.messaging.sqs.SQSClientModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.ingestor.finatra.modules.{
   IdentifiedWorkKeyPrefixGeneratorModule,

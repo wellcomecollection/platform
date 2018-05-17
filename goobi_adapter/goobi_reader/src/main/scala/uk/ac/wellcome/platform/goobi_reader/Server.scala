@@ -8,10 +8,10 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
+import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.modules.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.messaging.sqs.{SQSClientModule, SQSConfigModule}
 
 object ServerMain extends Server
 

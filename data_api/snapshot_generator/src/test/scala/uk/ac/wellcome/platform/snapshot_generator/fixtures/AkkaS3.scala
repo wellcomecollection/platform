@@ -15,7 +15,7 @@ trait AkkaS3 extends S3 {
     materializer: ActorMaterializer)(testWith: TestWith[S3Client, R]): R = {
 
     val s3AkkaClient = AkkaS3ClientModule.buildAkkaS3Client(
-      awsConfig = AWSConfig(region = regionName),
+      awsConfig = AWSConfig(region = "localhost"),
       actorSystem = actorSystem,
       endpoint = localS3EndpointUrl,
       accessKey = accessKey,
