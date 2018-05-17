@@ -80,6 +80,21 @@ jobs:
     - env: TASK=common_storage-test
     - env: TASK=common_monitoring-test
 
+    # Lambda tests.
+    #
+    # We test all the Lambdas in a single job to reduce the number of small
+    # build VMs we start.  Because most of our applications are Scala, the
+    # majority of builds for a Lambda wake up, discover they have nothing to
+    # do, and exit immediately.
+    #
+    # This includes all the tests for monitoring and shared_infra stacks.
+    #
+    # When this job runs, all the Lambdas get tested at once, but even this
+    # isn't significantly longer than a Scala test.
+    #
+    - stage: test
+      env: TASK=travis-lambda-test
+
     # Catalogue API stack
     - stage: test
       env: TASK=api-test
@@ -94,29 +109,20 @@ jobs:
     - env: TASK=id_minter-test
 
     # Data API stack
-    - env: TASK=snapshot_scheduler-test
     - env: TASK=snapshot_generator-test
 
     # Reindexer stack
     - env: TASK=reindex_worker-test
-    - env: TASK=reindex_job_creator-test
-    - env: TASK=complete_reindex-test
-    - env: TASK=reindex_shard_generator-test
 
     # Goobi adapter stack
     - env: TASK=goobi_reader-test
 
     # Sierra adapter stack
     - env: TASK=sierra_adapter_common-test
-    - env: TASK=sierra_window_generator-test
     - env: TASK=sierra_reader-test
     - env: TASK=sierra_items_to_dynamo-test
     - env: TASK=sierra_bib_merger-test
     - env: TASK=sierra_item_merger-test
-    - env: TASK=s3_demultiplexer-test
-
-    # Shared infra stack
-    - env: TASK=shared_infra-test
 
     # (not under active development)
 
@@ -126,9 +132,6 @@ jobs:
     # Loris stack
     # - env: TASK=loris-build
     # - env: TASK=cache_cleaner-build
-
-    # Monitoring stack
-    # - env: TASK=monitoring-test
 
 stages:
   - quicktest
