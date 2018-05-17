@@ -17,11 +17,11 @@ identifier of the original works that compose it.
 
 The merging of works is broken into two phases
 
- * a matching phase that identifies groups of work to be merged.
+ * a linking phase that identifies linked works to be merged.
  * a merging phase that merges works to form new combined works.
    
 The matcher receives source identifiers for processed works along with source identifiers for works that should be merged,
-and determines how they group together.
+and determines how they link together.
 
 The merger takes transformed works and merges them into new combined works. This means that the merger needs a strategy for how to combine existing works into one.
 Among other things it will choose which of the original source identifiers to use for the merged work.
@@ -37,12 +37,12 @@ This document has notes on the proposed architecture.
 A matching phase is introduced to determine where works need to be combined.
 
 The input to this phase is the source identity for a work and a list of the identities that make up the combined work.
-The output is groups of identifiers of affected works that will be combined downstream by the merger
+The output is sets of identifiers of affected works that will be combined downstream by the merger
 
 Example:
 ```[json]
     {
-        "work-groups": [
+        "linked-works": [
             {
                 "identifiers": [
                     "sierra-system-number/b1234567",
@@ -60,10 +60,10 @@ Example:
 
 ## Storage
 
-When the matcher receives an update for a work, it needs to know about previously seen works that referenced it to be able to group them together.
-This implies storing each work that is sees, along to the group of nodes it belongs to at that point in time.
-The group that each work belongs to should have an indentifier that is deterministic on the identifiers of the nodes that compose it.
-The group identifiers should be never exposed outside the matcher.
+When the matcher receives an update for a work, it needs to know about previously seen works that referenced it to be able to link them together.
+This implies storing each work that is sees, along to the linked nodes it belongs to at that point in time.
+The set of linked works that each work belongs to should have an indentifier that is deterministic on the identifiers of the nodes that compose it.
+The set of linked works identifiers should be never exposed outside the matcher.
 
 Similarly, the matcher needs to be able to break connections if a link from one work to another is removed.
 This mean storing, for each work, the list of works directly referenced.
@@ -97,7 +97,7 @@ In the case that neither A or B has previously been identified as a part of a co
 will output:
 ```[json]
 {
-  "work-groups": [
+  "linked-works": [
     {
       "identifiers": [ "sierra-system-number/s12345", "miro-image-number/s67890"]
     }
@@ -109,7 +109,7 @@ For example, suppose works `A`, `B`, and `A-B` have been previously created and 
 edited to link to `C`, then the output from the matcher would be:
 ```javascript
 {
-  "work-groups": [
+  "linked-works": [
     { 
       identifiers: [ 'sierra/A', 'miro/B', 'sierra/C' ]
     }
@@ -144,7 +144,7 @@ We receive an update to B telling us it now has edges B→A and B→D.
 
 0.  The existing DB is as follows:
 
-        work_id   | links | group_id
+        work_id   | links | linked_works_set
         A         | B     | ABC
         B         | A     | ABC
         C         | B     | ABC
@@ -160,7 +160,7 @@ We receive an update to B telling us it now has edges B→A and B→D.
         B     | A      | ABC
         D     | F      | DEF
 
-2.  By looking at their group id, we can do a second read to gather
+2.  By looking at their linked_works_set id, we can do a second read to gather
     all the vertices that might be affected: ABCDEF.
     This gives us the database above, and enough to construct the entire graph
     we're interested in.
@@ -168,7 +168,7 @@ We receive an update to B telling us it now has edges B→A and B→D.
 3.  Apply the changes, and work out what the new components are.  Write that
     back to the database.
 
-        work_id   | links | group_id
+        work_id   | links | linked_works_set
         A         | B     | ABCDEF
         B         | AD    | ABCDEF
         C         | B     | ABCDEF
@@ -179,7 +179,7 @@ We receive an update to B telling us it now has edges B→A and B→D.
 4.  The output JSON is:
 ```[json]
 {
-  "work-groups":[
+  "linked-works":[
     {
       "identifiers": [ "A", "B", "C", "D", "E", "F" ]
     }
@@ -202,7 +202,7 @@ different vertices).
 
 0.  The existing DB is as follows:
 
-            work_id   | links | group_d
+            work_id   | links | linked_works_set
             A         | B     | ABC
             B         | A     | ABC
             C         | B     | ABC
@@ -217,7 +217,7 @@ different vertices).
     Meanwhile update (**) is also being processed, and it affects F and G.
     So the worker handling (**) F and G acquires a lock on those two rows.
 
-            work_id   | links | group_id
+            work_id   | links | linked_works_set
             A         | B     | ABC
         *   B         | A     | ABC
             C         | B     | ABC
@@ -243,7 +243,7 @@ guarantee.
 
 ```[json]
 {
-  "work-groups": [
+  "linked-works": [
     {
       "identifiers":[ "A", "B", "C", "D", "E", "F", "G"]
     }
@@ -261,31 +261,31 @@ In this example A, B and C are connected into a component called ABC. We receive
 
 0.  The existing DB is as follows:
 
-            work_id   | links | group_id
+            work_id   | links | linked_works_set
             A         | B     | ABC
             B         | A     | ABC
             C         | B     | ABC
 
 1.  Because we have an update that affects C, we read and acquire a lock on C from the database first:
 
-            work_id   | links | group_id
+            work_id   | links | linked_works_set
             C         | B     | ABC
 
 2.  By looking at their connected components, we acquire a lock on all other vertices affected: A and B.
 3.  We update C to not belong to ABC:
 
-            work_id   | links | group_id
-            C         | _     | _
+            work_id   | links | linked_works_set
+            C         | _     | C
 
-4.  We assign A and B to group_id AB:
+4.  We assign A and B to linked_works_set AB:
 
-            work_id   | links | group_id
+            work_id   | links | linked_works_set
             A     | B      | AB
             B     | A      | AB
 
 5.  The database ends up looking like this:
 
-            work_id   | links | group_id
+            work_id   | links | linked_works_set
             A         | B     | AB
             B         | A     | AB
             C         | _     | C
@@ -294,7 +294,7 @@ In this example A, B and C are connected into a component called ABC. We receive
 
 ```[json]
 {
-  "work-groups": [
+  "linked-works": [
     {
       "identifiers":[ "A", "B"]
     },
