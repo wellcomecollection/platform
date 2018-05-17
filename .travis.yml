@@ -93,7 +93,7 @@ jobs:
     # isn't significantly longer than a Scala test.
     #
     - stage: test
-      env: TRAVIS_LAMBDAS = snapshot_scheduler \
+      env: TRAVIS_LAMBDAS="snapshot_scheduler \
         reindex_job_creator \
         complete_reindex \
         reindex_shard_generator \
@@ -107,7 +107,7 @@ jobs:
         notify_old_deploys \
         post_to_slack \
         service_deployment_status \
-        update_service_list
+        update_service_list"
       env: TASK=travis-lambda-test
 
     # Catalogue API stack
