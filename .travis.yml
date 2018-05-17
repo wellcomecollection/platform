@@ -33,7 +33,7 @@ cache:
 
     - data_api/snapshot_generator/target
 
-    - mets_adapter/mets_reader/target
+    - goobi_adapter/mets_reader/target
 
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
