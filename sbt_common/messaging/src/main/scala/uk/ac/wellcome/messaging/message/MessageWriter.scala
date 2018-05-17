@@ -22,7 +22,8 @@ class MessageWriter[T] @Inject()(
   snsClient: AmazonSNS,
   s3Client: AmazonS3,
   keyPrefixGenerator: KeyPrefixGenerator[T]
-)(implicit encoder: Encoder[T], decoder: Decoder[T]) extends Logging {
+)(implicit encoder: Encoder[T], decoder: Decoder[T])
+    extends Logging {
 
   private val sns = new SNSWriter(
     snsClient = snsClient,
@@ -35,7 +36,9 @@ class MessageWriter[T] @Inject()(
 
   def write(message: T, subject: String): Future[Unit] = {
     for {
-      location <- s3.put(messageConfig.s3Config.bucketName)(message, keyPrefixGenerator.generate(message))
+      location <- s3.put(messageConfig.s3Config.bucketName)(
+        message,
+        keyPrefixGenerator.generate(message))
       pointer <- Future.fromTry(toJson(MessagePointer(location)))
       publishAttempt <- sns.writeMessage(pointer, subject)
       _ = info(publishAttempt)

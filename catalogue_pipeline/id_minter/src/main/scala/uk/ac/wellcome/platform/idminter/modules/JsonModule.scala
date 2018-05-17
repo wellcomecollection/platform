@@ -7,7 +7,6 @@ import javax.inject.Singleton
 import uk.ac.wellcome.platform.idminter.models.JsonKeyPrefixGenerator
 import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
 
-
 object JsonModule extends TwitterModule {
   @Provides
   @Singleton
@@ -25,5 +24,3 @@ object JsonModule extends TwitterModule {
     Encoder.encodeJson
 
 }
-
-

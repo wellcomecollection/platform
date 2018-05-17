@@ -1,6 +1,5 @@
 package uk.ac.wellcome.storage.vhs
 
-
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
@@ -25,7 +24,10 @@ class StringStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3StringStoreFixtures[R](
-    testWith: TestWith[(Bucket, Table, VersionedHybridStore[String, S3StringStore]), R]
+    testWith: TestWith[(Bucket,
+                        Table,
+                        VersionedHybridStore[String, S3StringStore]),
+                       R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
@@ -65,8 +67,7 @@ class StringStoreVersionedHybridStoreTest
             hybridStore.updateRecord(id)(record)(identity)()
 
           val updatedFuture = future.flatMap { _ =>
-            hybridStore.updateRecord(id)(updatedRecord)(_ =>
-              updatedRecord)()
+            hybridStore.updateRecord(id)(updatedRecord)(_ => updatedRecord)()
           }
 
           whenReady(updatedFuture) { _ =>
@@ -89,7 +90,6 @@ class StringStoreVersionedHybridStoreTest
     it("returns a future of Some[String] if the record exists") {
       withS3StringStoreFixtures {
         case (_, _, hybridStore) =>
-
           val id = Random.nextString(5)
           val record = "Five fishing flinging flint"
 
@@ -108,9 +108,9 @@ class StringStoreVersionedHybridStoreTest
 
     it("can store additional metadata alongside HybridRecord") {
       case class ExtraData(
-                            data: String,
-                            number: Int
-                          )
+        data: String,
+        number: Int
+      )
 
       val id = Random.nextString(5)
       val record = "this goes in dynamo"
@@ -127,8 +127,7 @@ class StringStoreVersionedHybridStoreTest
 
           whenReady(future) { _ =>
             val maybeResult =
-              Scanamo.get[ExtraData](dynamoDbClient)(table.name)(
-                'id -> id)
+              Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> id)
 
             maybeResult shouldBe defined
             maybeResult.get.isRight shouldBe true

@@ -17,8 +17,9 @@ import uk.ac.wellcome.utils.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-                                                versionedHybridStore: VersionedHybridStore[SierraTransformable, S3TypeStore[SierraTransformable]],
-                                                metrics: MetricsSender
+  versionedHybridStore: VersionedHybridStore[SierraTransformable,
+                                             S3TypeStore[SierraTransformable]],
+  metrics: MetricsSender
 ) extends Logging {
 
   val sourceName = "sierra"

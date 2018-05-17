@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class TestObject(content: String)
 
 class S3TypeStoreTest
-  extends FunSpec
+    extends FunSpec
     with S3
     with Matchers
     with JsonTestUtil

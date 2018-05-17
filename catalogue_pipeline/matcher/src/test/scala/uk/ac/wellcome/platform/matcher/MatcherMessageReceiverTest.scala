@@ -55,8 +55,7 @@ class MatcherMessageReceiverTest
         val matcherMessageReceiver = new MatcherMessageReceiver(
           sqsStream,
           snsWriter,
-          new S3TypeStore[RecorderWorkEntry](
-            s3Client),
+          new S3TypeStore[RecorderWorkEntry](s3Client),
           storageS3Config,
           actorSystem)
         testWith(matcherMessageReceiver)

@@ -15,14 +15,13 @@ import scala.util.Random
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 case class ExampleRecord(
-                          override val id: String,
-                          content: String
-                        ) extends Id
+  override val id: String,
+  content: String
+) extends Id
 
 class TypeStoreVersionedHybridStoreTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with ExtendedPatience
@@ -31,8 +30,12 @@ class TypeStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3TypeStoreFixtures[R](
-                                  testWith: TestWith[(Bucket, Table, VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]), R]
-                                ): R =
+    testWith: TestWith[
+      (Bucket,
+       Table,
+       VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]),
+      R]
+  ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>

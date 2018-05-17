@@ -14,8 +14,9 @@ import uk.ac.wellcome.storage.s3.S3TypeStore
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-                                               versionedHybridStore: VersionedHybridStore[SierraTransformable, S3TypeStore[SierraTransformable]],
-                                               metrics: MetricsSender
+  versionedHybridStore: VersionedHybridStore[SierraTransformable,
+                                             S3TypeStore[SierraTransformable]],
+  metrics: MetricsSender
 ) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {

@@ -4,12 +4,20 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.storage.type_classes.{HybridRecordEnricher, IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.s3.{
+  KeyPrefixGenerator,
+  S3ObjectLocation,
+  S3ObjectStore
+}
+import uk.ac.wellcome.storage.type_classes.{
+  HybridRecordEnricher,
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
-
 
 class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
@@ -93,7 +101,9 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
     updateExpressionGenerator: UpdateExpressionGenerator[O]
   ) = {
 
-    val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(t, keyPrefixGenerator.generate(t))
+    val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
+      t,
+      keyPrefixGenerator.generate(t))
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))

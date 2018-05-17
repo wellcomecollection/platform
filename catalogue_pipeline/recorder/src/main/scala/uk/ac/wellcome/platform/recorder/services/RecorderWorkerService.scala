@@ -11,13 +11,13 @@ import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
 
-
 import scala.concurrent.Future
 
 class RecorderWorkerService @Inject()(
-                                       versionedHybridStore: VersionedHybridStore[RecorderWorkEntry, S3TypeStore[RecorderWorkEntry]],
-                                       messageStream: MessageStream[UnidentifiedWork],
-                                       system: ActorSystem) {
+  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
+                                             S3TypeStore[RecorderWorkEntry]],
+  messageStream: MessageStream[UnidentifiedWork],
+  system: ActorSystem) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 

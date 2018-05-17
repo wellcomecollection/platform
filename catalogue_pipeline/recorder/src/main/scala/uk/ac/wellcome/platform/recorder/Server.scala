@@ -9,7 +9,11 @@ import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule, S
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, VHSConfigModule}
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.platform.recorder.modules.{RecorderModule, RecorderWorkEntryModule, UnidentifiedWorkModule}
+import uk.ac.wellcome.platform.recorder.modules.{
+  RecorderModule,
+  RecorderWorkEntryModule,
+  UnidentifiedWorkModule
+}
 
 object ServerMain extends Server
 

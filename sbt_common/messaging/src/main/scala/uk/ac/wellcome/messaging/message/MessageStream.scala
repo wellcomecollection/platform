@@ -19,7 +19,9 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  sqsClient: AmazonSQSAsync,
                                  s3Client: AmazonS3,
                                  messageReaderConfig: MessageReaderConfig,
-                                 metricsSender: MetricsSender)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
+                                 metricsSender: MetricsSender)(
+  implicit encoder: Encoder[T],
+  decoder: Decoder[T]) {
 
   private val s3TypeStore = new S3TypeStore[T](
     s3Client = s3Client
@@ -41,9 +43,8 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     )
   }
 
-  private def processMessagePointer(
-    notification: NotificationMessage,
-    process: T => Future[Unit]): Future[Unit] =
+  private def processMessagePointer(notification: NotificationMessage,
+                                    process: T => Future[Unit]): Future[Unit] =
     for {
       messagePointer <- Future.fromTry(
         fromJson[MessagePointer](notification.Message))

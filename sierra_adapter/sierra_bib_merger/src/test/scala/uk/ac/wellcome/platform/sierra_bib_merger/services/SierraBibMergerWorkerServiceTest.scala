@@ -26,7 +26,8 @@ class SierraBibMergerWorkerServiceTest
     val metricsSender = mock[MetricsSender]
     val mergerUpdaterService =
       new SierraBibMergerUpdaterService(
-        mock[VersionedHybridStore[SierraTransformable, S3TypeStore[SierraTransformable]]],
+        mock[VersionedHybridStore[SierraTransformable,
+                                  S3TypeStore[SierraTransformable]]],
         metricsSender)
     val worker = new SierraBibMergerWorkerService(
       sqsReader,

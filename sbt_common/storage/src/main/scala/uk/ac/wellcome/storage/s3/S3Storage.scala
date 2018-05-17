@@ -9,8 +9,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.hashing.MurmurHash3
 
 object S3Storage extends Logging {
-  def put(s3Client: AmazonS3, bucketName: String)(keyPrefix: String)(
-    is: InputStream)(implicit ec: ExecutionContext): Future[S3ObjectLocation] = {
+  def put(s3Client: AmazonS3, bucketName: String)(
+    keyPrefix: String)(is: InputStream)(
+    implicit ec: ExecutionContext): Future[S3ObjectLocation] = {
 
     // Currently hiding the stringification, so we can deal with it later if we need to
     val content = scala.io.Source.fromInputStream(is).mkString
@@ -34,16 +35,17 @@ object S3Storage extends Logging {
     }
   }
 
-  def get(s3Client: AmazonS3, bucketName: String)(
-    key: String)(implicit ec: ExecutionContext): Future[InputStream] = {
+  def get(s3Client: AmazonS3, bucketName: String)(key: String)(
+    implicit ec: ExecutionContext): Future[InputStream] = {
     info(s"Attempt: GET object from s3://$bucketName/$key")
 
     val futureInputStream = Future {
       s3Client.getObject(bucketName, key).getObjectContent
     }
 
-    futureInputStream.foreach { case _ =>
-      info(s"Success: GET object from s3://$bucketName/$key")
+    futureInputStream.foreach {
+      case _ =>
+        info(s"Success: GET object from s3://$bucketName/$key")
     }
 
     futureInputStream

@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 
 import uk.ac.wellcome.utils.JsonUtil._
 
-
 object UnidentifiedWorkModule extends TwitterModule {
   @Provides
   @Singleton

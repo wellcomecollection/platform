@@ -11,7 +11,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  HybridRecord,
+  VHSConfig,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -34,7 +38,9 @@ trait LocalVersionedHybridStore
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
   def withTypeVHS[T <: Id, R](bucket: Bucket, table: Table)(
-    testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(implicit encoder: Encoder[T], decoder: Decoder[T]): R = {
+    testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(
+    implicit encoder: Encoder[T],
+    decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
@@ -59,7 +65,8 @@ trait LocalVersionedHybridStore
   }
 
   def withStreamVHS[R](bucket: Bucket, table: Table)(
-    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
+    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R])
+    : R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
@@ -130,9 +137,11 @@ trait LocalVersionedHybridStore
   private def getHybridRecord(bucket: Bucket, table: Table, id: String) =
     Scanamo.get[HybridRecord](dynamoDbClient)(table.name)('id -> id) match {
       case None => throw new RuntimeException(s"No object with id $id found!")
-      case Some(read) => read match {
-        case Left(error) => throw new RuntimeException(s"Error reading from dynamo: $error")
-        case Right(record) => record
-      }
+      case Some(read) =>
+        read match {
+          case Left(error) =>
+            throw new RuntimeException(s"Error reading from dynamo: $error")
+          case Right(record) => record
+        }
     }
 }
