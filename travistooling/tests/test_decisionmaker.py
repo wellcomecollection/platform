@@ -41,6 +41,9 @@ from travistooling.decisions import (
     ('monitoring/Makefile', 'travistooling-test', IgnoredFileFormat, False),
     ('formatting.Makefile', 'travistooling-test', IgnoredFileFormat, False),
     ('my_lambda/requirements.in', 'my_lambda-test', IgnoredFileFormat, False),
+    ('data_science/data/.gitkeep', 'ingestor-test', IgnoredFileFormat, False),
+    ('data_science/.gitignore', 'ingestor-test', IgnoredFileFormat, False),
+    ('data_science/experiments.ipynb', 'ingestor-test', IgnoredFileFormat, False),
 
     # Terraform files are significant, but only in the travis-format task
     ('s3.tf', 'elasticdump-test', IgnoredFileFormat, False),
