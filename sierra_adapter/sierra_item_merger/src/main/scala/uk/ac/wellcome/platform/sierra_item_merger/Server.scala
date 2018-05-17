@@ -11,11 +11,10 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule}
+import uk.ac.wellcome.finatra.storage.VHSClientModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
-import uk.ac.wellcome.storage.vhs.VHSConfigModule
 
 object ServerMain extends Server
 
@@ -23,13 +22,11 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.sierra_item_merger SierraItemMerger"
   override val modules = Seq(
-    DynamoClientModule,
-    VHSConfigModule,
+    VHSClientModule,
     MetricsSenderModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
-    S3ClientModule,
     AkkaModule,
     SierraItemMergerModule,
     SierraKeyPrefixGeneratorModule
