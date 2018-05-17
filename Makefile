@@ -26,10 +26,10 @@ sbt-common-publish:
 
 
 travis-lambda-test:
-	$(foreach task,$(TRAVIS_LAMBDAS),TASK=$(task)-test python run_travis_task.py;)
+	python run_travis_lambdas.py test
 
 travis-lambda-publish:
-	$(foreach task,$(TRAVIS_LAMBDAS),TASK=$(task)-publish python run_travis_task.py;)
+	python run_travis_lambdas.py publish
 
 
 travistooling-test:
