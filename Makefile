@@ -25,23 +25,21 @@ sbt-common-publish:
 	echo "Nothing to do!"
 
 
-travis-lambda-test: snapshot_scheduler-test \
-					reindex_job_creator-test \
-					complete_reindex-test \
-					reindex_shard_generator-test \
-					sierra_window_generator-test \
-					s3_demultiplexer-test \
-					shared_infra-test \
-					monitoring-test
+TRAVIS_LAMBDAS = snapshot_scheduler-test \
+				reindex_job_creator-test \
+				complete_reindex-test \
+				reindex_shard_generator-test \
+				sierra_window_generator-test \
+				s3_demultiplexer-test \
+				shared_infra-test \
+				monitoring-test
 
-travis-lambda-publish: snapshot_scheduler-publish \
-					reindex_job_creator-publish \
-					complete_reindex-publish \
-					reindex_shard_generator-publish \
-					sierra_window_generator-publish \
-					s3_demultiplexer-publish \
-					shared_infra-publish \
-					monitoring-publish
+
+travis-lambda-test:
+	$(foreach task,$(TRAVIS_LAMBDAS),python run_travis_task.py $(task)-test;)
+
+travis-lambda-publish:
+	$(foreach task,$(TRAVIS_LAMBDAS),python run_travis_task.py $(task)-publish;)
 
 
 travistooling-test:
