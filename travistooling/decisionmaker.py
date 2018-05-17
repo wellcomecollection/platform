@@ -71,20 +71,17 @@ def does_file_affect_build_task(path, task):
     # For example, the ``catalogue_api/api`` directory only contains code
     # for the api Scala app, so changes in this directory cannot affect
     # any other task.
-    #
-    for project in PROJECTS:
-        project_path = os.path.relpath(project.exclusive_path, start=ROOT)
-        if path.startswith(project_path):
-            if (
-                project.type == 'python_lambda' and
-                task in ('travis-lambda-test', 'travis-lambda-publish')
-            ):
-                raise ExclusivelyAffectsThisTask()
+    exclusive_directories = {
+        os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
+    }
 
-            if task.startswith(project.name):
+    for dir_name, task_prefix in exclusive_directories.items():
+        if path.startswith(dir_name):
+            if task.startswith(task_prefix):
                 raise ExclusivelyAffectsThisTask()
             else:
-                raise ExclusivelyAffectsAnotherTask(project.name)
+                raise ExclusivelyAffectsAnotherTask(task_prefix)
+
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
