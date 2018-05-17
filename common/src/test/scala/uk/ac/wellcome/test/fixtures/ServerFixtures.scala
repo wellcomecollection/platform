@@ -6,7 +6,8 @@ import org.scalatest.Suite
 
 trait ServerFixtures { this: Suite =>
 
-  def withServer[R](appServer : => Ports, flags: Map[String, String],
+  def withServer[R](appServer: => Ports,
+                    flags: Map[String, String],
                     modifyServer: (EmbeddedHttpServer) => EmbeddedHttpServer =
                       identity)(testWith: TestWith[EmbeddedHttpServer, R]) = {
     val server: EmbeddedHttpServer = modifyServer(

@@ -5,5 +5,6 @@ import uk.ac.wellcome.platform.api.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.ServerFixtures
 
 trait Server extends ServerFixtures { this: Suite =>
-  def withServer[R](flags: Map[String, String]) = withServer[R](new AppServer, flags)
+  def withServer[R](flags: Map[String, String]) =
+    withServer[R](new AppServer, flags)
 }

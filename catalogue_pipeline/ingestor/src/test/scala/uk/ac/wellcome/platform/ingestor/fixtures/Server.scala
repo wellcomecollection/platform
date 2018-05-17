@@ -5,6 +5,9 @@ import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.ingestor.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.ServerFixtures
 
-trait Server extends ServerFixtures with CloudWatch {this: Suite =>
-  def withServer[R](flags: Map[String, String]) = withServer[R](new AppServer, flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags)
+trait Server extends ServerFixtures with CloudWatch { this: Suite =>
+  def withServer[R](flags: Map[String, String]) =
+    withServer[R](
+      new AppServer,
+      flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags)
 }
