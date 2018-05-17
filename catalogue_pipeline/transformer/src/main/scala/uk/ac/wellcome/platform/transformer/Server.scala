@@ -17,7 +17,6 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.storage.dynamo.DynamoConfigModule
 import uk.ac.wellcome.storage.s3.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.platform.transformer.modules.{TransformerWorkerModule, _}
 
@@ -28,7 +27,6 @@ class Server extends HttpServer {
   override val modules = Seq(
     MetricsSenderModule,
     AWSConfigModule,
-    DynamoConfigModule,
     AkkaModule,
     SQSClientModule,
     SQSConfigModule,

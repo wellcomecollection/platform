@@ -15,12 +15,12 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.finatra.storage.DynamoClientModule
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.recorder.modules.{
   RecorderModule,
   RecorderWorkEntryKeyPrefixGeneratorModule
 }
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
 import uk.ac.wellcome.storage.s3.S3ClientModule
 import uk.ac.wellcome.storage.vhs.VHSConfigModule
 
