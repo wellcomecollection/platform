@@ -25,16 +25,6 @@ sbt-common-publish:
 	echo "Nothing to do!"
 
 
-TRAVIS_LAMBDAS = snapshot_scheduler-test \
-				reindex_job_creator-test \
-				complete_reindex-test \
-				reindex_shard_generator-test \
-				sierra_window_generator-test \
-				s3_demultiplexer-test \
-				shared_infra-test \
-				monitoring-test
-
-
 travis-lambda-test:
 	$(foreach task,$(TRAVIS_LAMBDAS),python run_travis_task.py $(task)-test;)
 
