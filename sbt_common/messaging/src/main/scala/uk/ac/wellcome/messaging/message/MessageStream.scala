@@ -22,8 +22,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
                                  metricsSender: MetricsSender)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
 
   private val s3TypeStore = new S3TypeStore[T](
-    s3Client = s3Client,
-    s3Config = messageReaderConfig.s3Config
+    s3Client = s3Client
   )
 
   private val sqsStream = new SQSStream[NotificationMessage](

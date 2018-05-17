@@ -14,24 +14,23 @@ import scala.io.Source
 
 
 class S3TypeStore[T] @Inject()(
-    s3Client: AmazonS3,
-    s3Config: S3Config
-  )(implicit encoder: Encoder[T], decoder: Decoder[T])
+                                s3Client: AmazonS3
+                              )(implicit encoder: Encoder[T], decoder: Decoder[T])
   extends Logging
     with S3ObjectStore[T] {
 
-  def put(in: T, keyPrefix: String): Future[S3ObjectLocation] =
+  def put(bucket: String)(in: T, keyPrefix: String): Future[S3ObjectLocation] =
     Future.fromTry(toJson(in)).flatMap { content =>
       val is = new ByteArrayInputStream(content.getBytes)
 
-      S3Storage.put(s3Client, s3Config.bucketName)(keyPrefix)(is)
+      S3Storage.put(s3Client, bucket)(keyPrefix)(is)
     }
 
   def get(s3ObjectLocation: S3ObjectLocation): Future[T] =
     S3Storage.get(s3Client, s3ObjectLocation.bucket)(s3ObjectLocation.key)
-      .map(is => Source.fromInputStream(is).mkString )
+      .map(is => Source.fromInputStream(is).mkString)
       .flatMap { content =>
 
-      Future.fromTry(fromJson[T](content))
-    }
+        Future.fromTry(fromJson[T](content))
+      }
 }

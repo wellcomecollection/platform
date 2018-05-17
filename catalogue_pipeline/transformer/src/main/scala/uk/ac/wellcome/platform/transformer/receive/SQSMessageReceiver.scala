@@ -67,14 +67,11 @@ class SQSMessageReceiver @Inject()(
   }
 
   val miroTransformableStore =
-    new S3TypeStore[MiroTransformable](s3Client = s3Client,
-      s3Config = s3Config)
+    new S3TypeStore[MiroTransformable](s3Client)
   val calmTransformableStore =
-    new S3TypeStore[CalmTransformable](s3Client = s3Client,
-      s3Config = s3Config)
+    new S3TypeStore[CalmTransformable](s3Client)
   val sierraTransformableStore =
-    new S3TypeStore[SierraTransformable](s3Client = s3Client,
-      s3Config = s3Config)
+    new S3TypeStore[SierraTransformable](s3Client)
 
   private def getTransformable(
                                 hybridRecord: HybridRecord,

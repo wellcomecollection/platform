@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 case class TestObject(content: String)
 
 class S3TypeStoreTest
-    extends FunSpec
+  extends FunSpec
     with S3
     with Matchers
     with JsonTestUtil
@@ -33,7 +33,7 @@ class S3TypeStoreTest
 
         val testObject = TestObject(content = content)
 
-        val writtenToS3 = objectStore.put(testObject, prefix)
+        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedJson = JsonUtil.toJson(testObject).get
@@ -60,7 +60,7 @@ class S3TypeStoreTest
         val prefix = "/foo"
 
         val testObject = TestObject(content = content)
-        val writtenToS3 = objectStore.put(testObject, prefix)
+        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -77,7 +77,7 @@ class S3TypeStoreTest
         val prefix = "foo/"
 
         val testObject = TestObject(content = content)
-        val writtenToS3 = objectStore.put(testObject, prefix)
+        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -95,7 +95,7 @@ class S3TypeStoreTest
 
         val testObject = TestObject(content = content)
 
-        val writtenToS3 = objectStore.put(testObject, prefix)
+        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix)
 
         whenReady(writtenToS3.flatMap(objectStore.get)) { actualTestObject =>
           actualTestObject shouldBe testObject
@@ -123,9 +123,8 @@ class S3TypeStoreTest
 
   private def withS3TypeStore(bucket: Bucket)(
     testWith: TestWith[S3TypeStore[TestObject], Assertion]) = {
-      val s3TypeStore = new S3TypeStore[TestObject](
-      s3Client = s3Client,
-      s3Config = S3Config(bucketName = bucket.name)
+    val s3TypeStore = new S3TypeStore[TestObject](
+      s3Client = s3Client
     )
 
     testWith(s3TypeStore)

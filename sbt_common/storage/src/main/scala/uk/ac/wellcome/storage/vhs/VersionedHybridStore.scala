@@ -93,7 +93,7 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
     updateExpressionGenerator: UpdateExpressionGenerator[O]
   ) = {
 
-    val futureUri = s3ObjectStore.put(t, keyPrefixGenerator.generate(t))
+    val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(t, keyPrefixGenerator.generate(t))
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))

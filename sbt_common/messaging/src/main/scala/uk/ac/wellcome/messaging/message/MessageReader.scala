@@ -23,8 +23,7 @@ class MessageReader[T] @Inject()(
   val sqsReader = new SQSReader(sqsClient, messageReaderConfig.sqsConfig)
 
   val s3TypeStore = new S3TypeStore[T](
-    s3Client = s3Client,
-    s3Config = messageReaderConfig.s3Config
+    s3Client = s3Client
   )
 
   def readAndDelete(process: T => Future[Unit])(

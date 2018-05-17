@@ -33,7 +33,7 @@ class Server extends HttpServer {
     SNSClientModule,
     S3ClientModule,
     MessageConfigModule,
-    JsonKeyPrefixGeneratorModule,
+    JsonModule,
     CloudWatchClientModule,
     MetricsSenderModule
   )

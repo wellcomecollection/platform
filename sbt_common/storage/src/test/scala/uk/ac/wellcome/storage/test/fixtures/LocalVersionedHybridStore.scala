@@ -43,8 +43,7 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3TypeStore[T](
-      s3Client = s3Client,
-      s3Config = s3Config
+      s3Client = s3Client
     )
 
     val store = new VersionedHybridStore[T, S3TypeStore[T]](
@@ -69,8 +68,7 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3StreamStore(
-      s3Client = s3Client,
-      s3Config = s3Config
+      s3Client = s3Client
     )
 
     val store = new VersionedHybridStore[InputStream, S3StreamStore](
@@ -95,8 +93,7 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3StringStore(
-      s3Client = s3Client,
-      s3Config = s3Config
+      s3Client = s3Client
     )
 
     val store = new VersionedHybridStore[String, S3StringStore](
