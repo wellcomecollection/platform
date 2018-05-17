@@ -90,11 +90,7 @@ object Dependencies {
   )
 
   // Internal Library dependency groups
-  val commonDependencies: Seq[ModuleID] = Seq(
-    "org.mockito" % "mockito-core" % versions.mockito % "test",
-    "com.novocode" % "junit-interface" % versions.junitInterface % "test",
-    "javax.xml.bind" % "jaxb-api" % versions.jaxbVersion
-  ) ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
+  val commonDependencies = testDependencies ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
