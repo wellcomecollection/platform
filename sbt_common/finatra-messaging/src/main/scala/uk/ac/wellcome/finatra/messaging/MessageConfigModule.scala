@@ -3,11 +3,7 @@ package uk.ac.wellcome.finatra.messaging
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
-import uk.ac.wellcome.messaging.message.{
-  MessageReaderConfig,
-  MessageWriterConfig
-}
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.message.MessageReaderConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.storage.s3.S3Config
 
@@ -43,15 +39,6 @@ object MessageConfigModule extends TwitterModule {
       "aws.message.reader.sqs.maxMessages",
       10,
       "Maximum number of SQS messages to return")
-
-  @Singleton
-  @Provides
-  def providesMessageWriterConfig(): MessageWriterConfig = {
-    val snsConfig = SNSConfig(topicArn = writerTopicArn())
-    val s3Config = S3Config(bucketName = writerBucketName())
-
-    MessageWriterConfig(snsConfig = snsConfig, s3Config = s3Config)
-  }
 
   @Singleton
   @Provides
