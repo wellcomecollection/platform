@@ -9,7 +9,7 @@ import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
+import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
@@ -35,7 +35,7 @@ class SierraItemMergerUpdaterServiceTest
     }
 
   def withSierraUpdaterService(
-    hybridStore: VersionedHybridStore[SierraTransformable])(
+    hybridStore: VersionedHybridStore[SierraTransformable, S3TypeStore[SierraTransformable]])(
     testWith: TestWith[SierraItemMergerUpdaterService, Assertion]) = {
     val sierraUpdaterService = new SierraItemMergerUpdaterService(
       versionedHybridStore = hybridStore,

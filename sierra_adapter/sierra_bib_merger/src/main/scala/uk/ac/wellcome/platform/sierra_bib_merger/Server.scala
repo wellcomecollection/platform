@@ -2,11 +2,7 @@ package uk.ac.wellcome.platform.sierra_bib_merger
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.modules._
@@ -18,7 +14,7 @@ import uk.ac.wellcome.finatra.storage.{
 }
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
-import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
+import uk.ac.wellcome.sierra_adapter.modules.{SierraKeyPrefixGeneratorModule, SierraTransformableModule}
 
 object ServerMain extends Server
 
@@ -30,6 +26,7 @@ class Server extends HttpServer {
     DynamoClientModule,
     SierraBibMergerModule,
     SierraKeyPrefixGeneratorModule,
+    SierraTransformableModule,
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
