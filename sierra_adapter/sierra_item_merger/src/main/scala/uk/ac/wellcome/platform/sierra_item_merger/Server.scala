@@ -26,13 +26,13 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.sierra_item_merger SierraItemMerger"
   override val modules = Seq(
+    DynamoClientModule,
+    VHSConfigModule,
     MetricsSenderModule,
     AWSConfigModule,
-    DynamoClientModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
-    VHSConfigModule,
     AkkaModule,
     SierraItemMergerModule,
     SierraKeyPrefixGeneratorModule

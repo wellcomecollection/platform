@@ -32,16 +32,16 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.recorder Recorder"
   override val modules = Seq(
-    RecorderWorkEntryKeyPrefixGeneratorModule,
+    VHSConfigModule,
     MessageConfigModule,
+    DynamoClientModule,
     RecorderModule,
     MetricsSenderModule,
+    RecorderWorkEntryKeyPrefixGeneratorModule,
     AWSConfigModule,
-    DynamoClientModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,
-    VHSConfigModule,
     AkkaModule
   )
 
