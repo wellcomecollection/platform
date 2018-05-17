@@ -1,6 +1,7 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
+import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
 import io.circe.generic.semiauto._
@@ -10,7 +11,7 @@ import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3._
@@ -18,9 +19,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-
 import uk.ac.wellcome.messaging.sns.SNSWriter
-
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -165,6 +164,70 @@ trait Messaging
     )
 
     testWith(messageWriter)
+  }
+
+  def withSNSWriter[R](snsClient: AmazonSNS, topic: Topic)(testWith: TestWith[SNSWriter, R]): R = {
+    val snsConfig = SNSConfig(topicArn = topic.arn)
+    val snsWriter = new SNSWriter(snsClient, snsConfig)
+
+    testWith(snsWriter)
+  }
+
+  def withS3TypeStore[T,R](s3Client: AmazonS3, s3Config: S3Config)(testWith: TestWith[S3TypeStore[T], R]) = {
+    val s3StringStore = new S3StringStore(s3Client, s3Config)
+    val s3TypeStore = new S3TypeStore[T](s3StringStore)
+
+    testWith(s3TypeStore)
+  }
+
+  def withS3TypeMessageRetriever[T, R](s3TypeStore: S3TypeStore[T])(testWith: TestWith[S3TypeMessageRetriever[T], R]) = {
+    val messageRetriever = new S3TypeMessageRetriever[T](s3TypeStore)
+
+    testWith(messageRetriever)
+  }
+
+  def withS3TypeMessageSender[T, R](snsWriter: SNSWriter, s3TypeStore: S3TypeStore[T])(testWith: TestWith[S3TypeMessageSender[T], R]) = {
+    val messageSender = new S3TypeMessageSender[T](snsWriter, s3TypeStore)
+
+    testWith(messageSender)
+  }
+
+  def withTypeMessageRetriever[T, R]()(testWith: TestWith[TypeMessageRetriever[T], R]) = {
+    val messageRetriever = new TypeMessageRetriever[T]()
+
+    testWith(messageRetriever)
+  }
+
+  def withTypeMessageSender[T, R](snsWriter: SNSWriter)(testWith: TestWith[TypeMessageSender[T], R]) = {
+    val messageSender = new TypeMessageSender[T](snsWriter)
+
+    testWith(messageSender)
+  }
+
+  def withMessageStreamFixtures[R](
+                                    testWith: TestWith[(Bucket,
+                                      MessageStream[ExampleObject],
+                                      QueuePair,
+                                      MetricsSender),
+                                      R]) = {
+
+    withActorSystem { actorSystem =>
+      withLocalS3Bucket { bucket =>
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, _) =>
+            withMockMetricSender { metricsSender =>
+              withMessageStream[ExampleObject, R](
+                actorSystem,
+                bucket,
+                queue,
+                metricsSender) { stream =>
+                testWith((bucket, stream, queuePair, metricsSender))
+              }
+
+            }
+        }
+      }
+    }
   }
 
   def withExampleObjectMessageReaderFixtures[R](
