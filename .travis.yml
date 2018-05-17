@@ -93,21 +93,7 @@ jobs:
     # isn't significantly longer than a Scala test.
     #
     - stage: test
-      env: TRAVIS_LAMBDAS="snapshot_scheduler \
-        reindex_job_creator \
-        complete_reindex \
-        reindex_shard_generator \
-        sierra_window_generator \
-        s3_demultiplexer \
-        drain_ecs_container_instance \
-        dynamo_to_sns \
-        ecs_ec2_instance_tagger \
-        run_ecs_task \
-        gatling_to_cloudwatch \
-        notify_old_deploys \
-        post_to_slack \
-        service_deployment_status \
-        update_service_list"
+      env: TRAVIS_LAMBDAS="snapshot_scheduler reindex_job_creator complete_reindex reindex_shard_generator sierra_window_generator s3_demultiplexer drain_ecs_container_instance dynamo_to_sns ecs_ec2_instance_tagger run_ecs_task gatling_to_cloudwatch notify_old_deploys post_to_slack service_deployment_status update_service_list"
       env: TASK=travis-lambda-test
 
     # Catalogue API stack
