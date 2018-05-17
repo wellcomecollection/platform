@@ -9,6 +9,7 @@ from travistooling.decisionmaker import (
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
+    CheckedByTravisLambda,
     ExclusivelyAffectsAnotherTask,
     ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
@@ -83,8 +84,8 @@ from travistooling.decisions import (
     ('reindex_job_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
 
     # Changes to Lambdas trigger the travis-lambda-test task.
-    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-test', ExclusivelyAffectsThisTask, True),
-    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-publish', ExclusivelyAffectsThisTask, True),
+    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-test', CheckedByTravisLambda, True),
+    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-publish', CheckedByTravisLambda, True),
 
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),

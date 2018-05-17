@@ -15,6 +15,7 @@ import os
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
     CheckedByTravisFormat,
+    CheckedByTravisLambda,
     ExclusivelyAffectsAnotherTask,
     ExclusivelyAffectsThisTask,
     IgnoredFileFormat,
@@ -41,6 +42,14 @@ def does_file_affect_build_task(path, task):
         path.endswith(('.scala', '.tf', '.py', '.json', '.ttl'))
     ):
         raise CheckedByTravisFormat()
+
+    # And a quick catch-all of file types that might signify a change for
+    # travis-lambda-{test, publish}
+    if (
+        task.startswith('travis-lambda-') and
+        path.endswith(('requirements.txt', '.py'))
+    ):
+        raise CheckedByTravisLambda()
 
     # These extensions and paths never have an effect on tests.
     if path.endswith(('.in', '.md', '.png', '.graffle', '.tf', 'Makefile')):

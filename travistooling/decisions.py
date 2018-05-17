@@ -51,6 +51,10 @@ class CheckedByTravisFormat(SignificantFile):
     message = 'File format is checked by the travis-format task'
 
 
+class CheckedByTravisLambda(SignificantFile):
+    message = 'File format is chekced by the travis-lambda task'
+
+
 class ScalaChangeAndIsScalaApp(SignificantFile):
     message = 'Changes to Scala common libs affect Scala apps'
 
