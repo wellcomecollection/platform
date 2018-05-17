@@ -7,7 +7,7 @@ import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.platform.api.Server
+import uk.ac.wellcome.platform.api.fixtures.Server
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.versions.ApiVersions
