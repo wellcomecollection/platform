@@ -61,6 +61,7 @@ lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
 
 lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra-messaging")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
@@ -85,7 +86,7 @@ lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
@@ -116,7 +117,7 @@ lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
