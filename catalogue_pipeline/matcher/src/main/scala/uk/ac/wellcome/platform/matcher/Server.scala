@@ -16,8 +16,8 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.modules.{AWSConfigModule, AkkaModule}
+import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.matcher.modules.{
   MatcherModule,
   RecorderWorkEntryModule
