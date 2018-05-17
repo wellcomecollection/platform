@@ -3,11 +3,12 @@ package uk.ac.wellcome.platform.api
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.test.fixtures.ServerFixtures
 import uk.ac.wellcome.versions.ApiVersions
 
 import scala.collection.JavaConverters._
 
-class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
+class ApiSwaggerTest extends FunSpec with Matchers with ServerFixtures {
 
   it("returns a valid JSON response for all api versions") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
@@ -117,7 +118,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       "es.index.v2" -> "v2"
     )
 
-    val response: Response = withServer(flags) { server =>
+    val response: Response = withServer(new Server,flags) { server =>
       server.httpGet(
         path = path,
         andExpect = Status.Ok
