@@ -1,11 +1,18 @@
 # -*- encoding: utf-8
 
 import os
+import subprocess
 from unittest import mock
 
 import pytest
 
 from travistooling import travis_utils
+
+
+@pytest.fixture
+def cleanup_secrets():
+    yield
+    subprocess.check_call(['rm', '-rf', 'secrets'])
 
 
 def test_not_in_travis_is_an_error():
@@ -33,7 +40,7 @@ def test_travis_branch_name_on_pr():
         assert travis_utils.branch_name() == 'feature-branch'
 
 
-def test_unpack_secrets():
+def test_unpack_secrets(cleanup_secrets):
     travis_utils.unpack_secrets()
     assert os.path.exists('secrets/id_rsa')
 

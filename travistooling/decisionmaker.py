@@ -92,7 +92,6 @@ def does_file_affect_build_task(path, task):
             else:
                 raise ExclusivelyAffectsAnotherTask(task_prefix)
 
-
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith((
