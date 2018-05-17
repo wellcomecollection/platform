@@ -7,6 +7,5 @@ import uk.ac.wellcome.platform.sierra_bib_merger.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.{ServerFixtures, TestWith}
 
 trait Server extends ServerFixtures with CloudWatch { this: Suite =>
-  def withServer[R](flags: Map[String, String])(testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withServer[R](new AppServer, flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags)(testWith)
-}
+  def withServer[R](flags: Map[String, String],modifyServer: EmbeddedHttpServer => EmbeddedHttpServer = identity)(testWith: TestWith[EmbeddedHttpServer, R]): R =
+    withServer[R](new AppServer, flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags, modifyServer)(testWith)}
