@@ -6,8 +6,5 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.ServerFixtures
 
 trait Server extends ServerFixtures with CloudWatch { this: Suite =>
-  def newAppServer: () => AppServer = () => new AppServer()
-
-  val defaultFlags
-    : Map[String, String] = Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags
+  def withServer[R](flags: Map[String, String]) = withServer[R](new AppServer, flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags)
 }

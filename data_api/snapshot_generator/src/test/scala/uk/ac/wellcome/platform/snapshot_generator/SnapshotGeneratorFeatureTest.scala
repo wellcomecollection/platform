@@ -8,20 +8,13 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -39,6 +32,7 @@ class SnapshotGeneratorFeatureTest
     with S3
     with SNS
     with SQS
+    with fixtures.Server
     with CloudWatch
     with GzipUtils
     with JsonTestUtil
@@ -155,20 +149,4 @@ class SnapshotGeneratorFeatureTest
       }
     }
 
-  def withServer[R](flags: Map[String, String])(
-    testWith: TestWith[EmbeddedHttpServer, R]) = {
-    val server: EmbeddedHttpServer =
-      new EmbeddedHttpServer(
-        new Server(),
-        flags = flags ++ cloudWatchLocalFlags
-      )
-
-    server.start()
-
-    try {
-      testWith(server)
-    } finally {
-      server.close()
-    }
-  }
 }
