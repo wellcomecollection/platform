@@ -43,7 +43,15 @@ def does_file_affect_build_task(path, task):
         raise CheckedByTravisFormat()
 
     # These extensions and paths never have an effect on tests.
-    if path.endswith(('.in', '.md', '.png', '.graffle', '.tf', 'Makefile')):
+    if path.endswith((
+        '.in',
+        '.ipynb',
+        '.md',
+        '.png',
+        '.graffle',
+        '.tf',
+        'Makefile'
+    )) or os.path.basename(path).startswith('.git'):
         raise IgnoredFileFormat()
 
     # These paths never have an effect on tests.
