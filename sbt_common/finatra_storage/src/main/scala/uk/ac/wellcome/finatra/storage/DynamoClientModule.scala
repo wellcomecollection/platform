@@ -1,11 +1,10 @@
 package uk.ac.wellcome.finatra.storage
 
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2._
+import javax.inject.Singleton
+
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 import uk.ac.wellcome.finatra.modules.AWSConfigModule
 import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
@@ -24,23 +23,10 @@ object DynamoClientModule extends TwitterModule {
   @Singleton
   @Provides
   def providesDynamoClient(awsConfig: AWSConfig): AmazonDynamoDB =
-    buildDynamoClient(
-      awsConfig = awsConfig,
+    DynamoClientFactory.create(
+      region = awsConfig.region,
       endpoint = dynamoDbEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
     )
-
-  def buildDynamoClient(awsConfig: AWSConfig,
-                        endpoint: String,
-                        accessKey: String,
-                        secretKey: String): AmazonDynamoDB = {
-
-    DynamoClientFactory.create(
-      region = awsConfig.region,
-      endpoint = endpoint,
-      accessKey = accessKey,
-      secretKey = secretKey
-    )
-  }
 }
