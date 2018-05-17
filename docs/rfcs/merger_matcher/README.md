@@ -11,23 +11,22 @@ merge them into combined works to aid understanding and searching.
 
 ## Problem Statement
 
-Individual works can be merged to form larger combined works.
+Individual works can be merged to form larger combined works. Combined works can be later split.
+Each individual work has a unique source identifier. The source identifier for the merged works will be one of the source
+identifier of the original works that compose it.
+
 The merging of works is broken into two phases
 
- * a matching/redirect phase that identifies works to be merged and tracks previously identified combined works.
+ * a matching phase that identifies groups of work to be merged.
  * a merging phase that merges works to form new combined works.
    
-The matcher/redirecter receives source identifiers for processed works along with source identifiers for works that should be merged, 
-and determines what changes to published works should be made.  Changes can include combining existing works and redirecting previously 
-published works that have been superseded by merging operations.
+The matcher receives source identifiers for processed works along with source identifiers for works that should be merged,
+and determines how they group together.
 
-Each work has a unique persistent id, and this introduces additional complexity because works 
-may have an identity as an individual item, and then later be merged -- both ids need to remain valid and redirect 
-to the correct combined work.  Similarly, works can be combined and later split or further combined but should retain 
-their published identities so that the relevant combined work can still be found.
-
-The merger takes identified works and merges them into new combined works.
-
+The merger takes transformed works and merges them into new combined works. This means that the merger needs a strategy for how to combine existing works into one.
+Among other things it will choose which of the original source identifiers to use for the merged work.
+The source identifiers that are not choosen for the merged work will redirect to the merged work.
+The merger will put redirect information into those works.
 
 ## Proposed Solution
 
@@ -35,23 +34,39 @@ This document has notes on the proposed architecture.
 
 ## Model
 
-A matching/redirecting phase is introduced to determine where works need to be combined, and to track where individual or 
-combined works have previously published ids that need to be preserved.  
+A matching phase is introduced to determine where works need to be combined.
 
-The input to this phase is the source identity for a work and a list of the identities that make up the combined work. 
-The output is identifiers for each affected work, with redirection identifiers for existing works that need to change.
+The input to this phase is the source identity for a work and a list of the identities that make up the combined work.
+The output is groups of identifiers of affected works that will be combined downstream by the merger
 
-Works are identified by their source identifiers
+Example:
+```[json]
+    {
+        "work-groups": [
+            {
+                "identifiers": [
+                    "sierra-system-number/b1234567",
+                    "miro-image-number/V003456"
+                ]
+            },
+            {
+                "identifiers": [
+                   "sierra-system-number/b876543"
+                ]
+            }
+        ]
+    }
+```
 
 ## Storage
 
-Related works that have been merged into a single work have an identity that should be preserved, 
-where a merged work supersedes a previous work the resource identity of the previous work should redirect to the new
- combined work. Similarly when merged works are disconnected to create new individual works the resource identity of the 
- previous merged work should redirect.
+When the matcher receives an update for a work, it needs to know about previously seen works that referenced it to be able to group them together.
+This implies storing each work that is sees, along to the group of nodes it belongs to at that point in time.
+The group that each work belongs to should have an indentifier that is deterministic on the identifiers of the nodes that compose it.
+The group identifiers should be never exposed outside the matcher.
 
-This implies storing the state of related works to enable the merging process to also emit updates to the identities of 
-affected merged works.
+Similalry, the matcher needs to be able to break connections if a link from one node to another is removes.
+This mean storing, for each work, the list of works directly referenced.
 
 ## Database schema
 
@@ -78,32 +93,25 @@ For example creating a combined work 'A-B' when processing work 'A' could give a
 }
 ```
 Note that `A.identifiers` includes the source identifier for  `A` itself.
-In the case that neither A or B has previously been identified as a part of a combined work the matcher/redirector 
-will output: 
-```javascript
-redirects = [ 
-  { 
-    target: 'sierra-system-number/s12345+miro-image-number/s67890' // A-B
-    sources: [ 'sierra-system-number/s12345', 'miro-image-number/s67890'] // A, B
-  }
-]
+In the case that neither A or B has previously been identified as a part of a combined work the matcher
+will output:
+```[json]
+{
+  "work-groups": [
+    {
+      "identifiers": [ "sierra-system-number/s12345", "miro-image-number/s67890"]
+    }
+  ]
+}
 ```
-The identifiers used are generated to be unique from source identifers (`$identifierScheme/$identifierValue`), and 
-combined in a deterministic way for combined works [`$identifier1Scheme/$identifier1Value`, 
-`$identifier2Scheme/$identifier2Value`].`sortAlphabetical`.`concatenate("+")`
-
-Where works have previously published identifiers the output of the matcher/redirector will be updates to the 
-existing works referenced by source ids.
 
 For example, suppose works `A`, `B`, and `A-B` have been previously created and `A` is 
-edited to additionally include `C`, then references to `A`, `B`, and the combined work `A-B` should be redirected to 
-the new combined work `A-B-C`.  In this case the output from the matcher/redirector would be:
+edited to link to `C`, then the output from the matcher would be:
 ```javascript
 {
-  redirects: [ 
+  "work-groups": [
     { 
-      target: 'sierra/A+miro/B+miro/C' // A-B-C
-      sources: [ 'sierra/A', 'miro/B', 'sierra/A+miro/B' ] // A, B, A-B
+      identifiers: [ 'sierra/A', 'miro/B', 'sierra/C' ]
     }
   ]
 }
@@ -121,10 +129,9 @@ A locking mechanism is used to achieve this, with all participating works being 
 
 Use dynamoDB with a works and a lock table.
 
-
 ## Examples
 
-The matcher/redirector is best understood with examples.
+The matcher is best understood with examples.
 
 ## Example 1
 
@@ -137,26 +144,23 @@ We receive an update to B telling us it now has edges B→A and B→D.
 
 0.  The existing DB is as follows:
 
-        src   | tail_v | component_v | is_redirect | redirected_target
-        A     | B      | ABC         | true        | ABC
-        B     | A      | ABC         | true        | ABC
-        C     | B      | ABC         | true        | ABC
-        ABC   | _      | _           | false       | _
-        D     | F      | DEF         | true        | DEF
-        E     | D      | DEF         | true        | DEF
-        F     | -      | DEF         | true        | DEF
-        DEF   | -      | _           | false       | _
+        work_id   | links | group_id
+        A         | B     | ABC
+        B         | A     | ABC
+        C         | B     | ABC
+        D         | F     | DEF
+        E         | D     | DEF
+        F         | -     | DEF
 
-    (TODO: Should we have explicit redirects for single nodes?)
 
 1.  Because we have an update that affects A, B and D, we read those rows from
     the database first:
 
-        A     | B      | ABC         | true        | ABC
-        B     | A      | ABC         | true        | ABC
-        D     | F      | DEF         | true        | DEF    
+        A     | B      | ABC
+        B     | A      | ABC
+        D     | F      | DEF
 
-2.  By looking at their connected components, we can do a second read to gather
+2.  By looking at their group id, we can do a second read to gather
     all the vertices that might be affected: ABCDEF.
     This gives us the database above, and enough to construct the entire graph
     we're interested in.
@@ -164,35 +168,31 @@ We receive an update to B telling us it now has edges B→A and B→D.
 3.  Apply the changes, and work out what the new components are.  Write that
     back to the database.
 
-        src   | tail_v | component_v | is_redirect | redirected_target
-        A     | B      | ABCDEF      | true        | ABCDEF
-        B     | AD     | ABCDEF      | true        | ABCDEF
-        C     | B      | ABCDEF      | true        | ABCDEF
-        ABC   | D      | ABCDEF      | true        | ABCDEF
-        D     | F      | ABCDEF      | true        | ABCDEF
-        E     | D      | ABCDEF      | true        | ABCDEF
-        F     | -      | ABCDEF      | true        | ABCDEF
-        DEF   | -      | ABCDEF      | true        | ABCDEF
-        ABCDEF| -      | _           | false       | _
+        work_id   | links | group_id
+        A         | B     | ABCDEF
+        B         | AD    | ABCDEF
+        C         | B     | ABCDEF
+        D         | F     | ABCDEF
+        E         | D     | ABCDEF
+        F         | -     | ABCDEF
 
 4.  The output JSON is:
     ```[json]
-    [
+    {
+    "work-groups":[
         {
-            "winner": "ABCDEF",
-            "loosers":
+            "identifiers":
                 [
                     "A",
                     "B",
                     "C",
-                    "ABC",
                     "D",
                     "E",
-                    "F",
-                    "DEF"
+                    "F"
                 ]
         }
     ]
+    }
     ```
 
 ## Example 2
@@ -210,16 +210,14 @@ different vertices).
 
 0.  The existing DB is as follows:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | ABC         | true        | ABC
-            B     | A      | ABC         | true        | ABC
-            C     | B      | ABC         | true        | ABC
-            ABC   | _      | _           | false       | _
-            D     | F      | DEF         | true        | DEF
-            E     | D      | DEF         | true        | DEF
-            F     | -      | DEF         | true        | DEF
-            DEF   | -      | _           | false       | _
-            G     | -      | G           | false       | -
+            work_id   | links | group_d
+            A         | B     | ABC
+            B         | A     | ABC
+            C         | B     | ABC
+            D         | F     | DEF
+            E         | D     | DEF
+            F         | -     | DEF
+            G         | -     | G
 
 1.  Update (*) is processed, and it affects nodes B and E.
     So the worker handling (*) acquires a row-level lock on those two nodes.
@@ -227,16 +225,14 @@ different vertices).
     Meanwhile update (**) is also being processed, and it affects F and G.
     So the worker handling (**) F and G acquires a lock on those two rows.
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | ABC         | true        | ABC
-        *   B     | A      | ABC         | true        | ABC
-            C     | B      | ABC         | true        | ABC
-            ABC   | _      | _           | false       | _
-        *   D     | F      | DEF         | true        | DEF
-        **  E     | D      | DEF         | true        | DEF
-        **  F     | -      | DEF         | true        | DEF
-            DEF   | -      | _           | false       | _
-            G     | -      | G           | false       | -
+            work_id   | links | group_id
+            A         | B     | ABC
+        *   B         | A     | ABC
+            C         | B     | ABC
+        *   D         | F     | DEF
+        **  E         | D     | DEF
+        **  F         | -     | DEF
+            G         | -     | G
 2.  Process (*) discovers that it affects vertices ABCDEF.
 
     Process (**) discovers that it affects vertices DEFG.
@@ -251,6 +247,17 @@ different vertices).
 This results in an eventually consistent graph, which is as good as we can
 guarantee.
 
+3. Eventually the output JSON is:
+    ```[json]
+{
+  "work-groups": [
+    {
+      "identifiers":[ "A", "B", "C", "D", "E", "F", "G"]
+    }
+  ]
+}
+    ```
+
 ## Example 3
 
 What happens if we remove a link?
@@ -261,61 +268,45 @@ In this example A, B and C are connected into a component called ABC. We receive
 
 0.  The existing DB is as follows:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | ABC         | true        | ABC
-            B     | A      | ABC         | true        | ABC
-            C     | B      | ABC         | true        | ABC
-            ABC   | _      | _           | false       | _
+            work_id   | links | group_id
+            A         | B     | ABC
+            B         | A     | ABC
+            C         | B     | ABC
 
 1.  Because we have an update that affects C, we read and acquire a lock on C from the database first:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            C     | B      | ABC         | true        | ABC
+            work_id   | links | group_id
+            C         | B     | ABC
 
-2.  By looking at their connected components, we acquire a lock on all other vertices affected: A,B and ABC.
-3.  We update C to not redirect to ABC:
+2.  By looking at their connected components, we acquire a lock on all other vertices affected: A and B.
+3.  We update C to not belong to ABC:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            C     | _      | _           | false       | _
+            work_id   | links | group_id
+            C         | _     | _
 
-4.  We create a new component AB and redirect A and B to it:
+4.  We assign A and B to group_id AB:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | AB          | true        | AB
-            B     | A      | AB          | true        | AB
-            AB    | _      | _           | false       | _
+            work_id   | links | group_id
+            A     | B      | AB
+            B     | A      | AB
 
-5.  We modify ABC to redirect to AB:
+5.  The database ends up looking like this:
 
-            src   | tail_v | component_v | is_redirect | redirected_target
-            ABC   | _      | _           | true        | AB
-
-    How do we choose where to redirect a subgraph that gets split? In this case AB seems the most reasonable choice because it's the biggest bit of the late ABC, but what about graphs that get split into same size bits?
-
-6.  The database ends up looking like this:
-
-            src   | tail_v | component_v | is_redirect | redirected_target
-            A     | B      | AB          | true        | AB
-            B     | A      | AB          | true        | AB
-            AB    | _      | _           | false       | _
-            C     | _      | _           | false       | _
-            ABC   | _      | _           | true        | AB
+            work_id   | links | group_id
+            A         | B     | AB
+            B         | A     | AB
+            C         | _     | C
 
 7.  The output JSON is:
     ```[json]
-    [
-        {
-            "winner": "AB",
-            "loosers":
-                [
-                    "A",
-                    "B",
-                    "ABC"
-                ]
-        },
-        {
-            "winner": "C",
-            "loosers": []
-        }
-    ]
+{
+  "work-groups": [
+    {
+      "identifiers":[ "A", "B"]
+    },
+    {
+      "identifiers": [ "C" ]
+    }
+  ]
+}
     ```
