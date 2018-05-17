@@ -18,7 +18,11 @@ if __name__ == '__main__':
 
     results = {}
 
-    names = os.environ['TRAVIS_LAMBDAS'].replace('\\\n', ' ').split()
+    names = [
+        n
+        for n in os.environ['TRAVIS_LAMBDAS'].split()
+        if n != '\\'
+    ]
 
     for lambda_name in names:
         print('===  Starting Lambda task for %s ===' % lambda_name)
@@ -45,7 +49,7 @@ if __name__ == '__main__':
     for (name, outcome) in sorted(results.items()):
         print('%s %s' % (name.ljust(30), outcome))
 
-    if set(results.values()) == 'OK':
+    if set(results.values()) == set(['OK']):
         sys.exit(0)
     else:
         sys.exit(1)
