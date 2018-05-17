@@ -18,7 +18,9 @@ if __name__ == '__main__':
 
     results = {}
 
-    for lambda_name in os.environ['TRAVIS_LAMBDAS'].split():
+    names = os.environ['TRAVIS_LAMBDAS'].replace('\\\n', ' ').split()
+
+    for lambda_name in names:
         print('===  Starting Lambda task for %s ===' % lambda_name)
 
         env = os.environ.copy()
