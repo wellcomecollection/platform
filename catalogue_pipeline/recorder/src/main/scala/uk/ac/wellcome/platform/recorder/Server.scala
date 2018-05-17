@@ -20,10 +20,6 @@ import uk.ac.wellcome.platform.recorder.modules.{
   RecorderModule,
   RecorderWorkEntryKeyPrefixGeneratorModule
 }
-import uk.ac.wellcome.platform.recorder.modules.{
-  RecorderModule,
-  RecorderWorkEntryKeyPrefixGeneratorModule
-}
 import uk.ac.wellcome.storage.dynamo.DynamoClientModule
 import uk.ac.wellcome.storage.s3.S3ClientModule
 import uk.ac.wellcome.storage.vhs.VHSConfigModule
