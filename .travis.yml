@@ -103,7 +103,7 @@ jobs:
     - env: TASK=complete_reindex-test
     - env: TASK=reindex_shard_generator-test
 
-    # METS adapter stack
+    # Goobi adapter stack
     - env: TASK=mets_reader-test
 
     # Sierra adapter stack

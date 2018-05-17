@@ -108,7 +108,7 @@ lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
-lazy val mets_reader = doServiceSetup(project, "mets_adapter/mets_reader")
+lazy val mets_reader = doServiceSetup(project, "goobi_adapter/mets_reader")
   .dependsOn(common_messaging % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
