@@ -21,14 +21,11 @@ if __name__ == '__main__':
     for lambda_name in os.environ['TRAVIS_LAMBDAS'].split():
         print('===  Starting Lambda task for %s ===' % lambda_name)
 
+        env = os.environ.copy()
+        env['TASK'] = '%s-%s' % (lambda_name, verb)
+
         try:
-            subprocess.check_call(
-                ['python', 'run_travis_task.py'],
-                env={
-                    'TASK': '%s-%s' % (lambda_name, verb),
-                    'TRAVIS_EVENT_TYPE': os.environ['TRAVIS_EVENT_TYPE'],
-                }
-            )
+            subprocess.check_call(['python', 'run_travis_task.py'], env=env)
         except subprocess.CalledProcessError:
             outcome = 'FAILED'
         else:
