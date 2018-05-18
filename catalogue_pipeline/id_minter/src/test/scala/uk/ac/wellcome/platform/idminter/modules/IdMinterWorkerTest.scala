@@ -37,9 +37,11 @@ class IdMinterWorkerTest
 
             val identifiersDao = mock[IdentifiersDao]
 
-            withModifiedServer(flags, modifyServer = (server: EmbeddedHttpServer) => {
-              server.bind[IdentifiersDao](identifiersDao)
-            }) { _ =>
+            withModifiedServer(
+              flags,
+              modifyServer = (server: EmbeddedHttpServer) => {
+                server.bind[IdentifiersDao](identifiersDao)
+              }) { _ =>
               val database = dbConfig.database
               val table = dbConfig.table
 
