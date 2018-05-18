@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 
 import scala.concurrent.Future
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 
 case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
 

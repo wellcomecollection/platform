@@ -1,4 +1,4 @@
-package uk.ac.wellcome.elasticsearch
+package uk.ac.wellcome.messaging
 
 import scala.concurrent.ExecutionContext
 
