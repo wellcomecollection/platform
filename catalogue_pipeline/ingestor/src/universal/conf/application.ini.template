@@ -8,5 +8,5 @@
 -es.username=${es_username}
 -es.password=${es_password}
 -es.protocol=${es_protocol}
--aws.message.s3.bucketName=${message_bucket_name}
+-aws.message.reader.s3.bucketName=${message_bucket_name}
 -aws.message.sqs.queue.url=${ingest_queue_id}

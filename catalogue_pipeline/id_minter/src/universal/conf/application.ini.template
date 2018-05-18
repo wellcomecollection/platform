@@ -5,7 +5,7 @@
 -aws.rds.port=${db_port}
 -aws.rds.userName=${db_username}
 -aws.metrics.namespace=id-minter
--aws.message.s3.bucketName=${message_bucket_name}
+-aws.message.reader.s3.bucketName=${message_bucket_name}
 -aws.message.writer.sns.topic.arn=${topic_arn}
 -aws.message.writer.s3.bucketName=${message_bucket_name}
 -aws.message.sqs.queue.url=${queue_url}
