@@ -13,7 +13,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.{AllWorksIncludes, ApiVersions}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifierSchemes.sierraSystemNumber
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, SourceIdentifier}
@@ -28,7 +28,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.versions.ApiVersions
 
 import scala.util.Random
 

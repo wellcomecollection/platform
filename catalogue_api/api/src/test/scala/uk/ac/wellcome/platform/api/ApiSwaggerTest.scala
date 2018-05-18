@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.twitter.finagle.http.{Response, Status}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.versions.ApiVersions
+import uk.ac.wellcome.display.models.ApiVersions
 
 import scala.collection.JavaConverters._
 

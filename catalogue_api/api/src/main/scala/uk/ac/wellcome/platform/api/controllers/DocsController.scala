@@ -6,7 +6,7 @@ import com.twitter.finatra.http.Controller
 import io.swagger.util.Json
 import io.swagger.models.{Info, Scheme, Swagger}
 import javax.inject.{Inject, Singleton}
-import uk.ac.wellcome.versions.ApiVersions
+import uk.ac.wellcome.display.models.ApiVersions
 
 object ApiV1Swagger extends Swagger
 object ApiV2Swagger extends Swagger
