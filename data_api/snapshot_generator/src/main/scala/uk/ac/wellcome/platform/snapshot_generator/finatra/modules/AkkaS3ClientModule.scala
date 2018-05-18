@@ -15,7 +15,6 @@ import com.amazonaws.auth.{
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.AWSConfig
 
 object AkkaS3ClientModule extends TwitterModule {
   private val endpoint = flag[String](
@@ -26,6 +25,8 @@ object AkkaS3ClientModule extends TwitterModule {
     flag[String]("aws.s3.accessKey", "", "AccessKey to access S3")
   private val secretKey =
     flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
+
+  private val region = flag[String]("aws.s3.region", "eu-west-1")
 
   def akkaS3Settings(credentialsProvider: AWSCredentialsProvider,
                      regionProvider: AwsRegionProvider,
@@ -41,10 +42,9 @@ object AkkaS3ClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesAkkaS3Client(awsConfig: AWSConfig,
-                           actorSystem: ActorSystem): S3Client =
+  def providesAkkaS3Client(actorSystem: ActorSystem): S3Client =
     buildAkkaS3Client(
-      region = awsConfig.region,
+      region = region(),
       actorSystem = actorSystem,
       endpoint = endpoint(),
       accessKey = accessKey(),
