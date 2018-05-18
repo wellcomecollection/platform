@@ -69,7 +69,7 @@ lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_sto
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
-lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra-monitoring")
+lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
   .dependsOn(common_monitoring % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
