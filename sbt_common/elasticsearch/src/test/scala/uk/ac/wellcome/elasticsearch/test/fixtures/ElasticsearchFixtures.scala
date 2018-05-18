@@ -14,7 +14,7 @@ import uk.ac.wellcome.elasticsearch.{
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
