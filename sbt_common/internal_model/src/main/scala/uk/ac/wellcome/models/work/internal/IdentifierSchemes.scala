@@ -74,8 +74,7 @@ object IdentifierSchemes {
     libraryOfCongressNames,
     libraryOfCongressSubjectHeadings,
     marcCountries,
-    medicalSubjectHeadings,
-    mergedWork
+    medicalSubjectHeadings
   )
 
   private def createIdentifierScheme(
