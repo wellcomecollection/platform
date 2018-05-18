@@ -1,4 +1,4 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.platform.sierra_reader
 
 import scala.concurrent.ExecutionContext
 

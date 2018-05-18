@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.transformer.receive.SQSMessageReceiver
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
