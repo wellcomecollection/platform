@@ -11,7 +11,10 @@ object CloudWatchClientModule extends TwitterModule {
     "",
     "Endpoint of AWS CloudWatch. If not set, it will use the region")
 
-  private val region = flag[String]("aws.cloudWatch.region", "eu-west-1")
+  private val region = flag[String](
+    "aws.cloudWatch.region",
+    "eu-west-1",
+    "CloudWatch region.  Defaults to eu-west-1.")
 
   @Provides
   @Singleton
