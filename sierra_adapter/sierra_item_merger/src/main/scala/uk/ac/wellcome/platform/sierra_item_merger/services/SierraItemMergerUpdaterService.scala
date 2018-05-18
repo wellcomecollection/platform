@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.models.{SourceMetadata, Sourced}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.s3.S3TypeStore
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.sierra_item_merger.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 

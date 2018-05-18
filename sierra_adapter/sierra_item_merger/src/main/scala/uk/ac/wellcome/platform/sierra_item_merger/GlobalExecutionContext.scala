@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_worker
+package uk.ac.wellcome.platform.sierra_item_merger
 
 import scala.concurrent.ExecutionContext
 
