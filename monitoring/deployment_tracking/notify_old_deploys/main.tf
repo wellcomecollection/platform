@@ -12,7 +12,7 @@ module "lambda_notify_old_deploys" {
     AGE_BOUNDARY_MINS = "5"
   }
 
-  timeout = 10
+  timeout = 30
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
