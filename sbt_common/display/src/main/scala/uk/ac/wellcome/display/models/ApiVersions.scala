@@ -1,4 +1,4 @@
-package uk.ac.wellcome.versions
+package uk.ac.wellcome.display.models
 
 import io.circe.{Decoder, Encoder}
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.works
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.versions.ApiVersions
+import uk.ac.wellcome.display.models.ApiVersions
 
 class ApiContextTest extends ApiWorksTestBase {
 

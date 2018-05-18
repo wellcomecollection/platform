@@ -1,8 +1,7 @@
 package uk.ac.wellcome.monitoring.test.fixtures
 
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import uk.ac.wellcome.models.aws.AWSConfig
-import uk.ac.wellcome.monitoring.CloudWatchClientModule
+import uk.ac.wellcome.monitoring.CloudWatchClientFactory
 
 import scala.concurrent.duration._
 
@@ -20,8 +19,8 @@ trait CloudWatch {
     )
 
   val cloudWatchClient: AmazonCloudWatch =
-    CloudWatchClientModule.buildCloudWatchClient(
-      awsConfig = AWSConfig(region = regionName),
+    CloudWatchClientFactory.create(
+      region = regionName,
       endpoint = localCloudWatchEndpointUrl
     )
 }
