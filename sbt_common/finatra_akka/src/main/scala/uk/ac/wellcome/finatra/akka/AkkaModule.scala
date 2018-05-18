@@ -1,7 +1,6 @@
-package uk.ac.wellcome.finatra.modules
+package uk.ac.wellcome.finatra.akka
 
 import javax.inject.Singleton
-import uk.ac.wellcome.utils.GuiceAkkaExtension
 import akka.actor.ActorSystem
 import com.google.inject.Provides
 import com.google.inject.Injector
