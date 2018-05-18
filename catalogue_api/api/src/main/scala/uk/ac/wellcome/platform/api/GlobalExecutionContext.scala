@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.api.models
+package uk.ac.wellcome.platform.api
 
 import scala.concurrent.ExecutionContext
 
