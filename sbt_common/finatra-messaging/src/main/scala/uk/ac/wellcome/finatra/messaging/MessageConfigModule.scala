@@ -29,9 +29,11 @@ object MessageConfigModule extends TwitterModule {
       "aws.message.reader.s3.bucketName",
       "",
       "Name of the S3 bucket where message bodies are read from")
-
-  private val queueUrl =
-    flag[String]("aws.message.sqs.queue.url", "", "URL of the SQS Queue")
+  private val readerQueueUrl =
+    flag[String](
+      "aws.message.reader.sqs.queue.url",
+      "",
+      "URL of the SQS Queue to read messages from")
   val waitTime = flag(
     "aws.message.sqs.waitTime",
     20,
@@ -54,7 +56,9 @@ object MessageConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesMessageReaderConfig(): MessageReaderConfig = {
-    val sqsConfig = SQSConfig(queueUrl(), waitTime() seconds, maxMessages())
+    val sqsConfig = SQSConfig(
+      queueUrl = readerQueueUrl(),
+      waitTime() seconds, maxMessages())
     val s3Config = S3Config(bucketName = readerBucketName())
 
     MessageReaderConfig(sqsConfig = sqsConfig, s3Config = s3Config)
