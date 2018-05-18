@@ -38,6 +38,12 @@ object IdentifierSchemes {
     override def toString: String = "sierra-system-number"
   }
 
+  // Represents a combined work resulting from merging related works
+  // Examples: ??
+  case object mergedWork extends IdentifierScheme {
+    override def toString: String = "merged-work"
+  }
+
   // Represents the internal form of a Sierra record number, with no record
   // type prefix or check digit.  7 digits.
   // Examples: 1782863, 1783284
@@ -74,7 +80,8 @@ object IdentifierSchemes {
     libraryOfCongressNames,
     libraryOfCongressSubjectHeadings,
     marcCountries,
-    medicalSubjectHeadings
+    medicalSubjectHeadings,
+    mergedWork
   )
 
   private def createIdentifierScheme(
