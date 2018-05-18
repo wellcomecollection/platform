@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_reader
+package uk.ac.wellcome.platform.snapshot_generator
 
 import scala.concurrent.ExecutionContext
 
