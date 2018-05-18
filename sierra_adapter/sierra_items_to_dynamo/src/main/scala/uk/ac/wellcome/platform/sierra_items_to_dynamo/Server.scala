@@ -11,8 +11,8 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule}
-import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.modules.SierraItemsToDynamoModule
 
 object ServerMain extends Server

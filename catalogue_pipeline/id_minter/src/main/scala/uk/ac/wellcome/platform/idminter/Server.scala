@@ -15,9 +15,8 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule
 }
 import uk.ac.wellcome.finatra.modules._
+import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ClientModule
-import uk.ac.wellcome.monitoring.{CloudWatchClientModule, MetricsSenderModule}
-
 import uk.ac.wellcome.platform.idminter.modules._
 
 object ServerMain extends Server
@@ -34,7 +33,6 @@ class Server extends HttpServer {
     S3ClientModule,
     MessageConfigModule,
     JsonModule,
-    CloudWatchClientModule,
     MetricsSenderModule
   )
 
