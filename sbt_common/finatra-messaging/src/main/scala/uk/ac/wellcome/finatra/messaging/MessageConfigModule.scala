@@ -18,6 +18,11 @@ object MessageConfigModule extends TwitterModule {
     "aws.message.writer.sns.topic.arn",
     "",
     "ARN of the SNS topic where new message pointers are sent")
+  private val writerBucketName =
+    flag[String](
+      "aws.message.writer.s3.bucketName",
+      "",
+      "Name of the S3 bucket where new message bodies are written")
 
   private val bucketName =
     flag[String](
@@ -41,7 +46,7 @@ object MessageConfigModule extends TwitterModule {
   @Provides
   def providesMessageWriterConfig(): MessageWriterConfig = {
     val snsConfig = SNSConfig(topicArn = writerTopicArn())
-    val s3Config = S3Config(bucketName = bucketName())
+    val s3Config = S3Config(bucketName = writerBucketName())
 
     MessageWriterConfig(snsConfig = snsConfig, s3Config = s3Config)
   }

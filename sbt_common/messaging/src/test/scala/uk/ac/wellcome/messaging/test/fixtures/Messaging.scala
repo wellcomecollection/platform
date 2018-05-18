@@ -70,7 +70,7 @@ trait Messaging
   def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
     Map(
       "aws.message.writer.sns.topic.arn" -> topic.arn,
-      "aws.message.s3.bucketName" -> bucket.name
+      "aws.message.writer.s3.bucketName" -> bucket.name
     ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
 
   case class ExampleObject(name: String)
