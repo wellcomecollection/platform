@@ -62,9 +62,8 @@ class MatcherFeatureTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val identifiersList =
-                  fromJson[LinkedWorksList](snsMessage.message).get
-                identifiersList shouldBe List(IdentifierList(List("sierra-system-number/id")))
+                val identifiersList = fromJson[LinkedWorksList](snsMessage.message).get
+                identifiersList.linkedWorks shouldBe List(IdentifierList(List("sierra-system-number/id")))
               }
             }
           }
