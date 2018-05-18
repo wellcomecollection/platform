@@ -6,6 +6,7 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
@@ -14,8 +15,6 @@ import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
-
-import uk.ac.wellcome.platform.sierra_reader.GlobalExecutionContext.context
 
 case class WindowStatus(id: Option[String], offset: Int)
 

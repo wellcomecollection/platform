@@ -6,9 +6,8 @@ import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.snapshot_generator.models.SnapshotJob
-import uk.ac.wellcome.utils.JsonUtil._
-
 import uk.ac.wellcome.platform.snapshot_generator.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
