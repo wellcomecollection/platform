@@ -39,22 +39,24 @@ lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
+// Elasticsearch depends on some models in the common lib.
 lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
+// Monitoring depends on the GlobalExecutionContext util.
 lazy val common_monitoring = doSharedLibrarySetup(project, "sbt_common/monitoring")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMonitoringDependencies)
 
-// Messaging depends on the S3ObjectStore for message pointers and AWSConfig.
+// Messaging depends on the S3ObjectStore for message pointers.
 lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
   .dependsOn(common_monitoring % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
-// Storage depends on AWSConfig.
+// Storage depends on some models in the common lib.
 lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
