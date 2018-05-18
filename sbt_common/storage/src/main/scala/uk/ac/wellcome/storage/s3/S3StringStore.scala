@@ -5,7 +5,8 @@ import java.io.ByteArrayInputStream
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.io.Source
