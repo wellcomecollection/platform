@@ -5,7 +5,6 @@ import javax.inject.Singleton
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 
 object S3ClientModule extends TwitterModule {
@@ -19,11 +18,13 @@ object S3ClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
 
+  private val region = flag[String]("aws.s3.region", "eu-west-1")
+
   @Singleton
   @Provides
-  def providesS3Client(awsConfig: AWSConfig): AmazonS3 =
+  def providesS3Client(): AmazonS3 =
     S3ClientFactory.create(
-      region = awsConfig.region,
+      region = region(),
       endpoint = endpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
