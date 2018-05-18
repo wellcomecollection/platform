@@ -33,6 +33,7 @@ lazy val internal_model = doSharedLibrarySetup(project, "sbt_common/internal_mod
   .settings(libraryDependencies ++= Dependencies.internalModelDependencies)
 
 lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
+  .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
@@ -47,6 +48,7 @@ lazy val common_monitoring = doSharedLibrarySetup(project, "sbt_common/monitorin
 
 // Messaging depends on the S3ObjectStore for message pointers and AWSConfig.
 lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
+  .dependsOn(common % "compile->compile;test->test")
   .dependsOn(common_monitoring % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
@@ -66,7 +68,6 @@ lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra-m
   .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .dependsOn(finatra_common % "compile->compile;test->test")
   .dependsOn(finatra_common % "compile->compile;test->test")
   .dependsOn(common_storage % "compile->compile;test->test")
 
