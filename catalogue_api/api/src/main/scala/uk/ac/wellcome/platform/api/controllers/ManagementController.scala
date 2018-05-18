@@ -23,4 +23,3 @@ class ManagementController @Inject()(
       .map(health => response.ok.json(health.status))
   }
 }
-
