@@ -5,7 +5,6 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 import uk.ac.wellcome.messaging.sns.SNSClientFactory
-import uk.ac.wellcome.models.aws.AWSConfig
 
 object SNSClientModule extends TwitterModule {
   val snsEndpoint = flag[String](
@@ -18,11 +17,13 @@ object SNSClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.sns.secretKey", "", "SecretKey to access SNS")
 
+  private val region = flag[String]("aws.sns.region", "eu-west-1")
+
   @Singleton
   @Provides
-  def providesSNSClient(awsConfig: AWSConfig): AmazonSNS =
+  def providesSNSClient(): AmazonSNS =
     SNSClientFactory.create(
-      region = awsConfig.region,
+      region = region(),
       endpoint = snsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
