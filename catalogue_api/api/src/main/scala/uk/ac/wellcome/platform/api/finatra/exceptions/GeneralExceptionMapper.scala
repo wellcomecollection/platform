@@ -6,9 +6,8 @@ import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.annotations.Flag
 import com.twitter.inject.Logging
-import uk.ac.wellcome.models.Error
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.DisplayError
+import uk.ac.wellcome.platform.api.models.{DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
