@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.ingestor
+package uk.ac.wellcome.platform.reindex_worker
 
 import scala.concurrent.ExecutionContext
 

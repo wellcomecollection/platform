@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
   ReindexJob
 }
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
