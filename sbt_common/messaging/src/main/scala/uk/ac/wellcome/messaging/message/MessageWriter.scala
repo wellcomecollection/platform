@@ -38,7 +38,7 @@ class MessageWriter[T] @Inject()(
     for {
       location <- s3.put(messageConfig.s3Config.bucketName)(
         message,
-        keyPrefixGenerator.generate(message))
+        keyPrefixGenerator.generate(id = "", obj = message))
       pointer <- Future.fromTry(toJson(MessagePointer(location)))
       publishAttempt <- sns.writeMessage(pointer, subject)
       _ = info(publishAttempt)
