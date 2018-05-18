@@ -104,9 +104,7 @@ class MatcherFeatureTest
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
         new Server(),
-        flags = Map(
-          "aws.region" -> "localhost"
-        ) ++ cloudWatchLocalFlags ++ s3LocalFlags(bucket) ++ sqsLocalFlags(
+        flags = cloudWatchLocalFlags ++ s3LocalFlags(bucket) ++ sqsLocalFlags(
           queue) ++ snsLocalFlags(topic)
       )
 
