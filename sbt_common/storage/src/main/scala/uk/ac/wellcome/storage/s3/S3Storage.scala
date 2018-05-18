@@ -10,8 +10,9 @@ import scala.util.hashing.MurmurHash3
 
 object S3Storage extends Logging {
 
-  def put(s3Client: AmazonS3, bucketName: String)(
-    keyPrefix: String, keySuffix: Option[String] = None)(is: InputStream)(
+  def put(s3Client: AmazonS3, bucketName: String)(keyPrefix: String,
+                                                  keySuffix: Option[String] =
+                                                    None)(is: InputStream)(
     implicit ec: ExecutionContext): Future[S3ObjectLocation] = {
 
     // Currently hiding the stringification, so we can deal with it later if we need to

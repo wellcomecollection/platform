@@ -9,9 +9,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-
 class S3StorageTest
-  extends FunSpec
+    extends FunSpec
     with S3
     with Matchers
     with ScalaFutures
@@ -24,9 +23,12 @@ class S3StorageTest
     withLocalS3Bucket { bucket =>
       val inputStream = new ByteArrayInputStream(content.getBytes)
 
-      val store = S3Storage.put(s3Client, bucket.name)("prefix", Some(".extension"))(inputStream)
+      val store =
+        S3Storage.put(s3Client, bucket.name)("prefix", Some(".extension"))(
+          inputStream)
 
-      val expectedLocation = S3ObjectLocation(bucket.name, s"prefix/$expectedHash.extension")
+      val expectedLocation =
+        S3ObjectLocation(bucket.name, s"prefix/$expectedHash.extension")
 
       whenReady(store) { location =>
         location shouldBe expectedLocation
@@ -41,7 +43,8 @@ class S3StorageTest
 
       val store = S3Storage.put(s3Client, bucket.name)("prefix")(inputStream)
 
-      val expectedLocation = S3ObjectLocation(bucket.name, s"prefix/$expectedHash")
+      val expectedLocation =
+        S3ObjectLocation(bucket.name, s"prefix/$expectedHash")
 
       whenReady(store) { location =>
         location shouldBe expectedLocation
@@ -71,7 +74,8 @@ class S3StorageTest
       val prefix = "/foo"
 
       val store = S3Storage.put(s3Client, bucket.name)(prefix)(inputStream)
-      val expectedLocation = S3ObjectLocation(bucket.name, s"foo/$expectedHash")
+      val expectedLocation =
+        S3ObjectLocation(bucket.name, s"foo/$expectedHash")
 
       whenReady(store) { actualLocation =>
         expectedLocation shouldBe actualLocation
@@ -87,7 +91,8 @@ class S3StorageTest
       val prefix = "foo/"
 
       val store = S3Storage.put(s3Client, bucket.name)(prefix)(inputStream)
-      val expectedLocation = S3ObjectLocation(bucket.name, s"foo/$expectedHash")
+      val expectedLocation =
+        S3ObjectLocation(bucket.name, s"foo/$expectedHash")
 
       whenReady(store) { actualLocation =>
         expectedLocation shouldBe actualLocation
@@ -101,8 +106,10 @@ class S3StorageTest
 
       val suffix = ".json"
 
-      val store = S3Storage.put(s3Client, bucket.name)("prefix", Some(suffix))(inputStream)
-      val expectedLocation = S3ObjectLocation(bucket.name, s"foo/$expectedHash")
+      val store = S3Storage.put(s3Client, bucket.name)("prefix", Some(suffix))(
+        inputStream)
+      val expectedLocation =
+        S3ObjectLocation(bucket.name, s"foo/$expectedHash")
 
       whenReady(store) { actualLocation =>
         expectedLocation shouldBe actualLocation

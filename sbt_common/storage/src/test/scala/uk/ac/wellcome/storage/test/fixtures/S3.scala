@@ -82,15 +82,12 @@ trait S3 extends Logging with Eventually {
   def getContentFromS3(s3ObjectLocation: S3ObjectLocation): String =
     getContentFromS3(s3ObjectLocation.bucket, s3ObjectLocation.key)
 
-
   def getContentFromS3(bucket: Bucket, key: String): String =
     getContentFromS3(bucket.name, key)
 
-
   def getContentFromS3(bucket: String, key: String): String =
     stringify(
-      s3Client.getObject(bucket, key)
-        .getObjectContent
+      s3Client.getObject(bucket, key).getObjectContent
     )
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
