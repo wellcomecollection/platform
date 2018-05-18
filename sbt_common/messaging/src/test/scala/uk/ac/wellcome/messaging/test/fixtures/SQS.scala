@@ -46,7 +46,7 @@ trait SQS extends Matchers {
     "aws.sqs.endpoint" -> sqsEndpointUrl,
     "aws.sqs.accessKey" -> accessKey,
     "aws.sqs.secretKey" -> secretKey,
-    "aws.region" -> regionName
+    "aws.sqs.region" -> regionName
   )
 
   val sqsClient: AmazonSQS = SQSClientFactory.createSyncClient(

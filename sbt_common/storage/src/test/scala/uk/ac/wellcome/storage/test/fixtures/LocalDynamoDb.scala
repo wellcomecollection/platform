@@ -40,7 +40,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
     "aws.dynamoDb.accessKey" -> accessKey,
     "aws.dynamoDb.secretKey" -> secretKey,
-    "aws.region" -> regionName
+    "aws.dynamoDb.region" -> regionName
   )
 
   val dynamoDbClient: AmazonDynamoDB = DynamoClientFactory.create(

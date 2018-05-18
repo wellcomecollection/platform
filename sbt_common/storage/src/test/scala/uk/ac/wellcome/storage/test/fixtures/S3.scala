@@ -42,7 +42,7 @@ trait S3 extends Logging with Eventually {
     "aws.s3.endpoint" -> localS3EndpointUrl,
     "aws.s3.accessKey" -> accessKey,
     "aws.s3.secretKey" -> secretKey,
-    "aws.region" -> regionName
+    "aws.s3.region" -> regionName
   )
 
   val s3Client: AmazonS3 = S3ClientFactory.create(
