@@ -40,7 +40,6 @@ class Server extends HttpServer {
     MetricsSenderModule,
     RecorderWorkEntryModule,
     UnidentifiedWorkModule,
-    AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,

@@ -15,7 +15,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule,
   SQSConfigModule
 }
-import uk.ac.wellcome.finatra.modules.{AWSConfigModule, AkkaModule}
+import uk.ac.wellcome.finatra.modules.AkkaModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.platform.matcher.modules.{
@@ -30,7 +30,6 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.matcher Matcher"
   override val modules = Seq(
     MetricsSenderModule,
-    AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,
     S3ClientModule,

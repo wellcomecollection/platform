@@ -5,11 +5,9 @@ import javax.inject.Singleton
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.AWSConfigModule
 import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
 
 object DynamoClientModule extends TwitterModule {
-  override val modules = Seq(AWSConfigModule)
   private val dynamoDbEndpoint = flag[String](
     "aws.dynamoDb.endpoint",
     "",
