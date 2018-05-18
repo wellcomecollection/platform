@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.GlobalExecutionContext._
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.util.Random
 

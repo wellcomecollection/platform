@@ -15,7 +15,7 @@ import uk.ac.wellcome.storage.type_classes.{
   VersionGetter,
   VersionUpdater
 }
-import uk.ac.wellcome.utils.GlobalExecutionContext._
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
