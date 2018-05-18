@@ -309,7 +309,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       transformer.getSubjects(bibData)
     }
 
-    caught.getMessage shouldEqual "Unrecognised identifier scheme: 7"
+    caught.getMessage shouldEqual s"Unrecognised identifier scheme: 7 (${bibData.varFields.head.subfields})"
   }
 
   it(s"throws an error if it sees too many subfield $$0 instances") {
