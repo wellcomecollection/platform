@@ -10,7 +10,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MessageRetriever[T] {
   def retrieve(notification: NotificationMessage)(
-    implicit decoderT: Decoder[T], ec: ExecutionContext
+    implicit decoderT: Decoder[T],
+    ec: ExecutionContext
   ): Future[T]
 }
 
@@ -18,21 +19,24 @@ class S3TypeMessageRetriever[T] @Inject()(s3TypeStore: S3TypeStore[T])(
   implicit decoderP: Decoder[MessagePointer]
 ) extends MessageRetriever[T] {
   def retrieve(notification: NotificationMessage)(
-    implicit decoderT: Decoder[T], ec: ExecutionContext
-  ): Future[T] = for {
-    messagePointer <- Future.fromTry(
-      fromJson[MessagePointer](notification.Message))
-    deserialisedObject <- s3TypeStore.get(messagePointer.src)
-  } yield deserialisedObject
+    implicit decoderT: Decoder[T],
+    ec: ExecutionContext
+  ): Future[T] =
+    for {
+      messagePointer <- Future.fromTry(
+        fromJson[MessagePointer](notification.Message))
+      deserialisedObject <- s3TypeStore.get(messagePointer.src)
+    } yield deserialisedObject
 }
 
-class TypeMessageRetriever[T] @Inject()()
-  extends MessageRetriever[T] {
+class TypeMessageRetriever[T] @Inject()() extends MessageRetriever[T] {
   def retrieve(notification: NotificationMessage)(
-    implicit decoderT: Decoder[T], ec: ExecutionContext
-  ): Future[T] = for {
-    deserialisedObject <- Future.fromTry(
-      fromJson[T](notification.Message)
-    )
-  } yield deserialisedObject
+    implicit decoderT: Decoder[T],
+    ec: ExecutionContext
+  ): Future[T] =
+    for {
+      deserialisedObject <- Future.fromTry(
+        fromJson[T](notification.Message)
+      )
+    } yield deserialisedObject
 }

@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.utils.JsonUtil._
 
 class MessageRetrieverTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with Messaging
     with Akka
@@ -27,32 +27,34 @@ class MessageRetrieverTest
   describe("with S3TypeMessageRetriever") {
     it("retrieves messages") {
       withLocalS3Bucket { bucket =>
-        withS3TypeStore[ExampleObject, Assertion](s3Client, S3Config(bucket.name)) { typeStore =>
-          withS3TypeMessageRetriever[ExampleObject, Assertion](typeStore) { retriever =>
+        withS3TypeStore[ExampleObject, Assertion](
+          s3Client,
+          S3Config(bucket.name)) { typeStore =>
+          withS3TypeMessageRetriever[ExampleObject, Assertion](typeStore) {
+            retriever =>
+              val exampleObject = ExampleObject(Random.nextString(15))
 
-            val exampleObject = ExampleObject(Random.nextString(15))
+              val s3Location = S3ObjectLocation(
+                bucket = bucket.name,
+                key = Random.nextString(5)
+              )
 
-            val s3Location = S3ObjectLocation(
-              bucket = bucket.name,
-              key = Random.nextString(5)
-            )
+              put(exampleObject, s3Location)
 
-            put(exampleObject, s3Location)
+              val messagePointer = MessagePointer(s3Location)
 
-            val messagePointer = MessagePointer(s3Location)
+              val notificationMessage = NotificationMessage(
+                MessageId = Random.nextString(5),
+                TopicArn = Random.nextString(5),
+                Subject = Random.nextString(5),
+                Message = toJson(messagePointer).get
+              )
 
-            val notificationMessage = NotificationMessage(
-              MessageId = Random.nextString(5),
-              TopicArn = Random.nextString(5),
-              Subject = Random.nextString(5),
-              Message = toJson(messagePointer).get
-            )
+              val retrieval = retriever.retrieve(notificationMessage)
 
-            val retrieval = retriever.retrieve(notificationMessage)
-
-            whenReady(retrieval) { result =>
-              result shouldBe exampleObject
-            }
+              whenReady(retrieval) { result =>
+                result shouldBe exampleObject
+              }
           }
         }
       }
@@ -62,7 +64,6 @@ class MessageRetrieverTest
   describe("with TypeMessageRetriever") {
     it("retrieves messages") {
       withTypeMessageRetriever[ExampleObject, Assertion]() { retriever =>
-
         val exampleObject = ExampleObject(Random.nextString(15))
 
         val notificationMessage = NotificationMessage(

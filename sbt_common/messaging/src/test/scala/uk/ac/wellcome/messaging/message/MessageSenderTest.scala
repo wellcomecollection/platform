@@ -15,7 +15,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class MessageSenderTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with Messaging
     with Akka
@@ -25,14 +25,17 @@ class MessageSenderTest
     with SNS
     with MetricsSenderFixture {
 
-
   describe("with S3TypeMessageSender") {
     it("sends messages") {
       withLocalS3Bucket { bucket =>
         withLocalSnsTopic { topic =>
           withSNSWriter(snsClient, topic) { snsWriter =>
-            withS3TypeStore[ExampleObject, Assertion](s3Client, S3Config(bucketName = bucket.name)) { s3TypeStore =>
-              withS3TypeMessageSender[ExampleObject, Assertion](snsWriter, s3TypeStore) { messageSender =>
+            withS3TypeStore[ExampleObject, Assertion](
+              s3Client,
+              S3Config(bucketName = bucket.name)) { s3TypeStore =>
+              withS3TypeMessageSender[ExampleObject, Assertion](
+                snsWriter,
+                s3TypeStore) { messageSender =>
                 val subject = Random.nextString(10)
 
                 val exampleObject = ExampleObject(Random.nextString(15))
@@ -46,7 +49,7 @@ class MessageSenderTest
                   messages.head.subject shouldBe subject
 
                   val actualMessage = get[ExampleObject](messages.head)
-                  
+
                   exampleObject shouldBe actualMessage
                 }
               }
@@ -61,27 +64,28 @@ class MessageSenderTest
     it("sends messages") {
       withLocalSnsTopic { topic =>
         withSNSWriter(snsClient, topic) { snsWriter =>
-          withTypeMessageSender[ExampleObject, Assertion](snsWriter) { messageSender =>
-            val subject = Random.nextString(10)
+          withTypeMessageSender[ExampleObject, Assertion](snsWriter) {
+            messageSender =>
+              val subject = Random.nextString(10)
 
-            val exampleObject = ExampleObject(Random.nextString(15))
+              val exampleObject = ExampleObject(Random.nextString(15))
 
-            val attempt = messageSender.send(exampleObject, subject)
+              val attempt = messageSender.send(exampleObject, subject)
 
-            whenReady(attempt) { _ =>
-              val messages = listMessagesReceivedFromSNS(topic)
+              whenReady(attempt) { _ =>
+                val messages = listMessagesReceivedFromSNS(topic)
 
-              messages.length shouldBe 1
-              messages.head.subject shouldBe subject
+                messages.length shouldBe 1
+                messages.head.subject shouldBe subject
 
-              val actualMessage = fromJson[ExampleObject](messages.head.message).get
+                val actualMessage =
+                  fromJson[ExampleObject](messages.head.message).get
 
-              exampleObject shouldBe actualMessage
-            }
+                exampleObject shouldBe actualMessage
+              }
           }
         }
       }
     }
   }
 }
-

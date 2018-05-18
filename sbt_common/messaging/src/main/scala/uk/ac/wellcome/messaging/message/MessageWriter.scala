@@ -10,7 +10,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
-
 class MessageWriter[T, S <: MessageSender[T]] @Inject()(
   snsWriter: SNSWriter,
   messageSender: S
@@ -25,4 +24,3 @@ class MessageWriter[T, S <: MessageSender[T]] @Inject()(
 
   }
 }
-
