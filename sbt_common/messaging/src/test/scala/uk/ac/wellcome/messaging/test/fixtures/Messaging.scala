@@ -64,7 +64,7 @@ trait Messaging
     Map(
       "aws.message.reader.s3.bucketName" -> bucket.name,
       "aws.message.reader.sqs.queue.url" -> queue.url,
-      "aws.message.sqs.waitTime" -> "1",
+      "aws.message.reader.sqs.waitTime" -> "1",
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 
   def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
