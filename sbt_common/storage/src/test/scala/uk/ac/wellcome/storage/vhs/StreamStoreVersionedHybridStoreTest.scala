@@ -23,9 +23,6 @@ class StreamStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  private def stringify(is: InputStream) =
-    scala.io.Source.fromInputStream(is).mkString
-
   def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket,
                         Table,

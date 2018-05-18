@@ -9,8 +9,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.hashing.MurmurHash3
 
 object S3Storage extends Logging {
+
   def put(s3Client: AmazonS3, bucketName: String)(
-    keyPrefix: String)(is: InputStream)(
+    keyPrefix: String, keySuffix: Option[String] = None)(is: InputStream)(
     implicit ec: ExecutionContext): Future[S3ObjectLocation] = {
 
     // Currently hiding the stringification, so we can deal with it later if we need to
@@ -22,7 +23,12 @@ object S3Storage extends Logging {
       .stripPrefix("/")
       .stripSuffix("/")
 
-    val key = s"$prefix/$contentHash.json"
+    val suffix = keySuffix
+      .map { _.stripPrefix(".") }
+      .map { "." + _ }
+      .getOrElse("")
+
+    val key = s"$prefix/$contentHash$suffix"
 
     info(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {

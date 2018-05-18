@@ -29,47 +29,13 @@ class S3StringStoreTest
           stringStore.put(bucket.name)(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3) { actualKey =>
-          val expectedKey = s"$prefix/$expectedHash.json"
+          val expectedKey = s"$prefix/$expectedHash"
           val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
 
           actualKey shouldBe expectedUri
 
           val contentFromS3 = getContentFromS3(bucket, expectedKey)
           contentFromS3 shouldBe content
-        }
-      }
-    }
-  }
-
-  it("removes leading slashes from prefixes") {
-    withLocalS3Bucket { bucket =>
-      withS3StringObjectStore(bucket) { stringStore =>
-        val prefix = "/foo"
-
-        val writtenToS3 =
-          stringStore.put(bucket.name)(content = content, keyPrefix = prefix)
-
-        whenReady(writtenToS3) { actualKey =>
-          val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
-          actualKey shouldBe expectedUri
-        }
-      }
-    }
-  }
-
-  it("removes trailing slashes from prefixes") {
-    withLocalS3Bucket { bucket =>
-      withS3StringObjectStore(bucket) { stringStore =>
-        val prefix = "foo/"
-
-        val writtenToS3 =
-          stringStore.put(bucket.name)(content = content, keyPrefix = prefix)
-
-        whenReady(writtenToS3) { actualKey =>
-          val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
-          actualKey shouldBe expectedUri
         }
       }
     }

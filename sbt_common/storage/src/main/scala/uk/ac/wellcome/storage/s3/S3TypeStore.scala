@@ -22,7 +22,7 @@ class S3TypeStore[T] @Inject()(
     Future.fromTry(toJson(in)).flatMap { content =>
       val is = new ByteArrayInputStream(content.getBytes)
 
-      S3Storage.put(s3Client, bucket)(keyPrefix)(is)
+      S3Storage.put(s3Client, bucket)(keyPrefix, Some(".json"))(is)
     }
 
   def get(s3ObjectLocation: S3ObjectLocation): Future[T] =
