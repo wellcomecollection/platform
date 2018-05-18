@@ -18,6 +18,7 @@ class ServerTest
     with S3
     with SNS
     with CloudWatch
+    with fixtures.Server
     with SQS
     with ScalaFutures
     with ElasticsearchFixtures {
@@ -53,21 +54,4 @@ class ServerTest
         }
       }
     }
-
-  def withServer[R](flags: Map[String, String])(
-    testWith: TestWith[EmbeddedHttpServer, R]) = {
-    val server: EmbeddedHttpServer =
-      new EmbeddedHttpServer(
-        new Server(),
-        flags = flags ++ cloudWatchLocalFlags
-      )
-
-    server.start()
-
-    try {
-      testWith(server)
-    } finally {
-      server.close()
-    }
-  }
 }
