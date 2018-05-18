@@ -1,7 +1,8 @@
-sqs:
- image: s12v/elasticmq
- ports:
-   - "9324:9324"
+localstack:
+  image: localstack/localstack
+  ports:
+    - "4567-4583:4567-4583"
+    - "8080:8080"
 dynamodb:
   image: peopleperhour/dynamodb
   ports:
