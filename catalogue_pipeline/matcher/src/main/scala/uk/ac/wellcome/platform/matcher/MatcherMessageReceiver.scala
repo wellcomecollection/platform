@@ -11,9 +11,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-case class MatchedWorksList(redirects: List[MatchedWorkIds])
-case class MatchedWorkIds(matchedWorkId: String, linkedWorkIds: List[String])
-
 class MatcherMessageReceiver @Inject()(
   messageStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
@@ -33,7 +30,7 @@ class MatcherMessageReceiver @Inject()(
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(linkedWorkMatcher.matchWork(workEntry)).get,
+        message = toJson(linkedWorkMatcher.matchWork(workEntry.work)).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

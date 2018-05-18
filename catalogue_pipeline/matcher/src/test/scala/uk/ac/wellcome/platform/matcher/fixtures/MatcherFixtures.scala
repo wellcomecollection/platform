@@ -20,5 +20,4 @@ trait MatcherFixtures {
       identifiers = List(sourceIdentifier)
     )
   }
-
 }
