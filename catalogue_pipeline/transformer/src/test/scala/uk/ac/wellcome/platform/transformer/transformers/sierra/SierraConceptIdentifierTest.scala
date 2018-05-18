@@ -1,12 +1,8 @@
-package uk.ac.wellcome.transformer.transformers.sierra
+package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 
 class SierraConceptIdentifierTest extends FunSpec with Matchers {
 
