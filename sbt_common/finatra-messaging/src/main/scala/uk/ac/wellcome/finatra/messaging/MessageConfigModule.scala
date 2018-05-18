@@ -14,10 +14,10 @@ import uk.ac.wellcome.storage.s3.S3Config
 import scala.concurrent.duration._
 
 object MessageConfigModule extends TwitterModule {
-  private val topicArn = flag[String](
-    "aws.message.sns.topic.arn",
+  private val writerTopicArn = flag[String](
+    "aws.message.writer.sns.topic.arn",
     "",
-    "ARN of the SNS topic used for messaging")
+    "ARN of the SNS topic where new message pointers are sent")
 
   private val bucketName =
     flag[String](
@@ -40,7 +40,7 @@ object MessageConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesMessageWriterConfig(): MessageWriterConfig = {
-    val snsConfig = SNSConfig(topicArn = topicArn())
+    val snsConfig = SNSConfig(topicArn = writerTopicArn())
     val s3Config = S3Config(bucketName = bucketName())
 
     MessageWriterConfig(snsConfig = snsConfig, s3Config = s3Config)
