@@ -15,8 +15,6 @@ trait Server extends ServerFixtures with CloudWatch { this: Suite =>
     flags: Map[String, String],
     modifyServer: EmbeddedHttpServer => EmbeddedHttpServer)(
     testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withServer[R](
-      new AppServer,
-      flags ++ Map("aws.region" -> "localhost") ++ cloudWatchLocalFlags,
-      modifyServer)(testWith)
+    withServer[R](new AppServer, flags ++ cloudWatchLocalFlags, modifyServer)(
+      testWith)
 }

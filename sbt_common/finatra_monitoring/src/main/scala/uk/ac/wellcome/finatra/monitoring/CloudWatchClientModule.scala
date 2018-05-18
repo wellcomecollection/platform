@@ -3,23 +3,24 @@ package uk.ac.wellcome.finatra.monitoring
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.AWSConfigModule
-import uk.ac.wellcome.models.aws.AWSConfig
 import uk.ac.wellcome.monitoring.CloudWatchClientFactory
 
 object CloudWatchClientModule extends TwitterModule {
-  override val modules = Seq(AWSConfigModule)
-
   private val endpoint = flag[String](
     "aws.cloudWatch.endpoint",
     "",
     "Endpoint of AWS CloudWatch. If not set, it will use the region")
 
+  private val region = flag[String](
+    "aws.cloudWatch.region",
+    "eu-west-1",
+    "CloudWatch region.  Defaults to eu-west-1.")
+
   @Provides
   @Singleton
-  def providesAmazonCloudWatch(awsConfig: AWSConfig): AmazonCloudWatch =
+  def providesAmazonCloudWatch(): AmazonCloudWatch =
     CloudWatchClientFactory.create(
-      region = awsConfig.region,
+      region = region(),
       endpoint = endpoint()
     )
 }

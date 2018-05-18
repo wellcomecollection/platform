@@ -144,8 +144,7 @@ class SnapshotGeneratorFeatureTest
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType) ++ Map(
-                "aws.region" -> "localhost")
+                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
               withServer(flags) { server =>
                 testWith(
                   (server, queue, topic, indexNameV1, indexNameV2, bucket))

@@ -27,7 +27,6 @@ class Server extends HttpServer {
     MysqlModule,
     AkkaModule,
     IdMinterWorkerModule,
-    AWSConfigModule,
     SQSClientModule,
     SNSClientModule,
     S3ClientModule,

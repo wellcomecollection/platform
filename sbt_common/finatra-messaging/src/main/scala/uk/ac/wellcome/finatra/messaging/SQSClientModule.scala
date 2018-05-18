@@ -5,7 +5,6 @@ import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
-import uk.ac.wellcome.models.aws.AWSConfig
 
 object SQSClientModule extends TwitterModule {
   override val modules = Seq(SQSConfigModule)
@@ -20,11 +19,13 @@ object SQSClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.sqs.secretKey", "", "SecretKey to access SQS")
 
+  private val region = flag[String]("aws.sqs.region", "eu-west-1")
+
   @Singleton
   @Provides
-  def providesSQSClient(awsConfig: AWSConfig): AmazonSQS =
+  def providesSQSClient(): AmazonSQS =
     SQSClientFactory.createSyncClient(
-      region = awsConfig.region,
+      region = region(),
       endpoint = sqsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
@@ -32,9 +33,9 @@ object SQSClientModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesSQSAsyncClient(awsConfig: AWSConfig): AmazonSQSAsync =
+  def providesSQSAsyncClient(): AmazonSQSAsync =
     SQSClientFactory.createAsyncClient(
-      region = awsConfig.region,
+      region = region(),
       endpoint = sqsEndpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
