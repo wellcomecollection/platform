@@ -44,21 +44,21 @@ object AkkaS3ClientModule extends TwitterModule {
   def providesAkkaS3Client(awsConfig: AWSConfig,
                            actorSystem: ActorSystem): S3Client =
     buildAkkaS3Client(
-      awsConfig = awsConfig,
+      region = awsConfig.region,
       actorSystem = actorSystem,
       endpoint = endpoint(),
       accessKey = accessKey(),
       secretKey = secretKey()
     )
 
-  def buildAkkaS3Client(awsConfig: AWSConfig,
+  def buildAkkaS3Client(region: String,
                         actorSystem: ActorSystem,
                         endpoint: String,
                         accessKey: String,
                         secretKey: String): S3Client = {
     val regionProvider =
       new AwsRegionProvider {
-        def getRegion: String = awsConfig.region
+        def getRegion: String = region
       }
 
     val credentialsProvider = if (endpoint.isEmpty) {
