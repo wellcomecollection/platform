@@ -9,9 +9,16 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
-import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorksIdentifiersList
+}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -62,8 +69,10 @@ class MatcherFeatureTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val identifiersList = fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
-                identifiersList.linkedWorks shouldBe List(IdentifierList(List("sierra-system-number/id")))
+                val identifiersList =
+                  fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
+                identifiersList.linkedWorks shouldBe List(
+                  IdentifierList(List("sierra-system-number/id")))
               }
             }
           }

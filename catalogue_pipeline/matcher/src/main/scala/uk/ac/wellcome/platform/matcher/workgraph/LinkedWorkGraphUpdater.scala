@@ -5,9 +5,12 @@ import scalax.collection.GraphPredef._
 import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorksGraph}
 
 object LinkedWorkGraphUpdater {
-  def update(workUpdate: LinkedWork, existingGraph: LinkedWorksGraph): LinkedWorksGraph = {
+  def update(workUpdate: LinkedWork,
+             existingGraph: LinkedWorksGraph): LinkedWorksGraph = {
 
-    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(workUpdate.workId, existingGraph.linkedWorksList)
+    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
+      workUpdate.workId,
+      existingGraph.linkedWorksList)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
       toEdges(linkedWork)
     }) ++ toEdges(workUpdate)
@@ -23,13 +26,15 @@ object LinkedWorkGraphUpdater {
     }
 
     LinkedWorksGraph(
-      g.componentTraverser().flatMap(component => {
-        val nodeIds = component.nodes.map(_.value).toList
-        val componentIdentifier = nodeIds.sorted.mkString("+")
-        component.nodes.map(node => {
-          LinkedWork(node.value, adjacentNodeIds(node), componentIdentifier)
+      g.componentTraverser()
+        .flatMap(component => {
+          val nodeIds = component.nodes.map(_.value).toList
+          val componentIdentifier = nodeIds.sorted.mkString("+")
+          component.nodes.map(node => {
+            LinkedWork(node.value, adjacentNodeIds(node), componentIdentifier)
+          })
         })
-      }).toList
+        .toList
     )
   }
 
@@ -41,7 +46,9 @@ object LinkedWorkGraphUpdater {
     linkedWork.linkedIds.map(linkedWork.workId ~> _)
   }
 
-  private def existingGraphWithoutUpdatedNode(workId: String, linkedWorksList: List[LinkedWork]) = {
+  private def existingGraphWithoutUpdatedNode(
+    workId: String,
+    linkedWorksList: List[LinkedWork]) = {
     linkedWorksList.filterNot(_.workId == workId)
   }
 }

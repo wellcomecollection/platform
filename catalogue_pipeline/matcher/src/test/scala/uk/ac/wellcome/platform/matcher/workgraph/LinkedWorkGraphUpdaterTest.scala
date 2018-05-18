@@ -13,28 +13,34 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 
   describe("Adding links without existing works") {
     it("updating nothing with A gives A:A") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("A"),
-        existingGraph = LinkedWorksGraph(List())
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("A"),
+          existingGraph = LinkedWorksGraph(List())
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(LinkedWork("A", setId = "A"))
     }
 
     it("updating nothing with A->B gives A+B:A->B") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("A", List("B")),
-        existingGraph = LinkedWorksGraph(List())
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("A", List("B")),
+          existingGraph = LinkedWorksGraph(List())
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B"),
           LinkedWork("B", setId = "A+B"))
     }
 
     it("updating nothing with B->A gives A+B:B->A") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B", List("A")),
-        existingGraph = LinkedWorksGraph(List())
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B", List("A")),
+          existingGraph = LinkedWorksGraph(List())
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("B", List("A"), setId = "A+B"),
           LinkedWork("A", setId = "A+B"))
@@ -43,20 +49,24 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 
   describe("Adding links to existing works") {
     it("updating A->B with A->B gives A+B:(A->B, B)") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("A", List("B")),
-        existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("A", List("B")),
+          existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B"),
           LinkedWork("B", setId = "A+B"))
     }
 
     it("updating A->B with B->C gives A+B+C:(A->B, B->C, C)") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B", List("C")),
-        existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B", List("C")),
+          existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B+C"),
           LinkedWork("B", List("C"), setId = "A+B+C"),
@@ -65,10 +75,13 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     }
 
     it("updating A->B, C->D with B->C gives A+B+C+D:(A->B, B->C, C->D, D)") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B", List("C")),
-        existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B")), LinkedWork("C", List("D"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B", List("C")),
+          existingGraph = LinkedWorksGraph(
+            List(LinkedWork("A", List("B")), LinkedWork("C", List("D"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), "A+B+C+D"),
           LinkedWork("B", List("C"), "A+B+C+D"),
@@ -77,10 +90,12 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     }
 
     it("updating A->B with B->[C,D] gives A+B+C+D:(A->B, B->C&D, C, D") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B", List("C", "D")),
-        existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B", List("C", "D")),
+          existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B+C+D"),
           LinkedWork("B", List("C", "D"), setId = "A+B+C+D"),
@@ -90,12 +105,13 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     }
 
     it("updating A->B->C with A->C gives A+B+C:(A->B, B->C, C->A") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("C", List("A")),
-        existingGraph = LinkedWorksGraph(List(
-          LinkedWork("A", List("B")),
-          LinkedWork("B", List("C"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("C", List("A")),
+          existingGraph = LinkedWorksGraph(
+            List(LinkedWork("A", List("B")), LinkedWork("B", List("C"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B+C"),
           LinkedWork("B", List("C"), setId = "A+B+C"),
@@ -106,35 +122,35 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 
   describe("Removing links") {
     it("updating  A->B, B with A gives A:A and B:B") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("A"),
-        existingGraph = LinkedWorksGraph(List(
-          LinkedWork("A", List("B")),
-          LinkedWork("B")))
-      ).linkedWorksList should contain theSameElementsAs
-        List(
-          LinkedWork("A", setId = "A"),
-          LinkedWork("B", setId = "B"))
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("A"),
+          existingGraph =
+            LinkedWorksGraph(List(LinkedWork("A", List("B")), LinkedWork("B")))
+        )
+        .linkedWorksList should contain theSameElementsAs
+        List(LinkedWork("A", setId = "A"), LinkedWork("B", setId = "B"))
     }
 
-    it("updating A->B with A but NO B (*should* not be possible) gives A:A and B:B") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("A"),
-        existingGraph = LinkedWorksGraph(List(
-          LinkedWork("A", List("B"))))
-      ).linkedWorksList should contain theSameElementsAs
-        List(
-          LinkedWork("A", setId = "A"),
-          LinkedWork("B", setId = "B"))
+    it(
+      "updating A->B with A but NO B (*should* not be possible) gives A:A and B:B") {
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("A"),
+          existingGraph = LinkedWorksGraph(List(LinkedWork("A", List("B"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
+        List(LinkedWork("A", setId = "A"), LinkedWork("B", setId = "B"))
     }
 
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B"),
-        existingGraph = LinkedWorksGraph(List(
-          LinkedWork("A", List("B")),
-          LinkedWork("B", List("C"))))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B"),
+          existingGraph = LinkedWorksGraph(
+            List(LinkedWork("A", List("B")), LinkedWork("B", List("C"))))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B"),
           LinkedWork("B", setId = "A+B"),
@@ -142,13 +158,16 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     }
 
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
-      LinkedWorkGraphUpdater.update(
-        workUpdate = LinkedWork("B", List("C")),
-        existingGraph = LinkedWorksGraph(List(
-          LinkedWork("A", List("B")),
-          LinkedWork("B", List("A", "C")),
-          LinkedWork("C")))
-      ).linkedWorksList should contain theSameElementsAs
+      LinkedWorkGraphUpdater
+        .update(
+          workUpdate = LinkedWork("B", List("C")),
+          existingGraph = LinkedWorksGraph(
+            List(
+              LinkedWork("A", List("B")),
+              LinkedWork("B", List("A", "C")),
+              LinkedWork("C")))
+        )
+        .linkedWorksList should contain theSameElementsAs
         List(
           LinkedWork("A", List("B"), setId = "A+B+C"),
           LinkedWork("B", List("C"), setId = "A+B+C"),

@@ -11,7 +11,10 @@ import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorksIdentifiersList
+}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -73,7 +76,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(List(IdentifierList(List("sierra-system-number/id"))))
+                LinkedWorksIdentifiersList(
+                  List(IdentifierList(List("sierra-system-number/id"))))
               )
             }
           }
@@ -82,7 +86,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("work A with one link to B and no existing works returns a single matched work") {
+  it(
+    "work A with one link to B and no existing works returns a single matched work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -99,9 +104,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(List(IdentifierList(
-                  List(
-                    "sierra-system-number/A",
-                    "sierra-system-number/B"))))
+                  List("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
           }
@@ -128,10 +131,13 @@ class MatcherMessageReceiverTest
 
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(List(IdentifierList(List(
-                  "sierra-system-number/A",
-                  "sierra-system-number/B"
-                ))))
+                LinkedWorksIdentifiersList(
+                  List(
+                    IdentifierList(
+                      List(
+                        "sierra-system-number/A",
+                        "sierra-system-number/B"
+                      ))))
               )
 
               val bWork = anUnidentifiedSierraWork.copy(
@@ -144,12 +150,15 @@ class MatcherMessageReceiverTest
 
                 assertMessageSent(
                   topic,
-                  LinkedWorksIdentifiersList(List(IdentifierList(List(
-                    "sierra-system-number/A",
-                    "sierra-system-number/B",
-                    "sierra-system-number/C"
-                  ))))
-                 )
+                  LinkedWorksIdentifiersList(
+                    List(
+                      IdentifierList(
+                        List(
+                          "sierra-system-number/A",
+                          "sierra-system-number/B",
+                          "sierra-system-number/C"
+                        ))))
+                )
               }
             }
           }
@@ -158,8 +167,9 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(topic: Topic,
-                                identifiersList: LinkedWorksIdentifiersList) = {
+  private def assertMessageSent(
+    topic: Topic,
+    identifiersList: LinkedWorksIdentifiersList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
