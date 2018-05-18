@@ -1,17 +1,13 @@
 package uk.ac.wellcome.storage.vhs
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
-import io.circe.{Decoder, Encoder}
-import uk.ac.wellcome.models._
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.s3.{
   KeyPrefixGenerator,
   S3ObjectLocation,
-  S3StringStore,
-  S3TypeStore
+  S3ObjectStore
 }
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
@@ -23,21 +19,12 @@ import uk.ac.wellcome.utils.GlobalExecutionContext._
 
 import scala.concurrent.Future
 
-class VersionedHybridStore[T <: Id] @Inject()(
+class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
-  s3Client: AmazonS3,
+  s3ObjectStore: S,
   keyPrefixGenerator: KeyPrefixGenerator[T],
   dynamoDbClient: AmazonDynamoDB
 ) {
-
-  private val s3StringStore = new S3StringStore(
-    s3Client = s3Client,
-    s3Config = vhsConfig.s3Config
-  )
-
-  val sourcedObjectStore = new S3TypeStore[T](
-    stringStore = s3StringStore
-  )
 
   val versionedDao = new VersionedDao(
     dynamoDbClient = dynamoDbClient,
@@ -61,9 +48,7 @@ class VersionedHybridStore[T <: Id] @Inject()(
   //
   def updateRecord[O, M](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
     metadata: M = EmptyMetadata())(
-    implicit decoder: Decoder[T],
-    encoder: Encoder[T],
-    enricher: HybridRecordEnricher.Aux[M, O],
+    implicit enricher: HybridRecordEnricher.Aux[M, O],
     dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
@@ -103,41 +88,36 @@ class VersionedHybridStore[T <: Id] @Inject()(
     }
   }
 
-  def getRecord(id: String)(implicit decoder: Decoder[T]): Future[Option[T]] =
+  def getRecord(id: String): Future[Option[T]] =
     getObject(id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
 
-  private def putObject[O](id: String, sourcedObject: T, f: (String) => O)(
-    implicit encoder: Encoder[T],
-    dynamoFormat: DynamoFormat[O],
+  private def putObject[O](id: String, t: T, f: (String) => O)(
+    implicit dynamoFormat: DynamoFormat[O],
     versionUpdater: VersionUpdater[O],
     idGetter: IdGetter[O],
     versionGetter: VersionGetter[O],
     updateExpressionGenerator: UpdateExpressionGenerator[O]
   ) = {
-    if (sourcedObject.id != id)
-      throw new IllegalArgumentException(
-        "ID provided does not match ID in record.")
 
-    val futureUri = sourcedObjectStore.put(
-      sourcedObject,
-      keyPrefixGenerator.generate(sourcedObject))
+    val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
+      t,
+      keyPrefixGenerator.generate(t))
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
     }
   }
 
-  private def getObject(id: String)(
-    implicit decoder: Decoder[T]): Future[Option[VersionedHybridObject]] = {
+  private def getObject(id: String): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[HybridRecord]] =
       versionedDao.getRecord[HybridRecord](id = id)
 
     dynamoRecord.flatMap {
       case Some(hybridRecord) => {
-        sourcedObjectStore
+        s3ObjectStore
           .get(
             S3ObjectLocation(
               bucket = vhsConfig.s3Config.bucketName,

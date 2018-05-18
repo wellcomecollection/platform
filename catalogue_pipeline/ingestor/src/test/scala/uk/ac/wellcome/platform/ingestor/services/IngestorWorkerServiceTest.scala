@@ -23,6 +23,8 @@ import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import uk.ac.wellcome.utils.JsonUtil._
+
 class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures

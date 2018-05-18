@@ -162,7 +162,7 @@ class RecorderWorkerServiceTest
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
-            withVersionedHybridStore[RecorderWorkEntry, Unit](
+            withTypeVHS[RecorderWorkEntry, Unit](
               bucket = bucket,
               table = table) { versionedHybridStore =>
               withMessageStream[UnidentifiedWork, R](

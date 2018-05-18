@@ -23,7 +23,8 @@ import uk.ac.wellcome.finatra.storage.{
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.recorder.modules.{
   RecorderModule,
-  RecorderWorkEntryKeyPrefixGeneratorModule
+  RecorderWorkEntryModule,
+  UnidentifiedWorkModule
 }
 
 object ServerMain extends Server
@@ -37,7 +38,8 @@ class Server extends HttpServer {
     DynamoClientModule,
     RecorderModule,
     MetricsSenderModule,
-    RecorderWorkEntryKeyPrefixGeneratorModule,
+    RecorderWorkEntryModule,
+    UnidentifiedWorkModule,
     AWSConfigModule,
     SQSConfigModule,
     SQSClientModule,

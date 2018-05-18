@@ -69,7 +69,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id = "1000001"
                 val record = SierraBibRecord(
@@ -106,7 +106,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id1 = "1000001"
                 val record1 = SierraBibRecord(
@@ -163,7 +163,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id = "3000003"
                 val oldBibRecord = SierraBibRecord(
@@ -219,7 +219,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id = "6000006"
                 val newBibRecord = SierraBibRecord(
@@ -276,7 +276,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withVersionedHybridStore[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, Unit](bucket, table) {
               hybridStore =>
                 val id = "7000007"
                 val newRecord = SierraTransformable(sourceId = id)

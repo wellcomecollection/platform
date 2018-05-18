@@ -5,14 +5,17 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
+
 import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.Future
 
 class RecorderWorkerService @Inject()(
-  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry],
+  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
+                                             S3TypeStore[RecorderWorkEntry]],
   messageStream: MessageStream[UnidentifiedWork],
   system: ActorSystem) {
 

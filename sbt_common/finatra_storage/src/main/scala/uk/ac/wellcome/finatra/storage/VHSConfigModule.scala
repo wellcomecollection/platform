@@ -10,12 +10,10 @@ import uk.ac.wellcome.storage.vhs.VHSConfig
 object VHSConfigModule extends TwitterModule {
   private val tableName = flag[String](
     "aws.vhs.dynamo.tableName",
-    "",
     "Name of the DynamoDB table holding the VHS index")
 
   private val bucketName = flag[String](
     "aws.vhs.s3.bucketName",
-    "",
     "Name of the S3 bucket holding VHS objects")
 
   @Singleton

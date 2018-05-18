@@ -14,7 +14,7 @@ import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.ingestor.finatra.modules.{
-  IdentifiedWorkKeyPrefixGeneratorModule,
+  IdentifiedWorkModule,
   IngestorModule,
   IngestorWorkerModule,
   WorksIndexModule
@@ -35,7 +35,7 @@ class Server extends HttpServer {
     IngestorWorkerModule,
     IngestorModule,
     WorksIndexModule,
-    IdentifiedWorkKeyPrefixGeneratorModule
+    IdentifiedWorkModule
   )
   flag[String]("es.index.v1", "V1 ES index name")
   flag[String]("es.index.v2", "V2 ES index name")

@@ -18,7 +18,10 @@ import uk.ac.wellcome.finatra.storage.{
 }
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
-import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
+import uk.ac.wellcome.sierra_adapter.modules.{
+  SierraKeyPrefixGeneratorModule,
+  SierraTransformableModule
+}
 
 object ServerMain extends Server
 
@@ -35,6 +38,7 @@ class Server extends HttpServer {
     S3ClientModule,
     AkkaModule,
     SierraItemMergerModule,
+    SierraTransformableModule,
     SierraKeyPrefixGeneratorModule
   )
 

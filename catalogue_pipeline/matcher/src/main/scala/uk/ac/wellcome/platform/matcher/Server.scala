@@ -18,7 +18,10 @@ import uk.ac.wellcome.finatra.messaging.{
 import uk.ac.wellcome.finatra.modules.{AWSConfigModule, AkkaModule}
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.monitoring.MetricsSenderModule
-import uk.ac.wellcome.platform.matcher.modules.MatcherModule
+import uk.ac.wellcome.platform.matcher.modules.{
+  MatcherModule,
+  RecorderWorkEntryModule
+}
 
 object ServerMain extends Server
 
@@ -35,6 +38,7 @@ class Server extends HttpServer {
     SNSConfigModule,
     SNSClientModule,
     MatcherModule,
+    RecorderWorkEntryModule,
     AkkaModule
   )
 

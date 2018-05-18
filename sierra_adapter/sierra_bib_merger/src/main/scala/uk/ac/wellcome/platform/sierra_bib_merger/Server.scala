@@ -18,7 +18,10 @@ import uk.ac.wellcome.finatra.storage.{
 }
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
-import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
+import uk.ac.wellcome.sierra_adapter.modules.{
+  SierraKeyPrefixGeneratorModule,
+  SierraTransformableModule
+}
 
 object ServerMain extends Server
 
@@ -30,6 +33,7 @@ class Server extends HttpServer {
     DynamoClientModule,
     SierraBibMergerModule,
     SierraKeyPrefixGeneratorModule,
+    SierraTransformableModule,
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
