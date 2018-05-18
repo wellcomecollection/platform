@@ -38,9 +38,9 @@ object MessageConfigModule extends TwitterModule {
     "aws.message.reader.sqs.waitTime",
     20,
     "Time to wait (in seconds) for a message to arrive on the queue before returning")
-  val maxMessages =
+  private val readerMaxMessages =
     flag(
-      "aws.message.sqs.maxMessages",
+      "aws.message.reader.sqs.maxMessages",
       10,
       "Maximum number of SQS messages to return")
 
@@ -59,7 +59,8 @@ object MessageConfigModule extends TwitterModule {
     val sqsConfig = SQSConfig(
       queueUrl = readerQueueUrl(),
       waitTime = readerWaitTime() seconds,
-      maxMessages())
+      maxMessages = readerMaxMessages()
+    )
     val s3Config = S3Config(bucketName = readerBucketName())
 
     MessageReaderConfig(sqsConfig = sqsConfig, s3Config = s3Config)
