@@ -27,7 +27,7 @@ class GoobiReaderFeatureTest
       withLocalDynamoDbTable { table =>
         withLocalSqsQueue { queue =>
           val id = "mets-0001"
-          val sourceKey = "mets-0001.xml"
+          val sourceKey = s"$id.xml"
 
           s3Client.putObject(bucket.name, sourceKey, contents)
 
@@ -68,10 +68,9 @@ class GoobiReaderFeatureTest
             |            }
             |        }
             |    ]
-            |}"""
+            |}""".stripMargin
 
-          val
-          notificationMessage = NotificationMessage(
+          val notificationMessage = NotificationMessage(
             MessageId = Random.nextString(5),
             TopicArn = queue.arn,
             Subject = "Test notification in GoobiReaderFeatureTest",
@@ -86,14 +85,14 @@ class GoobiReaderFeatureTest
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
 
           val expectedRecord = HybridRecord(
-            id = "mets-0001",
+            id = id,
             version = 1,
             s3key = "mets-0001.xml"
           )
 
           withServer(flags) { _ =>
             eventually {
-              val hybridRecord: HybridRecord = getHybridRecord(bucket, table, "mets-0001")
+              val hybridRecord: HybridRecord = getHybridRecord(bucket, table, id)
               hybridRecord shouldBe expectedRecord
 
               val s3contents = getContentFromS3(bucket, hybridRecord.s3key)

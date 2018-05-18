@@ -12,6 +12,8 @@ import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
+import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, VHSConfigModule}
+import uk.ac.wellcome.platform.goobi_reader.modules.GoobiReaderModule
 
 object ServerMain extends Server
 
@@ -20,9 +22,13 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.goobi_reader Goobi reader"
   override val modules = Seq(
     AkkaModule,
+    DynamoClientModule,
+    GoobiReaderModule,
     MetricsSenderModule,
     SQSClientModule,
-    SQSConfigModule
+    SQSConfigModule,
+    S3ClientModule,
+    VHSConfigModule
   )
 
   override def configureHttp(router: HttpRouter) {
