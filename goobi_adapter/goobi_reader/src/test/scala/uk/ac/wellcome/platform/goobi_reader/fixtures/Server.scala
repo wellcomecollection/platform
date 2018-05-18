@@ -9,8 +9,5 @@ import uk.ac.wellcome.test.fixtures.{ServerFixtures, TestWith}
 trait Server extends ServerFixtures with CloudWatch { this: Suite =>
   def withServer[R](flags: Map[String, String])(
     testWith: TestWith[EmbeddedHttpServer, R]): R =
-    withServer[R](
-      new AppServer,
-      flags ++ cloudWatchLocalFlags)(
-      testWith)
+    withServer[R](new AppServer, flags ++ cloudWatchLocalFlags)(testWith)
 }
