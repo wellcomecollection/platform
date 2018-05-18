@@ -61,6 +61,11 @@ lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
 
 lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra-messaging")
   .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
+
+lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
+  .dependsOn(common_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
@@ -81,7 +86,7 @@ lazy val transformer = doServiceSetup(project, "catalogue_pipeline/transformer")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val id_minter = doServiceSetup(project, "catalogue_pipeline/id_minter")
   .dependsOn(common % "compile->compile;test->test")
@@ -93,45 +98,45 @@ lazy val recorder = doServiceSetup(project, "catalogue_pipeline/recorder")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val sierra_adapter_common = doServiceSetup(project, "sierra_adapter/common")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraAdapterCommonDependencies)
 
 lazy val sierra_reader = doSharedSierraSetup(project, "sierra_adapter/sierra_reader")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.sierraReaderDependencies)
 
 lazy val sierra_items_to_dynamo = doSharedSierraSetup(project, "sierra_adapter/sierra_items_to_dynamo")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val sierra_bib_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_bib_merger")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierra_item_merger")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(finatra_storage % "compile->compile;test->test")
 
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
   .dependsOn(common % "compile->compile;test->test")
@@ -151,6 +156,7 @@ lazy val root = (project in file("."))
     common_monitoring,
     common_storage,
     finatra_messaging,
+    finatra_storage,
     api,
     ingestor,
     transformer,

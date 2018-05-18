@@ -6,8 +6,7 @@ import io.circe.Json
 import io.circe.parser.parse
 import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.models.aws.AWSConfig
-import uk.ac.wellcome.storage.s3.S3ClientModule
+import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConverters._
@@ -46,8 +45,8 @@ trait S3 extends Logging with Eventually {
     "aws.region" -> regionName
   )
 
-  val s3Client: AmazonS3 = S3ClientModule.buildS3Client(
-    awsConfig = AWSConfig(region = regionName),
+  val s3Client: AmazonS3 = S3ClientFactory.create(
+    region = regionName,
     endpoint = localS3EndpointUrl,
     accessKey = accessKey,
     secretKey = secretKey

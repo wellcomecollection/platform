@@ -11,12 +11,14 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  S3ClientModule,
+  VHSConfigModule
+}
 import uk.ac.wellcome.monitoring.MetricsSenderModule
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraKeyPrefixGeneratorModule
-import uk.ac.wellcome.storage.dynamo.DynamoClientModule
-import uk.ac.wellcome.storage.s3.S3ClientModule
-import uk.ac.wellcome.storage.vhs.VHSConfigModule
 
 object ServerMain extends Server
 
