@@ -22,7 +22,7 @@ import uk.ac.wellcome.models.Sourced
 // and use it on all instances, even when T is a subclass of Sourced.
 
 trait KeyPrefixGenerator[-T] {
-  def generate(obj: T): String
+  def generate(id: String, obj: T): String
 }
 
 // To spread objects evenly in our S3 bucket, we take the last two
@@ -35,7 +35,7 @@ trait KeyPrefixGenerator[-T] {
 //      e.g. b0001 and b0002 are separated by nine shards.
 
 class SourcedKeyPrefixGenerator @Inject() extends KeyPrefixGenerator[Sourced] {
-  override def generate(obj: Sourced): String = {
+  override def generate(id: String, obj: Sourced): String = {
     val s3Shard = obj.sourceId.reverse.slice(0, 2)
 
     s"${obj.sourceName}/${s3Shard}/${obj.sourceId}"

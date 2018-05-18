@@ -56,7 +56,7 @@ trait LocalVersionedHybridStore
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
       keyPrefixGenerator = new KeyPrefixGenerator[T] {
-        override def generate(obj: T): String = "/"
+        override def generate(id: String, obj: T): String = "/"
       },
       dynamoDbClient = dynamoDbClient
     )
@@ -82,7 +82,7 @@ trait LocalVersionedHybridStore
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
       keyPrefixGenerator = new KeyPrefixGenerator[InputStream] {
-        override def generate(obj: InputStream): String = "/"
+        override def generate(id: String, obj: InputStream): String = "/"
       },
       dynamoDbClient = dynamoDbClient
     )
@@ -107,7 +107,7 @@ trait LocalVersionedHybridStore
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
       keyPrefixGenerator = new KeyPrefixGenerator[String] {
-        override def generate(obj: String): String = "/"
+        override def generate(id: String, obj: String): String = "/"
       },
       dynamoDbClient = dynamoDbClient
     )

@@ -31,7 +31,7 @@ class SierraItemMergerUpdaterServiceTest
 
   val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
     new KeyPrefixGenerator[Sourced] {
-      override def generate(obj: Sourced): String = "/"
+      override def generate(id: String, obj: Sourced): String = "/"
     }
 
   def withSierraUpdaterService(

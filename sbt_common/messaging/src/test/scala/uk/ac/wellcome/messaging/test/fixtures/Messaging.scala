@@ -101,7 +101,7 @@ trait Messaging
 
   val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
     new KeyPrefixGenerator[ExampleObject] {
-      override def generate(obj: ExampleObject): String = "/"
+      override def generate(id: String, obj: ExampleObject): String = "/"
     }
 
   def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
