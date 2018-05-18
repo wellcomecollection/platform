@@ -57,7 +57,7 @@ class GoobiReaderWorkerService @Inject()(
 
         val id = objectKey.replaceAll(".xml", "")
 
-        versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(ifExisting = (_) => content)
+        versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(identity)()
       }
 
       println(eventNotification)
