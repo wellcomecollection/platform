@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_items_to_dynamo
+package uk.ac.wellcome.platform.sierra_reader
 
 import scala.concurrent.ExecutionContext
 
