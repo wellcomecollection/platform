@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 
 // Implements logic for finding a source identifier for varFields with
