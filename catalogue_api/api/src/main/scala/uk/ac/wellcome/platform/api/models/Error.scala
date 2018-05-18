@@ -1,4 +1,4 @@
-package uk.ac.wellcome.models
+package uk.ac.wellcome.platform.api.models
 
 case class Error(
   errorType: String,

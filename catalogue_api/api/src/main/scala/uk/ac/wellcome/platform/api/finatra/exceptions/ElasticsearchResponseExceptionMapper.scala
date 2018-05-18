@@ -8,9 +8,8 @@ import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
 import org.elasticsearch.client.ResponseException
-import uk.ac.wellcome.models.Error
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.DisplayError
+import uk.ac.wellcome.platform.api.models.{DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
