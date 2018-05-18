@@ -4,7 +4,7 @@ import com.twitter.inject.annotations.Flag
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import javax.inject.{Inject, Singleton}
-import uk.ac.wellcome.versions.ApiVersions
+import uk.ac.wellcome.display.models.ApiVersions
 
 @Singleton
 class ContextController @Inject()(

@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.api
 
-import uk.ac.wellcome.versions.ApiVersions
+import uk.ac.wellcome.display.models.ApiVersions
 
 object ContextHelper {
   def buildContextUri(apiScheme: String,
