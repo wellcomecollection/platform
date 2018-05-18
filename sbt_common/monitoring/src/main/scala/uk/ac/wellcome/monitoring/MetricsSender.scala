@@ -15,7 +15,7 @@ import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
