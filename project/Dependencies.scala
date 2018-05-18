@@ -90,7 +90,7 @@ object Dependencies {
   )
 
   // Internal Library dependency groups
-  val commonDependencies = testDependencies ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
+  val commonDependencies = testDependencies ++ akkaDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
