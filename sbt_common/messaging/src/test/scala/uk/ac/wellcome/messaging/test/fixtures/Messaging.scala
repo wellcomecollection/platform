@@ -62,15 +62,15 @@ trait Messaging
 
   def messageReaderLocalFlags(bucket: Bucket, queue: Queue) =
     Map(
-      "aws.message.s3.bucketName" -> bucket.name,
-      "aws.message.sqs.queue.url" -> queue.url,
-      "aws.message.sqs.waitTime" -> "1",
+      "aws.message.reader.s3.bucketName" -> bucket.name,
+      "aws.message.reader.sqs.queue.url" -> queue.url,
+      "aws.message.reader.sqs.waitTime" -> "1",
     ) ++ s3ClientLocalFlags ++ sqsLocalClientFlags
 
   def messageWriterLocalFlags(bucket: Bucket, topic: Topic) =
     Map(
-      "aws.message.sns.topic.arn" -> topic.arn,
-      "aws.message.s3.bucketName" -> bucket.name
+      "aws.message.writer.sns.topic.arn" -> topic.arn,
+      "aws.message.writer.s3.bucketName" -> bucket.name
     ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
 
   case class ExampleObject(name: String)
