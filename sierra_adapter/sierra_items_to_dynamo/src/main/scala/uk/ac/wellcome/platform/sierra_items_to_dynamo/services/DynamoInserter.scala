@@ -4,7 +4,8 @@ import com.google.inject.Inject
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.utils.GlobalExecutionContext._
+
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 

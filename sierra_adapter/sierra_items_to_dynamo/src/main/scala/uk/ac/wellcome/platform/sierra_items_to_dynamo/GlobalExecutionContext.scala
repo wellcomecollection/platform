@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_item_merger
+package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import scala.concurrent.ExecutionContext
 
