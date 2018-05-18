@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.idminter
+package uk.ac.wellcome.platform.ingestor
 
 import scala.concurrent.ExecutionContext
 
