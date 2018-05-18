@@ -34,11 +34,12 @@ def main(event, context):
         username = 'ecr-pushes'
         icon_emoji = 'ecr'
 
-    lines = [
-        message,
-        f'Git branch: {git_branch} ({commit_id})',
-        f'Commit message: {commit_msg!r}',
-    ]
+    lines = [message]
+
+    if (git_branch != 'HEAD') and (commit_id != 'HEAD'):
+        lines.apppend(f'Git branch: {git_branch} ({commit_id})')
+
+    lines.append(f'Commit message: {commit_msg!r}')
 
     slack_data = {
         'username': username,
