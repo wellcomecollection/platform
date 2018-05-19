@@ -7,6 +7,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
   ElasticClientBuilder,
+  ElasticConfig,
   ElasticSearchIndex,
   WorksIndex
 }
@@ -55,9 +56,15 @@ trait ElasticsearchFixtures
     indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
     itemType: String)(testWith: TestWith[String, R]): R = {
 
+    val elasticConfig = ElasticConfig(
+      documentType = itemType,
+      indexV1name = indexName,
+      indexV2name = s"$indexName-v2"
+    )
+
     val index = new WorksIndex(
       client = elasticClient,
-      itemType = itemType
+      elasticConfig = elasticConfig
     )
 
     withLocalElasticsearchIndex(index, indexName)(testWith)
