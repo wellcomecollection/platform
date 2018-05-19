@@ -84,7 +84,10 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
 
     // This source outputs DisplayWorks in the elasticsearch index.
     val displayWorks: Source[DisplayWork, Any] =
-      ElasticsearchWorksSource(elasticClient, indexName, elasticConfig.documentType)
+      ElasticsearchWorksSource(
+        elasticClient,
+        indexName,
+        elasticConfig.documentType)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which

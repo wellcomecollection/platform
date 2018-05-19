@@ -8,8 +8,7 @@ import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.twitter.inject.Logging
 
-class WorksIndex @Inject()(client: HttpClient,
-                           elasticConfig: ElasticConfig)
+class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     extends ElasticSearchIndex
     with Logging {
 

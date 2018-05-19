@@ -40,11 +40,13 @@ class IngestorWorkerService @Inject()(
   // * Works from any other source are not expected so they are discarded.
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
     work.sourceIdentifier.identifierScheme match {
-      case IdentifierSchemes.miroImageNumber => List(
-        elasticConfig.indexV1name,
-        elasticConfig.indexV2name
-      )
-      case IdentifierSchemes.sierraSystemNumber => List(elasticConfig.indexV2name)
+      case IdentifierSchemes.miroImageNumber =>
+        List(
+          elasticConfig.indexV1name,
+          elasticConfig.indexV2name
+        )
+      case IdentifierSchemes.sierraSystemNumber =>
+        List(elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
           s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))
