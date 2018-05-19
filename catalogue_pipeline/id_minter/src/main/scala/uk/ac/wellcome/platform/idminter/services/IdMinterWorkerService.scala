@@ -10,7 +10,7 @@ import uk.ac.wellcome.messaging.message.{
 }
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.idminter.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 import scala.concurrent.duration._

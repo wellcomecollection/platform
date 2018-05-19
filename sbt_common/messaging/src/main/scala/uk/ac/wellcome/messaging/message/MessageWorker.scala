@@ -5,7 +5,7 @@ import com.twitter.inject.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future

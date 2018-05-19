@@ -23,7 +23,7 @@ import uk.ac.wellcome.platform.transformer.transformers.{
   MiroTransformableTransformer,
   SierraTransformableTransformer
 }
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future

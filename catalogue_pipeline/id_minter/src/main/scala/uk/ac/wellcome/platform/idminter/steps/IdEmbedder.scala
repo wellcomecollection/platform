@@ -7,7 +7,7 @@ import io.circe.optics.JsonTraversalPath
 import io.circe.{Json, _}
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.idminter.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.annotation.tailrec

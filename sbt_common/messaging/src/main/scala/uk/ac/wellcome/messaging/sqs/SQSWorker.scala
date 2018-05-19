@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil.fromJson
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import scala.concurrent.Future
 import com.twitter.inject.Logging
 import scala.concurrent.duration._

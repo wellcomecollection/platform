@@ -19,7 +19,7 @@ import uk.ac.wellcome.platform.api.responses.{
   ResultResponse
 }
 import uk.ac.wellcome.platform.api.services.WorksService
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe.TypeTag

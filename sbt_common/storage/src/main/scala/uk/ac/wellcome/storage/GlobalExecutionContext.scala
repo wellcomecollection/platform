@@ -1,4 +1,4 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.storage
 
 import scala.concurrent.ExecutionContext
 

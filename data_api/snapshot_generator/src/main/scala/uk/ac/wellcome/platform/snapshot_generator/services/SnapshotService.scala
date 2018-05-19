@@ -25,7 +25,7 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
   SnapshotJob
 }
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.snapshot_generator.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 

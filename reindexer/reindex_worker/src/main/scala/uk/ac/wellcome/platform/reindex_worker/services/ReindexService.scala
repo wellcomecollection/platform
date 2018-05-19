@@ -15,7 +15,7 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexRecord
 }
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 

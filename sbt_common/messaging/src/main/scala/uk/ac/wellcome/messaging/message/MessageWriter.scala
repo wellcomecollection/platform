@@ -7,7 +7,7 @@ import com.twitter.inject.Logging
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3Config, S3TypeStore}
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future

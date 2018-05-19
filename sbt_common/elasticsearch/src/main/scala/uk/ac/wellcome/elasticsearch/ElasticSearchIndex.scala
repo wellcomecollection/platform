@@ -7,7 +7,7 @@ import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.twitter.inject.Logging
 import org.elasticsearch.client.ResponseException
-import uk.ac.wellcome.utils.GlobalExecutionContext.context
+import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
