@@ -11,6 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.elasticsearch.ElasticClientModule
 import uk.ac.wellcome.finatra.messaging.{
   SNSClientModule,
   SNSConfigModule,
@@ -19,7 +20,6 @@ import uk.ac.wellcome.finatra.messaging.{
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ConfigModule
-import uk.ac.wellcome.platform.snapshot_generator.finatra.SnapshotGeneratorModule
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{
   AkkaS3ClientModule,
   SnapshotGeneratorWorkerModule
@@ -45,7 +45,7 @@ class Server extends HttpServer {
     SNSConfigModule,
     S3ConfigModule,
     AkkaS3ClientModule,
-    SnapshotGeneratorModule,
+    ElasticClientModule,
     SnapshotGeneratorWorkerModule,
     AkkaModule
   )
