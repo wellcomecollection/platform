@@ -20,9 +20,8 @@ object MetricsSenderModule extends TwitterModule {
                             actorSystem: ActorSystem,
                             metricsConfig: MetricsConfig) =
     new MetricsSender(
-      namespace = metricsConfig.namespace,
-      flushInterval = metricsConfig.flushInterval,
       amazonCloudWatch = amazonCloudWatch,
-      actorSystem = actorSystem
+      actorSystem = actorSystem,
+      metricsConfig = metricsConfig
     )
 }
