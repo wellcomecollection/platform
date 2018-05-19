@@ -10,7 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.elasticsearch.ElasticClientModule
+import uk.ac.wellcome.finatra.elasticsearch.{ElasticClientModule, ElasticConfigModule}
 import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
@@ -33,12 +33,13 @@ class Server extends HttpServer {
     AkkaModule,
     IngestorWorkerModule,
     ElasticClientModule,
+    ElasticConfigModule,
     WorksIndexModule,
     IdentifiedWorkModule
   )
   flag[String]("es.index.v1", "V1 ES index name")
   flag[String]("es.index.v2", "V2 ES index name")
-  flag[String]("es.type", "item", "ES document type")
+
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]

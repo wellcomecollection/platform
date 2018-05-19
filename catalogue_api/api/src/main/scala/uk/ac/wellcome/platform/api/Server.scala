@@ -9,7 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.finatra.elasticsearch.ElasticClientModule
+import uk.ac.wellcome.finatra.elasticsearch.{ElasticClientModule, ElasticConfigModule}
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
@@ -21,7 +21,10 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
-  override val modules = Seq(ElasticClientModule)
+  override val modules = Seq(
+    ElasticClientModule,
+    ElasticConfigModule
+  )
 
   flag(name = "api.host", default = "localhost:8888", help = "API hostname")
   flag(name = "api.scheme", default = "https", help = "API protocol scheme")
@@ -36,8 +39,6 @@ class Server extends HttpServer {
 
   flag[String](name = "es.index.v1", help = "V1 ES index name")
   flag[String](name = "es.index.v2", help = "V2 ES index name")
-
-  flag[String](name = "es.type", default = "item", help = "ES document type")
   flag(
     name = "api.context.suffix",
     default = "/context.json",
