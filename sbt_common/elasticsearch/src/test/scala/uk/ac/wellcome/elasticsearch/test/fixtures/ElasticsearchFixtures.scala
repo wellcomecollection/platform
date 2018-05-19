@@ -7,7 +7,6 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
   ElasticClientBuilder,
-  ElasticConfig,
   ElasticSearchIndex,
   WorksIndex
 }
@@ -39,16 +38,13 @@ trait ElasticsearchFixtures
     "es.type" -> itemType
   )
 
-  val elasticConfig = ElasticConfig(
+  val elasticClient: HttpClient = ElasticClientBuilder.create(
     hostname = esHost,
-    hostPort = esPort,
-    hostProtocol = "http",
+    port = esPort,
+    protocol = "http",
     username = "elastic",
     password = "changeme"
   )
-
-  val elasticClient: HttpClient =
-    ElasticClientBuilder.buildElasticClient(elasticConfig)
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {
