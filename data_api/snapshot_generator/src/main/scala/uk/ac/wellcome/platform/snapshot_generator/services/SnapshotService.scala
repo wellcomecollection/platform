@@ -14,6 +14,7 @@ import javax.inject.Inject
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.snapshot_generator.flow.{
   DisplayWorkToJsonStringFlow,
@@ -32,10 +33,8 @@ import scala.concurrent.Future
 class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
+                                elasticConfig: ElasticConfig,
                                 @Flag("aws.s3.endpoint") s3Endpoint: String,
-                                @Flag("es.index.v1") esIndexV1: String,
-                                @Flag("es.index.v2") esIndexV2: String,
-                                @Flag("es.type") esType: String,
                                 objectMapper: ObjectMapper)
     extends Logging {
   implicit val system: ActorSystem = actorSystem
@@ -53,14 +52,14 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = esIndexV1,
+          indexName = elasticConfig.indexV1name,
           toDisplayWork = DisplayWorkV1.apply
         )
       case ApiVersions.v2 =>
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
-          indexName = esIndexV2,
+          indexName = elasticConfig.indexV2name,
           toDisplayWork = DisplayWorkV2.apply
         )
     }
@@ -85,7 +84,7 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
 
     // This source outputs DisplayWorks in the elasticsearch index.
     val displayWorks: Source[DisplayWork, Any] =
-      ElasticsearchWorksSource(elasticClient, indexName, esType)
+      ElasticsearchWorksSource(elasticClient, indexName, elasticConfig.documentType)
         .via(IdentifiedWorkToVisibleDisplayWork(toDisplayWork))
 
     // This source generates JSON strings of DisplayWork instances, which

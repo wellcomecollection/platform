@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
@@ -13,8 +13,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class IngestorWorkerService @Inject()(
-  @Flag("es.index.v1") esIndexV1: String,
-  @Flag("es.index.v2") esIndexV2: String,
+  elasticConfig: ElasticConfig,
   identifiedWorkIndexer: WorkIndexer,
   messageStream: MessageStream[IdentifiedWork],
   system: ActorSystem) {
@@ -41,8 +40,11 @@ class IngestorWorkerService @Inject()(
   // * Works from any other source are not expected so they are discarded.
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
     work.sourceIdentifier.identifierScheme match {
-      case IdentifierSchemes.miroImageNumber => List(esIndexV1, esIndexV2)
-      case IdentifierSchemes.sierraSystemNumber => List(esIndexV2)
+      case IdentifierSchemes.miroImageNumber => List(
+        elasticConfig.indexV1name,
+        elasticConfig.indexV2name
+      )
+      case IdentifierSchemes.sierraSystemNumber => List(elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
           s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))

@@ -29,11 +29,6 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
 
-  flag[String](name = "es.index.v1", help = "V1 ES index name")
-  flag[String](name = "es.index.v2", help = "V2 ES index name")
-
-  flag[String](name = "es.type", default = "item", help = "ES document type")
-
   override val name =
     "uk.ac.wellcome.platform.snapshot_generator SnapshotGenerator"
 
@@ -46,6 +41,7 @@ class Server extends HttpServer {
     S3ConfigModule,
     AkkaS3ClientModule,
     ElasticClientModule,
+    ElasticConfigModule,
     SnapshotGeneratorWorkerModule,
     AkkaModule
   )
