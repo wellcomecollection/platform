@@ -15,10 +15,11 @@ trait Server extends CloudWatch { this: Suite =>
     flags: Map[String, String],
     modifyServer: EmbeddedHttpServer => EmbeddedHttpServer)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
-    val server: EmbeddedHttpServer = modifyServer(new EmbeddedHttpServer(
-      new AppServer(),
-      flags = flags ++ cloudWatchLocalFlags
-    ))
+    val server: EmbeddedHttpServer = modifyServer(
+      new EmbeddedHttpServer(
+        new AppServer(),
+        flags = flags ++ cloudWatchLocalFlags
+      ))
 
     server.start()
 

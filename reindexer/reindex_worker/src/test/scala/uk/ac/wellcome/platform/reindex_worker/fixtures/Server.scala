@@ -23,4 +23,3 @@ trait Server extends CloudWatch { this: Suite =>
     }
   }
 }
-
