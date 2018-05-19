@@ -5,7 +5,7 @@ import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.google.inject.{Provides, Singleton}
 import com.twitter.app.Flaggable
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.finatra.modules.AkkaModule
+import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.monitoring.MetricsSender
 
 import scala.concurrent.duration._

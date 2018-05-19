@@ -110,6 +110,8 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++ dynamoDependencies
 
+  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies
+
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
   )

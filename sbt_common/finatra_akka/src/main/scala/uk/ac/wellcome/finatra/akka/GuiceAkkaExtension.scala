@@ -1,4 +1,4 @@
-package uk.ac.wellcome.utils
+package uk.ac.wellcome.finatra.akka
 
 import akka.actor._
 import com.google.inject.name.Names

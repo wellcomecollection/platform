@@ -9,6 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
+import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
   SNSClientModule,
@@ -16,7 +17,6 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule,
   SQSConfigModule
 }
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ConfigModule
 import uk.ac.wellcome.platform.snapshot_generator.finatra.SnapshotGeneratorModule
