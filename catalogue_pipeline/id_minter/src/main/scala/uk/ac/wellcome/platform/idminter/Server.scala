@@ -15,7 +15,6 @@ import uk.ac.wellcome.finatra.messaging.{
   SNSClientModule,
   SQSClientModule
 }
-import uk.ac.wellcome.finatra.modules._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ClientModule
 import uk.ac.wellcome.platform.idminter.modules._
