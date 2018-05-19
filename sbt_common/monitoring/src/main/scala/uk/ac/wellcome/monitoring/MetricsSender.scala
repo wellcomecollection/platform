@@ -4,7 +4,12 @@ import java.util.Date
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
+import akka.stream.{
+  ActorMaterializer,
+  OverflowStrategy,
+  QueueOfferResult,
+  ThrottleMode
+}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
@@ -16,10 +21,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-class MetricsSender @Inject()(
-  amazonCloudWatch: AmazonCloudWatch,
-  actorSystem: ActorSystem,
-  metricsConfig: MetricsConfig)
+class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
+                              actorSystem: ActorSystem,
+                              metricsConfig: MetricsConfig)
     extends Logging {
   implicit val system = actorSystem
   implicit val materialiser = ActorMaterializer()
@@ -36,8 +40,9 @@ class MetricsSender @Inject()(
       // Group the MetricDatum objects into lists of at max 20 items.
       // Send smaller chunks if not appearing within 10 seconds
       .viaMat(
-        Flow[MetricDatum].groupedWithin(metricDataListMaxSize, metricsConfig.flushInterval))(
-        Keep.left)
+        Flow[MetricDatum].groupedWithin(
+          metricDataListMaxSize,
+          metricsConfig.flushInterval))(Keep.left)
       // Make sure we don't exceed aws rate limit
       .throttle(
         maxPutMetricDataRequestsPerSecond,
