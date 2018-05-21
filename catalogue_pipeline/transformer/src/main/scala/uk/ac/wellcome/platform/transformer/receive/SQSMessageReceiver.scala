@@ -7,7 +7,6 @@ import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,
@@ -17,7 +16,7 @@ import uk.ac.wellcome.models.transformable.{
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.platform.transformer.transformers.{
   CalmTransformableTransformer,
   MiroTransformableTransformer,
