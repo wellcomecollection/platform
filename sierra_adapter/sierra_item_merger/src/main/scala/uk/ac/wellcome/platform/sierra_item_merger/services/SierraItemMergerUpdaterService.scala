@@ -8,8 +8,8 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemLinker
 import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.VersionedHybridStore
-import uk.ac.wellcome.models.{SourceMetadata, Sourced}
+import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.platform.sierra_item_merger.GlobalExecutionContext.context

@@ -4,7 +4,6 @@ import java.time.Instant
 
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.models.SourceMetadata
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
@@ -16,7 +15,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
 
 trait TransformableMessageUtils {
