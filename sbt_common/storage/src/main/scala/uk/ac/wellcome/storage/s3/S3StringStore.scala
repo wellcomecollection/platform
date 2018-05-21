@@ -1,32 +1,28 @@
 package uk.ac.wellcome.storage.s3
 
-import java.io.ByteArrayInputStream
-
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.io.Source
+
+import uk.ac.wellcome.storage.type_classes.KeyGenerator._
+import uk.ac.wellcome.storage.type_classes.StreamGenerator._
 
 
 class S3StringStore @Inject()(
   s3Client: AmazonS3,
-) extends Logging
+)(implicit ec: ExecutionContext) extends Logging
     with S3ObjectStore[String]{
-  def put(bucket: String)(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
-    val is = new ByteArrayInputStream(content.getBytes)
 
-    S3Storage.put(s3Client, bucket)(keyPrefix)(is)
+  override def put(bucket: String)(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
+    S3Storage.put(s3Client)(bucket)(content, keyPrefix)
   }
 
-  def get(s3ObjectLocation: S3ObjectLocation): Future[String] = {
-    val bucket = s3ObjectLocation.bucket
-    val key = s3ObjectLocation.key
+  override def get(s3ObjectLocation: S3ObjectLocation): Future[String] = {
+    val futureInput = S3Storage.get(s3Client)(s3ObjectLocation)
 
-    S3Storage.get(s3Client, bucket)(key).map (is =>
-      Source.fromInputStream(is).mkString
-    )
+    futureInput.map(input => Source.fromInputStream(input).mkString)
   }
 }

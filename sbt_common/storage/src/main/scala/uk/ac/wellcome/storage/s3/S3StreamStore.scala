@@ -8,16 +8,19 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.ac.wellcome.storage.type_classes.KeyGenerator._
+import uk.ac.wellcome.storage.type_classes.StreamGenerator._
+
+
 class S3StreamStore @Inject()(
   s3Client: AmazonS3
 )(implicit ec: ExecutionContext)
     extends Logging
     with S3ObjectStore[InputStream] {
 
-  override def put(bucket: String)(
-    in: InputStream,
-    keyPrefix: String): Future[S3ObjectLocation] =
-    S3Storage.put(s3Client, bucket)(keyPrefix)(in)
+  override def put(bucket: String)(input: InputStream, keyPrefix: String): Future[S3ObjectLocation] =
+    S3Storage.put(s3Client)(bucket)(input, keyPrefix)
+
   override def get(s3ObjectLocation: S3ObjectLocation): Future[InputStream] =
-    S3Storage.get(s3Client, s3ObjectLocation.bucket)(s3ObjectLocation.key)
+    S3Storage.get(s3Client)(s3ObjectLocation)
 }
