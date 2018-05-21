@@ -14,6 +14,7 @@ import uk.ac.wellcome.storage.s3.S3Config
 import scala.concurrent.duration._
 
 object MessageConfigModule extends TwitterModule {
+
   private val writerTopicArn = flag[String](
     "aws.message.writer.sns.topic.arn",
     "",

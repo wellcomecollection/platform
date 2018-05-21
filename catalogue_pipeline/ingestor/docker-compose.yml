@@ -1,7 +1,8 @@
-sqs:
-  image: s12v/elasticmq
+localstack:
+  image: localstack/localstack
   ports:
-    - "9324:9324"
+    - "4567-4583:4567-4583"
+    - "8080:8080"
 elasticsearch:
   image: docker.elastic.co/elasticsearch/elasticsearch:5.6.6
   ports:

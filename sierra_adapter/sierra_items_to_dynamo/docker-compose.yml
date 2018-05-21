@@ -2,7 +2,8 @@ dynamodb:
   image: peopleperhour/dynamodb
   ports:
     - "45678:8000"
-sqs:
-  image: s12v/elasticmq
+localstack:
+  image: localstack/localstack
   ports:
-    - "9324:9324"
+    - "4567-4583:4567-4583"
+    - "8080:8080"
