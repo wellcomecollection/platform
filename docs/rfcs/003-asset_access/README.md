@@ -1,6 +1,6 @@
 # RFC 003: Asset Access
 
-**Last updated: 14 May 2018.**
+**Last updated: 21 May 2018.**
 
 ## Background
 
