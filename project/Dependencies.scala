@@ -56,23 +56,27 @@ object Dependencies {
     "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % versions.scalaCheckShapelessVersion % "test"
   )
 
-  val finatraDependencies: Seq[ModuleID] = Seq(
+  val finatraDependencies = Seq(
+    "ch.qos.logback" % "logback-classic" % versions.logback,
+    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
-    "ch.qos.logback" % "logback-classic" % versions.logback,
-    "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
-    "com.twitter" %% "inject-server" % versions.finatra % "test",
-    "com.twitter" %% "inject-app" % versions.finatra % "test",
-    "com.twitter" %% "inject-core" % versions.finatra % "test",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test",
+    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests"
+  )
+
+  val injectDependencies = Seq(
     "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
-    "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-app" % versions.finatra % "test",
+    "com.twitter" %% "inject-core" % versions.finatra,
+    "com.twitter" %% "inject-core" % versions.finatra % "test",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests"
+    "com.twitter" %% "inject-modules" % versions.finatra % "test",
+    "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-server" % versions.finatra % "test" classifier "tests",
+    "com.twitter" %% "inject-server" % versions.finatra % "test"
   )
 
   val elasticsearchDependencies = Seq(
@@ -95,7 +99,7 @@ object Dependencies {
   )
 
   // Internal Library dependency groups
-  val commonDependencies = testDependencies ++ finatraDependencies ++ akkaDependencies ++ circeDependencies
+  val commonDependencies = testDependencies ++ injectDependencies ++ akkaDependencies ++ circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
@@ -115,7 +119,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++ dynamoDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies
+  val finatraAkkaDependencies = akkaDependencies ++ injectDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
