@@ -1,12 +1,13 @@
 package uk.ac.wellcome.storage.test.fixtures
 
+import java.io.InputStream
+
 import com.amazonaws.services.s3.AmazonS3
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.parser.parse
-import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.storage.s3.S3ClientFactory
+import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3ObjectLocation}
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConverters._
@@ -14,7 +15,7 @@ import scala.util.Random
 
 object S3 {
 
-  class Bucket(val name: String) extends AnyVal {
+  case class Bucket(val name: String) {
     override def toString = s"S3.Bucket($name)"
   }
 
@@ -75,9 +76,19 @@ trait S3 extends Logging with Eventually {
       }
     )
 
-  def getContentFromS3(bucket: Bucket, key: String): String = {
-    IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
-  }
+  def stringify(is: InputStream) =
+    scala.io.Source.fromInputStream(is).mkString
+
+  def getContentFromS3(s3ObjectLocation: S3ObjectLocation): String =
+    getContentFromS3(s3ObjectLocation.bucket, s3ObjectLocation.key)
+
+  def getContentFromS3(bucket: Bucket, key: String): String =
+    getContentFromS3(bucket.name, key)
+
+  def getContentFromS3(bucket: String, key: String): String =
+    stringify(
+      s3Client.getObject(bucket, key).getObjectContent
+    )
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
     parse(getContentFromS3(bucket, key)).right.get
