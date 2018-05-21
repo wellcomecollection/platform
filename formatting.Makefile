@@ -13,6 +13,12 @@ lint-js:
 		--volume $(ROOT):/data \
 		wellcome/jslint:latest
 
+lint-rfcs:
+	$(ROOT)/docker_run.py -- \
+		--volume $(ROOT):/data \
+		wellcome/build_tooling \
+		python3 /data/check_rfc_headers.py
+
 format-terraform:
 	$(ROOT)/docker_run.py --aws -- \
 		--volume $(ROOT):/repo \

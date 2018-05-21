@@ -1,4 +1,4 @@
-# RFC 1: Matcher architecture
+# RFC 001: Matcher architecture
 
 **Last updated: 21 May 2018.**
 
