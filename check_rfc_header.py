@@ -14,5 +14,18 @@ def get_rfc_readmes(repo):
                 yield os.path.join(root, f)
 
 
+print('*** Checking RFC headers')
+
 for f in get_rfc_readmes(ROOT):
-    print(f)
+    print('*** Checking header for %s' % os.path.relpath(f, start=ROOT))
+    filename = os.path.basename(os.path.dirname(f))
+    number, name = filename.split('-', 1)
+
+    contents = open(f).read()
+    header = contents.splitlines()[:3]
+
+    assert header[0].startswith('# RFC %03d: ' % int(number))
+    assert header[1] == ''
+
+    print(f, name)
+    print(header)
