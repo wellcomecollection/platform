@@ -27,18 +27,22 @@ object SierraConceptIdentifier {
   def maybeFindIdentifier(varField: VarField,
                           identifierSubfield: MarcSubfield,
                           ontologyType: String): Option[SourceIdentifier] = {
-
-    // The mapping from indicator 2 to the identifier scheme is provided
-    // by the MARC spec.
-    // https://www.loc.gov/marc/bibliographic/bd655.html
     val maybeIdentifierScheme = varField.indicator2 match {
       case None => None
+
+      // These mappings are provided by the MARC spec.
+      // https://www.loc.gov/marc/bibliographic/bd655.html
       case Some("0") =>
         Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
       case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
-      case Some(scheme) =>
-        throw new RuntimeException(
-          s"Unrecognised identifier scheme: $scheme (${varField.subfields})")
+      case Some("4") => None
+
+      // For now we omit the other schemes as they're fairly unusual in
+      // our collections.  If ind2 = "7", then we need to look in another
+      // subfield to find the identifier scheme.  For now, we just highlight
+      // LCSH and MESH, and drop everything else.
+      // TODO: Revisit this properly.
+      case Some(scheme) => None
     }
 
     maybeIdentifierScheme match {
