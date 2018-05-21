@@ -26,7 +26,7 @@ class LinkedWorkMatcher {
 
     val updatedLinkedWorkGraph: LinkedWorksGraph =
       LinkedWorkGraphUpdater.update(
-        LinkedWork(workId, linkedWorkIds),
+        LinkedWork(workId, linkedWorkIds, ""),
         existingLinkedWorkGraph)
 
     // return just the ids in the groups
