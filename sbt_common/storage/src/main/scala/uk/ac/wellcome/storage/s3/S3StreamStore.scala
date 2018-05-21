@@ -8,9 +8,7 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.ac.wellcome.storage.type_classes.KeyGenerator._
-import uk.ac.wellcome.storage.type_classes.StreamGenerator._
-
+import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
 class S3StreamStore @Inject()(
   s3Client: AmazonS3

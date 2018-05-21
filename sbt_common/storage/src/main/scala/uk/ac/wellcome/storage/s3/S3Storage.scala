@@ -5,7 +5,7 @@ import java.io.InputStream
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
 import com.twitter.inject.Logging
-import uk.ac.wellcome.storage.type_classes.{KeyGenerationStrategy, StreamGenerationStrategy}
+import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
@@ -30,18 +30,16 @@ object S3Storage extends Logging {
     bucketName: String
   )(t: T, keyPrefix: String = "", userMetadata: Map[String, String] = Map.empty[String, String])(
     implicit
-      keyGenerationStrategy: KeyGenerationStrategy[T],
-      streamStrategy: StreamGenerationStrategy[T],
+      storageStrategy: StorageStrategy[T],
       ec: ExecutionContext
   ): Future[S3ObjectLocation] = {
 
     val metadata = generateMetadata(userMetadata)
     val normalizedPrefix = normalizePrefix(keyPrefix)
-    val generatedKey = keyGenerationStrategy.getKey(t)
+
+    val (input, generatedKey) = storageStrategy.get(t)
 
     val key = s"$normalizedPrefix/$generatedKey"
-
-    val input = streamStrategy.getStream(t)
 
     info(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {
