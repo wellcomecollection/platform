@@ -12,7 +12,10 @@ class SourcedKeyPrefixGeneratorTest extends FunSpec with Matchers {
     }
 
     val sourcedKeyPrefixGenerator = new SourcedKeyPrefixGenerator()
-    val prefix = sourcedKeyPrefixGenerator.generate(sourced)
+    val prefix = sourcedKeyPrefixGenerator.generate(
+      id = sourced.sourceId,
+      obj = sourced
+    )
 
     prefix shouldBe "sourceName/43/1234"
   }

@@ -29,7 +29,7 @@ object IdentifiedWorkModule extends TwitterModule {
 
 class IdentifiedWorkKeyPrefixGenerator
     extends KeyPrefixGenerator[IdentifiedWork] {
-  override def generate(obj: IdentifiedWork): String = {
+  override def generate(id: String, obj: IdentifiedWork): String = {
     obj.sourceIdentifier.value.reverse.slice(0, 2)
   }
 }
