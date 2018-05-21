@@ -48,6 +48,17 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     actualSourceIdentifier shouldBe expectedSourceIdentifier
   }
 
+  it("finds a no-ID identifier if indicator 2 = 4") {
+    val varField = baseVarField.copy(indicator2 = Some("4"))
+    val identifierSubfield = MarcSubfield(tag = "0", content = "noid/000")
+
+    SierraConceptIdentifier.maybeFindIdentifier(
+      varField = varField,
+      identifierSubfield = identifierSubfield,
+      ontologyType = ontologyType
+    ) shouldBe None
+  }
+
   it("returns None if indicator 2 is empty") {
     val varField = baseVarField.copy(indicator2 = None)
     val identifierSubfield = MarcSubfield(tag = "0", content = "lcsh/789")
@@ -59,22 +70,18 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     ) shouldBe None
   }
 
-  it("throws an exception if it sees an unrecognised identifier scheme") {
+  it("returns None if it sees an unrecognised identifier scheme") {
     val identifierSubfield = MarcSubfield(tag = "0", content = "u/xxx")
     val varField = baseVarField.copy(
       indicator2 = Some("8"),
       subfields = List(identifierSubfield)
     )
 
-    val caught = intercept[RuntimeException] {
-      SierraConceptIdentifier.maybeFindIdentifier(
-        varField = varField,
-        identifierSubfield = identifierSubfield,
-        ontologyType = ontologyType
-      )
-    }
-
-    caught.getMessage shouldEqual s"Unrecognised identifier scheme: ${varField.indicator2.get} (${varField.subfields})"
+    SierraConceptIdentifier.maybeFindIdentifier(
+      varField = varField,
+      identifierSubfield = identifierSubfield,
+      ontologyType = ontologyType
+    ) shouldBe None
   }
 
   it("passes through the ontology type") {
