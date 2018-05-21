@@ -9,7 +9,7 @@ import org.mockito.ArgumentCaptor
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
@@ -33,8 +33,15 @@ class MetricsSenderTest
     it("records the time and count of a successful future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 1 second
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedResult = "foo"
@@ -67,8 +74,15 @@ class MetricsSenderTest
     it("records the time and count of a failed future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 1 second
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val timedFunction = () => Future { throw new RuntimeException() }
@@ -99,8 +113,15 @@ class MetricsSenderTest
     it("groups 20 MetricDatum into one PutMetricDataRequest") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender("test", 1 second, amazonCloudWatch, actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 1 second
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val emptyFunction = () => Future.successful(())
@@ -126,8 +147,15 @@ class MetricsSenderTest
     it("takes at least one second to make 150 PutMetricData requests") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender("test", 2 second, amazonCloudWatch, actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 2 seconds
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedDuration = (1 second).toMillis
@@ -164,12 +192,15 @@ class MetricsSenderTest
     it("calls putMetricData with the correct value") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender(
-            "test",
-            100 millisecond,
-            amazonCloudWatch,
-            actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 100 milliseconds
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedValue = 3.0F
@@ -190,12 +221,15 @@ class MetricsSenderTest
     it("calls putMetricData with the correct value") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsSender =
-          new MetricsSender(
-            "test",
-            100 milliseconds,
-            amazonCloudWatch,
-            actorSystem)
+        val metricsConfig = MetricsConfig(
+          namespace = "test",
+          flushInterval = 100 milliseconds
+        )
+        val metricsSender = new MetricsSender(
+          amazonCloudWatch = amazonCloudWatch,
+          actorSystem = actorSystem,
+          metricsConfig = metricsConfig
+        )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedValue = 5 millis
