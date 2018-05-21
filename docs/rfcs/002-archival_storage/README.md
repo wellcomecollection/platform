@@ -1,4 +1,4 @@
-# RFC 2: Archival Storage Service
+# RFC 002: Archival Storage Service
 
 **Last updated: 15 May 2018.**
 

@@ -1,4 +1,4 @@
-# RFC 5: Reporting Pipeline
+# RFC 005: Reporting Pipeline
 
 **Last updated: 14 May 2018.**
 

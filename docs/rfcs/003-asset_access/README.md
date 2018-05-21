@@ -1,4 +1,4 @@
-# RFC 3: Asset Access
+# RFC 003: Asset Access
 
 **Last updated: 14 May 2018.**
 
