@@ -8,12 +8,13 @@ import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorksIdentifiersList
+}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -33,6 +34,7 @@ class MatcherMessageReceiverTest
     with S3
     with MetricsSenderFixture
     with ExtendedPatience
+    with MatcherFixtures
     with Eventually {
 
   def withMatcherMessageReceiver[R](
@@ -57,52 +59,140 @@ class MatcherMessageReceiverTest
           snsWriter,
           new S3TypeStore[RecorderWorkEntry](s3Client),
           storageS3Config,
-          actorSystem)
+          actorSystem,
+          new LinkedWorkMatcher)
         testWith(matcherMessageReceiver)
       }
     }
   }
 
-  it("receives a message with UnidentifiedWork") {
+  it("sends no redirects for a work without identifiers") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val work = UnidentifiedWork(
-            sourceIdentifier = SourceIdentifier(
-              IdentifierSchemes.sierraSystemNumber,
-              "Work",
-              "id"),
-            title = Some("Work"),
-            version = 1
-          )
-          val workSqsMessage: NotificationMessage =
-            hybridRecordNotificationMessage(
-              message = toJson(RecorderWorkEntry(work = work)).get,
-              version = 1,
-              s3Client = s3Client,
-              bucket = storageBucket
-            )
-          sqsClient.sendMessage(
-            queue.url,
-            toJson(workSqsMessage).get
-          )
+          sendSQS(queue, storageBucket, anUnidentifiedSierraWork)
 
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             eventually {
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages.size should be >= 1
+              assertMessageSent(
+                topic,
+                LinkedWorksIdentifiersList(
+                  List(IdentifierList(List("sierra-system-number/id"))))
+              )
+            }
+          }
+        }
+      }
+    }
+  }
 
-              snsMessages.map { snsMessage =>
-                val redirectList =
-                  fromJson[RedirectList](snsMessage.message).get
-                redirectList shouldBe RedirectList(List(
-                  Redirect(target = work.sourceIdentifier, sources = List())))
+  it(
+    "work A with one link to B and no existing works returns a single matched work") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          val linkedIdentifier = aSierraSourceIdentifier("B")
+          val aIdentifier = aSierraSourceIdentifier("A")
+          val work = anUnidentifiedSierraWork.copy(
+            sourceIdentifier = aIdentifier,
+            identifiers = List(aIdentifier, linkedIdentifier))
+
+          sendSQS(queue, storageBucket, work)
+
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            eventually {
+              assertMessageSent(
+                topic,
+                LinkedWorksIdentifiersList(List(IdentifierList(
+                  List("sierra-system-number/A", "sierra-system-number/B"))))
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ignore("redirects a work with one link and existing redirects") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            val aIdentifier = aSierraSourceIdentifier("A")
+            val bIdentifier = aSierraSourceIdentifier("B")
+            val cIdentifier = aSierraSourceIdentifier("C")
+            val aWork = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier, bIdentifier))
+
+            sendSQS(queue, storageBucket, aWork)
+
+            eventually {
+
+              assertMessageSent(
+                topic,
+                LinkedWorksIdentifiersList(
+                  List(
+                    IdentifierList(
+                      List(
+                        "sierra-system-number/A",
+                        "sierra-system-number/B"
+                      ))))
+              )
+
+              val bWork = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = bIdentifier,
+                identifiers = List(bIdentifier, cIdentifier))
+
+              sendSQS(queue, storageBucket, bWork)
+
+              eventually {
+
+                assertMessageSent(
+                  topic,
+                  LinkedWorksIdentifiersList(
+                    List(
+                      IdentifierList(
+                        List(
+                          "sierra-system-number/A",
+                          "sierra-system-number/B",
+                          "sierra-system-number/C"
+                        ))))
+                )
               }
             }
           }
         }
       }
     }
+  }
+
+  private def assertMessageSent(
+    topic: Topic,
+    identifiersList: LinkedWorksIdentifiersList) = {
+    val snsMessages = listMessagesReceivedFromSNS(topic)
+    snsMessages.size should be >= 1
+
+    val actualMatchedWorkLists = snsMessages.map { snsMessage =>
+      fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
+    }
+    actualMatchedWorkLists should contain(identifiersList)
+  }
+
+  private def sendSQS(queue: SQS.Queue,
+                      storageBucket: Bucket,
+                      work: UnidentifiedWork) = {
+    val workSqsMessage: NotificationMessage =
+      hybridRecordNotificationMessage(
+        message = toJson(RecorderWorkEntry(work = work)).get,
+        version = 1,
+        s3Client = s3Client,
+        bucket = storageBucket
+      )
+    sqsClient.sendMessage(
+      queue.url,
+      toJson(workSqsMessage).get
+    )
   }
 
   def hybridRecordNotificationMessage(message: String,

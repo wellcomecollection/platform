@@ -15,6 +15,10 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorksIdentifiersList
+}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -36,11 +40,14 @@ class MatcherFeatureTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
+          val identifier = SourceIdentifier(
+            IdentifierSchemes.sierraSystemNumber,
+            "Work",
+            "id")
+
           val work = UnidentifiedWork(
-            sourceIdentifier = SourceIdentifier(
-              IdentifierSchemes.sierraSystemNumber,
-              "Work",
-              "id"),
+            sourceIdentifier = identifier,
+            identifiers = List(identifier),
             title = Some("Work"),
             version = 1
           )
@@ -62,10 +69,10 @@ class MatcherFeatureTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val redirectList =
-                  fromJson[RedirectList](snsMessage.message).get
-                redirectList shouldBe RedirectList(List(
-                  Redirect(target = work.sourceIdentifier, sources = List())))
+                val identifiersList =
+                  fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
+                identifiersList.linkedWorks shouldBe List(
+                  IdentifierList(List("sierra-system-number/id")))
               }
             }
           }

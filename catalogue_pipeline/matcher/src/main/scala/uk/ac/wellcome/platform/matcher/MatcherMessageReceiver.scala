@@ -5,22 +5,19 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-case class RedirectList(redirects: List[Redirect])
-case class Redirect(target: SourceIdentifier, sources: List[SourceIdentifier])
-
 class MatcherMessageReceiver @Inject()(
   messageStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
   s3TypeStore: S3TypeStore[RecorderWorkEntry],
   storageS3Config: S3Config,
-  actorSystem: ActorSystem) {
+  actorSystem: ActorSystem,
+  linkedWorkMatcher: LinkedWorkMatcher) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
@@ -33,12 +30,7 @@ class MatcherMessageReceiver @Inject()(
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       _ <- snsWriter.writeMessage(
-        message = toJson(
-          RedirectList(
-            List(
-              Redirect(
-                target = workEntry.work.sourceIdentifier,
-                sources = List())))).get,
+        message = toJson(linkedWorkMatcher.matchWork(workEntry.work)).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

@@ -20,6 +20,7 @@ object Dependencies {
     val scalaCheckShapelessVersion = "1.1.6"
     val sierraStreamsSourceVersion = "0.2"
     val jaxbVersion = "2.2.11"
+    val scalaGraphVersion = "1.12.5"
   }
 
   // External Library dependency groups
@@ -81,6 +82,10 @@ object Dependencies {
     "com.sksamuel.elastic4s" %% "elastic4s-http" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-http-streams" % versions.elastic4s,
     "com.sksamuel.elastic4s" %% "elastic4s-testkit" % versions.elastic4s % "test"
+  )
+
+  val scalaGraphDependencies = Seq(
+    "org.scala-graph" %% "graph-core" % versions.scalaGraphVersion
   )
 
   val testDependencies = Seq(

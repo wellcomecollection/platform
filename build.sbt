@@ -120,6 +120,7 @@ lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(internal_model % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.scalaGraphDependencies)
 
 lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
   .dependsOn(common % "compile->compile;test->test")
