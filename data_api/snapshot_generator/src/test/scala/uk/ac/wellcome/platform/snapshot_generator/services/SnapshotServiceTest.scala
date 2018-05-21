@@ -14,6 +14,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, ApiVersions}
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifierSchemes.sierraSystemNumber
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, SourceIdentifier}
@@ -52,14 +53,18 @@ class SnapshotServiceTest
     s3AkkaClient: S3Client,
     indexNameV1: String,
     indexNameV2: String)(testWith: TestWith[SnapshotService, R]) = {
+    val elasticConfig = ElasticConfig(
+      documentType = itemType,
+      indexV1name = indexNameV1,
+      indexV2name = indexNameV2
+    )
+
     val snapshotService = new SnapshotService(
       actorSystem = actorSystem,
       elasticClient = elasticClient,
+      elasticConfig = elasticConfig,
       akkaS3Client = s3AkkaClient,
       s3Endpoint = localS3EndpointUrl,
-      esIndexV1 = indexNameV1,
-      esIndexV2 = indexNameV2,
-      esType = itemType,
       objectMapper = mapper
     )
 
@@ -300,14 +305,18 @@ class SnapshotServiceTest
       withMaterializer(actorSystem) { actorMaterialiser =>
         withS3AkkaClient(actorSystem, actorMaterialiser) { s3Client =>
           withLocalS3Bucket { bucket =>
+            val elasticConfig = ElasticConfig(
+              documentType = itemType,
+              indexV1name = "wrong-index",
+              indexV2name = "wrong-index"
+            )
+
             val brokenSnapshotService = new SnapshotService(
               actorSystem = actorSystem,
               elasticClient = elasticClient,
+              elasticConfig = elasticConfig,
               akkaS3Client = s3Client,
               s3Endpoint = localS3EndpointUrl,
-              esIndexV1 = "wrong-index",
-              esIndexV2 = "wrong-index",
-              esType = itemType,
               objectMapper = mapper
             )
             val snapshotJob = SnapshotJob(

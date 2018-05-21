@@ -39,16 +39,13 @@ trait ElasticsearchFixtures
     "es.type" -> itemType
   )
 
-  val elasticConfig = ElasticConfig(
+  val elasticClient: HttpClient = ElasticClientBuilder.create(
     hostname = esHost,
-    hostPort = esPort,
-    hostProtocol = "http",
+    port = esPort,
+    protocol = "http",
     username = "elastic",
     password = "changeme"
   )
-
-  val elasticClient: HttpClient =
-    ElasticClientBuilder.buildElasticClient(elasticConfig)
 
   // Elasticsearch takes a while to start up so check that it actually started before running tests
   eventually {
@@ -59,9 +56,15 @@ trait ElasticsearchFixtures
     indexName: String = (Random.alphanumeric take 10 mkString) toLowerCase,
     itemType: String)(testWith: TestWith[String, R]): R = {
 
+    val elasticConfig = ElasticConfig(
+      documentType = itemType,
+      indexV1name = indexName,
+      indexV2name = s"$indexName-v2"
+    )
+
     val index = new WorksIndex(
       client = elasticClient,
-      itemType = itemType
+      elasticConfig = elasticConfig
     )
 
     withLocalElasticsearchIndex(index, indexName)(testWith)

@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.snapshot_generator.finatra
+package uk.ac.wellcome.finatra.elasticsearch
 
 import com.google.inject.{Provides, Singleton}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.TwitterModule
-import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig}
+import uk.ac.wellcome.elasticsearch.ElasticClientBuilder
 
-object SnapshotGeneratorModule extends TwitterModule {
+object ElasticClientModule extends TwitterModule {
   private val hostname =
     flag[String]("es.host", "localhost", "host name of ES")
   private val hostPort = flag[Int]("es.port", 9200, "port no of ES")
@@ -16,17 +16,12 @@ object SnapshotGeneratorModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesElasticConfig(): ElasticConfig =
-    ElasticConfig(
+  def providesElasticClient(): HttpClient =
+    ElasticClientBuilder.create(
       hostname = hostname(),
-      hostPort = hostPort(),
-      hostProtocol = hostProtocol(),
+      port = hostPort(),
+      protocol = hostProtocol(),
       username = username(),
       password = password()
     )
-
-  @Singleton
-  @Provides
-  def providesElasticClient(elasticConfig: ElasticConfig): HttpClient =
-    ElasticClientBuilder.buildElasticClient(elasticConfig)
 }

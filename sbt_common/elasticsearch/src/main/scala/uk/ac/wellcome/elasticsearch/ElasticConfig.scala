@@ -1,9 +1,7 @@
 package uk.ac.wellcome.elasticsearch
 
 case class ElasticConfig(
-  hostname: String,
-  hostPort: Int,
-  hostProtocol: String,
-  username: String,
-  password: String
+  documentType: String,
+  indexV1name: String,
+  indexV2name: String
 )

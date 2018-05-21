@@ -7,14 +7,12 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 
-class WorksIndex @Inject()(client: HttpClient,
-                           @Flag("es.type") itemType: String)
+class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     extends ElasticSearchIndex
     with Logging {
 
-  val rootIndexType = itemType
+  val rootIndexType = elasticConfig.documentType
 
   val httpClient: HttpClient = client
 

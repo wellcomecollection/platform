@@ -8,7 +8,7 @@ import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.elasticsearch.ElasticCredentials
+import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
@@ -191,9 +191,14 @@ class IngestorWorkerServiceTest
           bucket,
           queue,
           metricsSender) { messageStream =>
+          val elasticConfig = ElasticConfig(
+            documentType = itemType,
+            indexV1name = esIndexV1,
+            indexV2name = esIndexV2
+          )
+
           val service = new IngestorWorkerService(
-            esIndexV1 = esIndexV1,
-            esIndexV2 = esIndexV2,
+            elasticConfig = elasticConfig,
             identifiedWorkIndexer = workIndexer,
             messageStream = messageStream,
             system = actorSystem
