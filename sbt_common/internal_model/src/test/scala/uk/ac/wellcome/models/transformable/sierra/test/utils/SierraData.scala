@@ -1,4 +1,4 @@
-package uk.ac.wellcome.test.utils
+package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 
