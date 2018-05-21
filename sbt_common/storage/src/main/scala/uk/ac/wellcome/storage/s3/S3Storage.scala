@@ -10,14 +10,15 @@ import uk.ac.wellcome.storage.type_classes.StorageStrategy
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
-
 object S3Storage extends Logging {
 
-  private def normalizePrefix(prefix: String) = prefix
-    .stripPrefix("/")
-    .stripSuffix("/")
+  private def normalizePrefix(prefix: String) =
+    prefix
+      .stripPrefix("/")
+      .stripSuffix("/")
 
-  private def generateMetadata(userMetadata: Map[String, String]): ObjectMetadata = {
+  private def generateMetadata(
+    userMetadata: Map[String, String]): ObjectMetadata = {
     val objectMetadata = new ObjectMetadata()
 
     objectMetadata.setUserMetadata(userMetadata.asJava)
@@ -25,13 +26,13 @@ object S3Storage extends Logging {
     objectMetadata
   }
 
-  def put[T](
-    s3Client: AmazonS3)(
+  def put[T](s3Client: AmazonS3)(
     bucketName: String
-  )(t: T, keyPrefix: String = "", userMetadata: Map[String, String] = Map.empty[String, String])(
-    implicit
-      storageStrategy: StorageStrategy[T],
-      ec: ExecutionContext
+  )(t: T,
+    keyPrefix: String = "",
+    userMetadata: Map[String, String] = Map.empty[String, String])(
+    implicit storageStrategy: StorageStrategy[T],
+    ec: ExecutionContext
   ): Future[S3ObjectLocation] = {
 
     val metadata = generateMetadata(userMetadata)

@@ -13,9 +13,10 @@ trait StorageStrategy[T] {
 
 object StorageStrategyGenerator {
 
-  private def hash(s: String) = MurmurHash3
-    .stringHash(s, MurmurHash3.stringSeed)
-    .toHexString
+  private def hash(s: String) =
+    MurmurHash3
+      .stringHash(s, MurmurHash3.stringSeed)
+      .toHexString
 
   def getKey[T](t: T)(implicit strategy: StorageStrategy[T]) =
     strategy.get(t)

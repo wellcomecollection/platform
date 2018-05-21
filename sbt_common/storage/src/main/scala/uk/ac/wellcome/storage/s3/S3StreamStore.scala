@@ -16,7 +16,9 @@ class S3StreamStore @Inject()(
     extends Logging
     with S3ObjectStore[InputStream] {
 
-  override def put(bucket: String)(input: InputStream, keyPrefix: String): Future[S3ObjectLocation] =
+  override def put(bucket: String)(
+    input: InputStream,
+    keyPrefix: String): Future[S3ObjectLocation] =
     S3Storage.put(s3Client)(bucket)(input, keyPrefix)
 
   override def get(s3ObjectLocation: S3ObjectLocation): Future[InputStream] =
