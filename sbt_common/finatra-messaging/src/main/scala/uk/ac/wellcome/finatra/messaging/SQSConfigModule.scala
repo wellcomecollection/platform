@@ -18,7 +18,10 @@ object SQSConfigModule extends TwitterModule {
     flag("aws.sqs.maxMessages", 10, "Maximum number of SQS messages to return")
 
   val parallelism =
-    flag("aws.sqs.parallelism", 10, "Number of messages to process in parallel")
+    flag(
+      "aws.sqs.parallelism",
+      10,
+      "Number of messages to process in parallel")
 
   @Singleton
   @Provides
