@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher
+package uk.ac.wellcome.platform.matcher.messages
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject

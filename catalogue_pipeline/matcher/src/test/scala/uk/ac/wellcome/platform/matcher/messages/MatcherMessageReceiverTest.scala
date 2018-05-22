@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher
+package uk.ac.wellcome.platform.matcher.messages
 
 import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually

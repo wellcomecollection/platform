@@ -4,12 +4,10 @@ import akka.actor.ActorSystem
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
 import javax.inject.Singleton
-import uk.ac.wellcome.platform.matcher.{
-  GlobalExecutionContext,
-  MatcherMessageReceiver
-}
+import uk.ac.wellcome.platform.matcher.GlobalExecutionContext
 
 import scala.concurrent.ExecutionContext
+import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 
 object MatcherModule extends TwitterModule {
   override def singletonStartup(injector: Injector): Unit = {

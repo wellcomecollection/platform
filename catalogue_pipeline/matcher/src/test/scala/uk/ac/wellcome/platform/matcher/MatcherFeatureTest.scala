@@ -32,7 +32,7 @@ class MatcherFeatureTest
     with ExtendedPatience
     with Eventually {
 
-  it("receives a message with UnidentifiedWork") {
+  it("processes a message with a sinple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>

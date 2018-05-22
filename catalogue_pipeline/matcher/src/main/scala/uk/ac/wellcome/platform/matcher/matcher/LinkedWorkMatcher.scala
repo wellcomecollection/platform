@@ -27,7 +27,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     eventualLinkedWorksGraph.map { linkedWorksGraph =>
       val updatedLinkedWorkGraph: LinkedWorksGraph =
         LinkedWorkGraphUpdater.update(
-          LinkedWork(workId, linkedWorkIds, ""),
+          LinkedWorkUpdate(workId, linkedWorkIds),
           linkedWorksGraph)
 
       // persist updated graph

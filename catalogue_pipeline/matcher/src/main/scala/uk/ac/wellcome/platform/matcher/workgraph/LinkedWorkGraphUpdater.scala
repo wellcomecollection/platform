@@ -2,18 +2,18 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorksGraph}
+import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
 
 object LinkedWorkGraphUpdater {
-  def update(workUpdate: LinkedWork,
+  def update(workUpdate: LinkedWorkUpdate,
              existingGraph: LinkedWorksGraph): LinkedWorksGraph = {
 
     val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
       workUpdate.workId,
       existingGraph.linkedWorksSet)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
-      toEdges(linkedWork)
-    }) ++ toEdges(workUpdate)
+      toEdges(linkedWork.workId, linkedWork.linkedIds)
+    }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
 
     val nodes = existingGraph.linkedWorksSet.flatMap(linkedWork => {
       allNodes(linkedWork)
@@ -42,8 +42,8 @@ object LinkedWorkGraphUpdater {
     linkedWork.workId +: linkedWork.linkedIds
   }
 
-  private def toEdges(linkedWork: LinkedWork) = {
-    linkedWork.linkedIds.map(linkedWork.workId ~> _)
+  private def toEdges(workId: String, linkedWorkIds: List[String]) = {
+    linkedWorkIds.map(workId ~> _)
   }
 
   private def existingGraphWithoutUpdatedNode(
