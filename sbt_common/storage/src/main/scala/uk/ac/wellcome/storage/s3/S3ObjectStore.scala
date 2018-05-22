@@ -5,6 +5,6 @@ import scala.concurrent.Future
 trait S3ObjectStore[T] {
   def put(bucket: String)(in: T,
                           keyPrefix: String,
-                          keySufix: String = ""): Future[S3ObjectLocation]
+                          keySuffix: String = ""): Future[S3ObjectLocation]
   def get(s3ObjectLocation: S3ObjectLocation): Future[T]
 }
