@@ -3,7 +3,7 @@ locals {
 }
 
 module "sierra_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
   name   = "${local.service_name}"
 
   source_queue_name  = "${module.windows_queue.name}"

@@ -1,5 +1,5 @@
 module "matcher" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v7.0.1"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
   name   = "matcher"
 
   source_queue_name  = "${module.matcher_queue.name}"
