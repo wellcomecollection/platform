@@ -19,7 +19,6 @@ module "ingestor" {
   env_vars = {
     es_host             = "${data.template_file.es_cluster_host_ingestor.rendered}"
     es_port             = "${var.es_config_ingestor["port"]}"
-    es_name             = "${var.es_config_ingestor["name"]}"
     es_index_v1         = "${var.es_config_ingestor["index_v1"]}"
     es_index_v2         = "${var.es_config_ingestor["index_v2"]}"
     es_doc_type         = "${var.es_config_ingestor["doc_type"]}"
