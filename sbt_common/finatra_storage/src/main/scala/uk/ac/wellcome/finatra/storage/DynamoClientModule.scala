@@ -16,7 +16,10 @@ object DynamoClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.dynamoDb.secretKey", "", "SecretKey to access DynamoDB")
 
-  private val region = flag[String](name = "aws.dynamoDb.region", default = "eu-west-1", help = "AWS region for dynamoDb")
+  private val region = flag[String](
+    name = "aws.dynamoDb.region",
+    default = "eu-west-1",
+    help = "AWS region for dynamoDb")
 
   @Singleton
   @Provides

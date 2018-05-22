@@ -17,7 +17,10 @@ object S3ClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
 
-  private val region = flag[String](name = "aws.s3.region", default = "eu-west-1", help = "AWS region for s3")
+  private val region = flag[String](
+    name = "aws.s3.region",
+    default = "eu-west-1",
+    help = "AWS region for s3")
 
   @Singleton
   @Provides

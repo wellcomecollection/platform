@@ -17,7 +17,10 @@ object SNSClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.sns.secretKey", "", "SecretKey to access SNS")
 
-  private val region = flag[String](name = "aws.sns.region", default = "eu-west-1", help = "AWS region for sns")
+  private val region = flag[String](
+    name = "aws.sns.region",
+    default = "eu-west-1",
+    help = "AWS region for sns")
 
   @Singleton
   @Provides
