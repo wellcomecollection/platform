@@ -2,27 +2,35 @@ package uk.ac.wellcome.storage.s3
 
 import java.io.InputStream
 
-import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-
-import scala.concurrent.{ExecutionContext, Future}
+import uk.ac.wellcome.storage.{KeyPrefix, KeySuffix, ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
+import scala.concurrent.{ExecutionContext, Future}
+
+import scala.io.Source
+
 class S3StreamStore @Inject()(
-  s3Client: AmazonS3
+  storageBackend: S3StorageBackend[InputStream]
 )(implicit ec: ExecutionContext)
     extends Logging
-    with S3ObjectStore[InputStream] {
+    with ObjectStore[InputStream] {
 
-  override def put(bucket: String)(
+  def put(bucket: String)(
     input: InputStream,
-    keyPrefix: String,
-    keySuffix: String = ""
-  ): Future[S3ObjectLocation] =
-    S3Storage.put(s3Client)(bucket)(input, keyPrefix, keySuffix)
+    keyPrefix: KeyPrefix = KeyPrefix(""),
+    keySuffix: KeySuffix = KeySuffix(""),
+    userMetadata: Map[String, String] = Map()
+  )(implicit storageStrategy: StorageStrategy[InputStream]): Future[ObjectLocation] =
+    storageBackend.put(bucket)(input, keyPrefix, keySuffix, userMetadata)
 
-  override def get(s3ObjectLocation: S3ObjectLocation): Future[InputStream] =
-    S3Storage.get(s3Client)(s3ObjectLocation)
+  def get(objectLocation: ObjectLocation)(
+    implicit storageStrategy: StorageStrategy[InputStream]
+  ): Future[String] =
+    storageBackend
+      .get(objectLocation)
+      .map(input => Source.fromInputStream(input).mkString)
 }

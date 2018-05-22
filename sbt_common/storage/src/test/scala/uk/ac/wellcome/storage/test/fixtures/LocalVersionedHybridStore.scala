@@ -4,18 +4,14 @@ import java.io.InputStream
 
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, Json}
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{
-  HybridRecord,
-  VHSConfig,
-  VersionedHybridStore
-}
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -54,12 +50,12 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3TypeStore[T](
-      s3Client = s3Client
+      new S3StorageBackend[Json](s3Client)
     )
 
     val store = new VersionedHybridStore[T, S3TypeStore[T]](
       vhsConfig = vhsConfig,
-      s3ObjectStore = s3ObjectStore,
+      objectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
 
@@ -83,12 +79,12 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3StreamStore(
-      s3Client = s3Client
+      new S3StorageBackend[InputStream](s3Client)
     )
 
     val store = new VersionedHybridStore[InputStream, S3StreamStore](
       vhsConfig = vhsConfig,
-      s3ObjectStore = s3ObjectStore,
+      objectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
 
@@ -109,12 +105,12 @@ trait LocalVersionedHybridStore
     )
 
     val s3ObjectStore = new S3StringStore(
-      s3Client = s3Client
+      new S3StorageBackend[String](s3Client)
     )
 
     val store = new VersionedHybridStore[String, S3StringStore](
       vhsConfig = vhsConfig,
-      s3ObjectStore = s3ObjectStore,
+      objectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
 

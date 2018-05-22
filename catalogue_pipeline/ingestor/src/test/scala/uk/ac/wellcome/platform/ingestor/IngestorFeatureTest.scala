@@ -6,12 +6,8 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierSchemes,
-  SourceIdentifier
-}
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes, SourceIdentifier}
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -145,8 +141,8 @@ class IngestorFeatureTest
   private def sendToSqs(work: IdentifiedWork, queue: Queue, bucket: Bucket) = {
     val messageBody = put[IdentifiedWork](
       obj = work,
-      location = S3ObjectLocation(
-        bucket = bucket.name,
+      location = ObjectLocation(
+        namespace = bucket.name,
         key = s"${work.canonicalId}.json"
       )
     )

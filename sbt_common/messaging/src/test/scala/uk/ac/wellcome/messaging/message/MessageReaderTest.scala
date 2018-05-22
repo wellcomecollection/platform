@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, _}
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -26,7 +26,7 @@ class MessageReaderTest
         val key = "message-key"
         val exampleObject = ExampleObject("some value")
 
-        val notice = put(exampleObject, S3ObjectLocation(bucket.name, key))
+        val notice = put(exampleObject, ObjectLocation(bucket.name, key))
 
         sqsClient.sendMessage(
           queue.url,
@@ -89,7 +89,7 @@ class MessageReaderTest
         // Do NOT put S3 object here
 
         val examplePointer =
-          MessagePointer(S3ObjectLocation(bucket.name, key))
+          MessagePointer(ObjectLocation(bucket.name, key))
         val serialisedExamplePointer = toJson(examplePointer).get
 
         val exampleNotification = NotificationMessage(

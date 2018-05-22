@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.s3
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -39,7 +40,7 @@ class S3TypeStoreTest
           val expectedJson = JsonUtil.toJson(testObject).get
 
           val expectedKey = s"$prefix/$expectedHash.json"
-          val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
+          val expectedUri = ObjectLocation(bucket.name, expectedKey)
 
           actualKey shouldBe expectedUri
 
@@ -64,7 +65,7 @@ class S3TypeStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+            ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
         }
       }
@@ -81,7 +82,7 @@ class S3TypeStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+            ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
         }
       }
@@ -109,7 +110,7 @@ class S3TypeStoreTest
       withS3TypeStore(bucket) { objectStore =>
         whenReady(
           objectStore
-            .get(S3ObjectLocation(bucket.name, "not/a/real/object"))
+            .get(ObjectLocation(bucket.name, "not/a/real/object"))
             .failed) { exception =>
           exception shouldBe a[AmazonS3Exception]
           exception

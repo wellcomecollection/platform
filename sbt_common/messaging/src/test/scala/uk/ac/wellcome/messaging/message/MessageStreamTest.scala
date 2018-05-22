@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -115,7 +115,7 @@ class MessageStreamTest
         // Do NOT put S3 object here
 
         val examplePointer =
-          MessagePointer(S3ObjectLocation(bucket.name, key))
+          MessagePointer(ObjectLocation(bucket.name, key))
         val serialisedExamplePointer = toJson(examplePointer).get
 
         val exampleNotification = NotificationMessage(

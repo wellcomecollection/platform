@@ -7,7 +7,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -29,7 +29,7 @@ class MessageWorkerTest
         val exampleObject = ExampleObject("some value")
         val exampleObjectJson = toJson(exampleObject).get
 
-        val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+        val examplePointer = MessagePointer(ObjectLocation(bucket.name, key))
 
         val exampleNotification = NotificationMessage(
           MessageId = "MessageId",
@@ -59,7 +59,7 @@ class MessageWorkerTest
         val exampleObject = ExampleObject("some value")
         val exampleObjectJson = toJson(exampleObject).get
 
-        val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+        val examplePointer = MessagePointer(ObjectLocation(bucket.name, key))
 
         val exampleNotification = NotificationMessage(
           MessageId = "MessageId",
@@ -106,7 +106,7 @@ class MessageWorkerTest
 
         s3Client.putObject(bucket.name, key, json)
 
-        val examplePointer = MessagePointer(S3ObjectLocation(bucket.name, key))
+        val examplePointer = MessagePointer(ObjectLocation(bucket.name, key))
 
         val exampleNotification = NotificationMessage(
           MessageId = "MessageId",

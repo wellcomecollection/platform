@@ -5,8 +5,13 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+<<<<<<< HEAD:catalogue_pipeline/matcher/src/main/scala/uk/ac/wellcome/platform/matcher/messages/MatcherMessageReceiver.scala
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
+=======
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+>>>>>>> Storage experiment:catalogue_pipeline/matcher/src/main/scala/uk/ac/wellcome/platform/matcher/MatcherMessageReceiver.scala
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -29,7 +34,7 @@ class MatcherMessageReceiver @Inject()(
       hybridRecord <- Future.fromTry(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
-        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+        ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
         message = toJson(identifiersList).get,

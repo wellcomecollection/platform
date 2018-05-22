@@ -5,12 +5,8 @@ import io.circe.generic.extras.semiauto.deriveDecoder
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -53,8 +49,8 @@ class RecorderFeatureTest
               withServer(flags) { _ =>
                 val messageBody = put[UnidentifiedWork](
                   obj = work,
-                  location = S3ObjectLocation(
-                    bucket = bucket.name,
+                  location = ObjectLocation(
+                    namespace = bucket.name,
                     key = "work_message.json"
                   )
                 )

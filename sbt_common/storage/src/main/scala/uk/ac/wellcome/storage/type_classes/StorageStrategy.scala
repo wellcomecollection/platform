@@ -4,7 +4,12 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import io.circe.Json
 
+import scala.io.Source
 import scala.io.Source.fromInputStream
+import io.circe._
+import io.circe.parser._
+
+import scala.util.{Success, Try}
 import scala.util.hashing.MurmurHash3
 
 case class StorageKey(val value: String) extends AnyVal
@@ -15,7 +20,8 @@ case class StorageStream(inputStream: InputStream, storageKey: StorageKey)
 // a unique storage path.
 
 trait StorageStrategy[T] {
-  def get(t: T): StorageStream
+  def store(t: T): StorageStream
+  def retrieve(input: InputStream): Try[T]
 }
 
 object StorageStrategyGenerator {
@@ -25,9 +31,9 @@ object StorageStrategyGenerator {
       .stringHash(s, MurmurHash3.stringSeed)
       .toHexString
 
-  implicit val inputStreamKeyGetter: StorageStrategy[InputStream] =
+  implicit val streamStore: StorageStrategy[InputStream] =
     new StorageStrategy[InputStream] {
-      def get(t: InputStream): StorageStream = {
+      def store(t: InputStream): StorageStream = {
         val s = fromInputStream(t).mkString
 
         val key = StorageKey(hash(s))
@@ -35,26 +41,37 @@ object StorageStrategyGenerator {
 
         StorageStream(input, key)
       }
+
+      def retrieve(input: InputStream) = Success(input)
     }
 
-  implicit val stringKeyGetter: StorageStrategy[String] =
+  implicit val stringStore: StorageStrategy[String] =
     new StorageStrategy[String] {
-      def get(t: String): StorageStream = {
+      def store(t: String): StorageStream = {
         val key = StorageKey(hash(t))
         val input = new ByteArrayInputStream(t.getBytes)
 
         StorageStream(input, key)
       }
+
+      def retrieve(input: InputStream) =
+        Success(Source.fromInputStream(input).mkString)
+
     }
 
-  implicit val jsonKeyGetter: StorageStrategy[Json] =
+  implicit val typeStore: StorageStrategy[Json] =
     new StorageStrategy[Json] {
-      def get(t: Json): StorageStream = {
+      def store(t: Json): StorageStream = {
         val key = StorageKey(hash(t.noSpaces))
         val input = new ByteArrayInputStream(t.noSpaces.getBytes)
 
         StorageStream(input, key)
       }
-    }
 
+      def retrieve(input: InputStream) =
+          parse(Source.fromInputStream(input).mkString).toTry
+
+    }
 }
+
+

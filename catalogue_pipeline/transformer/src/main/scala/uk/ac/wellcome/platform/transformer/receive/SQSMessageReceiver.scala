@@ -7,22 +7,15 @@ import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
-import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -72,8 +65,8 @@ class SQSMessageReceiver @Inject()(
     hybridRecord: HybridRecord,
     sourceMetadata: SourceMetadata
   ) = {
-    val s3ObjectLocation = S3ObjectLocation(
-      bucket = s3Config.bucketName,
+    val s3ObjectLocation = ObjectLocation(
+      namespace = s3Config.bucketName,
       key = hybridRecord.s3key
     )
 
