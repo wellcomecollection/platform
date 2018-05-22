@@ -1,6 +1,6 @@
 package uk.ac.wellcome.utils
 
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.java8.time.TimeInstances
 import io.circe.parser._
