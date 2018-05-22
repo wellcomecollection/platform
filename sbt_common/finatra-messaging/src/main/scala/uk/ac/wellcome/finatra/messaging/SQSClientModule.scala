@@ -4,7 +4,6 @@ import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
 import javax.inject.Singleton
-import uk.ac.wellcome.finatra.messaging.SNSClientModule.flag
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
 
 object SQSClientModule extends TwitterModule {
