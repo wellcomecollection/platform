@@ -17,12 +17,15 @@ class S3TypeStore[T] @Inject()(
     extends Logging
     with S3ObjectStore[T] {
 
-  override def put(
-    bucket: String)(input: T, keyPrefix: String): Future[S3ObjectLocation] = {
+  override def put(bucket: String)(
+    input: T,
+    keyPrefix: String,
+    keySuffix: String = ".json"
+  ): Future[S3ObjectLocation] = {
     Future
       .fromTry(toJson(input))
       .flatMap(jsonInput =>
-        S3Storage.put(s3Client)(bucket)(jsonInput, keyPrefix))
+        S3Storage.put(s3Client)(bucket)(jsonInput, keyPrefix, keySuffix))
   }
 
   override def get(s3ObjectLocation: S3ObjectLocation): Future[T] = {

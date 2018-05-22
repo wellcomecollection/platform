@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 object S3Storage extends Logging {
 
-  private def normalizePrefix(prefix: String) =
+  private def normalizePathFragment(prefix: String) =
     prefix
       .stripPrefix("/")
       .stripSuffix("/")
@@ -30,21 +30,24 @@ object S3Storage extends Logging {
     bucketName: String
   )(t: T,
     keyPrefix: String = "",
-    userMetadata: Map[String, String] = Map.empty[String, String])(
+    keySuffix: String = "",
+    userMetadata: Map[String, String] = Map())(
     implicit storageStrategy: StorageStrategy[T],
     ec: ExecutionContext
   ): Future[S3ObjectLocation] = {
 
     val metadata = generateMetadata(userMetadata)
-    val normalizedPrefix = normalizePrefix(keyPrefix)
+    val storageStream = storageStrategy.get(t)
 
-    val (input, generatedKey) = storageStrategy.get(t)
+    val prefix = normalizePathFragment(keyPrefix)
+    val suffix = normalizePathFragment(keySuffix)
+    val storageKey = storageStream.storageKey.value
 
-    val key = s"$normalizedPrefix/$generatedKey"
+    val key = s"$prefix/${storageKey}$suffix"
 
     info(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {
-      s3Client.putObject(bucketName, key, input, metadata)
+      s3Client.putObject(bucketName, key, storageStream.inputStream, metadata)
     }
 
     putObject.map { _ =>

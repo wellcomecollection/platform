@@ -15,8 +15,12 @@ class S3StringStore @Inject()(
 )(implicit ec: ExecutionContext) extends Logging
     with S3ObjectStore[String]{
 
-  override def put(bucket: String)(content: String, keyPrefix: String): Future[S3ObjectLocation] = {
-    S3Storage.put(s3Client)(bucket)(content, keyPrefix)
+  override def put(bucket: String)(
+    content: String,
+    keyPrefix: String,
+    keySuffix: String = ""
+  ): Future[S3ObjectLocation] = {
+    S3Storage.put(s3Client)(bucket)(content, keyPrefix, keySuffix)
   }
 
   override def get(s3ObjectLocation: S3ObjectLocation): Future[String] = {

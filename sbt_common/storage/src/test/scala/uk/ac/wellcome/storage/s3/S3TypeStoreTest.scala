@@ -38,7 +38,7 @@ class S3TypeStoreTest
         whenReady(writtenToS3) { actualKey =>
           val expectedJson = JsonUtil.toJson(testObject).get
 
-          val expectedKey = s"$prefix/$expectedHash"
+          val expectedKey = s"$prefix/$expectedHash.json"
           val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
 
           actualKey shouldBe expectedUri
@@ -64,7 +64,7 @@ class S3TypeStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash")
+            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
         }
       }
@@ -81,7 +81,7 @@ class S3TypeStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash")
+            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
           actualKey shouldBe expectedUri
         }
       }

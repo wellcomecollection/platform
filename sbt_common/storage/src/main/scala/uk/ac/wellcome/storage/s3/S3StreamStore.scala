@@ -18,8 +18,10 @@ class S3StreamStore @Inject()(
 
   override def put(bucket: String)(
     input: InputStream,
-    keyPrefix: String): Future[S3ObjectLocation] =
-    S3Storage.put(s3Client)(bucket)(input, keyPrefix)
+    keyPrefix: String,
+    keySuffix: String = ""
+  ): Future[S3ObjectLocation] =
+    S3Storage.put(s3Client)(bucket)(input, keyPrefix, keySuffix)
 
   override def get(s3ObjectLocation: S3ObjectLocation): Future[InputStream] =
     S3Storage.get(s3Client)(s3ObjectLocation)

@@ -7,8 +7,15 @@ import io.circe.Json
 import scala.io.Source.fromInputStream
 import scala.util.hashing.MurmurHash3
 
+case class StorageKey(val value: String) extends AnyVal
+case class StorageStream(inputStream: InputStream, storageKey: StorageKey)
+
+// This type class describes an implementation that takes a type T
+// and produces a java.io.InputStream and a StorageKey indicating
+// a unique storage path.
+
 trait StorageStrategy[T] {
-  def get(t: T): (InputStream, String)
+  def get(t: T): StorageStream
 }
 
 object StorageStrategyGenerator {
@@ -18,38 +25,35 @@ object StorageStrategyGenerator {
       .stringHash(s, MurmurHash3.stringSeed)
       .toHexString
 
-  def getKey[T](t: T)(implicit strategy: StorageStrategy[T]) =
-    strategy.get(t)
-
   implicit val inputStreamKeyGetter: StorageStrategy[InputStream] =
     new StorageStrategy[InputStream] {
-      def get(t: InputStream): (InputStream, String) = {
+      def get(t: InputStream): StorageStream = {
         val s = fromInputStream(t).mkString
 
-        val key = hash(s)
+        val key = StorageKey(hash(s))
         val input = new ByteArrayInputStream(s.getBytes)
 
-        (input, key)
+        StorageStream(input, key)
       }
     }
 
   implicit val stringKeyGetter: StorageStrategy[String] =
     new StorageStrategy[String] {
-      def get(t: String): (InputStream, String) = {
-        val key = hash(t)
+      def get(t: String): StorageStream = {
+        val key = StorageKey(hash(t))
         val input = new ByteArrayInputStream(t.getBytes)
 
-        (input, key)
+        StorageStream(input, key)
       }
     }
 
   implicit val jsonKeyGetter: StorageStrategy[Json] =
     new StorageStrategy[Json] {
-      def get(t: Json): (InputStream, String) = {
-        val key = hash(t.noSpaces)
+      def get(t: Json): StorageStream = {
+        val key = StorageKey(hash(t.noSpaces))
         val input = new ByteArrayInputStream(t.noSpaces.getBytes)
 
-        (input, key)
+        StorageStream(input, key)
       }
     }
 
