@@ -1,10 +1,10 @@
 package uk.ac.wellcome.finatra.storage
 
 import javax.inject.Singleton
-
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import uk.ac.wellcome.finatra.storage.DynamoClientModule.flag
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 
 object S3ClientModule extends TwitterModule {
@@ -18,7 +18,7 @@ object S3ClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
 
-  private val region = flag[String]("aws.s3.region", "eu-west-1")
+  private val region = flag[String](name = "aws.s3.region", default = "eu-west-1", help = "AWS region for s3")
 
   @Singleton
   @Provides
