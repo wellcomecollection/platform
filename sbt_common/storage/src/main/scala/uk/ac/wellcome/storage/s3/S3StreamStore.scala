@@ -8,6 +8,8 @@ import com.twitter.inject.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
+
 class S3StreamStore @Inject()(
   s3Client: AmazonS3
 )(implicit ec: ExecutionContext)
@@ -15,9 +17,12 @@ class S3StreamStore @Inject()(
     with S3ObjectStore[InputStream] {
 
   override def put(bucket: String)(
-    in: InputStream,
-    keyPrefix: String): Future[S3ObjectLocation] =
-    S3Storage.put(s3Client, bucket)(keyPrefix)(in)
+    input: InputStream,
+    keyPrefix: String,
+    keySuffix: String = ""
+  ): Future[S3ObjectLocation] =
+    S3Storage.put(s3Client)(bucket)(input, keyPrefix, keySuffix)
+
   override def get(s3ObjectLocation: S3ObjectLocation): Future[InputStream] =
-    S3Storage.get(s3Client, s3ObjectLocation.bucket)(s3ObjectLocation.key)
+    S3Storage.get(s3Client)(s3ObjectLocation)
 }

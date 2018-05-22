@@ -17,7 +17,7 @@ import uk.ac.wellcome.finatra.elasticsearch.{
 import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.ingestor.finatra.modules.{
+import uk.ac.wellcome.platform.ingestor.modules.{
   IdentifiedWorkModule,
   IngestorWorkerModule,
   WorksIndexModule

@@ -19,6 +19,8 @@ class RecorderWorkerService @Inject()(
   messageStream: MessageStream[UnidentifiedWork],
   system: ActorSystem) {
 
+  implicit val executionContext = system.dispatcher
+
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   def processMessage(work: UnidentifiedWork): Future[Unit] = {

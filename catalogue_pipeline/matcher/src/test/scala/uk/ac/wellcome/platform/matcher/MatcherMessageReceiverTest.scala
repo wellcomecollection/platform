@@ -48,6 +48,8 @@ class MatcherMessageReceiverTest
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
+        implicit val executionContext = actorSystem.dispatcher
+
         val sqsStream = new SQSStream[NotificationMessage](
           actorSystem = actorSystem,
           sqsClient = asyncSqsClient,

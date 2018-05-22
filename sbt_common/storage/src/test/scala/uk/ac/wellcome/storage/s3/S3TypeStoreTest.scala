@@ -23,7 +23,7 @@ class S3TypeStoreTest
     with ExtendedPatience {
 
   val content = "Some content!"
-  val expectedHash = "1770874231"
+  val expectedHash = "698d6577"
 
   it("stores a versioned object with path id/version/hash") {
     withLocalS3Bucket { bucket =>

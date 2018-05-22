@@ -6,7 +6,6 @@ import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
 import javax.inject.Singleton
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-
 import uk.ac.wellcome.utils.JsonUtil._
 
 object RecorderWorkEntryModule extends TwitterModule {

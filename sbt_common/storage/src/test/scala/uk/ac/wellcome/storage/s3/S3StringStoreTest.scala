@@ -18,7 +18,7 @@ class S3StringStoreTest
     with ExtendedPatience {
 
   val content = "Some content!"
-  val expectedHash = "1227282840"
+  val expectedHash = "4926d998"
 
   it("stores a string with path id/version/hash") {
     withLocalS3Bucket { bucket =>
@@ -29,7 +29,7 @@ class S3StringStoreTest
           stringStore.put(bucket.name)(content = content, keyPrefix = prefix)
 
         whenReady(writtenToS3) { actualKey =>
-          val expectedKey = s"$prefix/$expectedHash.json"
+          val expectedKey = s"$prefix/$expectedHash"
           val expectedUri = S3ObjectLocation(bucket.name, expectedKey)
 
           actualKey shouldBe expectedUri
@@ -51,7 +51,7 @@ class S3StringStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+            S3ObjectLocation(bucket.name, s"foo/$expectedHash")
           actualKey shouldBe expectedUri
         }
       }
@@ -68,7 +68,7 @@ class S3StringStoreTest
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
-            S3ObjectLocation(bucket.name, s"foo/$expectedHash.json")
+            S3ObjectLocation(bucket.name, s"foo/$expectedHash")
           actualKey shouldBe expectedUri
         }
       }
