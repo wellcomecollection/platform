@@ -8,7 +8,6 @@ import javax.inject.Singleton
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.utils.JsonUtil._
 
-
 object RecorderWorkEntryModule extends TwitterModule {
 
   @Provides
