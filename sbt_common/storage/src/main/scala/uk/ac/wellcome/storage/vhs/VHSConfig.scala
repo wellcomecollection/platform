@@ -5,5 +5,6 @@ import uk.ac.wellcome.storage.s3.S3Config
 
 case class VHSConfig(
   dynamoConfig: DynamoConfig,
-  s3Config: S3Config
+  s3Config: S3Config,
+  globalS3Prefix: String
 )

@@ -16,11 +16,20 @@ object VHSConfigModule extends TwitterModule {
     "aws.vhs.s3.bucketName",
     "Name of the S3 bucket holding VHS objects")
 
+  private val globalS3Prefix = flag[String](
+    name = "aws.vhs.s3.globalPrefix",
+    help = "A string prepended to all objects in the VHS"
+  )
+
   @Singleton
   @Provides
   def providesVHSConfig(): VHSConfig = {
     val dynamoConfig = DynamoConfig(table = tableName())
     val s3Config = S3Config(bucketName = bucketName())
-    VHSConfig(dynamoConfig = dynamoConfig, s3Config = s3Config)
+    VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix()
+    )
   }
 }

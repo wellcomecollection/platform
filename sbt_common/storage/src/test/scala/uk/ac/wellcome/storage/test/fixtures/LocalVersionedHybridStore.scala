@@ -28,16 +28,23 @@ trait LocalVersionedHybridStore
     with JsonTestUtil
     with Matchers {
 
+  val defaultGlobalS3Prefix = "testing"
+
   override lazy val evidence: DynamoFormat[HybridRecord] =
     DynamoFormat[HybridRecord]
 
-  def vhsLocalFlags(bucket: Bucket, table: Table) =
+  def vhsLocalFlags(bucket: Bucket,
+                    table: Table,
+                    globalS3Prefix: String = defaultGlobalS3Prefix) =
     Map(
       "aws.vhs.s3.bucketName" -> bucket.name,
+      "aws.vhs.s3.globalPrefix" -> globalS3Prefix,
       "aws.vhs.dynamo.tableName" -> table.name
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
-  def withTypeVHS[T <: Id, R](bucket: Bucket, table: Table)(
+  def withTypeVHS[T <: Id, R](bucket: Bucket,
+                              table: Table,
+                              globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(
     implicit encoder: Encoder[T],
     decoder: Decoder[T]): R = {
@@ -45,7 +52,8 @@ trait LocalVersionedHybridStore
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
-      s3Config = s3Config
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
     )
 
     val s3ObjectStore = new S3TypeStore[T](
@@ -64,14 +72,17 @@ trait LocalVersionedHybridStore
     testWith(store)
   }
 
-  def withStreamVHS[R](bucket: Bucket, table: Table)(
+  def withStreamVHS[R](bucket: Bucket,
+                       table: Table,
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R])
     : R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
-      s3Config = s3Config
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
     )
 
     val s3ObjectStore = new S3StreamStore(
@@ -90,13 +101,16 @@ trait LocalVersionedHybridStore
     testWith(store)
   }
 
-  def withStringVHS[R](bucket: Bucket, table: Table)(
+  def withStringVHS[R](bucket: Bucket,
+                       table: Table,
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[String, S3StringStore], R]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name)
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
-      s3Config = s3Config
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
     )
 
     val s3ObjectStore = new S3StringStore(
