@@ -11,6 +11,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.type_classes.{StorageStrategy, StorageStrategyGenerator}
 
 import scala.util.Random
 
@@ -22,6 +23,8 @@ class StringStoreVersionedHybridStoreTest
     with LocalVersionedHybridStore {
 
   import uk.ac.wellcome.storage.dynamo._
+
+  implicit val store: StorageStrategy[String] = StorageStrategyGenerator.stringStore
 
   def withS3StringStoreFixtures[R](
     testWith: TestWith[(Bucket,

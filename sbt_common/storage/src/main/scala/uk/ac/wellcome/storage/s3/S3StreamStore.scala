@@ -9,14 +9,12 @@ import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-import scala.io.Source
 
 class S3StreamStore @Inject()(
   storageBackend: S3StorageBackend[InputStream]
-)(implicit ec: ExecutionContext)
-    extends Logging
+) extends Logging
     with ObjectStore[InputStream] {
 
   def put(bucket: String)(
@@ -29,8 +27,7 @@ class S3StreamStore @Inject()(
 
   def get(objectLocation: ObjectLocation)(
     implicit storageStrategy: StorageStrategy[InputStream]
-  ): Future[String] =
+  ): Future[InputStream] =
     storageBackend
       .get(objectLocation)
-      .map(input => Source.fromInputStream(input).mkString)
 }
