@@ -28,7 +28,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.platform.transformer.modules.UnidentifiedWorkKeyPrefixGenerator
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -72,10 +71,10 @@ class SQSMessageReceiverTest
 
     val messageWriter =
       new MessageWriter[UnidentifiedWork](
-        messageConfig,
-        maybeSnsClient.getOrElse(snsClient),
-        s3Client,
-        new UnidentifiedWorkKeyPrefixGenerator())
+        messageConfig = messageConfig,
+        snsClient = maybeSnsClient.getOrElse(snsClient),
+        s3Client = s3Client
+      )
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
