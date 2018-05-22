@@ -47,6 +47,10 @@ object Dependencies {
     "com.jakehschwartz" %% "finatra-swagger" % versions.finatra
   )
 
+  val loggingDependencies = Seq(
+    "org.clapper" %% "grizzled-slf4j" % "1.3.2"
+  )
+
   val sharedDependencies = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   )
@@ -99,7 +103,12 @@ object Dependencies {
   )
 
   // Internal Library dependency groups
-  val commonDependencies = testDependencies ++ injectDependencies ++ akkaDependencies ++ circeDependencies
+  val commonDependencies =
+    testDependencies ++
+      loggingDependencies ++
+      injectDependencies ++
+      akkaDependencies ++
+      circeDependencies
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 

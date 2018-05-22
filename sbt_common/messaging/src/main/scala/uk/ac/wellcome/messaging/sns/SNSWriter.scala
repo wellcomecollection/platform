@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.sns
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 
 import scala.concurrent.{blocking, Future}
