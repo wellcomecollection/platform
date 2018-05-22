@@ -19,7 +19,10 @@ object SQSClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.sqs.secretKey", "", "SecretKey to access SQS")
 
-  private val region = flag[String]("aws.sqs.region", "eu-west-1")
+  private val region = flag[String](
+    name = "aws.sqs.region",
+    default = "eu-west-1",
+    help = "AWS region for SQS")
 
   @Singleton
   @Provides

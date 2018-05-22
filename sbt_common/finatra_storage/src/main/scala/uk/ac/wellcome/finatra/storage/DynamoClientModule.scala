@@ -1,7 +1,6 @@
 package uk.ac.wellcome.finatra.storage
 
 import javax.inject.Singleton
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
@@ -17,7 +16,10 @@ object DynamoClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.dynamoDb.secretKey", "", "SecretKey to access DynamoDB")
 
-  private val region = flag[String]("aws.dynamoDb.region", "eu-west-1")
+  private val region = flag[String](
+    name = "aws.dynamoDb.region",
+    default = "eu-west-1",
+    help = "AWS region for dynamoDb")
 
   @Singleton
   @Provides
