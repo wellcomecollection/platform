@@ -51,6 +51,11 @@ object Dependencies {
     "org.clapper" %% "grizzled-slf4j" % "1.3.2"
   )
 
+  val guiceDependencies = Seq(
+    "com.google.inject" % "guice" % versions.guice % "test",
+    "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
+  )
+
   val sharedDependencies = Seq(
     "org.scalatest" %% "scalatest" % versions.scalatest % "test"
   )
@@ -67,11 +72,7 @@ object Dependencies {
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
-    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests"
-  )
-
-  val injectDependencies = Seq(
-    "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test",
+    "com.twitter" %% "finatra-jackson" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test",
     "com.twitter" %% "inject-core" % versions.finatra,
@@ -106,7 +107,7 @@ object Dependencies {
   val commonDependencies =
     testDependencies ++
       loggingDependencies ++
-      injectDependencies ++
+      guiceDependencies ++
       akkaDependencies ++
       circeDependencies
 
@@ -128,7 +129,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++ dynamoDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ injectDependencies
+  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
