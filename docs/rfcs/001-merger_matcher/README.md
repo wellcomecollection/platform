@@ -38,7 +38,8 @@ This document has notes on the proposed architecture.
 A matching phase is introduced to determine where works need to be combined.
 
 The input to this phase is a work. A transformed work contains the work identifier, the work version and a list of identifiers of other works that the current work directly links to.
-The output is sets of identifiers of affected works alongside their versions. The merger will use the identifiers to read the works from the recorder VHS and it will use the versions in
+The output is sets of identifiers of affected works alongside their versions. The versions of directly affected works will come from the matcher database.
+The merger will use the identifiers to read the works from the recorder VHS and it will use the versions in
 the message to ensure that the versions are still the most up to date ones. If so, it will combine the works. If not, it will discard the message.
 
 Example:
@@ -72,16 +73,17 @@ Example:
 
 ## Storage
 
-When the matcher receives an update for a work, it needs to know about previously seen works that referenced it to be able to link them together.
-This implies storing each work that is sees, along to the linked nodes it belongs to at that point in time.
-The set of linked works that each work belongs to should have an indentifier that is deterministic on the identifiers of the nodes that compose it.
-The set of linked works identifiers should be never exposed outside the matcher.
+When the matcher receives an update for a work, it needs to know about previously seen works that referenced it to be able to arrange them into sets of linked works.
+This implies storing each work that is sees, along to the set of linked works it belongs to at that point in time.
+Each set of linked works should have an indentifier that is deterministic on the nodes that compose it. The identifiers of set of linked works should never be exposed outside the matcher.
 
 Similarly, the matcher needs to be able to break connections if a link from one work to another is removed.
 This mean storing, for each work, the list of works directly referenced.
 
 The matcher needs to enforce that updates to the same node are applied in order. This means that it needs to store the version for each and that it needs to check that the
 version for each update is greater than the currently stored one.
+In order to output the version for each node in the output, it needs to have previously seen all nodes affected by an update and stred thei versions.
+If it doesn't know the version of some of the nodes because it hasn't seen them yet, it should set their version in the output as 0.
 
 ## Database schema
 
