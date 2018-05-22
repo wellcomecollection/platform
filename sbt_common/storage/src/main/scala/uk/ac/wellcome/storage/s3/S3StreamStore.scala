@@ -4,7 +4,7 @@ import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 
 import scala.concurrent.{ExecutionContext, Future}
 
