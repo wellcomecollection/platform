@@ -63,9 +63,6 @@ trait LocalVersionedHybridStore
     val store = new VersionedHybridStore[T, S3TypeStore[T]](
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
-      keyPrefixGenerator = new KeyPrefixGenerator[T] {
-        override def generate(obj: T): String = "/"
-      },
       dynamoDbClient = dynamoDbClient
     )
 
@@ -92,9 +89,6 @@ trait LocalVersionedHybridStore
     val store = new VersionedHybridStore[InputStream, S3StreamStore](
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
-      keyPrefixGenerator = new KeyPrefixGenerator[InputStream] {
-        override def generate(obj: InputStream): String = "/"
-      },
       dynamoDbClient = dynamoDbClient
     )
 
@@ -120,9 +114,6 @@ trait LocalVersionedHybridStore
     val store = new VersionedHybridStore[String, S3StringStore](
       vhsConfig = vhsConfig,
       s3ObjectStore = s3ObjectStore,
-      keyPrefixGenerator = new KeyPrefixGenerator[String] {
-        override def generate(obj: String): String = "/"
-      },
       dynamoDbClient = dynamoDbClient
     )
 
