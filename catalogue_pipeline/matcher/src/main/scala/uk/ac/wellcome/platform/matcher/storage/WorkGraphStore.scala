@@ -11,7 +11,8 @@ class WorkGraphStore @Inject()(
                                 linkedWorkDao: LinkedWorkDao
                               ) extends Logging {
 
-  def allLinkedWorks(workUpdate: LinkedWorkUpdate): Future[LinkedWorksGraph] = {
+
+  def findAffectedWorks(workUpdate: LinkedWorkUpdate): Future[LinkedWorksGraph] = {
 
     val eventualMaybeWorkToUpdate: Future[List[LinkedWork]] = linkedWorkDao.get(workUpdate.workId).map(_.toList)
     val eventualMaybeLinkedWorksToUpdate: Future[List[LinkedWork]] = Future.sequence(workUpdate.linkedIds.map(linkedWorkDao.get)).map(_.flatten)
@@ -27,5 +28,11 @@ class WorkGraphStore @Inject()(
 
     val eventualLinkedWorks: Future[Set[LinkedWork]] = eventualSetIds.flatMap { setIds => Future.sequence(setIds.map(linkedWorkDao.getBySetId)) }.map(_.flatten)
     eventualLinkedWorks.map(linkedWorks => LinkedWorksGraph(linkedWorks))
+  }
+
+  def put(graph: LinkedWorksGraph) = {
+    Future.sequence(
+      graph.linkedWorksSet.map(linkedWorkDao.put)
+    )
   }
 }
