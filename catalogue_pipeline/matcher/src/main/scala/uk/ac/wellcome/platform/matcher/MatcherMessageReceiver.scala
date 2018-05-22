@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._

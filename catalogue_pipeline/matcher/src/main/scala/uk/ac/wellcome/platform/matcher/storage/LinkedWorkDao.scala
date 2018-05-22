@@ -12,7 +12,7 @@ import scala.concurrent.Future
 
 class LinkedWorkDao @Inject()(
                                  dynamoDbClient: AmazonDynamoDB,
-                                 dynamoConfig: DynamoConfig
+                                 dynamoConfig: MatcherDynamoConfig
                                ) extends Logging {
   def get(workId: String): Future[Option[LinkedWork]] = {
     Future {

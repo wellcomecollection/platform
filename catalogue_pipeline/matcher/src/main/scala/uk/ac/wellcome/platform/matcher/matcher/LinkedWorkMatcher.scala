@@ -1,10 +1,10 @@
-package uk.ac.wellcome.platform.matcher
+package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
 import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.platform.matcher.workgraph.LinkedWorkGraphUpdater
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
+import uk.ac.wellcome.platform.matcher.workgraph.LinkedWorkGraphUpdater
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
@@ -29,6 +29,9 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
         LinkedWorkGraphUpdater.update(
           LinkedWork(workId, linkedWorkIds, ""),
           linkedWorksGraph)
+
+      // persist updated graph
+      workGraphStore.put(updatedLinkedWorkGraph)
 
       // return just the ids in the groups
       updatedLinkedWorkGraph.linkedWorksSet

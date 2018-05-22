@@ -22,7 +22,7 @@ class LinkedWorkDaoTest
   with ScalaFutures {
 
   def withLinkedWorkDao[R](table: Table)(testWith: TestWith[LinkedWorkDao, R]): R = {
-    val linkedDao = new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index))
+    val linkedDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
     testWith(linkedDao)
   }
 
@@ -58,7 +58,7 @@ class LinkedWorkDaoTest
         val expectedException = new RuntimeException("FAILED!")
         when(dynamoDbClient.getItem(any[GetItemRequest]))
           .thenThrow(expectedException)
-        val matcherGraphDao = new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index))
+        val matcherGraphDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
 
         whenReady(matcherGraphDao.get("A").failed) {
           failedException =>
@@ -115,7 +115,7 @@ class LinkedWorkDaoTest
         val expectedException = new RuntimeException("FAILED")
         when(dynamoDbClient.query(any[QueryRequest]))
           .thenThrow(expectedException)
-        val linkedWordDao = new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index))
+        val linkedWordDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
 
         whenReady(linkedWordDao.getBySetId("A+B").failed) {
           failedException =>
@@ -159,7 +159,7 @@ class LinkedWorkDaoTest
         val expectedException = new RuntimeException("FAILED")
         when(dynamoDbClient.putItem(any[PutItemRequest]))
           .thenThrow(expectedException)
-        val linkedWordDao = new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index))
+        val linkedWordDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
 
         whenReady(linkedWordDao.put(LinkedWork("A", List("B"), "A+B")).failed) {
           failedException =>

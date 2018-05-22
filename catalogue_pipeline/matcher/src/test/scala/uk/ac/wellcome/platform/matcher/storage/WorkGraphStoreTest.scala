@@ -21,7 +21,7 @@ class WorkGraphStoreTest
   with ScalaFutures {
 
   def withWorkGraphStore[R](table: Table)(testWith: TestWith[WorkGraphStore, R]): R = {
-    val workGraphStore = new WorkGraphStore(new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index)))
+    val workGraphStore = new WorkGraphStore(new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index)))
     testWith(workGraphStore)
   }
 
