@@ -22,21 +22,30 @@ cache:
     - ~/.ivy2
     - project/target
     - target
+
     - catalogue_api/api/target
+
     - catalogue_pipeline/common/target
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/recorder/target
-    - reindexer/reindex_worker/target
+
     - common/target
 
     - data_api/snapshot_generator/target
 
     - goobi_adapter/goobi_reader/target
 
+    - reindexer/reindex_worker/target
+
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
+    - sbt_common/finatra-messaging/target
+    - sbt_common/finatra_akka/target
+    - sbt_common/finatra_controllers/target
+    - sbt_common/finatra_elasticsearch/target
+    - sbt_common/finatra_monitoring/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
     - sbt_common/monitoring/target
