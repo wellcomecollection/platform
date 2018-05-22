@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.ingestor.finatra.modules
+package uk.ac.wellcome.platform.ingestor.modules
 
 import javax.inject.Singleton
 import com.google.inject.Provides
