@@ -5,13 +5,16 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
-import io.circe.{Decoder, Encoder}
+import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.s3.{S3StorageBackend, S3TypeStore}
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
+
+
+import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
 import scala.concurrent.Future
 
@@ -24,7 +27,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
   decoder: Decoder[T]) {
 
   private val s3TypeStore = new S3TypeStore[T](
-    s3Client = s3Client
+    new S3StorageBackend[Json](s3Client)
   )
 
   private val sqsStream = new SQSStream[NotificationMessage](
