@@ -1,20 +1,14 @@
 package uk.ac.wellcome.platform.snapshot_generator.finatra.modules
 
-import javax.inject.Singleton
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
-import com.amazonaws.auth.{
-  AWSCredentialsProvider,
-  AWSStaticCredentialsProvider,
-  BasicAWSCredentials,
-  DefaultAWSCredentialsProviderChain
-}
+import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
+import javax.inject.Singleton
 
 object AkkaS3ClientModule extends TwitterModule {
   private val endpoint = flag[String](
@@ -26,7 +20,7 @@ object AkkaS3ClientModule extends TwitterModule {
   private val secretKey =
     flag[String]("aws.s3.secretKey", "", "SecretKey to access S3")
 
-  private val region = flag[String]("aws.s3.region", "eu-west-1")
+  private val region = flag[String](name = "aws.s3.region", default = "eu-west-1", help = "AWS region for s3")
 
   def akkaS3Settings(credentialsProvider: AWSCredentialsProvider,
                      regionProvider: AwsRegionProvider,
