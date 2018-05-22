@@ -19,9 +19,7 @@ class IdMinterWorkerService @Inject()(
 ) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
-
-  val snsSubject = "identified-item"
-
+  
   def processMessage(json: Json): Future[Unit] =
     for {
       identifiedJson <- idEmbedder.embedId(json)
