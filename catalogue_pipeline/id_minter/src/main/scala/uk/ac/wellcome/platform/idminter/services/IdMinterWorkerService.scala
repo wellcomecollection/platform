@@ -19,7 +19,7 @@ class IdMinterWorkerService @Inject()(
 ) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
-  
+
   def processMessage(json: Json): Future[Unit] =
     for {
       identifiedJson <- idEmbedder.embedId(json)
