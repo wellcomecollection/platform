@@ -4,10 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{
-  S3ObjectLocation,
-  S3ObjectStore
-}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
   IdGetter,
