@@ -12,7 +12,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import scala.collection.JavaConverters._
 import scala.util.Random
 
-trait LocalMatcherDynamoDb
+trait LocalLinkedWorkDynamoDb
   extends Eventually
     with ExtendedPatience
 {

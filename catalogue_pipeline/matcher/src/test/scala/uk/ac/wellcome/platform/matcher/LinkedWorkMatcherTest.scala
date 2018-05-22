@@ -18,7 +18,7 @@ class LinkedWorkMatcherTest
     "matches a work entry with no linked identifiers to a matched works list referencing itself") {
     linkedWorkMatcher.matchWork(anUnidentifiedSierraWork) shouldBe
       LinkedWorksIdentifiersList(
-        List(IdentifierList(List("sierra-system-number/id"))))
+        List(IdentifierList(Set("sierra-system-number/id"))))
   }
 
   it(
@@ -31,7 +31,7 @@ class LinkedWorkMatcherTest
     linkedWorkMatcher.matchWork(work) shouldBe
       LinkedWorksIdentifiersList(
         List(IdentifierList(
-          List("sierra-system-number/A", "sierra-system-number/B"))))
+          Set("sierra-system-number/A", "sierra-system-number/B"))))
   }
 
 }

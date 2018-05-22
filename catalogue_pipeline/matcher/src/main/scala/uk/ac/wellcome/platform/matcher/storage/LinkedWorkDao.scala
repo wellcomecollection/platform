@@ -7,20 +7,13 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.matcher.models.LinkedWork
 import uk.ac.wellcome.storage.GlobalExecutionContext._
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
-class MatcherGraphDao @Inject()(
+class LinkedWorkDao @Inject()(
                                  dynamoDbClient: AmazonDynamoDB,
                                  dynamoConfig: DynamoConfig
                                ) extends Logging {
-  def put(work: LinkedWork) = {
-    Future {
-      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
-    }
-  }
-
   def get(workId: String): Future[Option[LinkedWork]] = {
     Future {
       Scanamo.get[LinkedWork](dynamoDbClient)(dynamoConfig.table)('workId -> workId) match {
@@ -30,8 +23,7 @@ class MatcherGraphDao @Inject()(
         case Some(Left(scanamoError)) =>
           val exception = new RuntimeException(scanamoError.toString)
           error(
-            s"An error occurred while retrieving $workId from DynamoDB",
-            exception
+            s"An error occurred while retrieving workId=$workId from DynamoDB", exception
           )
           throw exception
         case None => {
@@ -40,4 +32,29 @@ class MatcherGraphDao @Inject()(
       }
     }
   }
+
+  def getBySetId(setId: String) = {
+    Future {
+      Scanamo.queryIndex[LinkedWork](dynamoDbClient)(dynamoConfig.table, dynamoConfig.index)('setId -> setId)
+        .map {
+          case Right(record) => {
+            record
+          }
+          case Left(scanamoError) => {
+            val exception = new RuntimeException(scanamoError.toString)
+            error(
+              s"An error occurred while retrieving bySetId=$setId from DynamoDB", exception
+            )
+            throw exception
+          }
+        }
+    }
+  }
+
+  def put(work: LinkedWork) = {
+    Future {
+      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
+    }
+  }
+
 }

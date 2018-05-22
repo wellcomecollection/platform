@@ -79,7 +79,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  List(IdentifierList(List("sierra-system-number/id"))))
+                  List(IdentifierList(Set("sierra-system-number/id"))))
               )
             }
           }
@@ -106,7 +106,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(List(IdentifierList(
-                  List("sierra-system-number/A", "sierra-system-number/B"))))
+                  Set("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
           }
@@ -136,7 +136,7 @@ class MatcherMessageReceiverTest
                 LinkedWorksIdentifiersList(
                   List(
                     IdentifierList(
-                      List(
+                      Set(
                         "sierra-system-number/A",
                         "sierra-system-number/B"
                       ))))
@@ -155,7 +155,7 @@ class MatcherMessageReceiverTest
                   LinkedWorksIdentifiersList(
                     List(
                       IdentifierList(
-                        List(
+                        Set(
                           "sierra-system-number/A",
                           "sierra-system-number/B",
                           "sierra-system-number/C"

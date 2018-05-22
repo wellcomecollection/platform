@@ -10,14 +10,14 @@ object LinkedWorkGraphUpdater {
 
     val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
       workUpdate.workId,
-      existingGraph.linkedWorksList)
+      existingGraph.linkedWorksSet)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
       toEdges(linkedWork)
     }) ++ toEdges(workUpdate)
 
-    val nodes = existingGraph.linkedWorksList.flatMap(linkedWork => {
+    val nodes = existingGraph.linkedWorksSet.flatMap(linkedWork => {
       allNodes(linkedWork)
-    }) :+ workUpdate.workId
+    }) + workUpdate.workId
 
     val g = Graph.from(edges = edges, nodes = nodes)
 
@@ -34,7 +34,7 @@ object LinkedWorkGraphUpdater {
             LinkedWork(node.value, adjacentNodeIds(node), componentIdentifier)
           })
         })
-        .toList
+        .toSet
     )
   }
 
@@ -48,7 +48,7 @@ object LinkedWorkGraphUpdater {
 
   private def existingGraphWithoutUpdatedNode(
     workId: String,
-    linkedWorksList: List[LinkedWork]) = {
+    linkedWorksList: Set[LinkedWork]) = {
     linkedWorksList.filterNot(_.workId == workId)
   }
 }

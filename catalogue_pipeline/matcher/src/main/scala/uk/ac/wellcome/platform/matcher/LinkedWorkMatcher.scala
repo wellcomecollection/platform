@@ -22,7 +22,7 @@ class LinkedWorkMatcher {
       work.identifiers.map(identifierToString).filterNot(_ == workId)
 
     // load from persisted graphs, assume no exisiting graph
-    val existingLinkedWorkGraph = LinkedWorksGraph(List())
+    val existingLinkedWorkGraph = LinkedWorksGraph(Set())
 
     val updatedLinkedWorkGraph: LinkedWorksGraph =
       LinkedWorkGraphUpdater.update(
@@ -30,11 +30,11 @@ class LinkedWorkMatcher {
         existingLinkedWorkGraph)
 
     // return just the ids in the groups
-    updatedLinkedWorkGraph.linkedWorksList
+    updatedLinkedWorkGraph.linkedWorksSet
       .groupBy(_.setId)
       .map {
         case (setId, linkedWorkList) =>
-          IdentifierList(linkedWorkList.map(_.workId).sorted)
+          IdentifierList(linkedWorkList.map(_.workId))
       }
       .toList
   }
