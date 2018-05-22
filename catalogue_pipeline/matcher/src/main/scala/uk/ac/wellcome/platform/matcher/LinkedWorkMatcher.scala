@@ -1,41 +1,43 @@
 package uk.ac.wellcome.platform.matcher
 
+import com.google.inject.Inject
 import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.workgraph.LinkedWorkGraphUpdater
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWork,
-  LinkedWorksGraph,
-  LinkedWorksIdentifiersList
-}
+import uk.ac.wellcome.platform.matcher.models._
+import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
+import uk.ac.wellcome.storage.GlobalExecutionContext._
 
-class LinkedWorkMatcher {
+import scala.concurrent.Future
+
+class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   def matchWork(work: UnidentifiedWork) =
-    LinkedWorksIdentifiersList(matchLinkedWorks(work))
+    matchLinkedWorks(work).map(LinkedWorksIdentifiersList)
 
   private def identifierToString(sourceIdentifier: SourceIdentifier): String =
     s"${sourceIdentifier.identifierScheme}/${sourceIdentifier.value}"
 
-  private def matchLinkedWorks(work: UnidentifiedWork): List[IdentifierList] = {
+  private def matchLinkedWorks(work: UnidentifiedWork): Future[List[IdentifierList]] = {
     val workId = identifierToString(work.sourceIdentifier)
     val linkedWorkIds =
       work.identifiers.map(identifierToString).filterNot(_ == workId)
 
     // load from persisted graphs, assume no exisiting graph
-    val existingLinkedWorkGraph = LinkedWorksGraph(Set())
+    val eventualLinkedWorksGraph = workGraphStore.findAffectedWorks(LinkedWorkUpdate(workId, linkedWorkIds))
 
-    val updatedLinkedWorkGraph: LinkedWorksGraph =
-      LinkedWorkGraphUpdater.update(
-        LinkedWork(workId, linkedWorkIds, ""),
-        existingLinkedWorkGraph)
+    eventualLinkedWorksGraph.map { linkedWorksGraph =>
+      val updatedLinkedWorkGraph: LinkedWorksGraph =
+        LinkedWorkGraphUpdater.update(
+          LinkedWork(workId, linkedWorkIds, ""),
+          linkedWorksGraph)
 
-    // return just the ids in the groups
-    updatedLinkedWorkGraph.linkedWorksSet
-      .groupBy(_.setId)
-      .map {
-        case (setId, linkedWorkList) =>
-          IdentifierList(linkedWorkList.map(_.workId))
-      }
-      .toList
+      // return just the ids in the groups
+      updatedLinkedWorkGraph.linkedWorksSet
+        .groupBy(_.setId)
+        .map {
+          case (setId, linkedWorkList) =>
+            IdentifierList(linkedWorkList.map(_.workId))
+        }
+        .toList
+    }
   }
 }

@@ -29,8 +29,9 @@ class MatcherMessageReceiver @Inject()(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+      identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
-        message = toJson(linkedWorkMatcher.matchWork(workEntry.work)).get,
+        message = toJson(identifiersList).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

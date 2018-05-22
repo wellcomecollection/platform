@@ -10,12 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWorksIdentifiersList
-}
+import uk.ac.wellcome.platform.matcher.fixtures.{LocalLinkedWorkDynamoDb, MatcherFixtures}
+import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
+import uk.ac.wellcome.platform.matcher.storage.{DynamoConfig, LinkedWorkDao, WorkGraphStore}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -35,8 +34,14 @@ class MatcherMessageReceiverTest
     with MetricsSenderFixture
     with ExtendedPatience
     with MatcherFixtures
-    with Eventually {
+    with Eventually
+      with LocalLinkedWorkDynamoDb {
 
+  def withLinkedWorkMatcher[R](table: Table)(testWith: TestWith[LinkedWorkMatcher, R]): R = {
+    val workGraphStore = new WorkGraphStore(new LinkedWorkDao(dynamoDbClient, DynamoConfig(table.name, table.index)))
+    val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
+    testWith(linkedWorkMatcher)
+  }
   def withMatcherMessageReceiver[R](
     queue: SQS.Queue,
     storageBucket: Bucket,
@@ -48,22 +53,25 @@ class MatcherMessageReceiverTest
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        implicit val executionContext = actorSystem.dispatcher
-
-        val sqsStream = new SQSStream[NotificationMessage](
-          actorSystem = actorSystem,
-          sqsClient = asyncSqsClient,
-          sqsConfig = SQSConfig(queue.url, 1 second, 1),
-          metricsSender = metricsSender
-        )
-        val matcherMessageReceiver = new MatcherMessageReceiver(
-          sqsStream,
-          snsWriter,
-          new S3TypeStore[RecorderWorkEntry](s3Client),
-          storageS3Config,
-          actorSystem,
-          new LinkedWorkMatcher)
-        testWith(matcherMessageReceiver)
+        withLocalDynamoDbTable { table =>
+          withLinkedWorkMatcher(table) { linkedWorkMatcher =>
+            implicit val executionContext = actorSystem.dispatcher
+            val sqsStream = new SQSStream[NotificationMessage](
+              actorSystem = actorSystem,
+              sqsClient = asyncSqsClient,
+              sqsConfig = SQSConfig(queue.url, 1 second, 1),
+              metricsSender = metricsSender
+            )
+            val matcherMessageReceiver = new MatcherMessageReceiver(
+              sqsStream,
+              snsWriter,
+              new S3TypeStore[RecorderWorkEntry](s3Client),
+              storageS3Config,
+              actorSystem,
+              linkedWorkMatcher)
+            testWith(matcherMessageReceiver)
+          }
+        }
       }
     }
   }
@@ -115,7 +123,7 @@ class MatcherMessageReceiverTest
     }
   }
 
-  ignore("redirects a work with one link and existing redirects") {
+  it("redirects a work with one link and existing redirects") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -123,6 +131,7 @@ class MatcherMessageReceiverTest
             val aIdentifier = aSierraSourceIdentifier("A")
             val bIdentifier = aSierraSourceIdentifier("B")
             val cIdentifier = aSierraSourceIdentifier("C")
+
             val aWork = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               identifiers = List(aIdentifier, bIdentifier))
