@@ -1,8 +1,8 @@
 resource "aws_dynamodb_table" "matcher_table" {
-  name             = "works-graph"
-  read_capacity    = 1
-  write_capacity   = 1
-  hash_key         = "workId"
+  name           = "works-graph"
+  read_capacity  = 1
+  write_capacity = 1
+  hash_key       = "workId"
 
   attribute {
     name = "workId"
@@ -32,7 +32,6 @@ resource "aws_dynamodb_table" "matcher_table" {
     ]
   }
 }
-
 
 module "matcher_dynamo_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v10.2.0"

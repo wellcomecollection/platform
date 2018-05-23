@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
+import uk.ac.wellcome.platform.matcher.models.{
+  LinkedWork,
+  LinkedWorkUpdate,
+  LinkedWorksGraph
+}
 
 import scala.collection.immutable.Iterable
 

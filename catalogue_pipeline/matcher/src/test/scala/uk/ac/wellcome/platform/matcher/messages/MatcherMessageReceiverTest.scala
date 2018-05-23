@@ -10,10 +10,20 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.matcher.fixtures.{LocalLinkedWorkDynamoDb, MatcherFixtures}
+import uk.ac.wellcome.platform.matcher.fixtures.{
+  LocalLinkedWorkDynamoDb,
+  MatcherFixtures
+}
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
-import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
-import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, MatcherDynamoConfig, WorkGraphStore}
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorksIdentifiersList
+}
+import uk.ac.wellcome.platform.matcher.storage.{
+  LinkedWorkDao,
+  MatcherDynamoConfig,
+  WorkGraphStore
+}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -36,10 +46,14 @@ class MatcherMessageReceiverTest
     with ExtendedPatience
     with MatcherFixtures
     with Eventually
-      with LocalLinkedWorkDynamoDb {
+    with LocalLinkedWorkDynamoDb {
 
-  def withLinkedWorkMatcher[R](table: Table)(testWith: TestWith[LinkedWorkMatcher, R]): R = {
-    val workGraphStore = new WorkGraphStore(new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index)))
+  def withLinkedWorkMatcher[R](table: Table)(
+    testWith: TestWith[LinkedWorkMatcher, R]): R = {
+    val workGraphStore = new WorkGraphStore(
+      new LinkedWorkDao(
+        dynamoDbClient,
+        MatcherDynamoConfig(table.name, table.index)))
     val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
     testWith(linkedWorkMatcher)
   }
@@ -218,14 +232,12 @@ class MatcherMessageReceiverTest
                   topic,
                   LinkedWorksIdentifiersList(
                     Set(
-                      IdentifierList(
-                        Set(
-                          "sierra-system-number/A"
-                        )),
-                      IdentifierList(
-                        Set(
-                          "sierra-system-number/B"
-                        ))
+                      IdentifierList(Set(
+                        "sierra-system-number/A"
+                      )),
+                      IdentifierList(Set(
+                        "sierra-system-number/B"
+                      ))
                     ))
                 )
               }

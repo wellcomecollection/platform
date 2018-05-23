@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
+import uk.ac.wellcome.platform.matcher.models.{
+  LinkedWork,
+  LinkedWorkUpdate,
+  LinkedWorksGraph
+}
 
 class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 
@@ -28,8 +32,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = LinkedWorksGraph(Set.empty)
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List("B"), setId = "A+B"),
-          LinkedWork("B", List(), setId = "A+B"))
+        LinkedWork("A", List("B"), setId = "A+B"),
+        LinkedWork("B", List(), setId = "A+B"))
     }
 
     it("updating nothing with B->A gives A+B:B->A") {
@@ -39,8 +43,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = LinkedWorksGraph(Set.empty)
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("B", List("A"), setId = "A+B"),
-          LinkedWork("A", List(), setId = "A+B"))
+        LinkedWork("B", List("A"), setId = "A+B"),
+        LinkedWork("A", List(), setId = "A+B"))
     }
   }
 
@@ -48,8 +52,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B with A->B gives A+B:(A->B, B)") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A",Set("B")),
-          existingGraph = LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+          workUpdate = LinkedWorkUpdate("A", Set("B")),
+          existingGraph =
+            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
         )
         .linkedWorksSet should contain theSameElementsAs
         List(
@@ -61,13 +66,14 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
       LinkedWorkGraphUpdater
         .update(
           workUpdate = LinkedWorkUpdate("B", Set("C")),
-          existingGraph = LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+          existingGraph =
+            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List("B"), setId = "A+B+C"),
-          LinkedWork("B", List("C"), setId = "A+B+C"),
-          LinkedWork("C", List(), setId = "A+B+C")
-        )
+        LinkedWork("A", List("B"), setId = "A+B+C"),
+        LinkedWork("B", List("C"), setId = "A+B+C"),
+        LinkedWork("C", List(), setId = "A+B+C")
+      )
     }
 
     it("updating A->B, C->D with B->C gives A+B+C+D:(A->B, B->C, C->D, D)") {
@@ -75,7 +81,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
         .update(
           workUpdate = LinkedWorkUpdate("B", Set("C")),
           existingGraph = LinkedWorksGraph(
-            Set(LinkedWork("A", List("B"), "A+B"), LinkedWork("C", List("D"), "C+D")))
+            Set(
+              LinkedWork("A", List("B"), "A+B"),
+              LinkedWork("C", List("D"), "C+D")))
         )
         .linkedWorksSet should contain theSameElementsAs
         List(
@@ -89,7 +97,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
       LinkedWorkGraphUpdater
         .update(
           workUpdate = LinkedWorkUpdate("B", Set("C", "D")),
-          existingGraph = LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+          existingGraph =
+            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
         )
         .linkedWorksSet should contain theSameElementsAs
         List(
@@ -105,13 +114,15 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
         .update(
           workUpdate = LinkedWorkUpdate("C", Set("A")),
           existingGraph = LinkedWorksGraph(
-            Set(LinkedWork("A", List("B"), "A+B"), LinkedWork("B", List("C"), "B+C")))
+            Set(
+              LinkedWork("A", List("B"), "A+B"),
+              LinkedWork("B", List("C"), "B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List("B"), setId = "A+B+C"),
-          LinkedWork("B", List("C"), setId = "A+B+C"),
-          LinkedWork("C", List("A"), setId = "A+B+C")
-        )
+        LinkedWork("A", List("B"), setId = "A+B+C"),
+        LinkedWork("B", List("C"), setId = "A+B+C"),
+        LinkedWork("C", List("A"), setId = "A+B+C")
+      )
     }
   }
 
@@ -120,11 +131,14 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
       LinkedWorkGraphUpdater
         .update(
           workUpdate = LinkedWorkUpdate("A", Set.empty),
-          existingGraph =
-            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B"), LinkedWork("B", List(), "A+B")))
+          existingGraph = LinkedWorksGraph(
+            Set(
+              LinkedWork("A", List("B"), "A+B"),
+              LinkedWork("B", List(), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List(), setId = "A"), LinkedWork("B", List(), setId = "B"))
+        LinkedWork("A", List(), setId = "A"),
+        LinkedWork("B", List(), setId = "B"))
     }
 
     it(
@@ -132,10 +146,12 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
       LinkedWorkGraphUpdater
         .update(
           workUpdate = LinkedWorkUpdate("A", Set.empty),
-          existingGraph = LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+          existingGraph =
+            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List(), setId = "A"), LinkedWork("B", List(), setId = "B"))
+        LinkedWork("A", List(), setId = "A"),
+        LinkedWork("B", List(), setId = "B"))
     }
 
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
@@ -143,12 +159,14 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
         .update(
           workUpdate = LinkedWorkUpdate("B", Set.empty),
           existingGraph = LinkedWorksGraph(
-            Set(LinkedWork("A", List("B"), "A+B+C"), LinkedWork("B", List("C"), "A+B+C")))
+            Set(
+              LinkedWork("A", List("B"), "A+B+C"),
+              LinkedWork("B", List("C"), "A+B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List("B"), setId = "A+B"),
-          LinkedWork("B", List(), setId = "A+B"),
-          LinkedWork("C", List(), setId = "C"))
+        LinkedWork("A", List("B"), setId = "A+B"),
+        LinkedWork("B", List(), setId = "A+B"),
+        LinkedWork("C", List(), setId = "C"))
     }
 
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -162,9 +180,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
               LinkedWork("C", List(), "A+B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          LinkedWork("A", List("B"), setId = "A+B+C"),
-          LinkedWork("B", List("C"), setId = "A+B+C"),
-          LinkedWork("C", List(), setId = "A+B+C"))
+        LinkedWork("A", List("B"), setId = "A+B+C"),
+        LinkedWork("B", List("C"), setId = "A+B+C"),
+        LinkedWork("C", List(), setId = "A+B+C"))
     }
   }
 }

@@ -16,13 +16,15 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   private def identifierToString(sourceIdentifier: SourceIdentifier): String =
     s"${sourceIdentifier.identifierScheme}/${sourceIdentifier.value}"
 
-  private def matchLinkedWorks(work: UnidentifiedWork): Future[Set[IdentifierList]] = {
+  private def matchLinkedWorks(
+    work: UnidentifiedWork): Future[Set[IdentifierList]] = {
     val workId = identifierToString(work.sourceIdentifier)
     val linkedWorkIds =
       work.identifiers.map(identifierToString).filterNot(_ == workId).toSet
 
     for {
-      linkedWorksGraph <- workGraphStore.findAffectedWorks(LinkedWorkUpdate(workId, linkedWorkIds))
+      linkedWorksGraph <- workGraphStore.findAffectedWorks(
+        LinkedWorkUpdate(workId, linkedWorkIds))
       updatedLinkedWorkGraph = LinkedWorkGraphUpdater.update(
         LinkedWorkUpdate(workId, linkedWorkIds),
         linkedWorksGraph)
@@ -33,13 +35,12 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     }
   }
 
-  private def convertToIdentifiersList(updatedLinkedWorkGraph: LinkedWorksGraph) = {
-    groupBySetId(updatedLinkedWorkGraph)
-      .map {
-        case (_, linkedWorkList) =>
-          IdentifierList(linkedWorkList.map(_.workId))
-      }
-      .toSet
+  private def convertToIdentifiersList(
+    updatedLinkedWorkGraph: LinkedWorksGraph) = {
+    groupBySetId(updatedLinkedWorkGraph).map {
+      case (_, linkedWorkList) =>
+        IdentifierList(linkedWorkList.map(_.workId))
+    }.toSet
   }
 
   private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
