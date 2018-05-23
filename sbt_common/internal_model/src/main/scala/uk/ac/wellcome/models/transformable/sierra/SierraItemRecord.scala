@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra
 
 import java.time.Instant
 
-import uk.ac.wellcome.models.{Id, Versioned}
+import uk.ac.wellcome.models.Id
 
 case class SierraItemRecord(
   id: String,
@@ -11,8 +11,7 @@ case class SierraItemRecord(
   bibIds: List[String],
   unlinkedBibIds: List[String] = List(),
   version: Int = 0
-) extends Versioned
-    with Id
+) extends Id
 
 object SierraItemRecord {
   def apply(id: String,
