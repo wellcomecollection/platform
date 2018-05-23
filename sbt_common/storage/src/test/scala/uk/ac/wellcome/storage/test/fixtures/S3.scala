@@ -75,9 +75,11 @@ trait S3 extends Logging with Eventually {
     )
 
   def getContentFromS3(bucket: Bucket, key: String): String =
-    scala.io.Source.fromInputStream(
-      s3Client.getObject(bucket.name, key).getObjectContent
-    ).mkString
+    scala.io.Source
+      .fromInputStream(
+        s3Client.getObject(bucket.name, key).getObjectContent
+      )
+      .mkString
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
     parse(getContentFromS3(bucket, key)).right.get
