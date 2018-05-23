@@ -13,7 +13,7 @@ import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, VHSConfigModule}
-import uk.ac.wellcome.platform.goobi_reader.modules.{GoobiReaderModule, InputStreamKeyPrefixGeneratorModule}
+import uk.ac.wellcome.platform.goobi_reader.modules.GoobiReaderModule
 
 object ServerMain extends Server
 
@@ -24,7 +24,6 @@ class Server extends HttpServer {
     AkkaModule,
     DynamoClientModule,
     GoobiReaderModule,
-    InputStreamKeyPrefixGeneratorModule,
     MetricsSenderModule,
     SQSClientModule,
     SQSConfigModule,

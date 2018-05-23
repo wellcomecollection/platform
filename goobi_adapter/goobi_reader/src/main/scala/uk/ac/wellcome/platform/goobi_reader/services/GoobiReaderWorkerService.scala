@@ -43,7 +43,7 @@ class GoobiReaderWorkerService @Inject()(
 
   def processMessage(snsNotification: NotificationMessage): Future[Unit] =
     Future {
-      info("I got a message!")
+      debug(s"Received notification: $snsNotification")
 
       val eventNotification = Try(S3EventNotification.parseJson(snsNotification.Message)).get
       val records = eventNotification.getRecords
@@ -59,7 +59,5 @@ class GoobiReaderWorkerService @Inject()(
 
         versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(identity)()
       }
-
-      println(eventNotification)
     }
 }

@@ -21,7 +21,7 @@ class GoobiReaderFeatureTest
     with ExtendedPatience {
 
   it("gets an S3 notification and puts the new record in VHS") {
-    val contents = Random.nextString(20)
+    val contents = "muddling the machinations of morose METS"
 
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
@@ -82,12 +82,12 @@ class GoobiReaderFeatureTest
             toJson(notificationMessage).get
           )
 
-          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, globalS3Prefix = "goobi")
 
           val expectedRecord = HybridRecord(
             id = id,
             version = 1,
-            s3key = "mets-0001.xml"
+            s3key = "goobi/10/mets-0001/cd92f8d3"
           )
 
           withServer(flags) { _ =>
