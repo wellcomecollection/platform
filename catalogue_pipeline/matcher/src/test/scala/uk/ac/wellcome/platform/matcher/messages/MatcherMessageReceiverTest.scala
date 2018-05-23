@@ -88,7 +88,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  List(IdentifierList(Set("sierra-system-number/id"))))
+                  Set(IdentifierList(Set("sierra-system-number/id"))))
               )
             }
           }
@@ -114,7 +114,7 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(List(IdentifierList(
+                LinkedWorksIdentifiersList(Set(IdentifierList(
                   Set("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
@@ -144,7 +144,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  List(
+                  Set(
                     IdentifierList(
                       Set(
                         "sierra-system-number/A",
@@ -163,13 +163,70 @@ class MatcherMessageReceiverTest
                 assertMessageSent(
                   topic,
                   LinkedWorksIdentifiersList(
-                    List(
+                    Set(
                       IdentifierList(
                         Set(
                           "sierra-system-number/A",
                           "sierra-system-number/B",
                           "sierra-system-number/C"
                         ))))
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("breaks a set of works into individual works") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            val aIdentifier = aSierraSourceIdentifier("A")
+            val bIdentifier = aSierraSourceIdentifier("B")
+
+            val aWork = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier, bIdentifier))
+
+            sendSQS(queue, storageBucket, aWork)
+
+            eventually {
+
+              assertMessageSent(
+                topic,
+                LinkedWorksIdentifiersList(
+                  Set(
+                    IdentifierList(
+                      Set(
+                        "sierra-system-number/A",
+                        "sierra-system-number/B"
+                      ))))
+              )
+
+              val aWorkWithoutLinks = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = aIdentifier,
+                identifiers = List(aIdentifier))
+
+              sendSQS(queue, storageBucket, aWorkWithoutLinks)
+
+              eventually {
+
+                assertMessageSent(
+                  topic,
+                  LinkedWorksIdentifiersList(
+                    Set(
+                      IdentifierList(
+                        Set(
+                          "sierra-system-number/A"
+                        )),
+                      IdentifierList(
+                        Set(
+                          "sierra-system-number/B"
+                        ))
+                    ))
                 )
               }
             }

@@ -16,7 +16,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   private def identifierToString(sourceIdentifier: SourceIdentifier): String =
     s"${sourceIdentifier.identifierScheme}/${sourceIdentifier.value}"
 
-  private def matchLinkedWorks(work: UnidentifiedWork): Future[List[IdentifierList]] = {
+  private def matchLinkedWorks(work: UnidentifiedWork): Future[Set[IdentifierList]] = {
     val workId = identifierToString(work.sourceIdentifier)
     val linkedWorkIds =
       work.identifiers.map(identifierToString).filterNot(_ == workId)
@@ -39,7 +39,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
         case (_, linkedWorkList) =>
           IdentifierList(linkedWorkList.map(_.workId))
       }
-      .toList
+      .toSet
   }
 
   private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
