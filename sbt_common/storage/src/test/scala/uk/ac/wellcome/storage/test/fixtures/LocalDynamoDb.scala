@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.concurrent.Eventually
 
 import scala.util.Random
-import uk.ac.wellcome.models.{Id, Versioned}
+import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.test.fixtures._
 import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo.DynamoFormat
@@ -18,7 +18,7 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb[T <: Versioned with Id]
+trait LocalDynamoDb[T <: Id]
     extends Eventually
     with ExtendedPatience {
 

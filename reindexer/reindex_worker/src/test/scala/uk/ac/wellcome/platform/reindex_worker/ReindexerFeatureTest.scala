@@ -6,7 +6,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.{Id, Versioned}
+import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
   ReindexJob,
@@ -24,8 +24,7 @@ case class TestRecord(
   version: Int,
   reindexShard: String,
   reindexVersion: Int
-) extends Versioned
-    with Id
+) extends Id
 
 class ReindexerFeatureTest
     extends FunSpec
