@@ -7,7 +7,12 @@ class MigrationTest extends FunSpec with Matchers {
 
   case class Alphabet(a: String, b: String, c: String, d: String, e: String)
 
-  val alphabet = Alphabet(a = "apple", b = "banana", c = "coconut", d = "dandelion", e = "egg")
+  val alphabet = Alphabet(
+    a = "apple",
+    b = "banana",
+    c = "coconut",
+    d = "dandelion",
+    e = "egg")
 
   it("gets the intersection of two case classes") {
     case class Vowels(a: String, e: String)
