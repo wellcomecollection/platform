@@ -14,7 +14,17 @@ class LinkedWorkDao @Inject()(
                                  dynamoDbClient: AmazonDynamoDB,
                                  dynamoConfig: MatcherDynamoConfig
                                ) extends Logging {
-  def get(workId: String): Future[Option[LinkedWork]] = {
+  def get(workIds: Set[String]): Future[Set[LinkedWork]] = Future.sequence(workIds.map(get)).map(_.flatten)
+
+  def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] = Future.sequence(setIds.map(getBySetId)).map(_.flatten)
+
+  def put(work: LinkedWork) = {
+    Future {
+      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
+    }
+  }
+
+  private def get(workId: String): Future[Option[LinkedWork]] = {
     Future {
       Scanamo.get[LinkedWork](dynamoDbClient)(dynamoConfig.table)('workId -> workId) match {
         case Some(Right(record)) => {
@@ -33,7 +43,7 @@ class LinkedWorkDao @Inject()(
     }
   }
 
-  def getBySetId(setId: String) = {
+  private def getBySetId(setId: String) = {
     Future {
       Scanamo.queryIndex[LinkedWork](dynamoDbClient)(dynamoConfig.table, dynamoConfig.index)('setId -> setId)
         .map {
@@ -48,12 +58,6 @@ class LinkedWorkDao @Inject()(
             throw exception
           }
         }
-    }
-  }
-
-  def put(work: LinkedWork) = {
-    Future {
-      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
     }
   }
 

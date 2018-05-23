@@ -27,26 +27,28 @@ class LinkedWorkDaoTest
   }
 
   describe("Get from dynamo") {
-    it("returns nothing if matcher graph is not in dynamo") {
+    it("returns nothing if ids are not in dynamo") {
       withLocalDynamoDbTable { table =>
-        withLinkedWorkDao(table) { matcherGraphDao =>
-          whenReady(matcherGraphDao.get("Not-there")) {
+        withLinkedWorkDao(table) { linkedWorkDao =>
+          whenReady(linkedWorkDao.get(Set("Not-there"))) {
             linkedWork =>
-              linkedWork shouldBe None
+              linkedWork shouldBe Set.empty
           }
         }
       }
     }
 
-    it("returns a stored linkedWork in dynamo") {
+    it("returns the stored linkedWorks in dynamo") {
       withLocalDynamoDbTable { table =>
-        withLinkedWorkDao(table) { matcherGraphDao =>
-          val existingLinkedWork: LinkedWork = LinkedWork("A", List("B"), "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWork)
+        withLinkedWorkDao(table) { linkedWorkDao =>
+          val existingLinkedWorkA: LinkedWork = LinkedWork("A", List("B"), "A+B")
+          val existingLinkedWorkB: LinkedWork = LinkedWork("B", Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
 
-          whenReady(matcherGraphDao.get("A")) {
+          whenReady(linkedWorkDao.get(Set("A", "B"))) {
             linkedWork =>
-              linkedWork shouldBe Some(existingLinkedWork)
+              linkedWork shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
           }
         }
       }
@@ -60,7 +62,7 @@ class LinkedWorkDaoTest
           .thenThrow(expectedException)
         val matcherGraphDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
 
-        whenReady(matcherGraphDao.get("A").failed) {
+        whenReady(matcherGraphDao.get(Set("A")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }
@@ -74,7 +76,7 @@ class LinkedWorkDaoTest
           val badRecord: BadRecord = BadRecord(workId = "A")
           Scanamo.put(dynamoDbClient)(table.name)(badRecord)
 
-          whenReady(matcherGraphDao.get("A").failed) {
+          whenReady(matcherGraphDao.get(Set("A")).failed) {
             failedException =>
               failedException shouldBe a[RuntimeException]
           }
@@ -83,27 +85,29 @@ class LinkedWorkDaoTest
     }
   }
 
-  describe("Get by SetId") {
-    it("returns empty list if setId is not in dynamo") {
+  describe("Get by SetIds") {
+    it("returns empty set if setIds are not in dynamo") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
-          whenReady(matcherGraphDao.getBySetId("Not-there")) {
+          whenReady(matcherGraphDao.getBySetIds(Set("Not-there"))) {
             linkedWorks =>
-              linkedWorks shouldBe List()
+              linkedWorks shouldBe Set()
           }
         }
       }
     }
 
-    it("returns a stored linkedWork in dynamo") {
+    it("returns stored linkedWorks in dynamo") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
-          val existingLinkedWork: LinkedWork = LinkedWork("A", List("B"), "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWork)
+          val existingLinkedWorkA: LinkedWork = LinkedWork("A", List("B"), "A+B")
+          val existingLinkedWorkB: LinkedWork = LinkedWork("B", Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
 
-          whenReady(matcherGraphDao.getBySetId("A+B")) {
+          whenReady(matcherGraphDao.getBySetIds(Set("A+B"))) {
             linkedWorks =>
-              linkedWorks shouldBe List(existingLinkedWork)
+              linkedWorks shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
           }
         }
       }
@@ -117,7 +121,7 @@ class LinkedWorkDaoTest
           .thenThrow(expectedException)
         val linkedWordDao = new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index))
 
-        whenReady(linkedWordDao.getBySetId("A+B").failed) {
+        whenReady(linkedWordDao.getBySetIds(Set("A+B")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }
@@ -131,7 +135,7 @@ class LinkedWorkDaoTest
           val badRecord: BadRecord = BadRecord(workId = "A", setId = "A+B")
           Scanamo.put(dynamoDbClient)(table.name)(badRecord)
 
-          whenReady(matcherGraphDao.getBySetId("A+B").failed) {
+          whenReady(matcherGraphDao.getBySetIds(Set("A+B")).failed) {
             failedException =>
               failedException shouldBe a[RuntimeException]
           }
