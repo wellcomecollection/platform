@@ -24,7 +24,7 @@ object VHSConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesVHSConfig(): VHSConfig = {
-    val dynamoConfig = DynamoConfig(table = tableName())
+    val dynamoConfig = DynamoConfig(table = tableName(), index = None)
     val s3Config = S3Config(bucketName = bucketName())
     VHSConfig(
       dynamoConfig = dynamoConfig,
