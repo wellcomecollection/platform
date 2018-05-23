@@ -29,7 +29,7 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
 
   private val accessKey = "access"
   private val secretKey = "secret"
-
+  
   def dynamoDbLocalEndpointFlags(table: Table): Map[String, String] =
     dynamoClientLocalFlags ++ Map(
       "aws.dynamo.tableName" -> table.name,
