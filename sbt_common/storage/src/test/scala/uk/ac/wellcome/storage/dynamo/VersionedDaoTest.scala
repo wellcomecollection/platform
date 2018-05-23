@@ -13,7 +13,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import shapeless._
-import uk.ac.wellcome.models.{Id, Versioned}
+import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
@@ -21,11 +21,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class TestVersioned(override val id: String,
-                         data: String,
-                         override val version: Int)
-    extends Versioned
-    with Id
+case class TestVersioned(override val id: String, data: String, version: Int)
+    extends Id
 
 class VersionedDaoTest
     extends FunSpec
@@ -239,12 +236,10 @@ class VersionedDaoTest
                                 data: String,
                                 moreData: Int,
                                 version: Int)
-              extends Versioned
-              with Id
+              extends Id
 
           case class PartialRecord(id: String, moreData: Int, version: Int)
-              extends Versioned
-              with Id
+              extends Id
 
           val fullRecord = FullRecord(
             id = id,
