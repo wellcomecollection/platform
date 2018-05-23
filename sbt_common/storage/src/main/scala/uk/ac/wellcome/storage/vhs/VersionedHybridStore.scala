@@ -8,7 +8,12 @@ import uk.ac.wellcome.storage.type_classes._
 import uk.ac.wellcome.storage.type_classes.Migration._
 
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.type_classes.{HybridRecordEnricher, IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{
+  HybridRecordEnricher,
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.storage.type_classes._
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectLocation, ObjectStore}
@@ -20,8 +25,8 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
                                                                   objectStore: Store,
                                                                   dynamoDbClient: AmazonDynamoDB
 
-) {
 
+) {
 
   val versionedDao = new VersionedDao(
     dynamoDbClient = dynamoDbClient,
@@ -83,7 +88,7 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     }
   }
 
-  def getRecord(id: String): Future[Option[T]] =
+  def getRecord(id: String)(implicit storageStrategy: StorageStrategy[T]): Future[Option[T]] =
     getObject[HybridRecord](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
@@ -100,7 +105,6 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
       t,
       keyPrefix = KeyPrefix(buildKeyPrefix(id))
     )
-
 
     futureUri.flatMap {
       case ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
@@ -123,8 +127,9 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
 
   private def getObject[DynamoRow](id: String)(
     implicit dynamoFormat: DynamoFormat[DynamoRow],
-    migrationH: Migration[DynamoRow, HybridRecord])
-    : Future[Option[VersionedHybridObject]] = {
+    storageStrategy: StorageStrategy[T],
+    migrationH: Migration[DynamoRow, HybridRecord]
+  ): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
       versionedDao.getRecord[DynamoRow](id = id)

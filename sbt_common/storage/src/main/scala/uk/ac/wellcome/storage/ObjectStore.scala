@@ -14,8 +14,8 @@ trait ObjectStore[T] {
     keySuffix: KeySuffix = KeySuffix(""),
     userMetadata: Map[String, String] = Map()
   )(
-           implicit storageStrategy: StorageStrategy[T]
-         ): Future[ObjectLocation]
+    implicit storageStrategy: StorageStrategy[T]
+  ): Future[ObjectLocation]
 
   def get(objectLocation: ObjectLocation)(
     implicit storageStrategy: StorageStrategy[T]

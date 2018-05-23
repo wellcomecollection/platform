@@ -69,9 +69,7 @@ object StorageStrategyGenerator {
       }
 
       def retrieve(input: InputStream) =
-          parse(Source.fromInputStream(input).mkString).toTry
+        parse(Source.fromInputStream(input).mkString).toTry
 
     }
 }
-
-

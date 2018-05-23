@@ -8,7 +8,11 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.storage.{KeyPrefix, KeySuffix, ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.{StorageKey, StorageStrategy, StorageStream}
+import uk.ac.wellcome.storage.type_classes.{
+  StorageKey,
+  StorageStrategy,
+  StorageStream
+}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil
@@ -53,7 +57,8 @@ class S3TypeStoreTest
 
         val testObject = TestObject(content = content)
 
-        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix, suffix)
+        val writtenToS3 =
+          objectStore.put(bucket.name)(testObject, prefix, suffix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedJson = JsonUtil.toJson(testObject).get
@@ -81,7 +86,8 @@ class S3TypeStoreTest
         val suffix = KeySuffix(".json")
 
         val testObject = TestObject(content = content)
-        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix, suffix)
+        val writtenToS3 =
+          objectStore.put(bucket.name)(testObject, prefix, suffix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -99,7 +105,8 @@ class S3TypeStoreTest
         val suffix = KeySuffix(".json")
 
         val testObject = TestObject(content = content)
-        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix, suffix)
+        val writtenToS3 =
+          objectStore.put(bucket.name)(testObject, prefix, suffix)
 
         whenReady(writtenToS3) { actualKey =>
           val expectedUri =
@@ -118,7 +125,8 @@ class S3TypeStoreTest
 
         val testObject = TestObject(content = content)
 
-        val writtenToS3 = objectStore.put(bucket.name)(testObject, prefix, suffix)
+        val writtenToS3 =
+          objectStore.put(bucket.name)(testObject, prefix, suffix)
 
         whenReady(writtenToS3.flatMap(objectStore.get)) { actualTestObject =>
           actualTestObject shouldBe testObject

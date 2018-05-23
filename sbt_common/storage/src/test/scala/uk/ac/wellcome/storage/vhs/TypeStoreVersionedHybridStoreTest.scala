@@ -9,7 +9,11 @@ import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.{StorageKey, StorageStrategy, StorageStream}
+import uk.ac.wellcome.storage.type_classes.{
+  StorageKey,
+  StorageStrategy,
+  StorageStream
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._

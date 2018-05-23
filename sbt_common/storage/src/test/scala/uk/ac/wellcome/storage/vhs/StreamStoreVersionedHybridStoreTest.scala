@@ -8,7 +8,10 @@ import uk.ac.wellcome.storage.s3.S3StreamStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.{StorageStrategy, StorageStrategyGenerator}
+import uk.ac.wellcome.storage.type_classes.{
+  StorageStrategy,
+  StorageStrategyGenerator
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -24,7 +27,8 @@ class StreamStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  implicit val store: StorageStrategy[InputStream] = StorageStrategyGenerator.streamStore
+  implicit val store: StorageStrategy[InputStream] =
+    StorageStrategyGenerator.streamStore
 
   private def stringify(is: InputStream) =
     scala.io.Source.fromInputStream(is).mkString

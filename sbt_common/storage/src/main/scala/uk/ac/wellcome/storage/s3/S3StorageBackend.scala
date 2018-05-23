@@ -2,7 +2,12 @@ package uk.ac.wellcome.storage.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import uk.ac.wellcome.storage.{KeyPrefix, KeySuffix, ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.{
+  KeyPrefix,
+  KeySuffix,
+  ObjectLocation,
+  ObjectStore
+}
 import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import grizzled.slf4j.Logging
@@ -11,16 +16,17 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
 class S3StorageBackend[T](s3Client: AmazonS3)(implicit ec: ExecutionContext)
-  extends ObjectStore[T]
+    extends ObjectStore[T]
     with Logging {
 
-  private def normalizePathFragment(prefix: String) = prefix
-    .stripPrefix("/")
-    .stripSuffix("/")
+  private def normalizePathFragment(prefix: String) =
+    prefix
+      .stripPrefix("/")
+      .stripSuffix("/")
 
   private def generateMetadata(
-                                userMetadata: Map[String, String]
-                              ): ObjectMetadata = {
+    userMetadata: Map[String, String]
+  ): ObjectMetadata = {
     val objectMetadata = new ObjectMetadata()
     objectMetadata.setUserMetadata(userMetadata.asJava)
     objectMetadata
@@ -53,7 +59,8 @@ class S3StorageBackend[T](s3Client: AmazonS3)(implicit ec: ExecutionContext)
     }
   }
 
-  def get(objectLocation: ObjectLocation)(implicit storageStrategy: StorageStrategy[T]): Future[T] = {
+  def get(objectLocation: ObjectLocation)(
+    implicit storageStrategy: StorageStrategy[T]): Future[T] = {
     val bucketName = objectLocation.namespace
     val key = objectLocation.key
 
