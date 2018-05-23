@@ -13,9 +13,7 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb
-    extends Eventually
-    with ExtendedPatience {
+trait LocalDynamoDb extends Eventually with ExtendedPatience {
 
   import LocalDynamoDb._
 

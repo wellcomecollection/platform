@@ -11,7 +11,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  HybridRecord,
+  VHSConfig,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -38,9 +42,9 @@ trait LocalVersionedHybridStore
   def withTypeVHS[T <: Id, R](bucket: Bucket,
                               table: Table,
                               globalS3Prefix: String = defaultGlobalS3Prefix)(
-                               testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(
-                               implicit encoder: Encoder[T],
-                               decoder: Decoder[T]): R = {
+    testWith: TestWith[VersionedHybridStore[T, S3TypeStore[T]], R])(
+    implicit encoder: Encoder[T],
+    decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name, Some(table.index))
     val vhsConfig = VHSConfig(
@@ -64,8 +68,9 @@ trait LocalVersionedHybridStore
 
   def withStreamVHS[R](bucket: Bucket,
                        table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)
-                      (testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
+    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R])
+    : R = {
     val s3Config = S3Config(bucketName = bucket.name)
 
     val dynamoConfig =
@@ -93,7 +98,7 @@ trait LocalVersionedHybridStore
   def withStringVHS[R](bucket: Bucket,
                        table: Table,
                        globalS3Prefix: String = defaultGlobalS3Prefix)(
-                        testWith: TestWith[VersionedHybridStore[String, S3StringStore], R]): R = {
+    testWith: TestWith[VersionedHybridStore[String, S3StringStore], R]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig =
       DynamoConfig(table = table.name, index = Some(table.index))
@@ -145,4 +150,4 @@ trait LocalVersionedHybridStore
           case Right(record) => record
         }
     }
-  }
+}
