@@ -50,10 +50,10 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   ): Future[Unit] = {
 
     getObject[DynamoRow](id).flatMap {
-      case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
-        val transformedS3Record = ifExisting(s3Record)
+      case Some(VersionedHybridObject(storedHybridRecord, storedS3Record)) =>
+        val transformedS3Record = ifExisting(storedS3Record)
 
-        if (transformedS3Record != s3Record) {
+        if (transformedS3Record != storedS3Record) {
           putObject(
             id,
             transformedS3Record,
@@ -61,7 +61,7 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
               .enrichedHybridRecordHList(
                 id = id,
                 metadata = metadata,
-                version = hybridRecord.version)
+                version = storedHybridRecord.version)
           )
         } else {
           Future.successful(())
