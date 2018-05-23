@@ -6,4 +6,6 @@ module "demultiplexer_queue" {
   topic_names = ["${var.demultiplexer_topic_name}"]
 
   alarm_topic_arn = "${var.dlq_alarm_arn}"
+
+  max_receive_count = 10
 }
