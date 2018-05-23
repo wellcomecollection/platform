@@ -18,10 +18,7 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
-import uk.ac.wellcome.sierra_adapter.modules.{
-  SierraKeyPrefixGeneratorModule,
-  SierraTransformableModule
-}
+import uk.ac.wellcome.sierra_adapter.modules.SierraTransformableModule
 
 object ServerMain extends Server
 
@@ -32,7 +29,6 @@ class Server extends HttpServer {
     VHSConfigModule,
     DynamoClientModule,
     SierraBibMergerModule,
-    SierraKeyPrefixGeneratorModule,
     SierraTransformableModule,
     MetricsSenderModule,
     SQSConfigModule,

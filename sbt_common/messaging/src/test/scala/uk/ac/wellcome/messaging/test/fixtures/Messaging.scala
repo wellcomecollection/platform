@@ -18,7 +18,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.{
-  KeyPrefixGenerator,
   S3Config,
   S3ObjectLocation
 }
@@ -99,11 +98,6 @@ trait Messaging
     }
   }
 
-  val keyPrefixGenerator: KeyPrefixGenerator[ExampleObject] =
-    new KeyPrefixGenerator[ExampleObject] {
-      override def generate(obj: ExampleObject): String = "/"
-    }
-
   def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
     withMessageReader(bucket, queue)(testWith)
@@ -166,8 +160,7 @@ trait Messaging
     val messageWriter = new MessageWriter[ExampleObject](
       messageConfig = messageConfig,
       snsClient = writerSnsClient,
-      s3Client = s3Client,
-      keyPrefixGenerator = keyPrefixGenerator
+      s3Client = s3Client
     )
 
     testWith(messageWriter)

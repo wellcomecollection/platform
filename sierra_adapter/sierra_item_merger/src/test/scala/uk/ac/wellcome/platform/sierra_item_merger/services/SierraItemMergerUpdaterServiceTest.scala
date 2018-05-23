@@ -5,11 +5,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.{KeyPrefixGenerator, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
@@ -28,11 +27,6 @@ class SierraItemMergerUpdaterServiceTest
     with LocalVersionedHybridStore
     with SQS
     with SierraItemMergerTestUtil {
-
-  val keyPrefixGenerator: KeyPrefixGenerator[Sourced] =
-    new KeyPrefixGenerator[Sourced] {
-      override def generate(obj: Sourced): String = "/"
-    }
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,

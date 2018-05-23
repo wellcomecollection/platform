@@ -4,11 +4,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
-import uk.ac.wellcome.storage.s3.{
-  KeyPrefixGenerator,
-  S3ObjectLocation,
-  S3ObjectStore
-}
+import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.type_classes.{
   HybridRecordEnricher,
   IdGetter,
@@ -22,7 +18,6 @@ import scala.concurrent.Future
 class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
   s3ObjectStore: S,
-  keyPrefixGenerator: KeyPrefixGenerator[T],
   dynamoDbClient: AmazonDynamoDB
 ) {
 
@@ -103,12 +98,27 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
 
     val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
       t,
-      keyPrefixGenerator.generate(t))
+      keyPrefix = buildKeyPrefix(id)
+    )
 
     futureUri.flatMap {
       case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
     }
   }
+
+  // To spread objects evenly in our S3 bucket, we take the last two
+  // characters of the ID and reverse them.  This ensures that:
+  //
+  //  1.  We can find the S3 data corresponding to a given source ID
+  //      without consulting the index.
+  //
+  //  2.  We can identify which record an S3 object is associated with.
+  //
+  //  3.  Adjacent objects are stored in shards that are far apart,
+  //      e.g. 0001 and 0002 are separated by nine shards.
+  //
+  private def buildKeyPrefix(id: String): String =
+    s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
   private def getObject(id: String): Future[Option[VersionedHybridObject]] = {
 

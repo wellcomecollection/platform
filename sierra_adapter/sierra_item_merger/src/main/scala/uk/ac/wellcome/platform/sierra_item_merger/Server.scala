@@ -18,10 +18,7 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
-import uk.ac.wellcome.sierra_adapter.modules.{
-  SierraKeyPrefixGeneratorModule,
-  SierraTransformableModule
-}
+import uk.ac.wellcome.sierra_adapter.modules.SierraTransformableModule
 
 object ServerMain extends Server
 
@@ -37,8 +34,7 @@ class Server extends HttpServer {
     S3ClientModule,
     AkkaModule,
     SierraItemMergerModule,
-    SierraTransformableModule,
-    SierraKeyPrefixGeneratorModule
+    SierraTransformableModule
   )
 
   override def configureHttp(router: HttpRouter) {

@@ -6,16 +6,9 @@ import io.circe.{Decoder, Encoder}
 import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 import javax.inject.Singleton
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.storage.s3.KeyPrefixGenerator
-
 import uk.ac.wellcome.utils.JsonUtil._
 
 object UnidentifiedWorkModule extends TwitterModule {
-  @Provides
-  @Singleton
-  def provideKeyPrefixGenerator(): KeyPrefixGenerator[UnidentifiedWork] =
-    new UnidentifiedWorkKeyPrefixGenerator()
-
   @Provides
   @Singleton
   def provideUnidentifiedWorkDecoder(): Decoder[UnidentifiedWork] =
@@ -26,11 +19,4 @@ object UnidentifiedWorkModule extends TwitterModule {
   def provideUnidentifiedWorkEncoder(): Encoder[UnidentifiedWork] =
     deriveEncoder[UnidentifiedWork]
 
-}
-
-class UnidentifiedWorkKeyPrefixGenerator
-    extends KeyPrefixGenerator[UnidentifiedWork] {
-  override def generate(obj: UnidentifiedWork): String = {
-    obj.sourceIdentifier.value.reverse.slice(0, 2)
-  }
 }
