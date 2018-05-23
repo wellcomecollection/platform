@@ -14,10 +14,10 @@ class WorkGraphStore @Inject()(
 
   def findAffectedWorks(workUpdate: LinkedWorkUpdate): Future[LinkedWorksGraph] = {
 
-    val directlyAffectedWorkIds = workUpdate.workId +: workUpdate.linkedIds
+    val directlyAffectedWorkIds = workUpdate.linkedIds + workUpdate.workId
 
     for {
-      direcltyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds.toSet)
+      direcltyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds)
       affectedSetIds = direcltyAffectedWorks.map( linkedWork =>
         linkedWork.setId
       )

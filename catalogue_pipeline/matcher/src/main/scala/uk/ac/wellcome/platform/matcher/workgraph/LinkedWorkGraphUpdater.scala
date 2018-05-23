@@ -4,6 +4,8 @@ import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
 
+import scala.collection.immutable.Iterable
+
 object LinkedWorkGraphUpdater {
   def update(workUpdate: LinkedWorkUpdate,
              existingGraph: LinkedWorksGraph): LinkedWorksGraph = {
@@ -42,7 +44,7 @@ object LinkedWorkGraphUpdater {
     linkedWork.workId +: linkedWork.linkedIds
   }
 
-  private def toEdges(workId: String, linkedWorkIds: List[String]) = {
+  private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
     linkedWorkIds.map(workId ~> _)
   }
 

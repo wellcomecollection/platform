@@ -68,7 +68,7 @@ class MatcherFeatureTest
                 snsMessages.map { snsMessage =>
                   val identifiersList =
                     fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
-                  identifiersList.linkedWorks shouldBe List(
+                  identifiersList.linkedWorks shouldBe Set(
                     IdentifierList(Set("sierra-system-number/id")))
                 }
               }

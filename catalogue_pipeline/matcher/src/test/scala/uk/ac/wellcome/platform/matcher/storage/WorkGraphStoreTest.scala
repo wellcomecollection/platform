@@ -29,7 +29,7 @@ class WorkGraphStoreTest
     it("returns nothing if there are no matching graphs") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("Not-there", Nil))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("Not-there", Set.empty))) {
             linkedWorkGraph =>
               linkedWorkGraph shouldBe LinkedWorksGraph(Set.empty)
           }
@@ -43,7 +43,7 @@ class WorkGraphStoreTest
           val work = LinkedWork(workId = "A", linkedIds = Nil, setId = "A")
           Scanamo.put(dynamoDbClient)(table.name)(work)
 
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Nil))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Set.empty))) {
             linkedWorkGraph =>
               linkedWorkGraph shouldBe LinkedWorksGraph(Set(work))
           }
@@ -59,7 +59,7 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workA)
           Scanamo.put(dynamoDbClient)(table.name)(workB)
 
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", List("B")))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Set("B")))) {
             linkedWorkGraph =>
               linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
           }
@@ -75,7 +75,7 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workA)
           Scanamo.put(dynamoDbClient)(table.name)(workB)
 
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Nil))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Set.empty))) {
             linkedWorkGraph =>
               linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
           }
@@ -93,7 +93,7 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workB)
           Scanamo.put(dynamoDbClient)(table.name)(workC)
 
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Nil))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("A", Set.empty))) {
             linkedWorkGraph =>
               linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
           }
@@ -111,7 +111,7 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workB)
           Scanamo.put(dynamoDbClient)(table.name)(workC)
 
-          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("B", List("C")))) {
+          whenReady(workGraphStore.findAffectedWorks(LinkedWorkUpdate("B", Set("C")))) {
             linkedWorkGraph =>
               linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
           }

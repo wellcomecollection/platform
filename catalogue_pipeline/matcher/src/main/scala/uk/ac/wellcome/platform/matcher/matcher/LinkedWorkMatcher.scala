@@ -19,7 +19,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   private def matchLinkedWorks(work: UnidentifiedWork): Future[Set[IdentifierList]] = {
     val workId = identifierToString(work.sourceIdentifier)
     val linkedWorkIds =
-      work.identifiers.map(identifierToString).filterNot(_ == workId)
+      work.identifiers.map(identifierToString).filterNot(_ == workId).toSet
 
     for {
       linkedWorksGraph <- workGraphStore.findAffectedWorks(LinkedWorkUpdate(workId, linkedWorkIds))
