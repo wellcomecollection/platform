@@ -8,5 +8,4 @@ module "demultiplexer_queue" {
   alarm_topic_arn = "${var.dlq_alarm_arn}"
 
   max_receive_count = 10
-
 }
