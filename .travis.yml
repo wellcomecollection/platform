@@ -31,14 +31,13 @@ cache:
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/recorder/target
 
-    - common/target
-
     - data_api/snapshot_generator/target
 
     - goobi_adapter/goobi_reader/target
 
     - reindexer/reindex_worker/target
 
+    - sbt_common/common/target
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
     - sbt_common/finatra-messaging/target
@@ -81,7 +80,7 @@ jobs:
     - env: TASK=travistooling-test
 
     - stage: sbt-common-test
-      env: TASK=sbt-common-test
+      env: TASK=common-test
     - env: TASK=internal_model-test
     - env: TASK=common_display-test
     - env: TASK=common_elasticsearch-test
