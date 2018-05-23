@@ -52,7 +52,7 @@ object Dependencies {
   )
 
   val guiceDependencies = Seq(
-    "com.google.inject" % "guice" % versions.guice % "test",
+    "com.google.inject" % "guice" % versions.guice,
     "com.google.inject.extensions" % "guice-testlib" % versions.guice % "test"
   )
 
