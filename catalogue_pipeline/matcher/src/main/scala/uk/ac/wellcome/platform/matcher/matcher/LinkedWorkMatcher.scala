@@ -21,26 +21,29 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     val linkedWorkIds =
       work.identifiers.map(identifierToString).filterNot(_ == workId)
 
-    // load from persisted graphs, assume no exisiting graph
-    val eventualLinkedWorksGraph = workGraphStore.findAffectedWorks(LinkedWorkUpdate(workId, linkedWorkIds))
+    for {
+      linkedWorksGraph <- workGraphStore.findAffectedWorks(LinkedWorkUpdate(workId, linkedWorkIds))
+      updatedLinkedWorkGraph = LinkedWorkGraphUpdater.update(
+        LinkedWorkUpdate(workId, linkedWorkIds),
+        linkedWorksGraph)
+      _ <- workGraphStore.put(updatedLinkedWorkGraph)
 
-    eventualLinkedWorksGraph.map { linkedWorksGraph =>
-      val updatedLinkedWorkGraph: LinkedWorksGraph =
-        LinkedWorkGraphUpdater.update(
-          LinkedWorkUpdate(workId, linkedWorkIds),
-          linkedWorksGraph)
-
-      // persist updated graph
-      workGraphStore.put(updatedLinkedWorkGraph)
-
-      // return just the ids in the groups
-      updatedLinkedWorkGraph.linkedWorksSet
-        .groupBy(_.setId)
-        .map {
-          case (setId, linkedWorkList) =>
-            IdentifierList(linkedWorkList.map(_.workId))
-        }
-        .toList
+    } yield {
+      convertToIdentifiersList(updatedLinkedWorkGraph)
     }
+  }
+
+  private def convertToIdentifiersList(updatedLinkedWorkGraph: LinkedWorksGraph) = {
+    groupBySetId(updatedLinkedWorkGraph)
+      .map {
+        case (_, linkedWorkList) =>
+          IdentifierList(linkedWorkList.map(_.workId))
+      }
+      .toList
+  }
+
+  private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
+    updatedLinkedWorkGraph.linkedWorksSet
+      .groupBy(_.setId)
   }
 }

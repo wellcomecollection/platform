@@ -2,23 +2,34 @@ package uk.ac.wellcome.platform.matcher.matcher
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.{LocalLinkedWorkDynamoDb, MatcherFixtures}
-import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWork, LinkedWorksIdentifiersList}
+import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, MatcherDynamoConfig, WorkGraphStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
+
+import scala.concurrent.Future
 
 class LinkedWorkMatcherTest
     extends FunSpec
     with Matchers
     with MatcherFixtures
     with LocalLinkedWorkDynamoDb
-    with ScalaFutures {
+    with ScalaFutures
+    with MockitoSugar {
 
   def withLinkedWorkMatcher[R](table: Table)(testWith: TestWith[LinkedWorkMatcher, R]): R = {
     val workGraphStore = new WorkGraphStore(new LinkedWorkDao(dynamoDbClient, MatcherDynamoConfig(table.name, table.index)))
+    val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
+    testWith(linkedWorkMatcher)
+  }
+
+  def withLinkedWorkMatcher[R](table: Table, workGraphStore: WorkGraphStore)(testWith: TestWith[LinkedWorkMatcher, R]): R = {
     val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
     testWith(linkedWorkMatcher)
   }
@@ -89,6 +100,20 @@ class LinkedWorkMatcherTest
             LinkedWork("sierra-system-number/B", List("sierra-system-number/C"), "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
             LinkedWork("sierra-system-number/C", Nil, "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
           )
+        }
+      }
+    }
+  }
+
+  it("fails if saving the updated links fails") {
+    withLocalDynamoDbTable { table =>
+      val mockWorkGraphStore = mock[WorkGraphStore]
+      withLinkedWorkMatcher(table, mockWorkGraphStore) { linkedWorkMatcher =>
+        val expectedException = new RuntimeException("Failed to put")
+        when(mockWorkGraphStore.findAffectedWorks(any[LinkedWorkUpdate])).thenReturn(Future.successful(LinkedWorksGraph(Set.empty)))
+        when(mockWorkGraphStore.put(any[LinkedWorksGraph])).thenReturn(Future.failed(expectedException))
+        whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork).failed) { actualException =>
+          actualException shouldBe expectedException
         }
       }
     }
