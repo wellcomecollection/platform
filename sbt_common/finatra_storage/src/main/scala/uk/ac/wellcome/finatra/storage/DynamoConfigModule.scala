@@ -11,10 +11,11 @@ object DynamoConfigModule extends TwitterModule {
   private val tableIndex =
     flag[String]("aws.dynamo.tableIndex", "", "Name of the DynamoDB index")
 
-
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig = {
-    DynamoConfig(table = tableName(), index = if (tableIndex().isEmpty) None else Some(tableIndex()))
+    DynamoConfig(
+      table = tableName(),
+      index = if (tableIndex().isEmpty) None else Some(tableIndex()))
   }
 }

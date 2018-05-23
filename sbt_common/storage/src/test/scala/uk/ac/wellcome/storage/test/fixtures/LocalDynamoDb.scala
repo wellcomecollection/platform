@@ -32,10 +32,11 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def dynamoDbLocalEndpointFlags(table: Table): Map[String, String] = dynamoClientLocalFlags ++ Map(
-    "aws.dynamo.tableName" -> table.name,
-    "aws.dynamo.tableIndex" -> table.index
-  )
+  def dynamoDbLocalEndpointFlags(table: Table): Map[String, String] =
+    dynamoClientLocalFlags ++ Map(
+      "aws.dynamo.tableName" -> table.name,
+      "aws.dynamo.tableIndex" -> table.index
+    )
 
   def dynamoClientLocalFlags = Map(
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,

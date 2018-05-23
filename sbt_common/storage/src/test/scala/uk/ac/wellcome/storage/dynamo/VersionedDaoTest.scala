@@ -89,7 +89,9 @@ class VersionedDaoTest
           .thenThrow(expectedException)
 
         val testVersionedDaoMockedDynamoClient =
-          new VersionedDao(dynamoDbClient, DynamoConfig(table.name, Some(table.index)))
+          new VersionedDao(
+            dynamoDbClient,
+            DynamoConfig(table.name, Some(table.index)))
 
         val future =
           testVersionedDaoMockedDynamoClient.getRecord[TestVersioned](
@@ -282,7 +284,9 @@ class VersionedDaoTest
           .thenThrow(expectedException)
 
         val failingDao =
-          new VersionedDao(dynamoDbClient, DynamoConfig(table.name, Some(table.index)))
+          new VersionedDao(
+            dynamoDbClient,
+            DynamoConfig(table.name, Some(table.index)))
 
         val testVersioned = TestVersioned(
           id = "testSource/b1111",

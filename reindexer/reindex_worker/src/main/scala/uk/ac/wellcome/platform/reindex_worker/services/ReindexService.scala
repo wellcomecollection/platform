@@ -10,7 +10,10 @@ import javax.inject.Inject
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  ReindexJob,
+  ReindexRecord
+}
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
 
 import scala.concurrent.Future

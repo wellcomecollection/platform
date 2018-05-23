@@ -71,10 +71,12 @@ trait LocalVersionedHybridStore
 
   def withStreamVHS[R](bucket: Bucket,
                        table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)
-                      (testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R]): R = {
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
+    testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R])
+    : R = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val dynamoConfig = DynamoConfig(table = table.name, index = Some(table.index))
+    val dynamoConfig =
+      DynamoConfig(table = table.name, index = Some(table.index))
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,
@@ -99,7 +101,8 @@ trait LocalVersionedHybridStore
                        globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[String, S3StringStore], R]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val dynamoConfig = DynamoConfig(table = table.name, index = Some(table.index))
+    val dynamoConfig =
+      DynamoConfig(table = table.name, index = Some(table.index))
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,
