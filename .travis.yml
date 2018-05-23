@@ -74,12 +74,12 @@ env:
     #
     - PYTHONUNBUFFERED=x
 
-jobs:
+matrix:
   include:
 #    - stage: quicktest
 #      env: TASK=travis-format
 #    - env: TASK=travistooling-test
-#
+
 #    - stage: sbt-common-test
 
     # Lambda tests.
@@ -114,8 +114,8 @@ jobs:
 #        - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - stage: test
-      env: TASK=common-test
+#    - stage: test
+    - env: TASK=common-test
     - env: TASK=internal_model-test
     - env: TASK=display-test
     - env: TASK=elasticsearch-test
@@ -158,10 +158,10 @@ jobs:
     # - env: TASK=loris-build
     # - env: TASK=cache_cleaner-build
 
-stages:
-  - quicktest
+#stages:
+#  - quicktest
 #  - sbt-common-test
-  - test
+#  - test
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
