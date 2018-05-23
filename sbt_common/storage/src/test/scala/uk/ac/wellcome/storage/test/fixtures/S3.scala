@@ -1,10 +1,9 @@
 package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.s3.AmazonS3
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.Json
 import io.circe.parser.parse
-import org.apache.commons.io.IOUtils
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 import uk.ac.wellcome.test.fixtures._
@@ -75,9 +74,12 @@ trait S3 extends Logging with Eventually {
       }
     )
 
-  def getContentFromS3(bucket: Bucket, key: String): String = {
-    IOUtils.toString(s3Client.getObject(bucket.name, key).getObjectContent)
-  }
+  def getContentFromS3(bucket: Bucket, key: String): String =
+    scala.io.Source
+      .fromInputStream(
+        s3Client.getObject(bucket.name, key).getObjectContent
+      )
+      .mkString
 
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
     parse(getContentFromS3(bucket, key)).right.get

@@ -7,7 +7,7 @@ import com.amazonaws.services.sqs.model.{
   ReceiveMessageRequest
 }
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import scala.collection.JavaConverters._

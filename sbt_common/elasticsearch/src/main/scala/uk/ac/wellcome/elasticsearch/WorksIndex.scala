@@ -6,7 +6,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 
 class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     extends ElasticSearchIndex

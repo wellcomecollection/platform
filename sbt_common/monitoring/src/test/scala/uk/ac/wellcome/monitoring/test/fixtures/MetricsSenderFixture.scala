@@ -1,7 +1,7 @@
 package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import org.mockito.Matchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.mockito.invocation.InvocationOnMock

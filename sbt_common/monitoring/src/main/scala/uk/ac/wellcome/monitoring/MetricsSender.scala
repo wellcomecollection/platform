@@ -13,7 +13,7 @@ import akka.stream.{
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._

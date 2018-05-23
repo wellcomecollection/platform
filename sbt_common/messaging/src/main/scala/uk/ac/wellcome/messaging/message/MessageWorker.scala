@@ -1,7 +1,6 @@
 package uk.ac.wellcome.messaging.message
 
 import akka.actor.ActorSystem
-import com.twitter.inject.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.monitoring.MetricsSender
@@ -10,6 +9,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
+import grizzled.slf4j.Logging
 
 abstract class MessageWorker[T](messageReader: MessageReader[T],
                                 actorSystem: ActorSystem,

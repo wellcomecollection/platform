@@ -2,9 +2,10 @@ package uk.ac.wellcome.storage.s3
 
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.io.Source
 
 import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
@@ -12,7 +13,7 @@ import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
 class S3StringStore @Inject()(
   s3Client: AmazonS3,
-)(implicit ec: ExecutionContext) extends Logging
+) extends Logging
     with S3ObjectStore[String]{
 
   override def put(bucket: String)(

@@ -6,7 +6,7 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil.fromJson
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import scala.concurrent.Future
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import scala.concurrent.duration._
 
 abstract class SQSWorker(sqsReader: SQSReader,

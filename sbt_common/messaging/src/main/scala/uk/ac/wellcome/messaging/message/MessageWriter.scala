@@ -6,7 +6,7 @@ import java.util.Date
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import io.circe.{Decoder, Encoder}
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
