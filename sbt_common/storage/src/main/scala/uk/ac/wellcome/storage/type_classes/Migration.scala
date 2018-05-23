@@ -7,6 +7,7 @@ import shapeless.{HList, LabelledGeneric}
 // as downloaded on 23 May 2018.
 //
 // The code in question comes from § 6.3 "Case study: case class migrations".
+// (It omits § 6.3.4 "Adding new fields", as we don't currently need that.)
 //
 // The purpose of Migration is to allow you to move between case classes.
 // For example, suppose I had the following case classes:
