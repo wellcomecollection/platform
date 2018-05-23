@@ -21,9 +21,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-case class TestVersioned(override val id: String,
-                         data: String,
-                         version: Int)
+case class TestVersioned(override val id: String, data: String, version: Int)
     extends Id
 
 class VersionedDaoTest
