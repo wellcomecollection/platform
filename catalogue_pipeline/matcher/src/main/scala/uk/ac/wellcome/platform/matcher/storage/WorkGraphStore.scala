@@ -17,8 +17,8 @@ class WorkGraphStore @Inject()(
     val directlyAffectedWorkIds = workUpdate.linkedIds + workUpdate.workId
 
     for {
-      direcltyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds)
-      affectedSetIds = direcltyAffectedWorks.map( linkedWork =>
+      directlyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds)
+      affectedSetIds = directlyAffectedWorks.map( linkedWork =>
         linkedWork.setId
       )
       affectedWorks <- linkedWorkDao.getBySetIds(affectedSetIds)
