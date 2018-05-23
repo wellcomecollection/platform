@@ -39,8 +39,8 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   // The HybridRecordEnricher combines this with the HybridRecord, and stores
   // both of them as a single row in DynamoDB.
   //
-  def updateRecord[DynamoRow, Metadata](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
-    metadata: Metadata = EmptyMetadata())(
+  def updateRecord[DynamoRow, Metadata](id: String)(ifNotExisting: => T)(
+    ifExisting: T => T)(metadata: Metadata = EmptyMetadata())(
     implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
     dynamoFormat: DynamoFormat[DynamoRow],
     versionUpdater: VersionUpdater[DynamoRow],
@@ -118,7 +118,8 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   private def buildKeyPrefix(id: String): String =
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
-  private def getObject[DynamoRow](id: String): Future[Option[VersionedHybridObject]] = {
+  private def getObject[DynamoRow](
+    id: String): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
       versionedDao.getRecord[DynamoRow](id = id)
