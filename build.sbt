@@ -24,10 +24,7 @@ def doSharedSierraSetup(project: Project, folder: String) =
   doServiceSetup(project = project, folder = folder)
     .dependsOn(sierra_adapter_common % "compile->compile;test->test")
 
-lazy val common = project
-  .settings(Common.settings: _*)
-  .settings(DockerCompose.settings: _*)
-  .enablePlugins(DockerComposePlugin)
+lazy val common = doSharedLibrarySetup(project, "sbt_common/common")
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
 // It depends on common because it uses JsonUtil
