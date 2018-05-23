@@ -15,9 +15,9 @@ import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
+class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
-  s3ObjectStore: S,
+  s3ObjectStore: Store,
   dynamoDbClient: AmazonDynamoDB
 ) {
 
@@ -34,21 +34,18 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
 
   // Store a single record in DynamoDB.
   //
-  // You pass it a record and optionally a case class containing some metadata (type M).
-  // The metadata parameter is useful if you have some additional detail you don't want
-  // to store on your primary model.
+  // You pass it a record and optionally a case class containing some metadata.
+  // The HybridRecordEnricher combines this with the HybridRecord, and stores
+  // both of them as a single row in DynamoDB.
   //
-  // The two are combined into a single HList with the HybridRecordEnricher of type O,
-  // and this record is what gets saved to DynamoDB.
-  //
-  def updateRecord[O, M](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
-    metadata: M = EmptyMetadata())(
-    implicit enricher: HybridRecordEnricher.Aux[M, O],
-    dynamoFormat: DynamoFormat[O],
-    versionUpdater: VersionUpdater[O],
-    idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O],
-    updateExpressionGenerator: UpdateExpressionGenerator[O]
+  def updateRecord[DynamoRow, Metadata](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
+    metadata: Metadata = EmptyMetadata())(
+    implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
+    dynamoFormat: DynamoFormat[DynamoRow],
+    versionUpdater: VersionUpdater[DynamoRow],
+    idGetter: IdGetter[DynamoRow],
+    versionGetter: VersionGetter[DynamoRow],
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ): Future[Unit] = {
 
     getObject(id).flatMap {
@@ -88,12 +85,12 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
       maybeObject.map(_.s3Object)
     }
 
-  private def putObject[O](id: String, t: T, f: (String) => O)(
-    implicit dynamoFormat: DynamoFormat[O],
-    versionUpdater: VersionUpdater[O],
-    idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O],
-    updateExpressionGenerator: UpdateExpressionGenerator[O]
+  private def putObject[DynamoRow](id: String, t: T, f: (String) => DynamoRow)(
+    implicit dynamoFormat: DynamoFormat[DynamoRow],
+    versionUpdater: VersionUpdater[DynamoRow],
+    idGetter: IdGetter[DynamoRow],
+    versionGetter: VersionGetter[DynamoRow],
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ) = {
 
     val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
