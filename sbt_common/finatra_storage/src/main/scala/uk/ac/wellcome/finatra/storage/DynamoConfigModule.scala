@@ -14,8 +14,10 @@ object DynamoConfigModule extends TwitterModule {
   @Singleton
   @Provides
   def providesDynamoConfig(): DynamoConfig = {
+
     DynamoConfig(
       table = tableName(),
       index = if (tableIndex().isEmpty) None else Some(tableIndex()))
+
   }
 }
