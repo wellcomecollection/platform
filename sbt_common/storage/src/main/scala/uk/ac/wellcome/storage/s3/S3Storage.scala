@@ -4,7 +4,6 @@ import java.io.InputStream
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import com.twitter.inject.Logging
 import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import grizzled.slf4j.Logging
