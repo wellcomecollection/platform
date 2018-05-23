@@ -1,9 +1,7 @@
 package uk.ac.wellcome.models.work.internal
 
-import uk.ac.wellcome.models.Versioned
-
 /** A representation of a work in our ontology */
-trait Work extends Versioned {
+trait Work {
   val title: Option[String]
   val sourceIdentifier: SourceIdentifier
   val version: Int
