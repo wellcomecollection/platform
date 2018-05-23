@@ -33,7 +33,8 @@ trait LocalDynamoDb[T <: Versioned with Id]
   private val secretKey = "secret"
 
   def dynamoDbLocalEndpointFlags(table: Table) = dynamoClientLocalFlags ++ Map(
-    "aws.dynamo.tableName" -> table.name
+    "aws.dynamo.tableName" -> table.name,
+    "aws.dynamo.tableIndex" -> table.index
   )
 
   def dynamoClientLocalFlags = Map(
@@ -52,7 +53,7 @@ trait LocalDynamoDb[T <: Versioned with Id]
 
   implicit val evidence: DynamoFormat[T]
 
-  def withLocalDynamoDbTable[R] = fixture[Table, R](
+  def withLocalDynamoDbTable[R]: Fixture[Table, R] = fixture[Table, R](
     create = {
       val tableName = Random.alphanumeric.take(10).mkString
       val indexName = Random.alphanumeric.take(10).mkString
