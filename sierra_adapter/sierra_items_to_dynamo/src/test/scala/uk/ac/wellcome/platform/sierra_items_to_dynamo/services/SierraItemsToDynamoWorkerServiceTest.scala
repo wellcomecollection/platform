@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import java.time.Instant
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
@@ -34,9 +34,6 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[SierraItemRecord] =
-    DynamoFormat[SierraItemRecord]
 
   case class ServiceFixtures(
     service: SierraItemsToDynamoWorkerService,
