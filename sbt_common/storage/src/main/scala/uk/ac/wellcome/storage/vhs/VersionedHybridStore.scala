@@ -11,6 +11,7 @@ import uk.ac.wellcome.storage.type_classes.{
   VersionGetter,
   VersionUpdater
 }
+import uk.ac.wellcome.storage.type_classes.Migration._
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
@@ -48,7 +49,7 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
     updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ): Future[Unit] = {
 
-    getObject(id).flatMap {
+    getObject[DynamoRow](id).flatMap {
       case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
         val transformedS3Record = ifExisting(s3Record)
 
@@ -117,13 +118,14 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   private def buildKeyPrefix(id: String): String =
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
-  private def getObject(id: String): Future[Option[VersionedHybridObject]] = {
+  private def getObject[DynamoRow](id: String): Future[Option[VersionedHybridObject]] = {
 
-    val dynamoRecord: Future[Option[HybridRecord]] =
-      versionedDao.getRecord[HybridRecord](id = id)
+    val dynamoRecord: Future[Option[DynamoRow]] =
+      versionedDao.getRecord[DynamoRow](id = id)
 
     dynamoRecord.flatMap {
-      case Some(hybridRecord) => {
+      case Some(dynamoRow) => {
+        val hybridRecord = dynamoRow.migrateTo[HybridRecord]
         s3ObjectStore
           .get(
             S3ObjectLocation(
