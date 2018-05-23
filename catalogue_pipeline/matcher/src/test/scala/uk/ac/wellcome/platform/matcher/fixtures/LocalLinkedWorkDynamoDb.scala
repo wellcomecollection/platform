@@ -26,7 +26,8 @@ trait LocalLinkedWorkDynamoDb
   private val secretKey = "secret"
 
   def dynamoDbLocalEndpointFlags(table: Table) = dynamoClientLocalFlags ++ Map(
-    "aws.dynamo.tableName" -> table.name
+    "aws.dynamo.tableName" -> table.name,
+    "aws.dynamo.tableIndex" -> table.index
   )
 
   def dynamoClientLocalFlags = Map(

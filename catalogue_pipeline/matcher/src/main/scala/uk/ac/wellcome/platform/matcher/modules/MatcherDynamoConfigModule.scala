@@ -7,10 +7,10 @@ import uk.ac.wellcome.platform.matcher.storage.MatcherDynamoConfig
 
 object MatcherDynamoConfigModule extends TwitterModule {
   private val tableName =
-    flag[String]("aws.dynamo.tableName", "", "Name of the DynamoDB table")
+    flag[String]( name = "aws.dynamo.tableName", help = "Name of the DynamoDB table")
 
   private val tableIndex =
-    flag[String]("aws.dynamo.tableIndex", "", "Name of the DynamoDB table index")
+    flag[String](name = "aws.dynamo.tableIndex", help = "Name of the DynamoDB table index")
 
   @Singleton
   @Provides
