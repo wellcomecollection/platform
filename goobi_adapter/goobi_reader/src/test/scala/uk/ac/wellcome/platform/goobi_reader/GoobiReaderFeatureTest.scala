@@ -12,7 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.Random
 
 class GoobiReaderFeatureTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.Server
     with LocalVersionedHybridStore
     with SQS
@@ -82,7 +82,10 @@ class GoobiReaderFeatureTest
             toJson(notificationMessage).get
           )
 
-          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, globalS3Prefix = "goobi")
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(
+            bucket,
+            table,
+            globalS3Prefix = "goobi")
 
           val expectedRecord = HybridRecord(
             id = id,
@@ -92,7 +95,8 @@ class GoobiReaderFeatureTest
 
           withServer(flags) { _ =>
             eventually {
-              val hybridRecord: HybridRecord = getHybridRecord(bucket, table, id)
+              val hybridRecord: HybridRecord =
+                getHybridRecord(bucket, table, id)
               hybridRecord shouldBe expectedRecord
 
               val s3contents = getContentFromS3(bucket, hybridRecord.s3key)
@@ -104,4 +108,3 @@ class GoobiReaderFeatureTest
     }
   }
 }
-

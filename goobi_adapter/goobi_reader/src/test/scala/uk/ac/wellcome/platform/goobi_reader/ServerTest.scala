@@ -6,10 +6,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 
 class ServerTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.Server
     with SQS
-    with LocalVersionedHybridStore  {
+    with LocalVersionedHybridStore {
 
   it("it shows the healthcheck message") {
     withLocalS3Bucket { bucket =>

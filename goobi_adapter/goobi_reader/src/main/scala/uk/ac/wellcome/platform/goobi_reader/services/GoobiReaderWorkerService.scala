@@ -45,7 +45,8 @@ class GoobiReaderWorkerService @Inject()(
     Future {
       debug(s"Received notification: $snsNotification")
 
-      val eventNotification = Try(S3EventNotification.parseJson(snsNotification.Message)).get
+      val eventNotification =
+        Try(S3EventNotification.parseJson(snsNotification.Message)).get
       val records = eventNotification.getRecords
 
       records.forEach { r =>
@@ -57,7 +58,8 @@ class GoobiReaderWorkerService @Inject()(
 
         val id = objectKey.replaceAll(".xml", "")
 
-        versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(identity)()
+        versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(
+          identity)()
       }
     }
 }
