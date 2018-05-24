@@ -43,6 +43,7 @@ if __name__ == '__main__':
         ('.scala', 'format-scala'),
         ('.py', 'format-python'),
         ('.json', 'format-json'),
+        ('.csv', 'check-reference_data'),
     ]
 
     for extension, format_task in extension_to_format_task:
