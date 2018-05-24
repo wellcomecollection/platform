@@ -1,51 +1,6 @@
 package uk.ac.wellcome.models.work.internal
 
-import java.io.InputStream
-
 import io.circe.{Decoder, Encoder, HCursor, Json}
-
-import scala.io.Source
-
-//object IdentifierSchemesResour
-
-object NewIdentifierSchemes {
-  private val stream: InputStream = getClass
-    .getResourceAsStream("/identifier-schemes.csv")
-
-  // identifier-schemes.csv is a CSV file with three columns per row:
-  //
-  //    CALMRefNo,calm-ref-no,CALM ref no
-  //
-  // The first entry is an immutable platform identifier.  The second
-  // and third entries are the ID and label we show in public ID schemes.
-  //
-  // Internally, we use the platform identifier ("CALMRefNo") -- this won't
-  // change even if the ID ("calm-ref-no") or label ("CALM ref no") do.
-  //
-  private val csvRows: Array[(String, String, String)] = Source.fromInputStream(stream).mkString
-    .split("\n")
-    .map { row =>
-      val columns = row.split(",").map(_.trim)
-      assert(columns.length == 3)
-      (columns(0), columns(1), columns(2))
-    }
-
-  private val identifierSchemeMap: Map[String, (String, String)] = csvRows
-      .map { case (platformId, schemeId, schemeLabel) =>
-        Map(platformId -> Tuple2(schemeId, schemeLabel))
-      }
-      .fold(Map[String, (String, String)]()) { (x, y) => x ++ y}
-
-  def getIdentifierScheme(platformId: String): SourceIdentifier = {
-    println(identifierSchemeMap)
-
-    SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
-      ontologyType = "Work",
-      value = "foo"
-    )
-  }
-}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
