@@ -81,12 +81,12 @@ jobs:
 
     - stage: sbt-common-test
       env: TASK=common-test
+    - env: TASK=elasticsearch-test
+    - env: TASK=messaging-test
+    - env: TASK=storage-test
+    - env: TASK=monitoring-test
     - env: TASK=internal_model-test
-    - env: TASK=common_display-test
-    - env: TASK=common_elasticsearch-test
-    - env: TASK=common_messaging-test
-    - env: TASK=common_storage-test
-    - env: TASK=common_monitoring-test
+    - env: TASK=display-test
 
     # Lambda tests.
     #

@@ -32,29 +32,29 @@ lazy val internal_model = doSharedLibrarySetup(project, "sbt_common/internal_mod
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.internalModelDependencies)
 
-lazy val common_display = doSharedLibrarySetup(project, "sbt_common/display")
+lazy val display = doSharedLibrarySetup(project, "sbt_common/display")
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonDisplayDependencies)
 
 // Elasticsearch depends on some models in the common lib.
-lazy val common_elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
+lazy val elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 // Monitoring depends on the GlobalExecutionContext util.
-lazy val common_monitoring = doSharedLibrarySetup(project, "sbt_common/monitoring")
+lazy val monitoring = doSharedLibrarySetup(project, "sbt_common/monitoring")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMonitoringDependencies)
 
 // Messaging depends on the S3ObjectStore for message pointers.
-lazy val common_messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
-  .dependsOn(common_monitoring % "compile->compile;test->test")
-  .dependsOn(common_storage % "compile->compile;test->test")
+lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
+  .dependsOn(monitoring % "compile->compile;test->test")
+  .dependsOn(storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
 // Storage depends on some models in the common lib.
-lazy val common_storage = doSharedLibrarySetup(project, "sbt_common/storage")
+lazy val storage = doSharedLibrarySetup(project, "sbt_common/storage")
   .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
 
@@ -65,28 +65,28 @@ lazy val finatra_controllers = doSharedLibrarySetup(project, "sbt_common/finatra
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_elasticsearch = doSharedLibrarySetup(project, "sbt_common/finatra_elasticsearch")
-  .dependsOn(common_elasticsearch % "compile->compile;test->test")
+  .dependsOn(elasticsearch % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
 
 lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_messaging")
-  .dependsOn(common_messaging % "compile->compile;test->test")
+  .dependsOn(messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
   .dependsOn(finatra_monitoring % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .dependsOn(common_storage % "compile->compile;test->test")
+  .dependsOn(storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
-  .dependsOn(common_monitoring % "compile->compile;test->test")
+  .dependsOn(monitoring % "compile->compile;test->test")
   .dependsOn(finatra_akka % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val api = doServiceSetup(project, "catalogue_api/api")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(common_display % "compile->compile;test->test")
+  .dependsOn(display % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
   .settings(Search.settings: _*)
@@ -174,7 +174,7 @@ lazy val sierra_item_merger = doSharedSierraSetup(project, "sierra_adapter/sierr
 lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generator")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(internal_model % "compile->compile;test->test")
-  .dependsOn(common_display % "compile->compile;test->test")
+  .dependsOn(display % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_elasticsearch % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
@@ -184,11 +184,11 @@ lazy val root = (project in file("."))
   .aggregate(
     common,
     internal_model,
-    common_display,
-    common_elasticsearch,
-    common_messaging,
-    common_monitoring,
-    common_storage,
+    display,
+    elasticsearch,
+    messaging,
+    monitoring,
+    storage,
     finatra_controllers,
     finatra_messaging,
     finatra_storage,
