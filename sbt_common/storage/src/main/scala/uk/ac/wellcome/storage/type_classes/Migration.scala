@@ -50,7 +50,6 @@ object Migration {
                               Target,
                               TRepr <: HList,
                               Unaligned <: HList](
-
     implicit targetGen: LabelledGeneric.Aux[Target, TRepr],
     intersection: Intersection.Aux[SRepr, TRepr, Unaligned],
     align: Align[Unaligned, TRepr]

@@ -24,11 +24,11 @@ class StringStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3StringStoreFixtures[R](
-                                    testWith: TestWith[(Bucket,
-                                      Table,
-                                      VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
-                                      R]
-                                  ): R =
+    testWith: TestWith[(Bucket,
+                        Table,
+                        VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
+                        R]
+    ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withStringVHS[EmptyMetadata, R](bucket, table) { vhs =>
@@ -108,9 +108,9 @@ class StringStoreVersionedHybridStoreTest
     describe("with metadata") {
 
       case class ExtraData(
-                            data: String,
-                            number: Int
-                          )
+        data: String,
+        number: Int
+      )
 
       val id = Random.nextString(5)
       val record = Random.nextString(256)
