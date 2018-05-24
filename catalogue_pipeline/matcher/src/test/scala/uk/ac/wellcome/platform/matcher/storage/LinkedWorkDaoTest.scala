@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  BatchGetItemRequest,
-  PutItemRequest,
-  QueryRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{BatchGetItemRequest, PutItemRequest, QueryRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -15,6 +11,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.LocalLinkedWorkDynamoDb
 import uk.ac.wellcome.platform.matcher.models.LinkedWork
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -29,7 +26,7 @@ class LinkedWorkDaoTest
     testWith: TestWith[LinkedWorkDao, R]): R = {
     val linkedDao = new LinkedWorkDao(
       dynamoDbClient,
-      MatcherDynamoConfig(table.name, table.index))
+      DynamoConfig(table.name, Some(table.index)))
     testWith(linkedDao)
   }
 
@@ -68,7 +65,7 @@ class LinkedWorkDaoTest
           .thenThrow(expectedException)
         val matcherGraphDao = new LinkedWorkDao(
           dynamoDbClient,
-          MatcherDynamoConfig(table.name, table.index))
+          DynamoConfig(table.name, Some(table.index)))
 
         whenReady(matcherGraphDao.get(Set("A")).failed) { failedException =>
           failedException shouldBe expectedException
@@ -127,7 +124,7 @@ class LinkedWorkDaoTest
           .thenThrow(expectedException)
         val linkedWordDao = new LinkedWorkDao(
           dynamoDbClient,
-          MatcherDynamoConfig(table.name, table.index))
+          DynamoConfig(table.name, Some(table.index)))
 
         whenReady(linkedWordDao.getBySetIds(Set("A+B")).failed) {
           failedException =>
@@ -174,13 +171,21 @@ class LinkedWorkDaoTest
           .thenThrow(expectedException)
         val linkedWordDao = new LinkedWorkDao(
           dynamoDbClient,
-          MatcherDynamoConfig(table.name, table.index))
+          DynamoConfig(table.name, Some(table.index)))
 
         whenReady(linkedWordDao.put(LinkedWork("A", List("B"), "A+B")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }
       }
+    }
+  }
+
+  it("cannot be instantiated if dynamoConfig.index is a None") {
+    intercept[RuntimeException] {
+      new LinkedWorkDao(
+        dynamoDbClient,
+        DynamoConfig("something", None))
     }
   }
 

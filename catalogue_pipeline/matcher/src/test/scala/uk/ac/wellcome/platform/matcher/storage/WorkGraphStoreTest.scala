@@ -7,11 +7,8 @@ import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.platform.matcher.fixtures.LocalLinkedWorkDynamoDb
-import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWork,
-  LinkedWorkUpdate,
-  LinkedWorksGraph
-}
+import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
@@ -29,7 +26,7 @@ class WorkGraphStoreTest
     val workGraphStore = new WorkGraphStore(
       new LinkedWorkDao(
         dynamoDbClient,
-        MatcherDynamoConfig(table.name, table.index)))
+        DynamoConfig(table.name, Some(table.index))))
     testWith(workGraphStore)
   }
 

@@ -8,13 +8,17 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.platform.matcher.models.LinkedWork
 import uk.ac.wellcome.storage.GlobalExecutionContext._
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
 class LinkedWorkDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: MatcherDynamoConfig
+  dynamoConfig: DynamoConfig
 ) extends Logging {
+
+  val index = dynamoConfig.index.getOrElse(throw new RuntimeException("Index cannot be empty!"))
+
   def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] =
     Future.sequence(setIds.map(getBySetId)).map(_.flatten)
 
@@ -48,7 +52,7 @@ class LinkedWorkDao @Inject()(
       Scanamo
         .queryIndex[LinkedWork](dynamoDbClient)(
           dynamoConfig.table,
-          dynamoConfig.index)('setId -> setId)
+          index)('setId -> setId)
         .map {
           case Right(record) => {
             record

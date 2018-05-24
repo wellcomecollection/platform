@@ -10,20 +10,11 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.matcher.fixtures.{
-  LocalLinkedWorkDynamoDb,
-  MatcherFixtures
-}
+import uk.ac.wellcome.platform.matcher.fixtures.{LocalLinkedWorkDynamoDb, MatcherFixtures}
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWorksIdentifiersList
-}
-import uk.ac.wellcome.platform.matcher.storage.{
-  LinkedWorkDao,
-  MatcherDynamoConfig,
-  WorkGraphStore
-}
+import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
+import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, WorkGraphStore}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -53,7 +44,7 @@ class MatcherMessageReceiverTest
     val workGraphStore = new WorkGraphStore(
       new LinkedWorkDao(
         dynamoDbClient,
-        MatcherDynamoConfig(table.name, table.index)))
+        DynamoConfig(table.name, Some(table.index))))
     val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
     testWith(linkedWorkMatcher)
   }
