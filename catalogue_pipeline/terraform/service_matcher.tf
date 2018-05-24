@@ -11,12 +11,12 @@ module "matcher" {
     queue_url         = "${module.matcher_queue.id}"
     vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
     metrics_namespace = "matcher"
-    topic_arn         = "${module.redirects_topic.arn}"
-    dynamo_table      = "${aws_dynamodb_table.matcher_table.id}"
+    topic_arn         = "${module.linked_works_topic.arn}"
+    dynamo_table      = "${aws_dynamodb_table.matcher_graph_table.id}"
     dynamo_index      = "${var.matcher_table_index}"
   }
 
-  env_vars_length = 4
+  env_vars_length = 6
 
   memory = 2048
   cpu    = 512

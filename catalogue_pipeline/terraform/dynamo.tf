@@ -1,4 +1,4 @@
-resource "aws_dynamodb_table" "matcher_table" {
+resource "aws_dynamodb_table" "matcher_graph_table" {
   name           = "works-graph"
   read_capacity  = 1
   write_capacity = 1
@@ -36,7 +36,7 @@ resource "aws_dynamodb_table" "matcher_table" {
 module "matcher_dynamo_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v10.2.0"
 
-  table_name = "${aws_dynamodb_table.matcher_table.name}"
+  table_name = "${aws_dynamodb_table.matcher_graph_table.name}"
 
   enable_read_scaling     = true
   read_target_utilization = 70

@@ -85,5 +85,10 @@ resource "aws_iam_role_policy" "matcher_task_vhs" {
 
 resource "aws_iam_role_policy" "matcher_task_sns" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${module.redirects_topic.publish_policy}"
+  policy = "${module.linked_works_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "matcher_read_write_dynamo" {
+  role   = "${module.matcher.task_role_name}"
+  policy = "${data.aws_iam_policy_document.graph_table_read_write_policy.json}"
 }
