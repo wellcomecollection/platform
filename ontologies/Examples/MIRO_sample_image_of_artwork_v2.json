@@ -170,7 +170,11 @@
       "locations": [
         {
           "type": "Location",
-          "locationType": "sicon",
+          "locationType": {
+            "id": "sicon",
+            "label": "Closed Store Iconographic",
+            "type": "LocationType"
+          },
           "label": "Closed Store Iconographic",
           "shelfmark": "1L9N",
           "accessStatus": {
@@ -190,7 +194,12 @@
           "copyright": "Wellcome ",
           "license": {
             "type": "License",
-            "licenseType": "CC-BY",
+            "licenseType": 
+            {
+              "id" : "CC-BY" ,
+              "label" : "CC-BY" ,
+              "LicenseType"
+            },
             "label": "Attribution 4.0 International (CC BY 4.0)",
             "url": "http://creativecommons.org/licenses/by/4.0/"
           }

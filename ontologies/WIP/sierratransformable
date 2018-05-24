@@ -27,11 +27,16 @@
    * Example: 
    * "identifiers": [
    * {
-   *   "value": "b11579328",
-   *   "type": "Identifier",
-   *   "identifierScheme": "sierra-system-number"
-   * }
-   * ]
+   *    "indentifierType":
+   *     {
+   *        "id" : "sierra-system-number" ,
+   *        "label" : "Sierra System Number" ,
+   *        "type" : "IdentifierType"
+   *    } ,
+   *    "value": "b-123",
+   *    "type": "Identifier"
+   *    }
+   *]
    *
    * 
    */
@@ -119,12 +124,16 @@
    *        "prefixes": ["Sir"] ,
    *        "numeration": "II" ,
    *        "type": "Person" , 
-   *        "identifiers": [
-   *        {
-   *           "value": "2005016805",
-   *           "type": "Identifier",
-   *           "identifierScheme": "lc-names"
-   *        }
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "lc-names" ,
+   *              "label" : "Library of Congress Names" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "n123",
+   *           "type": "Identifier"
+   *           }
    *        ]
    *     } 
    *     ]
@@ -135,12 +144,16 @@
    *        "id": "8t677qf3"
    *        "label": "International Labour Organisation",
    *        "type": "Organisation" ,
-   *        "identifiers": [
-   *        {
-   *           "value": "2005016805",
-   *           "type": "Identifier",
-   *           "identifierScheme": "lc-names"
-   *        }
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "lc-names" ,
+   *              "label" : "Library of Congress Names" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "n123",
+   *           "type": "Identifier"
+   *           }
    *        ]
    *     } 
    *     ]
@@ -169,13 +182,17 @@
    *         "prefixes": ["Sir"] ,
    *         "numeration": "II" ,
    *         "type": "Person",
-   *         "identifiers": [
-   *           {
-   *             "value": "2005016805",
-   *             "type": "Identifier",
-   *             "identifierScheme": "lc-names"
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "lc-names" ,
+   *              "label" : "Library of Congress Names" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "n123",
+   *           "type": "Identifier"
    *           }
-   *         ],
+   *        ]
    *         "roles": [
    *           {
    *             "label": "Editor",
@@ -195,13 +212,17 @@
    *         "id": "a24s7qf3" ,
    *         "label": "International Labour Organisation",
    *         "type": "Organisation",
-   *         "identifiers": [
-   *           {
-   *             "value": "2005016805",
-   *             "type": "Identifier",
-   *             "identifierScheme": "lc-names"
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "lc-names" ,
+   *              "label" : "Library of Congress Names" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "n123",
+   *           "type": "Identifier"
    *           }
-   *         ],
+   *        ]
    *         "roles": [
    *           {
    *             "label": "Sponsor",
@@ -240,13 +261,17 @@
    *          "id": "a24s7qf3",
    *          "label": "Caricatures",
    *          "type": "Concept",
-   *          "identifiers": [
-   *            {
-   *              "type": "Identifier",
-   *              "identifierScheme": "lctgm",
-   *              "value": "tgm001698"
-   *            }
-   *          ]
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "lctgm" ,
+   *              "label" : "Library of Congress Thesaurus of Graphic Materials" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "n123",
+   *           "type": "Identifier"
+   *           }
+   *        ]
    *        },
    *        {
    *          "label": "sketch",
@@ -283,13 +308,17 @@
    *          "id": "hd2891f",
    *          "label": "Tuberculosis",
    *          "type": "Concept",
-   *          "identifiers": [
-   *            {
-   *              "type": "Identifier",
-   *              "identifierScheme": "mesh",
-   *              "value": "D014376Q000517"
-   *            }
-   *          ]
+   *        "identifiers": [  
+   *           "indentifierType":
+   *              {
+   *              "id" : "mesh" ,
+   *              "label" : "Medical Subject Headings" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "D014376Q000517",
+   *           "type": "Identifier"
+   *           }
+   *        ]
    *        },
    *        {
    *          "label": "Paris",
@@ -317,16 +346,21 @@
    *          "id": "h388hh",
    *          "label": "Paris",
    *          "type": "Place",
-   *          "identifiers": [
-   *            {
-   *              "type": "Identifier",
-   *              "identifierScheme": "lcsh",
-   *              "value": "sh2168721872"
-   *            }
-   *          ]
+   *        "identifiers" : [
+   *           {
+   *           "indentifierType":
+   *              {
+   *              "id" : "lcsh" ,
+   *              "label" : "Library Of Congress Subject Headings" ,
+   *              "type" : "IdentifierType"
+   *              } ,
+   *           "value": "sh2168721872",
+   *           "type": "Identifier"
+   *           }
+   *        ] 
    *        }
    *      ]
-       *},
+   *},
    *    {
    *      "label": "1820",
    *      "type": "Subject",
@@ -366,18 +400,23 @@
    *          "prefixes": ["Sir"],
    *          "numeration": "II",
    *          "type": "Person",
-   *          "identifiers": [
-   *            {
-   *              "type": "Identifier",
-   *              "identifierScheme": "lc-names",
-   *              "value": "318290809"
-   *            }
-   *          ]
+   *          "identifiers" : [
+   *              {
+   *              "indentifierType":
+   *                 {
+   *                 "id" : "lc-names" ,
+   *                 "label" : "Library Of Congress Names" ,
+   *                    "type" : "IdentifierType"
+   *              } ,
+   *              "value": "sh2168721872",
+   *              "type": "Identifier"
+   *              }
+   *        ] 
    *        } ,
-            {
-              "label": "author .",
+   *        {
+   *          "label": "author .",
    *          "type": "ContributionRole"
-            }
+   *        }
    *      ]
    *    }
    *  ]
@@ -393,13 +432,18 @@
    *          "id": "hd2891f",
    *          "label": "Wellcome Trust.",
    *          "type": "Organisation",
-   *          "identifiers": [
-   *            {
-   *              "type": "Identifier",
-   *              "identifierScheme": "lc-names",
-   *              "value": "81290903210"
-   *            }
-   *          ]
+   *          "identifiers" : [
+   *              {
+   *              "indentifierType":
+   *                 {
+   *                 "id" : "lc-names" ,
+   *                 "label" : "Library Of Congress Names" ,
+   *                    "type" : "IdentifierType"
+   *              } ,
+   *              "value": "81290903210",
+   *              "type": "Identifier"
+   *              }
+   *        ] 
    *        }
    *      ]
    *    }
@@ -679,9 +723,13 @@
    *     ],
    *   "type": "Item",
    *   "locations": [
-   *     {
+   *     { 
    *       "type": "Location",
-   *       "locationType": "sicon",
+   *       "locationType": {
+   *           "id" : "sicon" ,
+   *           "label" : "Iconographic Collection" , 
+   *           "type" : "LocationType" 
+   *          } ,
    *       "label": "Closed Store Iconographic",
    *       "shelfmark": "1L9N",
    *       "accessStatus": {
@@ -700,7 +748,11 @@
    *       "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
    *       "license": {
    *         "type": "License",
-   *         "licenseType": "CC-BY",
+   *         "licenseType": {
+   *              "id" : "cc-by" ,
+   *              "label" : "CC-BY" ,
+   *              "type" : "LicenseType"
+   *              } ,
    *         "label": "Attribution 4.0 International (CC BY 4.0)",
    *         "url": "http://creativecommons.org/licenses/by/4.0/"
    *       }
