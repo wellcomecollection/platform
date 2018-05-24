@@ -2,6 +2,8 @@ package uk.ac.wellcome.models.work.internal
 
 import java.io.InputStream
 
+import uk.ac.wellcome.exceptions.GracefulFailureException
+
 import scala.io.Source
 
 case class IdentifierType(
@@ -32,7 +34,7 @@ case object IdentifierType {
       (columns(0), columns(1), columns(2))
     }
 
-  private val identifierSchemeMap: Map[String, IdentifierType] = csvRows
+  private val identifierTypeMap = csvRows
     .map { case (platformId, schemeId, schemeLabel) =>
       Map(
         platformId -> IdentifierType(
@@ -43,7 +45,11 @@ case object IdentifierType {
     }
     .fold(Map[String, IdentifierType]()) { (x, y) => x ++ y}
 
-  def apply(platformId: String): IdentifierType = {
-    identifierSchemeMap.get(platformId).get
-  }
+  def apply(platformId: String): IdentifierType =
+    identifierTypeMap.get(platformId) match {
+      case Some(identifierType) => identifierType
+      case None => throw GracefulFailureException(
+        new RuntimeException(s"Unrecognised identifier type: [$platformId]")
+      )
+    }
 }
