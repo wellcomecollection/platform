@@ -26,7 +26,9 @@ case object IdentifierType {
   // Internally, we use the platform identifier ("CALMRefNo") -- this won't
   // change even if the ID ("calm-ref-no") or label ("CALM ref no") do.
   //
-  private val csvRows: Array[(String, String, String)] = Source.fromInputStream(stream).mkString
+  private val csvRows: Array[(String, String, String)] = Source
+    .fromInputStream(stream)
+    .mkString
     .split("\n")
     .map { row =>
       val columns = row.split(",").map(_.trim)
@@ -35,22 +37,26 @@ case object IdentifierType {
     }
 
   private val identifierTypeMap = csvRows
-    .map { case (platformId, schemeId, schemeLabel) =>
-      Map(
-        platformId -> IdentifierType(
-          id = schemeId,
-          label = schemeLabel
+    .map {
+      case (platformId, schemeId, schemeLabel) =>
+        Map(
+          platformId -> IdentifierType(
+            id = schemeId,
+            label = schemeLabel
+          )
         )
-      )
     }
-    .fold(Map[String, IdentifierType]()) { (x, y) => x ++ y}
+    .fold(Map[String, IdentifierType]()) { (x, y) =>
+      x ++ y
+    }
 
   private def lookupPlatformId(id: String): IdentifierType =
     identifierTypeMap.get(id) match {
       case Some(identifierType) => identifierType
-      case None => throw GracefulFailureException(
-        new RuntimeException(s"Unrecognised identifier type: [$id]")
-      )
+      case None =>
+        throw GracefulFailureException(
+          new RuntimeException(s"Unrecognised identifier type: [$id]")
+        )
     }
 
   // This isn't ideal, because we're duplicating the list from the CSV,
@@ -60,7 +66,8 @@ case object IdentifierType {
   // startup -- not when we try to load the value!
   //
   final val miroImageNumber = lookupPlatformId("MiroImageNumber")
-  final val wellcomeLibraryVideoDiskNumber = lookupPlatformId("WellcomeLibraryVideodiskNumber")
+  final val wellcomeLibraryVideoDiskNumber = lookupPlatformId(
+    "WellcomeLibraryVideodiskNumber")
   final val sierraSystemNumber = lookupPlatformId("SierraSystemNumber")
   final val calmRefNo = lookupPlatformId("CALMRefNo")
   final val calmAltRefNo = lookupPlatformId("CALMAltRefNo")
