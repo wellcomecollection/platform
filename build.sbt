@@ -183,15 +183,21 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 lazy val root = (project in file("."))
   .aggregate(
     common,
+
     internal_model,
     display,
     elasticsearch,
     messaging,
     monitoring,
     storage,
-    finatra_controllers,
+
+    finatra_akka,
+    finatra_controllers
+    finatra_elasticsearch,
     finatra_messaging,
+    finatra_monitoring,
     finatra_storage,
+
     api,
     ingestor,
     transformer,
