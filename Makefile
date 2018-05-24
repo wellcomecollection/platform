@@ -18,13 +18,6 @@ include sierra_adapter/Makefile
 include nginx/Makefile
 
 
-sbt-common-test:
-	$(call sbt_test_no_docker,common)
-
-sbt-common-publish:
-	echo "Nothing to do!"
-
-
 travis-lambda-test:
 	python run_travis_lambdas.py test
 
