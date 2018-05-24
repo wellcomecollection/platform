@@ -36,7 +36,7 @@ class VersionedDaoTest
 
   def withVersionedDao[R](table: Table)(
     testWith: TestWith[VersionedDao, R]): R = {
-    val config = DynamoConfig(table.name)
+    val config = DynamoConfig(table.name, Some(table.index))
     val dao = new VersionedDao(dynamoDbClient, config)
     testWith(dao)
   }
@@ -86,7 +86,9 @@ class VersionedDaoTest
           .thenThrow(expectedException)
 
         val testVersionedDaoMockedDynamoClient =
-          new VersionedDao(dynamoDbClient, DynamoConfig(table.name))
+          new VersionedDao(
+            dynamoDbClient,
+            DynamoConfig(table.name, Some(table.index)))
 
         val future =
           testVersionedDaoMockedDynamoClient.getRecord[TestVersioned](
@@ -277,7 +279,9 @@ class VersionedDaoTest
           .thenThrow(expectedException)
 
         val failingDao =
-          new VersionedDao(dynamoDbClient, DynamoConfig(table.name))
+          new VersionedDao(
+            dynamoDbClient,
+            DynamoConfig(table.name, Some(table.index)))
 
         val testVersioned = TestVersioned(
           id = "testSource/b1111",

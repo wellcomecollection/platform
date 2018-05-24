@@ -1,29 +1,27 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
-import javax.inject.Inject
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
+import javax.inject.Inject
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
-import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
 class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
                                metricsSender: MetricsSender,
                                versionedDao: VersionedDao,
-                               dynamoConfig: DynamoConfig,
-                               @Flag("aws.dynamo.indexName") indexName: String)
+                               dynamoConfig: DynamoConfig)
     extends Logging {
 
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
@@ -31,7 +29,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
 
     val table = Table[ReindexRecord](dynamoConfig.table)
 
-    val index = table.index(indexName)
+    val index = table.index(dynamoConfig.index.get)
 
     // We start by querying DynamoDB for every record in the reindex shard
     // that has an out-of-date reindexVersion.  If a shard was especially

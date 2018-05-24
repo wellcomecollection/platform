@@ -18,7 +18,7 @@ trait DynamoInserterFixture extends LocalDynamoDb[SierraItemRecord] {
     val dynamoInserter = new DynamoInserter(
       new VersionedDao(
         dynamoDbClient,
-        dynamoConfig = DynamoConfig(table.name)
+        dynamoConfig = DynamoConfig(table.name, Some(table.index))
       )
     )
 

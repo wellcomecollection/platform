@@ -45,12 +45,11 @@ class ReindexServiceTest
         val reindexService =
           new ReindexService(
             dynamoDBClient = dynamoDbClient,
-            dynamoConfig = DynamoConfig(table.name),
+            dynamoConfig = DynamoConfig(table.name, Some(table.index)),
             metricsSender = metricsSender,
             versionedDao = new VersionedDao(
               dynamoDbClient = dynamoDbClient,
-              DynamoConfig(table.name)),
-            indexName = table.index
+              DynamoConfig(table.name, Some(table.index)))
           )
 
         testWith(reindexService)

@@ -50,10 +50,11 @@ class ReindexWorkerServiceTest
                 metricsSender = metricsSender,
                 versionedDao = new VersionedDao(
                   dynamoDbClient = dynamoDbClient,
-                  dynamoConfig = DynamoConfig(table = table.name)
+                  dynamoConfig =
+                    DynamoConfig(table = table.name, index = Some(table.index))
                 ),
-                dynamoConfig = DynamoConfig(table = table.name),
-                indexName = table.index
+                dynamoConfig =
+                  DynamoConfig(table = table.name, index = Some(table.index))
               ),
               reader = new SQSReader(
                 sqsClient = sqsClient,

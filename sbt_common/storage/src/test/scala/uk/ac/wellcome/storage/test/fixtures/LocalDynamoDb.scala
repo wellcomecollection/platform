@@ -30,9 +30,11 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
   private val accessKey = "access"
   private val secretKey = "secret"
 
-  def dynamoDbLocalEndpointFlags(table: Table) = dynamoClientLocalFlags ++ Map(
-    "aws.dynamo.tableName" -> table.name
-  )
+  def dynamoDbLocalEndpointFlags(table: Table): Map[String, String] =
+    dynamoClientLocalFlags ++ Map(
+      "aws.dynamo.tableName" -> table.name,
+      "aws.dynamo.tableIndex" -> table.index
+    )
 
   def dynamoClientLocalFlags = Map(
     "aws.dynamoDb.endpoint" -> dynamoDBEndPoint,
@@ -50,7 +52,7 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
 
   implicit val evidence: DynamoFormat[T]
 
-  def withLocalDynamoDbTable[R] = fixture[Table, R](
+  def withLocalDynamoDbTable[R]: Fixture[Table, R] = fixture[Table, R](
     create = {
       val tableName = Random.alphanumeric.take(10).mkString
       val indexName = Random.alphanumeric.take(10).mkString
