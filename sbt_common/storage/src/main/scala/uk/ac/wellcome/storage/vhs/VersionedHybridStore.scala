@@ -114,8 +114,10 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   private def buildKeyPrefix(id: String): String =
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
-  private def getObject[DynamoRow](
-    id: String)(implicit dynamoFormat: DynamoFormat[DynamoRow], migrationH: Migration[DynamoRow, HybridRecord]): Future[Option[VersionedHybridObject]] = {
+  private def getObject[DynamoRow](id: String)(
+    implicit dynamoFormat: DynamoFormat[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord])
+    : Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
       versionedDao.getRecord[DynamoRow](id = id)
