@@ -34,8 +34,8 @@ trait Migration[Source, Target] {
 }
 
 object Migration {
-  implicit class MigrationOps[Source, Target](src: Source) {
-    def migrateTo[T](implicit migration: Migration[Source, T]): T =
+  implicit class MigrationOps[Source](src: Source) {
+    def migrateTo[Target](implicit migration: Migration[Source, Target]): Target =
       migration.apply(src)
   }
 
