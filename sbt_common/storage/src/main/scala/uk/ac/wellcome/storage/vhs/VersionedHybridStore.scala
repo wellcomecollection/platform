@@ -157,5 +157,4 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
       case None => Future.successful(None)
     }
   }
-
 }

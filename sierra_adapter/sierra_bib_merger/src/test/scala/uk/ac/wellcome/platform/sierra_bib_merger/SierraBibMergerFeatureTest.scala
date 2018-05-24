@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
 import io.circe.Encoder
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, SourceMetadata}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -163,7 +163,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val id = "3000003"
                 val oldBibRecord = SierraBibRecord(
@@ -191,7 +191,7 @@ class SierraBibMergerFeatureTest
                 )
 
                 hybridStore
-                  .updateRecord(oldRecord.id)(oldRecord)(identity)(
+                  .updateRecord(oldRecord.id)(oldRecord)((t, _) => t)(
                     SourceMetadata(oldRecord.sourceName))
                   .map { _ =>
                     sendMessageToSQS(toJson(record).get, queue)
@@ -219,7 +219,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val id = "6000006"
                 val newBibRecord = SierraBibRecord(
@@ -249,7 +249,7 @@ class SierraBibMergerFeatureTest
 
                 hybridStore
                   .updateRecord(expectedSierraTransformable.id)(
-                    expectedSierraTransformable)(identity)(
+                    expectedSierraTransformable)((t,_) => t)(
                     SourceMetadata(expectedSierraTransformable.sourceName))
                   .map { _ =>
                     sendMessageToSQS(toJson(record).get, queue)
@@ -276,7 +276,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Unit](bucket, table) {
               hybridStore =>
                 val id = "7000007"
                 val newRecord = SierraTransformable(sourceId = id)
@@ -294,7 +294,7 @@ class SierraBibMergerFeatureTest
                 )
 
                 val future =
-                  hybridStore.updateRecord(newRecord.id)(newRecord)(identity)(
+                  hybridStore.updateRecord(newRecord.id)(newRecord)((t, _) => t)(
                     SourceMetadata(newRecord.sourceName))
 
                 future.map { _ =>

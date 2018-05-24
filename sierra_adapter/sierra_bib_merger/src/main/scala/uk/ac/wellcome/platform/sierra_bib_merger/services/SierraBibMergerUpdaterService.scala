@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.s3.S3TypeStore
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-  versionedHybridStore: VersionedHybridStore[SierraTransformable,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable, SourceMetadata,
                                              S3TypeStore[SierraTransformable]],
   metrics: MetricsSender
 ) extends Logging {
@@ -25,7 +25,7 @@ class SierraBibMergerUpdaterService @Inject()(
 
     versionedHybridStore.updateRecord(Sourced.id(sourceName, bibRecord.id))(
       SierraTransformable(bibRecord))(
-      existingSierraTransformable => {
+      (existingSierraTransformable, _) => {
         BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
       }
     )(SourceMetadata(sourceName = sourceName))
