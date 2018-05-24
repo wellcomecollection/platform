@@ -72,7 +72,7 @@ case object IdentifierType {
   final val calmRefNo = lookupPlatformId("CALMRefNo")
   final val calmAltRefNo = lookupPlatformId("CALMAltRefNo")
   final val lcGraphicMaterials = lookupPlatformId("LCGMGPC")
-  final val lcSubjectHeadings = lookupPlatformId("lcsh")
+  final val lcSubjectHeadings = lookupPlatformId("LCSH")
   final val lcNames = lookupPlatformId("LCNames")
   final val mesh = lookupPlatformId("MESHId")
   final val calmRecordId = lookupPlatformId("CALMRecordId")
