@@ -237,10 +237,10 @@ class VersionedDaoTest
                                 data: String,
                                 moreData: Int,
                                 version: Int)
-              extends Id
+              extends Identified
 
           case class PartialRecord(id: String, moreData: Int, version: Int)
-              extends Id
+              extends Identified
 
           val fullRecord = FullRecord(
             id = id,
