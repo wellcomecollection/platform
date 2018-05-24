@@ -34,15 +34,10 @@ class CSVReferenceTypeManager(path: String) {
     }
 
   private val referenceEntryMap = csvRows
-    .map {
-      case (platformId, id, label) =>
-        Map(
-          platformId -> ReferenceType(id = id, label = label)
-        )
+    .map { case (platformId, id, label) =>
+      Map(platformId -> ReferenceType(id = id, label = label))
     }
-    .fold(Map()) { (x, y) =>
-      x ++ y
-    }
+    .fold(Map()) { (x, y) => x ++ y }
 
   def lookupId(platformId: String) =
     referenceEntryMap.get(platformId) match {
