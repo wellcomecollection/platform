@@ -15,4 +15,4 @@ check-reference_data:
 	$(ROOT)/docker_run.py -- \
 		--workdir /repo \
 		--volume $(ROOT):/repo wellcome/build_tooling \
-		/repo/ontologies/Reference\ data/check_reference_data.py
+		/repo/ontologies/reference_data/check_reference_data.py
