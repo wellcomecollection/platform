@@ -1,32 +1,25 @@
 package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
 import org.scalatest.concurrent.Eventually
-
-import scala.util.Random
-import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.test.fixtures._
-import com.amazonaws.services.dynamodbv2.model._
-import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
+import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConverters._
+import scala.util.Random
 
 object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
+trait LocalDynamoDb extends Eventually with ExtendedPatience {
 
   import LocalDynamoDb._
 
   private val port = 45678
   private val dynamoDBEndPoint = "http://localhost:" + port
-
   private val regionName = "localhost"
-
   private val accessKey = "access"
   private val secretKey = "secret"
 
@@ -50,8 +43,6 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
     secretKey = secretKey
   )
 
-  implicit val evidence: DynamoFormat[T]
-
   def withLocalDynamoDbTable[R]: Fixture[Table, R] = fixture[Table, R](
     create = {
       val tableName = Random.alphanumeric.take(10).mkString
@@ -64,50 +55,7 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
     }
   )
 
-  private def createTable(table: Table): Table = {
-    dynamoDbClient.createTable(
-      new CreateTableRequest()
-        .withTableName(table.name)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
-          .withKeyType(KeyType.HASH))
-        .withAttributeDefinitions(
-          new AttributeDefinition()
-            .withAttributeName("id")
-            .withAttributeType("S"),
-          new AttributeDefinition()
-            .withAttributeName("reindexShard")
-            .withAttributeType("S"),
-          new AttributeDefinition()
-            .withAttributeName("reindexVersion")
-            .withAttributeType("N")
-        )
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))
-        .withGlobalSecondaryIndexes(
-          new GlobalSecondaryIndex()
-            .withIndexName(table.index)
-            .withProjection(
-              new Projection().withProjectionType(ProjectionType.ALL))
-            .withKeySchema(
-              new KeySchemaElement()
-                .withAttributeName("reindexShard")
-                .withKeyType(KeyType.HASH),
-              new KeySchemaElement()
-                .withAttributeName("reindexVersion")
-                .withKeyType(KeyType.RANGE)
-            )
-            .withProvisionedThroughput(new ProvisionedThroughput()
-              .withReadCapacityUnits(1L)
-              .withWriteCapacityUnits(1L))))
-
-    eventually {
-      waitUntilActive(dynamoDbClient, table.name)
-    }
-
-    table
-  }
+  def createTable(table: LocalDynamoDb.Table): Table
 
   private def deleteAllTables() = {
     dynamoDbClient
@@ -116,5 +64,4 @@ trait LocalDynamoDb[T <: Id] extends Eventually with ExtendedPatience {
       .asScala
       .foreach(dynamoDbClient.deleteTable)
   }
-
 }

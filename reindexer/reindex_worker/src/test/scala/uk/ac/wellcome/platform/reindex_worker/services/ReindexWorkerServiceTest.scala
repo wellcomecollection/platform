@@ -1,12 +1,11 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSReader}
@@ -15,8 +14,8 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -29,14 +28,11 @@ class ReindexWorkerServiceTest
     with Matchers
     with MockitoSugar
     with Akka
-    with LocalDynamoDb[TestRecord]
+    with LocalDynamoDbVersioned
     with MetricsSenderFixture
     with SNS
     with SQS
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[TestRecord] =
-    DynamoFormat[TestRecord]
 
   def withReindexWorkerService(table: Table)(
     testWith: TestWith[ReindexWorkerService, Assertion]) = {

@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.reindex_worker
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
-import org.scalatest.{FunSpec, Matchers}
+import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -12,8 +12,8 @@ import uk.ac.wellcome.platform.reindex_worker.models.{
   ReindexJob,
   ReindexRecord
 }
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -32,13 +32,10 @@ class ReindexerFeatureTest
     with Eventually
     with ExtendedPatience
     with fixtures.Server
-    with LocalDynamoDb[TestRecord]
+    with LocalDynamoDbVersioned
     with SNS
     with SQS
     with ScalaFutures {
-
-  override lazy val evidence: DynamoFormat[TestRecord] =
-    DynamoFormat[TestRecord]
 
   val currentVersion = 1
   val desiredVersion = 5

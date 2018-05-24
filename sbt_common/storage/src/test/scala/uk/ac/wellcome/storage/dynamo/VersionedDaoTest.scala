@@ -5,34 +5,32 @@ import com.amazonaws.services.dynamodbv2.model.{
   GetItemRequest,
   UpdateItemRequest
 }
+import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import shapeless._
-import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.models.{Id => Identified}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestVersioned(override val id: String, data: String, version: Int)
-    extends Id
+    extends Identified
 
 class VersionedDaoTest
     extends FunSpec
-    with LocalDynamoDb[TestVersioned]
+    with LocalDynamoDbVersioned
     with ScalaFutures
     with ExtendedPatience
     with MockitoSugar
     with Matchers {
-
-  override lazy val evidence = DynamoFormat[TestVersioned]
 
   def withVersionedDao[R](table: Table)(
     testWith: TestWith[VersionedDao, R]): R = {
@@ -238,10 +236,10 @@ class VersionedDaoTest
                                 data: String,
                                 moreData: Int,
                                 version: Int)
-              extends Id
+              extends Identified
 
           case class PartialRecord(id: String, moreData: Int, version: Int)
-              extends Id
+              extends Identified
 
           val fullRecord = FullRecord(
             id = id,

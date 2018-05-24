@@ -23,15 +23,12 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait LocalVersionedHybridStore
-    extends LocalDynamoDb[HybridRecord]
+    extends LocalDynamoDbVersioned
     with S3
     with JsonTestUtil
     with Matchers {
 
   val defaultGlobalS3Prefix = "testing"
-
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
 
   def vhsLocalFlags(bucket: Bucket,
                     table: Table,
@@ -75,8 +72,10 @@ trait LocalVersionedHybridStore
     testWith: TestWith[VersionedHybridStore[InputStream, S3StreamStore], R])
     : R = {
     val s3Config = S3Config(bucketName = bucket.name)
+
     val dynamoConfig =
       DynamoConfig(table = table.name, index = Some(table.index))
+
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,

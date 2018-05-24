@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import java.time.Instant
 
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
@@ -13,19 +13,16 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
-    with LocalDynamoDb[SierraItemRecord]
+    with LocalDynamoDbVersioned
     with SQS
     with fixtures.Server
     with Matchers
     with Eventually
     with ExtendedPatience {
-
-  override lazy val evidence: DynamoFormat[SierraItemRecord] =
-    DynamoFormat[SierraItemRecord]
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { table =>

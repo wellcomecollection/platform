@@ -1,20 +1,15 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
-import com.gu.scanamo.DynamoFormat
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.HybridRecord
 
 class ServerTest
     extends FunSpec
     with LocalVersionedHybridStore
     with fixtures.Server
     with SQS {
-
-  override lazy val evidence: DynamoFormat[HybridRecord] =
-    DynamoFormat[HybridRecord]
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
