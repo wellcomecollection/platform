@@ -192,7 +192,7 @@ lazy val root = (project in file("."))
     storage,
 
     finatra_akka,
-    finatra_controllers
+    finatra_controllers,
     finatra_elasticsearch,
     finatra_messaging,
     finatra_monitoring,
