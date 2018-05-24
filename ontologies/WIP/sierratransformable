@@ -748,11 +748,7 @@
    *       "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
    *       "license": {
    *         "type": "License",
-   *         "licenseType": {
-   *              "id" : "cc-by" ,
-   *              "label" : "CC-BY" ,
-   *              "type" : "LicenseType"
-   *              } ,
+   *         "id" : "cc-by" ,
    *         "label": "Attribution 4.0 International (CC BY 4.0)",
    *         "url": "http://creativecommons.org/licenses/by/4.0/"
    *       }
