@@ -34,8 +34,8 @@ trait Migration[Source, Target] {
 }
 
 object Migration {
-  implicit class MigrationOps[Source, Target](src: Source) {
-    def migrateTo[T](implicit migration: Migration[Source, T]): T =
+  implicit class MigrationOps[Source](src: Source) {
+    def migrateTo[Target](implicit migration: Migration[Source, Target]): Target =
       migration.apply(src)
   }
 
@@ -53,10 +53,10 @@ object Migration {
     intersection: Intersection.Aux[SRepr, TRepr, Unaligned],
     align: Align[Unaligned, TRepr]
   ): Migration[SRepr, Target] = new Migration[SRepr, Target] {
-    def apply(src: SRepr): Target = {
+    def apply(sourceHList: SRepr): Target = {
       // This gets the key-value pairs whose keys are in both `Source` and
       // `Target`, but they may not be in the correct order.
-      val commonFields: Unaligned = intersection.apply(src)
+      val commonFields: Unaligned = intersection.apply(sourceHList)
 
       // This reorders the HList fields to be in the same order as `Target`.
       val targetHList: TRepr = align.apply(commonFields)
