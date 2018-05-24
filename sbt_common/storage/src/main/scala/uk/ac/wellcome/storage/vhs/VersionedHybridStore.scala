@@ -5,12 +5,7 @@ import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
 import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.storage.type_classes.{
-  HybridRecordEnricher,
-  IdGetter,
-  VersionGetter,
-  VersionUpdater
-}
+import uk.ac.wellcome.storage.type_classes._
 import uk.ac.wellcome.storage.type_classes.Migration._
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
@@ -46,7 +41,8 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
     versionUpdater: VersionUpdater[DynamoRow],
     idGetter: IdGetter[DynamoRow],
     versionGetter: VersionGetter[DynamoRow],
-    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord]
   ): Future[Unit] = {
 
     getObject[DynamoRow](id).flatMap {
@@ -119,7 +115,7 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
   private def getObject[DynamoRow](
-    id: String): Future[Option[VersionedHybridObject]] = {
+    id: String)(implicit dynamoFormat: DynamoFormat[DynamoRow], migrationH: Migration[DynamoRow, HybridRecord]): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
       versionedDao.getRecord[DynamoRow](id = id)
