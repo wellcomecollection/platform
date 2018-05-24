@@ -35,8 +35,7 @@ trait Migration[Source, Target] {
 
 object Migration {
   implicit class MigrationOps[Source, Target](src: Source) {
-    def migrateTo[T](
-      implicit migration: Migration[Source, T]): T =
+    def migrateTo[T](implicit migration: Migration[Source, T]): T =
       migration.apply(src)
   }
 
@@ -47,9 +46,9 @@ object Migration {
   // -  `Unaligned` is an intermedate HList used during the migration.
   //
   implicit def hlistMigration[SRepr <: HList,
-                                Target,
-                                TRepr <: HList,
-                                Unaligned <: HList](
+                              Target,
+                              TRepr <: HList,
+                              Unaligned <: HList](
     implicit targetGen: LabelledGeneric.Aux[Target, TRepr],
     intersection: Intersection.Aux[SRepr, TRepr, Unaligned],
     align: Align[Unaligned, TRepr]
@@ -77,9 +76,9 @@ object Migration {
   // -  Further conversion from `SRepr` to `Target` is provided by `hlistMigration`
   //
   implicit def genericMigration[Source, SRepr <: HList, Target](
-                                                                 implicit sourceGen: LabelledGeneric.Aux[Source, SRepr],
-                                                                 hlistMigration: Migration[SRepr, Target]
-                                                               ): Migration[Source, Target] = new Migration[Source, Target] {
+    implicit sourceGen: LabelledGeneric.Aux[Source, SRepr],
+    hlistMigration: Migration[SRepr, Target]
+  ): Migration[Source, Target] = new Migration[Source, Target] {
     def apply(src: Source): Target = {
       val sourceHList: SRepr = sourceGen.to(src)
 

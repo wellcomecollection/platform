@@ -13,7 +13,7 @@ class MigrationTest extends FunSpec with Matchers {
     c = "coconut",
     d = "dandelion",
     e = "egg")
-  
+
   it("gets the intersection of two case classes") {
     case class Vowels(a: String, e: String)
     alphabet.migrateTo[Vowels] shouldBe Vowels(
