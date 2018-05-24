@@ -34,9 +34,9 @@ trait Migration[Source, Target] {
 }
 
 object Migration {
-  implicit class MigrationOps[Source](src: Source) {
-    def migrateTo[Target](
-      implicit migration: Migration[Source, Target]): Target =
+  implicit class MigrationOps[Source, Target](src: Source) {
+    def migrateTo[T](
+      implicit migration: Migration[Source, T]): T =
       migration.apply(src)
   }
 
@@ -50,6 +50,7 @@ object Migration {
                               Target,
                               TRepr <: HList,
                               Unaligned <: HList](
+
     implicit targetGen: LabelledGeneric.Aux[Target, TRepr],
     intersection: Intersection.Aux[SRepr, TRepr, Unaligned],
     align: Align[Unaligned, TRepr]
