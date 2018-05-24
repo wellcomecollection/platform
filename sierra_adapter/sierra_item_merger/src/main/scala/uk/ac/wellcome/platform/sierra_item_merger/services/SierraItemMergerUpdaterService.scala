@@ -17,7 +17,8 @@ import uk.ac.wellcome.platform.sierra_item_merger.GlobalExecutionContext.context
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-  versionedHybridStore: VersionedHybridStore[SierraTransformable, SourceMetadata,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable,
+                                             SourceMetadata,
                                              S3TypeStore[SierraTransformable]],
   metrics: MetricsSender
 ) extends Logging {
@@ -47,8 +48,7 @@ class SierraItemMergerUpdaterService @Inject()(
             new RuntimeException(
               s"Missing Bib record to unlink: $unlinkedBibId")
           )
-        )((record, _) =>
-          ItemUnlinker.unlinkItemRecord(record, itemRecord))(
+        )((record, _) => ItemUnlinker.unlinkItemRecord(record, itemRecord))(
           SourceMetadata(sourceName))
       }
 

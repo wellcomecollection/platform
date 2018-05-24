@@ -39,9 +39,10 @@ trait LocalVersionedHybridStore
       "aws.vhs.dynamo.tableName" -> table.name
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
-  def withTypeVHS[T <: Id, M, R](bucket: Bucket,
-                              table: Table,
-                              globalS3Prefix: String = defaultGlobalS3Prefix)(
+  def withTypeVHS[T <: Id, M, R](
+    bucket: Bucket,
+    table: Table,
+    globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[T, M, S3TypeStore[T]], R])(
     implicit encoder: Encoder[T],
     decoder: Decoder[T]): R = {
@@ -67,8 +68,8 @@ trait LocalVersionedHybridStore
   }
 
   def withStreamVHS[M, R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
+                          table: Table,
+                          globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[InputStream, M, S3StreamStore], R])
     : R = {
     val s3Config = S3Config(bucketName = bucket.name)
@@ -96,9 +97,10 @@ trait LocalVersionedHybridStore
   }
 
   def withStringVHS[M, R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
-    testWith: TestWith[VersionedHybridStore[String, M, S3StringStore], R]): R = {
+                          table: Table,
+                          globalS3Prefix: String = defaultGlobalS3Prefix)(
+    testWith: TestWith[VersionedHybridStore[String, M, S3StringStore], R])
+    : R = {
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig =
       DynamoConfig(table = table.name, index = Some(table.index))

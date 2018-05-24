@@ -15,7 +15,7 @@ import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import scala.util.Random
 
 class StringStoreVersionedHybridStoreTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with ExtendedPatience
@@ -24,11 +24,12 @@ class StringStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3StringStoreFixtures[R](
-    testWith: TestWith[(Bucket,
-                        Table,
-                        VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
-                        R]
-    ): R =
+    testWith: TestWith[
+      (Bucket,
+       Table,
+       VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
+      R]
+  ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withStringVHS[EmptyMetadata, R](bucket, table) { vhs =>
@@ -46,7 +47,8 @@ class StringStoreVersionedHybridStoreTest
           val id = Random.nextString(5)
           val record = "One ocelot in orange"
 
-          val future = hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
+          val future =
+            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
 
           whenReady(future) { _ =>
             getContentFor(bucket, table, id) shouldBe record
@@ -66,7 +68,8 @@ class StringStoreVersionedHybridStoreTest
           val future =
             hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
           val updatedFuture = future.flatMap { _ =>
-            hybridStore.updateRecord(id)(updatedRecord)((t, _) => updatedRecord)(EmptyMetadata())
+            hybridStore.updateRecord(id)(updatedRecord)(
+              (t, _) => updatedRecord)(EmptyMetadata())
           }
 
           whenReady(updatedFuture) { _ =>
@@ -154,7 +157,8 @@ class StringStoreVersionedHybridStoreTest
                 hybridStore.updateRecord(id)(record)((t, _) => t)(data)
 
               val updatedFuture = future.flatMap { _ =>
-                hybridStore.updateRecord(id)(updatedRecord)((t, m) => m.toString)(data)
+                hybridStore.updateRecord(id)(updatedRecord)((t, m) =>
+                  m.toString)(data)
               }
 
               whenReady(updatedFuture) { _ =>

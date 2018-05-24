@@ -12,9 +12,9 @@ import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.Future
 
-
 class RecorderWorkerService @Inject()(
-  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry, EmptyMetadata,
+  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
+                                             EmptyMetadata,
                                              S3TypeStore[RecorderWorkEntry]],
   messageStream: MessageStream[UnidentifiedWork],
   system: ActorSystem) {

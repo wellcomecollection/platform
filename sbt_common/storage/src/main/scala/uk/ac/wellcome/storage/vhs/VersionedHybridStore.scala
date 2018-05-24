@@ -48,7 +48,11 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   ): Future[Unit] = {
 
     getObject[DynamoRow](id).flatMap {
-      case Some(VersionedHybridObject(storedHybridRecord, storedS3Record, storedMetadata)) =>
+      case Some(
+          VersionedHybridObject(
+            storedHybridRecord,
+            storedS3Record,
+            storedMetadata)) =>
         val transformedS3Record = ifExisting(storedS3Record, storedMetadata)
 
         if (transformedS3Record != storedS3Record) {
@@ -80,11 +84,10 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   }
 
   def getRecord[DynamoRow](id: String)(
-    implicit
-      enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
-      dynamoFormat: DynamoFormat[DynamoRow],
-      migrationH: Migration[DynamoRow, HybridRecord],
-      migrationM: Migration[DynamoRow, Metadata]
+    implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
+    dynamoFormat: DynamoFormat[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord],
+    migrationM: Migration[DynamoRow, Metadata]
   ): Future[Option[T]] = {
 
     identity(enricher)
@@ -93,7 +96,6 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
       maybeObject.map(_.s3Object)
     }
   }
-
 
   private def putObject[DynamoRow](id: String, t: T, f: (String) => DynamoRow)(
     implicit dynamoFormat: DynamoFormat[DynamoRow],
@@ -128,10 +130,9 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
   private def getObject[DynamoRow](id: String)(
-    implicit
-      dynamoFormat: DynamoFormat[DynamoRow],
-      migrationH: Migration[DynamoRow, HybridRecord],
-      migrationM: Migration[DynamoRow, Metadata]
+    implicit dynamoFormat: DynamoFormat[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord],
+    migrationM: Migration[DynamoRow, Metadata]
   ): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
