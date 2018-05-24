@@ -12,7 +12,6 @@ import uk.ac.wellcome.storage.{
 }
 
 import uk.ac.wellcome.storage.type_classes.StorageStrategy
-import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
 
 import scala.concurrent.Future
 

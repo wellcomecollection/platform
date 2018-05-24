@@ -13,8 +13,6 @@ import uk.ac.wellcome.storage.{
 
 import scala.concurrent.Future
 
-import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
-
 class S3StringStore @Inject()(
   storageBackend: S3StorageBackend[String]
 ) extends Logging
