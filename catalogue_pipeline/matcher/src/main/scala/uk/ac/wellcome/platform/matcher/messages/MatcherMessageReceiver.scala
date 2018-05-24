@@ -5,13 +5,9 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-<<<<<<< HEAD:catalogue_pipeline/matcher/src/main/scala/uk/ac/wellcome/platform/matcher/messages/MatcherMessageReceiver.scala
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
-=======
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
->>>>>>> Storage experiment:catalogue_pipeline/matcher/src/main/scala/uk/ac/wellcome/platform/matcher/MatcherMessageReceiver.scala
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
