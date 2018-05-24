@@ -12,28 +12,32 @@ object NewIdentifierSchemes {
   private val stream: InputStream = getClass
     .getResourceAsStream("/identifier-schemes.csv")
 
-//  val identifierSchemeMap: Map[String, SourceIdentifier] =
-//    Source.fromInputStream(stream).mkString
-//      .split("\n")
-//      .map { line =>
-//        println(line.split(","))
-//      }
+  // identifier-schemes.csv is a CSV file with three columns per row:
+  //
+  //    CALMRefNo,calm-ref-no,CALM ref no
+  //
+  // The first entry is an immutable platform identifier.  The second
+  // and third entries are the ID and label we show in public ID schemes.
+  //
+  // Internally, we use the platform identifier ("CALMRefNo") -- this won't
+  // change even if the ID ("calm-ref-no") or label ("CALM ref no") do.
+  //
+  private val csvRows: Array[(String, String, String)] = Source.fromInputStream(stream).mkString
+    .split("\n")
+    .map { row =>
+      val columns = row.split(",").map(_.trim)
+      assert(columns.length == 3)
+      (columns(0), columns(1), columns(2))
+    }
 
-  def getIdentifierScheme(platformId: String): SourceIdentifier = {
-    val x: Map[String, (String, String)] = Source.fromInputStream(stream).mkString
-      .split("\n")
-      .map { line =>
-        val columns = line.split(",").map(_.trim)
-        assert(columns.length == 3)
-
-        val platformId = columns(0)
-        val schemeId = columns(1)
-        val schemeLabel = columns(2)
-
+  private val identifierSchemeMap: Map[String, (String, String)] = csvRows
+      .map { case (platformId, schemeId, schemeLabel) =>
         Map(platformId -> Tuple2(schemeId, schemeLabel))
       }
       .fold(Map[String, (String, String)]()) { (x, y) => x ++ y}
-    println(x)
+
+  def getIdentifierScheme(platformId: String): SourceIdentifier = {
+    println(identifierSchemeMap)
 
     SourceIdentifier(
       identifierScheme = IdentifierSchemes.miroImageNumber,
