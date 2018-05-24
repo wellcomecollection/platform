@@ -40,7 +40,7 @@ class IdMinterWorkerTest
             withModifiedServer(
               flags,
               modifyServer = (server: EmbeddedHttpServer) => {
-                server.bind[IdentifiersDao](identifiersDao)
+                server.bind[IdentifiersDao].toInstance(identifiersDao)
               }) { _ =>
               val database = dbConfig.database
               val table = dbConfig.table
