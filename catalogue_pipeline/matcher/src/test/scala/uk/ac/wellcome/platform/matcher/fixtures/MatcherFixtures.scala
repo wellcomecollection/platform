@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierSchemes,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
@@ -24,14 +28,20 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
-trait MatcherFixtures extends Akka with SQS with SNS with LocalLinkedWorkDynamoDb with MetricsSenderFixture with S3 {
+trait MatcherFixtures
+    extends Akka
+    with SQS
+    with SNS
+    with LocalLinkedWorkDynamoDb
+    with MetricsSenderFixture
+    with S3 {
 
   def withMatcherServer[R](
-                            queue: Queue,
-                            bucket: Bucket,
-                            topic: Topic,
-                            table: Table
-                          )(testWith: TestWith[EmbeddedHttpServer, R]) = {
+    queue: Queue,
+    bucket: Bucket,
+    topic: Topic,
+    table: Table
+  )(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer =
       new EmbeddedHttpServer(
@@ -54,20 +64,20 @@ trait MatcherFixtures extends Akka with SQS with SNS with LocalLinkedWorkDynamoD
   }
 
   def withMatcherMessageReceiver[R](
-                                     queue: SQS.Queue,
-                                     storageBucket: Bucket,
-                                     topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
+    queue: SQS.Queue,
+    storageBucket: Bucket,
+    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
     val storageS3Config = S3Config(storageBucket.name)
     val snsWriter =
       new SNSWriter(snsClient, SNSConfig(topic.arn))
-
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalDynamoDbTable { table =>
           withWorkGraphStore(table) { workGraphStore =>
             withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-              implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
+              implicit val executionContext: ExecutionContextExecutor =
+                actorSystem.dispatcher
               val sqsStream = new SQSStream[NotificationMessage](
                 actorSystem = actorSystem,
                 sqsClient = asyncSqsClient,
@@ -98,8 +108,7 @@ trait MatcherFixtures extends Akka with SQS with SNS with LocalLinkedWorkDynamoD
   def withWorkGraphStore[R](table: Table)(
     testWith: TestWith[WorkGraphStore, R]): R = {
     withLinkedWorkDao(table) { linkedWorkDao =>
-      val workGraphStore = new WorkGraphStore(
-        linkedWorkDao)
+      val workGraphStore = new WorkGraphStore(linkedWorkDao)
       testWith(workGraphStore)
     }
   }

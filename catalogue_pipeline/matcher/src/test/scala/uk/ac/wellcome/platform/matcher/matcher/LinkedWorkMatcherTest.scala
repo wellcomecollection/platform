@@ -23,7 +23,7 @@ class LinkedWorkMatcherTest
   it(
     "matches a work entry with no linked identifiers to a matched works list referencing itself and saves the updated graph") {
     withLocalDynamoDbTable { table =>
-      withWorkGraphStore(table) { workGraphStore=>
+      withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
           whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork)) {
             identifiersList =>
@@ -53,9 +53,8 @@ class LinkedWorkMatcherTest
             identifiers = List(aIdentifier, linkedIdentifier))
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              LinkedWorksIdentifiersList(
-                Set(IdentifierList(
-                  Set("sierra-system-number/A", "sierra-system-number/B"))))
+              LinkedWorksIdentifiersList(Set(IdentifierList(
+                Set("sierra-system-number/A", "sierra-system-number/B"))))
 
             val savedLinkedWorks = Scanamo
               .scan[LinkedWork](dynamoDbClient)(table.name)

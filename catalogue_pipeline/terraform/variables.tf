@@ -36,5 +36,5 @@ variable "es_config_ingestor" {
 
 variable "matcher_table_index" {
   description = "Name of the GSI in the matcher table"
-  default = "work-sets-index"
+  default     = "work-sets-index"
 }

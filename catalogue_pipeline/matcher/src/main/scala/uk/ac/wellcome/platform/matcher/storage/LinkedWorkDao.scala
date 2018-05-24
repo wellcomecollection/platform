@@ -17,7 +17,8 @@ class LinkedWorkDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  val index = dynamoConfig.index.getOrElse(throw new RuntimeException("Index cannot be empty!"))
+  val index = dynamoConfig.index.getOrElse(
+    throw new RuntimeException("Index cannot be empty!"))
 
   def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] =
     Future.sequence(setIds.map(getBySetId)).map(_.flatten)
@@ -50,9 +51,8 @@ class LinkedWorkDao @Inject()(
   private def getBySetId(setId: String) = {
     Future {
       Scanamo
-        .queryIndex[LinkedWork](dynamoDbClient)(
-          dynamoConfig.table,
-          index)('setId -> setId)
+        .queryIndex[LinkedWork](dynamoDbClient)(dynamoConfig.table, index)(
+          'setId -> setId)
         .map {
           case Right(record) => {
             record

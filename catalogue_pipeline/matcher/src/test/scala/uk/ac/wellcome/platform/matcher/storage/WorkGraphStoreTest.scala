@@ -7,7 +7,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
+import uk.ac.wellcome.platform.matcher.models.{
+  LinkedWork,
+  LinkedWorkUpdate,
+  LinkedWorksGraph
+}
 
 import scala.concurrent.Future
 
@@ -15,7 +19,8 @@ class WorkGraphStoreTest
     extends FunSpec
     with Matchers
     with MockitoSugar
-    with ScalaFutures with MatcherFixtures {
+    with ScalaFutures
+    with MatcherFixtures {
 
   describe("Get graph of linked works") {
     it("returns nothing if there are no matching graphs") {

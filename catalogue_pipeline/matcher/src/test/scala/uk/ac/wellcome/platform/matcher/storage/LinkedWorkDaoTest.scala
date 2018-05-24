@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{BatchGetItemRequest, PutItemRequest, QueryRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  BatchGetItemRequest,
+  PutItemRequest,
+  QueryRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -17,7 +21,8 @@ class LinkedWorkDaoTest
     extends FunSpec
     with Matchers
     with MockitoSugar
-    with ScalaFutures with MatcherFixtures{
+    with ScalaFutures
+    with MatcherFixtures {
 
   describe("Get from dynamo") {
     it("returns nothing if ids are not in dynamo") {
@@ -172,9 +177,7 @@ class LinkedWorkDaoTest
 
   it("cannot be instantiated if dynamoConfig.index is a None") {
     intercept[RuntimeException] {
-      new LinkedWorkDao(
-        dynamoDbClient,
-        DynamoConfig("something", None))
+      new LinkedWorkDao(dynamoDbClient, DynamoConfig("something", None))
     }
   }
 
