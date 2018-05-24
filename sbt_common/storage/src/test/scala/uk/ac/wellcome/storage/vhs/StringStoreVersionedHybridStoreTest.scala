@@ -136,8 +136,8 @@ class StringStoreVersionedHybridStoreTest
 
                 val extraData = maybeResult.get.right.get
 
-                extraData.data shouldBe "a tragic triangle of triffids"
-                extraData.number shouldBe 6
+                extraData.data shouldBe data.data
+                extraData.number shouldBe data.number
               }
             }
           }
