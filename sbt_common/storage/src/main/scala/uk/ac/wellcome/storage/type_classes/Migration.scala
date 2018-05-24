@@ -42,23 +42,19 @@ object Migration {
 
   // Type parameters:
   //
-  // -  We are migrating from `Source` to `Target`, both case classes.
-  // -  `SRepr` and `TRepr` are HList representations of `Source` and `Target`.
+  // -  We are migrating from `SRepr` a HList to `Target` a case class.
+  // -  `TRepr` is a HList representations of `Target`.
   // -  `Unaligned` is an intermedate HList used during the migration.
   //
-  implicit def genericMigration[Source,
-                                Target,
-                                SRepr <: HList,
-                                TRepr <: HList,
-                                Unaligned <: HList](
-    implicit sourceGen: LabelledGeneric.Aux[Source, SRepr],
-    targetGen: LabelledGeneric.Aux[Target, TRepr],
+  implicit def hlistMigration[SRepr <: HList,
+                              Target,
+                              TRepr <: HList,
+                              Unaligned <: HList](
+    implicit targetGen: LabelledGeneric.Aux[Target, TRepr],
     intersection: Intersection.Aux[SRepr, TRepr, Unaligned],
     align: Align[Unaligned, TRepr]
-  ): Migration[Source, Target] = new Migration[Source, Target] {
-    def apply(src: Source): Target = {
-      val sourceHList: SRepr = sourceGen.to(src)
-
+  ): Migration[SRepr, Target] = new Migration[SRepr, Target] {
+    def apply(sourceHList: SRepr): Target = {
       // This gets the key-value pairs whose keys are in both `Source` and
       // `Target`, but they may not be in the correct order.
       val commonFields: Unaligned = intersection.apply(sourceHList)
@@ -67,6 +63,27 @@ object Migration {
       val targetHList: TRepr = align.apply(commonFields)
 
       targetGen.from(targetHList)
+    }
+  }
+
+  // Type parameters:
+  //
+  // -  We are migrating from `Source` to `Target`, both case classes.
+  // -  `SRepr` is a HList representations of `Source`.
+  //
+  // Implicit parameters:
+  //
+  // -  Conversion from `Source` to `SRepr` provided by `sourceGen`
+  // -  Further conversion from `SRepr` to `Target` is provided by `hlistMigration`
+  //
+  implicit def genericMigration[Source, SRepr <: HList, Target](
+    implicit sourceGen: LabelledGeneric.Aux[Source, SRepr],
+    hlistMigration: Migration[SRepr, Target]
+  ): Migration[Source, Target] = new Migration[Source, Target] {
+    def apply(src: Source): Target = {
+      val sourceHList: SRepr = sourceGen.to(src)
+
+      sourceHList.migrateTo[Target]
     }
   }
 }

@@ -3,21 +3,17 @@ package uk.ac.wellcome.storage.vhs
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
-import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
-import uk.ac.wellcome.storage.type_classes.{
-  HybridRecordEnricher,
-  IdGetter,
-  VersionGetter,
-  VersionUpdater
-}
+import uk.ac.wellcome.storage.type_classes._
+import uk.ac.wellcome.storage.type_classes.Migration._
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
+class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
-  s3ObjectStore: S,
+  s3ObjectStore: Store,
   dynamoDbClient: AmazonDynamoDB
 ) {
 
@@ -34,28 +30,26 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
 
   // Store a single record in DynamoDB.
   //
-  // You pass it a record and optionally a case class containing some metadata (type M).
-  // The metadata parameter is useful if you have some additional detail you don't want
-  // to store on your primary model.
+  // You pass it a record and optionally a case class containing some metadata.
+  // The HybridRecordEnricher combines this with the HybridRecord, and stores
+  // both of them as a single row in DynamoDB.
   //
-  // The two are combined into a single HList with the HybridRecordEnricher of type O,
-  // and this record is what gets saved to DynamoDB.
-  //
-  def updateRecord[O, M](id: String)(ifNotExisting: => T)(ifExisting: T => T)(
-    metadata: M = EmptyMetadata())(
-    implicit enricher: HybridRecordEnricher.Aux[M, O],
-    dynamoFormat: DynamoFormat[O],
-    versionUpdater: VersionUpdater[O],
-    idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O],
-    updateExpressionGenerator: UpdateExpressionGenerator[O]
+  def updateRecord[DynamoRow, Metadata](id: String)(ifNotExisting: => T)(
+    ifExisting: T => T)(metadata: Metadata = EmptyMetadata())(
+    implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
+    dynamoFormat: DynamoFormat[DynamoRow],
+    versionUpdater: VersionUpdater[DynamoRow],
+    idGetter: IdGetter[DynamoRow],
+    versionGetter: VersionGetter[DynamoRow],
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord]
   ): Future[Unit] = {
 
-    getObject(id).flatMap {
-      case Some(VersionedHybridObject(hybridRecord, s3Record)) =>
-        val transformedS3Record = ifExisting(s3Record)
+    getObject[DynamoRow](id).flatMap {
+      case Some(VersionedHybridObject(storedHybridRecord, storedS3Record)) =>
+        val transformedS3Record = ifExisting(storedS3Record)
 
-        if (transformedS3Record != s3Record) {
+        if (transformedS3Record != storedS3Record) {
           putObject(
             id,
             transformedS3Record,
@@ -63,7 +57,7 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
               .enrichedHybridRecordHList(
                 id = id,
                 metadata = metadata,
-                version = hybridRecord.version)
+                version = storedHybridRecord.version)
           )
         } else {
           Future.successful(())
@@ -84,16 +78,16 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   }
 
   def getRecord(id: String): Future[Option[T]] =
-    getObject(id).map { maybeObject =>
+    getObject[HybridRecord](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
 
-  private def putObject[O](id: String, t: T, f: (String) => O)(
-    implicit dynamoFormat: DynamoFormat[O],
-    versionUpdater: VersionUpdater[O],
-    idGetter: IdGetter[O],
-    versionGetter: VersionGetter[O],
-    updateExpressionGenerator: UpdateExpressionGenerator[O]
+  private def putObject[DynamoRow](id: String, t: T, f: (String) => DynamoRow)(
+    implicit dynamoFormat: DynamoFormat[DynamoRow],
+    versionUpdater: VersionUpdater[DynamoRow],
+    idGetter: IdGetter[DynamoRow],
+    versionGetter: VersionGetter[DynamoRow],
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ) = {
 
     val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
@@ -120,13 +114,17 @@ class VersionedHybridStore[T, S <: S3ObjectStore[T]] @Inject()(
   private def buildKeyPrefix(id: String): String =
     s"${vhsConfig.globalS3Prefix.stripSuffix("/")}/${id.reverse.slice(0, 2)}/$id"
 
-  private def getObject(id: String): Future[Option[VersionedHybridObject]] = {
+  private def getObject[DynamoRow](id: String)(
+    implicit dynamoFormat: DynamoFormat[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord])
+    : Future[Option[VersionedHybridObject]] = {
 
-    val dynamoRecord: Future[Option[HybridRecord]] =
-      versionedDao.getRecord[HybridRecord](id = id)
+    val dynamoRecord: Future[Option[DynamoRow]] =
+      versionedDao.getRecord[DynamoRow](id = id)
 
     dynamoRecord.flatMap {
-      case Some(hybridRecord) => {
+      case Some(dynamoRow) => {
+        val hybridRecord = dynamoRow.migrateTo[HybridRecord]
         s3ObjectStore
           .get(
             S3ObjectLocation(
