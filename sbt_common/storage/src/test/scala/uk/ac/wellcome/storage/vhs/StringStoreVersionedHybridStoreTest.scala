@@ -1,9 +1,9 @@
 package uk.ac.wellcome.storage.vhs
 
-//import com.gu.scanamo.Scanamo
-//import com.gu.scanamo.syntax._
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.storage.s3.S3StringStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -15,7 +15,7 @@ import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import scala.util.Random
 
 class StringStoreVersionedHybridStoreTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with ExtendedPatience
@@ -24,11 +24,11 @@ class StringStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3StringStoreFixtures[R](
-    testWith: TestWith[(Bucket,
-                        Table,
-                        VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
-                       R]
-  ): R =
+                                    testWith: TestWith[(Bucket,
+                                      Table,
+                                      VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
+                                      R]
+                                  ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withStringVHS[EmptyMetadata, R](bucket, table) { vhs =>
@@ -105,38 +105,66 @@ class StringStoreVersionedHybridStoreTest
       }
     }
 
-//    it("can store additional metadata alongside HybridRecord") {
-//      case class ExtraData(
-//        data: String,
-//        number: Int
-//      )
-//
-//      val id = Random.nextString(5)
-//      val record = "this goes in dynamo"
-//
-//      val data = ExtraData(
-//        data = "a tragic triangle of triffids",
-//        number = 6
-//      )
-//
-//      withS3StringStoreFixtures {
-//        case (_, table, hybridStore) =>
-//          val future =
-//            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
-//
-//          whenReady(future) { _ =>
-//            val maybeResult =
-//              Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> id)
-//
-//            maybeResult shouldBe defined
-//            maybeResult.get.isRight shouldBe true
-//
-//            val extraData = maybeResult.get.right.get
-//
-//            extraData.data shouldBe "a tragic triangle of triffids"
-//            extraData.number shouldBe 6
-//          }
-//      }
-//    }
+    describe("with metadata") {
+
+      case class ExtraData(
+                            data: String,
+                            number: Int
+                          )
+
+      val id = Random.nextString(5)
+      val record = Random.nextString(256)
+
+      val data = ExtraData(
+        data = Random.nextString(256),
+        number = Random.nextInt(256)
+      )
+
+      it("can store additional metadata") {
+        withLocalS3Bucket { bucket =>
+          withLocalDynamoDbTable { table =>
+            withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
+              val future =
+                hybridStore.updateRecord(id)(record)((t, _) => t)(data)
+
+              whenReady(future) { _ =>
+                val maybeResult =
+                  Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> id)
+
+                maybeResult shouldBe defined
+                maybeResult.get.isRight shouldBe true
+
+                val extraData = maybeResult.get.right.get
+
+                extraData.data shouldBe "a tragic triangle of triffids"
+                extraData.number shouldBe 6
+              }
+            }
+          }
+        }
+      }
+
+      it("provides stored metadata when updating a record") {
+        withLocalS3Bucket { bucket =>
+          withLocalDynamoDbTable { table =>
+            withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
+              val updatedRecord = Random.nextString(256)
+
+              val future =
+                hybridStore.updateRecord(id)(record)((t, _) => t)(data)
+
+              val updatedFuture = future.flatMap { _ =>
+                hybridStore.updateRecord(id)(updatedRecord)((t, m) => m.toString)(data)
+              }
+
+              whenReady(updatedFuture) { _ =>
+                getContentFor(bucket, table, id) shouldBe data.toString
+              }
+            }
+          }
+        }
+      }
+
+    }
   }
 }
