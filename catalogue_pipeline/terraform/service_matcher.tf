@@ -12,8 +12,8 @@ module "matcher" {
     vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
     metrics_namespace = "matcher"
     topic_arn         = "${module.redirects_topic.arn}"
-    dynamo_table      = "${aws_dynamodb_table.matcher_table.name}"
-    dynamo_index      = "${aws_dynamodb_table.matcher_table.global_secondary_index.name}"
+    dynamo_table      = "${aws_dynamodb_table.matcher_table.id}"
+    dynamo_index      = "${var.matcher_table_index}"
   }
 
   env_vars_length = 4

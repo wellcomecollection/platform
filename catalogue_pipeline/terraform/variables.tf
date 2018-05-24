@@ -33,3 +33,8 @@ variable "es_config_ingestor" {
   type        = "map"
   default     = {}
 }
+
+variable "matcher_table_index" {
+  description = "Name of the GSI in the matcher table"
+  default = "work-sets-index"
+}

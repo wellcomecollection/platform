@@ -15,7 +15,7 @@ resource "aws_dynamodb_table" "matcher_table" {
   }
 
   global_secondary_index {
-    name            = "work-sets-index"
+    name            = "${var.matcher_table_index}"
     hash_key        = "setId"
     write_capacity  = 1
     read_capacity   = 1
