@@ -1,6 +1,47 @@
 package uk.ac.wellcome.models.work.internal
 
+import java.io.InputStream
+
 import io.circe.{Decoder, Encoder, HCursor, Json}
+
+import scala.io.Source
+
+//object IdentifierSchemesResour
+
+object NewIdentifierSchemes {
+  private val stream: InputStream = getClass
+    .getResourceAsStream("/identifier-schemes.csv")
+
+//  val identifierSchemeMap: Map[String, SourceIdentifier] =
+//    Source.fromInputStream(stream).mkString
+//      .split("\n")
+//      .map { line =>
+//        println(line.split(","))
+//      }
+
+  def getIdentifierScheme(platformId: String): SourceIdentifier = {
+    val x: Map[String, (String, String)] = Source.fromInputStream(stream).mkString
+      .split("\n")
+      .map { line =>
+        val columns = line.split(",").map(_.trim)
+        assert(columns.length == 3)
+
+        val platformId = columns(0)
+        val schemeId = columns(1)
+        val schemeLabel = columns(2)
+
+        Map(platformId -> Tuple2(schemeId, schemeLabel))
+      }
+      .fold(Map[String, (String, String)]()) { (x, y) => x ++ y}
+    println(x)
+
+    SourceIdentifier(
+      identifierScheme = IdentifierSchemes.miroImageNumber,
+      ontologyType = "Work",
+      value = "foo"
+    )
+  }
+}
 
 /** This is the canonical version of our identifier schemes.  This contains
   *  the strings that will be presented to users of the API.
