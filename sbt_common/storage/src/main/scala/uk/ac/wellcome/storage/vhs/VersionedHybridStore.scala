@@ -78,7 +78,7 @@ class VersionedHybridStore[T, Store <: S3ObjectStore[T]] @Inject()(
   }
 
   def getRecord(id: String): Future[Option[T]] =
-    getObject(id).map { maybeObject =>
+    getObject[HybridRecord](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
 
