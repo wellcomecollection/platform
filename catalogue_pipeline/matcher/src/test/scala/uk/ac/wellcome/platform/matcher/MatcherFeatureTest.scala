@@ -1,43 +1,23 @@
 package uk.ac.wellcome.platform.matcher
 
 import com.amazonaws.services.s3.AmazonS3
-import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier,
-  UnidentifiedWork
-}
-import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
-import uk.ac.wellcome.platform.matcher.fixtures.LocalLinkedWorkDynamoDb
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWorksIdentifiersList
-}
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
+import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 class MatcherFeatureTest
     extends FunSpec
     with Matchers
-    with SQS
-    with SNS
-    with S3
-    with LocalLinkedWorkDynamoDb
-    with CloudWatch
     with ExtendedPatience
-    with Eventually {
+    with Eventually with MatcherFixtures {
 
   it("processes a message with a sinple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
@@ -105,33 +85,6 @@ class MatcherFeatureTest
       "subject",
       toJson(hybridRecord).get
     )
-  }
-
-  def withMatcherServer[R](
-    queue: Queue,
-    bucket: Bucket,
-    topic: Topic,
-    table: Table
-  )(testWith: TestWith[EmbeddedHttpServer, R]) = {
-
-    val server: EmbeddedHttpServer =
-      new EmbeddedHttpServer(
-        new Server(),
-        flags =
-          cloudWatchLocalFlags ++
-            s3LocalFlags(bucket) ++
-            sqsLocalFlags(queue) ++
-            snsLocalFlags(topic) ++
-            dynamoDbLocalEndpointFlags(table)
-      )
-
-    server.start()
-
-    try {
-      testWith(server)
-    } finally {
-      server.close()
-    }
   }
 
 }

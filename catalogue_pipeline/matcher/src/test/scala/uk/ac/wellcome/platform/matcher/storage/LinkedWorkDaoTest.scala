@@ -9,26 +9,15 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.matcher.fixtures.LocalLinkedWorkDynamoDb
+import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.LinkedWork
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.test.fixtures.TestWith
 
 class LinkedWorkDaoTest
     extends FunSpec
-    with LocalLinkedWorkDynamoDb
     with Matchers
     with MockitoSugar
-    with ScalaFutures {
-
-  def withLinkedWorkDao[R](table: Table)(
-    testWith: TestWith[LinkedWorkDao, R]): R = {
-    val linkedDao = new LinkedWorkDao(
-      dynamoDbClient,
-      DynamoConfig(table.name, Some(table.index)))
-    testWith(linkedDao)
-  }
+    with ScalaFutures with MatcherFixtures{
 
   describe("Get from dynamo") {
     it("returns nothing if ids are not in dynamo") {

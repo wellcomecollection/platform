@@ -3,84 +3,24 @@ package uk.ac.wellcome.platform.matcher.messages
 import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.matcher.fixtures.{LocalLinkedWorkDynamoDb, MatcherFixtures}
-import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
+import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{IdentifierList, LinkedWorksIdentifiersList}
-import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, WorkGraphStore}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-
-import scala.concurrent.duration._
 
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
-    with Akka
-    with SQS
-    with SNS
-    with S3
-    with MetricsSenderFixture
     with ExtendedPatience
     with MatcherFixtures
-    with Eventually
-    with LocalLinkedWorkDynamoDb {
-
-  def withLinkedWorkMatcher[R](table: Table)(
-    testWith: TestWith[LinkedWorkMatcher, R]): R = {
-    val workGraphStore = new WorkGraphStore(
-      new LinkedWorkDao(
-        dynamoDbClient,
-        DynamoConfig(table.name, Some(table.index))))
-    val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
-    testWith(linkedWorkMatcher)
-  }
-  def withMatcherMessageReceiver[R](
-    queue: SQS.Queue,
-    storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
-    val storageS3Config = S3Config(storageBucket.name)
-
-    val snsWriter =
-      new SNSWriter(snsClient, SNSConfig(topic.arn))
-
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withLocalDynamoDbTable { table =>
-          withLinkedWorkMatcher(table) { linkedWorkMatcher =>
-            implicit val executionContext = actorSystem.dispatcher
-            val sqsStream = new SQSStream[NotificationMessage](
-              actorSystem = actorSystem,
-              sqsClient = asyncSqsClient,
-              sqsConfig = SQSConfig(queue.url, 1 second, 1),
-              metricsSender = metricsSender
-            )
-            val matcherMessageReceiver = new MatcherMessageReceiver(
-              sqsStream,
-              snsWriter,
-              new S3TypeStore[RecorderWorkEntry](s3Client),
-              storageS3Config,
-              actorSystem,
-              linkedWorkMatcher)
-            testWith(matcherMessageReceiver)
-          }
-        }
-      }
-    }
-  }
+    with Eventually {
 
   it("sends no redirects for a work without identifiers") {
     withLocalSnsTopic { topic =>

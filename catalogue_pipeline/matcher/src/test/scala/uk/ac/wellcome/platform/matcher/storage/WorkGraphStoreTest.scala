@@ -3,32 +3,19 @@ package uk.ac.wellcome.platform.matcher.storage
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.platform.matcher.fixtures.LocalLinkedWorkDynamoDb
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.concurrent.Future
 
 class WorkGraphStoreTest
     extends FunSpec
-    with LocalLinkedWorkDynamoDb
     with Matchers
     with MockitoSugar
-    with ScalaFutures {
-
-  def withWorkGraphStore[R](table: Table)(
-    testWith: TestWith[WorkGraphStore, R]): R = {
-    val workGraphStore = new WorkGraphStore(
-      new LinkedWorkDao(
-        dynamoDbClient,
-        DynamoConfig(table.name, Some(table.index))))
-    testWith(workGraphStore)
-  }
+    with ScalaFutures with MatcherFixtures {
 
   describe("Get graph of linked works") {
     it("returns nothing if there are no matching graphs") {
