@@ -194,11 +194,10 @@
           "copyright": "Wellcome ",
           "license": {
             "type": "License",
-            "licenseType": 
-            {
-              "id" : "CC-BY" ,
-              "label" : "CC-BY" ,
-              "LicenseType"
+            "licenseType": {
+              "id": "CC-BY",
+              "label": "CC-BY",
+              "type": "LicenseType"
             },
             "label": "Attribution 4.0 International (CC BY 4.0)",
             "url": "http://creativecommons.org/licenses/by/4.0/"
