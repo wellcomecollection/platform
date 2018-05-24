@@ -1,10 +1,11 @@
-package uk.ac.wellcome.platform.matcher
+package uk.ac.wellcome.platform.matcher.messages
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
@@ -29,8 +30,9 @@ class MatcherMessageReceiver @Inject()(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
         S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+      identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
-        message = toJson(linkedWorkMatcher.matchWork(workEntry.work)).get,
+        message = toJson(identifiersList).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

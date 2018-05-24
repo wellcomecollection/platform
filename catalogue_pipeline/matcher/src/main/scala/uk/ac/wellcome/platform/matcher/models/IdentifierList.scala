@@ -1,3 +1,3 @@
 package uk.ac.wellcome.platform.matcher.models
 
-case class IdentifierList(identifiers: List[String])
+case class IdentifierList(identifiers: Set[String])

@@ -17,7 +17,12 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  DynamoConfigModule,
+  S3ClientModule,
+  S3ConfigModule
+}
 import uk.ac.wellcome.platform.matcher.modules.{
   MatcherModule,
   RecorderWorkEntryModule
@@ -32,10 +37,12 @@ class Server extends HttpServer {
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
-    S3ClientModule,
     S3ConfigModule,
+    S3ClientModule,
     SNSConfigModule,
     SNSClientModule,
+    DynamoConfigModule,
+    DynamoClientModule,
     MatcherModule,
     RecorderWorkEntryModule,
     AkkaModule

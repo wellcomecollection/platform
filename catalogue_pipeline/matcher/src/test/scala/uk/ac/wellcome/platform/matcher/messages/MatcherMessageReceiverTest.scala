@@ -1,72 +1,29 @@
-package uk.ac.wellcome.platform.matcher
+package uk.ac.wellcome.platform.matcher.messages
 
 import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{
   IdentifierList,
   LinkedWorksIdentifiersList
 }
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
-import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-
-import scala.concurrent.duration._
 
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
-    with Akka
-    with SQS
-    with SNS
-    with S3
-    with MetricsSenderFixture
     with ExtendedPatience
     with MatcherFixtures
     with Eventually {
-
-  def withMatcherMessageReceiver[R](
-    queue: SQS.Queue,
-    storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
-    val storageS3Config = S3Config(storageBucket.name)
-
-    val snsWriter =
-      new SNSWriter(snsClient, SNSConfig(topic.arn))
-
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        implicit val executionContext = actorSystem.dispatcher
-
-        val sqsStream = new SQSStream[NotificationMessage](
-          actorSystem = actorSystem,
-          sqsClient = asyncSqsClient,
-          sqsConfig = SQSConfig(queue.url, 1 second, 1),
-          metricsSender = metricsSender
-        )
-        val matcherMessageReceiver = new MatcherMessageReceiver(
-          sqsStream,
-          snsWriter,
-          new S3TypeStore[RecorderWorkEntry](s3Client),
-          storageS3Config,
-          actorSystem,
-          new LinkedWorkMatcher)
-        testWith(matcherMessageReceiver)
-      }
-    }
-  }
 
   it("sends no redirects for a work without identifiers") {
     withLocalSnsTopic { topic =>
@@ -79,7 +36,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  List(IdentifierList(List("sierra-system-number/id"))))
+                  Set(IdentifierList(Set("sierra-system-number/id"))))
               )
             }
           }
@@ -105,8 +62,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(List(IdentifierList(
-                  List("sierra-system-number/A", "sierra-system-number/B"))))
+                LinkedWorksIdentifiersList(Set(IdentifierList(
+                  Set("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
           }
@@ -115,7 +72,7 @@ class MatcherMessageReceiverTest
     }
   }
 
-  ignore("redirects a work with one link and existing redirects") {
+  it("redirects a work with one link and existing redirects") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -123,6 +80,7 @@ class MatcherMessageReceiverTest
             val aIdentifier = aSierraSourceIdentifier("A")
             val bIdentifier = aSierraSourceIdentifier("B")
             val cIdentifier = aSierraSourceIdentifier("C")
+
             val aWork = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               identifiers = List(aIdentifier, bIdentifier))
@@ -134,9 +92,9 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  List(
+                  Set(
                     IdentifierList(
-                      List(
+                      Set(
                         "sierra-system-number/A",
                         "sierra-system-number/B"
                       ))))
@@ -153,13 +111,68 @@ class MatcherMessageReceiverTest
                 assertMessageSent(
                   topic,
                   LinkedWorksIdentifiersList(
-                    List(
+                    Set(
                       IdentifierList(
-                        List(
+                        Set(
                           "sierra-system-number/A",
                           "sierra-system-number/B",
                           "sierra-system-number/C"
                         ))))
+                )
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("breaks a set of works into individual works") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            val aIdentifier = aSierraSourceIdentifier("A")
+            val bIdentifier = aSierraSourceIdentifier("B")
+
+            val aWork = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier, bIdentifier))
+
+            sendSQS(queue, storageBucket, aWork)
+
+            eventually {
+
+              assertMessageSent(
+                topic,
+                LinkedWorksIdentifiersList(
+                  Set(
+                    IdentifierList(
+                      Set(
+                        "sierra-system-number/A",
+                        "sierra-system-number/B"
+                      ))))
+              )
+
+              val aWorkWithoutLinks = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = aIdentifier,
+                identifiers = List(aIdentifier))
+
+              sendSQS(queue, storageBucket, aWorkWithoutLinks)
+
+              eventually {
+
+                assertMessageSent(
+                  topic,
+                  LinkedWorksIdentifiersList(
+                    Set(
+                      IdentifierList(Set(
+                        "sierra-system-number/A"
+                      )),
+                      IdentifierList(Set(
+                        "sierra-system-number/B"
+                      ))
+                    ))
                 )
               }
             }
