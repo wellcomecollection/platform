@@ -90,6 +90,8 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
     migrationM: Migration[DynamoRow, Metadata]
   ): Future[Option[T]] = {
 
+    // The compiler wrongly thinks `enricher` is unused.
+    // This no-op persuades it to ignore it.
     identity(enricher)
 
     getObject[DynamoRow](id).map { maybeObject =>
