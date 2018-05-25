@@ -17,7 +17,6 @@ class DocsController @Inject()(
   @Flag("api.prefix") apiPrefix: String,
   @Flag("api.host") apiHost: String
 ) extends Controller {
-
   prefix(apiPrefix) {
     setupSwaggerEndpoint(ApiVersions.v1, ApiV1Swagger)
     setupSwaggerEndpoint(ApiVersions.v2, ApiV2Swagger)
@@ -49,7 +48,10 @@ class DocsController @Inject()(
         .title("Catalogue"))
     swagger.scheme(scheme)
     swagger.host(apiHost)
-    swagger.basePath(s"$apiPrefix/$apiVersion")
+    // Had to remove the basePath because of this "improvement"
+    // https://github.com/jakehschwartz/finatra-swagger/pull/27
+    // all paths now are including the prefix which means they
+    // are relative to the host, not to the basePath
     swagger.produces("application/json")
     swagger.produces("application/ld+json")
   }

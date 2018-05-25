@@ -7,7 +7,7 @@ object Dependencies {
     val akkaStreamAlpakkaS3 = "0.17"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
-    val finatra = "2.10.0"
+    val finatra = "18.4.0"
     val guice = "4.0"
     val logback = "1.1.8"
     val mockito = "1.9.5"
@@ -68,7 +68,6 @@ object Dependencies {
   val finatraDependencies = Seq(
     "ch.qos.logback" % "logback-classic" % versions.logback,
     "com.twitter" %% "finatra-http" % versions.finatra % "test" classifier "tests",
-    "com.twitter" %% "finatra-http" % versions.finatra % "test",
     "com.twitter" %% "finatra-http" % versions.finatra,
     "com.twitter" %% "finatra-httpclient" % versions.finatra,
     "com.twitter" %% "finatra-jackson" % versions.finatra % "test",
@@ -76,7 +75,6 @@ object Dependencies {
     "com.twitter" %% "inject-app" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-app" % versions.finatra % "test",
     "com.twitter" %% "inject-core" % versions.finatra,
-    "com.twitter" %% "inject-core" % versions.finatra % "test",
     "com.twitter" %% "inject-core" % versions.finatra % "test" classifier "tests",
     "com.twitter" %% "inject-modules" % versions.finatra % "test",
     "com.twitter" %% "inject-modules" % versions.finatra % "test" classifier "tests",
