@@ -11,37 +11,36 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
 
   it("returns a valid JSON response for all api versions") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/test/${version.toString}/swagger.json")
+      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
 
       tree.at("/host").toString should be("\"test.host\"")
       tree.at("/schemes").toString should be("[\"http\"]")
       tree.at("/info/version").toString should be(s""""${version.toString}"""")
-      tree.at("/basePath").toString should be(
-        s""""/test/${version.toString}"""")
+      tree.at("/basePath").toString should be("")
     }
   }
 
   it("includes the DisplayError model all api versions") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/test/${version.toString}/swagger.json")
+      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
       tree.at("/definitions/Error/type").toString should be("\"object\"")
     }
   }
 
   it("shows only the endpoints for the specified version") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      val tree = readTree(s"/test/${version.toString}/swagger.json")
+      val tree = readTree(s"/catalogue/${version.toString}/swagger.json")
       tree.at("/paths").isObject shouldBe true
       tree
         .at("/paths")
         .fieldNames
         .asScala
-        .toList should contain only ("/works", "/works/{id}")
+        .toList should contain only (s"/catalogue/${version.toString}/works", s"/catalogue/${version.toString}/works/{id}")
     }
   }
 
   it("shows the correct Work model for v1") {
-    val tree = readTree(s"/test/${ApiVersions.v1.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
     tree.at("/definitions/Work").isObject shouldBe true
     tree
       .at("/definitions/Work/properties/creators/type")
@@ -49,7 +48,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Work model for v2") {
-    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions/Work").isObject shouldBe true
     tree
       .at("/definitions/Work/properties/contributors/type")
@@ -57,7 +56,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Subject model for v2") {
-    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions/Subject").isObject shouldBe true
     tree
       .at("/definitions/Subject/properties/concepts/type")
@@ -68,7 +67,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("shows the correct Genre model for v2") {
-    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions/Genre").isObject shouldBe true
     tree
       .at("/definitions/Genre/properties/concepts/type")
@@ -79,13 +78,13 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
   }
 
   it("doesn't show DisplayWork in the definitions") {
-    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions").fieldNames.asScala.toList shouldNot contain(
       "DisplayWork")
   }
 
   it("shows Work as the items type in ResultList") {
-    val tree = readTree(s"/test/${ApiVersions.v2.toString}/swagger.json")
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree
       .at(s"/definitions/ResultList/properties/results/items/$$ref")
       .toString shouldBe "\"#/definitions/Work\""
@@ -95,7 +94,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     val flags = Map(
       "api.host" -> "test.host",
       "api.scheme" -> "http",
-      "api.name" -> "test",
+      "api.name" -> "catalogue",
       "es.index.v1" -> "v1",
       "es.index.v2" -> "v2"
     )
