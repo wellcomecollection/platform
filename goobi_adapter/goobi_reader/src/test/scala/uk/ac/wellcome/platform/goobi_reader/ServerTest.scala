@@ -15,7 +15,7 @@ class ServerTest
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
         withLocalSqsQueue { queue =>
-          val flags = sqsLocalFlags(queue)
+          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, "goobi")
 
           withServer(flags) { server =>
             server.httpGet(
