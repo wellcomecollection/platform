@@ -104,7 +104,6 @@ def does_file_affect_build_task(path, task):
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith((
         'sierra_adapter/common',
-        'common/',
         'project/',
         'build.sbt',
         'sbt_common/'
