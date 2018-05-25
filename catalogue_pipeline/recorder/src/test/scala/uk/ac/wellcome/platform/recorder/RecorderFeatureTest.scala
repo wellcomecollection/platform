@@ -46,29 +46,30 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](bucket = bucket, table = table) {
-            _ =>
-              val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
-                bucket,
-                queue)
-              withServer(flags) { _ =>
-                val messageBody = put[UnidentifiedWork](
-                  obj = work,
-                  location = S3ObjectLocation(
-                    bucket = bucket.name,
-                    key = "work_message.json"
-                  )
+          withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](
+            bucket = bucket,
+            table = table) { _ =>
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
+              bucket,
+              queue)
+            withServer(flags) { _ =>
+              val messageBody = put[UnidentifiedWork](
+                obj = work,
+                location = S3ObjectLocation(
+                  bucket = bucket.name,
+                  key = "work_message.json"
                 )
+              )
 
-                sqsClient.sendMessage(queue.url, messageBody)
+              sqsClient.sendMessage(queue.url, messageBody)
 
-                eventually {
-                  assertStored[RecorderWorkEntry](
-                    bucket,
-                    table,
-                    RecorderWorkEntry(work))
-                }
+              eventually {
+                assertStored[RecorderWorkEntry](
+                  bucket,
+                  table,
+                  RecorderWorkEntry(work))
               }
+            }
           }
         }
       }
