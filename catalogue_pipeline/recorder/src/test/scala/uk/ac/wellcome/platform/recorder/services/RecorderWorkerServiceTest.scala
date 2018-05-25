@@ -17,7 +17,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -162,7 +162,7 @@ class RecorderWorkerServiceTest
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
-            withTypeVHS[RecorderWorkEntry, Unit](
+            withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
               bucket = bucket,
               table = table) { versionedHybridStore =>
               withMessageStream[UnidentifiedWork, R](

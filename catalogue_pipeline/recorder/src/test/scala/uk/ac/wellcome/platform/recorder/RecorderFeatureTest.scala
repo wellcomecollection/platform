@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.recorder
 
 import io.circe.Decoder
 import io.circe.generic.extras.semiauto.deriveDecoder
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
@@ -12,6 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -45,7 +46,7 @@ class RecorderFeatureTest
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, Unit](bucket = bucket, table = table) {
+          withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](bucket = bucket, table = table) {
             _ =>
               val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table) ++ messageReaderLocalFlags(
                 bucket,
