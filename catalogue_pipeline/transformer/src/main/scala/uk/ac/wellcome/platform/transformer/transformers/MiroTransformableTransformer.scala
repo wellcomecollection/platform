@@ -230,10 +230,15 @@ class MiroTransformableTransformer
                        miroId: String): List[UnidentifiedItem] = {
     List(
       UnidentifiedItem(
-        sourceIdentifier =
-          SourceIdentifier(identifierType = IdentifierType("MiroImageNumber"), "Item", miroId),
+        sourceIdentifier = SourceIdentifier(
+          identifierType = IdentifierType("MiroImageNumber"),
+          "Item",
+          miroId),
         identifiers = List(
-          SourceIdentifier(identifierType = IdentifierType("MiroImageNumber"), "Item", miroId)
+          SourceIdentifier(
+            identifierType = IdentifierType("MiroImageNumber"),
+            "Item",
+            miroId)
         ),
         locations = List(
           DigitalLocation(

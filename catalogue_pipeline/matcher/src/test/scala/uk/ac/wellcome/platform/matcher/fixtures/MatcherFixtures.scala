@@ -122,7 +122,10 @@ trait MatcherFixtures
   }
 
   def aSierraSourceIdentifier(id: String) =
-    SourceIdentifier(identifierType = IdentifierType("SierraSystemNumber"), "Work", id)
+    SourceIdentifier(
+      identifierType = IdentifierType("SierraSystemNumber"),
+      "Work",
+      id)
 
   def anUnidentifiedSierraWork: UnidentifiedWork = {
     val sourceIdentifier = aSierraSourceIdentifier("id")
