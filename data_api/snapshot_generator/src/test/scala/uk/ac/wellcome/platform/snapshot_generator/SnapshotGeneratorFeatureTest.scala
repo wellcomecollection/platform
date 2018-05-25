@@ -14,7 +14,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier
 }
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
@@ -58,7 +58,7 @@ class SnapshotGeneratorFeatureTest
             canonicalId = s"rbfhv6b4$version",
             title = Some("Rumblings from a rambunctious rodent"),
             sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroImageNumber,
+              identifierType = IdentifierType("MiroImageNumber"),
               ontologyType = "work",
               value = "R0060400"
             ),
