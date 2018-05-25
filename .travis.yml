@@ -31,14 +31,13 @@ cache:
     - catalogue_pipeline/transformer/target
     - catalogue_pipeline/recorder/target
 
-    - common/target
-
     - data_api/snapshot_generator/target
 
     - goobi_adapter/goobi_reader/target
 
     - reindexer/reindex_worker/target
 
+    - sbt_common/common/target
     - sbt_common/display/target
     - sbt_common/elasticsearch/target
     - sbt_common/finatra_akka/target
@@ -74,13 +73,20 @@ env:
     #
     - PYTHONUNBUFFERED=x
 
-matrix:
+jobs:
   include:
-#    - stage: quicktest
-#      env: TASK=travis-format
-#    - env: TASK=travistooling-test
+    - stage: quicktest
+      env: TASK=travis-format
+    - env: TASK=travistooling-test
 
-#    - stage: sbt-common-test
+    - stage: sbt-common-test
+      env: TASK=common-test
+    - env: TASK=elasticsearch-test
+    - env: TASK=messaging-test
+    - env: TASK=storage-test
+    - env: TASK=monitoring-test
+    - env: TASK=internal_model-test
+    - env: TASK=display-test
 
     # Lambda tests.
     #
@@ -94,35 +100,28 @@ matrix:
     # When this job runs, all the Lambdas get tested at once, but even this
     # isn't significantly longer than a Scala test.
     #
-#    - stage: test
-#      env:
-#        - TRAVIS_LAMBDAS="snapshot_scheduler \
-#          reindex_job_creator \
-#          complete_reindex \
-#          reindex_shard_generator \
-#          sierra_window_generator \
-#          s3_demultiplexer \
-#          drain_ecs_container_instance \
-#          dynamo_to_sns \
-#          ecs_ec2_instance_tagger \
-#          run_ecs_task \
-#          gatling_to_cloudwatch \
-#          notify_old_deploys \
-#          post_to_slack \
-#          service_deployment_status \
-#          update_service_list"
-#        - TASK=travis-lambda-test
+    - stage: test
+      env:
+        - TRAVIS_LAMBDAS="snapshot_scheduler \
+          reindex_job_creator \
+          complete_reindex \
+          reindex_shard_generator \
+          sierra_window_generator \
+          s3_demultiplexer \
+          drain_ecs_container_instance \
+          dynamo_to_sns \
+          ecs_ec2_instance_tagger \
+          run_ecs_task \
+          gatling_to_cloudwatch \
+          notify_old_deploys \
+          post_to_slack \
+          service_deployment_status \
+          update_service_list"
+        - TASK=travis-lambda-test
 
     # Catalogue API stack
-#    - stage: test
-    - env: TASK=common-test
-    - env: TASK=internal_model-test
-    - env: TASK=display-test
-    - env: TASK=elasticsearch-test
-    - env: TASK=messaging-test
-    - env: TASK=storage-test
-    - env: TASK=monitoring-test
-    - env: TASK=api-test
+    - stage: test
+      env: TASK=api-test
     # (not under active development)
     # - env: TASK=api_docs-build
 
@@ -158,10 +157,10 @@ matrix:
     # - env: TASK=loris-build
     # - env: TASK=cache_cleaner-build
 
-#stages:
-#  - quicktest
-#  - sbt-common-test
-#  - test
+stages:
+  - quicktest
+  - sbt-common-test
+  - test
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
