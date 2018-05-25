@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, SourceMetadata}
+import uk.ac.wellcome.storage.vhs.SourceMetadata
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -69,7 +69,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val id = "1000001"
                 val record = SierraBibRecord(
@@ -106,7 +106,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val id1 = "1000001"
                 val record1 = SierraBibRecord(
