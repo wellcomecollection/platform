@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.models.DisplayLocation
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -31,15 +32,15 @@ class DisplayItemV2Test extends FunSpec with Matchers {
       locations = List(location)
     )
 
-    val DisplayItemV2 = DisplayItemV2(
+    val displayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    DisplayItemV2.id shouldBe item.canonicalId
-    DisplayItemV2.locations shouldBe List(DisplayLocation(location))
-    DisplayItemV2.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
-    DisplayItemV2.ontologyType shouldBe "Item"
+    displayItemV2.id shouldBe item.canonicalId
+    displayItemV2.locations shouldBe List(DisplayLocation(location))
+    displayItemV2.identifiers shouldBe Some(List(DisplayIdentifierV2(identifier)))
+    displayItemV2.ontologyType shouldBe "Item"
   }
 
   it("correctly parses an Item without any identifiers") {
@@ -61,12 +62,12 @@ class DisplayItemV2Test extends FunSpec with Matchers {
         }
       """).get
 
-    val DisplayItemV2 = DisplayItemV2(
+    val displayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    DisplayItemV2.identifiers shouldBe Some(List())
+    displayItemV2.identifiers shouldBe Some(List())
   }
 
   it("correctly parses an Item without any locations") {
@@ -88,11 +89,11 @@ class DisplayItemV2Test extends FunSpec with Matchers {
         }
       """).get
 
-    val DisplayItemV2 = DisplayItemV2(
+    val displayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    DisplayItemV2.locations shouldBe List()
+    displayItemV2.locations shouldBe List()
   }
 }
