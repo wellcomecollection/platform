@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -30,7 +30,7 @@ class RecorderFeatureTest
     val title = "Not from Guildford after all"
 
     val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("MiroImageNumber"),
       value = "V0237865",
       ontologyType = "Work"
     )
