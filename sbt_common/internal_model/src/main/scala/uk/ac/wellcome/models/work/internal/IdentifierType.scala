@@ -13,10 +13,10 @@ case class IdentifierType(
 )
 
 case object IdentifierType {
-  private val stream: InputStream = getClass.getResourceAsStream("/identifier-schemes.csv")
+  private val stream: InputStream =
+    getClass.getResourceAsStream("/identifier-schemes.csv")
   private val source = Source.fromInputStream(stream)
-  private val csvRows = source
-    .mkString
+  private val csvRows = source.mkString
     .split("\n")
 
   // identifier-schemes.csv is a list of 3-tuples, e.g.:
@@ -30,18 +30,22 @@ case object IdentifierType {
     .map { row =>
       val columns = row.split(",").map(_.trim)
       assert(columns.length == 3)
-      Map(columns(0) -> IdentifierType(
-        id = columns(1),
-        label = columns(2)
-      ))
+      Map(
+        columns(0) -> IdentifierType(
+          id = columns(1),
+          label = columns(2)
+        ))
     }
-    .fold(Map()) { (x, y) => x ++ y }
+    .fold(Map()) { (x, y) =>
+      x ++ y
+    }
 
   def apply(platformId: String): IdentifierType =
     identifierTypeMap.get(platformId) match {
       case Some(id) => id
-      case None => throw GracefulFailureException(
-        new RuntimeException(s"Unrecognised identifier type: [$platformId]")
-      )
+      case None =>
+        throw GracefulFailureException(
+          new RuntimeException(s"Unrecognised identifier type: [$platformId]")
+        )
     }
 }
