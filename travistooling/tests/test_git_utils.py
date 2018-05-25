@@ -22,8 +22,16 @@ def test_known_change_diff():
     #
     try:
         git('fetch', 'origin', '--unshallow')
-    except SystemExit:
-        pass
+    except SystemExit as err:  # pragma: no cover
+
+        # When running tests locally, you normally have a full checkout,
+        # so the command above is an error, and fails with:
+        #
+        #     fatal: --unshallow on a complete repository does not make sense
+        #
+        # In that case, we check we're seeing the expected exit code,
+        # but we don't need to run this branch in the tests.
+        assert err.value.code == 128
 
     assert get_changed_paths('1228fc9^', '1228fc9') == set([
         'travistooling/decisionmaker.py',
