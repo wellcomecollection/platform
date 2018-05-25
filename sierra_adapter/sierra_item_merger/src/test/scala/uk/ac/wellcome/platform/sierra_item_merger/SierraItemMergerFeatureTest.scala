@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -10,6 +10,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class SierraItemMergerFeatureTest
@@ -29,7 +30,7 @@ class SierraItemMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS [SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val id = "i1000001"
                 val bibId = "b1000001"
@@ -66,7 +67,7 @@ class SierraItemMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
               hybridStore =>
                 val bibId1 = "b1000001"
 
