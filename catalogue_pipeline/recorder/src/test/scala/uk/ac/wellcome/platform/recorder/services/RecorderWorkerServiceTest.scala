@@ -143,7 +143,7 @@ class RecorderWorkerServiceTest
     actualRecords.size shouldBe 1
 
     val hybridRecord: HybridRecord = actualRecords.head
-    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierScheme.toString}/${expectedWork.sourceIdentifier.value}"
+    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierType.id}/${expectedWork.sourceIdentifier.value}"
     hybridRecord.version shouldBe expectedVhsVersion
 
     val content = getContentFromS3(

@@ -24,7 +24,7 @@ object SierraConceptIdentifier {
   def maybeFindIdentifier(varField: VarField,
                           identifierSubfield: MarcSubfield,
                           ontologyType: String): Option[SourceIdentifier] = {
-    val maybeIdentifierScheme = varField.indicator2 match {
+    val maybeIdentifierType = varField.indicator2 match {
       case None => None
 
       // These mappings are provided by the MARC spec.
@@ -41,12 +41,12 @@ object SierraConceptIdentifier {
       case Some(scheme) => None
     }
 
-    maybeIdentifierScheme match {
+    maybeIdentifierType match {
       case None => None
-      case Some(identifierScheme) =>
+      case Some(identifierType) =>
         Some(
           SourceIdentifier(
-            identifierScheme = identifierScheme,
+            identifierType = identifierType,
             value = identifierSubfield.content,
             ontologyType = ontologyType
           ))

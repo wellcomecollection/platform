@@ -26,7 +26,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
         )
       ),
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraIdentifier,
+        identifierType = IdentifierType("SierraIdentifier"),
         ontologyType = "Work",
         value = bibData.id
       )

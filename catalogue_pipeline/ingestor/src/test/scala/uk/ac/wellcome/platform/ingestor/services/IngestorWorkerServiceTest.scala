@@ -110,7 +110,7 @@ class IngestorWorkerServiceTest
 
           whenReady(future.failed) { ex =>
             ex shouldBe a[GracefulFailureException]
-            ex.getMessage shouldBe s"Cannot ingest work with identifierScheme: ${IdentifierType("CALMAltRefNo")}"
+            ex.getMessage shouldBe s"Cannot ingest work with identifierType: ${IdentifierType("CALMAltRefNo")}"
           }
         }
       }

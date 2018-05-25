@@ -41,13 +41,13 @@ class IngestorWorkerService @Inject()(
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
     val miroIdentifier = IdentifierType("MiroImageNumber")
     val sierraIdentifier = IdentifierType("SierraSystemNumber")
-    work.sourceIdentifier.identifierType match {
-      case miroIdentifier =>
+    work.sourceIdentifier.identifierType.id match {
+      case miroIdentifier.id =>
         List(
           elasticConfig.indexV1name,
           elasticConfig.indexV2name
         )
-      case sierraIdentifier =>
+      case sierraIdentifier.id =>
         List(elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(

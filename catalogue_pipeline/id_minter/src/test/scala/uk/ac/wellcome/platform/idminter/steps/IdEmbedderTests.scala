@@ -353,7 +353,11 @@ class IdEmbedderTests
           val inputJson = s"""
         {
           "sourceIdentifier": {
-            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "identifierType": {
+              "id": "${sourceIdentifier.identifierType.id}",
+              "label": "${sourceIdentifier.identifierType.label}",
+              "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+            },
             "ontologyType": "$ontologyType",
             "value": "${sourceIdentifier.value}"
           },
@@ -414,7 +418,11 @@ class IdEmbedderTests
           "ki": "kiev",
           "item": {
             "sourceIdentifier": {
-              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "identifierType": {
+                "id": "${sourceIdentifier.identifierType.id}",
+                "label": "${sourceIdentifier.identifierType.label}",
+                "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+              },
               "ontologyType": "$ontologyType",
               "value": "${sourceIdentifier.value}"
             },
@@ -430,7 +438,11 @@ class IdEmbedderTests
           "item": {
             "canonicalId": "$newCanonicalId",
             "sourceIdentifier": {
-              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "identifierType": {
+                "id": "${sourceIdentifier.identifierType.id}",
+                "label": "${sourceIdentifier.identifierType.label}",
+                "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+              },
               "ontologyType": "$ontologyType",
               "value": "${sourceIdentifier.value}"
             },
@@ -452,7 +464,7 @@ class IdEmbedderTests
     sourceIdentifier: SourceIdentifier,
     ontologyType: String
   ): String =
-    s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
+    s"${sourceIdentifier.identifierType.id}==${sourceIdentifier.value}"
 
   private def setUpIdentifierGeneratorMock(
     mockIdentifierGenerator: IdentifierGenerator,
