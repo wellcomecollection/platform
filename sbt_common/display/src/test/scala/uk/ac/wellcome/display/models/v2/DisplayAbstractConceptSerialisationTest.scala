@@ -63,7 +63,7 @@ class DisplayAbstractConceptSerialisationTest
       canonicalId = "uq4bt5us",
       identifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          identifierType = IdentifierType("LCNames"),
           ontologyType = "Concept",
           value = "lcsh/uq4"
         )),

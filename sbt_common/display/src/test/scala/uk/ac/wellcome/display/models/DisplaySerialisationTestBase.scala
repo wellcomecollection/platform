@@ -61,7 +61,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def identifier(identifier: SourceIdentifier) =
     s"""{
       "type": "Identifier",
-      "identifierScheme": "${identifier.identifierScheme}",
+      "identifierScheme": "${identifier.identifierType.id}",
       "value": "${identifier.value}"
     }"""
 
