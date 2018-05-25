@@ -1,0 +1,20 @@
+package uk.ac.wellcome.models.work.internal
+
+import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
+
+class IdentifierTypeTest extends FunSpec with Matchers {
+  it("looks up an identifier type in the CSV") {
+    IdentifierType("MiroImageNumber") shouldBe IdentifierType(
+      id = "miro-image-number",
+      label = "Miro image number"
+    )
+  }
+
+  it("throws an error if looking up a non-existent identifier type") {
+    val caught = intercept[GracefulFailureException] {
+      IdentifierType(platformId = "DoesNotExist")
+    }
+    caught.e.getMessage shouldBe "Unrecognised identifier type: [DoesNotExist]"
+  }
+}
