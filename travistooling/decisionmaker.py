@@ -90,7 +90,7 @@ def does_file_affect_build_task(path, task):
     # for the api Scala app, so changes in this directory cannot affect
     # any other task.
     exclusive_directories = {
-        os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
+        proj.exclusive_path: proj.name for proj in PROJECTS
     }
 
     for dir_name, task_prefix in exclusive_directories.items():
