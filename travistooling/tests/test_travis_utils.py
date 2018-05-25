@@ -10,7 +10,7 @@ from travistooling import travis_utils
 
 
 @pytest.fixture
-def cleanup_secrets():
+def cleanup_secrets():  # pragma: no cover
     yield
     subprocess.check_call(['rm', '-rf', 'secrets'])
 
@@ -40,7 +40,11 @@ def test_travis_branch_name_on_pr():
         assert travis_utils.branch_name() == 'feature-branch'
 
 
-def test_unpack_secrets(cleanup_secrets):
+@pytest.mark.skipif(
+    os.environ['encrypted_83630750896a_key'] == '',
+    reason='Encrypted env vars are not available'
+)
+def test_unpack_secrets(cleanup_secrets):  # pragma: no cover
     travis_utils.unpack_secrets()
     assert os.path.exists('secrets/id_rsa')
 
