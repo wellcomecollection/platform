@@ -4,7 +4,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.storage.s3.S3StreamStore
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -33,7 +33,7 @@ class StreamStoreVersionedHybridStoreTest
   def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket,
                         Table,
-                        VersionedHybridStore[InputStream, S3StreamStore]),
+                        VersionedHybridStore[InputStream, ObjectStore[InputStream]]),
                        R]
   ): R =
     withLocalS3Bucket[R] { bucket =>

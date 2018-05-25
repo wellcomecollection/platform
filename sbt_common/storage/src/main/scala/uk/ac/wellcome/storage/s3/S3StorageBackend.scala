@@ -1,56 +1,37 @@
 package uk.ac.wellcome.storage.s3
 
+import java.io.InputStream
+
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.ObjectMetadata
-import uk.ac.wellcome.storage.{
-  KeyPrefix,
-  KeySuffix,
-  ObjectLocation,
-  ObjectStore
-}
-import uk.ac.wellcome.storage.type_classes.StorageStrategy
-
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.storage.{ObjectLocation, StorageBackend}
 
 import scala.concurrent.{ExecutionContext, Future}
+
 import scala.collection.JavaConverters._
 
-class S3StorageBackend[T](s3Client: AmazonS3)(implicit ec: ExecutionContext)
-    extends ObjectStore[T]
-    with Logging {
 
-  private def normalizePathFragment(prefix: String) =
-    prefix
-      .stripPrefix("/")
-      .stripSuffix("/")
+class S3StorageBackend(s3Client: AmazonS3)(implicit ec: ExecutionContext)
+  extends StorageBackend with Logging {
 
   private def generateMetadata(
-    userMetadata: Map[String, String]
-  ): ObjectMetadata = {
+                                userMetadata: Map[String, String]
+                              ): ObjectMetadata = {
     val objectMetadata = new ObjectMetadata()
     objectMetadata.setUserMetadata(userMetadata.asJava)
     objectMetadata
   }
 
-  def put(bucketName: String)(
-    t: T,
-    keyPrefix: KeyPrefix = KeyPrefix(""),
-    keySuffix: KeySuffix = KeySuffix(""),
-    userMetadata: Map[String, String] = Map()
-  )(implicit storageStrategy: StorageStrategy[T]): Future[ObjectLocation] = {
+  def put(location: ObjectLocation, input: InputStream, metadata: Map[String,String]): Future[Unit] = {
+    val bucketName = location.namespace
+    val key = location.key
 
-    val metadata = generateMetadata(userMetadata)
-    val storageStream = storageStrategy.store(t)
-
-    val prefix = normalizePathFragment(keyPrefix.value)
-    val suffix = normalizePathFragment(keySuffix.value)
-    val storageKey = storageStream.storageKey.value
-
-    val key = s"$prefix/${storageKey}$suffix"
+    val generatedMetadata = generateMetadata(metadata)
 
     info(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {
-      s3Client.putObject(bucketName, key, storageStream.inputStream, metadata)
+      s3Client.putObject(bucketName, key, input, generatedMetadata)
     }
 
     putObject.map { _ =>
@@ -59,10 +40,9 @@ class S3StorageBackend[T](s3Client: AmazonS3)(implicit ec: ExecutionContext)
     }
   }
 
-  def get(objectLocation: ObjectLocation)(
-    implicit storageStrategy: StorageStrategy[T]): Future[T] = {
-    val bucketName = objectLocation.namespace
-    val key = objectLocation.key
+  def get(location: ObjectLocation): Future[InputStream] = {
+    val bucketName = location.namespace
+    val key = location.key
 
     info(s"Attempt: GET object from s3://$bucketName/$key")
 
@@ -75,9 +55,6 @@ class S3StorageBackend[T](s3Client: AmazonS3)(implicit ec: ExecutionContext)
         info(s"Success: GET object from s3://$bucketName/$key")
     }
 
-    for {
-      inputStream <- futureInputStream
-      t <- Future.fromTry(storageStrategy.retrieve(inputStream))
-    } yield t
+    futureInputStream
   }
 }

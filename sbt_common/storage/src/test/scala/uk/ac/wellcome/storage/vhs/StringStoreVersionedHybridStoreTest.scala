@@ -4,13 +4,13 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.storage.s3.S3StringStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import scala.util.Random
@@ -31,7 +31,7 @@ class StringStoreVersionedHybridStoreTest
   def withS3StringStoreFixtures[R](
     testWith: TestWith[(Bucket,
                         Table,
-                        VersionedHybridStore[String, S3StringStore]),
+                        VersionedHybridStore[String, ObjectStore[String]]),
                        R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
