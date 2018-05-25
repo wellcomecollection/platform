@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier
 }
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
@@ -33,7 +33,7 @@ class IngestorFeatureTest
   it(
     "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
     val sourceIdentifier =
-      SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", "5678")
+      SourceIdentifier(identifierType = IdentifierType("MiroImageNumber"), "Item", "5678")
 
     val work = IdentifiedWork(
       title = Some("A type of a tame turtle"),
@@ -64,7 +64,7 @@ class IngestorFeatureTest
   it(
     "reads a sierra identified work from the queue and ingests it in the v2 index only") {
     val sourceIdentifier =
-      SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Item", "5678")
+      SourceIdentifier(identifierType = IdentifierType("SierraSystemNumber"), "Item", "5678")
 
     val work = IdentifiedWork(
       title = Some("A type of a tame turtle"),
