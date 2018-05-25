@@ -20,7 +20,10 @@ def test_known_change_diff():
     #
     # See https://docs.travis-ci.com/user/customizing-the-build#Git-Clone-Depth
     #
-    git('fetch', 'origin', '--unshallow')
+    try:
+        git('fetch', 'origin', '--unshallow')
+    except SystemExit:
+        pass
 
     assert get_changed_paths('1228fc9^', '1228fc9') == set([
         'travistooling/decisionmaker.py',
