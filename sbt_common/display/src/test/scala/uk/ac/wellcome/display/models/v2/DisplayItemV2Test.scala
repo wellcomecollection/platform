@@ -1,10 +1,10 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
-class DisplayItemTest extends FunSpec with Matchers {
+class DisplayItemV2Test extends FunSpec with Matchers {
 
   val location: Location = {
     val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
@@ -23,7 +23,7 @@ class DisplayItemTest extends FunSpec with Matchers {
     value = "value"
   )
 
-  it("should read an Item as a DisplayItem correctly") {
+  it("should read an Item as a DisplayItemV2 correctly") {
     val item = IdentifiedItem(
       canonicalId = "foo",
       sourceIdentifier = identifier,
@@ -31,15 +31,15 @@ class DisplayItemTest extends FunSpec with Matchers {
       locations = List(location)
     )
 
-    val displayItem = DisplayItem(
+    val DisplayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    displayItem.id shouldBe item.canonicalId
-    displayItem.locations shouldBe List(DisplayLocation(location))
-    displayItem.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
-    displayItem.ontologyType shouldBe "Item"
+    DisplayItemV2.id shouldBe item.canonicalId
+    DisplayItemV2.locations shouldBe List(DisplayLocation(location))
+    DisplayItemV2.identifiers shouldBe Some(List(DisplayIdentifier(identifier)))
+    DisplayItemV2.ontologyType shouldBe "Item"
   }
 
   it("correctly parses an Item without any identifiers") {
@@ -61,12 +61,12 @@ class DisplayItemTest extends FunSpec with Matchers {
         }
       """).get
 
-    val displayItem = DisplayItem(
+    val DisplayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    displayItem.identifiers shouldBe Some(List())
+    DisplayItemV2.identifiers shouldBe Some(List())
   }
 
   it("correctly parses an Item without any locations") {
@@ -88,11 +88,11 @@ class DisplayItemTest extends FunSpec with Matchers {
         }
       """).get
 
-    val displayItem = DisplayItem(
+    val DisplayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    displayItem.locations shouldBe List()
+    DisplayItemV2.locations shouldBe List()
   }
 }

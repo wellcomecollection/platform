@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
   value = "Item",
   description = "An item is a manifestation of a Work."
 )
-case class DisplayItem(
+case class DisplayItemV2(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
@@ -31,9 +31,9 @@ case class DisplayItem(
   @JsonProperty("type") val ontologyType: String = "Item"
 }
 
-object DisplayItem {
-  def apply(item: IdentifiedItem, includesIdentifiers: Boolean): DisplayItem = {
-    DisplayItem(
+object DisplayItemV2 {
+  def apply(item: IdentifiedItem, includesIdentifiers: Boolean): DisplayItemV2 = {
+    DisplayItemV2(
       id = item.canonicalId,
       identifiers =
         if (includesIdentifiers)
