@@ -41,7 +41,7 @@ case object IdentifierType {
     identifierTypeMap.get(platformId) match {
       case Some(id) => id
       case None => throw GracefulFailureException(
-        new RuntimeException(s"Unrecognised identifier type: $platformId")
+        new RuntimeException(s"Unrecognised identifier type: [$platformId]")
       )
     }
 }
