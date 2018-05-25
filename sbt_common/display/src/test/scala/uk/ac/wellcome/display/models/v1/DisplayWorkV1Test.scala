@@ -211,7 +211,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         id = Some(canonicalId),
         identifiers = Some(
           List(
-            DisplayIdentifier(
+            DisplayIdentifierV1(
               identifierScheme = IdentifierType("LCNames").id,
               sourceIdentifier.value))),
         label = "Juniper Journals"

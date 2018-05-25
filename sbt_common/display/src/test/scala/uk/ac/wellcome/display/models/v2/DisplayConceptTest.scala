@@ -54,7 +54,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayConcept(
         id = Some("dj4kndg5"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "darkness"
       )
     )
@@ -75,7 +75,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPeriod(
         id = Some("nrzbm3ah"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "never"
       )
     )
@@ -96,7 +96,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPlace(
         id = Some("axtswq4z"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "anywhere"
       )
     )

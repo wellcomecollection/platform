@@ -281,7 +281,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           label = "Vlad the Vanquished",
           identifiers = Some(
             List(
-              DisplayIdentifier(
+              DisplayIdentifierV2(
                 SourceIdentifier(
                   identifierType = IdentifierType("LCNames"),
                   ontologyType = "Person",

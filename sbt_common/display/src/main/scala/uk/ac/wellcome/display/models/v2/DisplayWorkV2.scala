@@ -52,7 +52,7 @@ case class DisplayWorkV2(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
@@ -123,7 +123,7 @@ case object DisplayWorkV2 {
       genres = work.genres.map { DisplayGenre(_) },
       identifiers =
         if (includes.identifiers)
-          Some(work.identifiers.map { DisplayIdentifier(_) })
+          Some(work.identifiers.map { DisplayIdentifierV2(_) })
         else None,
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =

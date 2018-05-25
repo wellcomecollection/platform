@@ -23,7 +23,7 @@ case object DisplayAbstractConcept {
       case Identified(concept: Concept, id, identifiers) =>
         DisplayConcept(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
           label = concept.label
         )
       case Unidentifiable(period: Period) =>
@@ -35,7 +35,7 @@ case object DisplayAbstractConcept {
       case Identified(period: Period, id, identifiers) =>
         DisplayPeriod(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
           label = period.label
         )
       case Unidentifiable(place: Place) =>
@@ -47,7 +47,7 @@ case object DisplayAbstractConcept {
       case Identified(place: Place, id, identifiers) =>
         DisplayPlace(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifier(_) }),
+          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
           label = place.label
         )
     }
@@ -66,7 +66,7 @@ case class DisplayConcept(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
   ) label: String
@@ -87,7 +87,7 @@ case class DisplayPeriod(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
   ) label: String
@@ -113,7 +113,7 @@ case class DisplayPlace(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "String"
   ) label: String
