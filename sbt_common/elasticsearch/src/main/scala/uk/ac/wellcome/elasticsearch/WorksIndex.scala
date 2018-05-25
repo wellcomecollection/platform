@@ -26,7 +26,11 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
   val sourceIdentifier = objectField("sourceIdentifier")
     .fields(
       keywordField("ontologyType"),
-      keywordField("identifierScheme"),
+      objectField("identifierType").fields(
+        keywordField("id"),
+        keywordField("label"),
+        keywordField("ontologyType")
+      ),
       keywordField("value")
     )
 
