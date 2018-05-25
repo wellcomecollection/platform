@@ -6,7 +6,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier
 }
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -76,14 +76,14 @@ class IdentifierGeneratorTest
           .into(fixtures.identifiersTable)
           .namedValues(
             fixtures.identifiersTable.column.CanonicalId -> "5678",
-            fixtures.identifiersTable.column.SourceSystem -> IdentifierSchemes.miroImageNumber.toString,
+            fixtures.identifiersTable.column.SourceSystem -> IdentifierType("MiroImageNumber").id,
             fixtures.identifiersTable.column.SourceId -> "1234",
             fixtures.identifiersTable.column.OntologyType -> "Work"
           )
       }.update().apply()
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234")
+        SourceIdentifier(identifierType = IdentifierType("MiroImageNumber"), "Work", "1234")
       )
 
       triedId shouldBe Success("5678")
@@ -95,7 +95,7 @@ class IdentifierGeneratorTest
       implicit val session = fixtures.dbConfig.session
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "1234")
+        SourceIdentifier(identifierType = IdentifierType("MiroImageNumber"), "Work", "1234")
       )
 
       triedId shouldBe a[Success[_]]
@@ -117,7 +117,7 @@ class IdentifierGeneratorTest
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(
         CanonicalId = id,
-        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        SourceSystem = IdentifierType("MiroImageNumber"),
         SourceId = "1234"
       )
     }
@@ -129,7 +129,7 @@ class IdentifierGeneratorTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val sourceIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("MiroImageNumber"),
           "Work",
           value = "1234"
         )
@@ -168,7 +168,7 @@ class IdentifierGeneratorTest
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
-          IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("MiroImageNumber"),
           ontologyType,
           miroId)
       )
