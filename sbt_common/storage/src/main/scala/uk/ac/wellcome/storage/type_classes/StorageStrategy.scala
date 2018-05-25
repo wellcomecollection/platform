@@ -8,6 +8,7 @@ import scala.io.Source
 import scala.io.Source.fromInputStream
 import io.circe._
 import io.circe.parser._
+import io.circe.syntax._
 
 import scala.util.{Success, Try}
 import scala.util.hashing.MurmurHash3
@@ -24,7 +25,29 @@ trait StorageStrategy[T] {
   def retrieve(input: InputStream): Try[T]
 }
 
-object StorageStrategyGenerator {
+object StorageStrategy {
+
+  def apply[T](implicit strategy: StorageStrategy[T]): StorageStrategy[T] =
+    strategy
+
+  def createStorageStrategy[T](
+                                store: T => StorageStream,
+                                retrieve: InputStream => Try[T]
+                              ): StorageStrategy[T] = new StorageStrategy[T] {
+    def store(t: T) = store(t)
+    def retrieve(input: InputStream) = retrieve(input)
+  }
+
+  implicit def jsonStorageStrategy[T](
+    implicit
+      encoder: Encoder[T],
+      decoder: Decoder[T]
+  ): StorageStrategy[T] = createStorageStrategy(
+      (t: T) => jsonStore.store(t.asJson),
+      (input: InputStream) => jsonStore
+        .retrieve(input)
+        .flatMap(_.as[T].toTry)
+    )
 
   private def hash(s: String) =
     MurmurHash3
@@ -59,7 +82,7 @@ object StorageStrategyGenerator {
 
     }
 
-  implicit val typeStore: StorageStrategy[Json] =
+  implicit val jsonStore: StorageStrategy[Json] =
     new StorageStrategy[Json] {
       def store(t: Json): StorageStream = {
         val key = StorageKey(hash(t.noSpaces))

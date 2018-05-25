@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.s3.{S3StorageBackend, S3TypeStore}
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
-import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
+import uk.ac.wellcome.storage.type_classes.StorageStrategy._
 
 import scala.concurrent.Future
 

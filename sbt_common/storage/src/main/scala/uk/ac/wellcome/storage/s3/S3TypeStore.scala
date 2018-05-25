@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.type_classes.StorageStrategy
 import io.circe.syntax._
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator._
+import uk.ac.wellcome.storage.type_classes.StorageStrategy._
 
 class S3TypeStore[T] @Inject()(
   storageBackend: S3StorageBackend[Json]

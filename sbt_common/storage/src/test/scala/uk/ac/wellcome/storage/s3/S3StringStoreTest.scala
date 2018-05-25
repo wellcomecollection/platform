@@ -6,14 +6,10 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.{
-  StorageStrategy,
-  StorageStrategyGenerator
-}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.ac.wellcome.storage.type_classes.StorageStrategyGenerator
+import uk.ac.wellcome.storage.type_classes.StorageStrategy
 import uk.ac.wellcome.test.fixtures.TestWith
 
 class S3StringStoreTest
@@ -27,7 +23,7 @@ class S3StringStoreTest
   val expectedHash = "4926d998"
 
   implicit val store: StorageStrategy[String] =
-    StorageStrategyGenerator.stringStore
+    StorageStrategy.stringStore
 
   it("stores a string with path id/version/hash") {
     withLocalS3Bucket { bucket =>
