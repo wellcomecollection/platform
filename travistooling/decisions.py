@@ -65,3 +65,11 @@ class ScalaChangeAndNotScalaApp(InsignificantFile):
 
 class ChangesToTestsDontGetPublished(InsignificantFile):
     message = "Changes to test files don't need to be published"
+
+
+class ChangeToUnusedLibrary(InsignificantFile):
+    def __init__(self, library):
+        self.message = (
+            "Changes to the %s library don't affect this task" % library
+        )
+        super(ChangeToUnusedLibrary, self).__init__()
