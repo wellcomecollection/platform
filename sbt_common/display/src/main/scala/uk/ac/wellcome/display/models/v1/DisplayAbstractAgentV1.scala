@@ -14,7 +14,7 @@ sealed trait DisplayAbstractAgentV1
 )
 case class DisplayAgentV1(
   id: Option[String],
-  identifiers: Option[List[DisplayIdentifier]],
+  identifiers: Option[List[DisplayIdentifierV1]],
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
@@ -34,13 +34,13 @@ case object DisplayAbstractAgentV1 {
       case Identified(a: Agent, id, identifiers) =>
         DisplayAgentV1(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers = Some(identifiers.map(DisplayIdentifierV1(_))),
           label = a.label
         )
       case Identified(p: Person, id, identifiers) =>
         DisplayPersonV1(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers = Some(identifiers.map(DisplayIdentifierV1(_))),
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
@@ -54,7 +54,7 @@ case object DisplayAbstractAgentV1 {
       case Identified(o: Organisation, id, identifiers) =>
         DisplayOrganisationV1(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers = Some(identifiers.map(DisplayIdentifierV1(_))),
           o.label)
       case Unidentifiable(o: Organisation) =>
         DisplayOrganisationV1(id = None, identifiers = None, label = o.label)
@@ -73,7 +73,7 @@ case class DisplayPersonV1(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]],
+  ) identifiers: Option[List[DisplayIdentifierV1]],
   @ApiModelProperty(
     value = "The name of the person"
   ) label: String,
@@ -100,7 +100,7 @@ case class DisplayOrganisationV1(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]],
+  ) identifiers: Option[List[DisplayIdentifierV1]],
   @ApiModelProperty(
     value = "The name of the organisation"
   ) label: String,
