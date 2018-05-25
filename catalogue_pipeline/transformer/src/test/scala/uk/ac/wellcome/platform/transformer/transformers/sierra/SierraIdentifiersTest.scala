@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
@@ -15,12 +15,12 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
       bibDataId = "1782863",
       expectedIdentifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          identifierType = IdentifierType("SierraSystemNumber"),
           ontologyType = "Work",
           value = "b17828636"
         ),
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraIdentifier,
+          identifierType = IdentifierType("SierraIdentifier"),
           ontologyType = "Work",
           value = "1782863"
         )

@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier
 }
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
@@ -32,9 +32,8 @@ object SierraConceptIdentifier {
 
       // These mappings are provided by the MARC spec.
       // https://www.loc.gov/marc/bibliographic/bd655.html
-      case Some("0") =>
-        Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
-      case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
+      case Some("0") => Some(IdentifierType("LCSH"))
+      case Some("2") => Some(IdentifierType("MESHId"))
       case Some("4") => None
 
       // For now we omit the other schemes as they're fairly unusual in

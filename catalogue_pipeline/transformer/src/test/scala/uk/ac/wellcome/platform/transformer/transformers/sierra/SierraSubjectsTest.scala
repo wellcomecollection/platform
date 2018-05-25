@@ -265,12 +265,12 @@ class SierraSubjectsTest extends FunSpec with Matchers {
 
     val expectedSourceIdentifiers = List(
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressSubjectHeadings,
+        identifierType = IdentifierType("LCSH"),
         value = "lcsh/123",
         ontologyType = "Concept"
       ),
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.medicalSubjectHeadings,
+        identifierType = IdentifierType("MESHId"),
         value = "mesh/456",
         ontologyType = "Concept"
       )

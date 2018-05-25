@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedItem
 }
@@ -97,12 +97,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       val item = SierraItemData(id = "4000004", deleted = false)
 
       val sourceIdentifier1 = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        identifierType = IdentifierType("SierraSystemNumber"),
         ontologyType = "Item",
         value = "i40000047"
       )
       val sourceIdentifier2 = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraIdentifier,
+        identifierType = IdentifierType("SierraIdentifier"),
         ontologyType = "Item",
         value = "4000004"
       )
@@ -116,7 +116,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       val item = SierraItemData(id = "5000005", deleted = false)
 
       val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        identifierType = IdentifierType("SierraSystemNumber"),
         ontologyType = "Item",
         value = "i50000056"
       )

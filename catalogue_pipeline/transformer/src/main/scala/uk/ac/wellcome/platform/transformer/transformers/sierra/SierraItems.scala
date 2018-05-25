@@ -4,7 +4,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedItem
 }
@@ -35,7 +35,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
     info(s"Attempting to transform ${sierraItemData.id}")
     internal.UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        identifierType = IdentifierType("SierraSystemNumber"),
         ontologyType = "Item",
         value = addCheckDigit(
           sierraItemData.id,
@@ -44,7 +44,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
       ),
       identifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          identifierType = IdentifierType("SierraSystemNumber"),
           ontologyType = "Item",
           value = addCheckDigit(
             sierraItemData.id,
@@ -52,7 +52,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
           )
         ),
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraIdentifier,
+          identifierType = IdentifierType("SierraIdentifier"),
           ontologyType = "Item",
           value = sierraItemData.id
         )

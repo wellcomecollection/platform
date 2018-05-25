@@ -6,7 +6,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -68,13 +68,13 @@ class SierraTransformerFeatureTest
                 snsMessages.size should be >= 1
 
                 val sourceIdentifier = SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                  identifierType = IdentifierType("SierraSystemNumber"),
                   ontologyType = "Work",
                   value = "b10010014"
                 )
 
                 val sierraIdentifier = SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.sierraIdentifier,
+                  identifierType = IdentifierType("SierraIdentifier"),
                   ontologyType = "Work",
                   value = id
                 )
