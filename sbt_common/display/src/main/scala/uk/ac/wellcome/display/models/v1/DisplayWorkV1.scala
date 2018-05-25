@@ -52,7 +52,7 @@ case class DisplayWorkV1(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) creators: List[DisplayAbstractAgent] = List(),
+  ) creators: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
@@ -73,11 +73,11 @@ case class DisplayWorkV1(
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
     value = "List of items related to this work."
-  ) items: Option[List[DisplayItem]] = None,
+  ) items: Option[List[DisplayItemV1]] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgent] = List(),
+  ) publishers: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v1.DisplayPlaceV1]",
     value = "Show a list of places of publication."

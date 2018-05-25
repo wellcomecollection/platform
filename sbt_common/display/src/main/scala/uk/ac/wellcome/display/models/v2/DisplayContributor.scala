@@ -2,7 +2,6 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.display.models.DisplayAbstractAgent
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   Contributor,
@@ -16,7 +15,7 @@ import uk.ac.wellcome.models.work.internal.{
 case class DisplayContributor(
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayAbstractAgent",
-    value = "The agent.") agent: DisplayAbstractAgent,
+    value = "The agent.") agent: DisplayAbstractAgentV2,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v2.DisplayContributionRole]",
     value = "The agent.") roles: List[DisplayContributionRole],
@@ -27,7 +26,7 @@ object DisplayContributor {
   def apply(
     contributor: Contributor[Displayable[AbstractAgent]]): DisplayContributor =
     DisplayContributor(
-      agent = DisplayAbstractAgent(contributor.agent),
+      agent = DisplayAbstractAgentV2(contributor.agent),
       roles = contributor.roles.map { DisplayContributionRole(_) }
     )
 }

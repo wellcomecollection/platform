@@ -2,6 +2,7 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.display.models.DisplayLocation
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedItem,
   Location,
@@ -21,7 +22,7 @@ case class DisplayItemV1(
     dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV1]] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayLocation]",
     value = "List of locations that provide access to the item"
@@ -43,7 +44,7 @@ object DisplayItemV1 {
           // we map over the value.
           Option[List[SourceIdentifier]](item.identifiers) match {
             case Some(identifiers) =>
-              Some(identifiers.map(DisplayIdentifier(_)))
+              Some(identifiers.map(DisplayIdentifierV1(_)))
             case None => Some(List())
           } else None,
       locations = // Same as with identifiers

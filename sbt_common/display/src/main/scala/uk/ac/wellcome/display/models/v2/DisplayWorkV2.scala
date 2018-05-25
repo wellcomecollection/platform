@@ -68,10 +68,10 @@ case class DisplayWorkV2(
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
     value = "List of items related to this work."
-  ) items: Option[List[DisplayItem]] = None,
+  ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgent] = List(),
+  ) publishers: List[DisplayAbstractAgentV2] = List(),
   @ApiModelProperty(
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlace] = List(),
@@ -132,10 +132,10 @@ case object DisplayWorkV2 {
       items =
         if (includes.items)
           Some(work.items.map {
-            DisplayItem(_, includesIdentifiers = includes.identifiers)
+            DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAbstractAgent(_)),
+      publishers = work.publishers.map(DisplayAbstractAgentV2(_)),
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
