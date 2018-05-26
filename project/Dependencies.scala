@@ -8,7 +8,7 @@ object Dependencies {
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
     val finatra = "18.4.0"
-    val guice = "4.0"
+    val guice = "4.2.0"
     val logback = "1.1.8"
     val mockito = "1.9.5"
     val scalatest = "3.0.1"
