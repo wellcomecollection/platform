@@ -121,7 +121,7 @@ class IdentifierGeneratorTest
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(
         CanonicalId = id,
-        SourceSystem = IdentifierType("MiroImageNumber"),
+        SourceSystem = IdentifierType("MiroImageNumber").id,
         SourceId = "1234"
       )
     }
