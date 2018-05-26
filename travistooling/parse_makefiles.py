@@ -3,6 +3,8 @@
 import collections
 import os
 
+from travistooling.git_utils import ROOT
+
 Project = collections.namedtuple('Project', ['name', 'type', 'exclusive_path'])
 
 
@@ -46,8 +48,11 @@ def _get_projects_from_makefile(root, path):
             )
 
         for t in targets:
+            exclusive_path = os.path.relpath(
+                os.path.join(root, t), start=ROOT
+            )
             yield Project(
                 name=t,
                 type=project_type,
-                exclusive_path=os.path.join(root, t)
+                exclusive_path=exclusive_path
             )
