@@ -33,7 +33,8 @@ case class DisplayItemV1(
 }
 
 object DisplayItemV1 {
-  def apply(item: IdentifiedItem, includesIdentifiers: Boolean): DisplayItemV1 = {
+  def apply(item: IdentifiedItem,
+            includesIdentifiers: Boolean): DisplayItemV1 = {
     DisplayItemV1(
       id = item.canonicalId,
       identifiers =
