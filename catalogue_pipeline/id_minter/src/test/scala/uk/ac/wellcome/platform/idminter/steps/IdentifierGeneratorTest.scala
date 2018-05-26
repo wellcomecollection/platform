@@ -193,7 +193,7 @@ class IdentifierGeneratorTest
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(
         CanonicalId = id,
-        SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+        SourceSystem = IdentifierType("MiroImageNumber").id,
         SourceId = miroId,
         OntologyType = ontologyType
       )
