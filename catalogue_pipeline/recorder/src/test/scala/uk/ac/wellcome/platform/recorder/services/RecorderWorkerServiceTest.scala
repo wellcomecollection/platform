@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -37,7 +37,7 @@ class RecorderWorkerServiceTest
   val title = "Whose umbrella did I find?"
 
   val sourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.miroImageNumber,
+    identifierType = IdentifierType("MiroImageNumber"),
     value = "U8634924",
     ontologyType = "Work"
   )
@@ -143,7 +143,7 @@ class RecorderWorkerServiceTest
     actualRecords.size shouldBe 1
 
     val hybridRecord: HybridRecord = actualRecords.head
-    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierScheme.toString}/${expectedWork.sourceIdentifier.value}"
+    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierType.id}/${expectedWork.sourceIdentifier.value}"
     hybridRecord.version shouldBe expectedVhsVersion
 
     val content = getContentFromS3(

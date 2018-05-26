@@ -1,6 +1,8 @@
 MiroImageNumber,miro-image-number,Miro image number
+MiroLibraryReference,miro-library-reference,Miro library reference
 WellcomeLibraryVideodiskNumber,wellcome-library-videodisk-number,Wellcome library videodisk number
 SierraSystemNumber,sierra-system-number,Sierra system number
+SierraIdentifier,sierra-identifier,Sierra identifier
 CALMRefNo,calm-ref-no,CALM ref no
 CALMAltRefNo,calm-altref-no,CALM alter no
 LCGMGPC,lc-gmgpc,Library of Congress Thesaurus for Graphic Materials

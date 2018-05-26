@@ -1,9 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 
 trait SierraIdentifiers extends SierraCheckDigits {
@@ -21,7 +18,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
   def getIdentifiers(bibData: SierraBibData): List[SourceIdentifier] =
     List(
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraSystemNumber,
+        identifierType = IdentifierType("SierraSystemNumber"),
         ontologyType = "Work",
         value = addCheckDigit(
           bibData.id,
@@ -29,7 +26,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
         )
       ),
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.sierraIdentifier,
+        identifierType = IdentifierType("SierraIdentifier"),
         ontologyType = "Work",
         value = bibData.id
       )

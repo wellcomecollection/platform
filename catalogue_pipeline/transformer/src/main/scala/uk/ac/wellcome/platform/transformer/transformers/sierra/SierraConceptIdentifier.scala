@@ -1,9 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 
 // Implements logic for finding a source identifier for varFields with
@@ -27,14 +24,13 @@ object SierraConceptIdentifier {
   def maybeFindIdentifier(varField: VarField,
                           identifierSubfield: MarcSubfield,
                           ontologyType: String): Option[SourceIdentifier] = {
-    val maybeIdentifierScheme = varField.indicator2 match {
+    val maybeIdentifierType = varField.indicator2 match {
       case None => None
 
       // These mappings are provided by the MARC spec.
       // https://www.loc.gov/marc/bibliographic/bd655.html
-      case Some("0") =>
-        Some(IdentifierSchemes.libraryOfCongressSubjectHeadings)
-      case Some("2") => Some(IdentifierSchemes.medicalSubjectHeadings)
+      case Some("0") => Some(IdentifierType("LCSH"))
+      case Some("2") => Some(IdentifierType("MESHId"))
       case Some("4") => None
 
       // For now we omit the other schemes as they're fairly unusual in
@@ -45,12 +41,12 @@ object SierraConceptIdentifier {
       case Some(scheme) => None
     }
 
-    maybeIdentifierScheme match {
+    maybeIdentifierType match {
       case None => None
-      case Some(identifierScheme) =>
+      case Some(identifierType) =>
         Some(
           SourceIdentifier(
-            identifierScheme = identifierScheme,
+            identifierType = identifierType,
             value = identifierSubfield.content,
             ontologyType = ontologyType
           ))

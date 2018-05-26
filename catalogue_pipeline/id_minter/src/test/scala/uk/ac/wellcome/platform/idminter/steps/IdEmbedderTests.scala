@@ -42,7 +42,7 @@ class IdEmbedderTests
 
   it("sets the canonicalId given by the IdentifierGenerator on the work") {
     val identifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("MiroImageNumber"),
       ontologyType = "Work",
       value = "1234"
     )
@@ -87,13 +87,13 @@ class IdEmbedderTests
 
   it("mints identifiers for creators in work") {
     val workIdentifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("MiroImageNumber"),
       ontologyType = "Work",
       value = "1234"
     )
 
     val creatorIdentifier = SourceIdentifier(
-      IdentifierSchemes.libraryOfCongressNames,
+      identifierType = IdentifierType("LCNames"),
       ontologyType = "Person",
       value = "1234"
     )
@@ -162,7 +162,7 @@ class IdEmbedderTests
 
   it("returns a failed future if the call to IdentifierGenerator fails") {
     val identifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("MiroImageNumber"),
       ontologyType = "Work",
       value = "1234"
     )
@@ -194,7 +194,7 @@ class IdEmbedderTests
 
   it("adds canonicalIds to all items") {
     val identifier = SourceIdentifier(
-      IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("MiroImageNumber"),
       ontologyType = "Item",
       value = "1234"
     )
@@ -206,7 +206,7 @@ class IdEmbedderTests
 
     val originalItem2 = UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
-        IdentifierSchemes.miroImageNumber,
+        identifierType = IdentifierType("MiroImageNumber"),
         ontologyType = "Item",
         value = "1235"
       ),
@@ -333,7 +333,7 @@ class IdEmbedderTests
 
       val ontologyType = "false capitals"
       val sourceIdentifier = SourceIdentifier(
-        IdentifierSchemes.miroImageNumber,
+        identifierType = IdentifierType("MiroImageNumber"),
         ontologyType = ontologyType,
         "sydney"
       )
@@ -353,7 +353,11 @@ class IdEmbedderTests
           val inputJson = s"""
         {
           "sourceIdentifier": {
-            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "identifierType": {
+              "id": "${sourceIdentifier.identifierType.id}",
+              "label": "${sourceIdentifier.identifierType.label}",
+              "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+            },
             "ontologyType": "$ontologyType",
             "value": "${sourceIdentifier.value}"
           },
@@ -365,7 +369,11 @@ class IdEmbedderTests
         {
           "canonicalId": "$newCanonicalId",
           "sourceIdentifier": {
-            "identifierScheme": "${sourceIdentifier.identifierScheme}",
+            "identifierType": {
+              "id": "${sourceIdentifier.identifierType.id}",
+              "label": "${sourceIdentifier.identifierType.label}",
+              "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+            },
             "ontologyType": "$ontologyType",
             "value": "${sourceIdentifier.value}"
           },
@@ -385,7 +393,7 @@ class IdEmbedderTests
       val ontologyType = "fictional cities"
 
       val sourceIdentifier = SourceIdentifier(
-        IdentifierSchemes.miroImageNumber,
+        identifierType = IdentifierType("MiroImageNumber"),
         ontologyType = ontologyType,
         "king's landing"
       )
@@ -410,7 +418,11 @@ class IdEmbedderTests
           "ki": "kiev",
           "item": {
             "sourceIdentifier": {
-              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "identifierType": {
+                "id": "${sourceIdentifier.identifierType.id}",
+                "label": "${sourceIdentifier.identifierType.label}",
+                "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+              },
               "ontologyType": "$ontologyType",
               "value": "${sourceIdentifier.value}"
             },
@@ -426,7 +438,11 @@ class IdEmbedderTests
           "item": {
             "canonicalId": "$newCanonicalId",
             "sourceIdentifier": {
-              "identifierScheme": "${sourceIdentifier.identifierScheme}",
+              "identifierType": {
+                "id": "${sourceIdentifier.identifierType.id}",
+                "label": "${sourceIdentifier.identifierType.label}",
+                "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+              },
               "ontologyType": "$ontologyType",
               "value": "${sourceIdentifier.value}"
             },
@@ -448,7 +464,7 @@ class IdEmbedderTests
     sourceIdentifier: SourceIdentifier,
     ontologyType: String
   ): String =
-    s"${sourceIdentifier.identifierScheme.toString}==${sourceIdentifier.value}"
+    s"${sourceIdentifier.identifierType.id}==${sourceIdentifier.value}"
 
   private def setUpIdentifierGeneratorMock(
     mockIdentifierGenerator: IdentifierGenerator,

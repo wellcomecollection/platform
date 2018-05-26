@@ -6,7 +6,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -46,7 +46,7 @@ class IdMinterFeatureTest
 
               val identifier =
                 SourceIdentifier(
-                  IdentifierSchemes.miroImageNumber,
+                  identifierType = IdentifierType("MiroImageNumber"),
                   "Work",
                   miroID)
 
@@ -106,7 +106,7 @@ class IdMinterFeatureTest
 
               val identifier =
                 SourceIdentifier(
-                  IdentifierSchemes.miroImageNumber,
+                  identifierType = IdentifierType("MiroImageNumber"),
                   "Work",
                   miroId)
 

@@ -29,7 +29,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
     sourceIdentifier: SourceIdentifier
   ): Try[Option[Identifier]] = Try {
 
-    val sourceSystem = sourceIdentifier.identifierScheme.toString
+    val sourceSystem = sourceIdentifier.identifierType.id
     val sourceId = sourceIdentifier.value
 
     // TODO: handle gracefully, don't TryBackoff ad infinitum

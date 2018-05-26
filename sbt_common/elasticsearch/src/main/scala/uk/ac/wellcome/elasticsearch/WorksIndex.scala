@@ -23,19 +23,21 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     textField("url")
   )
 
+  def sourceIdentifierFields = Seq(
+    keywordField("ontologyType"),
+    objectField("identifierType").fields(
+      keywordField("id"),
+      keywordField("label"),
+      keywordField("ontologyType")
+    ),
+    keywordField("value")
+  )
+
   val sourceIdentifier = objectField("sourceIdentifier")
-    .fields(
-      keywordField("ontologyType"),
-      keywordField("identifierScheme"),
-      keywordField("value")
-    )
+    .fields(sourceIdentifierFields)
 
   val identifiers = objectField("identifiers")
-    .fields(
-      keywordField("ontologyType"),
-      keywordField("identifierScheme"),
-      keywordField("value")
-    )
+    .fields(sourceIdentifierFields)
 
   val workType = objectField("workType")
     .fields(

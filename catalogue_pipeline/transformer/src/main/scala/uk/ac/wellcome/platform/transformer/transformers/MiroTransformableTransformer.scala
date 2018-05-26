@@ -25,7 +25,7 @@ class MiroTransformableTransformer
         UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
-            identifierScheme = IdentifierSchemes.miroImageNumber,
+            identifierType = IdentifierType("MiroImageNumber"),
             ontologyType = "Work",
             value = miroTransformable.sourceId),
           version = version,
@@ -152,7 +152,7 @@ class MiroTransformableTransformer
                              miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
       SourceIdentifier(
-        identifierScheme = IdentifierSchemes.miroImageNumber,
+        identifierType = IdentifierType("MiroImageNumber"),
         ontologyType = "Work",
         value = miroId)
     )
@@ -185,7 +185,7 @@ class MiroTransformableTransformer
           case Some(s) =>
             s.map { id =>
               SourceIdentifier(
-                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                identifierType = IdentifierType("SierraSystemNumber"),
                 ontologyType = "Work",
                 value = s"b$id")
             }
@@ -208,7 +208,7 @@ class MiroTransformableTransformer
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
-              identifierScheme = IdentifierSchemes.miroLibraryReference,
+              identifierType = IdentifierType("MiroLibraryReference"),
               ontologyType = "Work",
               value = s"$label $value"
             )
@@ -230,10 +230,15 @@ class MiroTransformableTransformer
                        miroId: String): List[UnidentifiedItem] = {
     List(
       UnidentifiedItem(
-        sourceIdentifier =
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId),
+        sourceIdentifier = SourceIdentifier(
+          identifierType = IdentifierType("MiroImageNumber"),
+          "Item",
+          miroId),
         identifiers = List(
-          SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", miroId)
+          SourceIdentifier(
+            identifierType = IdentifierType("MiroImageNumber"),
+            "Item",
+            miroId)
         ),
         locations = List(
           DigitalLocation(

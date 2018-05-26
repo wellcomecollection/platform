@@ -47,7 +47,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   val sourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    identifierType = IdentifierType("SierraSystemNumber"),
     ontologyType = "Work",
     value = "b1234567"
   )
@@ -173,7 +173,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     "extracts creators from a Work with a mixture of identified/Unidentifiable Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
-      IdentifierSchemes.libraryOfCongressNames,
+      identifierType = IdentifierType("LCNames"),
       "Organisation",
       "EW")
     val work = IdentifiedWork(
@@ -212,7 +212,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         identifiers = Some(
           List(
             DisplayIdentifier(
-              IdentifierSchemes.libraryOfCongressNames.toString,
+              identifierScheme = IdentifierType("LCNames").id,
               sourceIdentifier.value))),
         label = "Juniper Journals"
       )

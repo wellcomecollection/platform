@@ -47,7 +47,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   val sourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    identifierType = IdentifierType("SierraSystemNumber"),
     ontologyType = "Work",
     value = "b1234567"
   )
@@ -253,7 +253,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             canonicalId = "vs7jd5dx",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("LCNames"),
                 ontologyType = "Person",
                 value = "v1"
               )
@@ -283,7 +283,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             List(
               DisplayIdentifier(
                 SourceIdentifier(
-                  IdentifierSchemes.libraryOfCongressNames,
+                  identifierType = IdentifierType("LCNames"),
                   ontologyType = "Person",
                   value = "v1"
                 )

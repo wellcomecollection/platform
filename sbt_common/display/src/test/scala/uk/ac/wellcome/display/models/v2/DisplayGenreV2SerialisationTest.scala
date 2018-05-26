@@ -17,7 +17,7 @@ class DisplayGenreV2SerialisationTest
       canonicalId = "sqwyavpj",
       identifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          identifierType = IdentifierType("LCNames"),
           value = "lcsh/sqw",
           ontologyType = "Period"
         )),

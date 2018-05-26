@@ -75,7 +75,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "hgfedcba",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("LCNames"),
                 ontologyType = "Organisation",
                 value = "hv"
               )
@@ -88,7 +88,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "abcdefgh",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("LCNames"),
                 ontologyType = "Organisation",
                 value = "uu"
               )
@@ -101,7 +101,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "blahbluh",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("LCNames"),
                 ontologyType = "Organisation",
                 value = "uu"
               )
