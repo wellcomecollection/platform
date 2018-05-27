@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayConceptTest extends FunSpec with Matchers {
@@ -54,7 +53,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayConcept(
         id = Some("dj4kndg5"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "darkness"
       )
     )
@@ -75,7 +74,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPeriod(
         id = Some("nrzbm3ah"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "never"
       )
     )
@@ -96,7 +95,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPlace(
         id = Some("axtswq4z"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "anywhere"
       )
     )

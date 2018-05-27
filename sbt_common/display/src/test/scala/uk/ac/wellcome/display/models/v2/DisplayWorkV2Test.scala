@@ -97,12 +97,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
       val displayWork = DisplayWorkV2(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(
+        DisplayAgentV2(
           id = None,
           identifiers = None,
           label = "Henry Hare",
           ontologyType = "Agent"),
-        DisplayAgent(
+        DisplayAgentV2(
           id = None,
           identifiers = None,
           label = "Harriet Heron",
@@ -125,8 +125,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
       val displayWork = DisplayWorkV2(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(id = None, identifiers = None, label = "Janet Jackson"),
-        DisplayOrganisation(
+        DisplayAgentV2(id = None, identifiers = None, label = "Janet Jackson"),
+        DisplayOrganisationV2(
           id = None,
           identifiers = None,
           label = "Juniper Journals")
@@ -276,12 +276,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
     displayWork.contributors shouldBe List(
       DisplayContributor(
-        agent = DisplayPerson(
+        agent = DisplayPersonV2(
           id = Some("vs7jd5dx"),
           label = "Vlad the Vanquished",
           identifiers = Some(
             List(
-              DisplayIdentifier(
+              DisplayIdentifierV2(
                 SourceIdentifier(
                   identifierType = IdentifierType("LCNames"),
                   ontologyType = "Person",
@@ -293,7 +293,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         roles = List()
       ),
       DisplayContributor(
-        agent = DisplayOrganisation(
+        agent = DisplayOrganisationV2(
           id = None,
           label = "Transylvania Terrors",
           identifiers = None
