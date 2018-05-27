@@ -13,10 +13,9 @@ import uk.ac.wellcome.models.work.internal.{
   description = "A contributor"
 )
 case class DisplayContributor(
-  @ApiModelProperty(
-    value = "The agent.") agent: DisplayAbstractAgentV2,
-  @ApiModelProperty(
-    value = "The list of contribution roles.") roles: List[DisplayContributionRole],
+  @ApiModelProperty(value = "The agent.") agent: DisplayAbstractAgentV2,
+  @ApiModelProperty(value = "The list of contribution roles.") roles: List[
+    DisplayContributionRole],
   @JsonProperty("type") ontologyType: String = "Contributor"
 )
 
