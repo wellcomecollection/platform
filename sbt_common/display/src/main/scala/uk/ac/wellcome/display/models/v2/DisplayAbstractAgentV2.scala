@@ -70,7 +70,7 @@ case class DisplayPersonV2(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifierV2]],
@@ -97,7 +97,7 @@ case class DisplayOrganisationV2(
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifierV2]],

@@ -49,12 +49,11 @@ case class DisplayWorkV1(
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) creators: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifierV1]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifierV1]] = None,
@@ -71,11 +70,11 @@ case class DisplayWorkV1(
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayItemV1]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV1]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgentV1]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(

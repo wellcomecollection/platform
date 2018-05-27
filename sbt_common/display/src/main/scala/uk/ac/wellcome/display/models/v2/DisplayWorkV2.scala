@@ -49,7 +49,7 @@ case class DisplayWorkV2(
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) contributors: List[DisplayContributor] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifierV2]] = None,
@@ -66,7 +66,7 @@ case class DisplayWorkV2(
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
+    dataType = "List[uk.ac.wellcome.display.models.DisplayItemV2]",
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
