@@ -334,6 +334,24 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       ontologyType = "Item"
     )
 
+    val conceptSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCSH"),
+      value = "lcsh/bonds",
+      ontologyType = "Concept"
+    )
+
+    val periodSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCSH"),
+      value = "lcsh/before",
+      ontologyType = "Concept"
+    )
+
+    val placeSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCSH"),
+      value = "lcsh/bul",
+      ontologyType = "Concept"
+    )
+
     val work = IdentifiedWork(
       canonicalId = "bmzwdx3t",
       title = Some("Bizarre bees bounce below a basketball"),
@@ -379,6 +397,28 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           identifiers = List(itemSourceIdentifier)
         )
       ),
+      subjects = List(
+        Subject(
+          label = "Beryllium-Boron Bonding",
+          concepts = List(
+            Identified(
+              Concept("Bonding"),
+              canonicalId = "b5qsqkyh",
+              identifiers = List(conceptSourceIdentifier)
+            ),
+            Identified(
+              Period("Before"),
+              canonicalId = "bwn894hk",
+              identifiers = List(periodSourceIdentifier)
+            ),
+            Identified(
+              Place("Bulgaria"),
+              canonicalId = "bf42vqst",
+              identifiers = List(placeSourceIdentifier)
+            )
+          )
+        )
+      ),
       version = 1
     )
 
@@ -402,6 +442,11 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         val displayWork = DisplayWorkV2(work, includes = WorksIncludes(items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe None
+      }
+
+      it("subjects") {
+        val concepts = displayWork.subjects.head.concepts
+        concepts.map { _.identifiers } shouldBe List(None, None, None)
       }
     }
 
@@ -436,6 +481,20 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe Some(List(DisplayIdentifierV2(itemSourceIdentifier)))
+      }
+
+      it("subjects") {
+        val expectedIdentifiers = List(
+          conceptSourceIdentifier,
+          periodSourceIdentifier,
+          placeSourceIdentifier
+        )
+          .map { DisplayIdentifierV2(_) }
+          .map { List(_) }
+          .map { Some(_) }
+
+        val concepts = displayWork.subjects.head.concepts
+        concepts.map { _.identifiers } shouldBe expectedIdentifiers
       }
     }
   }

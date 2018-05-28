@@ -7,7 +7,11 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Concept"
 )
-sealed trait DisplayAbstractConcept
+sealed trait DisplayAbstractConcept {
+  val id: Option[String]
+  val identifiers: Option[List[DisplayIdentifierV2]]
+  val label: String
+}
 
 case object DisplayAbstractConcept {
   def apply(
