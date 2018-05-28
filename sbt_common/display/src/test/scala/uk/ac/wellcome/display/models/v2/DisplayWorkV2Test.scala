@@ -419,6 +419,18 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           )
         )
       ),
+      genres = List(
+        Genre(
+          label = "Black, Brown and Blue",
+          concepts = List(
+            Identified(
+              Concept("Colours"),
+              canonicalId = "chzwu4ea",
+              identifiers = List(conceptSourceIdentifier)
+            )
+          )
+        )
+      ),
       version = 1
     )
 
@@ -447,6 +459,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       it("subjects") {
         val concepts = displayWork.subjects.head.concepts
         concepts.map { _.identifiers } shouldBe List(None, None, None)
+      }
+
+      it("genres") {
+        displayWork.genres.head.concepts.head.identifiers shouldBe None
       }
     }
 
@@ -495,6 +511,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
         val concepts = displayWork.subjects.head.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers
+      }
+
+      it("genres") {
+        displayWork.genres.head.concepts.head.identifiers shouldBe Some(List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
     }
   }
