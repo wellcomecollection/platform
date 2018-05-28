@@ -120,7 +120,7 @@ case object DisplayWorkV1 {
       createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
-          DisplayAbstractAgentV1(contributor.agent)
+          DisplayAbstractAgentV1(contributor.agent, includesIdentifiers = includes.identifiers)
       },
       subjects = work.subjects.flatMap { subject =>
         subject.concepts.map { DisplayConceptV1(_) }
@@ -142,7 +142,9 @@ case object DisplayWorkV1 {
             DisplayItemV1(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAbstractAgentV1(_)),
+      publishers = work.publishers.map {
+        DisplayAbstractAgentV1(_, includesIdentifiers = includes.identifiers)
+      },
       publicationDate = work.publicationDate.map { DisplayPeriodV1(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlaceV1(_) },
       language = work.language.map { DisplayLanguage(_) },
