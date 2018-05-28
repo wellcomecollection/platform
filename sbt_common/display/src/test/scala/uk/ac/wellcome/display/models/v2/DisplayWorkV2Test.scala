@@ -303,105 +303,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
   }
 
-  describe("omits identifiers if WorksIncludes.identifiers is false") {
-    val work = IdentifiedWork(
-      canonicalId = "a82x3svv",
-      title = Some("Amazing animals are always abstract"),
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      contributors = List(
-        Contributor(
-          agent = Identified(
-            Agent(label = "Able Alan"),
-            canonicalId = "asxafxqp",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
-                value = "lcnames/alan",
-                ontologyType = "Agent"
-              )
-            )
-          ),
-          roles = List()
-        ),
-        Contributor(
-          agent = Identified(
-            Organisation(label = "Anachronistic Availability"),
-            canonicalId = "a8qhy8vr",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
-                value = "lcnames/ana",
-                ontologyType = "Organisation"
-              )
-            )
-          ),
-          roles = List()
-        ),
-        Contributor(
-          agent = Identified(
-            Person(label = "Absent Anna"),
-            canonicalId = "atvhs4u4",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
-                value = "lcnames/abs",
-                ontologyType = "Person"
-              )
-            )
-          ),
-          roles = List()
-        )
-      ),
-      publishers = List(
-        Identified(
-          Agent(label = "Acrobatic Ava"),
-          canonicalId = "ab2ngfh7",
-          identifiers = List(
-            SourceIdentifier(
-              identifierType = IdentifierType("LCNames"),
-              value = "lcnames/ava",
-              ontologyType = "Agent"
-            )
-          )
-        )
-      ),
-      items = List(
-        IdentifiedItem(
-          canonicalId = "ayfe6qea",
-          sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("MiroImageNumber"),
-            value = "miro/a0001",
-            ontologyType = "Item"
-          )
-        )
-      ),
-      version = 1
-    )
-
-    val displayWork = DisplayWorkV2(work, includes = WorksIncludes())
-
-    it("the top-level Work") {
-      displayWork.identifiers shouldBe None
-    }
-
-    it("contributors") {
-      val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
-      agents.map { _.identifiers } shouldBe List(None, None, None)
-    }
-
-    it("publishers") {
-      displayWork.publishers.head.identifiers shouldBe None
-    }
-
-    it("items") {
-      val displayWork = DisplayWorkV2(work, includes = WorksIncludes(items = true))
-      val item: DisplayItemV2 = displayWork.items.get.head
-      item.identifiers shouldBe None
-    }
-  }
-
-  describe("includes identifiers if WorksIncludes.identifiers is true") {
+  describe("correctly uses the WorksIncludes.identifiers include") {
     val publisherSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("LCNames"),
       value = "lcnames/boo",
@@ -480,36 +382,61 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       version = 1
     )
 
-    val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+    describe("omits identifiers if WorksIncludes.identifiers is false") {
+      val displayWork = DisplayWorkV2(work, includes = WorksIncludes())
 
-    it("on the top-level Work") {
-      displayWork.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
+      it("the top-level Work") {
+        displayWork.identifiers shouldBe None
+      }
+
+      it("contributors") {
+        val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
+        agents.map { _.identifiers } shouldBe List(None, None, None)
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe None
+      }
+
+      it("items") {
+        val displayWork = DisplayWorkV2(work, includes = WorksIncludes(items = true))
+        val item: DisplayItemV2 = displayWork.items.get.head
+        item.identifiers shouldBe None
+      }
     }
 
-    it("contributors") {
-      // This is moderately verbose, but the Scala compiler got confused when
-      // I tried to combine the three map() calls into one.
-      val expectedIdentifiers = List(
-        contributorAgentSourceIdentifier,
-        contributorOrganisationSourceIdentifier,
-        contributorPersonSourceIdentifier
-      )
-        .map { DisplayIdentifierV2(_) }
-        .map { List(_) }
-        .map { Some(_) }
+    describe("includes identifiers if WorksIncludes.identifiers is true") {
+      val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
 
-      val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
-      agents.map { _.identifiers } shouldBe expectedIdentifiers
-    }
+      it("on the top-level Work") {
+        displayWork.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
+      }
 
-    it("publishers") {
-      displayWork.publishers.head.identifiers shouldBe Some(List(DisplayIdentifierV2(publisherSourceIdentifier)))
-    }
+      it("contributors") {
+        // This is moderately verbose, but the Scala compiler got confused when
+        // I tried to combine the three map() calls into one.
+        val expectedIdentifiers = List(
+          contributorAgentSourceIdentifier,
+          contributorOrganisationSourceIdentifier,
+          contributorPersonSourceIdentifier
+        )
+          .map { DisplayIdentifierV2(_) }
+          .map { List(_) }
+          .map { Some(_) }
 
-    it("items") {
-      val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true, items = true))
-      val item: DisplayItemV2 = displayWork.items.get.head
-      item.identifiers shouldBe Some(List(DisplayIdentifierV2(itemSourceIdentifier)))
+        val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
+        agents.map { _.identifiers } shouldBe expectedIdentifiers
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe Some(List(DisplayIdentifierV2(publisherSourceIdentifier)))
+      }
+
+      it("items") {
+        val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true, items = true))
+        val item: DisplayItemV2 = displayWork.items.get.head
+        item.identifiers shouldBe Some(List(DisplayIdentifierV2(itemSourceIdentifier)))
+      }
     }
   }
 }
