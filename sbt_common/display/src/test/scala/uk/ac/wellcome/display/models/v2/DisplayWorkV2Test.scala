@@ -272,7 +272,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       version = 1
     )
 
-    val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+    val displayWork =
+      DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
 
     displayWork.contributors shouldBe List(
       DisplayContributor(
@@ -442,7 +443,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       }
 
       it("contributors") {
-        val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
+        val agents: List[DisplayAbstractAgentV2] =
+          displayWork.contributors.map { _.agent }
         agents.map { _.identifiers } shouldBe List(None, None, None)
       }
 
@@ -451,7 +453,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       }
 
       it("items") {
-        val displayWork = DisplayWorkV2(work, includes = WorksIncludes(items = true))
+        val displayWork =
+          DisplayWorkV2(work, includes = WorksIncludes(items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
@@ -467,10 +470,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     }
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
-      val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+      val displayWork =
+        DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
-        displayWork.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
+        displayWork.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(sourceIdentifier)))
       }
 
       it("contributors") {
@@ -480,23 +485,27 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           contributorAgentSourceIdentifier,
           contributorOrganisationSourceIdentifier,
           contributorPersonSourceIdentifier
-        )
-          .map { DisplayIdentifierV2(_) }
+        ).map { DisplayIdentifierV2(_) }
           .map { List(_) }
           .map { Some(_) }
 
-        val agents: List[DisplayAbstractAgentV2] = displayWork.contributors.map { _.agent }
+        val agents: List[DisplayAbstractAgentV2] =
+          displayWork.contributors.map { _.agent }
         agents.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
       it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe Some(List(DisplayIdentifierV2(publisherSourceIdentifier)))
+        displayWork.publishers.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(publisherSourceIdentifier)))
       }
 
       it("items") {
-        val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true, items = true))
+        val displayWork = DisplayWorkV2(
+          work,
+          includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
-        item.identifiers shouldBe Some(List(DisplayIdentifierV2(itemSourceIdentifier)))
+        item.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(itemSourceIdentifier)))
       }
 
       it("subjects") {
@@ -504,8 +513,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           conceptSourceIdentifier,
           periodSourceIdentifier,
           placeSourceIdentifier
-        )
-          .map { DisplayIdentifierV2(_) }
+        ).map { DisplayIdentifierV2(_) }
           .map { List(_) }
           .map { Some(_) }
 
@@ -514,7 +522,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe Some(List(DisplayIdentifierV2(conceptSourceIdentifier)))
+        displayWork.genres.head.concepts.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
     }
   }

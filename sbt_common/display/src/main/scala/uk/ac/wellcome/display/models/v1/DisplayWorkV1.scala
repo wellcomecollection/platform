@@ -120,7 +120,9 @@ case object DisplayWorkV1 {
       createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
-          DisplayAbstractAgentV1(contributor.agent, includesIdentifiers = includes.identifiers)
+          DisplayAbstractAgentV1(
+            contributor.agent,
+            includesIdentifiers = includes.identifiers)
       },
       subjects = work.subjects.flatMap { subject =>
         subject.concepts.map { DisplayConceptV1(_) }

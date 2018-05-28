@@ -200,7 +200,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       )
     )
 
-    val displayWork = DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+    val displayWork =
+      DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
     displayWork.creators shouldBe List(
       DisplayPersonV1(
         id = None,
@@ -490,7 +491,10 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       }
 
       it("creators") {
-        displayWork.creators.map { _.identifiers} shouldBe List(None, None, None)
+        displayWork.creators.map { _.identifiers } shouldBe List(
+          None,
+          None,
+          None)
       }
 
       it("publishers") {
@@ -498,17 +502,20 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       }
 
       it("items") {
-        val displayWork = DisplayWorkV1(work, includes = WorksIncludes(items = true))
+        val displayWork =
+          DisplayWorkV1(work, includes = WorksIncludes(items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
     }
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
-      val displayWork = DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+      val displayWork =
+        DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
-        displayWork.identifiers shouldBe Some(List(DisplayIdentifierV1(sourceIdentifier)))
+        displayWork.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(sourceIdentifier)))
       }
 
       it("creators") {
@@ -518,21 +525,24 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           creatorAgentSourceIdentifier,
           creatorOrganisationSourceIdentifier,
           creatorPersonSourceIdentifier
-        )
-          .map { DisplayIdentifierV1(_) }
+        ).map { DisplayIdentifierV1(_) }
           .map { List(_) }
           .map { Some(_) }
         displayWork.creators.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
       it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe Some(List(DisplayIdentifierV1(publisherSourceIdentifier)))
+        displayWork.publishers.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(publisherSourceIdentifier)))
       }
 
       it("items") {
-        val displayWork = DisplayWorkV1(work, includes = WorksIncludes(identifiers = true, items = true))
+        val displayWork = DisplayWorkV1(
+          work,
+          includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
-        item.identifiers shouldBe Some(List(DisplayIdentifierV1(itemSourceIdentifier)))
+        item.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(itemSourceIdentifier)))
       }
     }
   }

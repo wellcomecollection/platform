@@ -19,7 +19,8 @@ case class DisplayGenre(
   @JsonProperty("type") ontologyType: String = "Genre")
 
 object DisplayGenre {
-  def apply(genre: Genre[Displayable[AbstractConcept]], includesIdentifiers: Boolean): DisplayGenre =
+  def apply(genre: Genre[Displayable[AbstractConcept]],
+            includesIdentifiers: Boolean): DisplayGenre =
     DisplayGenre(label = genre.label, concepts = genre.concepts.map {
       DisplayAbstractConcept(_, includesIdentifiers = includesIdentifiers)
     }, ontologyType = genre.ontologyType)
