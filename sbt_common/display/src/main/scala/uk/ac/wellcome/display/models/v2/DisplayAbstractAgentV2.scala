@@ -7,7 +7,11 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Agent"
 )
-sealed trait DisplayAbstractAgentV2
+sealed trait DisplayAbstractAgentV2 {
+  val id: Option[String]
+  val identifiers: Option[List[DisplayIdentifierV2]]
+  val label: String
+}
 
 @ApiModel(
   value = "Agent"
