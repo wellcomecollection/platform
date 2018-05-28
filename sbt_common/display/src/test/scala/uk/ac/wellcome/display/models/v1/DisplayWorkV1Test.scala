@@ -402,4 +402,36 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
   }
+
+  describe("omits identifiers if WorksIncludes.identifiers is false") {
+    val work = IdentifiedWork(
+      canonicalId = "jas2rhsu",
+      title = Some("Jumping junipers in a jovial June"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      version = 1
+    )
+
+    val displayWork = DisplayWorkV1(work, includes = WorksIncludes())
+
+    it("on the top-level Work") {
+      displayWork.identifiers shouldBe None
+    }
+  }
+
+  describe("includes identifiers if WorksIncludes.identifiers is true") {
+    val work = IdentifiedWork(
+      canonicalId = "pt5vupg4",
+      title = Some("Pouncing pugs play in pipes"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      version = 1
+    )
+
+    val displayWork = DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+
+    it("on the top-level Work") {
+      displayWork.identifiers shouldBe Some(List(DisplayIdentifierV1(sourceIdentifier)))
+    }
+  }
 }
