@@ -30,7 +30,7 @@ class DisplayGenreV2SerialisationTest
     )
 
     assertObjectMapsToJson(
-      DisplayGenre(genre),
+      DisplayGenre(genre, includesIdentifiers = true),
       expectedJson = s"""
          |  {
          |    "label" : "${genre.label}",

@@ -105,7 +105,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
     concept: Displayable[AbstractConcept],
     expectedDisplayConcept: DisplayAbstractConcept
   ) = {
-    val displayConcept = DisplayAbstractConcept(concept)
+    val displayConcept = DisplayAbstractConcept(concept, includesIdentifiers = true)
     displayConcept shouldBe expectedDisplayConcept
   }
 }

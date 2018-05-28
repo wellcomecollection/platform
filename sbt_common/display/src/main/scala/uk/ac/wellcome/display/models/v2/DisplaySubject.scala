@@ -19,8 +19,8 @@ case class DisplaySubject(
   @JsonProperty("type") ontologyType: String = "Subject")
 
 object DisplaySubject {
-  def apply(subject: Subject[Displayable[AbstractConcept]]): DisplaySubject =
+  def apply(subject: Subject[Displayable[AbstractConcept]], includesIdentifiers: Boolean): DisplaySubject =
     DisplaySubject(label = subject.label, concepts = subject.concepts.map {
-      DisplayAbstractConcept(_)
+      DisplayAbstractConcept(_, includesIdentifiers = includesIdentifiers)
     }, ontologyType = subject.ontologyType)
 }

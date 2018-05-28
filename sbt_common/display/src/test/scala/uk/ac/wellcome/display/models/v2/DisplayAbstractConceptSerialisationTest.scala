@@ -71,7 +71,7 @@ class DisplayAbstractConceptSerialisationTest
     )
 
     assertObjectMapsToJson(
-      DisplayAbstractConcept(concept),
+      DisplayAbstractConcept(concept, includesIdentifiers = true),
       expectedJson = s"""
          |  {
          |    "id": "${concept.canonicalId}",
@@ -90,7 +90,7 @@ class DisplayAbstractConceptSerialisationTest
         Unidentifiable(Concept("conceptLabel")),
         Unidentifiable(Place("placeLabel")),
         Unidentifiable(Period("periodLabel"))
-      ).map(DisplayAbstractConcept(_)),
+      ).map(DisplayAbstractConcept(_, includesIdentifiers = false)),
       expectedJson = s"""
           | [
           |    {

@@ -119,8 +119,8 @@ case object DisplayWorkV2 {
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
       contributors = work.contributors.map { DisplayContributor(_, includesIdentifiers = includes.identifiers) },
-      subjects = work.subjects.map { DisplaySubject(_) },
-      genres = work.genres.map { DisplayGenre(_) },
+      subjects = work.subjects.map { DisplaySubject(_, includesIdentifiers = includes.identifiers) },
+      genres = work.genres.map { DisplayGenre(_, includesIdentifiers = includes.identifiers) },
       identifiers =
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifierV2(_) })

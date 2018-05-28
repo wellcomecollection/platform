@@ -15,7 +15,8 @@ sealed trait DisplayAbstractConcept {
 
 case object DisplayAbstractConcept {
   def apply(
-    abstractConcept: Displayable[AbstractConcept]): DisplayAbstractConcept =
+    abstractConcept: Displayable[AbstractConcept],
+    includesIdentifiers: Boolean): DisplayAbstractConcept =
     abstractConcept match {
       case Unidentifiable(concept: Concept) =>
         DisplayConcept(
@@ -26,7 +27,7 @@ case object DisplayAbstractConcept {
       case Identified(concept: Concept, id, identifiers) =>
         DisplayConcept(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           label = concept.label
         )
       case Unidentifiable(period: Period) =>
@@ -38,7 +39,7 @@ case object DisplayAbstractConcept {
       case Identified(period: Period, id, identifiers) =>
         DisplayPeriod(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           label = period.label
         )
       case Unidentifiable(place: Place) =>
@@ -50,7 +51,7 @@ case object DisplayAbstractConcept {
       case Identified(place: Place, id, identifiers) =>
         DisplayPlace(
           id = Some(id),
-          identifiers = Some(identifiers.map { DisplayIdentifierV2(_) }),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           label = place.label
         )
     }
