@@ -466,6 +466,16 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           )
         )
       ),
+      items = List(
+        IdentifiedItem(
+          canonicalId = "jtbaang9",
+          sourceIdentifier = SourceIdentifier(
+            identifierType = IdentifierType("MiroImageNumber"),
+            value = "miro/i0001",
+            ontologyType = "Item"
+          )
+        )
+      ),
       version = 1
     )
 
@@ -481,6 +491,12 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
     it("publishers") {
       displayWork.publishers.head.identifiers shouldBe None
+    }
+
+    it("items") {
+      val displayWork = DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      val item: DisplayItemV1 = displayWork.items.get.head
+      item.identifiers shouldBe None
     }
   }
 
@@ -507,6 +523,12 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       identifierType = IdentifierType("LCNames"),
       value = "lcnames/pri",
       ontologyType = "Agent"
+    )
+
+    val itemSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("MiroImageNumber"),
+      value = "miro/p0001",
+      ontologyType = "Item"
     )
 
     val work = IdentifiedWork(
@@ -547,6 +569,13 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           identifiers = List(publisherSourceIdentifier)
         )
       ),
+      items = List(
+        IdentifiedItem(
+          canonicalId = "pwaazubr",
+          sourceIdentifier = itemSourceIdentifier,
+          identifiers = List(itemSourceIdentifier)
+        )
+      ),
       version = 1
     )
 
@@ -572,6 +601,12 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
     it("publishers") {
       displayWork.publishers.head.identifiers shouldBe Some(List(DisplayIdentifierV1(publisherSourceIdentifier)))
+    }
+
+    it("items") {
+      val displayWork = DisplayWorkV1(work, includes = WorksIncludes(identifiers = true, items = true))
+      val item: DisplayItemV1 = displayWork.items.get.head
+      item.identifiers shouldBe Some(List(DisplayIdentifierV1(itemSourceIdentifier)))
     }
   }
 }
