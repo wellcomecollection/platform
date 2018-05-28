@@ -272,7 +272,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       version = 1
     )
 
-    val displayWork = DisplayWorkV2(work)
+    val displayWork = DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
 
     displayWork.contributors shouldBe List(
       DisplayContributor(
