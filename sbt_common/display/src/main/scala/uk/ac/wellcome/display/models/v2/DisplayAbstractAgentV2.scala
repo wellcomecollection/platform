@@ -27,7 +27,8 @@ case class DisplayAgentV2(
 
 case object DisplayAbstractAgentV2 {
   def apply(
-    displayableAgent: Displayable[AbstractAgent]): DisplayAbstractAgentV2 =
+    displayableAgent: Displayable[AbstractAgent],
+    includesIdentifiers: Boolean): DisplayAbstractAgentV2 =
     displayableAgent match {
       case Unidentifiable(a: Agent) =>
         DisplayAgentV2(
@@ -38,13 +39,13 @@ case object DisplayAbstractAgentV2 {
       case Identified(a: Agent, id, identifiers) =>
         DisplayAgentV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           label = a.label
         )
       case Identified(p: Person, id, identifiers) =>
         DisplayPersonV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
@@ -58,7 +59,7 @@ case object DisplayAbstractAgentV2 {
       case Identified(o: Organisation, id, identifiers) =>
         DisplayOrganisationV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers = if (includesIdentifiers) Some(identifiers.map(DisplayIdentifierV2(_))) else None,
           o.label)
       case Unidentifiable(o: Organisation) =>
         DisplayOrganisationV2(id = None, identifiers = None, label = o.label)

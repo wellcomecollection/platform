@@ -118,7 +118,7 @@ case object DisplayWorkV2 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      contributors = work.contributors.map { DisplayContributor(_) },
+      contributors = work.contributors.map { DisplayContributor(_, includesIdentifiers = includes.identifiers) },
       subjects = work.subjects.map { DisplaySubject(_) },
       genres = work.genres.map { DisplayGenre(_) },
       identifiers =
@@ -135,7 +135,9 @@ case object DisplayWorkV2 {
             DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAbstractAgentV2(_)),
+      publishers = work.publishers.map {
+        DisplayAbstractAgentV2(_, includesIdentifiers = includes.identifiers)
+      },
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
