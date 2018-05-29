@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.vhs
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.storage.s3.S3StringStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -24,14 +24,15 @@ class StringStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3StringStoreFixtures[R](
-    testWith: TestWith[(Bucket,
-                        Table,
-                        VersionedHybridStore[String, S3StringStore]),
-                       R]
+    testWith: TestWith[
+      (Bucket,
+       Table,
+       VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
+      R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
-        withStringVHS[R](bucket, table) { vhs =>
+        withStringVHS[EmptyMetadata, R](bucket, table) { vhs =>
           testWith((bucket, table, vhs))
         }
       }
@@ -46,7 +47,8 @@ class StringStoreVersionedHybridStoreTest
           val id = Random.nextString(5)
           val record = "One ocelot in orange"
 
-          val future = hybridStore.updateRecord(id)(record)(identity)()
+          val future =
+            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
 
           whenReady(future) { _ =>
             getContentFor(bucket, table, id) shouldBe record
@@ -64,10 +66,10 @@ class StringStoreVersionedHybridStoreTest
             "Throwing turquoise tangerines in Tanzania"
 
           val future =
-            hybridStore.updateRecord(id)(record)(identity)()
-
+            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
           val updatedFuture = future.flatMap { _ =>
-            hybridStore.updateRecord(id)(updatedRecord)(_ => updatedRecord)()
+            hybridStore.updateRecord(id)(updatedRecord)(
+              (t, _) => updatedRecord)(EmptyMetadata())
           }
 
           whenReady(updatedFuture) { _ =>
@@ -94,7 +96,7 @@ class StringStoreVersionedHybridStoreTest
           val record = "Five fishing flinging flint"
 
           val putFuture =
-            hybridStore.updateRecord(id)(record)(identity)()
+            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)
@@ -106,38 +108,69 @@ class StringStoreVersionedHybridStoreTest
       }
     }
 
-    it("can store additional metadata alongside HybridRecord") {
+    describe("with metadata") {
+
       case class ExtraData(
         data: String,
         number: Int
       )
 
       val id = Random.nextString(5)
-      val record = "this goes in dynamo"
+      val record = Random.nextString(256)
 
-      val data = ExtraData(
-        data = "a tragic triangle of triffids",
-        number = 6
+      val storedMetadata = ExtraData(
+        data = Random.nextString(256),
+        number = Random.nextInt(256)
       )
 
-      withS3StringStoreFixtures {
-        case (_, table, hybridStore) =>
-          val future =
-            hybridStore.updateRecord(id)(record)(identity)(data)
+      it("can store additional metadata") {
+        withLocalS3Bucket { bucket =>
+          withLocalDynamoDbTable { table =>
+            withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
+              val future =
+                hybridStore.updateRecord(id)(record)((t, _) => t)(
+                  storedMetadata)
 
-          whenReady(future) { _ =>
-            val maybeResult =
-              Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> id)
+              whenReady(future) { _ =>
+                val maybeResult =
+                  Scanamo.get[ExtraData](dynamoDbClient)(table.name)('id -> id)
 
-            maybeResult shouldBe defined
-            maybeResult.get.isRight shouldBe true
+                maybeResult shouldBe defined
+                maybeResult.get.isRight shouldBe true
 
-            val extraData = maybeResult.get.right.get
+                val extraData = maybeResult.get.right.get
 
-            extraData.data shouldBe "a tragic triangle of triffids"
-            extraData.number shouldBe 6
+                extraData.data shouldBe storedMetadata.data
+                extraData.number shouldBe storedMetadata.number
+              }
+            }
           }
+        }
       }
+
+      it("provides stored metadata when updating a record") {
+        withLocalS3Bucket { bucket =>
+          withLocalDynamoDbTable { table =>
+            withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
+              val updatedRecord = Random.nextString(256)
+
+              val future =
+                hybridStore.updateRecord(id)(record)((t, _) => t)(
+                  storedMetadata)
+
+              val updatedFuture = future.flatMap { _ =>
+                hybridStore.updateRecord(id)(updatedRecord)((t, m) =>
+                  m.toString)(storedMetadata)
+              }
+
+              whenReady(updatedFuture) { _ =>
+                getContentFor(bucket, table, id) shouldBe storedMetadata.toString
+              }
+            }
+          }
+        }
+      }
+
     }
   }
 }

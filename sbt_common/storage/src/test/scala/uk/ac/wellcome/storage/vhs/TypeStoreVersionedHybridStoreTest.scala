@@ -30,15 +30,16 @@ class TypeStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3TypeStoreFixtures[R](
-    testWith: TestWith[
-      (Bucket,
-       Table,
-       VersionedHybridStore[ExampleRecord, S3TypeStore[ExampleRecord]]),
-      R]
+    testWith: TestWith[(Bucket,
+                        Table,
+                        VersionedHybridStore[ExampleRecord,
+                                             EmptyMetadata,
+                                             S3TypeStore[ExampleRecord]]),
+                       R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
-        withTypeVHS[ExampleRecord, R](bucket, table) { vhs =>
+        withTypeVHS[ExampleRecord, EmptyMetadata, R](bucket, table) { vhs =>
           testWith((bucket, table, vhs))
         }
       }
@@ -54,7 +55,8 @@ class TypeStoreVersionedHybridStoreTest
           )
 
           val future =
-            hybridStore.updateRecord(record.id)(record)(identity)()
+            hybridStore.updateRecord(record.id)(record)((t, _) => t)(
+              EmptyMetadata())
 
           whenReady(future) { _ =>
             getJsonFor(bucket, table, record) shouldBe toJson(record).get
@@ -71,7 +73,7 @@ class TypeStoreVersionedHybridStoreTest
             content = "Hairy hyenas howling hatefully"
           )
           val putFuture =
-            hybridStore.updateRecord(id)(record)(identity)()
+            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)

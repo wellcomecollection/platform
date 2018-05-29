@@ -30,6 +30,7 @@ class SierraItemMergerUpdaterServiceTest
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,
+                                      SourceMetadata,
                                       S3TypeStore[SierraTransformable]])(
     testWith: TestWith[SierraItemMergerUpdaterService, Assertion]) = {
     val sierraUpdaterService = new SierraItemMergerUpdaterService(
@@ -42,7 +43,9 @@ class SierraItemMergerUpdaterServiceTest
   it("creates a record if it receives an item with a bibId that doesn't exist") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val bibId = "b666"
             val newItemRecord = sierraItemRecord(
@@ -74,7 +77,9 @@ class SierraItemMergerUpdaterServiceTest
   it("updates multiple merged records if the item contains multiple bibIds") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val bibIdNotExisting = "b666"
             val bibIdWithOldData = "b555"
@@ -114,7 +119,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(oldRecord.id)(
               oldRecord
-            )(identity)(SourceMetadata(oldRecord.sourceName))
+            )((t, _) => t)(SourceMetadata(oldRecord.sourceName))
 
             val anotherItem = sierraItemRecord(
               id = "i999",
@@ -137,7 +142,7 @@ class SierraItemMergerUpdaterServiceTest
             whenReady(f1) { _ =>
               val f2 = hybridStore.updateRecord(newRecord.id)(
                 newRecord
-              )(identity)(SourceMetadata(newRecord.sourceName))
+              )((t, _) => t)(SourceMetadata(newRecord.sourceName))
 
               whenReady(f2) { _ =>
                 whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
@@ -177,7 +182,9 @@ class SierraItemMergerUpdaterServiceTest
   it("updates an item if it receives an update with a newer date") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val id = "i3000003"
             val bibId = "b3000003"
@@ -194,7 +201,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(oldRecord.id)(
               oldRecord
-            )(identity)(SourceMetadata(oldRecord.sourceName))
+            )((t, _) => t)(SourceMetadata(oldRecord.sourceName))
 
             whenReady(f1) { _ =>
               val newItemRecord = sierraItemRecord(
@@ -223,7 +230,9 @@ class SierraItemMergerUpdaterServiceTest
   it("unlinks an item if it is updated with an unlinked item") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val itemId = "i3000003"
 
@@ -251,12 +260,12 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
               sierraTransformable1
-            )(_ => sierraTransformable1)(
+            )((_, _) => sierraTransformable1)(
               SourceMetadata(sierraTransformable1.sourceName))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
               sierraTransformable2
-            )(identity)(SourceMetadata(sierraTransformable2.sourceName))
+            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -304,7 +313,9 @@ class SierraItemMergerUpdaterServiceTest
   it("unlinks and updates a bib from a single call") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val itemId = "i3000003"
 
@@ -333,12 +344,12 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
               sierraTransformable1
-            )(_ => sierraTransformable1)(
+            )((_, _) => sierraTransformable1)(
               SourceMetadata(sierraTransformable1.sourceName))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
               sierraTransformable2
-            )(identity)(SourceMetadata(sierraTransformable2.sourceName))
+            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -381,7 +392,9 @@ class SierraItemMergerUpdaterServiceTest
   it("does not unlink an item if it receives an out of date unlink update") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val itemId = "i3000003"
 
@@ -409,12 +422,12 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
               sierraTransformable1
-            )(_ => sierraTransformable1)(
+            )((_, _) => sierraTransformable1)(
               SourceMetadata(sierraTransformable1.sourceName))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
               sierraTransformable2
-            )(identity)(SourceMetadata(sierraTransformable2.sourceName))
+            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -459,7 +472,9 @@ class SierraItemMergerUpdaterServiceTest
   it("does not update an item if it receives an update with an older date") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val id = "i6000006"
             val bibId = "b6000006"
@@ -476,7 +491,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(sierraRecord.id)(
               sierraRecord
-            )(identity)(SourceMetadata(sierraRecord.sourceName))
+            )((t, _) => t)(SourceMetadata(sierraRecord.sourceName))
 
             val oldItemRecord = sierraItemRecord(
               id = id,
@@ -498,7 +513,9 @@ class SierraItemMergerUpdaterServiceTest
   it("adds an item to the record if the bibId exists but has no itemData") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, Unit](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val bibId = "b7000007"
 
@@ -508,7 +525,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val f1 = hybridStore.updateRecord(sierraRecord.id)(
               sierraRecord
-            )(identity)(SourceMetadata(sierraRecord.sourceName))
+            )((t, _) => t)(SourceMetadata(sierraRecord.sourceName))
 
             val itemRecord = sierraItemRecord(
               id = "i7000007",
@@ -540,7 +557,9 @@ class SierraItemMergerUpdaterServiceTest
   it("returns a failed future if putting an item fails") {
     withLocalS3Bucket { bucket =>
       val table = Table(name = "doesnotexist", index = "missing")
-      withTypeVHS[SierraTransformable, Unit](bucket, table) { brokenStore =>
+      withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+        bucket,
+        table) { brokenStore =>
         withSierraUpdaterService(brokenStore) { brokenService =>
           val bibId = "b242"
 
