@@ -51,8 +51,7 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     idGetter: IdGetter[DynamoRow],
     versionGetter: VersionGetter[DynamoRow],
     updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow],
-    migrationH: Migration[DynamoRow, HybridRecord],
-    storageStrategy: StorageStrategy[T]
+    migrationH: Migration[DynamoRow, HybridRecord]
   ): Future[Unit] = {
 
     getObject[DynamoRow](id).flatMap {
@@ -87,8 +86,7 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     }
   }
 
-  def getRecord(id: String)(
-    implicit storageStrategy: StorageStrategy[T]): Future[Option[T]] =
+  def getRecord(id: String): Future[Option[T]] =
     getObject[HybridRecord](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
@@ -98,8 +96,7 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     versionUpdater: VersionUpdater[DynamoRow],
     idGetter: IdGetter[DynamoRow],
     versionGetter: VersionGetter[DynamoRow],
-    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow],
-    storageStrategy: StorageStrategy[T]
+    updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ) = {
 
     val futureUri = objectStore.put(vhsConfig.s3Config.bucketName)(
@@ -128,7 +125,6 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
 
   private def getObject[DynamoRow](id: String)(
     implicit dynamoFormat: DynamoFormat[DynamoRow],
-    storageStrategy: StorageStrategy[T],
     migrationH: Migration[DynamoRow, HybridRecord]
   ): Future[Option[VersionedHybridObject]] = {
 

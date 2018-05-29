@@ -5,15 +5,16 @@ import java.io.{ByteArrayInputStream, InputStream}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.StorageStrategy
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
+
 
 class StreamStoreVersionedHybridStoreTest
     extends FunSpec
@@ -24,18 +25,43 @@ class StreamStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  implicit val store: StorageStrategy[InputStream] =
-    StorageStrategy.streamStore
+  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   private def stringify(is: InputStream) =
     scala.io.Source.fromInputStream(is).mkString
+
+  def withStreamVHS[R](bucket: Bucket,
+                       table: Table,
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
+                        testWith: TestWith[VersionedHybridStore[InputStream, ObjectStore[InputStream]], R])(
+                        implicit objectStore: ObjectStore[InputStream]
+                      )
+  : R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+
+    val dynamoConfig =
+      DynamoConfig(table = table.name, index = Some(table.index))
+
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
+    )
+
+    val store = new VersionedHybridStore[InputStream, ObjectStore[InputStream]](
+      vhsConfig = vhsConfig,
+      objectStore = objectStore,
+      dynamoDbClient = dynamoDbClient
+    )
+
+    testWith(store)
+  }
 
   def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket,
                         Table,
                         VersionedHybridStore[InputStream, ObjectStore[InputStream]]),
-                       R]
-  ): R =
+                       R]): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withStreamVHS[R](bucket, table) { vhs =>

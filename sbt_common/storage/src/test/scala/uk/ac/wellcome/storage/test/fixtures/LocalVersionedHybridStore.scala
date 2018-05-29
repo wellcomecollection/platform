@@ -1,10 +1,8 @@
 package uk.ac.wellcome.storage.test.fixtures
 
-import java.io.InputStream
-
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.ObjectStore
@@ -17,7 +15,6 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDbVersioned
@@ -40,10 +37,9 @@ trait LocalVersionedHybridStore
                               table: Table,
                               globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[T, ObjectStore[T]], R])(
-    implicit encoder: Encoder[T],
-    decoder: Decoder[T],
-    objectStore: ObjectStore[T]
+    implicit objectStore: ObjectStore[T]
   ): R = {
+
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name, Some(table.index))
     val vhsConfig = VHSConfig(
@@ -53,59 +49,6 @@ trait LocalVersionedHybridStore
     )
 
     val store = new VersionedHybridStore[T, ObjectStore[T]](
-      vhsConfig = vhsConfig,
-      objectStore = objectStore,
-      dynamoDbClient = dynamoDbClient
-    )
-
-    testWith(store)
-  }
-
-  def withStreamVHS[R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
-    testWith: TestWith[VersionedHybridStore[InputStream, ObjectStore[InputStream]], R])(
-    implicit objectStore: ObjectStore[InputStream]
-  )
-    : R = {
-    val s3Config = S3Config(bucketName = bucket.name)
-
-    val dynamoConfig =
-      DynamoConfig(table = table.name, index = Some(table.index))
-
-    val vhsConfig = VHSConfig(
-      dynamoConfig = dynamoConfig,
-      s3Config = s3Config,
-      globalS3Prefix = globalS3Prefix
-    )
-
-    val store = new VersionedHybridStore[InputStream, ObjectStore[InputStream]](
-      vhsConfig = vhsConfig,
-      objectStore = objectStore,
-      dynamoDbClient = dynamoDbClient
-    )
-
-    testWith(store)
-  }
-
-  def withStringVHS[R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
-    testWith: TestWith[VersionedHybridStore[String, ObjectStore[String]], R])(
-                      implicit objectStore: ObjectStore[String]
-  ): R = {
-    val s3Config = S3Config(bucketName = bucket.name)
-
-    val dynamoConfig =
-      DynamoConfig(table = table.name, index = Some(table.index))
-
-    val vhsConfig = VHSConfig(
-      dynamoConfig = dynamoConfig,
-      s3Config = s3Config,
-      globalS3Prefix = globalS3Prefix
-    )
-
-    val store = new VersionedHybridStore[String, ObjectStore[String]](
       vhsConfig = vhsConfig,
       objectStore = objectStore,
       dynamoDbClient = dynamoDbClient

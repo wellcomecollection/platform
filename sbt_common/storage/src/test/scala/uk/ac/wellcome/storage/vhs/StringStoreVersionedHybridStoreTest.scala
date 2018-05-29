@@ -11,8 +11,9 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.type_classes.StorageStrategy
+import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 
+import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 
@@ -25,8 +26,33 @@ class StringStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  implicit val store: StorageStrategy[String] =
-    StorageStrategy.stringStore
+  implicit val storageBackend = new S3StorageBackend(s3Client)
+
+  def withStringVHS[R](bucket: Bucket,
+                       table: Table,
+                       globalS3Prefix: String = defaultGlobalS3Prefix)(
+                        testWith: TestWith[VersionedHybridStore[String, ObjectStore[String]], R])(
+                        implicit objectStore: ObjectStore[String]
+                      ): R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+
+    val dynamoConfig =
+      DynamoConfig(table = table.name, index = Some(table.index))
+
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
+    )
+
+    val store = new VersionedHybridStore[String, ObjectStore[String]](
+      vhsConfig = vhsConfig,
+      objectStore = objectStore,
+      dynamoDbClient = dynamoDbClient
+    )
+
+    testWith(store)
+  }
 
   def withS3StringStoreFixtures[R](
     testWith: TestWith[(Bucket,

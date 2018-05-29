@@ -1,6 +1,9 @@
 package uk.ac.wellcome.storage
 
+import java.io.InputStream
+
 import uk.ac.wellcome.storage.type_classes.StorageStrategy
+
 import scala.concurrent.{ExecutionContext, Future}
 
 
@@ -13,17 +16,9 @@ trait ObjectStore[T] {
     keyPrefix: KeyPrefix = KeyPrefix(""),
     keySuffix: KeySuffix = KeySuffix(""),
     userMetadata: Map[String, String] = Map()
-  )(
-    implicit
-      storageStrategy: StorageStrategy[T],
-      storageBackend: StorageBackend
   ): Future[ObjectLocation]
 
-  def get(objectLocation: ObjectLocation)(
-    implicit
-      storageStrategy: StorageStrategy[T],
-      storageBackend: StorageBackend
-  ): Future[T]
+  def get(objectLocation: ObjectLocation): Future[T]
 }
 
 object ObjectStore {
@@ -36,22 +31,20 @@ object ObjectStore {
   def apply[T](implicit store: ObjectStore[T]): ObjectStore[T] =
     store
 
-  def createObjectStore[T](
+  implicit def createObjectStore[T](
     put: ((String), (T, KeyPrefix, KeySuffix, Map[String, String]), (StorageStrategy[T])) =>
       Future[ObjectLocation],
     get: ((ObjectLocation), (StorageStrategy[T])) => Future[T]
   )(implicit
       storageStrategy: StorageStrategy[T],
-      storageBackend: StorageBackend
+      storageBackend: StorageBackend,
+      ec: ExecutionContext
   ): ObjectStore[T] = new ObjectStore[T] {
     def put(namespace: String)(
       t: T,
       keyPrefix: KeyPrefix = KeyPrefix(""),
       keySuffix: KeySuffix = KeySuffix(""),
       userMetadata: Map[String, String] = Map()
-    )(implicit
-        storageStrategy: StorageStrategy[T],
-        storageBackend: StorageBackend
     ): Future[ObjectLocation] = {
       val storageStream = storageStrategy.store(t)
 
@@ -72,13 +65,9 @@ object ObjectStore {
       stored.map(_ => location)
     }
 
-    def get(objectLocation: ObjectLocation)(
-      implicit
-        storageStrategy: StorageStrategy[T],
-        storageBackend: StorageBackend
-    ): Future[T] = {
-      val input = storageBackend.get(objectLocation)
-      input.map(storageStrategy.retrieve)
+    def get(objectLocation: ObjectLocation): Future[T] = {
+      val input: Future[InputStream] = storageBackend.get(objectLocation)
+      input.flatMap(input => Future.fromTry(storageStrategy.retrieve(input)))
     }
   }
 

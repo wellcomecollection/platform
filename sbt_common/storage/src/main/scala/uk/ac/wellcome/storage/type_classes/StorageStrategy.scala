@@ -49,6 +49,16 @@ object StorageStrategy {
         .flatMap(_.as[T].toTry)
     )
 
+  implicit def streamStorageStrategy: StorageStrategy[InputStream] = createStorageStrategy(
+    (t: InputStream) => streamStore.store(t),
+    (input: InputStream) => streamStore.retrieve(input)
+  )
+
+  implicit def stringStorageStrategy: StorageStrategy[String] = createStorageStrategy(
+    (t: String) => stringStore.store(t),
+    (input: InputStream) => stringStore.retrieve(input)
+  )
+
   private def hash(s: String) =
     MurmurHash3
       .stringHash(s, MurmurHash3.stringSeed)

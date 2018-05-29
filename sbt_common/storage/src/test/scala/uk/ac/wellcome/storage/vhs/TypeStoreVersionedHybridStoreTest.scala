@@ -1,15 +1,13 @@
 package uk.ac.wellcome.storage.vhs
 
-import java.io.{ByteArrayInputStream, InputStream}
-
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.type_classes.{StorageKey, StorageStrategy, StorageStream}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -32,19 +30,7 @@ class TypeStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  implicit val store: StorageStrategy[ExampleRecord] =
-    new StorageStrategy[ExampleRecord] {
-      def store(t: ExampleRecord): StorageStream = {
-        val key = StorageKey("key")
-        val input = new ByteArrayInputStream(toJson(t).get.getBytes)
-
-        StorageStream(input, key)
-      }
-
-      def retrieve(input: InputStream) =
-        fromJson[ExampleRecord](Source.fromInputStream(input).mkString)
-
-    }
+  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withS3TypeStoreFixtures[R](
     testWith: TestWith[
