@@ -12,8 +12,8 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |{
       |  "sourceIdentifier": {
       |      "identifierType": {
-      |        "id": "${IdentifierType("MiroImageNumber").id}",
-      |        "label": "${IdentifierType("MiroImageNumber").label}",
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
       |        "ontologyType": "IdentifierType"
       |      },
       |      "ontologyType": "Item",
@@ -22,8 +22,8 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  "identifiers": [
       |    {
       |      "identifierType": {
-      |        "id": "${IdentifierType("MiroImageNumber").id}",
-      |        "label": "${IdentifierType("MiroImageNumber").label}",
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
       |        "ontologyType": "IdentifierType"
       |      },
       |      "ontologyType": "Item",
@@ -56,7 +56,7 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
   )
 
   val identifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
   )

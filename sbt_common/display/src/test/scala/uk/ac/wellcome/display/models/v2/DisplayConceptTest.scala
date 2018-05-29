@@ -40,7 +40,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Concept as a DisplayConcept with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Concept",
       value = "lcsh/ehw"
     )
@@ -61,7 +61,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Period as a DisplayPeriod with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Period",
       value = "lcsh/zbm"
     )
@@ -82,7 +82,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Place as a DisplayPlace with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Place",
       value = "lcsh/axt"
     )

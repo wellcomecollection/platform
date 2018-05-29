@@ -231,7 +231,7 @@ class DisplayWorkV1SerialisationTest
 
   it("includes a list of identifiers on DisplayWorkV1") {
     val srcIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "Test1234"
     )

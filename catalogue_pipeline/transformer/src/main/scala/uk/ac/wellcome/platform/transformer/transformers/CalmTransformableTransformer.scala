@@ -24,14 +24,14 @@ class CalmTransformableTransformer
             UnidentifiedWork(
               title = Some("placeholder title"),
               sourceIdentifier = SourceIdentifier(
-                identifierType = IdentifierType("CALMAltRefNo"),
+                identifierType = IdentifierType("calm-altref-no"),
                 ontologyType = "Work",
                 value = "value"
               ),
               version = version,
               identifiers = List(
                 SourceIdentifier(
-                  identifierType = IdentifierType("CALMAltRefNo"),
+                  identifierType = IdentifierType("calm-altref-no"),
                   ontologyType = "Work",
                   value = "value"
                 ))

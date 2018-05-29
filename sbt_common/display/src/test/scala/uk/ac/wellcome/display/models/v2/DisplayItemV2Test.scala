@@ -19,7 +19,7 @@ class DisplayItemV2Test extends FunSpec with Matchers {
   }
 
   val identifier: SourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
   )

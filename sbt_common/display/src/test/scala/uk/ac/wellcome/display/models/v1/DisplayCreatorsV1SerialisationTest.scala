@@ -78,7 +78,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "hgfedcba",
             identifiers = List(
               SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "hv"
               )
@@ -91,7 +91,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "abcdefgh",
             identifiers = List(
               SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "uu"
               )
@@ -104,7 +104,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "blahbluh",
             identifiers = List(
               SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "uu"
               )

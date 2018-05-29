@@ -49,7 +49,7 @@ class SQSMessageReceiverTest
 
   val sourceIdentifier =
     SourceIdentifier(
-      identifierType = IdentifierType("CALMAltRefNo"),
+      identifierType = IdentifierType("calm-altref-no"),
       ontologyType = "Work",
       value = "value")
 
@@ -149,12 +149,12 @@ class SQSMessageReceiverTest
             val future = recordReceiver.receiveMessage(sierraMessage)
 
             val sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("SierraSystemNumber"),
+              identifierType = IdentifierType("sierra-system-number"),
               ontologyType = "Work",
               value = "b50050059"
             )
             val sierraIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("SierraIdentifier"),
+              identifierType = IdentifierType("sierra-identifier"),
               ontologyType = "Work",
               value = id
             )

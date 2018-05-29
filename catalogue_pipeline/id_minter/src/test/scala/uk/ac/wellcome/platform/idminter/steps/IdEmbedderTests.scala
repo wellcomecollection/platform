@@ -42,7 +42,7 @@ class IdEmbedderTests
 
   it("sets the canonicalId given by the IdentifierGenerator on the work") {
     val identifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "1234"
     )
@@ -87,13 +87,13 @@ class IdEmbedderTests
 
   it("mints identifiers for creators in work") {
     val workIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "1234"
     )
 
     val creatorIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Person",
       value = "1234"
     )
@@ -162,7 +162,7 @@ class IdEmbedderTests
 
   it("returns a failed future if the call to IdentifierGenerator fails") {
     val identifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "1234"
     )
@@ -194,7 +194,7 @@ class IdEmbedderTests
 
   it("adds canonicalIds to all items") {
     val identifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Item",
       value = "1234"
     )
@@ -206,7 +206,7 @@ class IdEmbedderTests
 
     val originalItem2 = UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("MiroImageNumber"),
+        identifierType = IdentifierType("miro-image-number"),
         ontologyType = "Item",
         value = "1235"
       ),
@@ -333,7 +333,7 @@ class IdEmbedderTests
 
       val ontologyType = "false capitals"
       val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("MiroImageNumber"),
+        identifierType = IdentifierType("miro-image-number"),
         ontologyType = ontologyType,
         "sydney"
       )
@@ -393,7 +393,7 @@ class IdEmbedderTests
       val ontologyType = "fictional cities"
 
       val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("MiroImageNumber"),
+        identifierType = IdentifierType("miro-image-number"),
         ontologyType = ontologyType,
         "king's landing"
       )

@@ -47,7 +47,7 @@ class SierraTransformableTransformer
             internal.UnidentifiedWork(
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
-                identifierType = IdentifierType("SierraSystemNumber"),
+                identifierType = IdentifierType("sierra-system-number"),
                 ontologyType = "Work",
                 value = addCheckDigit(
                   sierraBibData.id,

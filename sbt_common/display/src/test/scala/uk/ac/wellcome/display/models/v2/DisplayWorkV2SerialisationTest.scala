@@ -233,7 +233,7 @@ class DisplayWorkV2SerialisationTest
 
   it("includes a list of identifiers on DisplayWorkV2") {
     val srcIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Work",
       value = "Test1234"
     )

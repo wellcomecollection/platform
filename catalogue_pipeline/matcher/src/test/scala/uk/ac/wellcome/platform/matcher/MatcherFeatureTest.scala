@@ -34,7 +34,7 @@ class MatcherFeatureTest
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
               val identifier = SourceIdentifier(
-                identifierType = IdentifierType("SierraSystemNumber"),
+                identifierType = IdentifierType("sierra-system-number"),
                 "Work",
                 "id")
 

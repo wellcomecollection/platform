@@ -46,7 +46,7 @@ class IdMinterFeatureTest
 
               val identifier =
                 SourceIdentifier(
-                  identifierType = IdentifierType("MiroImageNumber"),
+                  identifierType = IdentifierType("miro-image-number"),
                   "Work",
                   miroID)
 
@@ -106,7 +106,7 @@ class IdMinterFeatureTest
 
               val identifier =
                 SourceIdentifier(
-                  identifierType = IdentifierType("MiroImageNumber"),
+                  identifierType = IdentifierType("miro-image-number"),
                   "Work",
                   miroId)
 

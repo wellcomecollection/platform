@@ -47,7 +47,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("SierraSystemNumber"),
+    identifierType = IdentifierType("sierra-system-number"),
     ontologyType = "Work",
     value = "b1234567"
   )
@@ -253,7 +253,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             canonicalId = "vs7jd5dx",
             identifiers = List(
               SourceIdentifier(
-                identifierType = IdentifierType("LCNames"),
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Person",
                 value = "v1"
               )
@@ -284,7 +284,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             List(
               DisplayIdentifierV2(
                 SourceIdentifier(
-                  identifierType = IdentifierType("LCNames"),
+                  identifierType = IdentifierType("lc-names"),
                   ontologyType = "Person",
                   value = "v1"
                 )
@@ -306,49 +306,49 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
   describe("correctly uses the WorksIncludes.identifiers include") {
     val publisherSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/boo",
       ontologyType = "Agent"
     )
 
     val contributorAgentSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/007",
       ontologyType = "Agent"
     )
 
     val contributorPersonSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/bla",
       ontologyType = "Agent"
     )
 
     val contributorOrganisationSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/bus",
       ontologyType = "Agent"
     )
 
     val itemSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       value = "miro/b0001",
       ontologyType = "Item"
     )
 
     val conceptSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCSH"),
+      identifierType = IdentifierType("lcsh"),
       value = "lcsh/bonds",
       ontologyType = "Concept"
     )
 
     val periodSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCSH"),
+      identifierType = IdentifierType("lcsh"),
       value = "lcsh/before",
       ontologyType = "Concept"
     )
 
     val placeSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCSH"),
+      identifierType = IdentifierType("lcsh"),
       value = "lcsh/bul",
       ontologyType = "Concept"
     )

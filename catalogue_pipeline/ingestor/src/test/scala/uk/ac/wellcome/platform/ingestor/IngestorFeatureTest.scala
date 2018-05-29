@@ -34,7 +34,7 @@ class IngestorFeatureTest
     "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
     val sourceIdentifier =
       SourceIdentifier(
-        identifierType = IdentifierType("MiroImageNumber"),
+        identifierType = IdentifierType("miro-image-number"),
         "Item",
         "5678")
 
@@ -68,7 +68,7 @@ class IngestorFeatureTest
     "reads a sierra identified work from the queue and ingests it in the v2 index only") {
     val sourceIdentifier =
       SourceIdentifier(
-        identifierType = IdentifierType("SierraSystemNumber"),
+        identifierType = IdentifierType("sierra-system-number"),
         "Item",
         "5678")
 

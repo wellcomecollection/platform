@@ -58,7 +58,7 @@ class SnapshotGeneratorFeatureTest
             canonicalId = s"rbfhv6b4$version",
             title = Some("Rumblings from a rambunctious rodent"),
             sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("MiroImageNumber"),
+              identifierType = IdentifierType("miro-image-number"),
               ontologyType = "work",
               value = "R0060400"
             ),

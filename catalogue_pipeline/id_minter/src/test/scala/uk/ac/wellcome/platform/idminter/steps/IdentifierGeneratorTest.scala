@@ -74,7 +74,7 @@ class IdentifierGeneratorTest
           .namedValues(
             fixtures.identifiersTable.column.CanonicalId -> "5678",
             fixtures.identifiersTable.column.SourceSystem -> IdentifierType(
-              "MiroImageNumber").id,
+              "miro-image-number").id,
             fixtures.identifiersTable.column.SourceId -> "1234",
             fixtures.identifiersTable.column.OntologyType -> "Work"
           )
@@ -82,7 +82,7 @@ class IdentifierGeneratorTest
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           "Work",
           "1234")
       )
@@ -97,7 +97,7 @@ class IdentifierGeneratorTest
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           "Work",
           "1234")
       )
@@ -121,7 +121,7 @@ class IdentifierGeneratorTest
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(
         CanonicalId = id,
-        SourceSystem = IdentifierType("MiroImageNumber").id,
+        SourceSystem = IdentifierType("miro-image-number").id,
         SourceId = "1234"
       )
     }
@@ -133,7 +133,7 @@ class IdentifierGeneratorTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           "Work",
           value = "1234"
         )
@@ -172,7 +172,7 @@ class IdentifierGeneratorTest
 
       val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType,
           miroId)
       )
@@ -193,7 +193,7 @@ class IdentifierGeneratorTest
       maybeIdentifier shouldBe defined
       maybeIdentifier.get shouldBe Identifier(
         CanonicalId = id,
-        SourceSystem = IdentifierType("MiroImageNumber").id,
+        SourceSystem = IdentifierType("miro-image-number").id,
         SourceId = miroId,
         OntologyType = ontologyType
       )

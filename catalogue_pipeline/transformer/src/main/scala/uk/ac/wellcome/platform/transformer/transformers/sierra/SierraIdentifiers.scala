@@ -18,7 +18,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
   def getIdentifiers(bibData: SierraBibData): List[SourceIdentifier] =
     List(
       SourceIdentifier(
-        identifierType = IdentifierType("SierraSystemNumber"),
+        identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
         value = addCheckDigit(
           bibData.id,
@@ -26,7 +26,7 @@ trait SierraIdentifiers extends SierraCheckDigits {
         )
       ),
       SourceIdentifier(
-        identifierType = IdentifierType("SierraIdentifier"),
+        identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",
         value = bibData.id
       )

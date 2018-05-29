@@ -47,7 +47,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("SierraSystemNumber"),
+    identifierType = IdentifierType("sierra-system-number"),
     ontologyType = "Work",
     value = "b1234567"
   )
@@ -173,7 +173,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     "extracts creators from a Work with a mixture of identified/Unidentifiable Contributors") {
     val canonicalId = "abcdefgh"
     val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       "Organisation",
       "EW")
     val work = IdentifiedWork(
@@ -213,7 +213,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         identifiers = Some(
           List(
             DisplayIdentifierV1(
-              identifierScheme = IdentifierType("LCNames").id,
+              identifierScheme = IdentifierType("lc-names").id,
               sourceIdentifier.value))),
         label = "Juniper Journals"
       )
@@ -406,31 +406,31 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
   describe("correctly uses the WorksIncludes.identifiers include") {
     val publisherSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/pp",
       ontologyType = "Agent"
     )
 
     val creatorAgentSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/pp",
       ontologyType = "Agent"
     )
 
     val creatorPersonSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/pri",
       ontologyType = "Agent"
     )
 
     val creatorOrganisationSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("LCNames"),
+      identifierType = IdentifierType("lc-names"),
       value = "lcnames/pri",
       ontologyType = "Agent"
     )
 
     val itemSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       value = "miro/p0001",
       ontologyType = "Item"
     )

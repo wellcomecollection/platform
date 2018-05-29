@@ -218,12 +218,12 @@ class SierraGenresTest extends FunSpec with Matchers {
 
     val expectedSourceIdentifiers = List(
       SourceIdentifier(
-        identifierType = IdentifierType("LCSH"),
+        identifierType = IdentifierType("lcsh"),
         value = "lcsh/123",
         ontologyType = "Concept"
       ),
       SourceIdentifier(
-        identifierType = IdentifierType("MESHId"),
+        identifierType = IdentifierType("mesh"),
         value = "mesh/456",
         ontologyType = "Concept"
       )

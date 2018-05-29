@@ -39,8 +39,8 @@ class IngestorWorkerService @Inject()(
   // * Sierra works are indexed only in the v2 index.
   // * Works from any other source are not expected so they are discarded.
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
-    val miroIdentifier = IdentifierType("MiroImageNumber")
-    val sierraIdentifier = IdentifierType("SierraSystemNumber")
+    val miroIdentifier = IdentifierType("miro-image-number")
+    val sierraIdentifier = IdentifierType("sierra-system-number")
     work.sourceIdentifier.identifierType.id match {
       case miroIdentifier.id =>
         List(

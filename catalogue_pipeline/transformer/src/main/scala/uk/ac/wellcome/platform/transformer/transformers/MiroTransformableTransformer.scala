@@ -25,7 +25,7 @@ class MiroTransformableTransformer
         UnidentifiedWork(
           title = Some(title),
           sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("MiroImageNumber"),
+            identifierType = IdentifierType("miro-image-number"),
             ontologyType = "Work",
             value = miroTransformable.sourceId),
           version = version,
@@ -152,7 +152,7 @@ class MiroTransformableTransformer
                              miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
       SourceIdentifier(
-        identifierType = IdentifierType("MiroImageNumber"),
+        identifierType = IdentifierType("miro-image-number"),
         ontologyType = "Work",
         value = miroId)
     )
@@ -185,7 +185,7 @@ class MiroTransformableTransformer
           case Some(s) =>
             s.map { id =>
               SourceIdentifier(
-                identifierType = IdentifierType("SierraSystemNumber"),
+                identifierType = IdentifierType("sierra-system-number"),
                 ontologyType = "Work",
                 value = s"b$id")
             }
@@ -208,7 +208,7 @@ class MiroTransformableTransformer
         .collect {
           case (Some(label), Some(value)) =>
             SourceIdentifier(
-              identifierType = IdentifierType("MiroLibraryReference"),
+              identifierType = IdentifierType("miro-library-reference"),
               ontologyType = "Work",
               value = s"$label $value"
             )
@@ -231,12 +231,12 @@ class MiroTransformableTransformer
     List(
       UnidentifiedItem(
         sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           "Item",
           miroId),
         identifiers = List(
           SourceIdentifier(
-            identifierType = IdentifierType("MiroImageNumber"),
+            identifierType = IdentifierType("miro-image-number"),
             "Item",
             miroId)
         ),

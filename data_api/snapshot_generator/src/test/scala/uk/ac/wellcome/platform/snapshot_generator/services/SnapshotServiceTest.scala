@@ -254,7 +254,7 @@ class SnapshotServiceTest
         val invalidWork = IdentifiedWork(
           canonicalId = "invalidwork",
           sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("SierraSystemNumber"),
+            identifierType = IdentifierType("sierra-system-number"),
             ontologyType = "Work",
             value = "123"),
           version = 1,

@@ -17,7 +17,7 @@ class DisplayGenreV2SerialisationTest
       canonicalId = "sqwyavpj",
       identifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("LCNames"),
+          identifierType = IdentifierType("lc-names"),
           value = "lcsh/sqw",
           ontologyType = "Period"
         )),

@@ -123,7 +123,7 @@ trait MatcherFixtures
 
   def aSierraSourceIdentifier(id: String) =
     SourceIdentifier(
-      identifierType = IdentifierType("SierraSystemNumber"),
+      identifierType = IdentifierType("sierra-system-number"),
       "Work",
       id)
 
