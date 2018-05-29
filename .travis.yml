@@ -18,8 +18,8 @@ install:
 
 cache:
   directories:
-    - ~/.sbt
-    - ~/.ivy2
+    - $HOME/.sbt
+    - $HOME/.ivy2/cache
     - project/target
     - target
 
@@ -28,8 +28,9 @@ cache:
     - catalogue_pipeline/common/target
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
-    - catalogue_pipeline/transformer/target
+    - catalogue_pipeline/matcher/target
     - catalogue_pipeline/recorder/target
+    - catalogue_pipeline/transformer/target
 
     - data_api/snapshot_generator/target
 
@@ -55,6 +56,12 @@ cache:
     - sierra_adapter/sierra_items_to_dynamo/target
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
+
+# Based on instructions from
+# https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
+before_cache:
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 script:
   - ./run_travis_task.py
