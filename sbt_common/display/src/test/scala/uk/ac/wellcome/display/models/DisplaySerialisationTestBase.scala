@@ -58,12 +58,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "url": "${license.url}"
     }"""
 
-  def identifier(identifier: SourceIdentifier) =
-    s"""{
-      "type": "Identifier",
-      "identifierScheme": "${identifier.identifierType.id}",
-      "value": "${identifier.value}"
-    }"""
+  def identifier(identifier: SourceIdentifier): String
 
   // Some of our fields can be optionally identified (e.g. creators).
   //

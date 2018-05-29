@@ -1,13 +1,12 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 
 class DisplaySubjectV2SerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil {
 
   it("serialises a DisplaySubject constructed from a Subject correctly") {

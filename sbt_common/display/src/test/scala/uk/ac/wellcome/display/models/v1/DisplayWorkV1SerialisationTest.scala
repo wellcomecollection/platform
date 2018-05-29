@@ -1,17 +1,14 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{
-  DisplaySerialisationTestBase,
-  WorksIncludes
-}
+import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV1SerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV1SerialisationTestBase
     with JsonMapperTestUtil
     with WorksUtil {
 
