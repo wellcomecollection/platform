@@ -12,12 +12,12 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
       bibDataId = "1782863",
       expectedIdentifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("SierraSystemNumber"),
+          identifierType = IdentifierType("sierra-system-number"),
           ontologyType = "Work",
           value = "b17828636"
         ),
         SourceIdentifier(
-          identifierType = IdentifierType("SierraIdentifier"),
+          identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Work",
           value = "1782863"
         )

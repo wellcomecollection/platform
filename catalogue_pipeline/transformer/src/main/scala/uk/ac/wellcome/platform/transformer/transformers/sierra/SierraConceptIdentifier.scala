@@ -29,8 +29,8 @@ object SierraConceptIdentifier {
 
       // These mappings are provided by the MARC spec.
       // https://www.loc.gov/marc/bibliographic/bd655.html
-      case Some("0") => Some(IdentifierType("LCSH"))
-      case Some("2") => Some(IdentifierType("MESHId"))
+      case Some("0") => Some(IdentifierType("lcsh"))
+      case Some("2") => Some(IdentifierType("mesh"))
       case Some("4") => None
 
       // For now we omit the other schemes as they're fairly unusual in

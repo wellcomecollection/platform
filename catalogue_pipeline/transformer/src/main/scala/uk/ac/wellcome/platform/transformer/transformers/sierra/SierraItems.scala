@@ -35,7 +35,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
     info(s"Attempting to transform ${sierraItemData.id}")
     internal.UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("SierraSystemNumber"),
+        identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
         value = addCheckDigit(
           sierraItemData.id,
@@ -44,7 +44,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
       ),
       identifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("SierraSystemNumber"),
+          identifierType = IdentifierType("sierra-system-number"),
           ontologyType = "Item",
           value = addCheckDigit(
             sierraItemData.id,
@@ -52,7 +52,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
           )
         ),
         SourceIdentifier(
-          identifierType = IdentifierType("SierraIdentifier"),
+          identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
           value = sierraItemData.id
         )

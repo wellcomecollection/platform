@@ -30,7 +30,7 @@ trait WorksUtil {
   )
 
   val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     "Work",
     "sourceIdentifierFromWorksUtil"
   )
@@ -98,7 +98,7 @@ trait WorksUtil {
       version = 1,
       identifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           "Work",
           "5678")
       ),
@@ -170,7 +170,7 @@ trait WorksUtil {
 
   def defaultItemSourceIdentifier = {
     SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       "Item",
       "M0000001")
   }

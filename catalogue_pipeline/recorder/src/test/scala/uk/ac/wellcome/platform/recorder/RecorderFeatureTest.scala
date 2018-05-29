@@ -31,7 +31,7 @@ class RecorderFeatureTest
     val title = "Not from Guildford after all"
 
     val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       value = "V0237865",
       ontologyType = "Work"
     )

@@ -5,7 +5,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 
 class IdentifierTypeTest extends FunSpec with Matchers {
   it("looks up an identifier type in the CSV") {
-    IdentifierType("MiroImageNumber") shouldBe IdentifierType(
+    IdentifierType("miro-image-number") shouldBe IdentifierType(
       id = "miro-image-number",
       label = "Miro image number"
     )

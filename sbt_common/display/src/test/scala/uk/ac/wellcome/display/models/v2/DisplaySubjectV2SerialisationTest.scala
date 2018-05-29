@@ -17,7 +17,7 @@ class DisplaySubjectV2SerialisationTest
       canonicalId = "p4xe8u22",
       identifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("LCNames"),
+          identifierType = IdentifierType("lc-names"),
           value = "lcsh/p4x",
           ontologyType = "Place"
         )),

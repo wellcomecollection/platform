@@ -48,8 +48,8 @@ class IdentifiedWorkTest
       |  "title": "title",
       |  "sourceIdentifier": {
       |      "identifierType": {
-      |        "id": "${IdentifierType("MiroImageNumber").id}",
-      |        "label": "${IdentifierType("MiroImageNumber").label}",
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
       |        "ontologyType": "IdentifierType"
       |      },
       |    "ontologyType": "Work",
@@ -59,8 +59,8 @@ class IdentifiedWorkTest
       |  "identifiers": [
       |    {
       |      "identifierType": {
-      |        "id": "${IdentifierType("MiroImageNumber").id}",
-      |        "label": "${IdentifierType("MiroImageNumber").label}",
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
       |        "ontologyType": "IdentifierType"
       |      },
       |      "ontologyType": "Work",
@@ -180,8 +180,8 @@ class IdentifiedWorkTest
       |      "canonicalId": "canonicalId",
       |      "sourceIdentifier": {
       |        "identifierType": {
-      |          "id": "${IdentifierType("MiroImageNumber").id}",
-      |          "label": "${IdentifierType("MiroImageNumber").label}",
+      |          "id": "${IdentifierType("miro-image-number").id}",
+      |          "label": "${IdentifierType("miro-image-number").label}",
       |          "ontologyType": "IdentifierType"
       |        },
       |        "ontologyType": "Item",
@@ -190,8 +190,8 @@ class IdentifiedWorkTest
       |      "identifiers": [
       |        {
       |          "identifierType": {
-      |            "id": "${IdentifierType("MiroImageNumber").id}",
-      |            "label": "${IdentifierType("MiroImageNumber").label}",
+      |            "id": "${IdentifierType("miro-image-number").id}",
+      |            "label": "${IdentifierType("miro-image-number").label}",
       |            "ontologyType": "IdentifierType"
       |          },
       |          "ontologyType": "Item",
@@ -246,13 +246,13 @@ class IdentifiedWorkTest
   )
 
   val workIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Work",
     value = "value"
   )
 
   val itemIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
   )

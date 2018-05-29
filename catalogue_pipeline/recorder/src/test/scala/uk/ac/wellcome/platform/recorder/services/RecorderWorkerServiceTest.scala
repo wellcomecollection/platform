@@ -37,7 +37,7 @@ class RecorderWorkerServiceTest
   val title = "Whose umbrella did I find?"
 
   val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("MiroImageNumber"),
+    identifierType = IdentifierType("miro-image-number"),
     value = "U8634924",
     ontologyType = "Work"
   )

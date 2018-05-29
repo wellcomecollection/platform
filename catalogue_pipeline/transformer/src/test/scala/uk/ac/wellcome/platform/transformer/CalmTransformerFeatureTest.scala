@@ -66,7 +66,7 @@ class CalmTransformerFeatureTest
                 snsMessages.size should be >= 1
 
                 val sourceIdentifier = SourceIdentifier(
-                  identifierType = IdentifierType("CALMAltRefNo"),
+                  identifierType = IdentifierType("calm-altref-no"),
                   ontologyType = "Work",
                   value = "value"
                 )

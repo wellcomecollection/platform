@@ -394,7 +394,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "Test1234"
         )
@@ -405,7 +405,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
         )
 
         val identifier2 = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "DTest5678"
         )
@@ -460,7 +460,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "Test1234"
         )

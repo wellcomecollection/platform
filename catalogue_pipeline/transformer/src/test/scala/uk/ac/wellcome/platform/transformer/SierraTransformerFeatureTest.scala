@@ -68,13 +68,13 @@ class SierraTransformerFeatureTest
                 snsMessages.size should be >= 1
 
                 val sourceIdentifier = SourceIdentifier(
-                  identifierType = IdentifierType("SierraSystemNumber"),
+                  identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
                   value = "b10010014"
                 )
 
                 val sierraIdentifier = SourceIdentifier(
-                  identifierType = IdentifierType("SierraIdentifier"),
+                  identifierType = IdentifierType("sierra-identifier"),
                   ontologyType = "Work",
                   value = id
                 )

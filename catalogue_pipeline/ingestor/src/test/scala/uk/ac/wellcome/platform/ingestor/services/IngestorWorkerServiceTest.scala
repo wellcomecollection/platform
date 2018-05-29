@@ -40,7 +40,7 @@ class IngestorWorkerServiceTest
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
     val miroSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("MiroImageNumber"),
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "M000765"
     )
@@ -68,7 +68,7 @@ class IngestorWorkerServiceTest
 
   it("inserts an Sierra identified Work only into the v2 index") {
     val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("SierraSystemNumber"),
+      identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Work",
       value = "b1027467"
     )
@@ -96,7 +96,7 @@ class IngestorWorkerServiceTest
 
   it("fails inserting a non sierra or miro identified work") {
     val calmSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("CALMAltRefNo"),
+      identifierType = IdentifierType("calm-altref-no"),
       ontologyType = "Work",
       value = "MS/237"
     )
@@ -110,7 +110,7 @@ class IngestorWorkerServiceTest
 
           whenReady(future.failed) { ex =>
             ex shouldBe a[GracefulFailureException]
-            ex.getMessage shouldBe s"Cannot ingest work with identifierType: ${IdentifierType("CALMAltRefNo")}"
+            ex.getMessage shouldBe s"Cannot ingest work with identifierType: ${IdentifierType("calm-altref-no")}"
           }
         }
       }
@@ -136,7 +136,7 @@ class IngestorWorkerServiceTest
         )
 
         val miroSourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "B000675"
         )

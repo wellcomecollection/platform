@@ -44,13 +44,13 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
           SourceId = "A tangerine",
-          SourceSystem = IdentifierType("MiroImageNumber").id,
+          SourceSystem = IdentifierType("miro-image-number").id,
           OntologyType = "t-t-t-turtles"
         )
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           identifier.OntologyType,
           value = identifier.SourceId
         )
@@ -69,14 +69,14 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
           SourceId = "A tangerine",
-          SourceSystem = IdentifierType("MiroImageNumber").id,
+          SourceSystem = IdentifierType("miro-image-number").id,
           OntologyType = "t-t-t-turtles"
         )
 
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("MiroImageNumber"),
+          identifierType = IdentifierType("miro-image-number"),
           identifier.OntologyType,
           value = "not_an_existing_value"
         )
@@ -98,7 +98,7 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A provision of porpoises",
           OntologyType = "Work",
-          SourceSystem = IdentifierType("MiroImageNumber").id,
+          SourceSystem = IdentifierType("miro-image-number").id,
           SourceId = "A picture of pangolins"
         )
         fixtures.identifiersDao.saveIdentifier(identifier)
@@ -108,7 +108,7 @@ class IdentifiersDaoTest
             .where
             .eq(
               fixtures.identifiersTable.i.SourceSystem,
-              IdentifierType("MiroImageNumber").id)
+              IdentifierType("miro-image-number").id)
             .and
             .eq(
               fixtures.identifiersTable.i.CanonicalId,
