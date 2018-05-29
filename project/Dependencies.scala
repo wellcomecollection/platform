@@ -24,11 +24,6 @@ object Dependencies {
   }
 
   // External Library dependency groups
-  val akkaDependencies: Seq[ModuleID] = Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "com.typesafe.akka" %% "akka-stream" % versions.akka
-  )
-
   val dynamoDependencies: Seq[ModuleID] = Seq(
     "com.amazonaws" % "aws-java-sdk-dynamodb" % versions.aws,
     "com.gu" %% "scanamo" % versions.scanamo
@@ -105,8 +100,10 @@ object Dependencies {
     testDependencies ++
       loggingDependencies ++
       guiceDependencies ++
-      akkaDependencies ++
-      circeDependencies
+      circeDependencies ++ Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
+    "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
+  )
 
   val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
 
@@ -126,7 +123,10 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
   ) ++ dynamoDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies
+  val finatraAkkaDependencies = Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-stream" % versions.akka
+  ) ++ finatraDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
