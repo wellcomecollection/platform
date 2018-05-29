@@ -4,5 +4,5 @@ import uk.ac.wellcome.display.models.v2.DisplayV2SerialisationTestBase
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
 trait ApiV2WorksTestBase
-  extends ApiWorksTestBase
+    extends ApiWorksTestBase
     with DisplayV2SerialisationTestBase

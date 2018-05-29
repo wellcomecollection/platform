@@ -5,7 +5,9 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
 
-class ApiErrorsTest extends ApiWorksTestBase with DisplayV1SerialisationTestBase {
+class ApiErrorsTest
+    extends ApiWorksTestBase
+    with DisplayV1SerialisationTestBase {
 
   it(
     "returns a BadRequest error when malformed query parameters are presented") {

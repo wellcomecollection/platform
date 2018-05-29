@@ -4,7 +4,8 @@ import org.scalatest.Suite
 import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
 
-trait DisplayV1SerialisationTestBase extends DisplaySerialisationTestBase { this: Suite =>
+trait DisplayV1SerialisationTestBase extends DisplaySerialisationTestBase {
+  this: Suite =>
   def identifier(identifier: SourceIdentifier) =
     s"""{
       "type": "Identifier",

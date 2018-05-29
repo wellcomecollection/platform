@@ -20,6 +20,7 @@ case class DisplayIdentifierV2(
 object DisplayIdentifierV2 {
   def apply(sourceIdentifier: SourceIdentifier): DisplayIdentifierV2 =
     DisplayIdentifierV2(
-      identifierType = DisplayIdentifierType(identifierType = sourceIdentifier.identifierType),
+      identifierType = DisplayIdentifierType(
+        identifierType = sourceIdentifier.identifierType),
       value = sourceIdentifier.value)
 }

@@ -3,7 +3,11 @@ package uk.ac.wellcome.display.models.v1
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.internal.{IdentifiedItem, IdentifiedWork, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedItem,
+  IdentifiedWork,
+  PhysicalLocation
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayLocationsV1SerialisationTest
