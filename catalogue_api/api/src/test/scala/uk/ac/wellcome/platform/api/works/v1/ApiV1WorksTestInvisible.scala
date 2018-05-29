@@ -6,7 +6,7 @@ import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
-class ApiV1WorksTestInvisible extends ApiWorksTestBase {
+class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withApiFixtures(apiVersion = ApiVersions.v1) {

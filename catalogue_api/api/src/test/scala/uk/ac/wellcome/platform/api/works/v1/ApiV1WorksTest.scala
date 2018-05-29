@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
-class ApiV1WorksTest extends ApiWorksTestBase {
+class ApiV1WorksTest extends ApiV1WorksTestBase {
 
   it("returns a list of works") {
     withApiFixtures(ApiVersions.v1) {
