@@ -270,7 +270,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
         ontologyType = "Concept"
       ),
       SourceIdentifier(
-        identifierType = IdentifierType("mesh"),
+        identifierType = IdentifierType("nlm-mesh"),
         value = "mesh/456",
         ontologyType = "Concept"
       )

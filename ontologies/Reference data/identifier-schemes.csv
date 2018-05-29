@@ -8,7 +8,7 @@ calm-altref-no,CALM alter no
 lc-gmgpc,Library of Congress Thesaurus for Graphic Materials
 lc-subjects,Library of Congress Subject Headings (LCSH)
 lc-names,Library of Congress Name authority records
-mesh,MESH identifier
+nlm-mesh,Medical Subject Headings (MESH) identifier
 calm-record-id,CALM record identifier
 preservica-guid,Perservica GUID
 calm-authority-code,CALM authority code
