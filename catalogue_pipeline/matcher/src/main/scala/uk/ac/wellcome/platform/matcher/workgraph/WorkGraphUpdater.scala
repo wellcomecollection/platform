@@ -2,40 +2,42 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
+import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.matcher.WorkNode
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
 import scala.collection.immutable.Iterable
 
 object WorkGraphUpdater {
+  def update(workUpdate: WorkUpdate,
+             existingGraph: WorkGraph): WorkGraph = {
+    val existingVersion = existingGraph.nodes.find(_.workId == workUpdate.workId) match {
+      case Some(lw) => lw.version
+      case None => 0
+    }
 
-  // Given an update to an individual node, and the existing graph,
-  // return the graph that comes from applying this update.
-  def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
+    if (existingVersion >= workUpdate.version) {
+      throw GracefulFailureException(new RuntimeException("Not processing old work update"))
+    }
 
-    // First we get every node except the updated node -- the edges coming
-    // from these nodes won't be changing.
-    val unchangedNodes: Set[WorkNode] = existingGraph.nodes
-      .filterNot { _.id == workUpdate.id }
+    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
+      workUpdate.workId,
+      existingGraph.nodes)
 
-    val unchangedEdges = unchangedNodes
-      .flatMap { node =>
-        toEdges(node.id, node.referencedWorkIds)
-      }
+    val nodeVersions = filteredLinkedWorks.map { linkedWork =>
+      (linkedWork.workId, linkedWork.version)
+    }.toMap + (workUpdate.workId -> workUpdate.version)
 
-    // Then we add the edges from the updated node.
-    val updatedEdges =
-      toEdges(workUpdate.id, workUpdate.referencedWorkIds)
-    val edges = unchangedEdges ++ updatedEdges
+    val edges = filteredLinkedWorks.flatMap(linkedWork => {
+      toEdges(linkedWork.workId, linkedWork.linkedIds)
+    }) ++ toEdges(workUpdate.workId, workUpdate.referencedWorkIds)
 
-    // And we get all the IDs from the existing graph, plus anything new.
-    val nodeIds = existingGraph.nodes
-      .flatMap { node =>
-        allNodes(node)
-      } + workUpdate.id
+    val nodes = existingGraph.nodes.flatMap(linkedWork => {
+      allNodes(linkedWork)
+    }) + workUpdate.workId
 
-    // Now we construct a graph with ScalaGraph, iterate over the connected
-    // components, and extract the nodes from each component.
-    val g = Graph.from(edges = edges, nodes = nodeIds)
+
+    val g = Graph.from(edges = edges, nodes = nodes)
 
     def adjacentNodeIds(n: g.NodeT) = {
       n.diSuccessors.map(_.value).toList.sorted
@@ -45,24 +47,26 @@ object WorkGraphUpdater {
       g.componentTraverser()
         .flatMap(component => {
           val nodeIds = component.nodes.map(_.value).toList
-          val componentId = nodeIds.sorted.mkString("+")
+          val componentIdentifier = nodeIds.sorted.mkString("+")
           component.nodes.map(node => {
-            WorkNode(
-              id = node.value,
-              referencedWorkIds = adjacentNodeIds(node),
-              componentId = componentId
-            )
+            WorkNode(node.value, nodeVersions.getOrElse(node.value, 0), adjacentNodeIds(node), componentIdentifier)
           })
         })
         .toSet
     )
   }
 
-  private def allNodes(workNode: WorkNode) = {
-    workNode.id +: workNode.referencedWorkIds
+  private def allNodes(linkedWork: WorkNode) = {
+    linkedWork.workId +: linkedWork.linkedIds
   }
 
   private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
     linkedWorkIds.map(workId ~> _)
+  }
+
+  private def existingGraphWithoutUpdatedNode(
+    workId: String,
+    linkedWorksList: Set[WorkNode]) = {
+    linkedWorksList.filterNot(_.workId == workId)
   }
 }

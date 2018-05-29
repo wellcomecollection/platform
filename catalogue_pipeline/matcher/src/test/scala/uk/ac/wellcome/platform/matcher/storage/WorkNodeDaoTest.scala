@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{
-  BatchGetItemRequest,
-  PutItemRequest,
-  QueryRequest
-}
+import com.amazonaws.services.dynamodbv2.model.{BatchGetItemRequest, PutItemRequest, QueryRequest}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -13,8 +9,8 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.WorkNode
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class WorkNodeDaoTest
@@ -37,6 +33,7 @@ class WorkNodeDaoTest
 
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
+<<<<<<< HEAD:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/WorkNodeDaoTest.scala
         withWorkNodeDao(table) { workNodeDao =>
           val workNodeA = WorkNode("A", List("B"), "A+B")
           val workNodeB = WorkNode("B", Nil, "A+B")
@@ -45,6 +42,17 @@ class WorkNodeDaoTest
 
           whenReady(workNodeDao.get(Set("A", "B"))) { workNodeSet =>
             workNodeSet shouldBe Set(workNodeA, workNodeB)
+=======
+        withLinkedWorkDao(table) { linkedWorkDao =>
+          val existingLinkedWorkA: LinkedWork =
+            LinkedWork("A", 1, List("B"), "A+B")
+          val existingLinkedWorkB: LinkedWork = LinkedWork("B", 0, Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+
+          whenReady(linkedWorkDao.get(Set("A", "B"))) { linkedWork =>
+            linkedWork shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+>>>>>>> works are versioned:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/LinkedWorkDaoTest.scala
           }
         }
       }
@@ -95,6 +103,7 @@ class WorkNodeDaoTest
 
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
+<<<<<<< HEAD:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/WorkNodeDaoTest.scala
         withWorkNodeDao(table) { workNodeDao =>
           val workNodeA = WorkNode("A", List("B"), "A+B")
           val workNodeB = WorkNode("B", Nil, "A+B")
@@ -103,6 +112,17 @@ class WorkNodeDaoTest
 
           whenReady(workNodeDao.getByComponentIds(Set("A+B"))) { workNodeSet =>
             workNodeSet shouldBe Set(workNodeA, workNodeB)
+=======
+        withLinkedWorkDao(table) { matcherGraphDao =>
+          val existingLinkedWorkA: LinkedWork =
+            LinkedWork("A", 1, List("B"), "A+B")
+          val existingLinkedWorkB: LinkedWork = LinkedWork("B", 0, Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+
+          whenReady(matcherGraphDao.getBySetIds(Set("A+B"))) { linkedWorks =>
+            linkedWorks shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+>>>>>>> works are versioned:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/LinkedWorkDaoTest.scala
           }
         }
       }
@@ -144,12 +164,21 @@ class WorkNodeDaoTest
   describe("Insert into dynamo") {
     it("puts a WorkNode") {
       withLocalDynamoDbTable { table =>
+<<<<<<< HEAD:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/WorkNodeDaoTest.scala
         withWorkNodeDao(table) { workNodeDao =>
           val workNode = WorkNode("A", List("B"), "A+B")
           whenReady(workNodeDao.put(workNode)) { _ =>
             val savedWorkNode =
               Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
             savedWorkNode shouldBe Some(Right(workNode))
+=======
+        withLinkedWorkDao(table) { linkedWordDao =>
+          val work = LinkedWork("A", 1, List("B"), "A+B")
+          whenReady(linkedWordDao.put(work)) { _ =>
+            val savedLinkedWork = Scanamo.get[LinkedWork](dynamoDbClient)(
+              table.name)('workId -> "A")
+            savedLinkedWork shouldBe Some(Right(work))
+>>>>>>> works are versioned:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/LinkedWorkDaoTest.scala
           }
         }
       }
@@ -165,7 +194,11 @@ class WorkNodeDaoTest
           dynamoDbClient,
           DynamoConfig(table.name, Some(table.index)))
 
+<<<<<<< HEAD:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/WorkNodeDaoTest.scala
         whenReady(workNodeDao.put(WorkNode("A", List("B"), "A+B")).failed) {
+=======
+        whenReady(linkedWordDao.put(LinkedWork("A", 1, List("B"), "A+B")).failed) {
+>>>>>>> works are versioned:catalogue_pipeline/matcher/src/test/scala/uk/ac/wellcome/platform/matcher/storage/LinkedWorkDaoTest.scala
           failedException =>
             failedException shouldBe expectedException
         }

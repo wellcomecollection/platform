@@ -7,14 +7,14 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.matcher.MatchedIdentifiers
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
 import scala.concurrent.Future
 
-class LinkedWorkMatcherTest
+class WorkNodeMatcherTest
     extends FunSpec
     with Matchers
     with MatcherFixtures
@@ -30,13 +30,13 @@ class LinkedWorkMatcherTest
             identifiersList =>
               val workId = "sierra-system-number/id"
               identifiersList shouldBe
-                LinkedWorksIdentifiersList(
-                  Set(MatchedIdentifiers(Set(workId))))
+                WorkGraphIdentifiersList(Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('id -> workId)
                 .map(_.right.get)
-              savedLinkedWork shouldBe Some(WorkNode(workId, Nil, workId))
+
+              savedLinkedWork shouldBe Some(WorkNode(workId, 1, Nil, workId))
           }
         }
       }
@@ -48,26 +48,29 @@ class LinkedWorkMatcherTest
     withLocalDynamoDbTable { table =>
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-          val linkedIdentifier = aSierraSourceIdentifier("B")
-          val aIdentifier = aSierraSourceIdentifier("A")
+          val identifierA = aSierraSourceIdentifier("A")
+          val identifierB = aSierraSourceIdentifier("B")
           val work = anUnidentifiedSierraWork.copy(
-            sourceIdentifier = aIdentifier,
-            identifiers = List(aIdentifier, linkedIdentifier))
+            sourceIdentifier = identifierA,
+            identifiers = List(identifierA, identifierB))
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              LinkedWorksIdentifiersList(Set(MatchedIdentifiers(
-                Set("sierra-system-number/A", "sierra-system-number/B"))))
+            WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+                Set(
+                  WorkIdentifier("sierra-system-number/A", 1),
+                  WorkIdentifier("sierra-system-number/B", 0)))))
 
             val savedWorkNodes = Scanamo
               .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
+
             savedWorkNodes should contain theSameElementsAs List(
               WorkNode(
-                "sierra-system-number/A",
+                "sierra-system-number/A", 1,
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B"),
               WorkNode(
-                "sierra-system-number/B",
+                "sierra-system-number/B", 0,
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B")
             )
@@ -83,45 +86,55 @@ class LinkedWorkMatcherTest
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
           val existingWorkA = WorkNode(
             "sierra-system-number/A",
+            1,
             List("sierra-system-number/B"),
             "sierra-system-number/A+sierra-system-number/B")
           val existingWorkB = WorkNode(
             "sierra-system-number/B",
+            1,
             Nil,
             "sierra-system-number/A+sierra-system-number/B")
+          val existingWorkC = WorkNode(
+            "sierra-system-number/C",
+            1,
+            Nil,
+            "sierra-system-number/C")
           Scanamo.put(dynamoDbClient)(table.name)(existingWorkA)
           Scanamo.put(dynamoDbClient)(table.name)(existingWorkB)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkC)
 
           val bIdentifier = aSierraSourceIdentifier("B")
           val cIdentifier = aSierraSourceIdentifier("C")
           val work = anUnidentifiedSierraWork.copy(
             sourceIdentifier = bIdentifier,
+            version = 2,
             identifiers = List(bIdentifier, cIdentifier))
 
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              LinkedWorksIdentifiersList(
+              WorkGraphIdentifiersList(
                 Set(
                   MatchedIdentifiers(
                     Set(
-                      "sierra-system-number/A",
-                      "sierra-system-number/B",
-                      "sierra-system-number/C"))))
+                      WorkIdentifier("sierra-system-number/A", 1),
+                      WorkIdentifier("sierra-system-number/B", 2),
+                      WorkIdentifier("sierra-system-number/C", 1)))))
 
-            val savedWorkNodes = Scanamo
+            val savedNodes = Scanamo
               .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
-            savedWorkNodes should contain theSameElementsAs List(
+
+            savedNodes should contain theSameElementsAs List(
               WorkNode(
-                "sierra-system-number/A",
+                "sierra-system-number/A", 1,
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
               WorkNode(
-                "sierra-system-number/B",
+                "sierra-system-number/B", 2,
                 List("sierra-system-number/C"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
               WorkNode(
-                "sierra-system-number/C",
+                "sierra-system-number/C", 1,
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
             )

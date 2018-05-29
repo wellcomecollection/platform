@@ -14,7 +14,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
+import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -100,8 +100,8 @@ trait MatcherFixtures
   }
 
   def withLinkedWorkMatcher[R](table: Table, workGraphStore: WorkGraphStore)(
-    testWith: TestWith[LinkedWorkMatcher, R]): R = {
-    val linkedWorkMatcher = new LinkedWorkMatcher(workGraphStore)
+    testWith: TestWith[WorkMatcher, R]): R = {
+    val linkedWorkMatcher = new WorkMatcher(workGraphStore)
     testWith(linkedWorkMatcher)
   }
 

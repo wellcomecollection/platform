@@ -7,4 +7,10 @@ package uk.ac.wellcome.models.matcher
 // For example, if the matcher sends MatchedIdentifiers({A, B, C}), it
 // means the merger should combine these into a single work.
 //
-case class MatchedIdentifiers(identifiers: Set[String])
+case class MatchedIdentifiers(identifiers: Set[WorkIdentifier])
+
+case object MatchedIdentifiers {
+  def apply(workNodes: Set[WorkNode]): MatchedIdentifiers =
+    MatchedIdentifiers(workNodes.map(WorkIdentifier(_)))
+
+}

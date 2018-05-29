@@ -12,12 +12,12 @@ class WorkGraphStore @Inject()(
 ) extends Logging {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {
-    val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.id
+    val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.workId
 
     for {
       directlyAffectedWorks <- workNodeDao.get(directlyAffectedWorkIds)
       affectedComponentIds = directlyAffectedWorks.map(workNode =>
-        workNode.componentId)
+        workNode.setId)
       affectedWorks <- workNodeDao.getByComponentIds(affectedComponentIds)
     } yield WorkGraph(affectedWorks)
   }
