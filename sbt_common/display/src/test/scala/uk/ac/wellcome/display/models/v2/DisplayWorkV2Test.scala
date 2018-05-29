@@ -336,19 +336,19 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
 
     val conceptSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lcsh"),
+      identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/bonds",
       ontologyType = "Concept"
     )
 
     val periodSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lcsh"),
+      identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/before",
       ontologyType = "Concept"
     )
 
     val placeSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lcsh"),
+      identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/bul",
       ontologyType = "Concept"
     )

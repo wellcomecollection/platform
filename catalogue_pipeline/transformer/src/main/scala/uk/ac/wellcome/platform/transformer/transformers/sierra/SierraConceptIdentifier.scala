@@ -29,7 +29,7 @@ object SierraConceptIdentifier {
 
       // These mappings are provided by the MARC spec.
       // https://www.loc.gov/marc/bibliographic/bd655.html
-      case Some("0") => Some(IdentifierType("lcsh"))
+      case Some("0") => Some(IdentifierType("lc-subjects"))
       case Some("2") => Some(IdentifierType("mesh"))
       case Some("4") => None
 

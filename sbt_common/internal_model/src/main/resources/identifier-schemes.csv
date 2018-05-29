@@ -6,7 +6,7 @@ sierra-identifier,Sierra identifier
 calm-ref-no,CALM ref no
 calm-altref-no,CALM alter no
 lc-gmgpc,Library of Congress Thesaurus for Graphic Materials
-lcsh,Library of Congress Subject Headings
+lc-subjects,Library of Congress Subject Headings (LCSH)
 lc-names,Library of Congress Name authority records
 mesh,MESH identifier
 calm-record-id,CALM record identifier
