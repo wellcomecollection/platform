@@ -7,7 +7,11 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Agent"
 )
-sealed trait DisplayAbstractAgentV2
+sealed trait DisplayAbstractAgentV2 {
+  val id: Option[String]
+  val identifiers: Option[List[DisplayIdentifierV2]]
+  val label: String
+}
 
 @ApiModel(
   value = "Agent"
@@ -22,8 +26,8 @@ case class DisplayAgentV2(
 ) extends DisplayAbstractAgentV2
 
 case object DisplayAbstractAgentV2 {
-  def apply(
-    displayableAgent: Displayable[AbstractAgent]): DisplayAbstractAgentV2 =
+  def apply(displayableAgent: Displayable[AbstractAgent],
+            includesIdentifiers: Boolean): DisplayAbstractAgentV2 =
     displayableAgent match {
       case Unidentifiable(a: Agent) =>
         DisplayAgentV2(
@@ -34,16 +38,23 @@ case object DisplayAbstractAgentV2 {
       case Identified(a: Agent, id, identifiers) =>
         DisplayAgentV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           label = a.label
         )
       case Identified(p: Person, id, identifiers) =>
         DisplayPersonV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           label = p.label,
           prefix = p.prefix,
-          numeration = p.numeration)
+          numeration = p.numeration
+        )
       case Unidentifiable(p: Person) =>
         DisplayPersonV2(
           id = None,
@@ -54,7 +65,10 @@ case object DisplayAbstractAgentV2 {
       case Identified(o: Organisation, id, identifiers) =>
         DisplayOrganisationV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifierV2(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           o.label)
       case Unidentifiable(o: Organisation) =>
         DisplayOrganisationV2(id = None, identifiers = None, label = o.label)

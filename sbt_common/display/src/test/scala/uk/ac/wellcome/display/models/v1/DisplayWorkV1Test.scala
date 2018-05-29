@@ -200,7 +200,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       )
     )
 
-    val displayWork = DisplayWorkV1(work)
+    val displayWork =
+      DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
     displayWork.creators shouldBe List(
       DisplayPersonV1(
         id = None,
@@ -401,5 +402,148 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     }
 
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
+  }
+
+  describe("correctly uses the WorksIncludes.identifiers include") {
+    val publisherSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCNames"),
+      value = "lcnames/pp",
+      ontologyType = "Agent"
+    )
+
+    val creatorAgentSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCNames"),
+      value = "lcnames/pp",
+      ontologyType = "Agent"
+    )
+
+    val creatorPersonSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCNames"),
+      value = "lcnames/pri",
+      ontologyType = "Agent"
+    )
+
+    val creatorOrganisationSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("LCNames"),
+      value = "lcnames/pri",
+      ontologyType = "Agent"
+    )
+
+    val itemSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("MiroImageNumber"),
+      value = "miro/p0001",
+      ontologyType = "Item"
+    )
+
+    val work = IdentifiedWork(
+      canonicalId = "pt5vupg4",
+      title = Some("Pouncing pugs play in pipes"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      contributors = List(
+        Contributor(
+          agent = Identified(
+            Agent(label = "Purple Penelope"),
+            canonicalId = "p72ujfbe",
+            identifiers = List(creatorAgentSourceIdentifier)
+          ),
+          roles = List()
+        ),
+        Contributor(
+          agent = Identified(
+            Organisation(label = "Pretty Prints"),
+            canonicalId = "pqcmakdp",
+            identifiers = List(creatorOrganisationSourceIdentifier)
+          ),
+          roles = List()
+        ),
+        Contributor(
+          agent = Identified(
+            Person(label = "Private Paul"),
+            canonicalId = "pcynevb6",
+            identifiers = List(creatorPersonSourceIdentifier)
+          ),
+          roles = List()
+        )
+      ),
+      publishers = List(
+        Identified(
+          Agent(label = "Percy Publisher"),
+          canonicalId = "p6gxycfb",
+          identifiers = List(publisherSourceIdentifier)
+        )
+      ),
+      items = List(
+        IdentifiedItem(
+          canonicalId = "pwaazubr",
+          sourceIdentifier = itemSourceIdentifier,
+          identifiers = List(itemSourceIdentifier)
+        )
+      ),
+      version = 1
+    )
+
+    describe("omits identifiers if WorksIncludes.identifiers is false") {
+      val displayWork = DisplayWorkV1(work, includes = WorksIncludes())
+
+      it("the top-level Work") {
+        displayWork.identifiers shouldBe None
+      }
+
+      it("creators") {
+        displayWork.creators.map { _.identifiers } shouldBe List(
+          None,
+          None,
+          None)
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe None
+      }
+
+      it("items") {
+        val displayWork =
+          DisplayWorkV1(work, includes = WorksIncludes(items = true))
+        val item: DisplayItemV1 = displayWork.items.get.head
+        item.identifiers shouldBe None
+      }
+    }
+
+    describe("includes identifiers if WorksIncludes.identifiers is true") {
+      val displayWork =
+        DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+
+      it("on the top-level Work") {
+        displayWork.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(sourceIdentifier)))
+      }
+
+      it("creators") {
+        // This is moderately verbose, but the Scala compiler got confused when
+        // I tried to combine the three map() calls into one.
+        val expectedIdentifiers = List(
+          creatorAgentSourceIdentifier,
+          creatorOrganisationSourceIdentifier,
+          creatorPersonSourceIdentifier
+        ).map { DisplayIdentifierV1(_) }
+          .map { List(_) }
+          .map { Some(_) }
+        displayWork.creators.map { _.identifiers } shouldBe expectedIdentifiers
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(publisherSourceIdentifier)))
+      }
+
+      it("items") {
+        val displayWork = DisplayWorkV1(
+          work,
+          includes = WorksIncludes(identifiers = true, items = true))
+        val item: DisplayItemV1 = displayWork.items.get.head
+        item.identifiers shouldBe Some(
+          List(DisplayIdentifierV1(itemSourceIdentifier)))
+      }
+    }
   }
 }

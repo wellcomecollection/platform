@@ -30,7 +30,7 @@ class DisplaySubjectV2SerialisationTest
     )
 
     assertObjectMapsToJson(
-      DisplaySubject(subject),
+      DisplaySubject(subject, includesIdentifiers = true),
       expectedJson = s"""
          |  {
          |    "label" : "${subject.label}",
