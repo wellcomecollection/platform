@@ -128,7 +128,8 @@ class StringStoreVersionedHybridStoreTest
           withLocalDynamoDbTable { table =>
             withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
               val future =
-                hybridStore.updateRecord(id)(record)((t, _) => t)(storedMetadata)
+                hybridStore.updateRecord(id)(record)((t, _) => t)(
+                  storedMetadata)
 
               whenReady(future) { _ =>
                 val maybeResult =
@@ -154,7 +155,8 @@ class StringStoreVersionedHybridStoreTest
               val updatedRecord = Random.nextString(256)
 
               val future =
-                hybridStore.updateRecord(id)(record)((t, _) => t)(storedMetadata)
+                hybridStore.updateRecord(id)(record)((t, _) => t)(
+                  storedMetadata)
 
               val updatedFuture = future.flatMap { _ =>
                 hybridStore.updateRecord(id)(updatedRecord)((t, m) =>
