@@ -14,7 +14,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.io.Source
 
 case class ExampleRecord(
   override val id: String,

@@ -13,7 +13,6 @@ import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 
-import scala.concurrent.ExecutionContext
 import scala.util.Random
 
 

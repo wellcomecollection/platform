@@ -31,13 +31,9 @@ object ObjectStore {
   def apply[T](implicit store: ObjectStore[T]): ObjectStore[T] =
     store
 
-  implicit def createObjectStore[T](
-    put: ((String), (T, KeyPrefix, KeySuffix, Map[String, String]), (StorageStrategy[T])) =>
-      Future[ObjectLocation],
-    get: ((ObjectLocation), (StorageStrategy[T])) => Future[T]
-  )(implicit
+  implicit def createObjectStore[T, R <: StorageBackend](implicit
       storageStrategy: StorageStrategy[T],
-      storageBackend: StorageBackend,
+      storageBackend: R,
       ec: ExecutionContext
   ): ObjectStore[T] = new ObjectStore[T] {
     def put(namespace: String)(
@@ -70,5 +66,4 @@ object ObjectStore {
       input.flatMap(input => Future.fromTry(storageStrategy.retrieve(input)))
     }
   }
-
 }
