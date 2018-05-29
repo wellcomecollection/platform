@@ -8,7 +8,11 @@ trait DisplayV2SerialisationTestBase extends DisplaySerialisationTestBase { this
   def identifier(identifier: SourceIdentifier) =
     s"""{
       "type": "Identifier",
-      "identifierScheme": "${identifier.identifierType.id}",
+      "identifierType": {
+        "id": "${identifier.identifierType.id}",
+        "label": "${identifier.identifierType.label}",
+        "type": "${identifier.identifierType.ontologyType}"
+      },
       "value": "${identifier.value}"
     }"""
 }
