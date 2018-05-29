@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.work.internal.{
   License_CCBY,
   SourceIdentifier
 }
-import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
 class ApiV1WorksTest extends ApiV1WorksTestBase {
 

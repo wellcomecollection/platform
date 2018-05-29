@@ -4,7 +4,6 @@ import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
 class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
