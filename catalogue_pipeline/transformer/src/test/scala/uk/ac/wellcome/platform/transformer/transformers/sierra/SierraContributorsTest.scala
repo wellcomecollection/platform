@@ -346,7 +346,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        identifierType = IdentifierType("lc-names"),
         ontologyType = "Person",
         value = lcshCode
       )
@@ -393,7 +393,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        identifierType = IdentifierType("lc-names"),
         ontologyType = "Person",
         value = lcshCodeCanonical
       )
@@ -570,7 +570,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        identifierType = IdentifierType("lc-names"),
         ontologyType = "Organisation",
         value = lcshCode
       )
@@ -612,7 +612,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
       )
 
       val sourceIdentifier = SourceIdentifier(
-        identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+        identifierType = IdentifierType("lc-names"),
         ontologyType = "Organisation",
         value = lcshCodeCanonical
       )

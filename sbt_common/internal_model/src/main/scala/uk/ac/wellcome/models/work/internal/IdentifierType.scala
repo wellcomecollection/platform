@@ -19,21 +19,21 @@ case object IdentifierType {
   private val csvRows = source.mkString
     .split("\n")
 
-  // identifier-schemes.csv is a list of 3-tuples, e.g.:
+  // identifier-schemes.csv is a list of 2-tuples, e.g.:
   //
   //
-  //    MiroImageNumber,miro-image-number,Miro image number
-  //    WellcomeLibraryVideodiskNumber,wellcome-library-videodisk-number,Wellcome library videodisk number
-  //    SierraSystemNumber,sierra-system-number,Sierra system number
+  //    miro-image-number,Miro image number
+  //    wellcome-library-videodisk-number,Wellcome library videodisk number
+  //    sierra-system-number,Sierra system number
   //
   private val identifierTypeMap: Map[String, IdentifierType] = csvRows
     .map { row =>
       val columns = row.split(",").map(_.trim)
-      assert(columns.length == 3)
+      assert(columns.length == 2)
       Map(
         columns(0) -> IdentifierType(
-          id = columns(1),
-          label = columns(2)
+          id = columns(0),
+          label = columns(1)
         ))
     }
     .fold(Map()) { (x, y) =>

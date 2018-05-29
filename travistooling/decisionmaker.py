@@ -14,6 +14,7 @@ import os
 
 from travistooling.decisions import (
     ChangesToTestsDontGetPublished,
+    ChangeToUnusedLibrary,
     CheckedByTravisFormat,
     CheckedByTravisLambda,
     ExclusivelyAffectsAnotherTask,
@@ -90,7 +91,7 @@ def does_file_affect_build_task(path, task):
     # for the api Scala app, so changes in this directory cannot affect
     # any other task.
     exclusive_directories = {
-        os.path.relpath(t.exclusive_path, start=ROOT): t.name for t in PROJECTS
+        proj.exclusive_path: proj.name for proj in PROJECTS
     }
 
     for dir_name, task_prefix in exclusive_directories.items():
@@ -100,11 +101,31 @@ def does_file_affect_build_task(path, task):
             else:
                 raise ExclusivelyAffectsAnotherTask(task_prefix)
 
+    # We have a library containing display models in sbt_common/display.
+    #
+    # Not every application uses these display models -- in particular,
+    # all our pipeline applications.  So a change to the display models
+    # can be safely ignored here.  Specifically, applications in the
+    # following stacks:
+    #
+    #   - catalogue_pipeline
+    #   - goobi_adapter
+    #   - sierra_adapter
+    #
+    if path.startswith('sbt_common/display'):
+        for project in PROJECTS:
+            if task.startswith(project.name) and (project.type == 'sbt_app'):
+                if project.exclusive_path.startswith((
+                    'catalogue_pipeline/',
+                    'goobi_adapter/',
+                    'sierra_adapter/',
+                )):
+                    raise ChangeToUnusedLibrary('display')
+
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith((
         'sierra_adapter/common',
-        'common/',
         'project/',
         'build.sbt',
         'sbt_common/'

@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -122,7 +122,10 @@ trait MatcherFixtures
   }
 
   def aSierraSourceIdentifier(id: String) =
-    SourceIdentifier(IdentifierSchemes.sierraSystemNumber, "Work", id)
+    SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      "Work",
+      id)
 
   def anUnidentifiedSierraWork: UnidentifiedWork = {
     val sourceIdentifier = aSierraSourceIdentifier("id")

@@ -14,7 +14,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     matchLinkedWorks(work).map(LinkedWorksIdentifiersList)
 
   private def identifierToString(sourceIdentifier: SourceIdentifier): String =
-    s"${sourceIdentifier.identifierScheme}/${sourceIdentifier.value}"
+    s"${sourceIdentifier.identifierType.id}/${sourceIdentifier.value}"
 
   private def matchLinkedWorks(
     work: UnidentifiedWork): Future[Set[IdentifierList]] = {

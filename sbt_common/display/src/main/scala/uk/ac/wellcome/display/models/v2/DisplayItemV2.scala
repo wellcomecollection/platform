@@ -1,7 +1,8 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.display.models.DisplayLocation
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedItem,
   Location,
@@ -12,16 +13,16 @@ import uk.ac.wellcome.models.work.internal.{
   value = "Item",
   description = "An item is a manifestation of a Work."
 )
-case class DisplayItem(
+case class DisplayItemV2(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: String,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.DisplayLocation]",
     value = "List of locations that provide access to the item"
@@ -31,9 +32,10 @@ case class DisplayItem(
   @JsonProperty("type") val ontologyType: String = "Item"
 }
 
-object DisplayItem {
-  def apply(item: IdentifiedItem, includesIdentifiers: Boolean): DisplayItem = {
-    DisplayItem(
+object DisplayItemV2 {
+  def apply(item: IdentifiedItem,
+            includesIdentifiers: Boolean): DisplayItemV2 = {
+    DisplayItemV2(
       id = item.canonicalId,
       identifiers =
         if (includesIdentifiers)
@@ -43,7 +45,7 @@ object DisplayItem {
           // we map over the value.
           Option[List[SourceIdentifier]](item.identifiers) match {
             case Some(identifiers) =>
-              Some(identifiers.map(DisplayIdentifier(_)))
+              Some(identifiers.map(DisplayIdentifierV2(_)))
             case None => Some(List())
           } else None,
       locations = // Same as with identifiers

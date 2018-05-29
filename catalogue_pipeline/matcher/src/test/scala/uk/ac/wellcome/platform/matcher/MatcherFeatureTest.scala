@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -34,7 +34,7 @@ class MatcherFeatureTest
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
               val identifier = SourceIdentifier(
-                IdentifierSchemes.sierraSystemNumber,
+                identifierType = IdentifierType("sierra-system-number"),
                 "Work",
                 "id")
 

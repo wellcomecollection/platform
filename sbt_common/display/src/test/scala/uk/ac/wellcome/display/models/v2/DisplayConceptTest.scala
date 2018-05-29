@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayConceptTest extends FunSpec with Matchers {
@@ -41,7 +40,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Concept as a DisplayConcept with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Concept",
       value = "lcsh/ehw"
     )
@@ -54,7 +53,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayConcept(
         id = Some("dj4kndg5"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "darkness"
       )
     )
@@ -62,7 +61,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Period as a DisplayPeriod with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Period",
       value = "lcsh/zbm"
     )
@@ -75,7 +74,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPeriod(
         id = Some("nrzbm3ah"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "never"
       )
     )
@@ -83,7 +82,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
 
   it("reads an identified Place as a DisplayPlace with identifiers") {
     val sourceIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Place",
       value = "lcsh/axt"
     )
@@ -96,7 +95,7 @@ class DisplayConceptTest extends FunSpec with Matchers {
       ),
       expectedDisplayConcept = DisplayPlace(
         id = Some("axtswq4z"),
-        identifiers = Some(List(DisplayIdentifier(sourceIdentifier))),
+        identifiers = Some(List(DisplayIdentifierV2(sourceIdentifier))),
         label = "anywhere"
       )
     )
@@ -106,7 +105,8 @@ class DisplayConceptTest extends FunSpec with Matchers {
     concept: Displayable[AbstractConcept],
     expectedDisplayConcept: DisplayAbstractConcept
   ) = {
-    val displayConcept = DisplayAbstractConcept(concept)
+    val displayConcept =
+      DisplayAbstractConcept(concept, includesIdentifiers = true)
     displayConcept shouldBe expectedDisplayConcept
   }
 }

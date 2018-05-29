@@ -5,7 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.CalmTransformable
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -66,7 +66,7 @@ class CalmTransformerFeatureTest
                 snsMessages.size should be >= 1
 
                 val sourceIdentifier = SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.calmPlaceholder,
+                  identifierType = IdentifierType("calm-altref-no"),
                   ontologyType = "Work",
                   value = "value"
                 )

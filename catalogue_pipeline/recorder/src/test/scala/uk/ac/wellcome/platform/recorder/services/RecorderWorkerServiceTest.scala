@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -17,7 +17,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.HybridRecord
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -37,7 +37,7 @@ class RecorderWorkerServiceTest
   val title = "Whose umbrella did I find?"
 
   val sourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.miroImageNumber,
+    identifierType = IdentifierType("miro-image-number"),
     value = "U8634924",
     ontologyType = "Work"
   )
@@ -143,7 +143,7 @@ class RecorderWorkerServiceTest
     actualRecords.size shouldBe 1
 
     val hybridRecord: HybridRecord = actualRecords.head
-    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierScheme.toString}/${expectedWork.sourceIdentifier.value}"
+    hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierType.id}/${expectedWork.sourceIdentifier.value}"
     hybridRecord.version shouldBe expectedVhsVersion
 
     val content = getContentFromS3(
@@ -162,7 +162,7 @@ class RecorderWorkerServiceTest
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
-            withTypeVHS[RecorderWorkEntry, Unit](
+            withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
               bucket = bucket,
               table = table) { versionedHybridStore =>
               withMessageStream[UnidentifiedWork, R](

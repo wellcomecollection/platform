@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
@@ -7,73 +7,87 @@ import uk.ac.wellcome.models.work.internal._
 @ApiModel(
   value = "Agent"
 )
-sealed trait DisplayAbstractAgent
+sealed trait DisplayAbstractAgentV2 {
+  val id: Option[String]
+  val identifiers: Option[List[DisplayIdentifierV2]]
+  val label: String
+}
 
 @ApiModel(
   value = "Agent"
 )
-case class DisplayAgent(
+case class DisplayAgentV2(
   id: Option[String],
-  identifiers: Option[List[DisplayIdentifier]],
+  identifiers: Option[List[DisplayIdentifierV2]],
   @ApiModelProperty(
     value = "The name of the agent"
   ) label: String,
   @JsonProperty("type") ontologyType: String = "Agent"
-) extends DisplayAbstractAgent
+) extends DisplayAbstractAgentV2
 
-case object DisplayAbstractAgent {
-  def apply(
-    displayableAgent: Displayable[AbstractAgent]): DisplayAbstractAgent =
+case object DisplayAbstractAgentV2 {
+  def apply(displayableAgent: Displayable[AbstractAgent],
+            includesIdentifiers: Boolean): DisplayAbstractAgentV2 =
     displayableAgent match {
       case Unidentifiable(a: Agent) =>
-        DisplayAgent(
+        DisplayAgentV2(
           id = None,
           identifiers = None,
           label = a.label
         )
       case Identified(a: Agent, id, identifiers) =>
-        DisplayAgent(
+        DisplayAgentV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           label = a.label
         )
       case Identified(p: Person, id, identifiers) =>
-        DisplayPerson(
+        DisplayPersonV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           label = p.label,
           prefix = p.prefix,
-          numeration = p.numeration)
+          numeration = p.numeration
+        )
       case Unidentifiable(p: Person) =>
-        DisplayPerson(
+        DisplayPersonV2(
           id = None,
           identifiers = None,
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
       case Identified(o: Organisation, id, identifiers) =>
-        DisplayOrganisation(
+        DisplayOrganisationV2(
           id = Some(id),
-          identifiers = Some(identifiers.map(DisplayIdentifier(_))),
+          identifiers =
+            if (includesIdentifiers)
+              Some(identifiers.map(DisplayIdentifierV2(_)))
+            else None,
           o.label)
       case Unidentifiable(o: Organisation) =>
-        DisplayOrganisation(id = None, identifiers = None, label = o.label)
+        DisplayOrganisationV2(id = None, identifiers = None, label = o.label)
     }
 }
 
 @ApiModel(
   value = "Person"
 )
-case class DisplayPerson(
+case class DisplayPersonV2(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]],
+  ) identifiers: Option[List[DisplayIdentifierV2]],
   @ApiModelProperty(
     value = "The name of the person"
   ) label: String,
@@ -86,23 +100,23 @@ case class DisplayPerson(
     value = "The numeration of the person"
   ) numeration: Option[String] = None,
   @JsonProperty("type") ontologyType: String = "Person")
-    extends DisplayAbstractAgent
+    extends DisplayAbstractAgentV2
 
 @ApiModel(
   value = "Organisation"
 )
-case class DisplayOrganisation(
+case class DisplayOrganisationV2(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
     value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]],
+  ) identifiers: Option[List[DisplayIdentifierV2]],
   @ApiModelProperty(
     value = "The name of the organisation"
   ) label: String,
   @JsonProperty("type") ontologyType: String = "Organisation")
-    extends DisplayAbstractAgent
+    extends DisplayAbstractAgentV2

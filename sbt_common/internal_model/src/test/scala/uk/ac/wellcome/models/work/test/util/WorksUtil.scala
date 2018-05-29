@@ -30,7 +30,7 @@ trait WorksUtil {
   )
 
   val sourceIdentifier = SourceIdentifier(
-    IdentifierSchemes.miroImageNumber,
+    identifierType = IdentifierType("miro-image-number"),
     "Work",
     "sourceIdentifierFromWorksUtil"
   )
@@ -97,7 +97,10 @@ trait WorksUtil {
       sourceIdentifier = sourceIdentifier,
       version = 1,
       identifiers = List(
-        SourceIdentifier(IdentifierSchemes.miroImageNumber, "Work", "5678")
+        SourceIdentifier(
+          identifierType = IdentifierType("miro-image-number"),
+          "Work",
+          "5678")
       ),
       canonicalId = canonicalId,
       thumbnail = Some(thumbnail)
@@ -166,7 +169,10 @@ trait WorksUtil {
   }
 
   def defaultItemSourceIdentifier = {
-    SourceIdentifier(IdentifierSchemes.miroImageNumber, "Item", "M0000001")
+    SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      "Item",
+      "M0000001")
   }
 
   def defaultLocation: Location = {

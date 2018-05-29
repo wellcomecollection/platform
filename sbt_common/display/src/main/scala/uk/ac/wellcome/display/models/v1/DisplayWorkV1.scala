@@ -49,15 +49,14 @@ case class DisplayWorkV1(
       "Relates the creation of a work to a date, when the date of creation does not cover a range."
   ) createdDate: Option[DisplayPeriodV1] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) creators: List[DisplayAbstractAgent] = List(),
+  ) creators: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayIdentifierV1]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV1]] = None,
   @ApiModelProperty(
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
@@ -71,13 +70,13 @@ case class DisplayWorkV1(
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
+    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayItemV1]",
     value = "List of items related to this work."
-  ) items: Option[List[DisplayItem]] = None,
+  ) items: Option[List[DisplayItemV1]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayAbstractAgent]",
+    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayAbstractAgentV1]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgent] = List(),
+  ) publishers: List[DisplayAbstractAgentV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v1.DisplayPlaceV1]",
     value = "Show a list of places of publication."
@@ -121,7 +120,9 @@ case object DisplayWorkV1 {
       createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
-          DisplayAbstractAgent(contributor.agent)
+          DisplayAbstractAgentV1(
+            contributor.agent,
+            includesIdentifiers = includes.identifiers)
       },
       subjects = work.subjects.flatMap { subject =>
         subject.concepts.map { DisplayConceptV1(_) }
@@ -131,7 +132,7 @@ case object DisplayWorkV1 {
       },
       identifiers =
         if (includes.identifiers)
-          Some(work.identifiers.map { DisplayIdentifier(_) })
+          Some(work.identifiers.map { DisplayIdentifierV1(_) })
         else None,
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
@@ -140,10 +141,12 @@ case object DisplayWorkV1 {
       items =
         if (includes.items)
           Some(work.items.map {
-            DisplayItem(_, includesIdentifiers = includes.identifiers)
+            DisplayItemV1(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAbstractAgent(_)),
+      publishers = work.publishers.map {
+        DisplayAbstractAgentV1(_, includesIdentifiers = includes.identifiers)
+      },
       publicationDate = work.publicationDate.map { DisplayPeriodV1(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlaceV1(_) },
       language = work.language.map { DisplayLanguage(_) },

@@ -1,14 +1,16 @@
-MiroImageNumber,miro-image-number,Miro image number
-WellcomeLibraryVideodiskNumber,wellcome-library-videodisk-number,Wellcome library videodisk number
-SierraSystemNumber,sierra-system-number,Sierra system number
-CALMRefNo,calm-ref-no,CALM ref no
-CALMAltRefNo,calm-altref-no,CALM alter no
-LCGMGPC,lc-gmgpc,Library of Congress Thesaurus for Graphic Materials
-LCSH,lcsh,Library of Congress Subject Headings
-LCNames,lc-names,Library of Congress Name authority records
-MESHId,mesh,MESH identifier
-CALMRecordId,calm-record-id,CALM record identifier
-PreservicaGUID,preservica-guid,Perservica GUID
-CALMAuthorityCode,calm-authority-code,CALM authority code
-ISBN,isbn,ISBN
-ISSN,issn,ISSN
+miro-image-number,Miro image number
+miro-library-reference,Miro library reference
+wellcome-library-videodisk-number,Wellcome library videodisk number
+sierra-system-number,Sierra system number
+sierra-identifier,Sierra identifier
+calm-ref-no,CALM ref no
+calm-altref-no,CALM alter no
+lc-gmgpc,Library of Congress Thesaurus for Graphic Materials
+lcsh,Library of Congress Subject Headings
+lc-names,Library of Congress Name authority records
+mesh,MESH identifier
+calm-record-id,CALM record identifier
+preservica-guid,Perservica GUID
+calm-authority-code,CALM authority code
+isbn,ISBN
+issn,ISSN

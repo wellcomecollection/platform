@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.transformable.{
   CalmTransformableData
 }
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -24,14 +24,14 @@ class CalmTransformableTransformer
             UnidentifiedWork(
               title = Some("placeholder title"),
               sourceIdentifier = SourceIdentifier(
-                identifierScheme = IdentifierSchemes.calmPlaceholder,
+                identifierType = IdentifierType("calm-altref-no"),
                 ontologyType = "Work",
                 value = "value"
               ),
               version = version,
               identifiers = List(
                 SourceIdentifier(
-                  identifierScheme = IdentifierSchemes.calmPlaceholder,
+                  identifierType = IdentifierType("calm-altref-no"),
                   ontologyType = "Work",
                   value = "value"
                 ))

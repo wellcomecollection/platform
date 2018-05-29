@@ -5,7 +5,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierSchemes}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
 import uk.ac.wellcome.platform.ingestor.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -39,17 +39,19 @@ class IngestorWorkerService @Inject()(
   // * Sierra works are indexed only in the v2 index.
   // * Works from any other source are not expected so they are discarded.
   private def decideTargetIndices(work: IdentifiedWork): List[String] = {
-    work.sourceIdentifier.identifierScheme match {
-      case IdentifierSchemes.miroImageNumber =>
+    val miroIdentifier = IdentifierType("miro-image-number")
+    val sierraIdentifier = IdentifierType("sierra-system-number")
+    work.sourceIdentifier.identifierType.id match {
+      case miroIdentifier.id =>
         List(
           elasticConfig.indexV1name,
           elasticConfig.indexV2name
         )
-      case IdentifierSchemes.sierraSystemNumber =>
+      case sierraIdentifier.id =>
         List(elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
-          s"Cannot ingest work with identifierScheme: ${work.sourceIdentifier.identifierScheme}"))
+          s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}"))
     }
 
   }

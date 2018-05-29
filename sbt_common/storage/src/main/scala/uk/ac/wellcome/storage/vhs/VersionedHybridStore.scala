@@ -20,7 +20,9 @@ import uk.ac.wellcome.storage.{KeyPrefix, ObjectLocation, ObjectStore}
 
 import scala.concurrent.Future
 
-class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
+case class EmptyMetadata()
+
+class VersionedHybridStore[T, Metadata,Store <: ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
   objectStore: Store,
   dynamoDbClient: AmazonDynamoDB
@@ -30,11 +32,10 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     dynamoConfig = vhsConfig.dynamoConfig
   )
 
-  case class EmptyMetadata()
-
   private case class VersionedHybridObject(
     hybridRecord: HybridRecord,
-    s3Object: T
+    s3Object: T,
+    metadata: Metadata
   )
 
   // Store a single record in DynamoDB.
@@ -43,20 +44,25 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
   // The HybridRecordEnricher combines this with the HybridRecord, and stores
   // both of them as a single row in DynamoDB.
   //
-  def updateRecord[DynamoRow, Metadata](id: String)(ifNotExisting: => T)(
-    ifExisting: T => T)(metadata: Metadata = EmptyMetadata())(
+  def updateRecord[DynamoRow](id: String)(ifNotExisting: => T)(
+    ifExisting: (T, Metadata) => T)(metadata: Metadata)(
     implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
     dynamoFormat: DynamoFormat[DynamoRow],
     versionUpdater: VersionUpdater[DynamoRow],
     idGetter: IdGetter[DynamoRow],
     versionGetter: VersionGetter[DynamoRow],
     updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow],
-    migrationH: Migration[DynamoRow, HybridRecord]
+    migrationH: Migration[DynamoRow, HybridRecord],
+    migrationM: Migration[DynamoRow, Metadata]
   ): Future[Unit] = {
 
     getObject[DynamoRow](id).flatMap {
-      case Some(VersionedHybridObject(storedHybridRecord, storedS3Record)) =>
-        val transformedS3Record = ifExisting(storedS3Record)
+      case Some(
+          VersionedHybridObject(
+            storedHybridRecord,
+            storedS3Record,
+            storedMetadata)) =>
+        val transformedS3Record = ifExisting(storedS3Record, storedMetadata)
 
         if (transformedS3Record != storedS3Record) {
           putObject(
@@ -86,10 +92,21 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
     }
   }
 
-  def getRecord(id: String): Future[Option[T]] =
-    getObject[HybridRecord](id).map { maybeObject =>
+  def getRecord[DynamoRow](id: String)(
+    implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
+    dynamoFormat: DynamoFormat[DynamoRow],
+    migrationH: Migration[DynamoRow, HybridRecord],
+    migrationM: Migration[DynamoRow, Metadata]
+  ): Future[Option[T]] = {
+
+    // The compiler wrongly thinks `enricher` is unused.
+    // This no-op persuades it to ignore it.
+    identity(enricher)
+
+    getObject[DynamoRow](id).map { maybeObject =>
       maybeObject.map(_.s3Object)
     }
+  }
 
   private def putObject[DynamoRow](id: String, t: T, f: (String) => DynamoRow)(
     implicit dynamoFormat: DynamoFormat[DynamoRow],
@@ -125,7 +142,8 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
 
   private def getObject[DynamoRow](id: String)(
     implicit dynamoFormat: DynamoFormat[DynamoRow],
-    migrationH: Migration[DynamoRow, HybridRecord]
+    migrationH: Migration[DynamoRow, HybridRecord],
+    migrationM: Migration[DynamoRow, Metadata]
   ): Future[Option[VersionedHybridObject]] = {
 
     val dynamoRecord: Future[Option[DynamoRow]] =
@@ -133,7 +151,10 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
 
     dynamoRecord.flatMap {
       case Some(dynamoRow) => {
+
         val hybridRecord = dynamoRow.migrateTo[HybridRecord]
+        val metadata = dynamoRow.migrateTo[Metadata]
+
         objectStore
           .get(
             ObjectLocation(
@@ -142,11 +163,10 @@ class VersionedHybridStore[T, Store <: ObjectStore[T]] @Inject()(
             )
           )
           .map { s3Record =>
-            Some(VersionedHybridObject(hybridRecord, s3Record))
+            Some(VersionedHybridObject(hybridRecord, s3Record, metadata))
           }
       }
       case None => Future.successful(None)
     }
   }
-
 }

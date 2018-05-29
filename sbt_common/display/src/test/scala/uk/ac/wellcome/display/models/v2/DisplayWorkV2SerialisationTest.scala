@@ -1,17 +1,14 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.{
-  DisplaySerialisationTestBase,
-  WorksIncludes
-}
+import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV2SerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil
     with WorksUtil {
 
@@ -233,7 +230,7 @@ class DisplayWorkV2SerialisationTest
 
   it("includes a list of identifiers on DisplayWorkV2") {
     val srcIdentifier = SourceIdentifier(
-      identifierScheme = IdentifierSchemes.miroImageNumber,
+      identifierType = IdentifierType("lc-names"),
       ontologyType = "Work",
       value = "Test1234"
     )

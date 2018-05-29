@@ -47,7 +47,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   val sourceIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.sierraSystemNumber,
+    identifierType = IdentifierType("sierra-system-number"),
     ontologyType = "Work",
     value = "b1234567"
   )
@@ -97,12 +97,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
       val displayWork = DisplayWorkV2(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(
+        DisplayAgentV2(
           id = None,
           identifiers = None,
           label = "Henry Hare",
           ontologyType = "Agent"),
-        DisplayAgent(
+        DisplayAgentV2(
           id = None,
           identifiers = None,
           label = "Harriet Heron",
@@ -125,8 +125,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
       val displayWork = DisplayWorkV2(work)
       displayWork.publishers shouldBe List(
-        DisplayAgent(id = None, identifiers = None, label = "Janet Jackson"),
-        DisplayOrganisation(
+        DisplayAgentV2(id = None, identifiers = None, label = "Janet Jackson"),
+        DisplayOrganisationV2(
           id = None,
           identifiers = None,
           label = "Juniper Journals")
@@ -253,7 +253,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             canonicalId = "vs7jd5dx",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Person",
                 value = "v1"
               )
@@ -272,18 +272,19 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       version = 1
     )
 
-    val displayWork = DisplayWorkV2(work)
+    val displayWork =
+      DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
 
     displayWork.contributors shouldBe List(
       DisplayContributor(
-        agent = DisplayPerson(
+        agent = DisplayPersonV2(
           id = Some("vs7jd5dx"),
           label = "Vlad the Vanquished",
           identifiers = Some(
             List(
-              DisplayIdentifier(
+              DisplayIdentifierV2(
                 SourceIdentifier(
-                  IdentifierSchemes.libraryOfCongressNames,
+                  identifierType = IdentifierType("lc-names"),
                   ontologyType = "Person",
                   value = "v1"
                 )
@@ -293,7 +294,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         roles = List()
       ),
       DisplayContributor(
-        agent = DisplayOrganisation(
+        agent = DisplayOrganisationV2(
           id = None,
           label = "Transylvania Terrors",
           identifiers = None
@@ -301,5 +302,229 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         roles = List(DisplayContributionRole(label = "Background location"))
       )
     )
+  }
+
+  describe("correctly uses the WorksIncludes.identifiers include") {
+    val publisherSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-names"),
+      value = "lcnames/boo",
+      ontologyType = "Agent"
+    )
+
+    val contributorAgentSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-names"),
+      value = "lcnames/007",
+      ontologyType = "Agent"
+    )
+
+    val contributorPersonSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-names"),
+      value = "lcnames/bla",
+      ontologyType = "Agent"
+    )
+
+    val contributorOrganisationSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-names"),
+      value = "lcnames/bus",
+      ontologyType = "Agent"
+    )
+
+    val itemSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      value = "miro/b0001",
+      ontologyType = "Item"
+    )
+
+    val conceptSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lcsh"),
+      value = "lcsh/bonds",
+      ontologyType = "Concept"
+    )
+
+    val periodSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lcsh"),
+      value = "lcsh/before",
+      ontologyType = "Concept"
+    )
+
+    val placeSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lcsh"),
+      value = "lcsh/bul",
+      ontologyType = "Concept"
+    )
+
+    val work = IdentifiedWork(
+      canonicalId = "bmzwdx3t",
+      title = Some("Bizarre bees bounce below a basketball"),
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier),
+      contributors = List(
+        Contributor(
+          agent = Identified(
+            Agent(label = "Bond"),
+            canonicalId = "bcwth7yg",
+            identifiers = List(contributorAgentSourceIdentifier)
+          ),
+          roles = List()
+        ),
+        Contributor(
+          agent = Identified(
+            Organisation(label = "Big Business"),
+            canonicalId = "bsf3kfwm",
+            identifiers = List(contributorOrganisationSourceIdentifier)
+          ),
+          roles = List()
+        ),
+        Contributor(
+          agent = Identified(
+            Person(label = "Blue Blaise"),
+            canonicalId = "b5szcu3c",
+            identifiers = List(contributorPersonSourceIdentifier)
+          ),
+          roles = List()
+        )
+      ),
+      publishers = List(
+        Identified(
+          Agent(label = "Brilliant Books"),
+          canonicalId = "bq5s3rzs",
+          identifiers = List(publisherSourceIdentifier)
+        )
+      ),
+      items = List(
+        IdentifiedItem(
+          canonicalId = "bksy8rkc",
+          sourceIdentifier = itemSourceIdentifier,
+          identifiers = List(itemSourceIdentifier)
+        )
+      ),
+      subjects = List(
+        Subject(
+          label = "Beryllium-Boron Bonding",
+          concepts = List(
+            Identified(
+              Concept("Bonding"),
+              canonicalId = "b5qsqkyh",
+              identifiers = List(conceptSourceIdentifier)
+            ),
+            Identified(
+              Period("Before"),
+              canonicalId = "bwn894hk",
+              identifiers = List(periodSourceIdentifier)
+            ),
+            Identified(
+              Place("Bulgaria"),
+              canonicalId = "bf42vqst",
+              identifiers = List(placeSourceIdentifier)
+            )
+          )
+        )
+      ),
+      genres = List(
+        Genre(
+          label = "Black, Brown and Blue",
+          concepts = List(
+            Identified(
+              Concept("Colours"),
+              canonicalId = "chzwu4ea",
+              identifiers = List(conceptSourceIdentifier)
+            )
+          )
+        )
+      ),
+      version = 1
+    )
+
+    describe("omits identifiers if WorksIncludes.identifiers is false") {
+      val displayWork = DisplayWorkV2(work, includes = WorksIncludes())
+
+      it("the top-level Work") {
+        displayWork.identifiers shouldBe None
+      }
+
+      it("contributors") {
+        val agents: List[DisplayAbstractAgentV2] =
+          displayWork.contributors.map { _.agent }
+        agents.map { _.identifiers } shouldBe List(None, None, None)
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe None
+      }
+
+      it("items") {
+        val displayWork =
+          DisplayWorkV2(work, includes = WorksIncludes(items = true))
+        val item: DisplayItemV2 = displayWork.items.get.head
+        item.identifiers shouldBe None
+      }
+
+      it("subjects") {
+        val concepts = displayWork.subjects.head.concepts
+        concepts.map { _.identifiers } shouldBe List(None, None, None)
+      }
+
+      it("genres") {
+        displayWork.genres.head.concepts.head.identifiers shouldBe None
+      }
+    }
+
+    describe("includes identifiers if WorksIncludes.identifiers is true") {
+      val displayWork =
+        DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+
+      it("on the top-level Work") {
+        displayWork.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(sourceIdentifier)))
+      }
+
+      it("contributors") {
+        // This is moderately verbose, but the Scala compiler got confused when
+        // I tried to combine the three map() calls into one.
+        val expectedIdentifiers = List(
+          contributorAgentSourceIdentifier,
+          contributorOrganisationSourceIdentifier,
+          contributorPersonSourceIdentifier
+        ).map { DisplayIdentifierV2(_) }
+          .map { List(_) }
+          .map { Some(_) }
+
+        val agents: List[DisplayAbstractAgentV2] =
+          displayWork.contributors.map { _.agent }
+        agents.map { _.identifiers } shouldBe expectedIdentifiers
+      }
+
+      it("publishers") {
+        displayWork.publishers.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(publisherSourceIdentifier)))
+      }
+
+      it("items") {
+        val displayWork = DisplayWorkV2(
+          work,
+          includes = WorksIncludes(identifiers = true, items = true))
+        val item: DisplayItemV2 = displayWork.items.get.head
+        item.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(itemSourceIdentifier)))
+      }
+
+      it("subjects") {
+        val expectedIdentifiers = List(
+          conceptSourceIdentifier,
+          periodSourceIdentifier,
+          placeSourceIdentifier
+        ).map { DisplayIdentifierV2(_) }
+          .map { List(_) }
+          .map { Some(_) }
+
+        val concepts = displayWork.subjects.head.concepts
+        concepts.map { _.identifiers } shouldBe expectedIdentifiers
+      }
+
+      it("genres") {
+        displayWork.genres.head.concepts.head.identifiers shouldBe Some(
+          List(DisplayIdentifierV2(conceptSourceIdentifier)))
+      }
+    }
   }
 }

@@ -49,7 +49,7 @@ class IdentifierGenerator @Inject()(
         Identifier(
           CanonicalId = canonicalId,
           OntologyType = identifier.ontologyType,
-          SourceSystem = identifier.identifierScheme.toString,
+          SourceSystem = identifier.identifierType.id,
           SourceId = identifier.value
         ))
       .map { _ =>

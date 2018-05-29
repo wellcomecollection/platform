@@ -18,7 +18,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -49,7 +49,7 @@ class SQSMessageReceiverTest
 
   val sourceIdentifier =
     SourceIdentifier(
-      identifierScheme = IdentifierSchemes.calmPlaceholder,
+      identifierType = IdentifierType("calm-altref-no"),
       ontologyType = "Work",
       value = "value")
 
@@ -149,12 +149,12 @@ class SQSMessageReceiverTest
             val future = recordReceiver.receiveMessage(sierraMessage)
 
             val sourceIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.sierraSystemNumber,
+              identifierType = IdentifierType("sierra-system-number"),
               ontologyType = "Work",
               value = "b50050059"
             )
             val sierraIdentifier = SourceIdentifier(
-              identifierScheme = IdentifierSchemes.sierraIdentifier,
+              identifierType = IdentifierType("sierra-identifier"),
               ontologyType = "Work",
               value = id
             )

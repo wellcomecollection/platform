@@ -160,7 +160,7 @@ trait SierraContributors extends MarcUtils {
       case Nil => Unidentifiable(agent)
       case Seq(code) => {
         val sourceIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          identifierType = IdentifierType("lc-names"),
           value = code,
           ontologyType = ontologyType
         )

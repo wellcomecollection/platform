@@ -1,13 +1,12 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayGenreV2SerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil {
 
   it("serialises a DisplayGenre constructed from a Genre correctly") {
@@ -17,7 +16,7 @@ class DisplayGenreV2SerialisationTest
       canonicalId = "sqwyavpj",
       identifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          identifierType = IdentifierType("lc-names"),
           value = "lcsh/sqw",
           ontologyType = "Period"
         )),
@@ -30,7 +29,7 @@ class DisplayGenreV2SerialisationTest
     )
 
     assertObjectMapsToJson(
-      DisplayGenre(genre),
+      DisplayGenre(genre, includesIdentifiers = true),
       expectedJson = s"""
          |  {
          |    "label" : "${genre.label}",

@@ -1,14 +1,14 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
+import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayCreatorsV1SerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV1SerialisationTestBase
     with JsonMapperTestUtil
     with WorksUtil {
 
@@ -75,7 +75,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "hgfedcba",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "hv"
               )
@@ -88,7 +88,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "abcdefgh",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "uu"
               )
@@ -101,7 +101,7 @@ class DisplayCreatorsV1SerialisationTest
             canonicalId = "blahbluh",
             identifiers = List(
               SourceIdentifier(
-                IdentifierSchemes.libraryOfCongressNames,
+                identifierType = IdentifierType("lc-names"),
                 ontologyType = "Organisation",
                 value = "uu"
               )
@@ -110,13 +110,15 @@ class DisplayCreatorsV1SerialisationTest
         )
       )
     )
-    val displayWork = DisplayWorkV1(work)
+    val displayWork =
+      DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
                             |{
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
+                            |  "identifiers": [],
                             |  "title": "${work.title.get}",
                             |  "creators": [
                             |    ${identifiedOrUnidentifiable(

@@ -18,6 +18,7 @@ import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
+                                             SourceMetadata,
                                              S3TypeStore[SierraTransformable]],
   metrics: MetricsSender
 ) extends Logging {
@@ -31,7 +32,7 @@ class SierraItemMergerUpdaterService @Inject()(
         ifNotExisting = SierraTransformable(
           sourceId = bibId,
           itemData = Map(itemRecord.id -> itemRecord)
-        ))(ifExisting = existingSierraTransformable => {
+        ))(ifExisting = (existingSierraTransformable, _) => {
         ItemLinker.linkItemRecord(
           existingSierraTransformable,
           itemRecord
@@ -47,8 +48,7 @@ class SierraItemMergerUpdaterService @Inject()(
             new RuntimeException(
               s"Missing Bib record to unlink: $unlinkedBibId")
           )
-        )((record: SierraTransformable) =>
-          ItemUnlinker.unlinkItemRecord(record, itemRecord))(
+        )((record, _) => ItemUnlinker.unlinkItemRecord(record, itemRecord))(
           SourceMetadata(sourceName))
       }
 

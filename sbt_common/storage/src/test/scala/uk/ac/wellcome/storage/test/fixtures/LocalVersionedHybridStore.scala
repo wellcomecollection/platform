@@ -1,5 +1,7 @@
 package uk.ac.wellcome.storage.test.fixtures
 
+import java.io.InputStream
+
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import io.circe.Encoder
@@ -33,22 +35,24 @@ trait LocalVersionedHybridStore
       "aws.vhs.dynamo.tableName" -> table.name
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
-  def withTypeVHS[T <: Id, R](bucket: Bucket,
+  def withTypeVHS[T <: Id, Metadata, R](bucket: Bucket,
                               table: Table,
                               globalS3Prefix: String = defaultGlobalS3Prefix)(
-    testWith: TestWith[VersionedHybridStore[T, ObjectStore[T]], R])(
+    testWith: TestWith[VersionedHybridStore[T, Metadata, ObjectStore[T]], R])(
     implicit objectStore: ObjectStore[T]
   ): R = {
 
     val s3Config = S3Config(bucketName = bucket.name)
     val dynamoConfig = DynamoConfig(table = table.name, Some(table.index))
+
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,
       globalS3Prefix = globalS3Prefix
     )
 
-    val store = new VersionedHybridStore[T, ObjectStore[T]](
+
+    val store = new VersionedHybridStore[T, Metadata, ObjectStore[T]](
       vhsConfig = vhsConfig,
       objectStore = objectStore,
       dynamoDbClient = dynamoDbClient

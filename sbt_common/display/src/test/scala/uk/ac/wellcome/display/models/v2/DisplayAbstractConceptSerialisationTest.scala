@@ -1,13 +1,12 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayAbstractConceptSerialisationTest
     extends FunSpec
-    with DisplaySerialisationTestBase
+    with DisplayV2SerialisationTestBase
     with JsonMapperTestUtil {
 
   it("serialises an unidentified DisplayConcept") {
@@ -63,7 +62,7 @@ class DisplayAbstractConceptSerialisationTest
       canonicalId = "uq4bt5us",
       identifiers = List(
         SourceIdentifier(
-          identifierScheme = IdentifierSchemes.libraryOfCongressNames,
+          identifierType = IdentifierType("lc-names"),
           ontologyType = "Concept",
           value = "lcsh/uq4"
         )),
@@ -71,7 +70,7 @@ class DisplayAbstractConceptSerialisationTest
     )
 
     assertObjectMapsToJson(
-      DisplayAbstractConcept(concept),
+      DisplayAbstractConcept(concept, includesIdentifiers = true),
       expectedJson = s"""
          |  {
          |    "id": "${concept.canonicalId}",
@@ -90,7 +89,7 @@ class DisplayAbstractConceptSerialisationTest
         Unidentifiable(Concept("conceptLabel")),
         Unidentifiable(Place("placeLabel")),
         Unidentifiable(Period("periodLabel"))
-      ).map(DisplayAbstractConcept(_)),
+      ).map(DisplayAbstractConcept(_, includesIdentifiers = false)),
       expectedJson = s"""
           | [
           |    {

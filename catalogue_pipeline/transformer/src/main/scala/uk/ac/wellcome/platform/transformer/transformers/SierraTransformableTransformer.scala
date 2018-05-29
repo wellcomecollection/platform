@@ -4,7 +4,7 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
+  IdentifierType,
   SourceIdentifier,
   UnidentifiedWork
 }
@@ -47,7 +47,7 @@ class SierraTransformableTransformer
             internal.UnidentifiedWork(
               title = getTitle(sierraBibData),
               sourceIdentifier = SourceIdentifier(
-                identifierScheme = IdentifierSchemes.sierraSystemNumber,
+                identifierType = IdentifierType("sierra-system-number"),
                 ontologyType = "Work",
                 value = addCheckDigit(
                   sierraBibData.id,

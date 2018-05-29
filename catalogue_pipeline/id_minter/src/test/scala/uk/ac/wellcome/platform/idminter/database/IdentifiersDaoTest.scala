@@ -3,10 +3,7 @@ package uk.ac.wellcome.platform.idminter.database
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierSchemes,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
@@ -47,13 +44,13 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
           SourceId = "A tangerine",
-          SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+          SourceSystem = IdentifierType("miro-image-number").id,
           OntologyType = "t-t-t-turtles"
         )
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("miro-image-number"),
           identifier.OntologyType,
           value = identifier.SourceId
         )
@@ -72,14 +69,14 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A turtle turns to try to taste",
           SourceId = "A tangerine",
-          SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+          SourceSystem = IdentifierType("miro-image-number").id,
           OntologyType = "t-t-t-turtles"
         )
 
         fixtures.identifiersDao.saveIdentifier(identifier) shouldBe Success(1)
 
         val sourceIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.sierraSystemNumber,
+          identifierType = IdentifierType("miro-image-number"),
           identifier.OntologyType,
           value = "not_an_existing_value"
         )
@@ -101,7 +98,7 @@ class IdentifiersDaoTest
         val identifier = Identifier(
           CanonicalId = "A provision of porpoises",
           OntologyType = "Work",
-          SourceSystem = IdentifierSchemes.miroImageNumber.toString,
+          SourceSystem = IdentifierType("miro-image-number").id,
           SourceId = "A picture of pangolins"
         )
         fixtures.identifiersDao.saveIdentifier(identifier)
@@ -111,7 +108,7 @@ class IdentifiersDaoTest
             .where
             .eq(
               fixtures.identifiersTable.i.SourceSystem,
-              IdentifierSchemes.miroImageNumber.toString)
+              IdentifierType("miro-image-number").id)
             .and
             .eq(
               fixtures.identifiersTable.i.CanonicalId,

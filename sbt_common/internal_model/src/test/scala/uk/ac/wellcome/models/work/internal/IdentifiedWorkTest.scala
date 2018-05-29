@@ -47,14 +47,22 @@ class IdentifiedWorkTest
       |{
       |  "title": "title",
       |  "sourceIdentifier": {
-      |    "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "identifierType": {
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
+      |        "ontologyType": "IdentifierType"
+      |      },
       |    "ontologyType": "Work",
       |    "value": "value"
       |  },
       |  "version": 1,
       |  "identifiers": [
       |    {
-      |      "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |      "identifierType": {
+      |        "id": "${IdentifierType("miro-image-number").id}",
+      |        "label": "${IdentifierType("miro-image-number").label}",
+      |        "ontologyType": "IdentifierType"
+      |      },
       |      "ontologyType": "Work",
       |      "value": "value"
       |    }
@@ -171,13 +179,21 @@ class IdentifiedWorkTest
       |    {
       |      "canonicalId": "canonicalId",
       |      "sourceIdentifier": {
-      |        "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |        "identifierType": {
+      |          "id": "${IdentifierType("miro-image-number").id}",
+      |          "label": "${IdentifierType("miro-image-number").label}",
+      |          "ontologyType": "IdentifierType"
+      |        },
       |        "ontologyType": "Item",
       |        "value": "value"
       |      },
       |      "identifiers": [
       |        {
-      |          "identifierScheme": "${IdentifierSchemes.miroImageNumber.toString}",
+      |          "identifierType": {
+      |            "id": "${IdentifierType("miro-image-number").id}",
+      |            "label": "${IdentifierType("miro-image-number").label}",
+      |            "ontologyType": "IdentifierType"
+      |          },
       |          "ontologyType": "Item",
       |          "value": "value"
       |        }
@@ -230,13 +246,13 @@ class IdentifiedWorkTest
   )
 
   val workIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.miroImageNumber,
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Work",
     value = "value"
   )
 
   val itemIdentifier = SourceIdentifier(
-    identifierScheme = IdentifierSchemes.miroImageNumber,
+    identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
   )

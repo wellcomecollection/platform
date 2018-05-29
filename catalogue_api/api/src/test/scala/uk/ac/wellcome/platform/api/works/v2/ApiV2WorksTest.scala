@@ -5,13 +5,12 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal.{
   DigitalLocation,
-  IdentifierSchemes,
+  IdentifierType,
   License_CCBY,
   SourceIdentifier
 }
-import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
-class ApiV2WorksTest extends ApiWorksTestBase {
+class ApiV2WorksTest extends ApiV2WorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
 
   it("returns a list of works") {
@@ -394,7 +393,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val identifier1 = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "Test1234"
         )
@@ -405,7 +404,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
         )
 
         val identifier2 = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "DTest5678"
         )
@@ -460,7 +459,7 @@ class ApiV2WorksTest extends ApiWorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val srcIdentifier = SourceIdentifier(
-          identifierScheme = IdentifierSchemes.miroImageNumber,
+          identifierType = IdentifierType("miro-image-number"),
           ontologyType = "Work",
           value = "Test1234"
         )

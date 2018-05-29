@@ -30,12 +30,13 @@ class StreamStoreVersionedHybridStoreTest
   private def stringify(is: InputStream) =
     scala.io.Source.fromInputStream(is).mkString
 
-  def withStreamVHS[R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
-                        testWith: TestWith[VersionedHybridStore[InputStream, ObjectStore[InputStream]], R])(
-                        implicit objectStore: ObjectStore[InputStream]
-                      )
+  def withStreamVHS[Metadata, R](bucket: Bucket,
+                                 table: Table,
+                                 globalS3Prefix: String = defaultGlobalS3Prefix)(
+                                  testWith: TestWith[VersionedHybridStore[InputStream, Metadata, ObjectStore[InputStream]], R])
+                                (
+                                  implicit objectStore: ObjectStore[InputStream]
+                                )
   : R = {
     val s3Config = S3Config(bucketName = bucket.name)
 
@@ -48,7 +49,8 @@ class StreamStoreVersionedHybridStoreTest
       globalS3Prefix = globalS3Prefix
     )
 
-    val store = new VersionedHybridStore[InputStream, ObjectStore[InputStream]](
+
+    val store = new VersionedHybridStore[InputStream, Metadata, ObjectStore[InputStream]](
       vhsConfig = vhsConfig,
       objectStore = objectStore,
       dynamoDbClient = dynamoDbClient
@@ -60,11 +62,11 @@ class StreamStoreVersionedHybridStoreTest
   def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket,
                         Table,
-                        VersionedHybridStore[InputStream, ObjectStore[InputStream]]),
+                        VersionedHybridStore[InputStream, EmptyMetadata, ObjectStore[InputStream]]),
                        R]): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
-        withStreamVHS[R](bucket, table) { vhs =>
+        withStreamVHS[EmptyMetadata, R](bucket, table) { vhs =>
           testWith((bucket, table, vhs))
         }
       }
@@ -78,7 +80,8 @@ class StreamStoreVersionedHybridStoreTest
           val content = "A thousand thinking thanes thanking a therapod"
           val inputStream = new ByteArrayInputStream(content.getBytes)
 
-          val future = hybridStore.updateRecord(id)(inputStream)(identity)()
+          val future = hybridStore.updateRecord(id)(inputStream)((t, _) => t)(
+            EmptyMetadata())
 
           whenReady(future) { _ =>
             getContentFor(bucket, table, id) shouldBe content
@@ -94,7 +97,8 @@ class StreamStoreVersionedHybridStoreTest
           val inputStream = new ByteArrayInputStream(content.getBytes)
 
           val putFuture =
-            hybridStore.updateRecord(id)(inputStream)(identity)()
+            hybridStore.updateRecord(id)(inputStream)((t, _) => t)(
+              EmptyMetadata())
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)

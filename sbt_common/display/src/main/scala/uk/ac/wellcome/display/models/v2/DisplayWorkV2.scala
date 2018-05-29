@@ -49,10 +49,10 @@ case class DisplayWorkV2(
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
   ) contributors: List[DisplayContributor] = List(),
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayIdentifier]",
+    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
-  ) identifiers: Option[List[DisplayIdentifier]] = None,
+  ) identifiers: Option[List[DisplayIdentifierV2]] = None,
   @ApiModelProperty(
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
@@ -66,12 +66,12 @@ case class DisplayWorkV2(
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocation] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayItem]",
+    dataType = "List[uk.ac.wellcome.display.models.v2.DisplayItemV2]",
     value = "List of items related to this work."
-  ) items: Option[List[DisplayItem]] = None,
+  ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgent] = List(),
+  ) publishers: List[DisplayAbstractAgentV2] = List(),
   @ApiModelProperty(
     value = "Show a list of places of publication."
   ) placesOfPublication: List[DisplayPlace] = List(),
@@ -118,12 +118,18 @@ case object DisplayWorkV2 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      contributors = work.contributors.map { DisplayContributor(_) },
-      subjects = work.subjects.map { DisplaySubject(_) },
-      genres = work.genres.map { DisplayGenre(_) },
+      contributors = work.contributors.map {
+        DisplayContributor(_, includesIdentifiers = includes.identifiers)
+      },
+      subjects = work.subjects.map {
+        DisplaySubject(_, includesIdentifiers = includes.identifiers)
+      },
+      genres = work.genres.map {
+        DisplayGenre(_, includesIdentifiers = includes.identifiers)
+      },
       identifiers =
         if (includes.identifiers)
-          Some(work.identifiers.map { DisplayIdentifier(_) })
+          Some(work.identifiers.map { DisplayIdentifierV2(_) })
         else None,
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
@@ -132,10 +138,12 @@ case object DisplayWorkV2 {
       items =
         if (includes.items)
           Some(work.items.map {
-            DisplayItem(_, includesIdentifiers = includes.identifiers)
+            DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map(DisplayAbstractAgent(_)),
+      publishers = work.publishers.map {
+        DisplayAbstractAgentV2(_, includesIdentifiers = includes.identifiers)
+      },
       publicationDate = work.publicationDate.map { DisplayPeriod(_) },
       placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
