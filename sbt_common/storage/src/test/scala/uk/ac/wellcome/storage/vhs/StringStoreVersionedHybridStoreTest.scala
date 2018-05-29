@@ -118,7 +118,7 @@ class StringStoreVersionedHybridStoreTest
       val id = Random.nextString(5)
       val record = Random.nextString(256)
 
-      val data = ExtraData(
+      val storedMetadata = ExtraData(
         data = Random.nextString(256),
         number = Random.nextInt(256)
       )
@@ -128,7 +128,7 @@ class StringStoreVersionedHybridStoreTest
           withLocalDynamoDbTable { table =>
             withStringVHS[ExtraData, Assertion](bucket, table) { hybridStore =>
               val future =
-                hybridStore.updateRecord(id)(record)((t, _) => t)(data)
+                hybridStore.updateRecord(id)(record)((t, _) => t)(storedMetadata)
 
               whenReady(future) { _ =>
                 val maybeResult =
@@ -139,8 +139,8 @@ class StringStoreVersionedHybridStoreTest
 
                 val extraData = maybeResult.get.right.get
 
-                extraData.data shouldBe data.data
-                extraData.number shouldBe data.number
+                extraData.data shouldBe storedMetadata.data
+                extraData.number shouldBe storedMetadata.number
               }
             }
           }
@@ -154,15 +154,15 @@ class StringStoreVersionedHybridStoreTest
               val updatedRecord = Random.nextString(256)
 
               val future =
-                hybridStore.updateRecord(id)(record)((t, _) => t)(data)
+                hybridStore.updateRecord(id)(record)((t, _) => t)(storedMetadata)
 
               val updatedFuture = future.flatMap { _ =>
                 hybridStore.updateRecord(id)(updatedRecord)((t, m) =>
-                  m.toString)(data)
+                  m.toString)(storedMetadata)
               }
 
               whenReady(updatedFuture) { _ =>
-                getContentFor(bucket, table, id) shouldBe data.toString
+                getContentFor(bucket, table, id) shouldBe storedMetadata.toString
               }
             }
           }
