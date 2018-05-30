@@ -42,10 +42,6 @@ class SierraReaderWorkerService @Inject()(
   implicit val materialiser = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  // This is the throttle rate for requests to Sierra, *not* the rate at
-  // which we fetch messages from SQS.
-  val throttleRate = ThrottleRate(3, 1.second)
-
   sqsStream.foreach(
     streamName = this.getClass.getSimpleName,
     process = processMessage
@@ -78,15 +74,19 @@ class SierraReaderWorkerService @Inject()(
       offset = windowStatus.offset
     )
 
-    val outcome =
-      SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret, throttleRate)(
-        resourceType = resourceType.toString,
-        params)
-        .via(SierraRecordWrapperFlow())
-        .grouped(batchSize)
-        .map(recordBatch => recordBatch.asJson)
-        .zipWithIndex
-        .runWith(s3sink)
+    val sierraSource = SierraSource(
+      apiUrl,
+      sierraOauthKey,
+      sierraOauthSecret,
+      throttleRate = ThrottleRate(3, per = 1.second),
+      timeoutMs = 60000)(resourceType = resourceType.toString, params)
+
+    val outcome = sierraSource
+      .via(SierraRecordWrapperFlow())
+      .grouped(batchSize)
+      .map(recordBatch => recordBatch.asJson)
+      .zipWithIndex
+      .runWith(s3sink)
 
     // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
     // were never successfully completed.
