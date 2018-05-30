@@ -4,7 +4,11 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.platform.matcher.models.{LinkedWork, LinkedWorkUpdate, LinkedWorksGraph}
+import uk.ac.wellcome.platform.matcher.models.{
+  LinkedWork,
+  LinkedWorkUpdate,
+  LinkedWorksGraph
+}
 
 import scala.collection.immutable.Iterable
 
@@ -24,12 +28,14 @@ object LinkedWorkGraphUpdater {
 
     // The edges in the new graph are the edges of all the unchanged works,
     // combined with the edges on the work we've just received.
-    val edges = unchangedEdges ++ toEdges(workUpdate.sourceId, workUpdate.otherIds)
+    val edges = unchangedEdges ++ toEdges(
+      workUpdate.sourceId,
+      workUpdate.otherIds)
 
     // The nodes in the new graph are the existing works, plus the
     // work we've just received.
-    val unchangedNodes = existingGraph.linkedWorksSet.flatMap {
-      linkedWork => linkedWork.workId +: linkedWork.linkedIds
+    val unchangedNodes = existingGraph.linkedWorksSet.flatMap { linkedWork =>
+      linkedWork.workId +: linkedWork.linkedIds
     }
 
     val nodes = unchangedNodes + workUpdate.sourceId

@@ -8,14 +8,15 @@ import io.circe.Encoder
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.{Future, blocking}
+import scala.concurrent.{blocking, Future}
 
 case class PublishAttempt(id: Either[Throwable, String])
 
 class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     extends Logging {
 
-  def writeMessage[T](message: T, subject: String)(implicit encoder: Encoder[T]): Future[PublishAttempt] =
+  def writeMessage[T](message: T, subject: String)(
+    implicit encoder: Encoder[T]): Future[PublishAttempt] =
     writeMessage(
       message = toJson(message).get,
       subject = subject
