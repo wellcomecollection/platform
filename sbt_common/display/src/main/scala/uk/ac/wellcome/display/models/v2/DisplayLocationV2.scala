@@ -1,32 +1,29 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{
-  DigitalLocation,
-  Location,
-  PhysicalLocation
-}
+import uk.ac.wellcome.display.models.DisplayLicense
+import uk.ac.wellcome.models.work.internal.{DigitalLocation, Location, PhysicalLocation}
 
 @ApiModel(
   value = "Location",
   description = "A location that provides access to an item",
   subTypes =
-    Array(classOf[DisplayDigitalLocation], classOf[DisplayPhysicalLocation])
+    Array(classOf[DisplayDigitalLocationV2], classOf[DisplayPhysicalLocationV2])
 )
-sealed trait DisplayLocation
+sealed trait DisplayLocationV2
 
-object DisplayLocation {
-  def apply(location: Location): DisplayLocation = location match {
+object DisplayLocationV2 {
+  def apply(location: Location): DisplayLocationV2 = location match {
     case l: DigitalLocation =>
-      DisplayDigitalLocation(
+      DisplayDigitalLocationV2(
         locationType = l.locationType,
         url = l.url,
         credit = l.credit,
         license = DisplayLicense(l.license)
       )
     case l: PhysicalLocation =>
-      DisplayPhysicalLocation(locationType = l.locationType, label = l.label)
+      DisplayPhysicalLocationV2(locationType = l.locationType, label = l.label)
   }
 }
 
@@ -34,7 +31,7 @@ object DisplayLocation {
   value = "DigitalLocation",
   description = "A digital location that provides access to an item"
 )
-case class DisplayDigitalLocation(
+case class DisplayDigitalLocationV2(
   @ApiModelProperty(
     value = "The type of location that an item is accessible from.",
     allowableValues = "thumbnail-image, iiif-image"
@@ -51,7 +48,7 @@ case class DisplayDigitalLocation(
     value =
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
   ) license: DisplayLicense
-) extends DisplayLocation {
+) extends DisplayLocationV2 {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "DigitalLocation"
 }
@@ -60,7 +57,7 @@ case class DisplayDigitalLocation(
   value = "PhysicalLocation",
   description = "A physical location that provides access to an item"
 )
-case class DisplayPhysicalLocation(
+case class DisplayPhysicalLocationV2(
   @ApiModelProperty(
     value = "The type of location that an item is accessible from.",
     allowableValues = ""
@@ -69,7 +66,7 @@ case class DisplayPhysicalLocation(
     dataType = "String",
     value = "The title or other short name of the location."
   ) label: String
-) extends DisplayLocation {
+) extends DisplayLocationV2 {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "PhysicalLocation"
 }

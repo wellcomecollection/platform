@@ -64,7 +64,7 @@ case class DisplayWorkV2(
     dataType = "uk.ac.wellcome.display.models.DisplayLocation",
     value =
       "Relates any thing to the location of a representative thumbnail image"
-  ) thumbnail: Option[DisplayLocation] = None,
+  ) thumbnail: Option[DisplayLocationV2] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v2.DisplayItemV2]",
     value = "List of items related to this work."
@@ -134,7 +134,7 @@ case object DisplayWorkV2 {
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
         if (includes.thumbnail)
-          work.thumbnail.map { DisplayLocation(_) } else None,
+          work.thumbnail.map { DisplayLocationV2(_) } else None,
       items =
         if (includes.items)
           Some(work.items.map {
