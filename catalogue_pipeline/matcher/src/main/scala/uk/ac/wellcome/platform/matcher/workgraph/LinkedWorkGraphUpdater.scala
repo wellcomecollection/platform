@@ -11,21 +11,31 @@ import uk.ac.wellcome.platform.matcher.models.{
 import scala.collection.immutable.Iterable
 
 object LinkedWorkGraphUpdater {
+
+  // Given an update to an individual node, and the existing graph,
+  // return the graph that comes from applying this update.
   def update(workNodeUpdate: WorkNodeUpdate,
              existingGraph: WorkGraph): WorkGraph = {
 
-    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
-      workNodeUpdate.id,
-      existingGraph.nodes)
-    val edges = filteredLinkedWorks.flatMap(linkedWork => {
-      toEdges(linkedWork.id, linkedWork.referencedWorkIds)
-    }) ++ toEdges(workNodeUpdate.id, workNodeUpdate.referencedWorkIds)
+    // First we get every node except the updated node -- the edges coming
+    // from these nodes won't be changing.
+    val unchangedNodes: Set[WorkNode] = existingGraph.nodes
+      .filterNot { _.id == workNodeUpdate.id }
 
-    val nodes = existingGraph.nodes.flatMap(linkedWork => {
-      allNodes(linkedWork)
-    }) + workNodeUpdate.id
+    val unchangedEdges = unchangedNodes
+      .flatMap { node => toEdges(node.id, node.referencedWorkIds) }
 
-    val g = Graph.from(edges = edges, nodes = nodes)
+    // Then we add the edges from the updated node.
+    val updatedEdges = toEdges(workNodeUpdate.id, workNodeUpdate.referencedWorkIds)
+    val edges = unchangedEdges ++ updatedEdges
+
+    // And we get all the IDs from the existing graph, plus anything new.
+    val nodeIds = existingGraph.nodes
+      .flatMap { node => allNodes(node) } + workNodeUpdate.id
+
+    // Now we construct a graph with ScalaGraph, iterate over the connected
+    // components, and extract the nodes from each component.
+    val g = Graph.from(edges = edges, nodes = nodeIds)
 
     def adjacentNodeIds(n: g.NodeT) = {
       n.diSuccessors.map(_.value).toList.sorted
@@ -48,17 +58,9 @@ object LinkedWorkGraphUpdater {
     )
   }
 
-  private def allNodes(linkedWork: WorkNode) = {
-    linkedWork.id +: linkedWork.referencedWorkIds
-  }
+  private def allNodes(node: WorkNode) =
+    node.id +: node.referencedWorkIds
 
-  private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
-    linkedWorkIds.map(workId ~> _)
-  }
-
-  private def existingGraphWithoutUpdatedNode(
-    workId: String,
-    linkedWorksList: Set[WorkNode]) = {
-    linkedWorksList.filterNot(_.id == workId)
-  }
+  private def toEdges(workId: String, referencedWorkIds: Iterable[String]) =
+    referencedWorkIds.map(workId ~> _)
 }
