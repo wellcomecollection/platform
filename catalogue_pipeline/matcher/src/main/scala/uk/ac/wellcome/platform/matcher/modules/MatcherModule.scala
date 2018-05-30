@@ -27,6 +27,6 @@ object MatcherModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def provideRecorderExecutionContext(): ExecutionContext =
+  def provideMatcherExecutionContext(): ExecutionContext =
     GlobalExecutionContext.context
 }
