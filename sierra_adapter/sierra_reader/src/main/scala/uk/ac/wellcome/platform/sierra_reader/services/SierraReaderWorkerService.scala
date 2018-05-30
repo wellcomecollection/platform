@@ -74,18 +74,19 @@ class SierraReaderWorkerService @Inject()(
       offset = windowStatus.offset
     )
 
-    val sierraSource = SierraSource(apiUrl, sierraOauthKey, sierraOauthSecret,
+    val sierraSource = SierraSource(
+      apiUrl,
+      sierraOauthKey,
+      sierraOauthSecret,
       throttleRate = ThrottleRate(3, per = 1.second),
-      timeoutMs = 60000)(
-      resourceType = resourceType.toString,
-      params)
+      timeoutMs = 60000)(resourceType = resourceType.toString, params)
 
     val outcome = sierraSource
-        .via(SierraRecordWrapperFlow())
-        .grouped(batchSize)
-        .map(recordBatch => recordBatch.asJson)
-        .zipWithIndex
-        .runWith(s3sink)
+      .via(SierraRecordWrapperFlow())
+      .grouped(batchSize)
+      .map(recordBatch => recordBatch.asJson)
+      .zipWithIndex
+      .runWith(s3sink)
 
     // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
     // were never successfully completed.
