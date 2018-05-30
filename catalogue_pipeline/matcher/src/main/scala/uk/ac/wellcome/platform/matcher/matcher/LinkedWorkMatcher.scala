@@ -39,12 +39,12 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     updatedLinkedWorkGraph: LinkedWorksGraph) = {
     groupBySetId(updatedLinkedWorkGraph).map {
       case (_, linkedWorkList) =>
-        IdentifierList(linkedWorkList.map(_.workId))
+        IdentifierList(linkedWorkList.map(_.id))
     }.toSet
   }
 
   private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
     updatedLinkedWorkGraph.linkedWorksSet
-      .groupBy(_.setId)
+      .groupBy(_.componentId)
   }
 }

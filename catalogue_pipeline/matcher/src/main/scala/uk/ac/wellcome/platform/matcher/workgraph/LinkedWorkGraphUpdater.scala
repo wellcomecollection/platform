@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWork,
   LinkedWorkUpdate,
-  LinkedWorksGraph
+  LinkedWorksGraph,
+  WorkNode
 }
 
 import scala.collection.immutable.Iterable
@@ -18,7 +18,7 @@ object LinkedWorkGraphUpdater {
       workUpdate.workId,
       existingGraph.linkedWorksSet)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
-      toEdges(linkedWork.workId, linkedWork.linkedIds)
+      toEdges(linkedWork.id, linkedWork.referencedWorkIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
 
     val nodes = existingGraph.linkedWorksSet.flatMap(linkedWork => {
@@ -37,15 +37,19 @@ object LinkedWorkGraphUpdater {
           val nodeIds = component.nodes.map(_.value).toList
           val componentIdentifier = nodeIds.sorted.mkString("+")
           component.nodes.map(node => {
-            LinkedWork(node.value, adjacentNodeIds(node), componentIdentifier)
+            WorkNode(
+              id = node.value,
+              referencedWorkIds = adjacentNodeIds(node),
+              componentId = componentIdentifier
+            )
           })
         })
         .toSet
     )
   }
 
-  private def allNodes(linkedWork: LinkedWork) = {
-    linkedWork.workId +: linkedWork.linkedIds
+  private def allNodes(linkedWork: WorkNode) = {
+    linkedWork.id +: linkedWork.referencedWorkIds
   }
 
   private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
@@ -54,7 +58,7 @@ object LinkedWorkGraphUpdater {
 
   private def existingGraphWithoutUpdatedNode(
     workId: String,
-    linkedWorksList: Set[LinkedWork]) = {
-    linkedWorksList.filterNot(_.workId == workId)
+    linkedWorksList: Set[WorkNode]) = {
+    linkedWorksList.filterNot(_.id == workId)
   }
 }

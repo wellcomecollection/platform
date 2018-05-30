@@ -14,7 +14,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.LinkedWork
+import uk.ac.wellcome.platform.matcher.models.WorkNode
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class LinkedWorkDaoTest
@@ -38,14 +38,13 @@ class LinkedWorkDaoTest
     it("returns the stored linkedWorks in dynamo") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { linkedWorkDao =>
-          val existingLinkedWorkA: LinkedWork =
-            LinkedWork("A", List("B"), "A+B")
-          val existingLinkedWorkB: LinkedWork = LinkedWork("B", Nil, "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+          val existingNodeA = WorkNode("A", List("B"), "A+B")
+          val existingNodeB = WorkNode("B", Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingNodeB)
 
           whenReady(linkedWorkDao.get(Set("A", "B"))) { linkedWork =>
-            linkedWork shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+            linkedWork shouldBe Set(existingNodeA, existingNodeB)
           }
         }
       }
@@ -97,14 +96,13 @@ class LinkedWorkDaoTest
     it("returns stored linkedWorks in dynamo") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
-          val existingLinkedWorkA: LinkedWork =
-            LinkedWork("A", List("B"), "A+B")
-          val existingLinkedWorkB: LinkedWork = LinkedWork("B", Nil, "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+          val existingNodeA = WorkNode("A", List("B"), "A+B")
+          val existingNodeB = WorkNode("B", Nil, "A+B")
+          Scanamo.put(dynamoDbClient)(table.name)(existingNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingNodeB)
 
           whenReady(matcherGraphDao.getBySetIds(Set("A+B"))) { linkedWorks =>
-            linkedWorks shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+            linkedWorks shouldBe Set(existingNodeA, existingNodeB)
           }
         }
       }
@@ -147,10 +145,10 @@ class LinkedWorkDaoTest
     it("puts a linkedWork") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { linkedWordDao =>
-          val work = LinkedWork("A", List("B"), "A+B")
+          val work = WorkNode("A", List("B"), "A+B")
           whenReady(linkedWordDao.put(work)) { _ =>
-            val savedLinkedWork = Scanamo.get[LinkedWork](dynamoDbClient)(
-              table.name)('workId -> "A")
+            val savedLinkedWork =
+              Scanamo.get[WorkNode](dynamoDbClient)(table.name)('workId -> "A")
             savedLinkedWork shouldBe Some(Right(work))
           }
         }
@@ -167,7 +165,7 @@ class LinkedWorkDaoTest
           dynamoDbClient,
           DynamoConfig(table.name, Some(table.index)))
 
-        whenReady(linkedWordDao.put(LinkedWork("A", List("B"), "A+B")).failed) {
+        whenReady(linkedWordDao.put(WorkNode("A", List("B"), "A+B")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }

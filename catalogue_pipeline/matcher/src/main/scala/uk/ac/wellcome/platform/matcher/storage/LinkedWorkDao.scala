@@ -6,7 +6,7 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.matcher.models.LinkedWork
+import uk.ac.wellcome.platform.matcher.models.WorkNode
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
@@ -20,20 +20,19 @@ class LinkedWorkDao @Inject()(
   val index = dynamoConfig.index.getOrElse(
     throw new RuntimeException("Index cannot be empty!"))
 
-  def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] =
+  def getBySetIds(setIds: Set[String]): Future[Set[WorkNode]] =
     Future.sequence(setIds.map(getBySetId)).map(_.flatten)
 
-  def put(
-    work: LinkedWork): Future[Option[Either[DynamoReadError, LinkedWork]]] = {
+  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
     Future {
       Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
     }
   }
 
-  def get(workIds: Set[String]): Future[Set[LinkedWork]] = {
+  def get(workIds: Set[String]): Future[Set[WorkNode]] = {
     Future {
       Scanamo
-        .getAll[LinkedWork](dynamoDbClient)(dynamoConfig.table)(
+        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)(
           'workId -> workIds)
         .map {
           case Right(works) => works
@@ -51,7 +50,7 @@ class LinkedWorkDao @Inject()(
   private def getBySetId(setId: String) = {
     Future {
       Scanamo
-        .queryIndex[LinkedWork](dynamoDbClient)(dynamoConfig.table, index)(
+        .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
           'setId -> setId)
         .map {
           case Right(record) => {
