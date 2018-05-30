@@ -3,27 +3,27 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWorkUpdate,
   WorkGraph,
-  WorkNode
+  WorkNode,
+  WorkNodeUpdate
 }
 
 import scala.collection.immutable.Iterable
 
 object LinkedWorkGraphUpdater {
-  def update(workUpdate: LinkedWorkUpdate,
+  def update(workNodeUpdate: WorkNodeUpdate,
              existingGraph: WorkGraph): WorkGraph = {
 
     val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
-      workUpdate.workId,
+      workNodeUpdate.id,
       existingGraph.nodes)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
       toEdges(linkedWork.id, linkedWork.referencedWorkIds)
-    }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
+    }) ++ toEdges(workNodeUpdate.id, workNodeUpdate.referencedWorkIds)
 
     val nodes = existingGraph.nodes.flatMap(linkedWork => {
       allNodes(linkedWork)
-    }) + workUpdate.workId
+    }) + workNodeUpdate.id
 
     val g = Graph.from(edges = edges, nodes = nodes)
 
