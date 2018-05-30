@@ -8,7 +8,7 @@ class DisplayLicenseV2Test extends FunSpec with Matchers {
   it("should read a License as a DisplayLicenseV2 correctly") {
     val displayLicense = DisplayLicenseV2(License_CCBY)
 
-    displayLicense.licenseType shouldBe License_CCBY.id
+    displayLicense.id shouldBe License_CCBY.id
     displayLicense.label shouldBe License_CCBY.label
     displayLicense.url shouldBe License_CCBY.url
     displayLicense.ontologyType shouldBe "License"

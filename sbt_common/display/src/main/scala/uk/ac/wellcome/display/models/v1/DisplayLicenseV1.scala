@@ -13,7 +13,7 @@ case class DisplayLicenseV1(
   @ApiModelProperty(
     value =
       "A type of license under which the work in question is released to the public.",
-    allowableValues = "CC-BY, CC-BY-NC"
+    allowableValues = "CC-BY, CC-BY-NC, CC-BY-NC-ND, CC-0, PDM"
   ) licenseType: String,
   @ApiModelProperty(
     value = "The title or other short name of a license"

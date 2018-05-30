@@ -13,8 +13,8 @@ case class DisplayLicenseV2(
   @ApiModelProperty(
     value =
       "A type of license under which the work in question is released to the public.",
-    allowableValues = "CC-BY, CC-BY-NC"
-  ) licenseType: String,
+    allowableValues = "cc-by, cc-by-nc, cc-by-nc-nd, cc-0, pdm"
+  ) id: String,
   @ApiModelProperty(
     value = "The title or other short name of a license"
   ) label: String,
@@ -28,7 +28,7 @@ case class DisplayLicenseV2(
 
 case object DisplayLicenseV2 {
   def apply(license: License): DisplayLicenseV2 = DisplayLicenseV2(
-    licenseType = license.id,
+    id = license.id,
     label = license.label,
     url = license.url
   )

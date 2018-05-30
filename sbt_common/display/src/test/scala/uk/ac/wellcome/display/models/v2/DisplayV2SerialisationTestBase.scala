@@ -9,8 +9,8 @@ trait DisplayV2SerialisationTestBase extends DisplaySerialisationTestBase {
 
   def license(license: License) =
     s"""{
+      "id": "${license.id}",
       "label": "${license.label}",
-      "licenseType": "${license.id}",
       "type": "${license.ontologyType}",
       "url": "${license.url}"
     }"""
