@@ -1,4 +1,4 @@
-package uk.ac.wellcome.display.models
+package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
@@ -9,7 +9,7 @@ import uk.ac.wellcome.models.work.internal.License
   description =
     "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
 )
-case class DisplayLicense(
+case class DisplayLicenseV1(
   @ApiModelProperty(
     value =
       "A type of license under which the work in question is released to the public.",
@@ -26,8 +26,8 @@ case class DisplayLicense(
   @JsonProperty("type") val ontologyType: String = "License"
 }
 
-case object DisplayLicense {
-  def apply(license: License): DisplayLicense = DisplayLicense(
+case object DisplayLicenseV1 {
+  def apply(license: License): DisplayLicenseV1 = DisplayLicenseV1(
     licenseType = license.licenseType,
     label = license.label,
     url = license.url
