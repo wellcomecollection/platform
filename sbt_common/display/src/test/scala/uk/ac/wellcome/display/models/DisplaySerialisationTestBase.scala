@@ -50,13 +50,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
        }
      """
 
-  def license(license: License) =
-    s"""{
-      "label": "${license.label}",
-      "licenseType": "${license.id}",
-      "type": "${license.ontologyType}",
-      "url": "${license.url}"
-    }"""
+  def license(license: License): String
 
   def identifier(identifier: SourceIdentifier): String
 
