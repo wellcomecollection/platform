@@ -2,13 +2,18 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, Location, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  Location,
+  PhysicalLocation
+}
 
 @ApiModel(
   value = "Location",
   description = "A location that provides access to an item",
-  subTypes =
-    Array(classOf[DisplayDigitalLocationV1], classOf[DisplayPhysicalLocationV1])
+  subTypes = Array(
+    classOf[DisplayDigitalLocationV1],
+    classOf[DisplayPhysicalLocationV1])
 )
 sealed trait DisplayLocationV1
 
