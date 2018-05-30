@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.DisplayLocation
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -38,7 +37,7 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     )
 
     displayItemV2.id shouldBe item.canonicalId
-    displayItemV2.locations shouldBe List(DisplayLocation(location))
+    displayItemV2.locations shouldBe List(DisplayLocationV2(location))
     displayItemV2.identifiers shouldBe Some(
       List(DisplayIdentifierV2(identifier)))
     displayItemV2.ontologyType shouldBe "Item"

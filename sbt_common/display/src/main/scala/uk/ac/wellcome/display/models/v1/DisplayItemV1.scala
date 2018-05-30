@@ -23,7 +23,6 @@ case class DisplayItemV1(
       "Relates the item to a unique system-generated identifier that governs interaction between systems and is regarded as canonical within the Wellcome data ecosystem."
   ) identifiers: Option[List[DisplayIdentifierV1]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.DisplayLocation]",
     value = "List of locations that provide access to the item"
   ) locations: List[DisplayLocationV1] = List()
 ) {
