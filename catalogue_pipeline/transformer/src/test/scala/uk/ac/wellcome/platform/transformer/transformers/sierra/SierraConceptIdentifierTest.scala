@@ -11,7 +11,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     val identifierSubfield = MarcSubfield(tag = "0", content = "lcsh/123")
 
     val expectedSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lcsh"),
+      identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/123",
       ontologyType = ontologyType
     )
@@ -32,7 +32,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     val identifierSubfield = MarcSubfield(tag = "0", content = "mesh/456")
 
     val expectedSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("mesh"),
+      identifierType = IdentifierType("nlm-mesh"),
       value = "mesh/456",
       ontologyType = ontologyType
     )
@@ -89,7 +89,7 @@ class SierraConceptIdentifierTest extends FunSpec with Matchers {
     val identifierSubfield = MarcSubfield(tag = "0", content = "mesh/456")
 
     val expectedSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("mesh"),
+      identifierType = IdentifierType("nlm-mesh"),
       value = "mesh/456",
       ontologyType = "Item"
     )
