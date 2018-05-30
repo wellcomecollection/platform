@@ -1,0 +1,54 @@
+{
+  "@context": "https://api.wellcomecollection.org/catalogue/v0/context.json",
+  "id": "watu9tbc",
+  "type": "Series",
+  "seriesType": {
+    "id": "archive-series",
+    "type": "seriesType",
+    "label": "ArchiveSeries"
+  },
+  "identifiers": [
+    {
+      "value": "9781999809003",
+      "type": "Identifier",
+      "identifierScheme": "ref-no"
+    }
+  ],
+  "title": "General correspondence - Correspondence - Professor Michael Ashburner: archive",
+  "numberInSeries": "22",
+  "section": {
+    "id": "d921j0ddj",
+    "label": "Correspondence",
+    "type": "Section"
+  },
+  "collection": {
+    "id": "y767k0ddj",
+    "label": "Professor Michael Ashburner: archive",
+    "type": "Collection"
+  },
+  "works": [
+    {
+      "id": "dh8191d8",
+      "type": "Work",
+      "workType": {
+        "id": "archive-item",
+        "type": "WorkType",
+        "label": "Archive Item"
+      },
+      "title": "Brenner rejection lettter",
+      "positionInSeries": "1",
+      "description": "Letter from Sydney Brenner when he was at the Laboratory of Molecular Biology refusing Ashburner as a research student."
+    },
+    {
+      "id": "j90xj9qjq",
+      "workType": {
+        "id": "archive-item",
+        "type": "WorkType",
+        "label": "Archive Item"
+      },
+      "title": "Cambridge Trust for Science and Technology ",
+      "positionInSeries": "2",
+      "description": " Correspondence regarding the new Cambridge Trust for Science and Technology. "
+    }
+  ]
+}
