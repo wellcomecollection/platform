@@ -41,32 +41,32 @@ object License {
 }
 
 case object License_CCBY extends License {
-  val id = "CC-BY"
+  val id = "cc-by"
   val label = "Attribution 4.0 International (CC BY 4.0)"
   val url = "http://creativecommons.org/licenses/by/4.0/"
 }
 
 case object License_CCBYNC extends License {
-  val id = "CC-BY-NC"
+  val id = "cc-by-nc"
   val label = "Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)"
   val url = "https://creativecommons.org/licenses/by-nc/4.0/"
 }
 
 case object License_CCBYNCND extends License {
-  val id = "CC-BY-NC-ND"
+  val id = "cc-by-nc-nd"
   val label =
     "Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"
   val url = "https://creativecommons.org/licenses/by-nc-nd/4.0/"
 }
 
 case object License_CC0 extends License {
-  val id = "CC-0"
+  val id = "cc-0"
   val label = "CC0 1.0 Universal"
   val url = "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
 }
 
 case object License_PDM extends License {
-  val id = "PDM"
+  val id = "pdm"
   val label = "Public Domain Mark"
   val url = "https://creativecommons.org/share-your-work/public-domain/pdm/"
 }
