@@ -18,7 +18,7 @@ object Dependencies {
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
-    val sierraStreamsSourceVersion = "0.2"
+    val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
   }
