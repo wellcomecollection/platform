@@ -23,15 +23,20 @@ object LinkedWorkGraphUpdater {
       .filterNot { _.id == workNodeUpdate.id }
 
     val unchangedEdges = unchangedNodes
-      .flatMap { node => toEdges(node.id, node.referencedWorkIds) }
+      .flatMap { node =>
+        toEdges(node.id, node.referencedWorkIds)
+      }
 
     // Then we add the edges from the updated node.
-    val updatedEdges = toEdges(workNodeUpdate.id, workNodeUpdate.referencedWorkIds)
+    val updatedEdges =
+      toEdges(workNodeUpdate.id, workNodeUpdate.referencedWorkIds)
     val edges = unchangedEdges ++ updatedEdges
 
     // And we get all the IDs from the existing graph, plus anything new.
     val nodeIds = existingGraph.nodes
-      .flatMap { node => allNodes(node) } + workNodeUpdate.id
+      .flatMap { node =>
+        allNodes(node)
+      } + workNodeUpdate.id
 
     // Now we construct a graph with ScalaGraph, iterate over the connected
     // components, and extract the nodes from each component.

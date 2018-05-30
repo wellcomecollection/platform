@@ -34,8 +34,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     }
   }
 
-  private def convertToIdentifiersList(
-    updatedLinkedWorkGraph: WorkGraph) = {
+  private def convertToIdentifiersList(updatedLinkedWorkGraph: WorkGraph) = {
     groupBySetId(updatedLinkedWorkGraph).map {
       case (_, linkedWorkList) =>
         IdentifierList(linkedWorkList.map(_.id))
