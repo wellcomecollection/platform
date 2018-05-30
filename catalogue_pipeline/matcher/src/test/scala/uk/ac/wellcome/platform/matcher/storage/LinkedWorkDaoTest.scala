@@ -176,9 +176,10 @@ class LinkedWorkDaoTest
   }
 
   it("cannot be instantiated if dynamoConfig.index is a None") {
-    intercept[RuntimeException] {
+    val caught = intercept[RuntimeException] {
       new LinkedWorkDao(dynamoDbClient, DynamoConfig("something", None))
     }
+    caught.getMessage shouldBe "Index cannot be empty!"
   }
 
 }

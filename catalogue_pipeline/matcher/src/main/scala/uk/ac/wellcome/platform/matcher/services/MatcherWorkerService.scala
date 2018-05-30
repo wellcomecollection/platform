@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
@@ -12,7 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class MatcherMessageReceiver @Inject()(
+class MatcherWorkerService @Inject()(
   messageStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
   s3TypeStore: S3TypeStore[RecorderWorkEntry],
@@ -28,11 +28,14 @@ class MatcherMessageReceiver @Inject()(
     for {
       hybridRecord <- Future.fromTry(
         fromJson[HybridRecord](notificationMessage.Message))
-      workEntry <- s3TypeStore.get(
-        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+      s3ObjectLocation = S3ObjectLocation(
+        bucket = storageS3Config.bucketName,
+        key = hybridRecord.s3key
+      )
+      workEntry: RecorderWorkEntry <- s3TypeStore.get(s3ObjectLocation)
       identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
-        message = toJson(identifiersList).get,
+        message = identifiersList,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()

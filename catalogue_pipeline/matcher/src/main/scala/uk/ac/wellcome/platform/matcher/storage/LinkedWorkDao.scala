@@ -20,9 +20,6 @@ class LinkedWorkDao @Inject()(
   val index = dynamoConfig.index.getOrElse(
     throw new RuntimeException("Index cannot be empty!"))
 
-  def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] =
-    Future.sequence(setIds.map(getBySetId)).map(_.flatten)
-
   def put(
     work: LinkedWork): Future[Option[Either[DynamoReadError, LinkedWork]]] = {
     Future {
@@ -30,6 +27,9 @@ class LinkedWorkDao @Inject()(
     }
   }
 
+  // Given a collection of work IDs, return a set of all the
+  // corresponding Works from the graph store.
+  //
   def get(workIds: Set[String]): Future[Set[LinkedWork]] = {
     Future {
       Scanamo
@@ -48,15 +48,22 @@ class LinkedWorkDao @Inject()(
     }
   }
 
+  // Given a collection of Set IDs, return a set of all the works in these sets
+  // from the graph store.
+  //
+  // Note: Each work in the table has exactly one set ID, so we can make
+  // separate DB queries for each set ID without worrying about redundant calls.
+  //
+  def getBySetIds(setIds: Set[String]): Future[Set[LinkedWork]] =
+    Future.sequence(setIds.map(getBySetId)).map(_.flatten)
+
   private def getBySetId(setId: String) = {
     Future {
       Scanamo
         .queryIndex[LinkedWork](dynamoDbClient)(dynamoConfig.table, index)(
           'setId -> setId)
         .map {
-          case Right(record) => {
-            record
-          }
+          case Right(record) => record
           case Left(scanamoError) => {
             val exception = new RuntimeException(scanamoError.toString)
             error(

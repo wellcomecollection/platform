@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.messages
+package uk.ac.wellcome.platform.matcher.services
 
 import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
@@ -18,7 +18,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-class MatcherMessageReceiverTest
+class MatcherWorkerServiceTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
@@ -31,7 +31,7 @@ class MatcherMessageReceiverTest
         withLocalS3Bucket { storageBucket =>
           sendSQS(queue, storageBucket, anUnidentifiedSierraWork)
 
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withMatcherWorkerService(queue, storageBucket, topic) { _ =>
             eventually {
               assertMessageSent(
                 topic,
@@ -58,7 +58,7 @@ class MatcherMessageReceiverTest
 
           sendSQS(queue, storageBucket, work)
 
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withMatcherWorkerService(queue, storageBucket, topic) { _ =>
             eventually {
               assertMessageSent(
                 topic,
@@ -76,7 +76,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withMatcherWorkerService(queue, storageBucket, topic) { _ =>
             val aIdentifier = aSierraSourceIdentifier("A")
             val bIdentifier = aSierraSourceIdentifier("B")
             val cIdentifier = aSierraSourceIdentifier("C")
@@ -131,7 +131,7 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withMatcherWorkerService(queue, storageBucket, topic) { _ =>
             val aIdentifier = aSierraSourceIdentifier("A")
             val bIdentifier = aSierraSourceIdentifier("B")
 
