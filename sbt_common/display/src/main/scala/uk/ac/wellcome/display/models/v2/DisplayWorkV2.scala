@@ -61,7 +61,7 @@ case class DisplayWorkV2(
     value = "Relates a work to the genre that describes the work's content."
   ) genres: List[DisplayGenre] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayLocation",
+    dataType = "uk.ac.wellcome.display.models.DisplayLocationV2",
     value =
       "Relates any thing to the location of a representative thumbnail image"
   ) thumbnail: Option[DisplayLocationV2] = None,
