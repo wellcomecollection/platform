@@ -7,19 +7,19 @@ import javax.inject.Singleton
 import uk.ac.wellcome.platform.matcher.GlobalExecutionContext
 
 import scala.concurrent.ExecutionContext
-import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
+import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 
 object MatcherModule extends TwitterModule {
   override def singletonStartup(injector: Injector): Unit = {
     super.singletonStartup(injector)
-    injector.instance[MatcherMessageReceiver]
+    injector.instance[MatcherWorkerService]
   }
 
   override def singletonShutdown(injector: Injector) {
     info("Terminating Matcher worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[MatcherMessageReceiver]
+    val workerService = injector.instance[MatcherWorkerService]
 
     workerService.stop()
     system.terminate()

@@ -15,7 +15,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
-import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
+import uk.ac.wellcome.platform.matcher.services.MatcherWorkerService
 import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, WorkGraphStore}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
@@ -63,10 +63,10 @@ trait MatcherFixtures
     }
   }
 
-  def withMatcherMessageReceiver[R](
+  def withMatcherWorkerService[R](
     queue: SQS.Queue,
     storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
+    topic: Topic)(testWith: TestWith[MatcherWorkerService, R]) = {
     val storageS3Config = S3Config(storageBucket.name)
     val snsWriter =
       new SNSWriter(snsClient, SNSConfig(topic.arn))
@@ -84,7 +84,7 @@ trait MatcherFixtures
                 sqsConfig = SQSConfig(queue.url, 1 second, 1),
                 metricsSender = metricsSender
               )
-              val matcherMessageReceiver = new MatcherMessageReceiver(
+              val matcherMessageReceiver = new MatcherWorkerService(
                 sqsStream,
                 snsWriter,
                 new S3TypeStore[RecorderWorkEntry](s3Client),
