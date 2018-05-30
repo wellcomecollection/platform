@@ -28,11 +28,14 @@ class MatcherWorkerService @Inject()(
     for {
       hybridRecord <- Future.fromTry(
         fromJson[HybridRecord](notificationMessage.Message))
-      workEntry <- s3TypeStore.get(
-        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+      s3ObjectLocation = S3ObjectLocation(
+        bucket = storageS3Config.bucketName,
+        key = hybridRecord.s3key
+      )
+      workEntry: RecorderWorkEntry <- s3TypeStore.get(s3ObjectLocation)
       identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
-        message = toJson(identifiersList).get,
+        message = identifiersList,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
