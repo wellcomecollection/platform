@@ -28,7 +28,7 @@ case class DisplayLicenseV1(
 
 case object DisplayLicenseV1 {
   def apply(license: License): DisplayLicenseV1 = DisplayLicenseV1(
-    licenseType = license.licenseType,
+    licenseType = license.id,
     label = license.label,
     url = license.url
   )

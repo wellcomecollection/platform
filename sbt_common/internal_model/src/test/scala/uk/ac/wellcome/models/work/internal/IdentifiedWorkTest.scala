@@ -13,7 +13,7 @@ class IdentifiedWorkTest
 
   private val license_CCBYJson =
     s"""{
-            "licenseType": "${License_CCBY.licenseType}",
+            "id": "${License_CCBY.id}",
             "label": "${License_CCBY.label}",
             "url": "${License_CCBY.url}",
             "ontologyType": "License"

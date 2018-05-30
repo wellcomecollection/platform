@@ -53,7 +53,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def license(license: License) =
     s"""{
       "label": "${license.label}",
-      "licenseType": "${license.licenseType}",
+      "licenseType": "${license.id}",
       "type": "${license.ontologyType}",
       "url": "${license.url}"
     }"""

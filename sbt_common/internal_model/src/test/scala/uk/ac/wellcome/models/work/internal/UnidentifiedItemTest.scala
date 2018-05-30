@@ -36,7 +36,7 @@ class UnidentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |      "url" : "",
       |      "credit" : null,
       |      "license": {
-      |        "licenseType": "${License_CCBY.licenseType}",
+      |        "id": "${License_CCBY.id}",
       |        "label": "${License_CCBY.label}",
       |        "url": "${License_CCBY.url}",
       |        "ontologyType": "License"
