@@ -4,7 +4,7 @@ import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.platform.matcher.models.{
   LinkedWorkUpdate,
-  LinkedWorksGraph,
+  WorkGraph,
   WorkNode
 }
 
@@ -12,16 +12,16 @@ import scala.collection.immutable.Iterable
 
 object LinkedWorkGraphUpdater {
   def update(workUpdate: LinkedWorkUpdate,
-             existingGraph: LinkedWorksGraph): LinkedWorksGraph = {
+             existingGraph: WorkGraph): WorkGraph = {
 
     val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
       workUpdate.workId,
-      existingGraph.linkedWorksSet)
+      existingGraph.nodes)
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
       toEdges(linkedWork.id, linkedWork.referencedWorkIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
 
-    val nodes = existingGraph.linkedWorksSet.flatMap(linkedWork => {
+    val nodes = existingGraph.nodes.flatMap(linkedWork => {
       allNodes(linkedWork)
     }) + workUpdate.workId
 
@@ -31,7 +31,7 @@ object LinkedWorkGraphUpdater {
       n.diSuccessors.map(_.value).toList.sorted
     }
 
-    LinkedWorksGraph(
+    WorkGraph(
       g.componentTraverser()
         .flatMap(component => {
           val nodeIds = component.nodes.map(_.value).toList

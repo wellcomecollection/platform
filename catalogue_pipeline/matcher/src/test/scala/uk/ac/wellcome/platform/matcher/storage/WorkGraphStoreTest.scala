@@ -9,7 +9,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{
   LinkedWorkUpdate,
-  LinkedWorksGraph,
+  WorkGraph,
   WorkNode
 }
 
@@ -29,7 +29,7 @@ class WorkGraphStoreTest
           whenReady(
             workGraphStore.findAffectedWorks(
               LinkedWorkUpdate("Not-there", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph shouldBe LinkedWorksGraph(Set.empty)
+            linkedWorkGraph shouldBe WorkGraph(Set.empty)
           }
         }
       }
@@ -45,7 +45,7 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph shouldBe LinkedWorksGraph(Set(work))
+            linkedWorkGraph shouldBe WorkGraph(Set(work))
           }
         }
       }
@@ -63,7 +63,7 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set("B")))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
+            linkedWorkGraph.nodes shouldBe Set(workA, workB)
           }
         }
       }
@@ -81,7 +81,7 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
+            linkedWorkGraph.nodes shouldBe Set(workA, workB)
           }
         }
       }
@@ -103,7 +103,7 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
+            linkedWorkGraph.nodes shouldBe Set(workA, workB, workC)
           }
         }
       }
@@ -125,7 +125,7 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("B", Set("C")))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
+            linkedWorkGraph.nodes shouldBe Set(workA, workB, workC)
           }
         }
       }
@@ -139,7 +139,7 @@ class WorkGraphStoreTest
           val workA = WorkNode("A", List("B"), "A+B")
           val workB = WorkNode("B", Nil, "A+B")
 
-          whenReady(workGraphStore.put(LinkedWorksGraph(Set(workA, workB)))) {
+          whenReady(workGraphStore.put(WorkGraph(Set(workA, workB)))) {
             _ =>
               val savedLinkedWorks = Scanamo
                 .scan[WorkNode](dynamoDbClient)(table.name)
@@ -162,7 +162,7 @@ class WorkGraphStoreTest
 
         whenReady(
           workGraphStore
-            .put(LinkedWorksGraph(Set(WorkNode("A", Nil, "A+B"))))
+            .put(WorkGraph(Set(WorkNode("A", Nil, "A+B"))))
             .failed) { failedException =>
           failedException shouldBe expectedException
         }

@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.matcher.storage
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWorkUpdate,
-  LinkedWorksGraph
-}
+import uk.ac.wellcome.platform.matcher.models.{LinkedWorkUpdate, WorkGraph}
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
@@ -15,7 +12,7 @@ class WorkGraphStore @Inject()(
 ) extends Logging {
 
   def findAffectedWorks(
-    workUpdate: LinkedWorkUpdate): Future[LinkedWorksGraph] = {
+    workUpdate: LinkedWorkUpdate): Future[WorkGraph] = {
 
     val directlyAffectedWorkIds = workUpdate.linkedIds + workUpdate.workId
 
@@ -25,12 +22,12 @@ class WorkGraphStore @Inject()(
         workNode.componentId
       }
       affectedWorks <- linkedWorkDao.getBySetIds(affectedSetIds)
-    } yield LinkedWorksGraph(affectedWorks)
+    } yield WorkGraph(affectedWorks)
   }
 
-  def put(graph: LinkedWorksGraph) = {
+  def put(graph: WorkGraph) = {
     Future.sequence(
-      graph.linkedWorksSet.map(linkedWorkDao.put)
+      graph.nodes.map(linkedWorkDao.put)
     )
   }
 }

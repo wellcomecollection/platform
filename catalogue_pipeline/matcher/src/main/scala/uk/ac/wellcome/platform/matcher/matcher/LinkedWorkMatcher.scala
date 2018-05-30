@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
 import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.platform.matcher.models._
+import uk.ac.wellcome.platform.matcher.models.{
+  IdentifierList,
+  LinkedWorkUpdate,
+  LinkedWorksIdentifiersList,
+  WorkGraph
+}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import uk.ac.wellcome.platform.matcher.workgraph.LinkedWorkGraphUpdater
 import uk.ac.wellcome.storage.GlobalExecutionContext._
@@ -36,15 +41,15 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   }
 
   private def convertToIdentifiersList(
-    updatedLinkedWorkGraph: LinkedWorksGraph) = {
+    updatedLinkedWorkGraph: WorkGraph) = {
     groupBySetId(updatedLinkedWorkGraph).map {
       case (_, linkedWorkList) =>
         IdentifierList(linkedWorkList.map(_.id))
     }.toSet
   }
 
-  private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
-    updatedLinkedWorkGraph.linkedWorksSet
+  private def groupBySetId(updatedLinkedWorkGraph: WorkGraph) = {
+    updatedLinkedWorkGraph.nodes
       .groupBy(_.componentId)
   }
 }
