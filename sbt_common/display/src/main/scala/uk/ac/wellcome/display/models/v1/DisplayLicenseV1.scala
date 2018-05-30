@@ -28,6 +28,11 @@ case class DisplayLicenseV1(
 
 case object DisplayLicenseV1 {
   def apply(license: License): DisplayLicenseV1 = DisplayLicenseV1(
+    // The old model for License had an uppercase "licenseType" field,
+    // e.g. "CC-BY" or "PDM".
+    //
+    // The current model uses lowercase IDs.  To preserve the V1 API,
+    // we uppercase the IDs before presenting them.
     licenseType = license.id.toUpperCase,
     label = license.label,
     url = license.url
