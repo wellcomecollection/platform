@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
@@ -109,8 +113,7 @@ trait MatcherFixtures
     }
   }
 
-  def withWorkNodeDao[R](table: Table)(
-    testWith: TestWith[WorkNodeDao, R]): R = {
+  def withWorkNodeDao[R](table: Table)(testWith: TestWith[WorkNodeDao, R]): R = {
     val workNodeDao = new WorkNodeDao(
       dynamoDbClient,
       DynamoConfig(table.name, Some(table.index)))

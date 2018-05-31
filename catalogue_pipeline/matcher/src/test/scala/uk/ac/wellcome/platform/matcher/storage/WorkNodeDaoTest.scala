@@ -86,7 +86,8 @@ class WorkNodeDaoTest
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { workNodeDao =>
           whenReady(workNodeDao.getByComponentIds(Set("Not-there"))) {
-            workNodeSet => workNodeSet shouldBe Set()
+            workNodeSet =>
+              workNodeSet shouldBe Set()
           }
         }
       }
@@ -146,8 +147,8 @@ class WorkNodeDaoTest
         withWorkNodeDao(table) { workNodeDao =>
           val workNode = WorkNode("A", List("B"), "A+B")
           whenReady(workNodeDao.put(workNode)) { _ =>
-            val savedWorkNode = Scanamo.get[WorkNode](dynamoDbClient)(
-              table.name)('id -> "A")
+            val savedWorkNode =
+              Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
             savedWorkNode shouldBe Some(Right(workNode))
           }
         }
