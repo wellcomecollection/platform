@@ -35,8 +35,8 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   // The HybridRecordEnricher combines this with the HybridRecord, and stores
   // both of them as a single row in DynamoDB.
   //
-  def updateRecord[DynamoRow](id: String)(ifNotExisting: => (T, Metadata))(
-    ifExisting: (T, Metadata) => (T, Metadata))(
+  def updateRecord[DynamoRow](id: String)(ifNotExisting: => T)(
+    ifExisting: (T, Metadata) => T)(metadata: Metadata)(
     implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
     dynamoFormat: DynamoFormat[DynamoRow],
     versionUpdater: VersionUpdater[DynamoRow],
@@ -54,12 +54,12 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
             storedS3Record,
             storedMetadata)) =>
         // todo put a comment here
-        val s3RecordToStore = ifExisting(storedS3Record, storedMetadata)
+        val transformedS3Record = ifExisting(storedS3Record, storedMetadata)
 
-        if (s3RecordToStore != storedS3Record) {
+        if (transformedS3Record != storedS3Record) {
           putObject(
             id,
-            s3RecordToStore,
+            transformedS3Record,
             enricher
               .enrichedHybridRecordHList(
                 id = id,
