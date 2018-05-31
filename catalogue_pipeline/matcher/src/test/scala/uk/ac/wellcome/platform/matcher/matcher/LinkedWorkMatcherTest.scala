@@ -134,7 +134,7 @@ class LinkedWorkMatcherTest
       val mockWorkGraphStore = mock[WorkGraphStore]
       withLinkedWorkMatcher(table, mockWorkGraphStore) { linkedWorkMatcher =>
         val expectedException = new RuntimeException("Failed to put")
-        when(mockWorkGraphStore.findAffectedWorks(any[LinkedWorkUpdate]))
+        when(mockWorkGraphStore.findAffectedWorks(any[WorkUpdate]))
           .thenReturn(Future.successful(WorkGraph(Set.empty)))
         when(mockWorkGraphStore.put(any[WorkGraph]))
           .thenReturn(Future.failed(expectedException))

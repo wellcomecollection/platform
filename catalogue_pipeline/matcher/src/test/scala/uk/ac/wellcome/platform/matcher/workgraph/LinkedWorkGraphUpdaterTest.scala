@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWorkUpdate,
   WorkGraph,
-  WorkNode
+  WorkNode,
+  WorkUpdate
 }
 
 class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
@@ -19,7 +19,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating nothing with A gives A:A") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
+          workUpdate = WorkUpdate("A", Set.empty),
           existingGraph = WorkGraph(Set.empty)
         )
         .nodes shouldBe Set(WorkNode("A", List(), "A"))
@@ -28,7 +28,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating nothing with A->B gives A+B:A->B") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A", Set("B")),
+          workUpdate = WorkUpdate("A", Set("B")),
           existingGraph = WorkGraph(Set.empty)
         )
         .nodes shouldBe Set(
@@ -39,7 +39,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating nothing with B->A gives A+B:B->A") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set("A")),
+          workUpdate = WorkUpdate("B", Set("A")),
           existingGraph = WorkGraph(Set.empty)
         )
         .nodes shouldBe Set(
@@ -52,7 +52,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B with A->B gives A+B:(A->B, B)") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A", Set("B")),
+          workUpdate = WorkUpdate("A", Set("B")),
           existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .nodes shouldBe Set(
@@ -63,7 +63,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B with B->C gives A+B+C:(A->B, B->C, C)") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
+          workUpdate = WorkUpdate("B", Set("C")),
           existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .nodes shouldBe Set(
@@ -76,7 +76,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B, C->D with B->C gives A+B+C+D:(A->B, B->C, C->D, D)") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
+          workUpdate = WorkUpdate("B", Set("C")),
           existingGraph = WorkGraph(
             Set(
               WorkNode("A", List("B"), "A+B"),
@@ -92,7 +92,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B with B->[C,D] gives A+B+C+D:(A->B, B->C&D, C, D") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C", "D")),
+          workUpdate = WorkUpdate("B", Set("C", "D")),
           existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .nodes shouldBe Set(
@@ -105,7 +105,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B->C with A->C gives A+B+C:(A->B, B->C, C->A") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("C", Set("A")),
+          workUpdate = WorkUpdate("C", Set("A")),
           existingGraph = WorkGraph(
             Set(
               WorkNode("A", List("B"), "A+B"),
@@ -123,7 +123,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating  A->B, B with A gives A:A and B:B") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
+          workUpdate = WorkUpdate("A", Set.empty),
           existingGraph = WorkGraph(
             Set(WorkNode("A", List("B"), "A+B"), WorkNode("B", List(), "A+B")))
         )
@@ -136,7 +136,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
       "updating A->B with A but NO B (*should* not be possible) gives A:A and B:B") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
+          workUpdate = WorkUpdate("A", Set.empty),
           existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .nodes shouldBe Set(
@@ -147,7 +147,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set.empty),
+          workUpdate = WorkUpdate("B", Set.empty),
           existingGraph = WorkGraph(
             Set(
               WorkNode("A", List("B"), "A+B+C"),
@@ -162,7 +162,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
       LinkedWorkGraphUpdater
         .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
+          workUpdate = WorkUpdate("B", Set("C")),
           existingGraph = WorkGraph(
             Set(
               WorkNode("A", List("B"), "A+B+C"),
