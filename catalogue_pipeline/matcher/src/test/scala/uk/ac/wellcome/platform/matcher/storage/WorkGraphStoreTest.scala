@@ -8,9 +8,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWork,
   LinkedWorkUpdate,
-  LinkedWorksGraph
+  LinkedWorksGraph,
+  WorkNode
 }
 
 import scala.concurrent.Future
@@ -36,89 +36,91 @@ class WorkGraphStoreTest
     }
 
     it(
-      "returns a LinkedWork if it has no links and it's the only node in the setId") {
+      "returns a WorkNode if it has no links and it's the only node in the setId") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val work = LinkedWork(workId = "A", linkedIds = Nil, setId = "A")
-          Scanamo.put(dynamoDbClient)(table.name)(work)
+          val workNode = WorkNode("A", Nil, "A")
+          Scanamo.put(dynamoDbClient)(table.name)(workNode)
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph shouldBe LinkedWorksGraph(Set(work))
+            linkedWorkGraph shouldBe LinkedWorksGraph(Set(workNode))
           }
         }
       }
     }
 
-    it("returns a LinkedWork and the links in the workUpdate") {
+    it("returns a WorkNode and the links in the workUpdate") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val workA = LinkedWork(workId = "A", linkedIds = Nil, setId = "A")
-          val workB = LinkedWork(workId = "B", linkedIds = Nil, setId = "B")
-          Scanamo.put(dynamoDbClient)(table.name)(workA)
-          Scanamo.put(dynamoDbClient)(table.name)(workB)
+          val workNodeA = WorkNode("A", Nil, "A")
+          val workNodeB = WorkNode("B", Nil, "B")
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set("B")))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(workNodeA, workNodeB)
           }
         }
       }
     }
 
-    it("returns a LinkedWork and the links in the database") {
+    it("returns a WorkNode and the links in the database") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val workA =
-            LinkedWork(workId = "A", linkedIds = List("B"), setId = "AB")
-          val workB = LinkedWork(workId = "B", linkedIds = Nil, setId = "AB")
-          Scanamo.put(dynamoDbClient)(table.name)(workA)
-          Scanamo.put(dynamoDbClient)(table.name)(workB)
+          val workNodeA = WorkNode("A", List("B"), "AB")
+          val workNodeB = WorkNode("B", Nil, "AB")
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(workNodeA, workNodeB)
           }
         }
       }
     }
 
     it(
-      "returns a LinkedWork and the links in the database more than one level down") {
+      "returns a WorkNode and the links in the database more than one level down") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val workA =
-            LinkedWork(workId = "A", linkedIds = List("B"), setId = "ABC")
-          val workB =
-            LinkedWork(workId = "B", linkedIds = List("C"), setId = "ABC")
-          val workC = LinkedWork(workId = "C", linkedIds = Nil, setId = "ABC")
-          Scanamo.put(dynamoDbClient)(table.name)(workA)
-          Scanamo.put(dynamoDbClient)(table.name)(workB)
-          Scanamo.put(dynamoDbClient)(table.name)(workC)
+          val workNodeA = WorkNode("A", List("B"), "ABC")
+          val workNodeB = WorkNode("B", List("C"), "ABC")
+          val workNodeC = WorkNode("C", Nil, "ABC")
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeC)
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(
+              workNodeA,
+              workNodeB,
+              workNodeC)
           }
         }
       }
     }
 
     it(
-      "returns a LinkedWork and the links in the database where an update joins two sets of works") {
+      "returns a WorkNode and the links in the database where an update joins two sets of works") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val workA =
-            LinkedWork(workId = "A", linkedIds = List("B"), setId = "AB")
-          val workB = LinkedWork(workId = "B", linkedIds = Nil, setId = "AB")
-          val workC = LinkedWork(workId = "C", linkedIds = Nil, setId = "C")
-          Scanamo.put(dynamoDbClient)(table.name)(workA)
-          Scanamo.put(dynamoDbClient)(table.name)(workB)
-          Scanamo.put(dynamoDbClient)(table.name)(workC)
+          val workNodeA = WorkNode("A", List("B"), "AB")
+          val workNodeB = WorkNode("B", Nil, "AB")
+          val workNodeC = WorkNode("C", Nil, "C")
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
+          Scanamo.put(dynamoDbClient)(table.name)(workNodeC)
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("B", Set("C")))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workA, workB, workC)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(
+              workNodeA,
+              workNodeB,
+              workNodeC)
           }
         }
       }
@@ -129,17 +131,18 @@ class WorkGraphStoreTest
     it("puts a simple graph") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
-          val workA = LinkedWork("A", List("B"), "A+B")
-          val workB = LinkedWork("B", Nil, "A+B")
+          val workNodeA = WorkNode("A", List("B"), "A+B")
+          val workNodeB = WorkNode("B", Nil, "A+B")
 
-          whenReady(workGraphStore.put(LinkedWorksGraph(Set(workA, workB)))) {
+          whenReady(
+            workGraphStore.put(LinkedWorksGraph(Set(workNodeA, workNodeB)))) {
             _ =>
               val savedLinkedWorks = Scanamo
-                .scan[LinkedWork](dynamoDbClient)(table.name)
+                .scan[WorkNode](dynamoDbClient)(table.name)
                 .map(_.right.get)
               savedLinkedWorks should contain theSameElementsAs List(
-                workA,
-                workB)
+                workNodeA,
+                workNodeB)
           }
         }
       }
@@ -149,13 +152,13 @@ class WorkGraphStoreTest
       withLocalDynamoDbTable { table =>
         val mockLinkedWorkDao = mock[LinkedWorkDao]
         val expectedException = new RuntimeException("FAILED")
-        when(mockLinkedWorkDao.put(any[LinkedWork]))
+        when(mockLinkedWorkDao.put(any[WorkNode]))
           .thenReturn(Future.failed(expectedException))
         val workGraphStore = new WorkGraphStore(mockLinkedWorkDao)
 
         whenReady(
           workGraphStore
-            .put(LinkedWorksGraph(Set(LinkedWork("A", Nil, "A+B"))))
+            .put(LinkedWorksGraph(Set(WorkNode("A", Nil, "A+B"))))
             .failed) { failedException =>
           failedException shouldBe expectedException
         }
