@@ -69,8 +69,8 @@ class LinkedWorkDaoTest
     it("returns an error if Scanamo fails") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
-          case class BadRecord(workId: String)
-          val badRecord: BadRecord = BadRecord(workId = "A")
+          case class BadRecord(id: String)
+          val badRecord: BadRecord = BadRecord(id = "A")
           Scanamo.put(dynamoDbClient)(table.name)(badRecord)
 
           whenReady(matcherGraphDao.get(Set("A")).failed) { failedException =>
@@ -128,8 +128,8 @@ class LinkedWorkDaoTest
     it("returns an error if Scanamo fails") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
-          case class BadRecord(workId: String, setId: String)
-          val badRecord: BadRecord = BadRecord(workId = "A", setId = "A+B")
+          case class BadRecord(id: String, componentId: String)
+          val badRecord: BadRecord = BadRecord(id = "A", componentId = "A+B")
           Scanamo.put(dynamoDbClient)(table.name)(badRecord)
 
           whenReady(matcherGraphDao.getBySetIds(Set("A+B")).failed) {
