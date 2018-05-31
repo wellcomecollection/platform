@@ -29,7 +29,8 @@ class LinkedWorkMatcherTest
           whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork)) {
             matchResult =>
               val workId = "sierra-system-number/id"
-              matchResult shouldBe MatchResult(Set(EquivalentIdentifiers(Set(workId))))
+              matchResult shouldBe MatchResult(
+                Set(EquivalentIdentifiers(Set(workId))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('workId -> workId)
@@ -53,7 +54,7 @@ class LinkedWorkMatcherTest
             identifiers = List(aIdentifier, linkedIdentifier))
           whenReady(linkedWorkMatcher.matchWork(work)) { matchResult =>
             matchResult shouldBe MatchResult(Set(EquivalentIdentifiers(
-                Set("sierra-system-number/A", "sierra-system-number/B"))))
+              Set("sierra-system-number/A", "sierra-system-number/B"))))
 
             val savedLinkedWorks = Scanamo
               .scan[WorkNode](dynamoDbClient)(table.name)

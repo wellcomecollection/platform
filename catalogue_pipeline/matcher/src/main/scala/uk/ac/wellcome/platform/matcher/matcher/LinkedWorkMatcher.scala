@@ -30,11 +30,16 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     }
   }
 
-  private def findEquivalentIdentifierSets(workGraph: WorkGraph): Set[EquivalentIdentifiers] =
+  private def findEquivalentIdentifierSets(
+    workGraph: WorkGraph): Set[EquivalentIdentifiers] =
     workGraph.nodes
       .groupBy { _.componentId }
       .values
-      .map { (nodeSet: Set[WorkNode]) => nodeSet.map { _.id }}
-      .map { (nodeIds: Set[String]) => EquivalentIdentifiers(nodeIds) }
+      .map { (nodeSet: Set[WorkNode]) =>
+        nodeSet.map { _.id }
+      }
+      .map { (nodeIds: Set[String]) =>
+        EquivalentIdentifiers(nodeIds)
+      }
       .toSet
 }

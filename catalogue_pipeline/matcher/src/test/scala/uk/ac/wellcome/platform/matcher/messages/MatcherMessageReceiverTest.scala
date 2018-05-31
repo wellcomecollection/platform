@@ -179,9 +179,7 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(
-    topic: Topic,
-    matchResult: MatchResult) = {
+  private def assertMessageSent(topic: Topic, matchResult: MatchResult) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
