@@ -1,19 +1,19 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
 import io.circe.Encoder
-import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -323,12 +323,11 @@ class SierraBibMergerFeatureTest
   }
 
   private def sendMessageToSQS(body: String, queue: Queue) = {
-    val message = SQSMessage(
-      subject = Some("Test message sent by SierraBibMergerWorkerServiceTest"),
-      body = body,
-      topic = "topic",
-      messageType = "messageType",
-      timestamp = "2001-01-01T01:01:01Z"
+    val message = NotificationMessage(
+      MessageId = "message-id",
+      TopicArn = "topic",
+      Subject = "Test message sent by SierraBibMergerWorkerServiceTest",
+      Message = body
     )
     sqsClient.sendMessage(queue.url, toJson(message).get)
   }
