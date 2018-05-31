@@ -21,8 +21,8 @@ object LinkedWorkGraphUpdater {
       toEdges(workNode.id, workNode.referencedWorkIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
 
-    val nodes = existingGraph.linkedWorksSet.flatMap(linkedWork => {
-      allNodes(linkedWork)
+    val nodes = existingGraph.linkedWorksSet.flatMap(workNode => {
+      allNodes(workNode)
     }) + workUpdate.workId
 
     val g = Graph.from(edges = edges, nodes = nodes)
