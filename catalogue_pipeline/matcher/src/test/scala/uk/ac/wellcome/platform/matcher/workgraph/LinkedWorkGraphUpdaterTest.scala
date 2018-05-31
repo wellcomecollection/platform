@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.matcher.models.{
-  WorkGraph,
-  WorkNode,
-  WorkUpdate
-}
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 
 class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 

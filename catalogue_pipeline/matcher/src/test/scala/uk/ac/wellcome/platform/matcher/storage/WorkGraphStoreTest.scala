@@ -7,11 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{
-  WorkGraph,
-  WorkNode,
-  WorkUpdate
-}
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 
 import scala.concurrent.Future
 
@@ -42,9 +38,10 @@ class WorkGraphStoreTest
           val workNode = WorkNode("A", Nil, "A")
           Scanamo.put(dynamoDbClient)(table.name)(workNode)
 
-          whenReady(workGraphStore.findAffectedWorks(
-            WorkUpdate("A", Set.empty))) { workGraph =>
-            workGraph shouldBe WorkGraph(Set(workNode))
+          whenReady(
+            workGraphStore.findAffectedWorks(WorkUpdate("A", Set.empty))) {
+            workGraph =>
+              workGraph shouldBe WorkGraph(Set(workNode))
           }
         }
       }
@@ -58,9 +55,10 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
           Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
 
-          whenReady(workGraphStore.findAffectedWorks(
-            WorkUpdate("A", Set("B")))) { workGraph =>
-            workGraph.nodes shouldBe Set(workNodeA, workNodeB)
+          whenReady(
+            workGraphStore.findAffectedWorks(WorkUpdate("A", Set("B")))) {
+            workGraph =>
+              workGraph.nodes shouldBe Set(workNodeA, workNodeB)
           }
         }
       }
@@ -74,9 +72,10 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
           Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
 
-          whenReady(workGraphStore.findAffectedWorks(
-            WorkUpdate("A", Set.empty))) { workGraph =>
-            workGraph.nodes shouldBe Set(workNodeA, workNodeB)
+          whenReady(
+            workGraphStore.findAffectedWorks(WorkUpdate("A", Set.empty))) {
+            workGraph =>
+              workGraph.nodes shouldBe Set(workNodeA, workNodeB)
           }
         }
       }
@@ -93,9 +92,10 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
           Scanamo.put(dynamoDbClient)(table.name)(workNodeC)
 
-          whenReady(workGraphStore.findAffectedWorks(
-            WorkUpdate("A", Set.empty))) { workGraph =>
-            workGraph.nodes shouldBe Set(workNodeA, workNodeB, workNodeC)
+          whenReady(
+            workGraphStore.findAffectedWorks(WorkUpdate("A", Set.empty))) {
+            workGraph =>
+              workGraph.nodes shouldBe Set(workNodeA, workNodeB, workNodeC)
           }
         }
       }
@@ -112,9 +112,10 @@ class WorkGraphStoreTest
           Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
           Scanamo.put(dynamoDbClient)(table.name)(workNodeC)
 
-          whenReady(workGraphStore.findAffectedWorks(
-            WorkUpdate("B", Set("C")))) { workGraph =>
-            workGraph.nodes shouldBe Set(workNodeA, workNodeB, workNodeC)
+          whenReady(
+            workGraphStore.findAffectedWorks(WorkUpdate("B", Set("C")))) {
+            workGraph =>
+              workGraph.nodes shouldBe Set(workNodeA, workNodeB, workNodeC)
           }
         }
       }

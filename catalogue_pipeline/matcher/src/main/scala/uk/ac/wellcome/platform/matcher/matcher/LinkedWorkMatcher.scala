@@ -19,7 +19,8 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
 
     for {
       existingGraph <- workGraphStore.findAffectedWorks(workNodeUpdate)
-      updatedGraph = LinkedWorkGraphUpdater.update(workNodeUpdate,
+      updatedGraph = LinkedWorkGraphUpdater.update(
+        workNodeUpdate,
         existingGraph = existingGraph)
       _ <- workGraphStore.put(updatedGraph)
 
