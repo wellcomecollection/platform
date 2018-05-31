@@ -11,8 +11,10 @@ class WorkGraphStore @Inject()(
   linkedWorkDao: LinkedWorkDao
 ) extends Logging {
 
+  // Given an update to a single node, return the WorkGraph containing all
+  // the nodes that might be affected by this change.
+  //
   def findAffectedWorks(workNodeUpdate: WorkNodeUpdate): Future[WorkGraph] = {
-
     val directlyAffectedWorkIds = workNodeUpdate.referencedWorkIds + workNodeUpdate.id
 
     for {
