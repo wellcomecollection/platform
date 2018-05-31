@@ -7,6 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.matcher.{EquivalentIdentifiers, MatchResult}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -26,15 +27,15 @@ class LinkedWorkMatcherTest
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
           whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork)) {
-            identifiersList =>
+            matchResult =>
               val workId = "sierra-system-number/id"
-              identifiersList shouldBe
-                LinkedWorksIdentifiersList(Set(IdentifierList(Set(workId))))
+              matchResult shouldBe MatchResult(
+                Set(EquivalentIdentifiers(Set(workId))))
 
               val savedLinkedWork = Scanamo
-                .get[LinkedWork](dynamoDbClient)(table.name)('workId -> workId)
+                .get[WorkNode](dynamoDbClient)(table.name)('workId -> workId)
                 .map(_.right.get)
-              savedLinkedWork shouldBe Some(LinkedWork(workId, Nil, workId))
+              savedLinkedWork shouldBe Some(WorkNode(workId, Nil, workId))
           }
         }
       }
@@ -51,20 +52,19 @@ class LinkedWorkMatcherTest
           val work = anUnidentifiedSierraWork.copy(
             sourceIdentifier = aIdentifier,
             identifiers = List(aIdentifier, linkedIdentifier))
-          whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
-            identifiersList shouldBe
-              LinkedWorksIdentifiersList(Set(IdentifierList(
-                Set("sierra-system-number/A", "sierra-system-number/B"))))
+          whenReady(linkedWorkMatcher.matchWork(work)) { matchResult =>
+            matchResult shouldBe MatchResult(Set(EquivalentIdentifiers(
+              Set("sierra-system-number/A", "sierra-system-number/B"))))
 
             val savedLinkedWorks = Scanamo
-              .scan[LinkedWork](dynamoDbClient)(table.name)
+              .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
             savedLinkedWorks should contain theSameElementsAs List(
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/A",
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/B",
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B")
@@ -79,11 +79,11 @@ class LinkedWorkMatcherTest
     withLocalDynamoDbTable { table =>
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-          val existingWorkA = LinkedWork(
+          val existingWorkA = WorkNode(
             "sierra-system-number/A",
             List("sierra-system-number/B"),
             "sierra-system-number/A+sierra-system-number/B")
-          val existingWorkB = LinkedWork(
+          val existingWorkB = WorkNode(
             "sierra-system-number/B",
             Nil,
             "sierra-system-number/A+sierra-system-number/B")
@@ -96,29 +96,29 @@ class LinkedWorkMatcherTest
             sourceIdentifier = bIdentifier,
             identifiers = List(bIdentifier, cIdentifier))
 
-          whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
-            identifiersList shouldBe
-              LinkedWorksIdentifiersList(
+          whenReady(linkedWorkMatcher.matchWork(work)) { matchResult =>
+            matchResult shouldBe
+              MatchResult(
                 Set(
-                  IdentifierList(
+                  EquivalentIdentifiers(
                     Set(
                       "sierra-system-number/A",
                       "sierra-system-number/B",
                       "sierra-system-number/C"))))
 
             val savedLinkedWorks = Scanamo
-              .scan[LinkedWork](dynamoDbClient)(table.name)
+              .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
             savedLinkedWorks should contain theSameElementsAs List(
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/A",
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/B",
                 List("sierra-system-number/C"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/C",
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
@@ -134,9 +134,9 @@ class LinkedWorkMatcherTest
       val mockWorkGraphStore = mock[WorkGraphStore]
       withLinkedWorkMatcher(table, mockWorkGraphStore) { linkedWorkMatcher =>
         val expectedException = new RuntimeException("Failed to put")
-        when(mockWorkGraphStore.findAffectedWorks(any[LinkedWorkUpdate]))
-          .thenReturn(Future.successful(LinkedWorksGraph(Set.empty)))
-        when(mockWorkGraphStore.put(any[LinkedWorksGraph]))
+        when(mockWorkGraphStore.findAffectedWorks(any[WorkNodeUpdate]))
+          .thenReturn(Future.successful(WorkGraph(Set.empty)))
+        when(mockWorkGraphStore.put(any[WorkGraph]))
           .thenReturn(Future.failed(expectedException))
         whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork).failed) {
           actualException =>

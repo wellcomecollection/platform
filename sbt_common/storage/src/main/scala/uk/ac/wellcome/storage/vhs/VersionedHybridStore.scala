@@ -53,6 +53,7 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
             storedHybridRecord,
             storedS3Record,
             storedMetadata)) =>
+        // todo put a comment here
         val transformedS3Record = ifExisting(storedS3Record, storedMetadata)
 
         if (transformedS3Record != storedS3Record) {

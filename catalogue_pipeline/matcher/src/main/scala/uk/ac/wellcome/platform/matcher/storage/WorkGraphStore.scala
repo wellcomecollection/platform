@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.matcher.storage
 
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWorkUpdate,
-  LinkedWorksGraph
-}
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNodeUpdate}
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
@@ -14,22 +11,24 @@ class WorkGraphStore @Inject()(
   linkedWorkDao: LinkedWorkDao
 ) extends Logging {
 
-  def findAffectedWorks(
-    workUpdate: LinkedWorkUpdate): Future[LinkedWorksGraph] = {
-
-    val directlyAffectedWorkIds = workUpdate.linkedIds + workUpdate.workId
+  // Given an update to a single node, return the WorkGraph containing all
+  // the nodes that might be affected by this change.
+  //
+  def findAffectedWorks(workNodeUpdate: WorkNodeUpdate): Future[WorkGraph] = {
+    val directlyAffectedWorkIds = workNodeUpdate.referencedWorkIds + workNodeUpdate.id
 
     for {
       directlyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds)
-      affectedSetIds = directlyAffectedWorks.map(linkedWork =>
-        linkedWork.setId)
+      affectedSetIds = directlyAffectedWorks.map { workNode =>
+        workNode.componentId
+      }
       affectedWorks <- linkedWorkDao.getBySetIds(affectedSetIds)
-    } yield LinkedWorksGraph(affectedWorks)
+    } yield WorkGraph(affectedWorks)
   }
 
-  def put(graph: LinkedWorksGraph) = {
+  def put(graph: WorkGraph) = {
     Future.sequence(
-      graph.linkedWorksSet.map(linkedWorkDao.put)
+      graph.nodes.map(linkedWorkDao.put)
     )
   }
 }

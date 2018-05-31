@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWork,
-  LinkedWorkUpdate,
-  LinkedWorksGraph
+  WorkGraph,
+  WorkNode,
+  WorkNodeUpdate
 }
 
 class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
@@ -17,172 +17,187 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
 
   describe("Adding links without existing works") {
     it("updating nothing with A gives A:A") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
-          existingGraph = LinkedWorksGraph(Set.empty)
-        )
-        .linkedWorksSet shouldBe Set(LinkedWork("A", List(), setId = "A"))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("A", Set.empty),
+        expectedNodes = Set(WorkNode("A", List(), "A"))
+      )
     }
 
     it("updating nothing with A->B gives A+B:A->B") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("A", Set("B")),
-          existingGraph = LinkedWorksGraph(Set.empty)
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("A", Set("B")),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B"),
+          WorkNode("B", List(), "A+B")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List("B"), setId = "A+B"),
-        LinkedWork("B", List(), setId = "A+B"))
+      )
     }
 
     it("updating nothing with B->A gives A+B:B->A") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set("A")),
-          existingGraph = LinkedWorksGraph(Set.empty)
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set("A")),
+        expectedNodes = Set(
+          WorkNode("B", List("A"), "A+B"),
+          WorkNode("A", List(), "A+B")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("B", List("A"), setId = "A+B"),
-        LinkedWork("A", List(), setId = "A+B"))
+      )
     }
   }
 
   describe("Adding links to existing works") {
     it("updating A->B with A->B gives A+B:(A->B, B)") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("A", Set("B")),
-          existingGraph =
-            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("A", Set("B")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B"),
+          WorkNode("B", List(), "A+B")
         )
-        .linkedWorksSet should contain theSameElementsAs
-        List(
-          LinkedWork("A", List("B"), setId = "A+B"),
-          LinkedWork("B", List(), setId = "A+B"))
+      )
     }
 
     it("updating A->B with B->C gives A+B+C:(A->B, B->C, C)") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
-          existingGraph =
-            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set("C")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C"),
+          WorkNode("B", List("C"), "A+B+C"),
+          WorkNode("C", List(), "A+B+C")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List("B"), setId = "A+B+C"),
-        LinkedWork("B", List("C"), setId = "A+B+C"),
-        LinkedWork("C", List(), setId = "A+B+C")
       )
     }
 
     it("updating A->B, C->D with B->C gives A+B+C+D:(A->B, B->C, C->D, D)") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
-          existingGraph = LinkedWorksGraph(
-            Set(
-              LinkedWork("A", List("B"), "A+B"),
-              LinkedWork("C", List("D"), "C+D")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set("C")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("C", List("D"), "C+D")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C+D"),
+          WorkNode("B", List("C"), "A+B+C+D"),
+          WorkNode("C", List("D"), "A+B+C+D"),
+          WorkNode("D", List(), "A+B+C+D")
         )
-        .linkedWorksSet should contain theSameElementsAs
-        List(
-          LinkedWork("A", List("B"), "A+B+C+D"),
-          LinkedWork("B", List("C"), "A+B+C+D"),
-          LinkedWork("C", List("D"), "A+B+C+D"),
-          LinkedWork("D", List(), setId = "A+B+C+D"))
+      )
     }
 
     it("updating A->B with B->[C,D] gives A+B+C+D:(A->B, B->C&D, C, D") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C", "D")),
-          existingGraph =
-            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set("C", "D")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C+D"),
+          WorkNode("B", List("C", "D"), "A+B+C+D"),
+          WorkNode("C", List(), "A+B+C+D"),
+          WorkNode("D", List(), "A+B+C+D")
         )
-        .linkedWorksSet should contain theSameElementsAs
-        List(
-          LinkedWork("A", List("B"), setId = "A+B+C+D"),
-          LinkedWork("B", List("C", "D"), setId = "A+B+C+D"),
-          LinkedWork("C", List(), setId = "A+B+C+D"),
-          LinkedWork("D", List(), setId = "A+B+C+D")
-        )
+      )
     }
 
     it("updating A->B->C with A->C gives A+B+C:(A->B, B->C, C->A") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("C", Set("A")),
-          existingGraph = LinkedWorksGraph(
-            Set(
-              LinkedWork("A", List("B"), "A+B"),
-              LinkedWork("B", List("C"), "B+C")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("C", Set("A")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("B", List("C"), "B+C")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C"),
+          WorkNode("B", List("C"), "A+B+C"),
+          WorkNode("C", List("A"), "A+B+C")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List("B"), setId = "A+B+C"),
-        LinkedWork("B", List("C"), setId = "A+B+C"),
-        LinkedWork("C", List("A"), setId = "A+B+C")
       )
     }
   }
 
   describe("Removing links") {
     it("updating  A->B, B with A gives A:A and B:B") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
-          existingGraph = LinkedWorksGraph(
-            Set(
-              LinkedWork("A", List("B"), "A+B"),
-              LinkedWork("B", List(), "A+B")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("A", Set.empty),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("B", List(), "A+B")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List(), "A"),
+          WorkNode("B", List(), "B")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List(), setId = "A"),
-        LinkedWork("B", List(), setId = "B"))
+      )
     }
 
     it(
       "updating A->B with A but NO B (*should* not be possible) gives A:A and B:B") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("A", Set.empty),
-          existingGraph =
-            LinkedWorksGraph(Set(LinkedWork("A", List("B"), "A+B")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("A", Set.empty),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List(), "A"),
+          WorkNode("B", List(), "B")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List(), setId = "A"),
-        LinkedWork("B", List(), setId = "B"))
+      )
     }
 
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set.empty),
-          existingGraph = LinkedWorksGraph(
-            Set(
-              LinkedWork("A", List("B"), "A+B+C"),
-              LinkedWork("B", List("C"), "A+B+C")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set.empty),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B+C"),
+            WorkNode("B", List("C"), "A+B+C")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B"),
+          WorkNode("B", List(), "A+B"),
+          WorkNode("C", List(), "C")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List("B"), setId = "A+B"),
-        LinkedWork("B", List(), setId = "A+B"),
-        LinkedWork("C", List(), setId = "C"))
+      )
     }
 
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
-      LinkedWorkGraphUpdater
-        .update(
-          workUpdate = LinkedWorkUpdate("B", Set("C")),
-          existingGraph = LinkedWorksGraph(
-            Set(
-              LinkedWork("A", List("B"), "A+B+C"),
-              LinkedWork("B", List("A", "C"), "A+B+C"),
-              LinkedWork("C", List(), "A+B+C")))
+      assertUpdaterWorksCorrectly(
+        workNodeUpdate = WorkNodeUpdate("B", Set("C")),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B+C"),
+            WorkNode("B", List("A", "C"), "A+B+C"),
+            WorkNode("C", List(), "A+B+C")
+          )),
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C"),
+          WorkNode("B", List("C"), "A+B+C"),
+          WorkNode("C", List(), "A+B+C")
         )
-        .linkedWorksSet shouldBe Set(
-        LinkedWork("A", List("B"), setId = "A+B+C"),
-        LinkedWork("B", List("C"), setId = "A+B+C"),
-        LinkedWork("C", List(), setId = "A+B+C"))
+      )
     }
+  }
+
+  private def assertUpdaterWorksCorrectly(
+    workNodeUpdate: WorkNodeUpdate,
+    existingGraph: WorkGraph = WorkGraph(Set.empty),
+    expectedNodes: Set[WorkNode]
+  ) = {
+    val actualNodes = LinkedWorkGraphUpdater.update(
+      workNodeUpdate = workNodeUpdate,
+      existingGraph = existingGraph
+    )
+    actualNodes shouldBe expectedNodes
   }
 }
