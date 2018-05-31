@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
-class LinkedWorkDao @Inject()(
+class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
