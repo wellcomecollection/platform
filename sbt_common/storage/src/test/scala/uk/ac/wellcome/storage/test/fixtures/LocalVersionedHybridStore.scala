@@ -1,7 +1,5 @@
 package uk.ac.wellcome.storage.test.fixtures
 
-import java.io.InputStream
-
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import io.circe.Encoder

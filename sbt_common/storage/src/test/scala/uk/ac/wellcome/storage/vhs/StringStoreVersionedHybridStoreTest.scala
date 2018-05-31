@@ -45,7 +45,7 @@ class StringStoreVersionedHybridStoreTest
       globalS3Prefix = globalS3Prefix
     )
 
-    val store = new VersionedHybridStore[String, EmptyMetadata, ObjectStore[String]](
+    val store = new VersionedHybridStore[String, Metadata, ObjectStore[String]](
       vhsConfig = vhsConfig,
       objectStore = objectStore,
       dynamoDbClient = dynamoDbClient

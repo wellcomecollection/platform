@@ -5,13 +5,14 @@ import com.amazonaws.services.sqs.AmazonSQS
 import com.amazonaws.services.sqs
 import uk.ac.wellcome.utils.JsonUtil._
 import com.google.inject.Inject
-import io.circe.{Decoder, Encoder, Json}
+import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSReader}
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.Future
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
 
 case class MessageReaderConfig(sqsConfig: SQSConfig, s3Config: S3Config)
 
@@ -19,12 +20,8 @@ class MessageReader[T] @Inject()(
   messageReaderConfig: MessageReaderConfig,
   s3Client: AmazonS3,
   sqsClient: AmazonSQS
-)(implicit encoder: Encoder[T], decoder: Decoder[T]) {
+)(implicit objectStore: ObjectStore[T]) {
   val sqsReader = new SQSReader(sqsClient, messageReaderConfig.sqsConfig)
-
-  val s3TypeStore = new S3TypeStore[T](
-    new S3StorageBackend[Json](s3Client)
-  )
 
   def readAndDelete(process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage]
@@ -49,7 +46,7 @@ class MessageReader[T] @Inject()(
     for {
       messagePointer <- Future.fromTry[MessagePointer](
         deserialisedMessagePointerAttempt)
-      deserialisedObject <- s3TypeStore.get(messagePointer.src)
+      deserialisedObject <- objectStore.get(messagePointer.src)
     } yield deserialisedObject
   }
 }

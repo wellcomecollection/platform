@@ -13,17 +13,17 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 import scala.util.{Random, Success}
-
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait Messaging
     extends Akka
@@ -32,6 +32,10 @@ trait Messaging
       with SNS
       with S3
       with Matchers {
+
+  implicit val storageBackend = new S3StorageBackend(s3Client)
+
+  case class ExampleObject(name: String)
 
   def withLocalStackSubscription[R](queue: Queue, topic: Topic) =
     fixture[SubscribeResult, R](
@@ -66,15 +70,15 @@ trait Messaging
       "aws.message.writer.s3.bucketName" -> bucket.name
     ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
 
-  case class ExampleObject(name: String)
-
   def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
     withMessageReader(bucket, queue)(testWith)
   }
 
   def withMessageReader[T, R](bucket: Bucket, queue: Queue)(
-    testWith: TestWith[MessageReader[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]) = {
+    testWith: TestWith[MessageReader[T], R])(
+    implicit objectStore: ObjectStore[T]
+  ) = {
 
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig = SQSConfig(
@@ -132,7 +136,7 @@ trait Messaging
     actorSystem: ActorSystem,
     bucket: Bucket,
     queue: SQS.Queue,
-    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]) = {
+    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(implicit objectStore: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val sqsConfig = SQSConfig(
       queueUrl = queue.url,
