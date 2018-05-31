@@ -2,11 +2,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{
-  SubscribeRequest,
-  SubscribeResult,
-  UnsubscribeRequest
-}
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
@@ -17,10 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.{
-  S3Config,
-  S3ObjectLocation
-}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
@@ -236,12 +229,6 @@ trait Messaging
       metricsSender)
     testWith(stream)
   }
-
-  implicit val messagePointerDecoder: Decoder[MessagePointer] =
-    deriveDecoder[MessagePointer]
-
-  implicit val messagePointerEncoder: Encoder[MessagePointer] =
-    deriveEncoder[MessagePointer]
 
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {
