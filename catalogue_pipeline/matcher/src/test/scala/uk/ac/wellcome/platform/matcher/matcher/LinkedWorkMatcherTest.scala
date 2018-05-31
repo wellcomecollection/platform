@@ -32,9 +32,9 @@ class LinkedWorkMatcherTest
                 LinkedWorksIdentifiersList(Set(IdentifierList(Set(workId))))
 
               val savedLinkedWork = Scanamo
-                .get[LinkedWork](dynamoDbClient)(table.name)('workId -> workId)
+                .get[WorkNode](dynamoDbClient)(table.name)('workId -> workId)
                 .map(_.right.get)
-              savedLinkedWork shouldBe Some(LinkedWork(workId, Nil, workId))
+              savedLinkedWork shouldBe Some(WorkNode(workId, Nil, workId))
           }
         }
       }
@@ -56,15 +56,15 @@ class LinkedWorkMatcherTest
               LinkedWorksIdentifiersList(Set(IdentifierList(
                 Set("sierra-system-number/A", "sierra-system-number/B"))))
 
-            val savedLinkedWorks = Scanamo
-              .scan[LinkedWork](dynamoDbClient)(table.name)
+            val savedWorkNodes = Scanamo
+              .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
-            savedLinkedWorks should contain theSameElementsAs List(
-              LinkedWork(
+            savedWorkNodes should contain theSameElementsAs List(
+              WorkNode(
                 "sierra-system-number/A",
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/B",
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B")
@@ -79,11 +79,11 @@ class LinkedWorkMatcherTest
     withLocalDynamoDbTable { table =>
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-          val existingWorkA = LinkedWork(
+          val existingWorkA = WorkNode(
             "sierra-system-number/A",
             List("sierra-system-number/B"),
             "sierra-system-number/A+sierra-system-number/B")
-          val existingWorkB = LinkedWork(
+          val existingWorkB = WorkNode(
             "sierra-system-number/B",
             Nil,
             "sierra-system-number/A+sierra-system-number/B")
@@ -106,19 +106,19 @@ class LinkedWorkMatcherTest
                       "sierra-system-number/B",
                       "sierra-system-number/C"))))
 
-            val savedLinkedWorks = Scanamo
-              .scan[LinkedWork](dynamoDbClient)(table.name)
+            val savedWorkNodes = Scanamo
+              .scan[WorkNode](dynamoDbClient)(table.name)
               .map(_.right.get)
-            savedLinkedWorks should contain theSameElementsAs List(
-              LinkedWork(
+            savedWorkNodes should contain theSameElementsAs List(
+              WorkNode(
                 "sierra-system-number/A",
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/B",
                 List("sierra-system-number/C"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-              LinkedWork(
+              WorkNode(
                 "sierra-system-number/C",
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
