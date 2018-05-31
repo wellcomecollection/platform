@@ -143,7 +143,7 @@ class LinkedWorkDaoTest
           val workNode = WorkNode("A", List("B"), "A+B")
           whenReady(linkedWordDao.put(workNode)) { _ =>
             val savedWorkNode = Scanamo.get[WorkNode](dynamoDbClient)(
-              table.name)('workId -> "A")
+              table.name)('id -> "A")
             savedWorkNode shouldBe Some(Right(workNode))
           }
         }

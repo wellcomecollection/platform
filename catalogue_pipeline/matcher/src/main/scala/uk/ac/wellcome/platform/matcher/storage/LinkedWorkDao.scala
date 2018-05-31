@@ -34,7 +34,7 @@ class LinkedWorkDao @Inject()(
     Future {
       Scanamo
         .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)(
-          'workId -> workIds)
+          'id -> workIds)
         .map {
           case Right(works) => works
           case Left(scanamoError) => {
@@ -52,7 +52,7 @@ class LinkedWorkDao @Inject()(
     Future {
       Scanamo
         .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
-          'setId -> setId)
+          'componentId -> setId)
         .map {
           case Right(record) => {
             record

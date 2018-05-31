@@ -32,7 +32,7 @@ class LinkedWorkMatcherTest
                 LinkedWorksIdentifiersList(Set(IdentifierList(Set(workId))))
 
               val savedLinkedWork = Scanamo
-                .get[WorkNode](dynamoDbClient)(table.name)('workId -> workId)
+                .get[WorkNode](dynamoDbClient)(table.name)('id -> workId)
                 .map(_.right.get)
               savedLinkedWork shouldBe Some(WorkNode(workId, Nil, workId))
           }
