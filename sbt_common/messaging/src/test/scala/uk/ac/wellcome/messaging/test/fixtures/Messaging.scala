@@ -2,11 +2,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{
-  SubscribeRequest,
-  SubscribeResult,
-  UnsubscribeRequest
-}
+import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
 import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
@@ -14,20 +10,15 @@ import uk.ac.wellcome.messaging.message._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.s3.{
-  S3Config,
-  S3ObjectLocation
-}
+import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation}
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Random, Success}
 
@@ -74,30 +65,6 @@ trait Messaging
 
   case class ExampleObject(name: String)
 
-  class ExampleMessageWorker(
-    messageReader: MessageReader[ExampleObject],
-    actorSystem: ActorSystem,
-    metricsSender: MetricsSender
-  ) extends MessageWorker[ExampleObject](
-        messageReader,
-        actorSystem,
-        metricsSender
-      ) {
-
-    var calledWith: Option[ExampleObject] = None
-
-    def hasBeenCalled: Boolean = calledWith.nonEmpty
-
-    override implicit val decoder: Decoder[ExampleObject] =
-      deriveDecoder[ExampleObject]
-
-    override def processMessage(message: ExampleObject) = Future {
-      calledWith = Some(message)
-
-      info("processMessage was called!")
-    }
-  }
-
   def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
     testWith: TestWith[MessageReader[ExampleObject], R]) = {
     withMessageReader(bucket, queue)(testWith)
@@ -124,26 +91,6 @@ trait Messaging
     )
 
     testWith(testReader)
-  }
-
-  def withMessageWorker[R](
-    actorSystem: ActorSystem,
-    metricsSender: MetricsSender,
-    queue: Queue,
-    messageReader: MessageReader[ExampleObject]
-  )(testWith: TestWith[ExampleMessageWorker, R]) = {
-
-    val testWorker = new ExampleMessageWorker(
-      messageReader,
-      actorSystem,
-      metricsSender
-    )
-
-    try {
-      testWith(testWorker)
-    } finally {
-      testWorker.stop()
-    }
   }
 
   def withMessageWriter[R](bucket: Bucket,
@@ -178,40 +125,6 @@ trait Messaging
     }
   }
 
-  def withExampleObjectMessageWorkerFixtures[R](
-    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
-                       R]) = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        withExampleObjectMessageReaderFixtures {
-          case (bucket, messageReader, queue) =>
-            withMessageWorker(actorSystem, metricsSender, queue, messageReader) {
-              worker =>
-                testWith((metricsSender, queue, bucket, worker))
-            }
-        }
-
-      }
-    }
-  }
-
-  def withMessageWorkerFixturesAndMockedMetrics[R](
-    testWith: TestWith[(MetricsSender, Queue, Bucket, ExampleMessageWorker),
-                       R]) = {
-    withActorSystem { actorSystem =>
-      withMockMetricSender { metricsSender =>
-        withExampleObjectMessageReaderFixtures {
-          case (bucket, messageReader, queue) =>
-            withMessageWorker(actorSystem, metricsSender, queue, messageReader) {
-              worker =>
-                testWith((metricsSender, queue, bucket, worker))
-            }
-        }
-
-      }
-    }
-  }
-
   def withMessageStream[T, R](
     actorSystem: ActorSystem,
     bucket: Bucket,
@@ -235,6 +148,32 @@ trait Messaging
       messageConfig,
       metricsSender)
     testWith(stream)
+  }
+
+  def withMessageStreamFixtures[R](
+                                    testWith: TestWith[(Bucket,
+                                      MessageStream[ExampleObject],
+                                      QueuePair,
+                                      MetricsSender),
+                                      R]) = {
+
+    withActorSystem { actorSystem =>
+      withLocalS3Bucket { bucket =>
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, _) =>
+            withMockMetricSender { metricsSender =>
+              withMessageStream[ExampleObject, R](
+                actorSystem,
+                bucket,
+                queue,
+                metricsSender) { stream =>
+                testWith((bucket, stream, queuePair, metricsSender))
+              }
+
+            }
+        }
+      }
+    }
   }
 
   implicit val messagePointerDecoder: Decoder[MessagePointer] =
