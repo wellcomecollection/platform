@@ -176,12 +176,6 @@ trait Messaging
     }
   }
 
-  implicit val messagePointerDecoder: Decoder[MessagePointer] =
-    deriveDecoder[MessagePointer]
-
-  implicit val messagePointerEncoder: Encoder[MessagePointer] =
-    deriveEncoder[MessagePointer]
-
   def put[T](obj: T, location: S3ObjectLocation)(
     implicit encoder: Encoder[T]) = {
     val serialisedExampleObject = toJson[T](obj).get
