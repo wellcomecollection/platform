@@ -23,28 +23,27 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
       work.identifiers.map(identifierToString).filterNot(_ == workId).toSet
 
     for {
-      linkedWorksGraph <- workGraphStore.findAffectedWorks(
+      existingGraph <- workGraphStore.findAffectedWorks(
         LinkedWorkUpdate(workId, linkedWorkIds))
-      updatedLinkedWorkGraph = LinkedWorkGraphUpdater.update(
+      updatedGraph = LinkedWorkGraphUpdater.update(
         LinkedWorkUpdate(workId, linkedWorkIds),
-        linkedWorksGraph)
-      _ <- workGraphStore.put(updatedLinkedWorkGraph)
+        existingGraph = existingGraph)
+      _ <- workGraphStore.put(updatedGraph)
 
     } yield {
-      convertToIdentifiersList(updatedLinkedWorkGraph)
+      convertToIdentifiersList(updatedGraph)
     }
   }
 
-  private def convertToIdentifiersList(
-    updatedLinkedWorkGraph: LinkedWorksGraph) = {
-    groupBySetId(updatedLinkedWorkGraph).map {
-      case (_, linkedWorkList) =>
-        IdentifierList(linkedWorkList.map(_.workId))
+  private def convertToIdentifiersList(updatedGraph: WorkGraph) = {
+    groupBySetId(updatedGraph).map {
+      case (_, workNodeList) =>
+        IdentifierList(workNodeList.map(_.id))
     }.toSet
   }
 
-  private def groupBySetId(updatedLinkedWorkGraph: LinkedWorksGraph) = {
-    updatedLinkedWorkGraph.linkedWorksSet
-      .groupBy(_.setId)
+  private def groupBySetId(updatedGraph: WorkGraph) = {
+    updatedGraph.nodes
+      .groupBy(_.componentId)
   }
 }

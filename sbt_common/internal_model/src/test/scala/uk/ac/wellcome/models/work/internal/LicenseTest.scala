@@ -8,17 +8,17 @@ class LicenseTest extends FunSpec with Matchers {
   it("should serialise a License as JSON") {
     val result = JsonUtil.toJson[License](License_CCBY)
     result.isSuccess shouldBe true
-    result.get shouldBe """{"licenseType":"CC-BY","label":"Attribution 4.0 International (CC BY 4.0)","url":"http://creativecommons.org/licenses/by/4.0/","ontologyType":"License"}"""
+    result.get shouldBe """{"id":"cc-by","label":"Attribution 4.0 International (CC BY 4.0)","url":"http://creativecommons.org/licenses/by/4.0/","ontologyType":"License"}"""
   }
 
   it("should deserialise a JSON string as a License") {
-    val licenseType = License_CC0.licenseType
+    val id = License_CC0.id
     val label = License_CC0.label
     val url = License_CC0.url
 
     val jsonString = s"""
       {
-        "licenseType": "$licenseType",
+        "id": "$id",
         "label": "$label",
         "url": "$url",
         "ontologyType": "License"
@@ -27,7 +27,7 @@ class LicenseTest extends FunSpec with Matchers {
     result.isSuccess shouldBe true
 
     val license = result.get
-    license.licenseType shouldBe licenseType
+    license.id shouldBe id
     license.label shouldBe label
     license.url shouldBe url
   }

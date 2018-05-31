@@ -65,10 +65,10 @@ case class DisplayWorkV1(
     value = "Relates a work to the genre that describes the work's content."
   ) genres: List[DisplayConceptV1] = List(),
   @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.DisplayLocation",
+    dataType = "uk.ac.wellcome.display.models.v1.DisplayLocationV1",
     value =
       "Relates any thing to the location of a representative thumbnail image"
-  ) thumbnail: Option[DisplayLocation] = None,
+  ) thumbnail: Option[DisplayLocationV1] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v1.DisplayItemV1]",
     value = "List of items related to this work."
@@ -137,7 +137,7 @@ case object DisplayWorkV1 {
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
         if (includes.thumbnail)
-          work.thumbnail.map { DisplayLocation(_) } else None,
+          work.thumbnail.map { DisplayLocationV1(_) } else None,
       items =
         if (includes.items)
           Some(work.items.map {

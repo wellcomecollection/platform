@@ -218,13 +218,51 @@ class SierraGenresTest extends FunSpec with Matchers {
 
     val expectedSourceIdentifiers = List(
       SourceIdentifier(
-        identifierType = IdentifierType("lcsh"),
+        identifierType = IdentifierType("lc-subjects"),
         value = "lcsh/123",
         ontologyType = "Concept"
       ),
       SourceIdentifier(
-        identifierType = IdentifierType("mesh"),
+        identifierType = IdentifierType("nlm-mesh"),
         value = "mesh/456",
+        ontologyType = "Concept"
+      )
+    )
+
+    val actualSourceIdentifiers = transformer
+      .getGenres(bibData)
+      .map { _.concepts.head }
+      .map {
+        case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+        case other => assert(false, other)
+      }
+
+    expectedSourceIdentifiers shouldBe actualSourceIdentifiers
+  }
+
+  it("deduplicates identifiers in subfield 0") {
+    val bibData = SierraBibData(
+      id = "b1962617",
+      title = Some("Basic Beeblebrox Books"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "655",
+          indicator1 = "",
+          indicator2 = "0",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "hitchhiking"),
+            MarcSubfield(tag = "0", content = "lcsh/bbb"),
+            MarcSubfield(tag = "0", content = "lcsh/bbb")
+          )
+        )
+      )
+    )
+
+    val expectedSourceIdentifiers = List(
+      SourceIdentifier(
+        identifierType = IdentifierType("lc-subjects"),
+        value = "lcsh/bbb",
         ontologyType = "Concept"
       )
     )

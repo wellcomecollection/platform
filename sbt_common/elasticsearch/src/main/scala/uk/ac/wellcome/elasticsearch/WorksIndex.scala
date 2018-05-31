@@ -18,7 +18,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
 
   val license = objectField("license").fields(
     keywordField("ontologyType"),
-    keywordField("licenseType"),
+    keywordField("id"),
     textField("label"),
     textField("url")
   )

@@ -18,7 +18,7 @@ object Dependencies {
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
-    val sierraStreamsSourceVersion = "0.2"
+    val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
   }
@@ -26,7 +26,6 @@ object Dependencies {
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "com.typesafe.akka" %% "akka-agent" % versions.akka,
     "com.typesafe.akka" %% "akka-stream" % versions.akka
   )
 
@@ -105,15 +104,16 @@ object Dependencies {
   val commonDependencies =
     testDependencies ++
       loggingDependencies ++
-      guiceDependencies ++
-      akkaDependencies ++
-      circeDependencies
+      circeDependencies ++ Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka % "test",
+    "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
+  )
 
-  val commonDisplayDependencies: Seq[ModuleID] = swaggerDependencies
+  val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies
 
   val commonElasticsearchDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
-  ) ++ elasticsearchDependencies ++ scalacheckDependencies
+  ) ++ elasticsearchDependencies ++ guiceDependencies ++ scalacheckDependencies
 
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
@@ -121,17 +121,17 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ dynamoDependencies ++ testDependencies
+  ) ++ akkaDependencies ++ dynamoDependencies ++ guiceDependencies ++ testDependencies
 
   val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  ) ++ dynamoDependencies
+  ) ++ dynamoDependencies ++ guiceDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies
+  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
-  )
+  ) ++ akkaDependencies ++ guiceDependencies
 
   val internalModelDependencies = dynamoDependencies
 

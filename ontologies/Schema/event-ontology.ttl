@@ -85,6 +85,20 @@ wev:interpretations rdf:type owl:ObjectProperty ;
     rdfs:range wev:Interpretations ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
     
+wev:places rdf:type owl:ObjectProperty ;
+    rdfs:label "places"@en ;
+    rdfs:comment "Relates an event to a place."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:Place ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+
+wev:agents rdf:type owl:ObjectProperty ;
+    rdfs:label "agents"@en ;
+    rdfs:comment "Relates an event to its agents."@en ;
+    rdfs:domain wev:Event ;
+    rdfs:range wev:Agent ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+
 wev:venue rdf:type owl:ObjectProperty ;
     rdfs:label "venue"@en ;
     rdfs:comment "Relates an event to its venue."@en ;

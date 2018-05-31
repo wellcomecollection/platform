@@ -13,14 +13,14 @@ trait LocalLinkedWorkDynamoDb
       new CreateTableRequest()
         .withTableName(table.name)
         .withKeySchema(new KeySchemaElement()
-          .withAttributeName("workId")
+          .withAttributeName("id")
           .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
-            .withAttributeName("workId")
+            .withAttributeName("id")
             .withAttributeType("S"),
           new AttributeDefinition()
-            .withAttributeName("setId")
+            .withAttributeName("componentId")
             .withAttributeType("S"),
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
@@ -33,7 +33,7 @@ trait LocalLinkedWorkDynamoDb
               new Projection().withProjectionType(ProjectionType.ALL))
             .withKeySchema(
               new KeySchemaElement()
-                .withAttributeName("setId")
+                .withAttributeName("componentId")
                 .withKeyType(KeyType.HASH)
             )
             .withProvisionedThroughput(new ProvisionedThroughput()

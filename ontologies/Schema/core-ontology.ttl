@@ -33,8 +33,8 @@ wcore:Identifier rdf:type owl:Class ;
     rdfs:comment "A unique system-generated identifier that governs interaction between systems and is regarded as canonical wcorethin the Wellcome data ecosystem."@en ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/core> .          
 
-wcore:IdentifierScheme rdf:type owl:Class ;
-    rdfs:label "IdentifierScheme" ;
+wcore:IdentifierType rdf:type owl:Class ;
+    rdfs:label "IdentifierType" ;
     rdfs:comment "An indication of the origin of identifiers identity scheme: that is, a note of whether this identifier originates in the Sierra bibliographic system, the CALM archive management system, and so forth, and thus an indication of the basic assumptions that lie behind it."@en ;
     rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
     
@@ -59,7 +59,7 @@ wcore:thumbnail rdf:type owl:ObjectProperty ;
     rdfs:range wcore:Location ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/works> .      
 
-wcore:identifierScheme rdf:type owl:ObjectProperty ;
+wcore:identifierType rdf:type owl:ObjectProperty ;
     rdfs:label "identifierScheme"@en ;
     rdfs:comment "Relates a Identifier to a particular authoritative source identifier scheme: for example, if the identifier is MS.49 this property might indicate that this identifier has its origins in the Wellcome Library's CALM archive management system."@en ;
     rdfs:domain wcore:Identifier ;
