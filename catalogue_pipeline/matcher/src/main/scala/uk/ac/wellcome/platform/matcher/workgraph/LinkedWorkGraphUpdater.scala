@@ -14,9 +14,8 @@ object LinkedWorkGraphUpdater {
   def update(workUpdate: LinkedWorkUpdate,
              existingGraph: WorkGraph): WorkGraph = {
 
-    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
-      workUpdate.workId,
-      existingGraph.nodes)
+    val filteredLinkedWorks =
+      existingGraphWithoutUpdatedNode(workUpdate.workId, existingGraph.nodes)
     val edges = filteredLinkedWorks.flatMap(workNode => {
       toEdges(workNode.id, workNode.referencedWorkIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
