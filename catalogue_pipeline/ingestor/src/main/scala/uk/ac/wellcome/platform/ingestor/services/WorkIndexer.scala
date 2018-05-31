@@ -47,12 +47,15 @@ class WorkIndexer @Inject()(
               .id(work.canonicalId)
               .doc(work)
           }
+          .map { _ =>
+            info(s"Successfully indexed work ${work.canonicalId}")
+          }
           .recover {
             case e: ResponseException
                 if getErrorType(e).contains(
                   "version_conflict_engine_exception") =>
               warn(
-                s"Trying to ingest work ${work.canonicalId} with older version: skipping.")
+                s"Trying to index work ${work.canonicalId} with older version: skipping.")
               ()
             case e: TimeoutException =>
               warn(
