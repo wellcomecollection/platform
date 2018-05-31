@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
-import uk.ac.wellcome.platform.matcher.workgraph.LinkedWorkGraphUpdater
+import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
@@ -19,8 +19,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
 
     for {
       existingGraph <- workGraphStore.findAffectedWorks(workNodeUpdate)
-      updatedGraph = LinkedWorkGraphUpdater.update(
-        workNodeUpdate,
+      updatedGraph = WorkGraphUpdater.update(workNodeUpdate,
         existingGraph = existingGraph)
       _ <- workGraphStore.put(updatedGraph)
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 
-class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
+class WorkGraphUpdaterTest extends FunSpec with Matchers {
 
   // An existing graph of works is updated by changing the links of a single work.
   // The change may result in new compound works which are identified by the LinkedWorkGraphUpdater
@@ -173,7 +173,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
     existingGraph: WorkGraph = WorkGraph(Set()),
     expectedNodes: Set[WorkNode]
   ) =
-    LinkedWorkGraphUpdater
+    WorkGraphUpdater
       .update(
         workUpdate = workUpdate,
         existingGraph = existingGraph

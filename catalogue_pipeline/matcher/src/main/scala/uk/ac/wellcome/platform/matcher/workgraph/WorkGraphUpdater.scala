@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 
 import scala.collection.immutable.Iterable
 
-object LinkedWorkGraphUpdater {
+object WorkGraphUpdater {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
     val filteredLinkedWorks =
