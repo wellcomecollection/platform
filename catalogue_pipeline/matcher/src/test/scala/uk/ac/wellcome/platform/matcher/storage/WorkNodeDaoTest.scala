@@ -82,10 +82,10 @@ class WorkNodeDaoTest
   }
 
   describe("Get by SetIds") {
-    it("returns empty set if setIds are not in dynamo") {
+    it("returns empty set if componentIds are not in dynamo") {
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          whenReady(workNodeDao.getBySetIds(Set("Not-there"))) {
+          whenReady(workNodeDao.getByComponentIds(Set("Not-there"))) {
             workNodeSet => workNodeSet shouldBe Set()
           }
         }
@@ -100,7 +100,7 @@ class WorkNodeDaoTest
           Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
           Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
 
-          whenReady(workNodeDao.getBySetIds(Set("A+B"))) { workNodeSet =>
+          whenReady(workNodeDao.getByComponentIds(Set("A+B"))) { workNodeSet =>
             workNodeSet shouldBe Set(workNodeA, workNodeB)
           }
         }
@@ -117,7 +117,7 @@ class WorkNodeDaoTest
           dynamoDbClient,
           DynamoConfig(table.name, Some(table.index)))
 
-        whenReady(workNodeDao.getBySetIds(Set("A+B")).failed) {
+        whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }
@@ -131,7 +131,7 @@ class WorkNodeDaoTest
           val badRecord: BadRecord = BadRecord(id = "A", componentId = "A+B")
           Scanamo.put(dynamoDbClient)(table.name)(badRecord)
 
-          whenReady(workNodeDao.getBySetIds(Set("A+B")).failed) {
+          whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
             failedException =>
               failedException shouldBe a[RuntimeException]
           }

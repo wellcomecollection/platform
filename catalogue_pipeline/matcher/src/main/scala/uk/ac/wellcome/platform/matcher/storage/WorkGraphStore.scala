@@ -16,9 +16,9 @@ class WorkGraphStore @Inject()(
 
     for {
       directlyAffectedWorks <- workNodeDao.get(directlyAffectedWorkIds)
-      affectedSetIds = directlyAffectedWorks.map(workNode =>
+      affectedComponentIds = directlyAffectedWorks.map(workNode =>
         workNode.componentId)
-      affectedWorks <- workNodeDao.getBySetIds(affectedSetIds)
+      affectedWorks <- workNodeDao.getByComponentIds(affectedComponentIds)
     } yield WorkGraph(affectedWorks)
   }
 
