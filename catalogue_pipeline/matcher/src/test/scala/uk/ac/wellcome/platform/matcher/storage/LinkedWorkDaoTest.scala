@@ -137,7 +137,7 @@ class LinkedWorkDaoTest
   }
 
   describe("Insert into dynamo") {
-    it("puts a linkedWork") {
+    it("puts a WorkNode") {
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { linkedWordDao =>
           val workNode = WorkNode("A", List("B"), "A+B")
