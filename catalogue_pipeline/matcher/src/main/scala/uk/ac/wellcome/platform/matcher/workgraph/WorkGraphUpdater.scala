@@ -7,19 +7,35 @@ import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 import scala.collection.immutable.Iterable
 
 object WorkGraphUpdater {
+
+  // Given an update to an individual node, and the existing graph,
+  // return the graph that comes from applying this update.
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
-    val filteredLinkedWorks =
-      existingGraphWithoutUpdatedNode(workUpdate.id, existingGraph.nodes)
-    val edges = filteredLinkedWorks.flatMap(workNode => {
-      toEdges(workNode.id, workNode.referencedWorkIds)
-    }) ++ toEdges(workUpdate.id, workUpdate.referencedWorkIds)
+    // First we get every node except the updated node -- the edges coming
+    // from these nodes won't be changing.
+    val unchangedNodes: Set[WorkNode] = existingGraph.nodes
+      .filterNot { _.id == workUpdate.id }
 
-    val nodes = existingGraph.nodes.flatMap(workNode => {
-      allNodes(workNode)
-    }) + workUpdate.id
+    val unchangedEdges = unchangedNodes
+      .flatMap { node =>
+        toEdges(node.id, node.referencedWorkIds)
+      }
 
-    val g = Graph.from(edges = edges, nodes = nodes)
+    // Then we add the edges from the updated node.
+    val updatedEdges =
+      toEdges(workUpdate.id, workUpdate.referencedWorkIds)
+    val edges = unchangedEdges ++ updatedEdges
+
+    // And we get all the IDs from the existing graph, plus anything new.
+    val nodeIds = existingGraph.nodes
+      .flatMap { node =>
+        allNodes(node)
+      } + workUpdate.id
+
+    // Now we construct a graph with ScalaGraph, iterate over the connected
+    // components, and extract the nodes from each component.
+    val g = Graph.from(edges = edges, nodes = nodeIds)
 
     def adjacentNodeIds(n: g.NodeT) = {
       n.diSuccessors.map(_.value).toList.sorted
@@ -48,10 +64,5 @@ object WorkGraphUpdater {
 
   private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
     linkedWorkIds.map(workId ~> _)
-  }
-
-  private def existingGraphWithoutUpdatedNode(workId: String,
-                                              workNodes: Set[WorkNode]) = {
-    workNodes.filterNot(_.id == workId)
   }
 }
