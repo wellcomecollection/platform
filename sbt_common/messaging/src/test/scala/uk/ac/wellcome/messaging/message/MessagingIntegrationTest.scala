@@ -29,7 +29,9 @@ class MessagingIntegrationTest
       case (messageStream, messageWriter) =>
         val messages = new ConcurrentLinkedDeque[ExampleObject]()
         messageWriter.write(message = message, subject = subject)
-        messageStream.foreach("integration-test-stream", obj => Future {messages.push(obj)})
+        messageStream.foreach(
+          "integration-test-stream",
+          obj => Future { messages.push(obj) })
         eventually {
           messages should contain only message
         }
@@ -37,7 +39,8 @@ class MessagingIntegrationTest
   }
 
   private def withLocalStackMessageWriterMessageStream[R](
-    testWith: TestWith[(MessageStream[ExampleObject], MessageWriter[ExampleObject]),
+    testWith: TestWith[(MessageStream[ExampleObject],
+                        MessageWriter[ExampleObject]),
                        R]) = {
     withLocalStackMessageStreamFixtures[R] {
       case (queue, bucket, messageStream) =>
@@ -53,15 +56,17 @@ class MessagingIntegrationTest
   }
 
   def withLocalStackMessageStreamFixtures[R](
-                                                 testWith: TestWith[(Queue, Bucket, MessageStream[ExampleObject]),
-                                                   R]) = {
+    testWith: TestWith[(Queue, Bucket, MessageStream[ExampleObject]), R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalS3Bucket { bucket =>
           withLocalStackSqsQueue { queue =>
-            withMessageStream[ExampleObject, R](actorSystem, bucket, queue, metricsSender) {
-              messageStream =>
-                testWith((queue, bucket, messageStream))
+            withMessageStream[ExampleObject, R](
+              actorSystem,
+              bucket,
+              queue,
+              metricsSender) { messageStream =>
+              testWith((queue, bucket, messageStream))
             }
           }
 
