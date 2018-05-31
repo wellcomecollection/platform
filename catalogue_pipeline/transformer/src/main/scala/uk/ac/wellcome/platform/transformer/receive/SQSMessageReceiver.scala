@@ -8,23 +8,15 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
-import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.type_classes.StorageStrategy._
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -63,12 +55,13 @@ class SQSMessageReceiver @Inject()(
     )
   }
 
-  val miroTransformableStore =
-    new S3TypeStore[MiroTransformable](s3Client)
-  val calmTransformableStore =
-    new S3TypeStore[CalmTransformable](s3Client)
-  val sierraTransformableStore =
-    new S3TypeStore[SierraTransformable](s3Client)
+  implicit val storageBackend = new S3StorageBackend(s3Client)
+
+  // Implicitly will create an instance using the appropriate type class
+  // if the correct implicit dependenencies are in scope
+  val miroTransformableStore = implicitly[ObjectStore[MiroTransformable]]
+  val calmTransformableStore = implicitly[ObjectStore[CalmTransformable]]
+  val sierraTransformableStore = implicitly[ObjectStore[SierraTransformable]]
 
   private def getTransformable(
     hybridRecord: HybridRecord,
