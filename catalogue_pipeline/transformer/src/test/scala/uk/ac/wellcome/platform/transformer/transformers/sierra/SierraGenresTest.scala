@@ -249,8 +249,9 @@ class SierraGenresTest extends FunSpec with Matchers {
           fieldTag = "p",
           marcTag = "655",
           indicator1 = "",
-          indicator2 = "2",
+          indicator2 = "0",
           subfields = List(
+            MarcSubfield(tag = "a", content = "hitchhiking"),
             MarcSubfield(tag = "0", content = "lcsh/bbb"),
             MarcSubfield(tag = "0", content = "lcsh/bbb")
           )
