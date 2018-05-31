@@ -287,7 +287,6 @@ class SierraSubjectsTest extends FunSpec with Matchers {
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
 
-
   it("deduplicates identifiers in subfield 0") {
     val bibData = SierraBibData(
       id = "b9811628",
