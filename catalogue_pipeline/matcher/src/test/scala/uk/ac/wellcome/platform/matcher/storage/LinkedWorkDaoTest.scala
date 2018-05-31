@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.{BatchGetItemRequest, PutItemRequest, QueryRequest}
+import com.amazonaws.services.dynamodbv2.model.{
+  BatchGetItemRequest,
+  PutItemRequest,
+  QueryRequest
+}
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Matchers.any
@@ -82,7 +86,8 @@ class LinkedWorkDaoTest
       withLocalDynamoDbTable { table =>
         withLinkedWorkDao(table) { matcherGraphDao =>
           whenReady(matcherGraphDao.getBySetIds(Set("Not-there"))) {
-            workNodeSet => workNodeSet shouldBe Set()
+            workNodeSet =>
+              workNodeSet shouldBe Set()
           }
         }
       }
@@ -142,8 +147,8 @@ class LinkedWorkDaoTest
         withLinkedWorkDao(table) { linkedWordDao =>
           val workNode = WorkNode("A", List("B"), "A+B")
           whenReady(linkedWordDao.put(workNode)) { _ =>
-            val savedWorkNode = Scanamo.get[WorkNode](dynamoDbClient)(
-              table.name)('id -> "A")
+            val savedWorkNode =
+              Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
             savedWorkNode shouldBe Some(Right(workNode))
           }
         }

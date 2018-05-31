@@ -32,8 +32,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = LinkedWorksGraph(Set.empty)
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("B", List(), "A+B"))
+        WorkNode("A", List("B"), "A+B"),
+        WorkNode("B", List(), "A+B"))
     }
 
     it("updating nothing with B->A gives A+B:B->A") {
@@ -43,8 +43,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = LinkedWorksGraph(Set.empty)
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("B", List("A"), "A+B"),
-          WorkNode("A", List(), "A+B"))
+        WorkNode("B", List("A"), "A+B"),
+        WorkNode("A", List(), "A+B"))
     }
   }
 
@@ -57,9 +57,7 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
             LinkedWorksGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .linkedWorksSet should contain theSameElementsAs
-        List(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("B", List(), "A+B"))
+        List(WorkNode("A", List("B"), "A+B"), WorkNode("B", List(), "A+B"))
     }
 
     it("updating A->B with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -70,9 +68,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
             LinkedWorksGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List("B"), "A+B+C"),
-          WorkNode("B", List("C"), "A+B+C"),
-          WorkNode("C", List(), "A+B+C")
+        WorkNode("A", List("B"), "A+B+C"),
+        WorkNode("B", List("C"), "A+B+C"),
+        WorkNode("C", List(), "A+B+C")
       )
     }
 
@@ -119,9 +117,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", List("C"), "B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List("B"), "A+B+C"),
-          WorkNode("B", List("C"), "A+B+C"),
-          WorkNode("C", List("A"), "A+B+C")
+        WorkNode("A", List("B"), "A+B+C"),
+        WorkNode("B", List("C"), "A+B+C"),
+        WorkNode("C", List("A"), "A+B+C")
       )
     }
   }
@@ -132,13 +130,11 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
         .update(
           workUpdate = LinkedWorkUpdate("A", Set.empty),
           existingGraph = LinkedWorksGraph(
-            Set(
-              WorkNode("A", List("B"), "A+B"),
-              WorkNode("B", List(), "A+B")))
+            Set(WorkNode("A", List("B"), "A+B"), WorkNode("B", List(), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List(), "A"),
-          WorkNode("B", List(), "B"))
+        WorkNode("A", List(), "A"),
+        WorkNode("B", List(), "B"))
     }
 
     it(
@@ -150,8 +146,8 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
             LinkedWorksGraph(Set(WorkNode("A", List("B"), "A+B")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List(), "A"),
-          WorkNode("B", List(), "B"))
+        WorkNode("A", List(), "A"),
+        WorkNode("B", List(), "B"))
     }
 
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
@@ -164,9 +160,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", List("C"), "A+B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("B", List(), "A+B"),
-          WorkNode("C", List(), "C"))
+        WorkNode("A", List("B"), "A+B"),
+        WorkNode("B", List(), "A+B"),
+        WorkNode("C", List(), "C"))
     }
 
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -180,9 +176,9 @@ class LinkedWorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("C", List(), "A+B+C")))
         )
         .linkedWorksSet shouldBe Set(
-          WorkNode("A", List("B"), "A+B+C"),
-          WorkNode("B", List("C"), "A+B+C"),
-          WorkNode("C", List(), "A+B+C"))
+        WorkNode("A", List("B"), "A+B+C"),
+        WorkNode("B", List("C"), "A+B+C"),
+        WorkNode("C", List(), "A+B+C"))
     }
   }
 }

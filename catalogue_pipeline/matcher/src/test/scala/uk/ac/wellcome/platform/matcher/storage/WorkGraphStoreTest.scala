@@ -35,7 +35,8 @@ class WorkGraphStoreTest
       }
     }
 
-    it("returns a WorkNode if it has no links and it's the only node in the setId") {
+    it(
+      "returns a WorkNode if it has no links and it's the only node in the setId") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
           val workNode = WorkNode("A", Nil, "A")
@@ -94,7 +95,10 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("A", Set.empty))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workNodeA, workNodeB, workNodeC)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(
+              workNodeA,
+              workNodeB,
+              workNodeC)
           }
         }
       }
@@ -113,7 +117,10 @@ class WorkGraphStoreTest
 
           whenReady(workGraphStore.findAffectedWorks(
             LinkedWorkUpdate("B", Set("C")))) { linkedWorkGraph =>
-            linkedWorkGraph.linkedWorksSet shouldBe Set(workNodeA, workNodeB, workNodeC)
+            linkedWorkGraph.linkedWorksSet shouldBe Set(
+              workNodeA,
+              workNodeB,
+              workNodeC)
           }
         }
       }
@@ -127,7 +134,8 @@ class WorkGraphStoreTest
           val workNodeA = WorkNode("A", List("B"), "A+B")
           val workNodeB = WorkNode("B", Nil, "A+B")
 
-          whenReady(workGraphStore.put(LinkedWorksGraph(Set(workNodeA, workNodeB)))) {
+          whenReady(
+            workGraphStore.put(LinkedWorksGraph(Set(workNodeA, workNodeB)))) {
             _ =>
               val savedLinkedWorks = Scanamo
                 .scan[WorkNode](dynamoDbClient)(table.name)

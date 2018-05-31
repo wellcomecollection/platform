@@ -56,9 +56,8 @@ object LinkedWorkGraphUpdater {
     linkedWorkIds.map(workId ~> _)
   }
 
-  private def existingGraphWithoutUpdatedNode(
-    workId: String,
-    workNodes: Set[WorkNode]) = {
+  private def existingGraphWithoutUpdatedNode(workId: String,
+                                              workNodes: Set[WorkNode]) = {
     workNodes.filterNot(_.id == workId)
   }
 }

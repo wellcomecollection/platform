@@ -23,8 +23,7 @@ class LinkedWorkDao @Inject()(
   def getBySetIds(setIds: Set[String]): Future[Set[WorkNode]] =
     Future.sequence(setIds.map(getBySetId)).map(_.flatten)
 
-  def put(
-    work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
+  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
     Future {
       Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
     }
@@ -33,8 +32,7 @@ class LinkedWorkDao @Inject()(
   def get(workIds: Set[String]): Future[Set[WorkNode]] = {
     Future {
       Scanamo
-        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)(
-          'id -> workIds)
+        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> workIds)
         .map {
           case Right(works) => works
           case Left(scanamoError) => {
