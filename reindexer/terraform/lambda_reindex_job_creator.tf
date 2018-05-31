@@ -7,7 +7,7 @@ module "reindex_job_creator_lambda" {
 
   description = "Generate jobs for the reindexer from the ${aws_dynamodb_table.reindex_shard_tracker.id} table"
 
-  timeout = 10
+  timeout = 60
 
   environment_variables = {
     TOPIC_ARN = "${module.reindex_jobs_topic.arn}"
