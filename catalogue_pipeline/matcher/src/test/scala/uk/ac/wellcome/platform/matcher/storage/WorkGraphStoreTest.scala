@@ -127,7 +127,7 @@ class WorkGraphStoreTest
           val workNodeA = WorkNode("A", List("B"), "A+B")
           val workNodeB = WorkNode("B", Nil, "A+B")
 
-          whenReady(workGraphStore.put(LinkedWorksGraph(Set(workA, workB)))) {
+          whenReady(workGraphStore.put(LinkedWorksGraph(Set(workNodeA, workNodeB)))) {
             _ =>
               val savedLinkedWorks = Scanamo
                 .scan[WorkNode](dynamoDbClient)(table.name)
