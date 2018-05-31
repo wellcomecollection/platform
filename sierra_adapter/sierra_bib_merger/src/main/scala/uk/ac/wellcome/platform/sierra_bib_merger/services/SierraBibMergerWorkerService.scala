@@ -16,7 +16,7 @@ class SierraBibMergerWorkerService @Inject()(
 
   sqsToDynamoStream.foreach(this.getClass.getSimpleName, store)
 
-  def store(record: SierraRecord): Future[Unit] =
+  private def store(record: SierraRecord): Future[Unit] =
     sierraBibMergerUpdaterService.update(record.toBibRecord)
 
   def stop() = system.terminate()
