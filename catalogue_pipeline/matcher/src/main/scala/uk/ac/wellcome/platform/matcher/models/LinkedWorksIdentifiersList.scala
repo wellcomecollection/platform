@@ -1,3 +1,5 @@
 package uk.ac.wellcome.platform.matcher.models
 
-case class LinkedWorksIdentifiersList(linkedWorks: Set[IdentifierList])
+import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
+
+case class LinkedWorksIdentifiersList(linkedWorks: Set[EquivalentIdentifiers])
