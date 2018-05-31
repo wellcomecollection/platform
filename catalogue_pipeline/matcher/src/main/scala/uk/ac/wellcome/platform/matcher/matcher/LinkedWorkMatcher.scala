@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
+import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -14,7 +15,7 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     matchLinkedWorks(work).map(LinkedWorksIdentifiersList)
 
   private def matchLinkedWorks(
-    work: UnidentifiedWork): Future[Set[IdentifierList]] = {
+    work: UnidentifiedWork): Future[Set[EquivalentIdentifiers]] = {
     val workNodeUpdate = WorkNodeUpdate(work)
 
     for {
@@ -25,15 +26,15 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
       _ <- workGraphStore.put(updatedLinkedWorkGraph)
 
     } yield {
-      convertToIdentifiersList(updatedLinkedWorkGraph)
+      findEquivalentIdentifierSets(updatedLinkedWorkGraph)
     }
   }
 
-  private def convertToIdentifiersList(workGraph: WorkGraph): Set[IdentifierList] =
+  private def findEquivalentIdentifierSets(workGraph: WorkGraph): Set[EquivalentIdentifiers] =
     workGraph.nodes
       .groupBy { _.componentId }
       .values
       .map { (nodeSet: Set[WorkNode]) => nodeSet.map { _.id }}
-      .map { (nodeIds: Set[String]) => IdentifierList(nodeIds) }
+      .map { (nodeIds: Set[String]) => EquivalentIdentifiers(nodeIds) }
       .toSet
 }

@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
@@ -11,10 +12,7 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWorksIdentifiersList
-}
+import uk.ac.wellcome.platform.matcher.models.LinkedWorksIdentifiersList
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -64,7 +62,7 @@ class MatcherFeatureTest
                   val identifiersList =
                     fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
                   identifiersList.linkedWorks shouldBe Set(
-                    IdentifierList(Set("sierra-system-number/id")))
+                    EquivalentIdentifiers(Set("sierra-system-number/id")))
                 }
               }
             }

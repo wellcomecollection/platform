@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.matcher.models
 
+import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
+
 // A1 A2 A3
 // B1 B2
 // C1 C2 C3
@@ -11,4 +13,4 @@ package uk.ac.wellcome.platform.matcher.models
 
 // to new namespace
 
-case class LinkedWorksIdentifiersList(linkedWorks: Set[IdentifierList])
+case class LinkedWorksIdentifiersList(linkedWorks: Set[EquivalentIdentifiers])
