@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.{
   WorkGraph,
   WorkNode,
-  WorkUpdate$
+  WorkUpdate
 }
 
 import scala.concurrent.Future
