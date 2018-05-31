@@ -7,7 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
+import uk.ac.wellcome.models.matcher.MatchedIdentifiers
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -30,7 +30,7 @@ class LinkedWorkMatcherTest
             identifiersList =>
               val workId = "sierra-system-number/id"
               identifiersList shouldBe
-                LinkedWorksIdentifiersList(Set(EquivalentIdentifiers(Set(workId))))
+                LinkedWorksIdentifiersList(Set(MatchedIdentifiers(Set(workId))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('id -> workId)
@@ -54,7 +54,7 @@ class LinkedWorkMatcherTest
             identifiers = List(aIdentifier, linkedIdentifier))
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              LinkedWorksIdentifiersList(Set(EquivalentIdentifiers(
+              LinkedWorksIdentifiersList(Set(MatchedIdentifiers(
                 Set("sierra-system-number/A", "sierra-system-number/B"))))
 
             val savedWorkNodes = Scanamo
@@ -101,7 +101,7 @@ class LinkedWorkMatcherTest
             identifiersList shouldBe
               LinkedWorksIdentifiersList(
                 Set(
-                  EquivalentIdentifiers(
+                  MatchedIdentifiers(
                     Set(
                       "sierra-system-number/A",
                       "sierra-system-number/B",

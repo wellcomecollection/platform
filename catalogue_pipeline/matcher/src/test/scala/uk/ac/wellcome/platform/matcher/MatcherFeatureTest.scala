@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
+import uk.ac.wellcome.models.matcher.MatchedIdentifiers
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -58,7 +58,7 @@ class MatcherFeatureTest
                   val identifiersList =
                     fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
                   identifiersList.linkedWorks shouldBe Set(
-                    EquivalentIdentifiers(Set("sierra-system-number/id")))
+                    MatchedIdentifiers(Set("sierra-system-number/id")))
                 }
               }
             }
