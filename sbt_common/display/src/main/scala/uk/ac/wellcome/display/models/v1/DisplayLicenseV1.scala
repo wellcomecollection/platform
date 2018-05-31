@@ -13,7 +13,7 @@ case class DisplayLicenseV1(
   @ApiModelProperty(
     value =
       "A type of license under which the work in question is released to the public.",
-    allowableValues = "CC-BY, CC-BY-NC"
+    allowableValues = "CC-BY, CC-BY-NC, CC-BY-NC-ND, CC-0, PDM"
   ) licenseType: String,
   @ApiModelProperty(
     value = "The title or other short name of a license"
@@ -28,7 +28,12 @@ case class DisplayLicenseV1(
 
 case object DisplayLicenseV1 {
   def apply(license: License): DisplayLicenseV1 = DisplayLicenseV1(
-    licenseType = license.licenseType,
+    // The old model for License had an uppercase "licenseType" field,
+    // e.g. "CC-BY" or "PDM".
+    //
+    // The current model uses lowercase IDs.  To preserve the V1 API,
+    // we uppercase the IDs before presenting them.
+    licenseType = license.id.toUpperCase,
     label = license.label,
     url = license.url
   )
