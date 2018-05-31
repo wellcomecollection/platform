@@ -19,14 +19,14 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     val workNodeUpdate = WorkNodeUpdate(work)
 
     for {
-      linkedWorksGraph <- workGraphStore.findAffectedWorks(workNodeUpdate)
-      updatedLinkedWorkGraph = LinkedWorkGraphUpdater.update(
-        workNodeUpdate,
-        linkedWorksGraph)
-      _ <- workGraphStore.put(updatedLinkedWorkGraph)
-
+      existingGraph <- workGraphStore.findAffectedWorks(workNodeUpdate)
+      updatedGraph = LinkedWorkGraphUpdater.update(
+        workNodeUpdate = workNodeUpdate,
+        existingGraph = existingGraph
+      )
+      _ <- workGraphStore.put(updatedGraph)
     } yield {
-      findEquivalentIdentifierSets(updatedLinkedWorkGraph)
+      findEquivalentIdentifierSets(updatedGraph)
     }
   }
 
