@@ -287,6 +287,44 @@ class SierraSubjectsTest extends FunSpec with Matchers {
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
 
+
+  it("deduplicates identifiers in subfield 0") {
+    val bibData = SierraBibData(
+      id = "b9811628",
+      title = Some("Serious Soldier Stories"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          indicator2 = "2",
+          subfields = List(
+            MarcSubfield(tag = "0", content = "lcsh/sss"),
+            MarcSubfield(tag = "0", content = "lcsh/sss")
+          )
+        )
+      )
+    )
+
+    val expectedSourceIdentifiers = List(
+      SourceIdentifier(
+        identifierType = IdentifierType("lc-subjects"),
+        value = "lcsh/sss",
+        ontologyType = "Concept"
+      )
+    )
+
+    val actualSourceIdentifiers = transformer
+      .getSubjects(bibData)
+      .map { _.concepts.head }
+      .map {
+        case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+        case other => assert(false, other)
+      }
+
+    expectedSourceIdentifiers shouldBe actualSourceIdentifiers
+  }
+
   it(s"throws an error if it sees too many subfield $$0 instances") {
     val bibData = SierraBibData(
       id = "b9171786",
