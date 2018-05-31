@@ -9,7 +9,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class SierraBibMergerWorkerService @Inject()(
-                                              system: ActorSystem,
+  system: ActorSystem,
   sqsToDynamoStream: SQSToDynamoStream[SierraRecord],
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
 ) {

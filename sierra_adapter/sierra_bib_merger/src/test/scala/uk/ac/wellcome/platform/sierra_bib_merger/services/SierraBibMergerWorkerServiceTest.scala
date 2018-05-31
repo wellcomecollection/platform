@@ -33,44 +33,59 @@ class SierraBibMergerWorkerServiceTest
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
 
-    withWorkerServiceFixtures { case (metricsSender, QueuePair(queue, dlq), _) =>
-      sqsClient.sendMessage(queue.url, toJson(SQSMessage(
-        subject = Some("default-subject"),
-        body = "null",
-        topic = "",
-        messageType = "",
-        timestamp = "")).get)
+    withWorkerServiceFixtures {
+      case (metricsSender, QueuePair(queue, dlq), _) =>
+        sqsClient.sendMessage(
+          queue.url,
+          toJson(
+            SQSMessage(
+              subject = Some("default-subject"),
+              body = "null",
+              topic = "",
+              messageType = "",
+              timestamp = "")).get)
 
-      eventually {
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-        verify(metricsSender, never()).incrementCount("SierraBibMergerUpdaterService_MessageProcessingFailure", 1.0)
-      }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+          verify(metricsSender, never()).incrementCount(
+            "SierraBibMergerUpdaterService_MessageProcessingFailure",
+            1.0)
+        }
     }
   }
 
-  def withWorkerServiceFixtures[R](testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),R])=
+  def withWorkerServiceFixtures[R](
+    testWith: TestWith[
+      (MetricsSender, QueuePair, SierraBibMergerWorkerService),
+      R]) =
     withActorSystem { system =>
-    withMockMetricSender { metricsSender =>
-      withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-        withSQSStream[NotificationMessage, R](system, queue, metricsSender) { sqsStream =>
-          withLocalDynamoDbTable {table =>
-            withLocalS3Bucket { storageBucket =>
-              withTypeVHS[SierraTransformable, SourceMetadata, R](storageBucket, table) { vhs =>
-                val sqsToDynamoStream = new SQSToDynamoStream[SierraRecord](system, sqsStream)
+      withMockMetricSender { metricsSender =>
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, dlq) =>
+            withSQSStream[NotificationMessage, R](system, queue, metricsSender) {
+              sqsStream =>
+                withLocalDynamoDbTable { table =>
+                  withLocalS3Bucket { storageBucket =>
+                    withTypeVHS[SierraTransformable, SourceMetadata, R](
+                      storageBucket,
+                      table) { vhs =>
+                      val sqsToDynamoStream =
+                        new SQSToDynamoStream[SierraRecord](system, sqsStream)
 
-                val mergerUpdaterService = new SierraBibMergerUpdaterService(vhs, metricsSender)
+                      val mergerUpdaterService =
+                        new SierraBibMergerUpdaterService(vhs, metricsSender)
 
-                val worker = new SierraBibMergerWorkerService(
-                  system,
-                  sqsToDynamoStream,
-                  mergerUpdaterService)
-                testWith((metricsSender, queuePair, worker))
-              }
+                      val worker = new SierraBibMergerWorkerService(
+                        system,
+                        sqsToDynamoStream,
+                        mergerUpdaterService)
+                      testWith((metricsSender, queuePair, worker))
+                    }
+                  }
+                }
             }
-          }
         }
       }
     }
-  }
 }

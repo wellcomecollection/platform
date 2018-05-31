@@ -12,7 +12,7 @@ class SierraItemMergerWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSToDynamoStream[SierraItemRecord],
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
-)  {
+) {
 
   sqsStream.foreach(this.getClass.getSimpleName, store)
 

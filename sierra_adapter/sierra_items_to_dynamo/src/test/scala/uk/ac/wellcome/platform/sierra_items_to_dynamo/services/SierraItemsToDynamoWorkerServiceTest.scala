@@ -36,29 +36,39 @@ class SierraItemsToDynamoWorkerServiceTest
     with ScalaFutures {
 
   def withSierraWorkerService[R](
-    testWith: TestWith[(SierraItemsToDynamoWorkerService, QueuePair, Table, MetricsSender), R]): Unit = {
+    testWith: TestWith[(SierraItemsToDynamoWorkerService,
+                        QueuePair,
+                        Table,
+                        MetricsSender),
+                       R]): Unit = {
     withActorSystem { actorSystem =>
       withLocalDynamoDbTable { table =>
         withDynamoInserter(table) { dynamoInserter =>
-          withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-            withMockMetricSender { metricsSender =>
-              withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-                val sierraItemsToDynamoWorkerService =
-                  new SierraItemsToDynamoWorkerService(
-                    system = actorSystem,
-                    new SQSToDynamoStream[SierraRecord](actorSystem, sqsStream),
-                    dynamoInserter = dynamoInserter
-                  )
+          withLocalSqsQueueAndDlq {
+            case queuePair @ QueuePair(queue, dlq) =>
+              withMockMetricSender { metricsSender =>
+                withSQSStream[NotificationMessage, R](
+                  actorSystem,
+                  queue,
+                  metricsSender) { sqsStream =>
+                  val sierraItemsToDynamoWorkerService =
+                    new SierraItemsToDynamoWorkerService(
+                      system = actorSystem,
+                      new SQSToDynamoStream[SierraRecord](
+                        actorSystem,
+                        sqsStream),
+                      dynamoInserter = dynamoInserter
+                    )
 
-                testWith(
-                  (
-                    sierraItemsToDynamoWorkerService,
-                    queuePair,
-                    table,
-                    metricsSender
-                  ))
+                  testWith(
+                    (
+                      sierraItemsToDynamoWorkerService,
+                      queuePair,
+                      table,
+                      metricsSender
+                    ))
+                }
               }
-            }
           }
         }
       }
@@ -66,98 +76,102 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   it("reads a sierra record from sqs an inserts it into DynamoDb") {
-    withSierraWorkerService { case (_, QueuePair(queue, _), table, _) =>
-      val id = "12345"
+    withSierraWorkerService {
+      case (_, QueuePair(queue, _), table, _) =>
+        val id = "12345"
 
-      val bibIds1 = List("1", "2", "3")
-      val modifiedDate1 = "2001-01-01T01:01:01Z"
+        val bibIds1 = List("1", "2", "3")
+        val modifiedDate1 = "2001-01-01T01:01:01Z"
 
-      val record1 = SierraItemRecord(
-        id = s"$id",
-        modifiedDate = modifiedDate1,
-        data = sierraRecordData(
-          bibIds = bibIds1,
-          modifiedDate = modifiedDate1
-        ),
-        bibIds = bibIds1
-      )
+        val record1 = SierraItemRecord(
+          id = s"$id",
+          modifiedDate = modifiedDate1,
+          data = sierraRecordData(
+            bibIds = bibIds1,
+            modifiedDate = modifiedDate1
+          ),
+          bibIds = bibIds1
+        )
 
-      Scanamo.put(dynamoDbClient)(table.name)(record1)
+        Scanamo.put(dynamoDbClient)(table.name)(record1)
 
-      val bibIds2 = List("3", "4", "5")
-      val modifiedDate2 = Instant.parse("2002-01-01T01:01:01Z")
+        val bibIds2 = List("3", "4", "5")
+        val modifiedDate2 = Instant.parse("2002-01-01T01:01:01Z")
 
-      val record2 = SierraRecord(
-        id = id,
-        data = sierraRecordData(
-          bibIds = bibIds2,
-          modifiedDate = modifiedDate2.toString
-        ),
-        modifiedDate = modifiedDate2
-      )
+        val record2 = SierraRecord(
+          id = id,
+          data = sierraRecordData(
+            bibIds = bibIds2,
+            modifiedDate = modifiedDate2.toString
+          ),
+          modifiedDate = modifiedDate2
+        )
 
-      val sqsMessage = NotificationMessage(
-        MessageId = "message-id",
-        TopicArn = "topic",
-        Subject = "subject",
-        Message = toJson(record2).get
-      )
+        val sqsMessage = NotificationMessage(
+          MessageId = "message-id",
+          TopicArn = "topic",
+          Subject = "subject",
+          Message = toJson(record2).get
+        )
 
-      sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+        sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-      val expectedBibIds = List("3", "4", "5")
-      val expectedUnlinkedBibIds = List("1", "2")
+        val expectedBibIds = List("3", "4", "5")
+        val expectedUnlinkedBibIds = List("1", "2")
 
-      val expectedRecord = SierraItemRecordMerger.mergeItems(
-        existingRecord = record1,
-        updatedRecord = record2.toItemRecord.get
-      )
+        val expectedRecord = SierraItemRecordMerger.mergeItems(
+          existingRecord = record1,
+          updatedRecord = record2.toItemRecord.get
+        )
 
-      val expectedData = expectedRecord.data
+        val expectedData = expectedRecord.data
 
-      eventually {
-        Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
+        eventually {
+          Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
-        val scanamoResult =
-          Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> id)
+          val scanamoResult =
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
+              'id -> id)
 
-        scanamoResult shouldBe defined
-        scanamoResult.get shouldBe Right(
-          SierraItemRecord(
-            id = id,
-            data = expectedData,
-            modifiedDate = modifiedDate2,
-            bibIds = expectedBibIds,
-            unlinkedBibIds = expectedUnlinkedBibIds,
-            version = 1))
-      }
+          scanamoResult shouldBe defined
+          scanamoResult.get shouldBe Right(
+            SierraItemRecord(
+              id = id,
+              data = expectedData,
+              modifiedDate = modifiedDate2,
+              bibIds = expectedBibIds,
+              unlinkedBibIds = expectedUnlinkedBibIds,
+              version = 1))
+        }
     }
   }
 
   it("returns a GracefulFailureException if it receives an invalid message") {
-    withSierraWorkerService { case (_, QueuePair(queue, dlq), _, metricsSender) =>
-      val message =
-        """
+    withSierraWorkerService {
+      case (_, QueuePair(queue, dlq), _, metricsSender) =>
+        val message =
+          """
           |{
           | "something": "something"
           |}
         """.stripMargin
 
-      val sqsMessage = NotificationMessage(
-        MessageId = "message-id",
-        TopicArn = "topic",
-        Subject = "subject",
-        Message = message
-      )
+        val sqsMessage = NotificationMessage(
+          MessageId = "message-id",
+          TopicArn = "topic",
+          Subject = "subject",
+          Message = message
+        )
 
-      sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+        sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-      eventually{
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-        verify(metricsSender, never()).incrementCount("SierraItemsToDynamoWorkerService_MessageProcessingFailure", 1.0)
-      }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+          verify(metricsSender, never()).incrementCount(
+            "SierraItemsToDynamoWorkerService_MessageProcessingFailure",
+            1.0)
+        }
     }
   }
 

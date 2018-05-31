@@ -133,7 +133,10 @@ trait SQS extends Matchers {
     }
   )
 
-  def withSQSStream[T, R](actorSystem: ActorSystem, queue: Queue, metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
+  def withSQSStream[T, R](
+    actorSystem: ActorSystem,
+    queue: Queue,
+    metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
     val sqsConfig = SQSConfig(
       queueUrl = queue.url,
       waitTime = 1 millisecond,

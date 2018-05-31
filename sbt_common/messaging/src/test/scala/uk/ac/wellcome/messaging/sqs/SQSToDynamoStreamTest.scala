@@ -17,11 +17,18 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSenderFixture with Messaging with ExtendedPatience{
+class SQSToDynamoStreamTest
+    extends FunSpec
+    with SQS
+    with Akka
+    with MetricsSenderFixture
+    with Messaging
+    with ExtendedPatience {
 
   val testObject = TestObject(foo = "bar")
 
-  def testMessageJson(obj: TestObject) = toJson(TestNotificationMessage(obj)).get
+  def testMessageJson(obj: TestObject) =
+    toJson(TestNotificationMessage(obj)).get
 
   private val streamName = "test-sqs-to-dynamo"
   it("processes messages") {
@@ -29,11 +36,12 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
       case (mockMetricSender, QueuePair(queue, dlq), stream) =>
         sqsClient.sendMessage(queue.url, testMessageJson(testObject))
         val messages = new ConcurrentLinkedDeque[TestObject]()
-        stream.foreach(streamName, obj => Future {messages.push(obj)})
+        stream.foreach(streamName, obj => Future { messages.push(obj) })
 
         eventually {
           messages should contain only testObject
-          verify(mockMetricSender, never()).incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+          verify(mockMetricSender, never())
+            .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
         }
@@ -42,7 +50,7 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
 
   it("fails gracefully when a conversion fails") {
     withFixtures {
-      case (mockMetricSender, QueuePair(queue, dlq),stream) =>
+      case (mockMetricSender, QueuePair(queue, dlq), stream) =>
         val invalidBodyTestMessage = SQSMessage(
           subject = Some("subject"),
           messageType = "messageType",
@@ -58,7 +66,8 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
         stream.foreach(streamName, _ => Future.successful(()))
 
         eventually {
-          verify(mockMetricSender, never()).incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+          verify(mockMetricSender, never())
+            .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -70,10 +79,13 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
       withFixtures {
         case (mockMetricSender, QueuePair(queue, dlq), stream) =>
           sqsClient.sendMessage(queue.url, testMessageJson(testObject))
-          stream.foreach(streamName, _ => Future.failed(new ConditionalCheckFailedException("Wrong!")))
+          stream.foreach(
+            streamName,
+            _ => Future.failed(new ConditionalCheckFailedException("Wrong!")))
 
           eventually {
-            verify(mockMetricSender, never()).incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+            verify(mockMetricSender, never())
+              .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
@@ -87,10 +99,13 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
         case (mockMetricSender, QueuePair(queue, dlq), stream) =>
           sqsClient.sendMessage(queue.url, testMessageJson(testObject))
 
-          stream.foreach(streamName, _ => Future.failed(new RuntimeException("Wrong!")))
+          stream.foreach(
+            streamName,
+            _ => Future.failed(new RuntimeException("Wrong!")))
 
           eventually {
-            verify(mockMetricSender, times(3)).incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+            verify(mockMetricSender, times(3))
+              .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
@@ -98,12 +113,20 @@ class SQSToDynamoStreamTest extends FunSpec with SQS with Akka with MetricsSende
     }
   }
 
-  def withFixtures[R](testWith: TestWith[(MetricsSender, QueuePair, SQSToDynamoStream[TestObject]), R]): R =
+  def withFixtures[R](
+    testWith: TestWith[(MetricsSender,
+                        QueuePair,
+                        SQSToDynamoStream[TestObject]),
+                       R]): R =
     withActorSystem[R] { actorSystem =>
       withMockMetricSender { metrics =>
         withLocalSqsQueueAndDlq[R] { queuePair =>
-          withSQSStream[NotificationMessage, R](actorSystem, queuePair.queue, metrics){ sqsStream =>
-            val sqsToDynamoStream = new SQSToDynamoStream[TestObject](actorSystem,sqsStream)
+          withSQSStream[NotificationMessage, R](
+            actorSystem,
+            queuePair.queue,
+            metrics) { sqsStream =>
+            val sqsToDynamoStream =
+              new SQSToDynamoStream[TestObject](actorSystem, sqsStream)
 
             testWith((metrics, queuePair, sqsToDynamoStream))
           }

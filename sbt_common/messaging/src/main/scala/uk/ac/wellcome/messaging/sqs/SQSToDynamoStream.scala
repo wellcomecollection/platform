@@ -12,19 +12,20 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class SQSToDynamoStream[T] @Inject()(actorSystem: ActorSystem,
-                            sqsStream: SQSStream[NotificationMessage]
-                          ) extends Logging {
+                                     sqsStream: SQSStream[NotificationMessage])
+    extends Logging {
   implicit val executor = actorSystem.dispatcher
 
   def foreach(name: String, f: T => Future[Unit])(
-    implicit decoderT: Decoder[T])= {
+    implicit decoderT: Decoder[T]) = {
     sqsStream.foreach(
       name,
       obj => processMessage(f, obj)
     )
   }
 
-  private def processMessage(store: T=> Future[Unit], message: NotificationMessage)(
+  private def processMessage(store: T => Future[Unit],
+                             message: NotificationMessage)(
     implicit decoderT: Decoder[T]): Future[Unit] =
     for {
       t <- Future.fromTry(fromJson[T](message.Message))
