@@ -70,3 +70,41 @@ if __name__ == '__main__':
     print(f'The staging API is {bold(staging_api)}')
     print(f'- api   = {bold(staging_api_info["api"])}')
     print(f'- nginx = {bold(staging_api_info["nginx_api"])}')
+
+    print('')
+    print('---')
+    print('')
+
+    print('If you want to switch the prod/staging API, copy the following')
+    print('Terraform into variables.tf:')
+    print('')
+
+    new_prod_api = staging_api
+    new_prod_api_info = staging_api_info
+
+    print(f'''
+\033[32mvariable "production_api" {{
+  description = "Which version of the API is production? (romulus | remus)"
+  default     = "{staging_api}"
+}}
+
+variable "pinned_romulus_api" {{
+  description = "Which version of the API image to pin romulus to, if any"
+  default     = "{new_prod_api_info['api'] if new_prod_api == 'romulus' else ''}"
+}}
+
+variable "pinned_romulus_api_nginx" {{
+  description = "Which version of the nginx API image to pin romulus to, if any"
+  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'romulus' else ''}"
+}}
+
+variable "pinned_remus_api" {{
+  description = "Which version of the API image to pin remus to, if any"
+  default     = "{new_prod_api_info['api'] if new_prod_api == 'remus' else ''}"
+}}
+
+variable "pinned_remus_api_nginx" {{
+  description = "Which version of the nginx API image to pin remus to, if any"
+  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'remus' else ''}"
+}}
+'''.strip())
