@@ -2,16 +2,16 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraItemMergerFeatureTest
     extends FunSpec
@@ -122,12 +122,11 @@ class SierraItemMergerFeatureTest
   }
 
   private def sendItemRecordToSQS(itemRecord: SierraItemRecord, queue: Queue) = {
-    val message = SQSMessage(
-      subject = Some("Test message sent by SierraItemMergerWorkerServiceTest"),
-      body = toJson(itemRecord).get,
-      topic = "topic",
-      messageType = "messageType",
-      timestamp = "2001-01-01T01:01:01Z"
+    val message = NotificationMessage(
+      MessageId = "message-id",
+      TopicArn = "topic",
+      Subject = "Test message sent by SierraItemMergerWorkerServiceTest",
+      Message = toJson(itemRecord).get
     )
     sqsClient.sendMessage(queue.url, toJson(message).get)
   }
