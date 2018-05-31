@@ -7,7 +7,7 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.matcher.EquivalentIdentifiers
+import uk.ac.wellcome.models.matcher.{EquivalentIdentifiers, MatchResult}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -27,10 +27,9 @@ class LinkedWorkMatcherTest
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
           whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork)) {
-            identifiersList =>
+            matchResult =>
               val workId = "sierra-system-number/id"
-              identifiersList shouldBe
-                LinkedWorksIdentifiersList(Set(EquivalentIdentifiers(Set(workId))))
+              matchResult shouldBe MatchResult(Set(EquivalentIdentifiers(Set(workId))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('workId -> workId)
@@ -52,9 +51,8 @@ class LinkedWorkMatcherTest
           val work = anUnidentifiedSierraWork.copy(
             sourceIdentifier = aIdentifier,
             identifiers = List(aIdentifier, linkedIdentifier))
-          whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
-            identifiersList shouldBe
-              LinkedWorksIdentifiersList(Set(EquivalentIdentifiers(
+          whenReady(linkedWorkMatcher.matchWork(work)) { matchResult =>
+            matchResult shouldBe MatchResult(Set(EquivalentIdentifiers(
                 Set("sierra-system-number/A", "sierra-system-number/B"))))
 
             val savedLinkedWorks = Scanamo
@@ -97,9 +95,9 @@ class LinkedWorkMatcherTest
             sourceIdentifier = bIdentifier,
             identifiers = List(bIdentifier, cIdentifier))
 
-          whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
-            identifiersList shouldBe
-              LinkedWorksIdentifiersList(
+          whenReady(linkedWorkMatcher.matchWork(work)) { matchResult =>
+            matchResult shouldBe
+              MatchResult(
                 Set(
                   EquivalentIdentifiers(
                     Set(

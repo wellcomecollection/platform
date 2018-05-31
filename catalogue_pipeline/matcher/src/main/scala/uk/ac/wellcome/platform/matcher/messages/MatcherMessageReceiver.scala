@@ -35,10 +35,10 @@ class MatcherMessageReceiver @Inject()(
       workEntry <- s3TypeStore.get(s3ObjectLocation)
 
       work = workEntry.work
-      identifiersList <- linkedWorkMatcher.matchWork(work)
+      matchResult <- linkedWorkMatcher.matchWork(work)
 
       _ <- snsWriter.writeMessage(
-        message = toJson(identifiersList).get,
+        message = toJson(matchResult).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()
