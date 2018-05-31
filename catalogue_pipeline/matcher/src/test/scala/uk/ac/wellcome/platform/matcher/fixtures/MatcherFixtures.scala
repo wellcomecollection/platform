@@ -16,7 +16,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
-import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, WorkGraphStore}
+import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -107,18 +107,17 @@ trait MatcherFixtures
 
   def withWorkGraphStore[R](table: Table)(
     testWith: TestWith[WorkGraphStore, R]): R = {
-    withLinkedWorkDao(table) { linkedWorkDao =>
-      val workGraphStore = new WorkGraphStore(linkedWorkDao)
+    withWorkNodeDao(table) { workNodeDao =>
+      val workGraphStore = new WorkGraphStore(workNodeDao)
       testWith(workGraphStore)
     }
   }
 
-  def withLinkedWorkDao[R](table: Table)(
-    testWith: TestWith[LinkedWorkDao, R]): R = {
-    val linkedDao = new LinkedWorkDao(
+  def withWorkNodeDao[R](table: Table)(testWith: TestWith[WorkNodeDao, R]): R = {
+    val workNodeDao = new WorkNodeDao(
       dynamoDbClient,
       DynamoConfig(table.name, Some(table.index)))
-    testWith(linkedDao)
+    testWith(workNodeDao)
   }
 
   def aSierraSourceIdentifier(id: String) =

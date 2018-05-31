@@ -8,23 +8,23 @@ import uk.ac.wellcome.storage.GlobalExecutionContext._
 import scala.concurrent.Future
 
 class WorkGraphStore @Inject()(
-  linkedWorkDao: LinkedWorkDao
+  workNodeDao: WorkNodeDao
 ) extends Logging {
 
   def findAffectedWorks(workUpdate: LinkedWorkUpdate): Future[WorkGraph] = {
     val directlyAffectedWorkIds = workUpdate.linkedIds + workUpdate.workId
 
     for {
-      directlyAffectedWorks <- linkedWorkDao.get(directlyAffectedWorkIds)
-      affectedSetIds = directlyAffectedWorks.map(workNode =>
+      directlyAffectedWorks <- workNodeDao.get(directlyAffectedWorkIds)
+      affectedComponentIds = directlyAffectedWorks.map(workNode =>
         workNode.componentId)
-      affectedWorks <- linkedWorkDao.getBySetIds(affectedSetIds)
+      affectedWorks <- workNodeDao.getByComponentIds(affectedComponentIds)
     } yield WorkGraph(affectedWorks)
   }
 
   def put(graph: WorkGraph) = {
     Future.sequence(
-      graph.nodes.map(linkedWorkDao.put)
+      graph.nodes.map(workNodeDao.put)
     )
   }
 }

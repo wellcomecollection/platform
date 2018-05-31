@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future
 
-class LinkedWorkDao @Inject()(
+class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {
@@ -20,25 +20,22 @@ class LinkedWorkDao @Inject()(
   val index = dynamoConfig.index.getOrElse(
     throw new RuntimeException("Index cannot be empty!"))
 
-  def getBySetIds(setIds: Set[String]): Future[Set[WorkNode]] =
-    Future.sequence(setIds.map(getBySetId)).map(_.flatten)
-
   def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
     Future {
       Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
     }
   }
 
-  def get(workIds: Set[String]): Future[Set[WorkNode]] = {
+  def get(ids: Set[String]): Future[Set[WorkNode]] = {
     Future {
       Scanamo
-        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> workIds)
+        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
         .map {
           case Right(works) => works
           case Left(scanamoError) => {
             val exception = new RuntimeException(scanamoError.toString)
             error(
-              s"An error occurred while retrieving all workIds=$workIds from DynamoDB",
+              s"An error occurred while retrieving all workIds=$ids from DynamoDB",
               exception)
             throw exception
           }
@@ -46,11 +43,14 @@ class LinkedWorkDao @Inject()(
     }
   }
 
-  private def getBySetId(setId: String) = {
+  def getByComponentIds(setIds: Set[String]): Future[Set[WorkNode]] =
+    Future.sequence(setIds.map(getByComponentId)).map(_.flatten)
+
+  private def getByComponentId(componentId: String) = {
     Future {
       Scanamo
         .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
-          'componentId -> setId)
+          'componentId -> componentId)
         .map {
           case Right(record) => {
             record
@@ -58,7 +58,7 @@ class LinkedWorkDao @Inject()(
           case Left(scanamoError) => {
             val exception = new RuntimeException(scanamoError.toString)
             error(
-              s"An error occurred while retrieving bySetId=$setId from DynamoDB",
+              s"An error occurred while retrieving byComponentId=$componentId from DynamoDB",
               exception
             )
             throw exception

@@ -143,11 +143,11 @@ class WorkGraphStoreTest
 
     it("throws if linkedDao fails to put") {
       withLocalDynamoDbTable { table =>
-        val mockLinkedWorkDao = mock[LinkedWorkDao]
+        val mockWorkNodeDao = mock[WorkNodeDao]
         val expectedException = new RuntimeException("FAILED")
-        when(mockLinkedWorkDao.put(any[WorkNode]))
+        when(mockWorkNodeDao.put(any[WorkNode]))
           .thenReturn(Future.failed(expectedException))
-        val workGraphStore = new WorkGraphStore(mockLinkedWorkDao)
+        val workGraphStore = new WorkGraphStore(mockWorkNodeDao)
 
         whenReady(
           workGraphStore
