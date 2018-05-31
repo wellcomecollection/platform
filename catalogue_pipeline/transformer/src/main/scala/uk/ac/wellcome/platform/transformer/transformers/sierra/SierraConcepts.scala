@@ -24,7 +24,7 @@ trait SierraConcepts extends MarcUtils {
     varField: VarField): MaybeDisplayable[T] = {
     val identifierSubfields = varField.subfields.filter { _.tag == "0" }
 
-    identifierSubfields match {
+    identifierSubfields.distinct match {
       case Seq() => Unidentifiable(agent = concept)
       case Seq(identifierSubfield) =>
         maybeAddIdentifier[T](
