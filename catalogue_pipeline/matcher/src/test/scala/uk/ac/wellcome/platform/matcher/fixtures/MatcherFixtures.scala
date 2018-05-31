@@ -12,7 +12,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
-import uk.ac.wellcome.platform.matcher.storage.{LinkedWorkDao, WorkGraphStore, WorkNodeDao}
+import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
