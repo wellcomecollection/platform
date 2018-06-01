@@ -11,7 +11,8 @@ class DynamoConfigTest extends FunSpec with Matchers {
     config.index shouldBe index
   }
 
-  it("throws a ConfigurationException if you look up the index without setting it") {
+  it(
+    "throws a ConfigurationException if you look up the index without setting it") {
     val config = DynamoConfig(table = "mytable")
     config.maybeIndex shouldBe None
 

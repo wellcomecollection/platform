@@ -280,7 +280,8 @@ class VersionedDaoTest
         val failingDao =
           new VersionedDao(
             dynamoDbClient,
-            dynamoConfig = DynamoConfig(table = table.name, index = table.index)
+            dynamoConfig =
+              DynamoConfig(table = table.name, index = table.index)
           )
 
         val testVersioned = TestVersioned(
