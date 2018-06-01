@@ -38,7 +38,7 @@ class SierraTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messagingBucket =>
             val sierraHybridRecordMessage =
-              hybridRecordSqsMessage(
+              hybridRecordNotificationMessage(
                 message = createValidSierraTransformableJson(
                   id = id,
                   title = title,

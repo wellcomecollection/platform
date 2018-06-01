@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex_worker
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.Id
@@ -73,12 +73,11 @@ class ReindexerFeatureTest
       desiredVersion = desiredVersion
     )
 
-    val sqsMessage = SQSMessage(
-      None,
-      toJson(reindexJob).get,
-      "topic",
-      "message",
-      "now"
+    val sqsMessage = NotificationMessage(
+      Subject = "",
+      Message = toJson(reindexJob).get,
+      TopicArn = "topic",
+      MessageId = "message"
     )
 
     sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)

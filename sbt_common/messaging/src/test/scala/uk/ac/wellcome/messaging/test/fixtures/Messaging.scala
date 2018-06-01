@@ -3,7 +3,6 @@ package uk.ac.wellcome.messaging.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
-import io.circe.generic.semiauto._
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
@@ -182,11 +181,6 @@ trait Messaging
     }
   }
 
-  implicit val messagePointerDecoder: Decoder[MessagePointer] =
-    deriveDecoder[MessagePointer]
-
-  implicit val messagePointerEncoder: Encoder[MessagePointer] =
-    deriveEncoder[MessagePointer]
 
   def put[T](obj: T, location: ObjectLocation)(
     implicit encoder: Encoder[T]) = {

@@ -124,3 +124,10 @@ wloc:copyright rdf:type owl:DatatypeProperty ;
     rdfs:domain wloc:Location ;
     rdfs:range rdf:langString ;
     rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> .     
+
+wloc:shelfmark rdf:type owl:DatatypeProperty ;
+    rdfs:label "shelfmark"@en ;
+    rdfs:comment "The shelfmark for an items location."@en ;
+    rdfs:domain wloc:Location ;
+    rdfs:range rdf:langString ;
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/location> . 

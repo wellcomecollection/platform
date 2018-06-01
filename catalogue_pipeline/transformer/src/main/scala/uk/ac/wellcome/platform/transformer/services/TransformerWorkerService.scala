@@ -2,20 +2,24 @@ package uk.ac.wellcome.platform.transformer.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
-import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.transformer.receive.SQSMessageReceiver
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.transformer.receive.NotificationMessageReceiver
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
 class TransformerWorkerService @Inject()(
-  reader: SQSReader,
   system: ActorSystem,
-  metrics: MetricsSender,
-  messageReceiver: SQSMessageReceiver
-) extends SQSWorker(reader, system, metrics) {
+  messageReceiver: NotificationMessageReceiver,
+  sqsStream: SQSStream[NotificationMessage]
+) {
 
-  override def processMessage(message: SQSMessage): Future[Unit] =
+  sqsStream.foreach(this.getClass.getSimpleName, processMessage)
+
+  private def processMessage(message: NotificationMessage): Future[Unit] =
     messageReceiver.receiveMessage(message).map(_ => ())
+
+  def stop() = system.terminate()
 }
