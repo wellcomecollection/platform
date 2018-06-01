@@ -23,18 +23,16 @@ class IngestorWorkerService @Inject()(
   def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =
       Future.fromTry(Try(decideTargetIndices(work)))
-    futureIndices.flatMap(indices => {
+    futureIndices.flatMap { indices =>
       val futureResults = indices.map { esIndex =>
         identifiedWorkIndexer.indexWork(
           work = work,
           esIndex = esIndex,
           esType = elasticConfig.documentType
         )
-      })
-      Future.sequence(futureResults).map { _ =>
-        ()
       }
-    })
+      Future.sequence(futureResults).map { _ => ()}
+    }
   }
   def stop(): Future[Terminated] = {
     system.terminate()

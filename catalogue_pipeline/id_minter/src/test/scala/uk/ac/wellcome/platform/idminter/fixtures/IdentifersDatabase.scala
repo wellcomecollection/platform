@@ -6,18 +6,10 @@ import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.database.FieldDescription
+import uk.ac.wellcome.platform.idminter.models.{IdentifiersTableConfig, RDSClientConfig}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
-
-case class DatabaseConfig(
-  databaseName: String,
-  tableName: String,
-  database: SQLSyntax,
-  table: SQLSyntax,
-  flags: Map[String, String],
-  session: AutoSession.type
-)
 
 trait IdentifiersDatabase
     extends Eventually
@@ -29,9 +21,9 @@ trait IdentifiersDatabase
   val username = "root"
   val password = "password"
 
-  def eventuallyTableExists(databaseConfig: DatabaseConfig) = eventually {
-    val database = databaseConfig.database
-    val table = databaseConfig.table
+  def eventuallyTableExists(tableConfig: IdentifiersTableConfig) = eventually {
+    val database = tableConfig.database
+    val table = tableConfig.tableName
 
     val fields = DB readOnly { implicit session =>
       sql"DESCRIBE $database.$table"
@@ -80,7 +72,7 @@ trait IdentifiersDatabase
     Stream continually nextAlpha
   }
 
-  def withIdentifiersDatabase[R](testWith: TestWith[DatabaseConfig, R]) = {
+  def withIdentifiersDatabase[R](testWith: TestWith[(RDSClientConfig, IdentifiersTableConfig), R]) = {
     Class.forName("com.mysql.jdbc.Driver")
     ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
 
@@ -115,19 +107,22 @@ trait IdentifiersDatabase
       "aws.rds.identifiers.database" -> databaseName
     )
 
-    val config = DatabaseConfig(
-      databaseName = databaseName,
-      tableName = tableName,
-      database = identifiersDatabase,
-      table = identifiersTable,
-      flags = flags,
-      session = session
+    val rdsClientConfig = RDSClientConfig(
+      host = host,
+      port = port,
+      username = username,
+      password = password
+    )
+
+    val identifiersTableConfig = IdentifiersTableConfig(
+      database = databaseName,
+      tableName = tableName
     )
 
     try {
       sql"CREATE DATABASE $identifiersDatabase".execute().apply()
 
-      testWith(config)
+      testWith((rdsClientConfig, identifiersTableConfig))
     } finally {
       DB localTx { implicit session =>
         sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()

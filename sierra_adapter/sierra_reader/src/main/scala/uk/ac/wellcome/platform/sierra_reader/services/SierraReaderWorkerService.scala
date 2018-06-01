@@ -10,8 +10,7 @@ import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
-  SierraConfig,
-  SierraResourceTypes
+  SierraConfig
 }
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor

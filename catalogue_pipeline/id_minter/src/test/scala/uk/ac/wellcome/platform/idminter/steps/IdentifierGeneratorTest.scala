@@ -12,7 +12,6 @@ import uk.ac.wellcome.platform.idminter.database.{
   TableProvisioner
 }
 import uk.ac.wellcome.platform.idminter.fixtures
-import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -26,21 +25,17 @@ class IdentifierGeneratorTest
     with Matchers
     with MockitoSugar {
 
-  case class IdentifierGeneratorFixtures(
-    identifierGenerator: IdentifierGenerator,
-    identifiersTable: IdentifiersTable,
-    dbConfig: DatabaseConfig
-  )
-
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
                                    None)(
-    testWith: TestWith[IdentifierGeneratorFixtures, R]) =
-    withIdentifiersDatabase[R] { dbConfig =>
-      val identifiersTable: IdentifiersTable =
-        new IdentifiersTable(dbConfig.databaseName, dbConfig.tableName)
+    testWith: TestWith[(IdentifierGenerator, IdentifiersTable), R]) =
+    withIdentifiersDatabase[R] { case (rdsClientConfig, identifiersTableConfig) =>
+      val identifiersTable = new IdentifiersTable(identifiersTableConfig)
 
-      new TableProvisioner(host, port, username, password)
-        .provision(dbConfig.databaseName, dbConfig.tableName)
+      new TableProvisioner(rdsClientConfig)
+        .provision(
+          database = identifiersTableConfig.database,
+          tableName = identifiersTableConfig.tableName
+        )
 
       val identifiersDao = maybeIdentifiersDao.getOrElse(
         new IdentifiersDao(DB.connect(), identifiersTable)
@@ -53,34 +48,30 @@ class IdentifierGeneratorTest
             metricsSender
           )
 
-          eventuallyTableExists(dbConfig)
+          eventuallyTableExists(identifiersTableConfig)
 
-          testWith(
-            IdentifierGeneratorFixtures(
-              identifierGenerator,
-              identifiersTable,
-              dbConfig))
+          testWith((identifierGenerator, identifiersTable))
         }
       }
     }
 
   it("queries the database and return a matching canonical id") {
-    withIdentifierGenerator() { fixtures =>
-      implicit val session = fixtures.dbConfig.session
+    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
+      implicit val session = AutoSession
 
       withSQL {
         insert
-          .into(fixtures.identifiersTable)
+          .into(identifiersTable)
           .namedValues(
-            fixtures.identifiersTable.column.CanonicalId -> "5678",
-            fixtures.identifiersTable.column.SourceSystem -> IdentifierType(
+            identifiersTable.column.CanonicalId -> "5678",
+            identifiersTable.column.SourceSystem -> IdentifierType(
               "miro-image-number").id,
-            fixtures.identifiersTable.column.SourceId -> "1234",
-            fixtures.identifiersTable.column.OntologyType -> "Work"
+            identifiersTable.column.SourceId -> "1234",
+            identifiersTable.column.OntologyType -> "Work"
           )
       }.update().apply()
 
-      val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
           identifierType = IdentifierType("miro-image-number"),
           "Work",
@@ -92,10 +83,10 @@ class IdentifierGeneratorTest
   }
 
   it("generates and saves a new identifier") {
-    withIdentifierGenerator() { fixtures =>
-      implicit val session = fixtures.dbConfig.session
+    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
+      implicit val session = AutoSession
 
-      val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
           identifierType = IdentifierType("miro-image-number"),
           "Work",
@@ -107,12 +98,12 @@ class IdentifierGeneratorTest
       val id = triedId.get
       id should not be empty
 
-      val i = fixtures.identifiersTable.i
+      val i = identifiersTable.i
 
       val maybeIdentifier = withSQL {
 
         select
-          .from(fixtures.identifiersTable as i)
+          .from(identifiersTable as i)
           .where
           .eq(i.SourceId, "1234")
 
@@ -150,9 +141,9 @@ class IdentifierGeneratorTest
         when(identifiersDao.saveIdentifier(any[Identifier]()))
           .thenReturn(Failure(expectedException))
 
-        withIdentifierGenerator(Some(identifiersDao)) { fixtures =>
+        withIdentifierGenerator(Some(identifiersDao)) { case (identifierGenerator, identifiersTable) =>
           val triedGeneratingId =
-            fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+            identifierGenerator.retrieveOrGenerateCanonicalId(
               sourceIdentifier
             )
 
@@ -164,13 +155,13 @@ class IdentifierGeneratorTest
   }
 
   it("should preserve the ontologyType when generating a new identifier") {
-    withIdentifierGenerator() { fixtures =>
-      implicit val session = fixtures.dbConfig.session
+    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
+      implicit val session = AutoSession
 
       val ontologyType = "Item"
       val miroId = "1234"
 
-      val triedId = fixtures.identifierGenerator.retrieveOrGenerateCanonicalId(
+      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
         SourceIdentifier(
           identifierType = IdentifierType("miro-image-number"),
           ontologyType,
@@ -180,11 +171,11 @@ class IdentifierGeneratorTest
       val id = triedId.get
       id should not be (empty)
 
-      val i = fixtures.identifiersTable.i
+      val i = identifiersTable.i
       val maybeIdentifier = withSQL {
 
         select
-          .from(fixtures.identifiersTable as i)
+          .from(identifiersTable as i)
           .where
           .eq(i.SourceId, miroId)
 
