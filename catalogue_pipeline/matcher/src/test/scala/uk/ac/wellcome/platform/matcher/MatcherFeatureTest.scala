@@ -15,7 +15,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-import scala.collection.JavaConverters._
+
 
 class MatcherFeatureTest
     extends FunSpec
@@ -78,7 +78,14 @@ class MatcherFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
-              val existingWorkV2 = WorkNode(workId = "A", version = 2, linkedIds = Nil, setId = "sierra-system-number/A")
+
+              val existingWorkV2 = WorkNode(
+                id = "A",
+                version = 2,
+                linkedIds = Nil,
+                componentId = "sierra-system-number/A"
+              )
+
               Scanamo.put(dynamoDbClient)(table.name)(existingWorkV2)
 
               val identifier = SourceIdentifier(
@@ -92,6 +99,7 @@ class MatcherFeatureTest
                 title = Some("Work"),
                 version = 1
               )
+
               val workSqsMessage: NotificationMessage =
                 hybridRecordNotificationMessage(
                   message = toJson(RecorderWorkEntry(work = workV1)).get,
@@ -99,23 +107,19 @@ class MatcherFeatureTest
                   s3Client = s3Client,
                   bucket = storageBucket
                 )
+
               sqsClient.sendMessage(
                 queue.url,
                 toJson(workSqsMessage).get
               )
+
               Thread.sleep(2000)
 
               eventually {
-                sqsClient
-                  .getQueueAttributes(
-                    queue.url,
-                    List("ApproximateNumberOfMessagesNotVisible").asJava
-                  )
-                  .getAttributes
-                  .get(
-                    "ApproximateNumberOfMessagesNotVisible"
-                  ) shouldBe "1"
+                noMessagesAreWaitingIn(queue)
+
                 val snsMessages = listMessagesReceivedFromSNS(topic)
+
                 snsMessages.size shouldBe 0
               }
             }

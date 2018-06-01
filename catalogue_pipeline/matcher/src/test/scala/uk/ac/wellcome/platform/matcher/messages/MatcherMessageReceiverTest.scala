@@ -278,8 +278,11 @@ class MatcherMessageReceiverTest
               version = 2,
               identifiers = List(aIdentifier)
             )
+
             sendSQS(queue, storageBucket, workAv2)
+
             eventually {
+
               assertMessageSent(
                 topic,
                 WorkGraphIdentifiersList(Set(
@@ -294,7 +297,9 @@ class MatcherMessageReceiverTest
                 version = 1)
 
               sendSQS(queue, storageBucket, workAv1)
+
               Thread.sleep(2000)
+
               eventually {
                 sqsClient
                   .getQueueAttributes(
@@ -305,8 +310,10 @@ class MatcherMessageReceiverTest
                   .get(
                     "ApproximateNumberOfMessagesNotVisible"
                   ) shouldBe "1"
+
                 val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages.size shouldBe 0
+
+                snsMessages.size shouldBe 1
               }
             }
           }

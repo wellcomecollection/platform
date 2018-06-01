@@ -187,6 +187,30 @@ trait SQS extends Matchers {
       TestNotificationMessage(toJson(testObject).get)
   }
 
+  def noMessagesAreWaitingIn(queue: Queue) = {
+    // No messages in flight
+    sqsClient
+      .getQueueAttributes(
+        queue.url,
+        List("ApproximateNumberOfMessagesNotVisible").asJava
+      )
+      .getAttributes
+      .get(
+        "ApproximateNumberOfMessagesNotVisible"
+      ) shouldBe "0"
+
+    // No messages awaiting processing
+    sqsClient
+      .getQueueAttributes(
+        queue.url,
+        List("ApproximateNumberOfMessages").asJava
+      )
+      .getAttributes
+      .get(
+        "ApproximateNumberOfMessages"
+      ) shouldBe "0"
+  }
+
   def assertQueueEmpty(queue: Queue) = {
     waitVisibilityTimeoutExipiry()
 

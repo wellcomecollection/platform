@@ -19,7 +19,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           workUpdate = WorkUpdate("A", 1, Set.empty),
           existingGraph = WorkGraph(Set.empty)
         )
-        .nodes shouldBe Set(WorkNode("A", 1, List(), setId = "A"))
+        .nodes shouldBe Set(WorkNode("A", 1, List(), componentId = "A"))
     }
 
     it("updating nothing with A->B gives A+B:A->B") {
@@ -29,8 +29,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = WorkGraph(Set.empty)
         )
         .nodes shouldBe Set(
-        WorkNode("A", 1, List("B"), setId = "A+B"),
-        WorkNode("B", 0, List(), setId = "A+B"))
+        WorkNode("A", 1, List("B"), componentId = "A+B"),
+        WorkNode("B", 0, List(), componentId = "A+B"))
     }
 
     it("updating nothing with B->A gives A+B:B->A") {
@@ -40,8 +40,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           existingGraph = WorkGraph(Set.empty)
         )
         .nodes shouldBe Set(
-        WorkNode("B", 1, List("A"), setId = "A+B"),
-        WorkNode("A", 0, List(), setId = "A+B"))
+        WorkNode("B", 1, List("A"), componentId = "A+B"),
+        WorkNode("A", 0, List(), componentId = "A+B"))
     }
   }
 
@@ -57,8 +57,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
         )
         .nodes should contain theSameElementsAs
         List(
-          WorkNode("A", 2, List("B"), setId = "A+B"),
-          WorkNode("B", 1, List(), setId = "A+B"))
+          WorkNode("A", 2, List("B"), componentId = "A+B"),
+          WorkNode("B", 1, List(), componentId = "A+B"))
     }
 
     it("updating A->B with A->B gives A+B:(A->B, B)") {
@@ -72,8 +72,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
         )
         .nodes should contain theSameElementsAs
         List(
-          WorkNode("A", 2, List("B"), setId = "A+B"),
-          WorkNode("B", 1, List(), setId = "A+B"))
+          WorkNode("A", 2, List("B"), componentId = "A+B"),
+          WorkNode("B", 1, List(), componentId = "A+B"))
     }
 
     it("updating A->B, B, C with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -87,9 +87,9 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("C", 1, Nil, "C")))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, List("B"), setId = "A+B+C"),
-        WorkNode("B", 2, List("C"), setId = "A+B+C"),
-        WorkNode("C", 1, List(), setId = "A+B+C")
+        WorkNode("A", 2, List("B"), componentId = "A+B+C"),
+        WorkNode("B", 2, List("C"), componentId = "A+B+C"),
+        WorkNode("C", 1, List(), componentId = "A+B+C")
       )
     }
 
@@ -127,10 +127,10 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
         )
         .nodes should contain theSameElementsAs
         List(
-          WorkNode("A", 2, List("B"), setId = "A+B+C+D"),
-          WorkNode("B", 2, List("C", "D"), setId = "A+B+C+D"),
-          WorkNode("C", 1, List(), setId = "A+B+C+D"),
-          WorkNode("D", 1, List(), setId = "A+B+C+D")
+          WorkNode("A", 2, List("B"), componentId = "A+B+C+D"),
+          WorkNode("B", 2, List("C", "D"), componentId = "A+B+C+D"),
+          WorkNode("C", 1, List(), componentId = "A+B+C+D"),
+          WorkNode("D", 1, List(), componentId = "A+B+C+D")
         )
     }
 
@@ -145,9 +145,9 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("C", 1, Nil, "A+B+C")))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, List("B"), setId = "A+B+C"),
-        WorkNode("B", 2, List("C"), setId = "A+B+C"),
-        WorkNode("C", 2, List("A"), setId = "A+B+C")
+        WorkNode("A", 2, List("B"), componentId = "A+B+C"),
+        WorkNode("B", 2, List("C"), componentId = "A+B+C"),
+        WorkNode("C", 2, List("A"), componentId = "A+B+C")
       )
     }
   }
@@ -163,8 +163,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", 1, List(), "A+B")))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, List(), setId = "A"),
-        WorkNode("B", 1, List(), setId = "B")
+        WorkNode("A", 2, List(), componentId = "A"),
+        WorkNode("B", 1, List(), componentId = "B")
       )
     }
 
@@ -179,8 +179,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
             ))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, Nil, setId = "A"),
-        WorkNode("B", 0, Nil, setId = "B")
+        WorkNode("A", 2, Nil, componentId = "A"),
+        WorkNode("B", 0, Nil, componentId = "B")
       )
     }
 

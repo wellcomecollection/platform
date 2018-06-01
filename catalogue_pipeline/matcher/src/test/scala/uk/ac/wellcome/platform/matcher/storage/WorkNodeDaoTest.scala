@@ -34,9 +34,9 @@ class WorkNodeDaoTest
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          val existingLinkedWorkA: WorkNode =
-            WorkNode("A", 1, List("B"), "A+B")
+          val existingLinkedWorkA: WorkNode = WorkNode("A", 1, List("B"), "A+B")
           val existingLinkedWorkB: WorkNode = WorkNode("B", 0, Nil, "A+B")
+
           Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
           Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
 
@@ -51,8 +51,10 @@ class WorkNodeDaoTest
       withLocalDynamoDbTable { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED!")
+
         when(dynamoDbClient.batchGetItem(any[BatchGetItemRequest]))
           .thenThrow(expectedException)
+
         val matcherGraphDao = new WorkNodeDao(
           dynamoDbClient,
           DynamoConfig(table.name, Some(table.index)))
@@ -93,14 +95,15 @@ class WorkNodeDaoTest
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { matcherGraphDao =>
-          val existingLinkedWorkA: WorkNode =
-            WorkNode("A", 1, List("B"), "A+B")
-          val existingLinkedWorkB: WorkNode = WorkNode("B", 0, Nil, "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+
+          val existingWorkNodeA: WorkNode = WorkNode("A", 1, List("B"), "A+B")
+          val existingWorkNodeB: WorkNode = WorkNode("B", 0, Nil, "A+B")
+
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeB)
 
           whenReady(matcherGraphDao.getByComponentIds(Set("A+B"))) { linkedWorks =>
-            linkedWorks shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+            linkedWorks shouldBe Set(existingWorkNodeA, existingWorkNodeB)
           }
         }
       }
@@ -146,7 +149,7 @@ class WorkNodeDaoTest
           val work = WorkNode("A", 1, List("B"), "A+B")
           whenReady(workNodeDao.put(work)) { _ =>
             val savedLinkedWork = Scanamo.get[WorkNode](dynamoDbClient)(
-              table.name)('workId -> "A")
+              table.name)('id -> "A")
             savedLinkedWork shouldBe Some(Right(work))
           }
         }

@@ -36,6 +36,6 @@ class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   }
 
   private def groupBySetId(updatedGraph: WorkGraph) =
-    updatedGraph.nodes.groupBy(_.setId)
+    updatedGraph.nodes.groupBy(_.componentId)
 
 }

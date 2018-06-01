@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
@@ -11,25 +10,30 @@ import scala.collection.immutable.Iterable
 object WorkGraphUpdater {
   def update(workUpdate: WorkUpdate,
              existingGraph: WorkGraph): WorkGraph = {
-    val existingVersion = existingGraph.nodes.find(_.workId == workUpdate.workId) match {
+
+    val existingVersion = existingGraph.nodes.find(_.id == workUpdate.workId) match {
       case Some(lw) => lw.version
       case None => 0
     }
 
     if (existingVersion >= workUpdate.version) {
-      throw GracefulFailureException(new RuntimeException("Not processing old work update"))
+      existingGraph
+    } else {
+      doUpdate(workUpdate, existingGraph)
     }
+  }
 
+  private def doUpdate(workUpdate: WorkUpdate, existingGraph: WorkGraph) =  {
     val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
       workUpdate.workId,
       existingGraph.nodes)
 
     val nodeVersions = filteredLinkedWorks.map { linkedWork =>
-      (linkedWork.workId, linkedWork.version)
+      (linkedWork.id, linkedWork.version)
     }.toMap + (workUpdate.workId -> workUpdate.version)
 
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
-      toEdges(linkedWork.workId, linkedWork.linkedIds)
+      toEdges(linkedWork.id, linkedWork.linkedIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.referencedWorkIds)
 
     val nodes = existingGraph.nodes.flatMap(linkedWork => {
@@ -57,7 +61,7 @@ object WorkGraphUpdater {
   }
 
   private def allNodes(linkedWork: WorkNode) = {
-    linkedWork.workId +: linkedWork.linkedIds
+    linkedWork.id +: linkedWork.linkedIds
   }
 
   private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
@@ -67,6 +71,6 @@ object WorkGraphUpdater {
   private def existingGraphWithoutUpdatedNode(
     workId: String,
     linkedWorksList: Set[WorkNode]) = {
-    linkedWorksList.filterNot(_.workId == workId)
+    linkedWorksList.filterNot(_.id == workId)
   }
 }
