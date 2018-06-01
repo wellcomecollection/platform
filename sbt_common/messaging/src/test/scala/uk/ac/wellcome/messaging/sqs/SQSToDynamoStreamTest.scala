@@ -53,12 +53,11 @@ class SQSToDynamoStreamTest
   it("fails gracefully when a conversion fails") {
     withFixtures {
       case (mockMetricSender, QueuePair(queue, dlq), stream) =>
-        val invalidBodyTestMessage = SQSMessage(
-          subject = Some("subject"),
-          messageType = "messageType",
-          topic = "topic",
-          body = "not valid json",
-          timestamp = "timestamp"
+        val invalidBodyTestMessage = NotificationMessage(
+          Subject = "subject",
+          MessageId = "message-id",
+          TopicArn = "topic",
+          Message = "not valid json"
         )
 
         val invalidBodyTestMessageJson = toJson(invalidBodyTestMessage).get

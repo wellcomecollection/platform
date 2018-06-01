@@ -17,6 +17,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
@@ -98,12 +99,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
       sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
@@ -143,12 +144,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
       sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
@@ -206,12 +207,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
       sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
@@ -253,12 +254,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
       whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
@@ -281,12 +282,12 @@ class SierraReaderWorkerServiceTest
         """.stripMargin
 
       val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
       whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
