@@ -57,7 +57,7 @@ class SQSMessageReceiver @Inject()(
   }
 
   // Implicitly will create an instance using the appropriate type class
-  // if the correct implicit dependenencies are in scope
+  // if the correct implicit dependencies are in scope
   val miroTransformableStore = implicitly[ObjectStore[MiroTransformable]]
   val calmTransformableStore = implicitly[ObjectStore[CalmTransformable]]
   val sierraTransformableStore = implicitly[ObjectStore[SierraTransformable]]

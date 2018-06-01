@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.transformer.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
 import javax.inject.Singleton
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.storage.ObjectStore
@@ -14,16 +12,6 @@ import uk.ac.wellcome.platform.transformer.GlobalExecutionContext
 import scala.concurrent.ExecutionContext
 
 object UnidentifiedWorkModule extends TwitterModule {
-  @Provides
-  @Singleton
-  def provideUnidentifiedWorkDecoder(): Decoder[UnidentifiedWork] =
-    deriveDecoder[UnidentifiedWork]
-
-  @Provides
-  @Singleton
-  def provideUnidentifiedWorkEncoder(): Encoder[UnidentifiedWork] =
-    deriveEncoder[UnidentifiedWork]
-
   @Provides
   @Singleton
   def provideExecutionContext(injector: Injector): ExecutionContext =
