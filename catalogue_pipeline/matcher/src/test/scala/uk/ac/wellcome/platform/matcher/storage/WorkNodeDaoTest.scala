@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.matcher.storage
 
+import javax.naming.ConfigurationException
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{
   BatchGetItemRequest,
@@ -176,9 +178,12 @@ class WorkNodeDaoTest
     }
   }
 
-  it("cannot be instantiated if dynamoConfig.index is a None") {
-    intercept[RuntimeException] {
-      new WorkNodeDao(dynamoDbClient, DynamoConfig(table = "something", maybeIndex = None))
+  it("cannot be instantiated if dynamoConfig.maybeIndex is None") {
+    intercept[ConfigurationException] {
+      new WorkNodeDao(
+        dynamoDbClient = dynamoDbClient,
+        dynamoConfig = DynamoConfig(table = "something", maybeIndex = None)
+      )
     }
   }
 
