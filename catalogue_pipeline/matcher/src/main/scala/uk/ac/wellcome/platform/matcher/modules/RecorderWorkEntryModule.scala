@@ -17,6 +17,6 @@ object RecorderWorkEntryModule extends TwitterModule {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[RecorderWorkEntry]]
+    ObjectStore[RecorderWorkEntry]
   }
 }

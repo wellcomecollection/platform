@@ -17,6 +17,6 @@ object UnidentifiedWorkModule extends TwitterModule {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[UnidentifiedWork]]
+    ObjectStore[UnidentifiedWork]
   }
 }

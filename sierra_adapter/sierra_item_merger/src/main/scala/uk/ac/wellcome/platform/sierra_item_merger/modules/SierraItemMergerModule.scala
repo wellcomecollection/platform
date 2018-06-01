@@ -26,9 +26,4 @@ object SierraItemMergerModule extends TwitterModule {
     workerService.stop()
     system.terminate()
   }
-
-  @Provides
-  @Singleton
-  def provideRecorderExecutionContext(): ExecutionContext =
-    GlobalExecutionContext.context
 }

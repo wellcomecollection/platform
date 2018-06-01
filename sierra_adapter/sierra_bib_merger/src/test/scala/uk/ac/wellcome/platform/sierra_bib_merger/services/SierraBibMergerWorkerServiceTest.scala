@@ -8,7 +8,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -28,7 +28,7 @@ class SierraBibMergerWorkerServiceTest
       new SierraBibMergerUpdaterService(
         mock[VersionedHybridStore[SierraTransformable,
                                   SourceMetadata,
-                                  S3TypeStore[SierraTransformable]]],
+                                  ObjectStore[SierraTransformable]]],
         metricsSender)
     val worker = new SierraBibMergerWorkerService(
       sqsReader,

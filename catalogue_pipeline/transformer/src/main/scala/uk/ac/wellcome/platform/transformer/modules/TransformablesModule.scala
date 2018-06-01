@@ -18,7 +18,7 @@ object TransformablesModule extends TwitterModule{
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[MiroTransformable]]
+    ObjectStore[MiroTransformable]
   }
 
   @Provides
@@ -27,7 +27,7 @@ object TransformablesModule extends TwitterModule{
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[CalmTransformable]]
+    ObjectStore[CalmTransformable]
   }
 
   @Provides
@@ -36,6 +36,6 @@ object TransformablesModule extends TwitterModule{
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[SierraTransformable]]
+    ObjectStore[SierraTransformable]
   }
 }

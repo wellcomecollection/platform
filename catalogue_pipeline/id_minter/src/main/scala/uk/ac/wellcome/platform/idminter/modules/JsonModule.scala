@@ -16,6 +16,6 @@ object JsonModule extends TwitterModule {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
-    implicitly[ObjectStore[Json]]
+    ObjectStore[Json]
   }
 }
