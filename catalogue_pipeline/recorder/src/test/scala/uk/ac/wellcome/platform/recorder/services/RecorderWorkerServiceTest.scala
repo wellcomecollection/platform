@@ -158,7 +158,6 @@ class RecorderWorkerServiceTest
     table: Table,
     bucket: Bucket,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
-    withMessageReader[UnidentifiedWork, Unit](bucket, queue) { messageReader =>
       withActorSystem { actorSystem =>
         withMetricsSender(actorSystem) { metricsSender =>
           withLocalSqsQueue { queue =>
@@ -185,7 +184,6 @@ class RecorderWorkerServiceTest
             }
           }
         }
-      }
     }
   }
 }
