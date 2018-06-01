@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
+import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
@@ -181,7 +182,7 @@ trait SQS extends Matchers {
         Message = messageBody
       )
 
-    def apply(testObject: TestObject): NotificationMessage =
+    def apply[T](testObject: T)(implicit encoder: Encoder[T]): NotificationMessage =
       TestNotificationMessage(toJson(testObject).get)
   }
 

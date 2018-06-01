@@ -25,6 +25,8 @@ class SQSToDynamoStreamTest
     with Messaging
     with ExtendedPatience {
 
+  case class TestObject(foo: String)
+
   val testObject = TestObject(foo = "bar")
 
   def testMessageJson(obj: TestObject) =
