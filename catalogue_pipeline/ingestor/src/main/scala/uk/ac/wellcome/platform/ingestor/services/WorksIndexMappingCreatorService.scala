@@ -1,15 +1,13 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.google.inject.Inject
-import com.twitter.inject.annotations.Flag
-import uk.ac.wellcome.elasticsearch.WorksIndex
+import uk.ac.wellcome.elasticsearch.{ElasticConfig, WorksIndex}
 
 class WorksIndexMappingCreatorService @Inject()(
-  @Flag("es.index.v1") esIndexV1: String,
-  @Flag("es.index.v2") esIndexV2: String,
+  elasticConfig: ElasticConfig,
   worksIndex: WorksIndex) {
 
-  worksIndex.create(esIndexV1)
-  worksIndex.create(esIndexV2)
+  worksIndex.create(elasticConfig.indexV1name)
+  worksIndex.create(elasticConfig.indexV2name)
 
 }
