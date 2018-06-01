@@ -20,7 +20,7 @@ import org.scalatest.compatible.Assertion
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes}
+import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig, SierraResourceTypes}
 
 import collection.JavaConverters._
 
@@ -51,10 +51,10 @@ class SierraReaderWorkerServiceTest
           withLocalS3Bucket { bucket =>
             val sierraConfig = SierraConfig(
               resourceType = resourceType,
-              apiUrl = "http://example.org",
-              oauthKey = "0au1hk3y",
-              oauthSec = "o4uth5ec",
-              fields = "title"
+              apiUrl = apiUrl,
+              oauthKey = "key",
+              oauthSec = "secret",
+              fields = fields
             )
 
             val worker = new SierraReaderWorkerService(
@@ -76,12 +76,8 @@ class SierraReaderWorkerServiceTest
                 S3Config(bucket.name),
                 sierraConfig = sierraConfig
               ),
-              batchSize = batchSize,
-              resourceType = resourceType,
-              apiUrl = apiUrl,
-              sierraOauthKey = "key",
-              sierraOauthSecret = "secret",
-              fields = fields
+              readerConfig = ReaderConfig(batchSize = batchSize),
+              sierraConfig = sierraConfig
             )
 
             testWith(FixtureParams(worker, queue, bucket))
