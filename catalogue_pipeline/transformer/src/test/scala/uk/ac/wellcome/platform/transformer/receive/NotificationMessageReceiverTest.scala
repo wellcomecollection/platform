@@ -218,7 +218,7 @@ class NotificationMessageReceiverTest
         withLocalS3Bucket { bucket =>
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(
-              createValidEmptySierraBibSQSMessage(
+              createValidEmptySierraBibNotificationMessage(
                 id = "0101010",
                 s3Client = s3Client,
                 bucket = bucket

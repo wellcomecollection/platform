@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSStream}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -17,6 +17,7 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
@@ -97,15 +98,17 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -142,14 +145,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -205,14 +210,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -252,15 +259,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
-        ex shouldBe a[GracefulFailureException]
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldBe a[GracefulFailureException]
       }
 
     }
@@ -280,16 +288,17 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
-        ex shouldNot be(a[GracefulFailureException])
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldNot be(a[GracefulFailureException])
       }
     }
   }
