@@ -178,7 +178,7 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("breaks a set of works into individual works") {
+  it("breaks matched works into individual works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
