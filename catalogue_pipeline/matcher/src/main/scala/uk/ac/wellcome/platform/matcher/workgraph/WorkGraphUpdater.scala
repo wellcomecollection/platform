@@ -3,19 +3,25 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{VersionConflictException, WorkGraph, WorkUpdate}
+import uk.ac.wellcome.platform.matcher.models.{
+  VersionConflictException,
+  WorkGraph,
+  WorkUpdate
+}
 
 import scala.collection.immutable.Iterable
 
 object WorkGraphUpdater {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
-    val existingVersion = existingGraph.nodes.find(_.id == workUpdate.workId) match {
-      case Some(lw) => lw.version
-      case None => 0
-    }
+    val existingVersion =
+      existingGraph.nodes.find(_.id == workUpdate.workId) match {
+        case Some(lw) => lw.version
+        case None => 0
+      }
     if (existingVersion >= workUpdate.version) {
-      val versionConflictMessage = s"Not matching work ${workUpdate.workId} v${workUpdate.version} because older than existing work v$existingVersion"
+      val versionConflictMessage =
+        s"Not matching work ${workUpdate.workId} v${workUpdate.version} because older than existing work v$existingVersion"
       throw new VersionConflictException(versionConflictMessage)
     } else {
       doUpdate(workUpdate, existingGraph)

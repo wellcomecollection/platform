@@ -20,7 +20,8 @@ class MatcherMessageReceiver @Inject()(
   s3TypeStore: S3TypeStore[RecorderWorkEntry],
   storageS3Config: S3Config,
   actorSystem: ActorSystem,
-  linkedWorkMatcher: WorkMatcher) extends Logging {
+  linkedWorkMatcher: WorkMatcher)
+    extends Logging {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
@@ -28,8 +29,10 @@ class MatcherMessageReceiver @Inject()(
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] = {
     (for {
-      hybridRecord <- Future.fromTry(fromJson[HybridRecord](notificationMessage.Message))
-      workEntry <- s3TypeStore.get(S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+      hybridRecord <- Future.fromTry(
+        fromJson[HybridRecord](notificationMessage.Message))
+      workEntry <- s3TypeStore.get(
+        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
         message = toJson(identifiersList).get,

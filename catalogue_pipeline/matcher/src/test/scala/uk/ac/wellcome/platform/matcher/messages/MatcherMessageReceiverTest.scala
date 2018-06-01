@@ -16,7 +16,6 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
@@ -283,9 +282,9 @@ class MatcherMessageReceiverTest
 
             sendSQS(queue, storageBucket, workAv2)
             eventually {
-              val expectedWorkAv2identifiers = WorkGraphIdentifiersList(Set(
-                MatchedIdentifiers(Set(
-                  WorkIdentifier("sierra-system-number/A", 2)))))
+              val expectedWorkAv2identifiers = WorkGraphIdentifiersList(
+                Set(MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
               assertMessageSent(
                 topic,
                 expectedWorkAv2identifiers
@@ -306,7 +305,8 @@ class MatcherMessageReceiverTest
                   fromJson[WorkGraphIdentifiersList](snsMessage.message).get
                 }
                 actualMatchedWorkLists.size shouldBe 1
-                actualMatchedWorkLists shouldBe List(expectedWorkAv2identifiers)
+                actualMatchedWorkLists shouldBe List(
+                  expectedWorkAv2identifiers)
               }
             }
           }
