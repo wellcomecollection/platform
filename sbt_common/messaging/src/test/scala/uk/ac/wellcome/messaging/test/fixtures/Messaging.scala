@@ -64,34 +64,6 @@ trait Messaging
 
   case class ExampleObject(name: String)
 
-  def withExampleObjectMessageReader[R](bucket: Bucket, queue: Queue)(
-    testWith: TestWith[MessageReader[ExampleObject], R]) = {
-    withMessageReader(bucket, queue)(testWith)
-  }
-
-  def withMessageReader[T, R](bucket: Bucket, queue: Queue)(
-    testWith: TestWith[MessageReader[T], R])(implicit encoder: Encoder[T], decoder: Decoder[T]) = {
-
-    val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      waitTime = 1 millisecond,
-      maxMessages = 1)
-
-    val messageReaderConfig = MessageReaderConfig(
-      sqsConfig = sqsConfig,
-      s3Config = s3Config
-    )
-
-    val testReader = new MessageReader[T](
-      messageReaderConfig = messageReaderConfig,
-      s3Client = s3Client,
-      sqsClient = sqsClient
-    )
-
-    testWith(testReader)
-  }
-
   def withMessageWriter[R](bucket: Bucket,
                            topic: Topic,
                            writerSnsClient: AmazonSNS = snsClient)(
@@ -110,18 +82,6 @@ trait Messaging
     )
 
     testWith(messageWriter)
-  }
-
-  def withExampleObjectMessageReaderFixtures[R](
-    testWith: TestWith[(Bucket, MessageReader[ExampleObject], Queue), R]) = {
-    withLocalS3Bucket { bucket =>
-      withLocalStackSqsQueue { queue =>
-        withExampleObjectMessageReader(bucket = bucket, queue = queue) {
-          reader =>
-            testWith((bucket, reader, queue))
-        }
-      }
-    }
   }
 
   def withMessageStream[T, R](
