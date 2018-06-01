@@ -26,8 +26,9 @@ class SQSMessageReceiver @Inject()(
   messageWriter: MessageWriter[UnidentifiedWork],
   s3Client: AmazonS3,
   s3Config: S3Config,
-  metricsSender: MetricsSender)
-    extends Logging {
+  metricsSender: MetricsSender)(
+  implicit val storageBackend: S3StorageBackend
+) extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
@@ -54,8 +55,6 @@ class SQSMessageReceiver @Inject()(
       }
     )
   }
-
-  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   // Implicitly will create an instance using the appropriate type class
   // if the correct implicit dependenencies are in scope
