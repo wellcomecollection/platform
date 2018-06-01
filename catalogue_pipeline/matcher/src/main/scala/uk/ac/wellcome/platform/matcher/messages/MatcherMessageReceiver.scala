@@ -14,12 +14,12 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class MatcherMessageReceiver @Inject()(
-                                        messageStream: SQSStream[NotificationMessage],
-                                        snsWriter: SNSWriter,
-                                        objectStore: ObjectStore[RecorderWorkEntry],
-                                        storageS3Config: S3Config,
-                                        actorSystem: ActorSystem,
-                                        linkedWorkMatcher: LinkedWorkMatcher) {
+  messageStream: SQSStream[NotificationMessage],
+  snsWriter: SNSWriter,
+  objectStore: ObjectStore[RecorderWorkEntry],
+  storageS3Config: S3Config,
+  actorSystem: ActorSystem,
+  linkedWorkMatcher: LinkedWorkMatcher) {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 

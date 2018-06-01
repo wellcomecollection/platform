@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext
 object IdentifiedWorkModule extends TwitterModule {
   @Provides
   @Singleton
-  def provideUnidentifiedWorkStore(injector: Injector): ObjectStore[IdentifiedWork] = {
+  def provideUnidentifiedWorkStore(
+    injector: Injector): ObjectStore[IdentifiedWork] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 

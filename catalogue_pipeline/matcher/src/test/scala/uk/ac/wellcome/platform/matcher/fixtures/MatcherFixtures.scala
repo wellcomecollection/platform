@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
@@ -73,7 +77,6 @@ trait MatcherFixtures
         withLocalDynamoDbTable { table =>
           withWorkGraphStore(table) { workGraphStore =>
             withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-
               val objectStore = implicitly[ObjectStore[RecorderWorkEntry]]
 
               val sqsStream = new SQSStream[NotificationMessage](

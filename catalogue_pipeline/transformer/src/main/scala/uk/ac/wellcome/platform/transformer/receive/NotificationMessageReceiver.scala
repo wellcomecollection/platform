@@ -34,10 +34,9 @@ class NotificationMessageReceiver @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config,
   metricsSender: MetricsSender)(
-  implicit
-    miroTransformableStore: ObjectStore[MiroTransformable],
-    calmTransformableStore: ObjectStore[CalmTransformable],
-    sierraTransformableStore: ObjectStore[SierraTransformable]
+  implicit miroTransformableStore: ObjectStore[MiroTransformable],
+  calmTransformableStore: ObjectStore[CalmTransformable],
+  sierraTransformableStore: ObjectStore[SierraTransformable]
 ) extends Logging {
 
   def receiveMessage(message: NotificationMessage): Future[Unit] = {

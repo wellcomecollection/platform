@@ -6,7 +6,6 @@ import uk.ac.wellcome.storage.type_classes.StorageStrategy
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 case class KeyPrefix(value: String) extends AnyVal
 case class KeySuffix(value: String) extends AnyVal
 
@@ -31,11 +30,10 @@ object ObjectStore {
   def apply[T](implicit store: ObjectStore[T]): ObjectStore[T] =
     store
 
-  implicit def createObjectStore[T, R <: StorageBackend](implicit
-      storageStrategy: StorageStrategy[T],
-      storageBackend: R,
-      ec: ExecutionContext
-  ): ObjectStore[T] = new ObjectStore[T] {
+  implicit def createObjectStore[T, R <: StorageBackend](
+    implicit storageStrategy: StorageStrategy[T],
+    storageBackend: R,
+    ec: ExecutionContext): ObjectStore[T] = new ObjectStore[T] {
     def put(namespace: String)(
       t: T,
       keyPrefix: KeyPrefix = KeyPrefix(""),

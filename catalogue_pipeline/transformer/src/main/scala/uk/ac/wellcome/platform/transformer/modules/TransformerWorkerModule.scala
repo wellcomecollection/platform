@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.transformer.services.TransformerWorkerService
 
-
 object TransformerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
     injector.instance[TransformerWorkerService]

@@ -11,19 +11,22 @@ import uk.ac.wellcome.storage.{ObjectLocation, StorageBackend}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.collection.JavaConverters._
 
-
-class S3StorageBackend @Inject()(s3Client: AmazonS3)(implicit ec: ExecutionContext)
-  extends StorageBackend with Logging {
+class S3StorageBackend @Inject()(s3Client: AmazonS3)(
+  implicit ec: ExecutionContext)
+    extends StorageBackend
+    with Logging {
 
   private def generateMetadata(
-                                userMetadata: Map[String, String]
-                              ): ObjectMetadata = {
+    userMetadata: Map[String, String]
+  ): ObjectMetadata = {
     val objectMetadata = new ObjectMetadata()
     objectMetadata.setUserMetadata(userMetadata.asJava)
     objectMetadata
   }
 
-  def put(location: ObjectLocation, input: InputStream, metadata: Map[String,String]): Future[Unit] = {
+  def put(location: ObjectLocation,
+          input: InputStream,
+          metadata: Map[String, String]): Future[Unit] = {
     val bucketName = location.namespace
     val key = location.key
 

@@ -13,11 +13,11 @@ import uk.ac.wellcome.storage.dynamo._
 import scala.concurrent.Future
 
 class RecorderWorkerService @Inject()(
-                                       versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
+  versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
                                              EmptyMetadata,
                                              ObjectStore[RecorderWorkEntry]],
-                                       messageStream: MessageStream[UnidentifiedWork],
-                                       system: ActorSystem) {
+  messageStream: MessageStream[UnidentifiedWork],
+  system: ActorSystem) {
 
   implicit val executionContext = system.dispatcher
 

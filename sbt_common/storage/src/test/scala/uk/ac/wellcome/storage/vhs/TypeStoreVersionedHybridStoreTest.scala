@@ -29,11 +29,12 @@ class TypeStoreVersionedHybridStoreTest
   import uk.ac.wellcome.storage.dynamo._
 
   def withS3TypeStoreFixtures[R](
-    testWith: TestWith[
-      (Bucket,
-       Table,
-       VersionedHybridStore[ExampleRecord, EmptyMetadata, ObjectStore[ExampleRecord]]),
-      R]
+    testWith: TestWith[(Bucket,
+                        Table,
+                        VersionedHybridStore[ExampleRecord,
+                                             EmptyMetadata,
+                                             ObjectStore[ExampleRecord]]),
+                       R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>

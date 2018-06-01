@@ -16,7 +16,6 @@ import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.util.Random
 
-
 class StringStoreVersionedHybridStoreTest
     extends FunSpec
     with Matchers
@@ -26,12 +25,15 @@ class StringStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
-  def withStringVHS[Metadata, R](bucket: Bucket,
-                       table: Table,
-                       globalS3Prefix: String = defaultGlobalS3Prefix)(
-                        testWith: TestWith[VersionedHybridStore[String, Metadata, ObjectStore[String]], R])(
-                        implicit objectStore: ObjectStore[String]
-                      ): R = {
+  def withStringVHS[Metadata, R](
+    bucket: Bucket,
+    table: Table,
+    globalS3Prefix: String = defaultGlobalS3Prefix)(
+    testWith: TestWith[
+      VersionedHybridStore[String, Metadata, ObjectStore[String]],
+      R])(
+    implicit objectStore: ObjectStore[String]
+  ): R = {
     val s3Config = S3Config(bucketName = bucket.name)
 
     val dynamoConfig =
@@ -43,11 +45,12 @@ class StringStoreVersionedHybridStoreTest
       globalS3Prefix = globalS3Prefix
     )
 
-    val store = new VersionedHybridStore[String, Metadata, ObjectStore[String]](
-      vhsConfig = vhsConfig,
-      objectStore = objectStore,
-      dynamoDbClient = dynamoDbClient
-    )
+    val store =
+      new VersionedHybridStore[String, Metadata, ObjectStore[String]](
+        vhsConfig = vhsConfig,
+        objectStore = objectStore,
+        dynamoDbClient = dynamoDbClient
+      )
 
     testWith(store)
   }

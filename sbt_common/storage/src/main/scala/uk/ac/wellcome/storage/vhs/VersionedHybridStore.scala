@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 case class EmptyMetadata()
 
-class VersionedHybridStore[T, Metadata,Store <: ObjectStore[T]] @Inject()(
+class VersionedHybridStore[T, Metadata, Store <: ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
   objectStore: Store,
   dynamoDbClient: AmazonDynamoDB

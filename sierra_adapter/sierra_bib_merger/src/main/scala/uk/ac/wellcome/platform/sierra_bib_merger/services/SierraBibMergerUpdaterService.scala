@@ -14,10 +14,10 @@ import uk.ac.wellcome.storage.ObjectStore
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
-                                               versionedHybridStore: VersionedHybridStore[SierraTransformable,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
                                              ObjectStore[SierraTransformable]],
-                                               metrics: MetricsSender
+  metrics: MetricsSender
 ) extends Logging {
 
   def update(bibRecord: SierraBibRecord): Future[Unit] = {
