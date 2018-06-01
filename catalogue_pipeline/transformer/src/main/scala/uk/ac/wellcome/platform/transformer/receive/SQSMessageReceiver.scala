@@ -11,11 +11,10 @@ import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
-import uk.ac.wellcome.storage.type_classes.StorageStrategy._
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -27,7 +26,10 @@ class SQSMessageReceiver @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config,
   metricsSender: MetricsSender)(
-  implicit val storageBackend: S3StorageBackend
+  implicit
+    miroTransformableStore: ObjectStore[MiroTransformable],
+    calmTransformableStore: ObjectStore[CalmTransformable],
+    sierraTransformableStore: ObjectStore[SierraTransformable]
 ) extends Logging {
 
   def receiveMessage(message: SQSMessage): Future[Unit] = {
@@ -55,12 +57,6 @@ class SQSMessageReceiver @Inject()(
       }
     )
   }
-
-  // Implicitly will create an instance using the appropriate type class
-  // if the correct implicit dependencies are in scope
-  val miroTransformableStore = implicitly[ObjectStore[MiroTransformable]]
-  val calmTransformableStore = implicitly[ObjectStore[CalmTransformable]]
-  val sierraTransformableStore = implicitly[ObjectStore[SierraTransformable]]
 
   private def getTransformable(
     hybridRecord: HybridRecord,

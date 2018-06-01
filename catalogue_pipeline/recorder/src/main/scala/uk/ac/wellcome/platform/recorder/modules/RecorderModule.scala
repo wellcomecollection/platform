@@ -26,9 +26,4 @@ object RecorderModule extends TwitterModule {
     workerService.stop()
     system.terminate()
   }
-
-  @Provides
-  @Singleton
-  def provideRecorderExecutionContext(): ExecutionContext =
-    GlobalExecutionContext.context
 }

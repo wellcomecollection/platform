@@ -4,7 +4,6 @@ import javax.inject.Singleton
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.ingestor.GlobalExecutionContext
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.utils.JsonUtil._
@@ -12,11 +11,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext
 
 object IdentifiedWorkModule extends TwitterModule {
-  @Provides
-  @Singleton
-  def provideExecutionContext(injector: Injector): ExecutionContext =
-    GlobalExecutionContext.context
-
   @Provides
   @Singleton
   def provideUnidentifiedWorkStore(injector: Injector): ObjectStore[IdentifiedWork] = {

@@ -7,16 +7,9 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.transformer.GlobalExecutionContext
-
 import scala.concurrent.ExecutionContext
 
 object UnidentifiedWorkModule extends TwitterModule {
-  @Provides
-  @Singleton
-  def provideExecutionContext(injector: Injector): ExecutionContext =
-    GlobalExecutionContext.context
-
   @Provides
   @Singleton
   def provideUnidentifiedWorkStore(injector: Injector): ObjectStore[UnidentifiedWork] = {
