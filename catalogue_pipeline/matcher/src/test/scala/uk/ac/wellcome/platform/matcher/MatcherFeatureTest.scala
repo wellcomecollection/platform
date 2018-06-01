@@ -7,19 +7,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-<<<<<<< HEAD
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models.WorkGraphIdentifiersList
-=======
-import uk.ac.wellcome.models.work.internal.{IdentifierSchemes, SourceIdentifier, UnidentifiedWork}
-import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{IdentifierList, WorkGraphIdentifiersList}
->>>>>>> works are versioned
+import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -91,7 +82,7 @@ class MatcherFeatureTest
               Scanamo.put(dynamoDbClient)(table.name)(existingWorkV2)
 
               val identifier = SourceIdentifier(
-                IdentifierSchemes.sierraSystemNumber,
+                identifierType = IdentifierType("sierra-system-number"),
                 "Work",
                 "A")
 

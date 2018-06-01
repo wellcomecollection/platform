@@ -110,7 +110,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           WorkNode("A", 1, List("B"), "A+B+C+D"),
           WorkNode("B", 2, List("C"), "A+B+C+D"),
           WorkNode("C", 1, List("D"), "A+B+C+D"),
-          WorkNode("D", 1, List(),  "A+B+C+D"))
+          WorkNode("D", 1, List(), "A+B+C+D"))
     }
 
     it("updating A->B with B->[C,D] gives A+B+C+D:(A->B, B->C&D, C, D") {
@@ -164,7 +164,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
         )
         .nodes shouldBe Set(
         WorkNode("A", 2, List(), setId = "A"),
-        WorkNode("B", 1, List(), setId = "B"))
+        WorkNode("B", 1, List(), setId = "B")
+      )
     }
 
     it(
@@ -178,8 +179,9 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
             ))
         )
         .nodes shouldBe Set(
-          WorkNode("A", 2, Nil, setId = "A"),
-          WorkNode("B", 0, Nil, setId = "B"))
+        WorkNode("A", 2, Nil, setId = "A"),
+        WorkNode("B", 0, Nil, setId = "B")
+      )
     }
 
     it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
@@ -193,9 +195,10 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("C", 1, Nil, "A+B+C")))
         )
         .nodes shouldBe Set(
-          WorkNode("A", 2, List("B"), "A+B"),
-          WorkNode("B", 3, Nil, "A+B"),
-          WorkNode("C", 1, Nil, "C"))
+        WorkNode("A", 2, List("B"), "A+B"),
+        WorkNode("B", 3, Nil, "A+B"),
+        WorkNode("C", 1, Nil, "C")
+      )
     }
 
     it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -211,7 +214,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
         .nodes shouldBe Set(
         WorkNode("A", 2, List("B"), "A+B+C"),
         WorkNode("B", 3, List("C"), "A+B+C"),
-        WorkNode("C", 1, Nil, "A+B+C"))
+        WorkNode("C", 1, Nil, "A+B+C")
+      )
     }
   }
 }

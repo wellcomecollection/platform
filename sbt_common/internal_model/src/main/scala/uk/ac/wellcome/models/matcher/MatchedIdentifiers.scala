@@ -8,9 +8,3 @@ package uk.ac.wellcome.models.matcher
 // means the merger should combine these into a single work.
 //
 case class MatchedIdentifiers(identifiers: Set[WorkIdentifier])
-
-case object MatchedIdentifiers {
-  def apply(workNodes: Set[WorkNode]): MatchedIdentifiers =
-    MatchedIdentifiers(workNodes.map(WorkIdentifier(_)))
-
-}

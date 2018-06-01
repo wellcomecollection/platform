@@ -1,7 +1,9 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.google.inject.Inject
+import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
+import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 
@@ -22,7 +24,7 @@ class WorkGraphStore @Inject()(
     } yield WorkGraph(affectedWorks)
   }
 
-  def put(graph: WorkGraph) = {
+  def put(graph: WorkGraph): Future[Set[Option[Either[DynamoReadError, WorkNode]]]] = {
     Future.sequence(
       graph.nodes.map(workNodeDao.put)
     )

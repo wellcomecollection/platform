@@ -182,12 +182,15 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            val aIdentifier = aSierraSourceIdentifier("A")
+            val bIdentifier = aSierraSourceIdentifier("B")
+
             val workAv1 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 1,
               identifiers = List(aIdentifier))
 
-            sendSQS(queue, storageBucket, aWork)
+            sendSQS(queue, storageBucket, workAv1)
 
             eventually {
               assertMessageSent(
@@ -200,6 +203,7 @@ class MatcherMessageReceiverTest
                       ))))
               )
             }
+
             val bWorkV1 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = bIdentifier,
               version = 1,
@@ -239,7 +243,7 @@ class MatcherMessageReceiverTest
                 version = 3,
                 identifiers = List(aIdentifier))
 
-              sendSQS(queue, storageBucket, workAWithoutLinks)
+              sendSQS(queue, storageBucket, workAv3WithoutLinks)
 
               eventually {
                 assertMessageSent(
@@ -266,7 +270,9 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            
+
+            val aIdentifier = aSierraSourceIdentifier("A")
+
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
