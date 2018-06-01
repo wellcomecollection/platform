@@ -77,10 +77,10 @@ class ReindexWorkerServiceTest
       versionedDao = new VersionedDao(
         dynamoDbClient = dynamoDbClient,
         dynamoConfig =
-          DynamoConfig(table = table.name, index = Some(table.index))
+          DynamoConfig(table = table.name, index = table.index)
       ),
       dynamoConfig =
-        DynamoConfig(table = table.name, index = Some(table.index))
+        DynamoConfig(table = table.name, index = table.index)
     )
     testWith(reindexService)
   }

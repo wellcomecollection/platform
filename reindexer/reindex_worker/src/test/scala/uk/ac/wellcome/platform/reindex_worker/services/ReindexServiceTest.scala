@@ -38,14 +38,19 @@ class ReindexServiceTest
     testWith: TestWith[ReindexService, Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
+        val dynamoConfig = DynamoConfig(
+          table = table.name,
+          index = table.index
+        )
         val reindexService =
           new ReindexService(
             dynamoDBClient = dynamoDbClient,
-            dynamoConfig = DynamoConfig(table.name, Some(table.index)),
+            dynamoConfig = dynamoConfig,
             metricsSender = metricsSender,
             versionedDao = new VersionedDao(
               dynamoDbClient = dynamoDbClient,
-              DynamoConfig(table.name, Some(table.index)))
+              dynamoConfig = dynamoConfig
+            )
           )
 
         testWith(reindexService)

@@ -29,7 +29,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
 
     val table = Table[ReindexRecord](dynamoConfig.table)
 
-    val index = table.index(dynamoConfig.index.get)
+    val index = table.index(dynamoConfig.maybeIndex.get)
 
     // We start by querying DynamoDB for every record in the reindex shard
     // that has an out-of-date reindexVersion.  If a shard was especially

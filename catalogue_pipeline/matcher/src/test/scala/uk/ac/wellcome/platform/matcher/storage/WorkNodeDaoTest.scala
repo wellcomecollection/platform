@@ -58,7 +58,8 @@ class WorkNodeDaoTest
           .thenThrow(expectedException)
         val matcherGraphDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(matcherGraphDao.get(Set("A")).failed) { failedException =>
           failedException shouldBe expectedException
@@ -116,7 +117,8 @@ class WorkNodeDaoTest
           .thenThrow(expectedException)
         val workNodeDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
           failedException =>
@@ -163,7 +165,8 @@ class WorkNodeDaoTest
           .thenThrow(expectedException)
         val workNodeDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(workNodeDao.put(WorkNode("A", List("B"), "A+B")).failed) {
           failedException =>
@@ -175,7 +178,7 @@ class WorkNodeDaoTest
 
   it("cannot be instantiated if dynamoConfig.index is a None") {
     intercept[RuntimeException] {
-      new WorkNodeDao(dynamoDbClient, DynamoConfig("something", None))
+      new WorkNodeDao(dynamoDbClient, DynamoConfig(table = "something", maybeIndex = None))
     }
   }
 
