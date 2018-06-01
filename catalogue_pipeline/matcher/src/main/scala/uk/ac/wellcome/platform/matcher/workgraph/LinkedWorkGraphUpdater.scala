@@ -2,27 +2,22 @@ package uk.ac.wellcome.platform.matcher.workgraph
 
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
-import uk.ac.wellcome.platform.matcher.models.{
-  LinkedWorkUpdate,
-  WorkGraph,
-  WorkNode
-}
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkNode, WorkUpdate}
 
 import scala.collection.immutable.Iterable
 
 object LinkedWorkGraphUpdater {
-  def update(workUpdate: LinkedWorkUpdate,
-             existingGraph: WorkGraph): WorkGraph = {
+  def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
     val filteredLinkedWorks =
-      existingGraphWithoutUpdatedNode(workUpdate.workId, existingGraph.nodes)
+      existingGraphWithoutUpdatedNode(workUpdate.id, existingGraph.nodes)
     val edges = filteredLinkedWorks.flatMap(workNode => {
       toEdges(workNode.id, workNode.referencedWorkIds)
-    }) ++ toEdges(workUpdate.workId, workUpdate.linkedIds)
+    }) ++ toEdges(workUpdate.id, workUpdate.referencedWorkIds)
 
     val nodes = existingGraph.nodes.flatMap(workNode => {
       allNodes(workNode)
-    }) + workUpdate.workId
+    }) + workUpdate.id
 
     val g = Graph.from(edges = edges, nodes = nodes)
 
