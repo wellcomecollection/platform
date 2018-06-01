@@ -14,7 +14,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
@@ -32,8 +32,6 @@ trait Messaging
       with SNS
       with S3
       with Matchers {
-
-  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   case class ExampleObject(name: String)
 
@@ -158,11 +156,12 @@ trait Messaging
   }
 
   def withMessageStreamFixtures[R](
-                                    testWith: TestWith[(Bucket,
-                                      MessageStream[ExampleObject],
-                                      QueuePair,
-                                      MetricsSender),
-                                      R]) = {
+    testWith: TestWith[(Bucket,
+    MessageStream[ExampleObject],
+    QueuePair,
+    MetricsSender),
+    R]
+  ) = {
 
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>

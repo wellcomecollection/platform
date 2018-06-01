@@ -4,7 +4,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -28,8 +27,6 @@ class TypeStoreVersionedHybridStoreTest
     with LocalVersionedHybridStore {
 
   import uk.ac.wellcome.storage.dynamo._
-
-  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withS3TypeStoreFixtures[R](
     testWith: TestWith[

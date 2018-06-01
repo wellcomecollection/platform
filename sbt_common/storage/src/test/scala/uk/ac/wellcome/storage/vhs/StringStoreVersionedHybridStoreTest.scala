@@ -12,7 +12,7 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
+import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.util.Random
 
@@ -25,8 +25,6 @@ class StringStoreVersionedHybridStoreTest
     with LocalVersionedHybridStore {
 
   import uk.ac.wellcome.storage.dynamo._
-
-  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withStringVHS[Metadata, R](bucket: Bucket,
                        table: Table,

@@ -5,7 +5,7 @@ import java.io.{ByteArrayInputStream, InputStream}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -24,8 +24,6 @@ class StreamStoreVersionedHybridStoreTest
     with LocalVersionedHybridStore {
 
   import uk.ac.wellcome.storage.dynamo._
-
-  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   private def stringify(is: InputStream) =
     scala.io.Source.fromInputStream(is).mkString

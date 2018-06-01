@@ -5,11 +5,13 @@ import grizzled.slf4j.Logging
 import io.circe.Json
 import io.circe.parser.parse
 import org.scalatest.concurrent.Eventually
-import uk.ac.wellcome.storage.s3.S3ClientFactory
+import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3StorageBackend}
 import uk.ac.wellcome.test.fixtures._
 
 import scala.collection.JavaConverters._
 import scala.util.Random
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 object S3 {
 
@@ -32,6 +34,8 @@ trait S3 extends Logging with Eventually {
 
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
+
+  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def s3LocalFlags(bucket: Bucket) = s3ClientLocalFlags ++ Map(
     "aws.s3.bucketName" -> bucket.name

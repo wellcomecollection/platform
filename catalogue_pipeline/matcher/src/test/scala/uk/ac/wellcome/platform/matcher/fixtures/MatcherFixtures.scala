@@ -7,25 +7,22 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 trait MatcherFixtures
@@ -76,8 +73,9 @@ trait MatcherFixtures
         withLocalDynamoDbTable { table =>
           withWorkGraphStore(table) { workGraphStore =>
             withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-              implicit val executionContext: ExecutionContextExecutor =
-                actorSystem.dispatcher
+
+              val objectStore = implicitly[ObjectStore[RecorderWorkEntry]]
+
               val sqsStream = new SQSStream[NotificationMessage](
                 actorSystem = actorSystem,
                 sqsClient = asyncSqsClient,
@@ -87,7 +85,7 @@ trait MatcherFixtures
               val matcherMessageReceiver = new MatcherMessageReceiver(
                 sqsStream,
                 snsWriter,
-                new S3TypeStore[RecorderWorkEntry](s3Client),
+                objectStore,
                 storageS3Config,
                 actorSystem,
                 linkedWorkMatcher)
