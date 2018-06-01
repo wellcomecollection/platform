@@ -38,12 +38,11 @@ class SierraBibMergerWorkerServiceTest
         sqsClient.sendMessage(
           queue.url,
           toJson(
-            SQSMessage(
-              subject = Some("default-subject"),
-              body = "null",
-              topic = "",
-              messageType = "",
-              timestamp = "")).get)
+            NotificationMessage(
+              Subject = "default-subject",
+              Message = "null",
+              TopicArn = "",
+              MessageId = "")).get)
 
         eventually {
           assertQueueEmpty(queue)

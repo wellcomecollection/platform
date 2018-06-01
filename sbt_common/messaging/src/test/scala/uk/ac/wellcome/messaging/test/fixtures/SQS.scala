@@ -153,26 +153,6 @@ trait SQS extends Matchers {
     testwith(stream)
   }
 
-  object TestSqsMessage {
-    def apply(messageBody: String) =
-      SQSMessage(
-        subject = Some("subject"),
-        messageType = "messageType",
-        topic = "topic",
-        body = messageBody,
-        timestamp = "timestamp"
-      )
-
-    def apply() =
-      SQSMessage(
-        subject = Some("subject"),
-        messageType = "messageType",
-        topic = "topic",
-        body = """{ "foo": "bar"}""",
-        timestamp = "timestamp"
-      )
-  }
-
   object TestNotificationMessage {
     def apply(messageBody: String) =
       NotificationMessage(

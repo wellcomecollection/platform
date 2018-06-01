@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.ingestor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedWork,
   IdentifierType,
@@ -110,12 +110,11 @@ class IngestorFeatureTest
 
             withServer(flags) { _ =>
               val invalidMessage = toJson(
-                SQSMessage(
-                  Some("identified-item"),
-                  "not a json string - this will fail parsing",
-                  "ingester",
-                  "messageType",
-                  "timestamp"
+                NotificationMessage(
+                  Subject = "identified-item",
+                  Message = "not a json string - this will fail parsing",
+                  TopicArn = "ingester",
+                  MessageId = "messageId"
                 )
               ).get
 
