@@ -98,7 +98,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
+      val notificationMessage =
         NotificationMessage(
           Subject = "subject",
           Message = message,
@@ -106,7 +106,7 @@ class SierraReaderWorkerServiceTest
           MessageId = "message-id"
         )
 
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -143,14 +143,14 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
+      val notificationMessage =
         NotificationMessage(
           Subject = "subject",
           Message = message,
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -206,14 +206,14 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
+      val notificationMessage =
         NotificationMessage(
           Subject = "subject",
           Message = message,
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -253,14 +253,14 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
+      val notificationMessage =
         NotificationMessage(
           Subject = "subject",
           Message = message,
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) { ex =>
         ex shouldBe a[GracefulFailureException]
       }
 
@@ -281,7 +281,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
+      val notificationMessage =
         NotificationMessage(
           Subject = "subject",
           Message = message,
@@ -289,7 +289,7 @@ class SierraReaderWorkerServiceTest
           MessageId = "message-id"
         )
 
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) { ex =>
         ex shouldNot be(a[GracefulFailureException])
       }
     }

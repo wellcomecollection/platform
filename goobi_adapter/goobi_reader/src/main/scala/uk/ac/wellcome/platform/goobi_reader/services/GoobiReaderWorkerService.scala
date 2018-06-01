@@ -24,6 +24,6 @@ class GoobiReaderWorkerService @Inject()(
     process = processMessage
   )
 
-  private def processMessage(sqsMessage: NotificationMessage): Future[Unit] =
+  private def processMessage(notificationMessage: NotificationMessage): Future[Unit] =
     Future { println("I got a message!") }
 }

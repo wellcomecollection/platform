@@ -37,13 +37,13 @@ class SierraReaderFeatureTest
             |}
             """.stripMargin
 
-          val sqsMessage = NotificationMessage(
+          val notificationMessage = NotificationMessage(
             Subject = "subject",
             Message = message,
             TopicArn = "topic",
             MessageId = "message-id"
           )
-          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response
