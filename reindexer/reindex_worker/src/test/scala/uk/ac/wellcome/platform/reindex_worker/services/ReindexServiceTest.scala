@@ -7,7 +7,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -38,19 +38,14 @@ class ReindexServiceTest
     testWith: TestWith[ReindexService, Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val dynamoConfig = DynamoConfig(
-          table = table.name,
-          index = table.index
-        )
         val reindexService =
           new ReindexService(
-            dynamoDBClient = dynamoDbClient,
-            dynamoConfig = dynamoConfig,
-            metricsSender = metricsSender,
-            versionedDao = new VersionedDao(
-              dynamoDbClient = dynamoDbClient,
-              dynamoConfig = dynamoConfig
-            )
+            dynamoDbClient = dynamoDbClient,
+            dynamoConfig = DynamoConfig(
+              table = table.name,
+              index = table.index
+            ),
+            metricsSender = metricsSender
           )
 
         testWith(reindexService)

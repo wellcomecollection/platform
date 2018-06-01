@@ -18,11 +18,15 @@ import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
 
 import scala.concurrent.Future
 
-class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                               metricsSender: MetricsSender,
-                               versionedDao: VersionedDao,
-                               dynamoConfig: DynamoConfig)
+class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
+                               dynamoConfig: DynamoConfig,
+                               metricsSender: MetricsSender)
     extends Logging {
+
+  val versionedDao = new VersionedDao(
+    dynamoDbClient = dynamoDbClient,
+    dynamoConfig = dynamoConfig
+  )
 
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
     info(s"ReindexService running $reindexJob")
@@ -38,7 +42,7 @@ class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
     // not to be a problem.
     val futureResults: Future[List[Either[DynamoReadError, ReindexRecord]]] =
       Future {
-        Scanamo.exec(dynamoDBClient)(
+        Scanamo.exec(dynamoDbClient)(
           index.query(
             'reindexShard -> reindexJob.shardId and
               KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
