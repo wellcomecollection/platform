@@ -4,8 +4,15 @@ import java.time.Instant
 
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
-import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
+import uk.ac.wellcome.models.transformable.{
+  CalmTransformable,
+  MiroTransformable,
+  SierraTransformable
+}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil

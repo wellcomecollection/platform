@@ -6,7 +6,10 @@ import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  CompletedReindexJob,
+  ReindexJob
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -17,7 +20,7 @@ class ReindexWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   metrics: MetricsSender
-)  {
+) {
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =

@@ -11,9 +11,9 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class TransformerWorkerService @Inject()(
-                                          system: ActorSystem,
-                                          messageReceiver: NotificationMessageReceiver,
-                                          sqsStream: SQSStream[NotificationMessage]
+  system: ActorSystem,
+  messageReceiver: NotificationMessageReceiver,
+  sqsStream: SQSStream[NotificationMessage]
 ) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)

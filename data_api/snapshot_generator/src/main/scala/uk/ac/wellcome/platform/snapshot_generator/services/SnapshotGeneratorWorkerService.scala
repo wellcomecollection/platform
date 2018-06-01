@@ -11,10 +11,10 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class SnapshotGeneratorWorkerService @Inject()(
-                                                snapshotService: SnapshotService,
-                                                sqsStream: SQSStream[NotificationMessage],
-                                                snsWriter: SNSWriter,
-                                                system: ActorSystem
+  snapshotService: SnapshotService,
+  sqsStream: SQSStream[NotificationMessage],
+  snsWriter: SNSWriter,
+  system: ActorSystem
 ) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
