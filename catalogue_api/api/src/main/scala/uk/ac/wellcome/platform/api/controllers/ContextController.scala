@@ -1,17 +1,16 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.twitter.inject.annotations.Flag
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.display.models.ApiVersions
+import uk.ac.wellcome.platform.api.models.ApiConfig
 
 @Singleton
-class ContextController @Inject()(
-  @Flag("api.prefix") apiPrefix: String
-) extends Controller {
+class ContextController @Inject()(apiConfig: ApiConfig) extends Controller {
 
-  prefix(apiPrefix) {
+  prefix(apiConfig.pathPrefix) {
     setupContextEndpoint(ApiVersions.v1)
     setupContextEndpoint(ApiVersions.v2)
   }

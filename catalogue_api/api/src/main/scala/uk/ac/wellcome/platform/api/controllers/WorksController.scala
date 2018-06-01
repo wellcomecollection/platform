@@ -9,6 +9,7 @@ import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{
+  ApiConfig,
   DisplayError,
   DisplayResultList,
   Error
@@ -24,12 +25,8 @@ import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class WorksController(apiPrefix: String,
-                               apiContextSuffix: String,
-                               apiHost: String,
-                               apiScheme: String,
+abstract class WorksController(apiConfig: ApiConfig,
                                indexName: String,
-                               defaultPageSize: Int,
                                worksService: WorksService)
     extends Controller
     with SwaggerController {
@@ -50,7 +47,7 @@ abstract class WorksController(apiPrefix: String,
     getWithDoc(s"$endpointSuffix") { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: MultipleResultsRequest =>
-      val pageSize = request.pageSize.getOrElse(defaultPageSize)
+      val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
       val includes = request.includes.getOrElse(WorksIncludes())
 
       for {
@@ -62,15 +59,10 @@ abstract class WorksController(apiPrefix: String,
           includes = includes)
       } yield
         ResultListResponse.create(
-          buildContextUri(
-            apiScheme = apiScheme,
-            apiHost = apiHost,
-            apiPrefix = apiPrefix,
-            version = version,
-            apiContextSuffix = apiContextSuffix),
+          buildContextUri(apiConfig = apiConfig, version = version),
           displayResultList,
           request,
-          s"$apiScheme://$apiHost"
+          s"${apiConfig.scheme}://${apiConfig.host}"
         )
     }
   }
@@ -85,12 +77,7 @@ abstract class WorksController(apiPrefix: String,
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
-      val contextUri = buildContextUri(
-        apiScheme = apiScheme,
-        apiHost = apiHost,
-        apiPrefix = apiPrefix,
-        version = version,
-        apiContextSuffix = apiContextSuffix)
+      val contextUri = buildContextUri(apiConfig = apiConfig, version = version)
       for {
         maybeWork <- worksService.findWorkById(
           canonicalId = request.id,

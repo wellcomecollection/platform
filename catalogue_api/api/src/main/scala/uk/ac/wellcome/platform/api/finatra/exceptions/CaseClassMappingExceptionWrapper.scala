@@ -5,26 +5,23 @@ import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.json.internal.caseclass.exceptions.CaseClassMappingException
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{DisplayError, Error}
+import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
 class CaseClassMappingExceptionWrapper @Inject()(
   response: ResponseBuilder,
-  @Flag("api.context.suffix") apiContextSuffix: String,
-  @Flag("api.host") apiHost: String,
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.scheme") apiScheme: String)
+  apiConfig: ApiConfig)
     extends ExceptionMapper[CaseClassMappingException]
     with Logging {
 
   override def toResponse(request: Request,
                           e: CaseClassMappingException): Response = {
 
-    val version = getVersion(request, s"$apiPrefix")
+    val version = getVersion(request, apiPrefix = apiConfig.pathPrefix)
 
     val errorString = e.errors
       .map { _.getMessage }
@@ -34,13 +31,9 @@ class CaseClassMappingExceptionWrapper @Inject()(
     val result = DisplayError(
       Error(variant = "http-400", description = Some(errorString)))
     val errorResponse = ResultResponse(
-      context = buildContextUri(
-        apiScheme,
-        apiHost,
-        apiPrefix,
-        version,
-        apiContextSuffix),
-      result = result)
+      context = buildContextUri(apiConfig = apiConfig, version = version),
+      result = result
+    )
 
     response.badRequest.json(errorResponse)
   }
