@@ -14,7 +14,6 @@ trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
     elasticClient: HttpClient,
     metricsSender: MetricsSender)(testWith: TestWith[WorkIndexer, R]): R = {
     val workIndexer = new WorkIndexer(
-      esType = esType,
       elasticClient = elasticClient,
       metricsSender = metricsSender
     )
@@ -26,7 +25,7 @@ trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
     testWith: TestWith[WorkIndexer, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer(esType, elasticClient, metricsSender) { workIndexer =>
+        withWorkIndexer(elasticClient = elasticClient, metricsSender = metricsSender) { workIndexer =>
           testWith(workIndexer)
         }
       }

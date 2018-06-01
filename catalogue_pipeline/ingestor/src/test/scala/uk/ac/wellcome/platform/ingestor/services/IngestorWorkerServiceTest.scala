@@ -130,7 +130,6 @@ class IngestorWorkerServiceTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val brokenWorkIndexer = new WorkIndexer(
-          esType = "work",
           elasticClient = brokenElasticClient,
           metricsSender = metricsSender
         )

@@ -6,7 +6,6 @@ import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
 import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
@@ -21,7 +20,6 @@ import scala.concurrent.Future
 
 @Singleton
 class WorkIndexer @Inject()(
-  @Flag("es.type") esType: String,
   elasticClient: HttpClient,
   metricsSender: MetricsSender
 ) extends Logging
@@ -32,7 +30,7 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWork(work: IdentifiedWork, esIndex: String): Future[Any] = {
+  def indexWork(work: IdentifiedWork, esIndex: String, esType: String): Future[Any] = {
 
     metricsSender.timeAndCount[Any](
       "ingestor-index-work",

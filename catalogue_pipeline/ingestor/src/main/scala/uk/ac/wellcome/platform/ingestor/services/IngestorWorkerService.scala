@@ -24,7 +24,13 @@ class IngestorWorkerService @Inject()(
     val futureIndices: Future[List[String]] =
       Future.fromTry(Try(decideTargetIndices(work)))
     futureIndices.flatMap(indices => {
-      val futureResults = indices.map(identifiedWorkIndexer.indexWork(work, _))
+      val futureResults = indices.map { esIndex =>
+        identifiedWorkIndexer.indexWork(
+          work = work,
+          esIndex = esIndex,
+          esType = elasticConfig.documentType
+        )
+      })
       Future.sequence(futureResults).map { _ =>
         ()
       }
