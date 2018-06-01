@@ -9,8 +9,9 @@ import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import javax.inject.Inject
+import javax.naming.ConfigurationException
+
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
@@ -34,11 +35,14 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
                                 elasticConfig: ElasticConfig,
-                                @Flag("aws.s3.endpoint") s3Endpoint: String,
                                 objectMapper: ObjectMapper)
     extends Logging {
   implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
+
+  val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse(
+    throw new ConfigurationException("No S3 endpoint specified?")
+  )
 
   def generateSnapshot(
     snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
