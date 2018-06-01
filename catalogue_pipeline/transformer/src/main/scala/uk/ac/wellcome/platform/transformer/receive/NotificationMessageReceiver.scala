@@ -19,7 +19,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 import scala.util.Try
 
-class SQSMessageReceiver @Inject()(
+class NotificationMessageReceiver @Inject()(
   messageWriter: MessageWriter[UnidentifiedWork],
   s3Client: AmazonS3,
   s3Config: S3Config,

@@ -5,15 +5,15 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.transformer.receive.SQSMessageReceiver
+import uk.ac.wellcome.platform.transformer.receive.NotificationMessageReceiver
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
 class TransformerWorkerService @Inject()(
-  system: ActorSystem,
-  messageReceiver: SQSMessageReceiver,
-  sqsStream: SQSStream[NotificationMessage]
+                                          system: ActorSystem,
+                                          messageReceiver: NotificationMessageReceiver,
+                                          sqsStream: SQSStream[NotificationMessage]
 ) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)

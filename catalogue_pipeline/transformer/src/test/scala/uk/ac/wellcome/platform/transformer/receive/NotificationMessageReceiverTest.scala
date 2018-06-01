@@ -27,7 +27,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class SQSMessageReceiverTest
+class NotificationMessageReceiverTest
     extends FunSpec
     with Matchers
     with Akka
@@ -55,11 +55,11 @@ class SQSMessageReceiverTest
     identifiers = List(sourceIdentifier)
   )
 
-  def withSQSMessageReceiver[R](
+  def withNotificationMessageReceiver[R](
     topic: Topic,
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
-  )(testWith: TestWith[SQSMessageReceiver, R]) = {
+  )(testWith: TestWith[NotificationMessageReceiver, R]) = {
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
@@ -73,7 +73,7 @@ class SQSMessageReceiverTest
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        val recordReceiver = new SQSMessageReceiver(
+        val recordReceiver = new NotificationMessageReceiver(
           messageWriter = messageWriter,
           s3Client = s3Client,
           s3Config = S3Config(bucket.name),
@@ -104,7 +104,7 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(calmSqsMessage)
 
             whenReady(future) { _ =>
@@ -113,7 +113,7 @@ class SQSMessageReceiverTest
 
               snsMessages.map { snsMessage =>
                 get[UnidentifiedWork](snsMessage)
-                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }
@@ -140,7 +140,7 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
             val sourceIdentifier = SourceIdentifier(
@@ -168,7 +168,7 @@ class SQSMessageReceiverTest
                   sourceIdentifier,
                   sierraIdentifier)
 
-                snsMessage.subject shouldBe "source: SQSMessageReceiver.publishMessage"
+                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }
@@ -190,7 +190,7 @@ class SQSMessageReceiverTest
               bucket = bucket
             )
 
-          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
 
             whenReady(future.failed) { x =>
@@ -206,7 +206,7 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(
               createValidEmptySierraBibSQSMessage(
                 id = "0101010",
@@ -244,7 +244,7 @@ class SQSMessageReceiverTest
               bucket = bucket
             )
 
-          withSQSMessageReceiver(topic, bucket) { recordReceiver =>
+          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
 
@@ -281,7 +281,7 @@ class SQSMessageReceiverTest
             bucket = bucket
           )
 
-          withSQSMessageReceiver(
+          withNotificationMessageReceiver(
             topic,
             bucket,
             Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
