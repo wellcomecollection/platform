@@ -15,7 +15,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import scala.concurrent.duration._
 
 class SQSStreamTest
     extends FunSpec
@@ -150,18 +149,10 @@ class SQSStreamTest
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-            val sqsConfig = SQSConfig(
-              queueUrl = queue.url,
-              waitTime = 1 millisecond,
-              maxMessages = 1
-            )
-
-            val stream = new SQSStream[ExampleObject](
-              actorSystem = actorSystem,
-              sqsClient = asyncSqsClient,
-              sqsConfig = sqsConfig,
-              metricsSender = metricsSender)
-            testWith((stream, queuePair, metricsSender))
+            withSQSStream[ExampleObject, R](actorSystem, queue, metricsSender) {
+              stream =>
+                testWith((stream, queuePair, metricsSender))
+            }
           }
       }
     }

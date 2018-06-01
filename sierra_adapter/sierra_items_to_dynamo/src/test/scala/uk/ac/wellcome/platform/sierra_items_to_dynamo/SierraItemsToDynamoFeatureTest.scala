@@ -6,14 +6,14 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
-import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.storage.dynamo._
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -36,13 +36,13 @@ class SierraItemsToDynamoFeatureTest
           val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
           val message = SierraRecord(id, data, modifiedDate)
 
-          val sqsMessage =
-            SQSMessage(
-              Some("subject"),
-              toJson(message).get,
-              "topic",
-              "messageType",
-              "timestamp")
+          val sqsMessage = NotificationMessage(
+            MessageId = "message-id",
+            TopicArn = "topic",
+            Subject = "subject",
+            Message = toJson(message).get
+          )
+
           sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
           eventually {

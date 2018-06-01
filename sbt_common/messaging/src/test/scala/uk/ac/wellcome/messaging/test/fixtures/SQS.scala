@@ -1,13 +1,19 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
+import akka.actor.ActorSystem
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
+import io.circe.Encoder
 import org.scalatest.Matchers
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.test.fixtures._
 
+import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
+import uk.ac.wellcome.utils.JsonUtil._
 
 object SQS {
 
@@ -128,6 +134,25 @@ trait SQS extends Matchers {
     }
   )
 
+  def withSQSStream[T, R](
+    actorSystem: ActorSystem,
+    queue: Queue,
+    metricsSender: MetricsSender)(testwith: TestWith[SQSStream[T], R]) = {
+    val sqsConfig = SQSConfig(
+      queueUrl = queue.url,
+      waitTime = 1 millisecond,
+      maxMessages = 1
+    )
+
+    val stream = new SQSStream[T](
+      actorSystem = actorSystem,
+      sqsClient = asyncSqsClient,
+      sqsConfig = sqsConfig,
+      metricsSender = metricsSender)
+
+    testwith(stream)
+  }
+
   object TestSqsMessage {
     def apply(messageBody: String) =
       SQSMessage(
@@ -146,6 +171,20 @@ trait SQS extends Matchers {
         body = """{ "foo": "bar"}""",
         timestamp = "timestamp"
       )
+  }
+
+  object TestNotificationMessage {
+    def apply(messageBody: String) =
+      NotificationMessage(
+        MessageId = "message-id",
+        TopicArn = "topic",
+        Subject = "subject",
+        Message = messageBody
+      )
+
+    def apply[T](testObject: T)(
+      implicit encoder: Encoder[T]): NotificationMessage =
+      TestNotificationMessage(toJson(testObject).get)
   }
 
   def assertQueueEmpty(queue: Queue) = {
