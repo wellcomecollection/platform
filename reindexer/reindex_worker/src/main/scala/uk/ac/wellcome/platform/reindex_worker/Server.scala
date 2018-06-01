@@ -42,11 +42,6 @@ class Server extends HttpServer {
     AkkaModule
   )
 
-  flag[String](
-    "aws.dynamo.indexName",
-    "reindexTracker",
-    "Name of the reindex tracker GSI")
-
   override def configureHttp(router: HttpRouter) {
     router
       .filter[CommonFilters]
