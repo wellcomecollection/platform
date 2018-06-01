@@ -47,8 +47,7 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it(
-    "work A with one link to B and no existing works returns a single matched work") {
+  it("work A with one link to B and no existing works returns a single matched work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -183,9 +182,7 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val aIdentifier = aSierraSourceIdentifier("A")
-            val bIdentifier = aSierraSourceIdentifier("B")
-            val aWork = anUnidentifiedSierraWork.copy(
+            val workAv1 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 1,
               identifiers = List(aIdentifier))
@@ -220,12 +217,12 @@ class MatcherMessageReceiverTest
               )
             }
 
-            val workALinkedToB = anUnidentifiedSierraWork.copy(
+            val workAv2LinkedToB = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
               identifiers = List(aIdentifier, bIdentifier))
 
-            sendSQS(queue, storageBucket, workALinkedToB)
+            sendSQS(queue, storageBucket, workAv2LinkedToB)
 
             eventually {
               assertMessageSent(
@@ -237,7 +234,7 @@ class MatcherMessageReceiverTest
                   ))))
               )
 
-              val workAWithoutLinks = anUnidentifiedSierraWork.copy(
+              val workAv3WithoutLinks = anUnidentifiedSierraWork.copy(
                 sourceIdentifier = aIdentifier,
                 version = 3,
                 identifiers = List(aIdentifier))
@@ -269,8 +266,7 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val aIdentifier = aSierraSourceIdentifier("A")
-
+            
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
@@ -286,12 +282,12 @@ class MatcherMessageReceiverTest
                   ))))
               )
 
-              val aWorkV1 = anUnidentifiedSierraWork.copy(
+              val workAv1 = anUnidentifiedSierraWork.copy(
                 sourceIdentifier = aIdentifier,
                 identifiers = List(aIdentifier),
                 version = 1)
 
-              sendSQS(queue, storageBucket, aWorkV1)
+              sendSQS(queue, storageBucket, workAv1)
               Thread.sleep(2000)
               eventually {
                 sqsClient
