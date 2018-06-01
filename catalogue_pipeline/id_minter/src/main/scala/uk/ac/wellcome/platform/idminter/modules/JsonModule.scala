@@ -1,18 +1,21 @@
 package uk.ac.wellcome.platform.idminter.modules
 
 import com.google.inject.Provides
-import com.twitter.inject.TwitterModule
-import io.circe.{Decoder, Encoder, Json}
+import com.twitter.inject.{Injector, TwitterModule}
+import io.circe.Json
 import javax.inject.Singleton
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+
+import scala.concurrent.ExecutionContext
 
 object JsonModule extends TwitterModule {
   @Provides
   @Singleton
-  def provideRecorderWorkEntryDecoder(): Decoder[Json] =
-    Decoder.decodeJson
+  def provideJsonStore(injector: Injector): ObjectStore[Json] = {
+    implicit val storageBackend = injector.instance[S3StorageBackend]
+    implicit val executionContext = injector.instance[ExecutionContext]
 
-  @Provides
-  @Singleton
-  def provideRecorderWorkEntryEncoder(): Encoder[Json] =
-    Encoder.encodeJson
+    implicitly[ObjectStore[Json]]
+  }
 }
