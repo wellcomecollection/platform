@@ -8,7 +8,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.sqs.SQSMessage
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -76,12 +76,11 @@ class SnapshotGeneratorFeatureTest
           apiVersion = ApiVersions.v1
         )
 
-        val message = SQSMessage(
-          subject = Some("Sent from SnapshotGeneratorFeatureTest"),
-          body = toJson(snapshotJob).get,
-          messageType = "json",
-          topic = topic.arn,
-          timestamp = "now"
+        val message = NotificationMessage(
+          Subject = "Sent from SnapshotGeneratorFeatureTest",
+          Message = toJson(snapshotJob).get,
+          TopicArn = topic.arn,
+          MessageId = "message-id"
         )
 
         sqsClient.sendMessage(queue.url, toJson(message).get)

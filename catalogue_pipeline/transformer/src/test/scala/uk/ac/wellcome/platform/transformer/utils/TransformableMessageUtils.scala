@@ -3,20 +3,20 @@ package uk.ac.wellcome.platform.transformer.utils
 import java.time.Instant
 
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,
   SierraTransformable
 }
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 trait TransformableMessageUtils {
   def createValidCalmTramsformableJson(RecordID: String,
@@ -34,7 +34,7 @@ trait TransformableMessageUtils {
     id: String,
     s3Client: AmazonS3,
     bucket: Bucket
-  ): SQSMessage = {
+  ): NotificationMessage = {
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
@@ -42,7 +42,7 @@ trait TransformableMessageUtils {
       itemData = Map[String, SierraItemRecord]()
     )
 
-    hybridRecordSqsMessage(
+    hybridRecordNotificationMessage(
       message = JsonUtil.toJson(sierraTransformable).get,
       sourceName = "sierra",
       version = 1,
@@ -85,11 +85,11 @@ trait TransformableMessageUtils {
     JsonUtil.toJson(miroTransformable).get
   }
 
-  def hybridRecordSqsMessage(message: String,
-                             sourceName: String,
-                             version: Int = 1,
-                             s3Client: AmazonS3,
-                             bucket: Bucket) = {
+  def hybridRecordNotificationMessage(message: String,
+                                      sourceName: String,
+                                      version: Int = 1,
+                                      s3Client: AmazonS3,
+                                      bucket: Bucket) = {
 
     val key = "testSource/1/testId/dshg548.json"
     s3Client.putObject(bucket.name, key, message)
@@ -120,12 +120,11 @@ trait TransformableMessageUtils {
 
     val hListJson = JsonUtil.toJson(joinedCaseClass).get
 
-    SQSMessage(
-      None,
-      hListJson,
-      "test_transformer_topic",
-      "notification",
-      "the_time"
+    NotificationMessage(
+      Subject = "",
+      Message = hListJson,
+      TopicArn = "test_transformer_topic",
+      MessageId = "notification"
     )
   }
 }
