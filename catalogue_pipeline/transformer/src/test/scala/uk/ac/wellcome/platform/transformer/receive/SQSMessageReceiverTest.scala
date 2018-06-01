@@ -12,23 +12,18 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.sqs.SQSMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -95,7 +90,7 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val calmSqsMessage: SQSMessage = hybridRecordSqsMessage(
+          val calmSqsMessage = hybridRecordNotificationMessage(
             message = createValidCalmTramsformableJson(
               RecordID = "abcdef",
               RecordType = "collection",
@@ -136,7 +131,7 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage: SQSMessage = hybridRecordSqsMessage(
+          val sierraMessage = hybridRecordNotificationMessage(
             message =
               createValidSierraTransformableJson(id, title, lastModifiedDate),
             sourceName = "sierra",
@@ -186,8 +181,8 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidCalmSqsMessage: SQSMessage =
-            hybridRecordSqsMessage(
+          val invalidCalmSqsMessage =
+            hybridRecordNotificationMessage(
               message = "not a json string",
               sourceName = "calm",
               version = 1,
@@ -234,8 +229,8 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val failingTransformCalmSqsMessage: SQSMessage =
-            hybridRecordSqsMessage(
+          val failingTransformCalmSqsMessage =
+            hybridRecordNotificationMessage(
               message = createValidCalmTramsformableJson(
                 RecordID = "abcdef",
                 RecordType = "collection",
@@ -278,7 +273,7 @@ class SQSMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordSqsMessage(
+          val message = hybridRecordNotificationMessage(
             message = JsonUtil.toJson(sierraTransformable).get,
             sourceName = "sierra",
             version = 1,

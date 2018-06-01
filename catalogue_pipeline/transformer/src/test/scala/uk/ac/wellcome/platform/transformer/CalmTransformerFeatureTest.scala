@@ -40,7 +40,7 @@ class CalmTransformerFeatureTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
-            val calmHybridRecordMessage = hybridRecordSqsMessage(
+            val calmHybridRecordMessage = hybridRecordNotificationMessage(
               message = JsonUtil.toJson(calmTransformable).get,
               sourceName = "calm",
               version = 1,

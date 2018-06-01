@@ -6,23 +6,14 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
-import uk.ac.wellcome.messaging.sqs.SQSMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
-import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
-import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
@@ -35,15 +26,15 @@ class SQSMessageReceiver @Inject()(
   metricsSender: MetricsSender)
     extends Logging {
 
-  def receiveMessage(message: SQSMessage): Future[Unit] = {
+  def receiveMessage(message: NotificationMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
     metricsSender.timeAndCount(
       "transform-time",
       () => {
         val futurePublishAttempt = for {
-          hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.body))
+          hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
           sourceMetadata <- Future.fromTry(
-            fromJson[SourceMetadata](message.body))
+            fromJson[SourceMetadata](message.Message))
           transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
           cleanRecord <- Future.fromTry(
             transformTransformable(transformableRecord, hybridRecord.version))

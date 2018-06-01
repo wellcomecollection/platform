@@ -33,7 +33,7 @@ class MiroTransformerFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messageBucket =>
             val miroHybridRecordMessage =
-              hybridRecordSqsMessage(
+              hybridRecordNotificationMessage(
                 message = createValidMiroTransformableJson(
                   MiroID = miroID,
                   MiroCollection = "foo",
