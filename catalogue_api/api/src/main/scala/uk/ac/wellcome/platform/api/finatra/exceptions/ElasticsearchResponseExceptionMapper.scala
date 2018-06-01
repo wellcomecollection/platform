@@ -5,7 +5,6 @@ import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
 
 import org.elasticsearch.client.ResponseException
