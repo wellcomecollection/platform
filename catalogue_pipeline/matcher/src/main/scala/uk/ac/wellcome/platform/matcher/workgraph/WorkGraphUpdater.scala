@@ -8,13 +8,13 @@ import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import scala.collection.immutable.Iterable
 
 object WorkGraphUpdater {
-  def update(workUpdate: WorkUpdate,
-             existingGraph: WorkGraph): WorkGraph = {
+  def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
-    val existingVersion = existingGraph.nodes.find(_.id == workUpdate.workId) match {
-      case Some(lw) => lw.version
-      case None => 0
-    }
+    val existingVersion =
+      existingGraph.nodes.find(_.id == workUpdate.workId) match {
+        case Some(lw) => lw.version
+        case None => 0
+      }
 
     if (existingVersion >= workUpdate.version) {
       existingGraph
@@ -23,10 +23,9 @@ object WorkGraphUpdater {
     }
   }
 
-  private def doUpdate(workUpdate: WorkUpdate, existingGraph: WorkGraph) =  {
-    val filteredLinkedWorks = existingGraphWithoutUpdatedNode(
-      workUpdate.workId,
-      existingGraph.nodes)
+  private def doUpdate(workUpdate: WorkUpdate, existingGraph: WorkGraph) = {
+    val filteredLinkedWorks =
+      existingGraphWithoutUpdatedNode(workUpdate.workId, existingGraph.nodes)
 
     val nodeVersions = filteredLinkedWorks.map { linkedWork =>
       (linkedWork.id, linkedWork.version)
@@ -40,7 +39,6 @@ object WorkGraphUpdater {
       allNodes(linkedWork)
     }) + workUpdate.workId
 
-
     val g = Graph.from(edges = edges, nodes = nodes)
 
     def adjacentNodeIds(n: g.NodeT) = {
@@ -53,7 +51,11 @@ object WorkGraphUpdater {
           val nodeIds = component.nodes.map(_.value).toList
           val componentIdentifier = nodeIds.sorted.mkString("+")
           component.nodes.map(node => {
-            WorkNode(node.value, nodeVersions.getOrElse(node.value, 0), adjacentNodeIds(node), componentIdentifier)
+            WorkNode(
+              node.value,
+              nodeVersions.getOrElse(node.value, 0),
+              adjacentNodeIds(node),
+              componentIdentifier)
           })
         })
         .toSet

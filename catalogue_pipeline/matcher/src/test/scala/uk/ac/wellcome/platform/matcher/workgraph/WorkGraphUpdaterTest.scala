@@ -50,10 +50,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       WorkGraphUpdater
         .update(
           workUpdate = WorkUpdate("A", 2, Set("B")),
-          existingGraph =
-            WorkGraph(Set(
-              WorkNode("A", 1, Nil, "A"),
-              WorkNode("B", 1, Nil, "B")))
+          existingGraph = WorkGraph(
+            Set(WorkNode("A", 1, Nil, "A"), WorkNode("B", 1, Nil, "B")))
         )
         .nodes should contain theSameElementsAs
         List(
@@ -65,8 +63,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       WorkGraphUpdater
         .update(
           workUpdate = WorkUpdate("A", 2, Set("B")),
-          existingGraph =
-            WorkGraph(Set(
+          existingGraph = WorkGraph(
+            Set(
               WorkNode("A", 1, List("B"), "A+B"),
               WorkNode("B", 1, Nil, "A+B")))
         )
@@ -80,8 +78,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       WorkGraphUpdater
         .update(
           workUpdate = WorkUpdate("B", 2, Set("C")),
-          existingGraph =
-            WorkGraph(Set(
+          existingGraph = WorkGraph(
+            Set(
               WorkNode("A", 2, List("B"), "A+B"),
               WorkNode("B", 1, Nil, "A+B"),
               WorkNode("C", 1, Nil, "C")))
@@ -117,8 +115,8 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       WorkGraphUpdater
         .update(
           workUpdate = WorkUpdate("B", 2, Set("C", "D")),
-          existingGraph =
-            WorkGraph(Set(
+          existingGraph = WorkGraph(
+            Set(
               WorkNode("A", 2, List("B"), "A+B"),
               WorkNode("B", 1, Nil, "A+B"),
               WorkNode("C", 1, Nil, "C"),
@@ -168,13 +166,12 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       )
     }
 
-    it(
-      "updating A->B with A but NO B (*should* not occur) gives A:A and B:B") {
+    it("updating A->B with A but NO B (*should* not occur) gives A:A and B:B") {
       WorkGraphUpdater
         .update(
           workUpdate = WorkUpdate("A", 2, Set.empty),
-          existingGraph =
-            WorkGraph(Set(
+          existingGraph = WorkGraph(
+            Set(
               WorkNode("A", 1, List("B"), "A+B")
             ))
         )

@@ -5,7 +5,11 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -15,7 +19,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-
 
 class MatcherFeatureTest
     extends FunSpec
@@ -62,7 +65,8 @@ class MatcherFeatureTest
                     fromJson[WorkGraphIdentifiersList](snsMessage.message).get
 
                   identifiersList.linkedWorks shouldBe
-                    Set(MatchedIdentifiers(Set(WorkIdentifier("sierra-system-number/id", 1))))
+                    Set(MatchedIdentifiers(
+                      Set(WorkIdentifier("sierra-system-number/id", 1))))
                 }
               }
             }
@@ -78,7 +82,6 @@ class MatcherFeatureTest
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
-
               val existingWorkV2 = WorkNode(
                 id = "A",
                 version = 2,

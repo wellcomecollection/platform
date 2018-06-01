@@ -24,7 +24,8 @@ class WorkGraphStore @Inject()(
     } yield WorkGraph(affectedWorks)
   }
 
-  def put(graph: WorkGraph): Future[Set[Option[Either[DynamoReadError, WorkNode]]]] = {
+  def put(graph: WorkGraph)
+    : Future[Set[Option[Either[DynamoReadError, WorkNode]]]] = {
     Future.sequence(
       graph.nodes.map(workNodeDao.put)
     )

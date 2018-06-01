@@ -18,9 +18,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConverters._
 
-
 class MatcherMessageReceiverTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ExtendedPatience
     with MatcherFixtures
@@ -36,9 +35,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/id", 1)))))
+                WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/id", 1)))))
               )
             }
           }
@@ -47,7 +45,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("work A with one link to B and no existing works returns a single matched work") {
+  it(
+    "work A with one link to B and no existing works returns a single matched work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -63,8 +62,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
+                WorkGraphIdentifiersList(
+                  Set(MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 1),
                     WorkIdentifier("sierra-system-number/B", 0)))))
               )
@@ -75,7 +74,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("matches a work with one link then matches the combined work to a new work") {
+  it(
+    "matches a work with one link then matches the combined work to a new work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
@@ -93,9 +93,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
+                WorkGraphIdentifiersList(
+                  Set(MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 1)
                   ))))
               )
@@ -109,8 +108,8 @@ class MatcherMessageReceiverTest
               eventually {
                 assertMessageSent(
                   topic,
-                  WorkGraphIdentifiersList(Set(
-                    MatchedIdentifiers(Set(
+                  WorkGraphIdentifiersList(
+                    Set(MatchedIdentifiers(Set(
                       WorkIdentifier("sierra-system-number/B", 1)
                     ))))
                 )
@@ -124,8 +123,8 @@ class MatcherMessageReceiverTest
               eventually {
                 assertMessageSent(
                   topic,
-                  WorkGraphIdentifiersList(Set(
-                    MatchedIdentifiers(Set(
+                  WorkGraphIdentifiersList(
+                    Set(MatchedIdentifiers(Set(
                       WorkIdentifier("sierra-system-number/C", 1)
                     ))))
                 )
@@ -142,12 +141,14 @@ class MatcherMessageReceiverTest
 
                 assertMessageSent(
                   topic,
-                  WorkGraphIdentifiersList(Set(
-                    MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/A", 2),
-                      WorkIdentifier("sierra-system-number/B", 1)
+                  WorkGraphIdentifiersList(
+                    Set(
+                      MatchedIdentifiers(
+                        Set(
+                          WorkIdentifier("sierra-system-number/A", 2),
+                          WorkIdentifier("sierra-system-number/B", 1)
+                        ))
                     ))
-                  ))
                 )
               }
 
@@ -162,12 +163,14 @@ class MatcherMessageReceiverTest
 
                 assertMessageSent(
                   topic,
-                  WorkGraphIdentifiersList(Set(
-                    MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/A", 2),
-                      WorkIdentifier("sierra-system-number/B", 2),
-                      WorkIdentifier("sierra-system-number/C", 1)
-                    ))))
+                  WorkGraphIdentifiersList(
+                    Set(
+                      MatchedIdentifiers(
+                        Set(
+                          WorkIdentifier("sierra-system-number/A", 2),
+                          WorkIdentifier("sierra-system-number/B", 2),
+                          WorkIdentifier("sierra-system-number/C", 1)
+                        ))))
                 )
               }
             }
@@ -196,11 +199,9 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 WorkGraphIdentifiersList(
-                  Set(
-                    MatchedIdentifiers(
-                      Set(
-                        WorkIdentifier("sierra-system-number/A", 1)
-                      ))))
+                  Set(MatchedIdentifiers(Set(
+                    WorkIdentifier("sierra-system-number/A", 1)
+                  ))))
               )
             }
 
@@ -214,8 +215,8 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
+                WorkGraphIdentifiersList(
+                  Set(MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/B", 1)
                   ))))
               )
@@ -231,11 +232,13 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 2),
-                    WorkIdentifier("sierra-system-number/B", 1)
-                  ))))
+                WorkGraphIdentifiersList(
+                  Set(
+                    MatchedIdentifiers(
+                      Set(
+                        WorkIdentifier("sierra-system-number/A", 2),
+                        WorkIdentifier("sierra-system-number/B", 1)
+                      ))))
               )
 
               val workAv3WithoutLinks = anUnidentifiedSierraWork.copy(
@@ -248,14 +251,15 @@ class MatcherMessageReceiverTest
               eventually {
                 assertMessageSent(
                   topic,
-                  WorkGraphIdentifiersList(Set(
-                    MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/A", 3)
-                    )),
-                    MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/B", 1)
+                  WorkGraphIdentifiersList(
+                    Set(
+                      MatchedIdentifiers(Set(
+                        WorkIdentifier("sierra-system-number/A", 3)
+                      )),
+                      MatchedIdentifiers(Set(
+                        WorkIdentifier("sierra-system-number/B", 1)
+                      ))
                     ))
-                  ))
                 )
               }
             }
@@ -270,7 +274,6 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-
             val aIdentifier = aSierraSourceIdentifier("A")
 
             val workAv2 = anUnidentifiedSierraWork.copy(
@@ -285,8 +288,8 @@ class MatcherMessageReceiverTest
 
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(Set(
-                  MatchedIdentifiers(Set(
+                WorkGraphIdentifiersList(
+                  Set(MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 2)
                   ))))
               )
@@ -322,9 +325,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(
-                                 topic: Topic,
-                                 identifiersList: WorkGraphIdentifiersList) = {
+  private def assertMessageSent(topic: Topic,
+                                identifiersList: WorkGraphIdentifiersList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 

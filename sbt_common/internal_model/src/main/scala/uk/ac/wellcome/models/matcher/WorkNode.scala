@@ -1,4 +1,8 @@
 package uk.ac.wellcome.models.matcher
 
-case class WorkNode(id: String, version: Int, linkedIds: List[String], componentId: String)
-  extends Versioned with IdentifiableWork
+case class WorkNode(id: String,
+                    version: Int,
+                    linkedIds: List[String],
+                    componentId: String)
+    extends Versioned
+    with IdentifiableWork

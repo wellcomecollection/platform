@@ -7,7 +7,11 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -30,7 +34,8 @@ class WorkNodeMatcherTest
             identifiersList =>
               val workId = "sierra-system-number/id"
               identifiersList shouldBe
-                WorkGraphIdentifiersList(Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
+                WorkGraphIdentifiersList(
+                  Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('id -> workId)
@@ -55,10 +60,11 @@ class WorkNodeMatcherTest
             identifiers = List(identifierA, identifierB))
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-            WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+              WorkGraphIdentifiersList(
                 Set(
-                  WorkIdentifier("sierra-system-number/A", 1),
-                  WorkIdentifier("sierra-system-number/B", 0)))))
+                  MatchedIdentifiers(Set(
+                    WorkIdentifier("sierra-system-number/A", 1),
+                    WorkIdentifier("sierra-system-number/B", 0)))))
 
             val savedWorkNodes = Scanamo
               .scan[WorkNode](dynamoDbClient)(table.name)
@@ -66,11 +72,13 @@ class WorkNodeMatcherTest
 
             savedWorkNodes should contain theSameElementsAs List(
               WorkNode(
-                "sierra-system-number/A", 1,
+                "sierra-system-number/A",
+                1,
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B"),
               WorkNode(
-                "sierra-system-number/B", 0,
+                "sierra-system-number/B",
+                0,
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B")
             )
@@ -126,15 +134,18 @@ class WorkNodeMatcherTest
 
             savedNodes should contain theSameElementsAs List(
               WorkNode(
-                "sierra-system-number/A", 1,
+                "sierra-system-number/A",
+                1,
                 List("sierra-system-number/B"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
               WorkNode(
-                "sierra-system-number/B", 2,
+                "sierra-system-number/B",
+                2,
                 List("sierra-system-number/C"),
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
               WorkNode(
-                "sierra-system-number/C", 1,
+                "sierra-system-number/C",
+                1,
                 Nil,
                 "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
             )

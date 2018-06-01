@@ -2,7 +2,9 @@ package uk.ac.wellcome.platform.matcher.models
 
 import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 
-case class WorkUpdate(workId: String, version: Int, referencedWorkIds: Set[String])
+case class WorkUpdate(workId: String,
+                      version: Int,
+                      referencedWorkIds: Set[String])
 
 case object WorkUpdate {
   def apply(work: UnidentifiedWork): WorkUpdate = {
