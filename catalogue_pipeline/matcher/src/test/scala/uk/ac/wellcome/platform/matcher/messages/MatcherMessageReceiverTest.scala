@@ -23,155 +23,130 @@ class MatcherMessageReceiverTest
     with MatcherFixtures
     with Eventually {
 
+  private val aIdentifier = aSierraSourceIdentifier("A")
+  private val bIdentifier = aSierraSourceIdentifier("B")
+  private val cIdentifier = aSierraSourceIdentifier("C")
+
   it("creates a work without identifiers") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          sendSQS(queue, storageBucket, anUnidentifiedSierraWork)
-
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/id", 1)))))
-              )
-            }
+            // Work Av1 created without any matched works
+            val updatedWork = anUnidentifiedSierraWork
+            val expectedMatchedWorks =
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(WorkIdentifier("sierra-system-number/id", 1)))))
+
+              processAndAssertMatchedWorkIs(
+                updatedWork,
+                expectedMatchedWorks,
+                queue, storageBucket,topic)
           }
         }
       }
     }
   }
 
-  it(
-    "work A with one link to B and no existing works returns a single matched work") {
+  it("work A with one link to B and no existing works returns a single matched work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
-          val linkedIdentifier = aSierraSourceIdentifier("B")
-          val aIdentifier = aSierraSourceIdentifier("A")
-          val work = anUnidentifiedSierraWork.copy(
-            sourceIdentifier = aIdentifier,
-            identifiers = List(aIdentifier, linkedIdentifier))
-
-          sendSQS(queue, storageBucket, work)
-
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(
-                  Set(MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 1),
-                    WorkIdentifier("sierra-system-number/B", 0)))))
-              )
+
+            // Work Av1
+            val workAv1 =
+              anUnidentifiedSierraWork.copy(
+                sourceIdentifier = aIdentifier,
+                identifiers = List(aIdentifier, bIdentifier))
+            // Work Av1 matched to B (before B exists hence version 0)
+            // need to match to works that do not exist to support
+            // bi-directionally matched works without deadlocking (A->B, B->A)
+            val expectedMatchedWorks = WorkGraphIdentifiersList(Set(
+              MatchedIdentifiers(Set(
+                WorkIdentifier("sierra-system-number/A", 1),
+                WorkIdentifier("sierra-system-number/B", 0)))))
+
+            processAndAssertMatchedWorkIs(
+              workAv1,
+              expectedMatchedWorks,
+              queue, storageBucket,topic)
             }
           }
         }
       }
     }
-  }
 
-  it(
-    "matches a work with one link then matches the combined work to a new work") {
+  it("matches a work with one link then matches the combined work to a new work") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val aIdentifier = aSierraSourceIdentifier("A")
-            val bIdentifier = aSierraSourceIdentifier("B")
-            val cIdentifier = aSierraSourceIdentifier("C")
 
-            val aWork = anUnidentifiedSierraWork.copy(
+            // Work Av1
+            val workAv1 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               identifiers = List(aIdentifier))
 
-            sendSQS(queue, storageBucket, aWork)
+            val expectedMatchedWorks = WorkGraphIdentifiersList(Set(
+              MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 1)
+                ))))
 
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(
-                  Set(MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 1)
-                  ))))
-              )
+            processAndAssertMatchedWorkIs(workAv1, expectedMatchedWorks, queue, storageBucket, topic)
 
-              val bWorkV1 = anUnidentifiedSierraWork.copy(
+            // Work Bv1
+            val workBv1 = anUnidentifiedSierraWork.copy(
                 sourceIdentifier = bIdentifier,
                 identifiers = List(bIdentifier))
 
-              sendSQS(queue, storageBucket, bWorkV1)
+            processAndAssertMatchedWorkIs(
+              workBv1,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                WorkIdentifier("sierra-system-number/B", 1))))),
+                queue, storageBucket, topic)
 
-              eventually {
-                assertMessageSent(
-                  topic,
-                  WorkGraphIdentifiersList(
-                    Set(MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/B", 1)
-                    ))))
-                )
-              }
-              val cWorkV1 = anUnidentifiedSierraWork.copy(
-                sourceIdentifier = cIdentifier,
-                identifiers = List(cIdentifier))
+            // Work Av1 matched to B
+            val workAv2 = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              version = 2,
+              identifiers = List(aIdentifier, bIdentifier))
 
-              sendSQS(queue, storageBucket, cWorkV1)
+              processAndAssertMatchedWorkIs(
+                workAv2,
+                WorkGraphIdentifiersList(Set(
+                  MatchedIdentifiers(Set(
+                    WorkIdentifier("sierra-system-number/A", 2),
+                    WorkIdentifier("sierra-system-number/B", 1))))),
+                queue, storageBucket, topic)
 
-              eventually {
-                assertMessageSent(
-                  topic,
-                  WorkGraphIdentifiersList(
-                    Set(MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/C", 1)
-                    ))))
-                )
-              }
+            // Work Cv1
+            val workCv1 = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = cIdentifier,
+              identifiers = List(cIdentifier))
 
-              val aWorkV2 = anUnidentifiedSierraWork.copy(
-                sourceIdentifier = aIdentifier,
-                version = 2,
-                identifiers = List(aIdentifier, bIdentifier))
+            processAndAssertMatchedWorkIs(
+              workCv1,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/C", 1))))),
+              queue, storageBucket, topic)
 
-              sendSQS(queue, storageBucket, aWorkV2)
+            // Work Bv2 matched to C
+            val workBv2 = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = bIdentifier,
+              version = 2,
+              identifiers = List(bIdentifier, cIdentifier))
 
-              eventually {
-
-                assertMessageSent(
-                  topic,
-                  WorkGraphIdentifiersList(
-                    Set(
-                      MatchedIdentifiers(
-                        Set(
-                          WorkIdentifier("sierra-system-number/A", 2),
-                          WorkIdentifier("sierra-system-number/B", 1)
-                        ))
-                    ))
-                )
-              }
-
-              val bWorkV2 = anUnidentifiedSierraWork.copy(
-                sourceIdentifier = bIdentifier,
-                version = 2,
-                identifiers = List(bIdentifier, cIdentifier))
-
-              sendSQS(queue, storageBucket, bWorkV2)
-
-              eventually {
-
-                assertMessageSent(
-                  topic,
-                  WorkGraphIdentifiersList(
-                    Set(
-                      MatchedIdentifiers(
-                        Set(
-                          WorkIdentifier("sierra-system-number/A", 2),
-                          WorkIdentifier("sierra-system-number/B", 2),
-                          WorkIdentifier("sierra-system-number/C", 1)
-                        ))))
-                )
-              }
-            }
+              processAndAssertMatchedWorkIs(
+                workBv2,
+                WorkGraphIdentifiersList(Set(
+                  MatchedIdentifiers(Set(
+                    WorkIdentifier("sierra-system-number/A", 2),
+                    WorkIdentifier("sierra-system-number/B", 2),
+                    WorkIdentifier("sierra-system-number/C", 1))))),
+                queue, storageBucket, topic)
           }
         }
       }
@@ -183,131 +158,104 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val aIdentifier = aSierraSourceIdentifier("A")
-            val bIdentifier = aSierraSourceIdentifier("B")
-
+            // Work Av1
             val workAv1 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 1,
               identifiers = List(aIdentifier))
 
-            sendSQS(queue, storageBucket, workAv1)
+            processAndAssertMatchedWorkIs(
+              workAv1,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 1))))),
+              queue, storageBucket, topic)
 
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(
-                  Set(MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 1)
-                  ))))
-              )
-            }
+            // Work Bv1
+            val workBv1 = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = bIdentifier,
+                version = 1,
+                identifiers = List(bIdentifier))
 
-            val bWorkV1 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = bIdentifier,
-              version = 1,
-              identifiers = List(bIdentifier))
+            processAndAssertMatchedWorkIs(
+              workBv1,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/B", 1))))),
+              queue, storageBucket, topic)
 
-            sendSQS(queue, storageBucket, bWorkV1)
-
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(
-                  Set(MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/B", 1)
-                  ))))
-              )
-            }
-
-            val workAv2LinkedToB = anUnidentifiedSierraWork.copy(
+            // Match Work A to Work B
+            val workAv2MatchedToB = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
               identifiers = List(aIdentifier, bIdentifier))
 
-            sendSQS(queue, storageBucket, workAv2LinkedToB)
+            processAndAssertMatchedWorkIs(
+              workAv2MatchedToB,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 2),
+                  WorkIdentifier("sierra-system-number/B", 1))))),
+              queue, storageBucket, topic)
 
-            eventually {
-              assertMessageSent(
-                topic,
-                WorkGraphIdentifiersList(
-                  Set(
-                    MatchedIdentifiers(
-                      Set(
-                        WorkIdentifier("sierra-system-number/A", 2),
-                        WorkIdentifier("sierra-system-number/B", 1)
-                      ))))
-              )
+            // A no longer matches B
+            val workAv3WithNoMatchingWorks = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              version = 3,
+              identifiers = List(aIdentifier))
 
-              val workAv3WithoutLinks = anUnidentifiedSierraWork.copy(
-                sourceIdentifier = aIdentifier,
-                version = 3,
-                identifiers = List(aIdentifier))
-
-              sendSQS(queue, storageBucket, workAv3WithoutLinks)
-
-              eventually {
-                assertMessageSent(
-                  topic,
-                  WorkGraphIdentifiersList(
-                    Set(
-                      MatchedIdentifiers(Set(
-                        WorkIdentifier("sierra-system-number/A", 3)
-                      )),
-                      MatchedIdentifiers(Set(
-                        WorkIdentifier("sierra-system-number/B", 1)
-                      ))
-                    ))
-                )
-              }
+            processAndAssertMatchedWorkIs(
+              workAv3WithNoMatchingWorks,
+              WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 3))),
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/B", 1))))),
+              queue, storageBucket, topic)
             }
           }
         }
       }
     }
-  }
 
-  it("fails when processing an old message") {
+  it("does not match a lower version") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val aIdentifier = aSierraSourceIdentifier("A")
 
+            // process Work V2
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
               identifiers = List(aIdentifier)
             )
 
-            sendSQS(queue, storageBucket, workAv2)
+            val expectedMatchedWorkAv2 = WorkGraphIdentifiersList(Set(
+              MatchedIdentifiers(Set(
+                WorkIdentifier("sierra-system-number/A", 2)))))
+
+            processAndAssertMatchedWorkIs(
+              workAv2,
+              expectedMatchedWorkAv2,
+              queue, storageBucket, topic)
+
+            // Work V1 is sent but not matched
+            val workAv1 = anUnidentifiedSierraWork.copy(
+              sourceIdentifier = aIdentifier,
+              identifiers = List(aIdentifier),
+              version = 1)
+
+            sendSQS(queue, storageBucket, workAv1)
+            Thread.sleep(2000)
             eventually {
-              val expectedWorkAv2identifiers = WorkGraphIdentifiersList(
-                Set(MatchedIdentifiers(
-                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
-              assertMessageSent(
-                topic,
-                expectedWorkAv2identifiers
-              )
-
-              val workAv1 = anUnidentifiedSierraWork.copy(
-                sourceIdentifier = aIdentifier,
-                identifiers = List(aIdentifier),
-                version = 1)
-
-              sendSQS(queue, storageBucket, workAv1)
-
-              Thread.sleep(2000)
-              eventually {
-                noMessagesAreWaitingIn(queue)
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                val actualMatchedWorkLists = snsMessages.map { snsMessage =>
-                  fromJson[WorkGraphIdentifiersList](snsMessage.message).get
-                }
-                actualMatchedWorkLists.size shouldBe 1
-                actualMatchedWorkLists shouldBe List(
-                  expectedWorkAv2identifiers)
+              noMessagesAreWaitingIn(queue)
+              val snsMessages = listMessagesReceivedFromSNS(topic)
+              val actualMatchedWorkLists = snsMessages.map { snsMessage =>
+                fromJson[WorkGraphIdentifiersList](snsMessage.message).get
               }
+              actualMatchedWorkLists.size shouldBe 1
+              actualMatchedWorkLists shouldBe List(expectedMatchedWorkAv2)
             }
           }
         }
@@ -315,8 +263,20 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(topic: Topic,
-                                identifiersList: WorkGraphIdentifiersList) = {
+  private def processAndAssertMatchedWorkIs(workToMatch: UnidentifiedWork, expectedMatchedWorks: WorkGraphIdentifiersList,
+                                            queue: SQS.Queue, storageBucket: Bucket, topic: Topic): Any = {
+    sendSQS(queue, storageBucket, workToMatch)
+    eventually {
+      assertMatchedResultIncludes(
+        topic,
+        expectedMatchedWorks
+      )
+    }
+  }
+
+  private def assertMatchedResultIncludes(
+    topic: Topic,
+    identifiersList: WorkGraphIdentifiersList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
@@ -342,10 +302,10 @@ class MatcherMessageReceiverTest
     )
   }
 
-  def hybridRecordNotificationMessage(message: String,
-                                      version: Int,
-                                      s3Client: AmazonS3,
-                                      bucket: Bucket) = {
+  private def hybridRecordNotificationMessage(message: String,
+                                              version: Int,
+                                              s3Client: AmazonS3,
+                                              bucket: Bucket) = {
     val key = "recorder/1/testId/dshg548.json"
     s3Client.putObject(bucket.name, key, message)
 
