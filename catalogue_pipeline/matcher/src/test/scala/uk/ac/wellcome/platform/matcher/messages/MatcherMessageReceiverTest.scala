@@ -16,7 +16,6 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.collection.JavaConverters._
 
 class MatcherMessageReceiverTest
     extends FunSpec
@@ -283,15 +282,13 @@ class MatcherMessageReceiverTest
             )
 
             sendSQS(queue, storageBucket, workAv2)
-
             eventually {
-
+              val expectedWorkAv2identifiers = WorkGraphIdentifiersList(Set(
+                MatchedIdentifiers(Set(
+                  WorkIdentifier("sierra-system-number/A", 2)))))
               assertMessageSent(
                 topic,
-                WorkGraphIdentifiersList(
-                  Set(MatchedIdentifiers(Set(
-                    WorkIdentifier("sierra-system-number/A", 2)
-                  ))))
+                expectedWorkAv2identifiers
               )
 
               val workAv1 = anUnidentifiedSierraWork.copy(
@@ -302,21 +299,14 @@ class MatcherMessageReceiverTest
               sendSQS(queue, storageBucket, workAv1)
 
               Thread.sleep(2000)
-
               eventually {
-                sqsClient
-                  .getQueueAttributes(
-                    queue.url,
-                    List("ApproximateNumberOfMessagesNotVisible").asJava
-                  )
-                  .getAttributes
-                  .get(
-                    "ApproximateNumberOfMessagesNotVisible"
-                  ) shouldBe "1"
-
+                noMessagesAreWaitingIn(queue)
                 val snsMessages = listMessagesReceivedFromSNS(topic)
-
-                snsMessages.size shouldBe 1
+                val actualMatchedWorkLists = snsMessages.map { snsMessage =>
+                  fromJson[WorkGraphIdentifiersList](snsMessage.message).get
+                }
+                actualMatchedWorkLists.size shouldBe 1
+                actualMatchedWorkLists shouldBe List(expectedWorkAv2identifiers)
               }
             }
           }

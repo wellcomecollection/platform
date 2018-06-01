@@ -27,20 +27,20 @@ class MatcherFeatureTest
     with Eventually
     with MatcherFixtures {
 
+  val sourceIdentifierA = SourceIdentifier(
+    identifierType = IdentifierType("sierra-system-number"),
+    ontologyType = "Work",
+    value = "A")
+
   it("processes a message with a simple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
-              val identifier = SourceIdentifier(
-                identifierType = IdentifierType("sierra-system-number"),
-                "Work",
-                "id")
-
               val work = UnidentifiedWork(
-                sourceIdentifier = identifier,
-                identifiers = List(identifier),
+                sourceIdentifier = sourceIdentifierA,
+                identifiers = List(sourceIdentifierA),
                 title = Some("Work"),
                 version = 1
               )
@@ -76,54 +76,46 @@ class MatcherFeatureTest
     }
   }
 
-  it("does not process a message if the version is old ") {
+  it("does not process a message if the work version is older than that already stored") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
             withMatcherServer(queue, storageBucket, topic, table) { _ =>
-              val existingWorkV2 = WorkNode(
-                id = "A",
-                version = 2,
+
+              val existingWorkVersion = 2
+              val updatedWorkVersion = 1
+
+              val existingWorkAv2 = WorkNode(
+                id = "sierra-system-number/A",
+                version = existingWorkVersion,
                 linkedIds = Nil,
                 componentId = "sierra-system-number/A"
               )
+              Scanamo.put(dynamoDbClient)(table.name)(existingWorkAv2)
 
-              Scanamo.put(dynamoDbClient)(table.name)(existingWorkV2)
-
-              val identifier = SourceIdentifier(
-                identifierType = IdentifierType("sierra-system-number"),
-                "Work",
-                "A")
-
-              val workV1 = UnidentifiedWork(
-                sourceIdentifier = identifier,
-                identifiers = List(identifier),
+              val workAv1 = UnidentifiedWork(
+                sourceIdentifier = sourceIdentifierA,
+                identifiers = List(sourceIdentifierA),
                 title = Some("Work"),
-                version = 1
+                version = updatedWorkVersion
               )
 
               val workSqsMessage: NotificationMessage =
                 hybridRecordNotificationMessage(
-                  message = toJson(RecorderWorkEntry(work = workV1)).get,
-                  version = 1,
+                  message = toJson(RecorderWorkEntry(workAv1)).get,
+                  version = updatedWorkVersion,
                   s3Client = s3Client,
-                  bucket = storageBucket
-                )
+                  bucket = storageBucket)
 
               sqsClient.sendMessage(
                 queue.url,
-                toJson(workSqsMessage).get
-              )
+                toJson(workSqsMessage).get)
 
               Thread.sleep(2000)
-
               eventually {
                 noMessagesAreWaitingIn(queue)
-
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-
-                snsMessages.size shouldBe 0
+                listMessagesReceivedFromSNS(topic).size shouldBe 0
               }
             }
           }
