@@ -25,6 +25,7 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.id_minter IdMinter"
   override val modules = Seq(
     MysqlModule,
+    IdentifiersTableConfigModule,
     AkkaModule,
     IdMinterWorkerModule,
     SQSClientModule,
