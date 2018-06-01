@@ -106,7 +106,9 @@ class SierraReaderWorkerServiceTest
           MessageId = "message-id"
         )
 
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -150,7 +152,9 @@ class SierraReaderWorkerServiceTest
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -213,7 +217,9 @@ class SierraReaderWorkerServiceTest
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -260,8 +266,9 @@ class SierraReaderWorkerServiceTest
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      whenReady(fixtures.worker.processMessage(notificationMessage).failed) { ex =>
-        ex shouldBe a[GracefulFailureException]
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldBe a[GracefulFailureException]
       }
 
     }
@@ -289,8 +296,9 @@ class SierraReaderWorkerServiceTest
           MessageId = "message-id"
         )
 
-      whenReady(fixtures.worker.processMessage(notificationMessage).failed) { ex =>
-        ex shouldNot be(a[GracefulFailureException])
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldNot be(a[GracefulFailureException])
       }
     }
   }

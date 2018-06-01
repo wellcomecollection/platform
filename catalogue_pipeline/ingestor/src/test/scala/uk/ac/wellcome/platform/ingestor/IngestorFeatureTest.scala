@@ -6,7 +6,11 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierType,
+  SourceIdentifier
+}
 import uk.ac.wellcome.storage.s3.S3ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
