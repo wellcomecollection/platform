@@ -2,29 +2,27 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import uk.ac.wellcome.messaging.sns.SNSWriter
-import uk.ac.wellcome.messaging.sqs.{SQSMessage, SQSReader, SQSWorker}
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
+import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.reindex_worker.models.{
-  CompletedReindexJob,
-  ReindexJob
-}
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
+import uk.ac.wellcome.platform.reindex_worker.models.{CompletedReindexJob, ReindexJob}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
 class ReindexWorkerService @Inject()(
   targetService: ReindexService,
-  reader: SQSReader,
   snsWriter: SNSWriter,
   system: ActorSystem,
+  sqsStream: SQSStream[NotificationMessage],
   metrics: MetricsSender
-) extends SQSWorker(reader, system, metrics) {
+)  {
+  sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
-  override def processMessage(message: SQSMessage): Future[Unit] =
+  private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexJob <- Future.fromTry(fromJson[ReindexJob](message.body))
+      reindexJob <- Future.fromTry(fromJson[ReindexJob](message.Message))
       _ <- targetService.runReindex(reindexJob = reindexJob)
       message <- Future.fromTry(toJson(CompletedReindexJob(reindexJob)))
       _ <- snsWriter.writeMessage(
@@ -32,4 +30,6 @@ class ReindexWorkerService @Inject()(
         message = message
       )
     } yield ()
+
+  def stop() = system.terminate()
 }
