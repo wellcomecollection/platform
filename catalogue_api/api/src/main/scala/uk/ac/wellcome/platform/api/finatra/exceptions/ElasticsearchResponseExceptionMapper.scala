@@ -13,9 +13,8 @@ import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
-class ElasticsearchResponseExceptionMapper @Inject()(
-  response: ResponseBuilder,
-  apiConfig: ApiConfig)
+class ElasticsearchResponseExceptionMapper @Inject()(response: ResponseBuilder,
+                                                     apiConfig: ApiConfig)
     extends ExceptionMapper[ResponseException]
     with Logging {
 

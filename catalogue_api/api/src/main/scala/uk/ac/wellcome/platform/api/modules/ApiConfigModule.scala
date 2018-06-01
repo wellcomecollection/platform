@@ -7,9 +7,12 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.platform.api.models.ApiConfig
 
 object ApiConfigModule extends TwitterModule {
-  private val host = flag(name = "api.host", default = "localhost:8888", help = "API hostname")
-  private val scheme = flag(name = "api.scheme", default = "https", help = "API protocol scheme")
-  private val defaultPageSize = flag(name = "api.pageSize", default = 10, help = "API default page size")
+  private val host =
+    flag(name = "api.host", default = "localhost:8888", help = "API hostname")
+  private val scheme =
+    flag(name = "api.scheme", default = "https", help = "API protocol scheme")
+  private val defaultPageSize =
+    flag(name = "api.pageSize", default = 10, help = "API default page size")
 
   private final val apiName =
     flag(name = "api.name", default = "catalogue", help = "API name path part")

@@ -11,9 +11,8 @@ import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
-class GeneralExceptionMapper @Inject()(
-  response: ResponseBuilder,
-  apiConfig: ApiConfig)
+class GeneralExceptionMapper @Inject()(response: ResponseBuilder,
+                                       apiConfig: ApiConfig)
     extends ExceptionMapper[Exception]
     with Logging {
 

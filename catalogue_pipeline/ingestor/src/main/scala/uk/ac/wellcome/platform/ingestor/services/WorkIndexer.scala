@@ -30,7 +30,9 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWork(work: IdentifiedWork, esIndex: String, esType: String): Future[Any] = {
+  def indexWork(work: IdentifiedWork,
+                esIndex: String,
+                esType: String): Future[Any] = {
 
     metricsSender.timeAndCount[Any](
       "ingestor-index-work",

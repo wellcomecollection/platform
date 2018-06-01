@@ -12,9 +12,8 @@ import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
-class CaseClassMappingExceptionWrapper @Inject()(
-  response: ResponseBuilder,
-  apiConfig: ApiConfig)
+class CaseClassMappingExceptionWrapper @Inject()(response: ResponseBuilder,
+                                                 apiConfig: ApiConfig)
     extends ExceptionMapper[CaseClassMappingException]
     with Logging {
 

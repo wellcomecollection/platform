@@ -9,10 +9,9 @@ import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.services.WorksService
 
 @Singleton
-class V1WorksController @Inject()(
-  apiConfig: ApiConfig,
-  elasticConfig: ElasticConfig,
-  worksService: WorksService)
+class V1WorksController @Inject()(apiConfig: ApiConfig,
+                                  elasticConfig: ElasticConfig,
+                                  worksService: WorksService)
     extends WorksController(
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV1name,

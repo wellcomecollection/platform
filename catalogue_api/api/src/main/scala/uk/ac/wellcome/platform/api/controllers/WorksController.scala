@@ -77,7 +77,8 @@ abstract class WorksController(apiConfig: ApiConfig,
     } { request: SingleWorkRequest =>
       val includes = request.includes.getOrElse(WorksIncludes())
 
-      val contextUri = buildContextUri(apiConfig = apiConfig, version = version)
+      val contextUri =
+        buildContextUri(apiConfig = apiConfig, version = version)
       for {
         maybeWork <- worksService.findWorkById(
           canonicalId = request.id,

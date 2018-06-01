@@ -25,7 +25,9 @@ trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
     testWith: TestWith[WorkIndexer, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer(elasticClient = elasticClient, metricsSender = metricsSender) { workIndexer =>
+        withWorkIndexer(
+          elasticClient = elasticClient,
+          metricsSender = metricsSender) { workIndexer =>
           testWith(workIndexer)
         }
       }

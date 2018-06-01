@@ -8,7 +8,11 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig, SierraResourceTypes}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  SierraResourceTypes
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
@@ -57,7 +61,8 @@ class SierraReaderWorkerService @Inject()(
 
     info(s"Running the stream with window=$window and status=$windowStatus")
 
-    val baseParams = Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
+    val baseParams =
+      Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
       case None => baseParams
@@ -75,7 +80,9 @@ class SierraReaderWorkerService @Inject()(
       oauthKey = sierraConfig.oauthKey,
       oauthSecret = sierraConfig.oauthSec,
       throttleRate = ThrottleRate(3, per = 1.second),
-      timeoutMs = 60000)(resourceType = sierraConfig.resourceType.toString, params)
+      timeoutMs = 60000)(
+      resourceType = sierraConfig.resourceType.toString,
+      params)
 
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow())
@@ -89,7 +96,8 @@ class SierraReaderWorkerService @Inject()(
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
-        s"windows_${sierraConfig.resourceType.toString}_complete/${windowManager.buildWindowLabel(window)}",
+        s"windows_${sierraConfig.resourceType.toString}_complete/${windowManager
+          .buildWindowLabel(window)}",
         "")
     }
   }
