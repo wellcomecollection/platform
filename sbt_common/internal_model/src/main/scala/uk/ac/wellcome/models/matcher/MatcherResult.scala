@@ -16,4 +16,4 @@ package uk.ac.wellcome.models.matcher
 // then the merger should create three works, one from A1-A2-A3, a second
 // from B1-B2, a third from C1-C2-C3.
 //
-case class MatcherResult(works: Set[EquivalentIdentifiers])
+case class MatcherResult(works: Set[MatchedIdentifiers])
