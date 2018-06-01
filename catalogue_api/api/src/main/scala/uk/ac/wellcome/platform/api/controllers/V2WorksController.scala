@@ -2,8 +2,10 @@ package uk.ac.wellcome.platform.api.controllers
 
 import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.platform.api.services.WorksService
 
 @Singleton
@@ -13,14 +15,14 @@ class V2WorksController @Inject()(
   @Flag("api.host") apiHost: String,
   @Flag("api.scheme") apiScheme: String,
   @Flag("api.pageSize") defaultPageSize: Int,
-  @Flag("es.index.v2") indexName: String,
+  elasticConfig: ElasticConfig,
   worksService: WorksService)
     extends WorksController(
       apiPrefix = apiPrefix,
       apiContextSuffix = apiContextSuffix,
       apiHost = apiHost,
       apiScheme = apiScheme,
-      indexName = indexName,
+      indexName = elasticConfig.indexV2name,
       defaultPageSize = defaultPageSize,
       worksService = worksService
     ) {
