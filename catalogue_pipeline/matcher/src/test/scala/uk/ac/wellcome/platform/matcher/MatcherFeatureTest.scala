@@ -66,7 +66,7 @@ class MatcherFeatureTest
 
                   identifiersList.linkedWorks shouldBe
                     Set(MatchedIdentifiers(
-                      Set(WorkIdentifier("sierra-system-number/id", 1))))
+                      Set(WorkIdentifier("sierra-system-number/A", 1))))
                 }
               }
             }
