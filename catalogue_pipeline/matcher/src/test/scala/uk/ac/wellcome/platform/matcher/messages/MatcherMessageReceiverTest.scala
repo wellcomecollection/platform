@@ -284,12 +284,7 @@ class MatcherMessageReceiverTest
             Thread.sleep(2000)
             eventually {
               noMessagesAreWaitingIn(queue)
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              val actualMatchedWorkLists = snsMessages.map { snsMessage =>
-                fromJson[WorkGraphIdentifiersList](snsMessage.message).get
-              }
-              actualMatchedWorkLists.size shouldBe 1
-              actualMatchedWorkLists shouldBe List(expectedMatchedWorkAv2)
+              assertLastMatchedResultIs(topic, expectedMatchedWorkAv2)
             }
           }
         }
@@ -305,14 +300,14 @@ class MatcherMessageReceiverTest
     topic: Topic): Any = {
     sendSQS(queue, storageBucket, workToMatch)
     eventually {
-      assertMatchedResultIncludes(
+      assertLastMatchedResultIs(
         topic,
         expectedMatchedWorks
       )
     }
   }
 
-  private def assertMatchedResultIncludes(
+  private def assertLastMatchedResultIs(
     topic: Topic,
     identifiersList: WorkGraphIdentifiersList) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -321,7 +316,7 @@ class MatcherMessageReceiverTest
     val actualMatchedWorkLists = snsMessages.map { snsMessage =>
       fromJson[WorkGraphIdentifiersList](snsMessage.message).get
     }
-    actualMatchedWorkLists should contain(identifiersList)
+    actualMatchedWorkLists.last shouldBe identifiersList
   }
 
   private def sendSQS(queue: SQS.Queue,
