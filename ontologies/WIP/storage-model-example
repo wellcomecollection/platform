@@ -1,0 +1,110 @@
+{
+  "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
+  "type": "Bag",
+  "id": "yy-yy-yy-yy",
+  "source": {
+    "type": "Source",
+    "id": "archivematica",
+    "label": "Archivematica"
+  },
+  "identifiers": [
+    {
+      "type": "Identifier",
+      "indentifierType": {
+        "id": "sierra-system-number",
+        "label": "Sierra System Number",
+        "type": "IdentifierType"
+      },
+      "value": "GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Identifier",
+      "indentifierType": {
+        "id": "archivematica-api-guid",
+        "label": "Archivematica API GUID",
+        "type": "IdentifierType"
+      },
+      "value": "a2870a2d-5111-403f-b092-45c569ef9476"
+    },
+    {
+      "type": "Identifier",
+      "indentifierType": {
+        "id": "calm-alt-ref-no",
+        "label": "CALM Alt Ref No",
+        "type": "IdentifierType"
+      },
+      "value": "GC253/1046"
+    }
+  ],
+  "manifest": {
+    "type": "Manifest",
+    "checksumAlgorithm": "sha256",
+    "files": [
+      {
+        "type": "File",
+        "checksum": "a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f",
+        "path": "data/METS.a2870a2d-5111-403f-b092-45c569ef9476.xml"
+      },
+      {
+        "type": "File",
+        "checksum": "4dd52bf39d518cf009b776511ce487fe943272d906abf1f56af9dba568f11cc4",
+        "path": "data/objects/Disc_1/HEART.WRI"
+      }
+    ]
+  },
+  "tagManifest": {
+    "type": "Manifest",
+    "checksumAlgorithm": "md5",
+    "files": [
+      {
+        "type": "File",
+        "checksum": "452ad4b7d28249102dcac5d5bafe834e",
+        "path": "bagit.txt"
+      },
+      {
+        "type": "File",
+        "checksum": "9e5ad981e0d29adc278f6a294b8c2aca",
+        "path": "bag-info.txt"
+      },
+      {
+        "type": "File",
+        "checksum": "3148319ddaf49214944ec357405a8189",
+        "path": "manifest-256.txt"
+      }
+    ]
+  },
+  "locations": [
+    {
+      "type": "DigitalLocation",
+      "locationType": {
+        "id": "s3-master",
+        "label": "S3 Master",
+        "type": "LocationType"
+      },
+      "url": "s3://masterbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+    },
+    {
+      "type": "DigitalLocation",
+      "locationType": {
+        "id": "s3-master-replica",
+        "label": "S3 Master Replica",
+        "type": "LocationType"
+      },
+      "url": "s3://replicabucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+    },
+    {
+      "type": "DigitalLocation",
+      "locationType": {
+        "id": "s3-master",
+        "label": "S3 Master",
+        "type": "LocationType"
+      },
+      "url": "s3://derivativesbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+    }
+  ],
+  "description": "GC253_1046",
+  "size": 435255.8,
+  "createdDate": "2016-08-07T00:00:00Z",
+  "lastModifiedDate": "2016-08-07T00:00:00Z",
+  "version": 1
+}
