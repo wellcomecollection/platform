@@ -19,7 +19,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           workUpdate = WorkUpdate("A", 1, Set.empty),
           existingGraph = WorkGraph(Set.empty)
         )
-        .linkedWorksSet shouldBe Set(WorkNode("A", 1, List(), setId = "A"))
+        .nodes shouldBe Set(WorkNode("A", 1, List(), setId = "A"))
     }
 
     it("updating nothing with A->B gives A+B:A->B") {
@@ -28,7 +28,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           workUpdate = WorkUpdate("A", 1, Set("B")),
           existingGraph = WorkGraph(Set.empty)
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("A", 1, List("B"), setId = "A+B"),
         WorkNode("B", 0, List(), setId = "A+B"))
     }
@@ -39,7 +39,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
           workUpdate = WorkUpdate("B", 1, Set("A")),
           existingGraph = WorkGraph(Set.empty)
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("B", 1, List("A"), setId = "A+B"),
         WorkNode("A", 0, List(), setId = "A+B"))
     }
@@ -55,7 +55,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("A", 1, Nil, "A"),
               WorkNode("B", 1, Nil, "B")))
         )
-        .linkedWorksSet should contain theSameElementsAs
+        .nodes should contain theSameElementsAs
         List(
           WorkNode("A", 2, List("B"), setId = "A+B"),
           WorkNode("B", 1, List(), setId = "A+B"))
@@ -70,7 +70,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("A", 1, List("B"), "A+B"),
               WorkNode("B", 1, Nil, "A+B")))
         )
-        .linkedWorksSet should contain theSameElementsAs
+        .nodes should contain theSameElementsAs
         List(
           WorkNode("A", 2, List("B"), setId = "A+B"),
           WorkNode("B", 1, List(), setId = "A+B"))
@@ -86,7 +86,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", 1, Nil, "A+B"),
               WorkNode("C", 1, Nil, "C")))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("A", 2, List("B"), setId = "A+B+C"),
         WorkNode("B", 2, List("C"), setId = "A+B+C"),
         WorkNode("C", 1, List(), setId = "A+B+C")
@@ -105,7 +105,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("D", 1, Nil, "C+D")
             ))
         )
-        .linkedWorksSet should contain theSameElementsAs
+        .nodes should contain theSameElementsAs
         List(
           WorkNode("A", 1, List("B"), "A+B+C+D"),
           WorkNode("B", 2, List("C"), "A+B+C+D"),
@@ -125,7 +125,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("D", 1, Nil, "D")
             ))
         )
-        .linkedWorksSet should contain theSameElementsAs
+        .nodes should contain theSameElementsAs
         List(
           WorkNode("A", 2, List("B"), setId = "A+B+C+D"),
           WorkNode("B", 2, List("C", "D"), setId = "A+B+C+D"),
@@ -144,7 +144,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", 2, List("C"), "A+B+C"),
               WorkNode("C", 1, Nil, "A+B+C")))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("A", 2, List("B"), setId = "A+B+C"),
         WorkNode("B", 2, List("C"), setId = "A+B+C"),
         WorkNode("C", 2, List("A"), setId = "A+B+C")
@@ -162,7 +162,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("A", 1, List("B"), "A+B"),
               WorkNode("B", 1, List(), "A+B")))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("A", 2, List(), setId = "A"),
         WorkNode("B", 1, List(), setId = "B"))
     }
@@ -177,7 +177,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("A", 1, List("B"), "A+B")
             ))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
           WorkNode("A", 2, Nil, setId = "A"),
           WorkNode("B", 0, Nil, setId = "B"))
     }
@@ -192,7 +192,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", 2, List("C"), "A+B+C"),
               WorkNode("C", 1, Nil, "A+B+C")))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
           WorkNode("A", 2, List("B"), "A+B"),
           WorkNode("B", 3, Nil, "A+B"),
           WorkNode("C", 1, Nil, "C"))
@@ -208,7 +208,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
               WorkNode("B", 2, List("A", "C"), "A+B+C"),
               WorkNode("C", 1, Nil, "A+B+C")))
         )
-        .linkedWorksSet shouldBe Set(
+        .nodes shouldBe Set(
         WorkNode("A", 2, List("B"), "A+B+C"),
         WorkNode("B", 3, List("C"), "A+B+C"),
         WorkNode("C", 1, Nil, "A+B+C"))
