@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
+import javax.naming.ConfigurationException
+
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
@@ -32,6 +34,11 @@ class ReindexServiceTest
     someData = "A ghastly gharial ganking a green golem.",
     reindexShard = shardName,
     reindexVersion = currentVersion
+  )
+
+  val exampleReindexJob = ReindexJob(
+    shardId = "sierra/000",
+    desiredVersion = 2
   )
 
   private def withReindexService(table: Table)(
@@ -142,15 +149,31 @@ class ReindexServiceTest
 
   it("returns a failed Future if there's a DynamoDB error") {
     withReindexService(Table("does-not-exist", "no-such-index")) { service =>
-      val reindexJob = ReindexJob(
-        shardId = "sierra/000",
-        desiredVersion = 2
-      )
-
-      val future = service.runReindex(reindexJob)
+      val future = service.runReindex(exampleReindexJob)
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
     }
   }
+
+  it("returns a failed Future if you don't specify a DynamoDB index") {
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val service = new ReindexService(
+          dynamoDbClient = dynamoDbClient,
+          dynamoConfig = DynamoConfig(
+            table = "mytable",
+            maybeIndex = None
+          ),
+          metricsSender = metricsSender
+        )
+
+        val future = service.runReindex(exampleReindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[ConfigurationException]
+        }
+      }
+    }
+  }
+
 }
