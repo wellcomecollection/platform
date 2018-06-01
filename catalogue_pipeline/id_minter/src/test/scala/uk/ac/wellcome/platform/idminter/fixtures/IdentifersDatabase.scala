@@ -6,7 +6,10 @@ import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.database.FieldDescription
-import uk.ac.wellcome.platform.idminter.models.{IdentifiersTableConfig, RDSClientConfig}
+import uk.ac.wellcome.platform.idminter.models.{
+  IdentifiersTableConfig,
+  RDSClientConfig
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
@@ -72,7 +75,8 @@ trait IdentifiersDatabase
     Stream continually nextAlpha
   }
 
-  def withIdentifiersDatabase[R](testWith: TestWith[(RDSClientConfig, IdentifiersTableConfig), R]) = {
+  def withIdentifiersDatabase[R](
+    testWith: TestWith[(RDSClientConfig, IdentifiersTableConfig), R]) = {
     Class.forName("com.mysql.jdbc.Driver")
     ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
 

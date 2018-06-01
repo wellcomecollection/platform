@@ -31,7 +31,9 @@ class IngestorWorkerService @Inject()(
           esType = elasticConfig.documentType
         )
       }
-      Future.sequence(futureResults).map { _ => ()}
+      Future.sequence(futureResults).map { _ =>
+        ()
+      }
     }
   }
   def stop(): Future[Terminated] = {

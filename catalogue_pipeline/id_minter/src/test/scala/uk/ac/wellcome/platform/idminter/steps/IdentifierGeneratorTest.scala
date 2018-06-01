@@ -28,93 +28,96 @@ class IdentifierGeneratorTest
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
                                    None)(
     testWith: TestWith[(IdentifierGenerator, IdentifiersTable), R]) =
-    withIdentifiersDatabase[R] { case (rdsClientConfig, identifiersTableConfig) =>
-      val identifiersTable = new IdentifiersTable(identifiersTableConfig)
+    withIdentifiersDatabase[R] {
+      case (rdsClientConfig, identifiersTableConfig) =>
+        val identifiersTable = new IdentifiersTable(identifiersTableConfig)
 
-      new TableProvisioner(rdsClientConfig)
-        .provision(
-          database = identifiersTableConfig.database,
-          tableName = identifiersTableConfig.tableName
-        )
-
-      val identifiersDao = maybeIdentifiersDao.getOrElse(
-        new IdentifiersDao(DB.connect(), identifiersTable)
-      )
-
-      withActorSystem { actorSystem =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          val identifierGenerator = new IdentifierGenerator(
-            identifiersDao,
-            metricsSender
+        new TableProvisioner(rdsClientConfig)
+          .provision(
+            database = identifiersTableConfig.database,
+            tableName = identifiersTableConfig.tableName
           )
 
-          eventuallyTableExists(identifiersTableConfig)
+        val identifiersDao = maybeIdentifiersDao.getOrElse(
+          new IdentifiersDao(DB.connect(), identifiersTable)
+        )
 
-          testWith((identifierGenerator, identifiersTable))
+        withActorSystem { actorSystem =>
+          withMetricsSender(actorSystem) { metricsSender =>
+            val identifierGenerator = new IdentifierGenerator(
+              identifiersDao,
+              metricsSender
+            )
+
+            eventuallyTableExists(identifiersTableConfig)
+
+            testWith((identifierGenerator, identifiersTable))
+          }
         }
-      }
     }
 
   it("queries the database and return a matching canonical id") {
-    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
-      implicit val session = AutoSession
+    withIdentifierGenerator() {
+      case (identifierGenerator, identifiersTable) =>
+        implicit val session = AutoSession
 
-      withSQL {
-        insert
-          .into(identifiersTable)
-          .namedValues(
-            identifiersTable.column.CanonicalId -> "5678",
-            identifiersTable.column.SourceSystem -> IdentifierType(
-              "miro-image-number").id,
-            identifiersTable.column.SourceId -> "1234",
-            identifiersTable.column.OntologyType -> "Work"
-          )
-      }.update().apply()
+        withSQL {
+          insert
+            .into(identifiersTable)
+            .namedValues(
+              identifiersTable.column.CanonicalId -> "5678",
+              identifiersTable.column.SourceSystem -> IdentifierType(
+                "miro-image-number").id,
+              identifiersTable.column.SourceId -> "1234",
+              identifiersTable.column.OntologyType -> "Work"
+            )
+        }.update().apply()
 
-      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Work",
-          "1234")
-      )
+        val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+          SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            "Work",
+            "1234")
+        )
 
-      triedId shouldBe Success("5678")
+        triedId shouldBe Success("5678")
     }
   }
 
   it("generates and saves a new identifier") {
-    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
-      implicit val session = AutoSession
+    withIdentifierGenerator() {
+      case (identifierGenerator, identifiersTable) =>
+        implicit val session = AutoSession
 
-      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Work",
-          "1234")
-      )
+        val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+          SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            "Work",
+            "1234")
+        )
 
-      triedId shouldBe a[Success[_]]
+        triedId shouldBe a[Success[_]]
 
-      val id = triedId.get
-      id should not be empty
+        val id = triedId.get
+        id should not be empty
 
-      val i = identifiersTable.i
+        val i = identifiersTable.i
 
-      val maybeIdentifier = withSQL {
+        val maybeIdentifier = withSQL {
 
-        select
-          .from(identifiersTable as i)
-          .where
-          .eq(i.SourceId, "1234")
+          select
+            .from(identifiersTable as i)
+            .where
+            .eq(i.SourceId, "1234")
 
-      }.map(Identifier(i)).single.apply()
+        }.map(Identifier(i)).single.apply()
 
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe Identifier(
-        CanonicalId = id,
-        SourceSystem = IdentifierType("miro-image-number").id,
-        SourceId = "1234"
-      )
+        maybeIdentifier shouldBe defined
+        maybeIdentifier.get shouldBe Identifier(
+          CanonicalId = id,
+          SourceSystem = IdentifierType("miro-image-number").id,
+          SourceId = "1234"
+        )
     }
   }
 
@@ -141,53 +144,55 @@ class IdentifierGeneratorTest
         when(identifiersDao.saveIdentifier(any[Identifier]()))
           .thenReturn(Failure(expectedException))
 
-        withIdentifierGenerator(Some(identifiersDao)) { case (identifierGenerator, identifiersTable) =>
-          val triedGeneratingId =
-            identifierGenerator.retrieveOrGenerateCanonicalId(
-              sourceIdentifier
-            )
+        withIdentifierGenerator(Some(identifiersDao)) {
+          case (identifierGenerator, identifiersTable) =>
+            val triedGeneratingId =
+              identifierGenerator.retrieveOrGenerateCanonicalId(
+                sourceIdentifier
+              )
 
-          triedGeneratingId shouldBe a[Failure[_]]
-          triedGeneratingId.failed.get shouldBe expectedException
+            triedGeneratingId shouldBe a[Failure[_]]
+            triedGeneratingId.failed.get shouldBe expectedException
         }
       }
     }
   }
 
   it("should preserve the ontologyType when generating a new identifier") {
-    withIdentifierGenerator() { case (identifierGenerator, identifiersTable) =>
-      implicit val session = AutoSession
+    withIdentifierGenerator() {
+      case (identifierGenerator, identifiersTable) =>
+        implicit val session = AutoSession
 
-      val ontologyType = "Item"
-      val miroId = "1234"
+        val ontologyType = "Item"
+        val miroId = "1234"
 
-      val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-        SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType,
-          miroId)
-      )
+        val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
+          SourceIdentifier(
+            identifierType = IdentifierType("miro-image-number"),
+            ontologyType,
+            miroId)
+        )
 
-      val id = triedId.get
-      id should not be (empty)
+        val id = triedId.get
+        id should not be (empty)
 
-      val i = identifiersTable.i
-      val maybeIdentifier = withSQL {
+        val i = identifiersTable.i
+        val maybeIdentifier = withSQL {
 
-        select
-          .from(identifiersTable as i)
-          .where
-          .eq(i.SourceId, miroId)
+          select
+            .from(identifiersTable as i)
+            .where
+            .eq(i.SourceId, miroId)
 
-      }.map(Identifier(i)).single.apply()
+        }.map(Identifier(i)).single.apply()
 
-      maybeIdentifier shouldBe defined
-      maybeIdentifier.get shouldBe Identifier(
-        CanonicalId = id,
-        SourceSystem = IdentifierType("miro-image-number").id,
-        SourceId = miroId,
-        OntologyType = ontologyType
-      )
+        maybeIdentifier shouldBe defined
+        maybeIdentifier.get shouldBe Identifier(
+          CanonicalId = id,
+          SourceSystem = IdentifierType("miro-image-number").id,
+          SourceId = miroId,
+          OntologyType = ontologyType
+        )
     }
   }
 }
