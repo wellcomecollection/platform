@@ -6,13 +6,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.models.matcher.MatchedIdentifiers
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{
-  IdentifierList,
-  LinkedWorksIdentifiersList
-}
+import uk.ac.wellcome.platform.matcher.models.LinkedWorksIdentifiersList
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -36,7 +34,7 @@ class MatcherMessageReceiverTest
               assertMessageSent(
                 topic,
                 LinkedWorksIdentifiersList(
-                  Set(IdentifierList(Set("sierra-system-number/id"))))
+                  Set(MatchedIdentifiers(Set("sierra-system-number/id"))))
               )
             }
           }
@@ -62,7 +60,7 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(Set(IdentifierList(
+                LinkedWorksIdentifiersList(Set(MatchedIdentifiers(
                   Set("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
@@ -93,7 +91,7 @@ class MatcherMessageReceiverTest
                 topic,
                 LinkedWorksIdentifiersList(
                   Set(
-                    IdentifierList(
+                    MatchedIdentifiers(
                       Set(
                         "sierra-system-number/A",
                         "sierra-system-number/B"
@@ -112,7 +110,7 @@ class MatcherMessageReceiverTest
                   topic,
                   LinkedWorksIdentifiersList(
                     Set(
-                      IdentifierList(
+                      MatchedIdentifiers(
                         Set(
                           "sierra-system-number/A",
                           "sierra-system-number/B",
@@ -147,7 +145,7 @@ class MatcherMessageReceiverTest
                 topic,
                 LinkedWorksIdentifiersList(
                   Set(
-                    IdentifierList(
+                    MatchedIdentifiers(
                       Set(
                         "sierra-system-number/A",
                         "sierra-system-number/B"
@@ -166,10 +164,10 @@ class MatcherMessageReceiverTest
                   topic,
                   LinkedWorksIdentifiersList(
                     Set(
-                      IdentifierList(Set(
+                      MatchedIdentifiers(Set(
                         "sierra-system-number/A"
                       )),
-                      IdentifierList(Set(
+                      MatchedIdentifiers(Set(
                         "sierra-system-number/B"
                       ))
                     ))
