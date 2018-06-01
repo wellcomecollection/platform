@@ -182,7 +182,8 @@ trait SQS extends Matchers {
         Message = messageBody
       )
 
-    def apply[T](testObject: T)(implicit encoder: Encoder[T]): NotificationMessage =
+    def apply[T](testObject: T)(
+      implicit encoder: Encoder[T]): NotificationMessage =
       TestNotificationMessage(toJson(testObject).get)
   }
 
