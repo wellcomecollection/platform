@@ -194,8 +194,7 @@ class SierraBibMergerFeatureTest
               )
 
               hybridStore
-                .updateRecord(oldRecord.id)(oldRecord)((t, _) => t)(
-                  SourceMetadata(oldRecord.sourceName))
+                .updateRecord(oldRecord.id)((oldRecord, SourceMetadata(oldRecord.sourceName)))((t, m) => (t, m))
                 .map { _ =>
                   sendMessageToSQS(toJson(record).get, queue)
                 }
@@ -253,8 +252,8 @@ class SierraBibMergerFeatureTest
 
               hybridStore
                 .updateRecord(expectedSierraTransformable.id)(
-                  expectedSierraTransformable)((t, _) => t)(
-                  SourceMetadata(expectedSierraTransformable.sourceName))
+                  (expectedSierraTransformable, SourceMetadata(expectedSierraTransformable.sourceName)))(
+                    (t, m) => (t, m))
                 .map { _ =>
                   sendMessageToSQS(toJson(record).get, queue)
                 }
@@ -299,8 +298,9 @@ class SierraBibMergerFeatureTest
               )
 
               val future =
-                hybridStore.updateRecord(newRecord.id)(newRecord)((t, _) => t)(
-                  SourceMetadata(newRecord.sourceName))
+                hybridStore.updateRecord(newRecord.id)(
+                  (newRecord, SourceMetadata(newRecord.sourceName)))(
+                  (t, m) => (t,m))
 
               future.map { _ =>
                 sendMessageToSQS(toJson(record).get, queue)

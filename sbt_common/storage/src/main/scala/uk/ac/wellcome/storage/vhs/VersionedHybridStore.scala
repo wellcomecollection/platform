@@ -3,6 +3,7 @@ package uk.ac.wellcome.storage.vhs
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
 import uk.ac.wellcome.storage.type_classes._
@@ -17,7 +18,7 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
   s3ObjectStore: Store,
   dynamoDbClient: AmazonDynamoDB
-) {
+) extends Logging {
   val versionedDao = new VersionedDao(
     dynamoDbClient = dynamoDbClient,
     dynamoConfig = vhsConfig.dynamoConfig
@@ -35,8 +36,8 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   // The HybridRecordEnricher combines this with the HybridRecord, and stores
   // both of them as a single row in DynamoDB.
   //
-  def updateRecord[DynamoRow](id: String)(ifNotExisting: => T)(
-    ifExisting: (T, Metadata) => T)(metadata: Metadata)(
+  def updateRecord[DynamoRow](id: String)(ifNotExisting: => (T, Metadata))(
+    ifExisting: (T, Metadata) => (T, Metadata))(
     implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
     dynamoFormat: DynamoFormat[DynamoRow],
     versionUpdater: VersionUpdater[DynamoRow],
@@ -53,33 +54,37 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
             storedHybridRecord,
             storedS3Record,
             storedMetadata)) =>
-        val transformedS3Record = ifExisting(storedS3Record, storedMetadata)
+        debug(s"Existing object $id")
+        val (transformedS3Record, transformedMetadata) = ifExisting(storedS3Record, storedMetadata)
 
-        if (transformedS3Record != storedS3Record) {
+        if (transformedS3Record != storedS3Record || transformedMetadata != storedMetadata ) {
+          debug("existing object changed, updating")
           putObject(
             id,
             transformedS3Record,
             enricher
               .enrichedHybridRecordHList(
                 id = id,
-                metadata = metadata,
+                metadata = transformedMetadata,
                 version = storedHybridRecord.version)
           )
         } else {
+          debug("existing object unchanged, not updating")
           Future.successful(())
         }
-
       case None =>
+        debug("NotExisting object")
+        val (s3Record, metadata) = ifNotExisting
+        debug(s"creating $id")
         putObject(
           id = id,
-          ifNotExisting,
+          s3Record,
           enricher.enrichedHybridRecordHList(
             id = id,
             metadata = metadata,
             version = 0
           )
         )
-
     }
   }
 

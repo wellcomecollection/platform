@@ -63,7 +63,6 @@ trait LocalVersionedHybridStore
       s3ObjectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
-
     testWith(store)
   }
 
@@ -92,7 +91,6 @@ trait LocalVersionedHybridStore
       s3ObjectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
-
     testWith(store)
   }
 
@@ -119,7 +117,6 @@ trait LocalVersionedHybridStore
       s3ObjectStore = s3ObjectStore,
       dynamoDbClient = dynamoDbClient
     )
-
     testWith(store)
   }
 
@@ -131,19 +128,31 @@ trait LocalVersionedHybridStore
     )
 
   def getJsonFor[T <: Id](bucket: Bucket, table: Table, record: T) = {
-    val hybridRecord = getHybridRecord(bucket, table, record.id)
+    val hybridRecord = getHybridRecord(table, record.id)
 
     getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
   }
 
   def getContentFor(bucket: Bucket, table: Table, id: String) = {
-    val hybridRecord = getHybridRecord(bucket, table, id)
+    val hybridRecord = getHybridRecord(table, id)
 
     getContentFromS3(bucket, hybridRecord.s3key)
   }
 
-  private def getHybridRecord(bucket: Bucket, table: Table, id: String) =
+  protected def getHybridRecord(table: Table, id: String): HybridRecord =
     Scanamo.get[HybridRecord](dynamoDbClient)(table.name)('id -> id) match {
+      case None => throw new RuntimeException(s"No object with id $id found!")
+      case Some(read) =>
+        read match {
+          case Left(error) =>
+            throw new RuntimeException(s"Error reading from dynamo: $error")
+          case Right(record) => record
+        }
+    }
+
+  protected def getRecordMetadata[T](table: Table, id: String)
+                                  (implicit dynamoFormat: DynamoFormat[T])=
+    Scanamo.get[T](dynamoDbClient)(table.name)('id -> id) match {
       case None => throw new RuntimeException(s"No object with id $id found!")
       case Some(read) =>
         read match {
