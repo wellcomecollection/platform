@@ -30,7 +30,8 @@ class LinkedWorkMatcherTest
             identifiersList =>
               val workId = "sierra-system-number/id"
               identifiersList shouldBe
-                LinkedWorksIdentifiersList(Set(MatchedIdentifiers(Set(workId))))
+                LinkedWorksIdentifiersList(
+                  Set(MatchedIdentifiers(Set(workId))))
 
               val savedLinkedWork = Scanamo
                 .get[WorkNode](dynamoDbClient)(table.name)('id -> workId)
