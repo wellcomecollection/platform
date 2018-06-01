@@ -73,7 +73,7 @@ class ReindexWorkerServiceTest
     testWith: TestWith[ReindexService, R]) = {
     val reindexService = new ReindexService(
       dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(table = table.name, index = table.index)
+      dynamoConfig = DynamoConfig(table = table.name, index = table.index),
       metricsSender = metricsSender
     )
     testWith(reindexService)
