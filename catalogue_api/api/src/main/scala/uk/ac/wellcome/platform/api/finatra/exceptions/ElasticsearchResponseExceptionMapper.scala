@@ -7,18 +7,16 @@ import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
 import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
 import org.elasticsearch.client.ResponseException
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{DisplayError, Error}
+import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}
 import uk.ac.wellcome.platform.api.responses.ResultResponse
 
 @Singleton
 class ElasticsearchResponseExceptionMapper @Inject()(
   response: ResponseBuilder,
-  @Flag("api.context.suffix") apiContextSuffix: String,
-  @Flag("api.host") apiHost: String,
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.scheme") apiScheme: String)
+  apiConfig: ApiConfig)
     extends ExceptionMapper[ResponseException]
     with Logging {
 
@@ -37,15 +35,10 @@ class ElasticsearchResponseExceptionMapper @Inject()(
   override def toResponse(request: Request,
                           exception: ResponseException): Response = {
     val result = toError(exception = exception)
-    val version = getVersion(request, s"$apiPrefix")
+    val version = getVersion(request, apiPrefix = apiConfig.pathPrefix)
 
     val errorResponse = ResultResponse(
-      context = buildContextUri(
-        apiScheme,
-        apiHost,
-        apiPrefix,
-        version,
-        apiContextSuffix),
+      context = buildContextUri(apiConfig = apiConfig, version = version),
       result = result)
     result.httpStatus.get match {
       case 500 => response.internalServerError.json(errorResponse)
