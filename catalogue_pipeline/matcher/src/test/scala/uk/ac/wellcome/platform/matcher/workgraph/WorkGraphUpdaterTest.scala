@@ -56,7 +56,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
       assertWorkGraphUpdaterBehavesCorrectly(
         workUpdate = WorkUpdate("B", Set("C")),
         existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B"))),
-        expectedNodes =  Set(
+        expectedNodes = Set(
           WorkNode("A", List("B"), "A+B+C"),
           WorkNode("B", List("C"), "A+B+C"),
           WorkNode("C", List(), "A+B+C")
@@ -67,10 +67,11 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B, C->D with B->C gives A+B+C+D:(A->B, B->C, C->D, D)") {
       assertWorkGraphUpdaterBehavesCorrectly(
         workUpdate = WorkUpdate("B", Set("C")),
-        existingGraph = WorkGraph(Set(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("C", List("D"), "C+D")
-        )),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("C", List("D"), "C+D")
+          )),
         expectedNodes = Set(
           WorkNode("A", List("B"), "A+B+C+D"),
           WorkNode("B", List("C"), "A+B+C+D"),
@@ -96,10 +97,11 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating A->B->C with A->C gives A+B+C:(A->B, B->C, C->A") {
       assertWorkGraphUpdaterBehavesCorrectly(
         workUpdate = WorkUpdate("C", Set("A")),
-        existingGraph = WorkGraph(Set(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("B", List("C"), "B+C")
-        )),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("B", List("C"), "B+C")
+          )),
         expectedNodes = Set(
           WorkNode("A", List("B"), "A+B+C"),
           WorkNode("B", List("C"), "A+B+C"),
@@ -113,10 +115,11 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
     it("updating  A->B, B with A gives A:A and B:B") {
       assertWorkGraphUpdaterBehavesCorrectly(
         workUpdate = WorkUpdate("A", Set.empty),
-        existingGraph = WorkGraph(Set(
-          WorkNode("A", List("B"), "A+B"),
-          WorkNode("B", List(), "A+B")
-        )),
+        existingGraph = WorkGraph(
+          Set(
+            WorkNode("A", List("B"), "A+B"),
+            WorkNode("B", List(), "A+B")
+          )),
         expectedNodes = Set(
           WorkNode("A", List(), "A"),
           WorkNode("B", List(), "B")
@@ -126,45 +129,47 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers {
 
     it(
       "updating A->B with A but NO B (*should* not be possible) gives A:A and B:B") {
-        assertWorkGraphUpdaterBehavesCorrectly(
-          workUpdate = WorkUpdate("A", Set.empty),
-          existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B"))),
-          expectedNodes = Set(
-            WorkNode("A", List(), "A"),
-            WorkNode("B", List(), "B")
-          )
+      assertWorkGraphUpdaterBehavesCorrectly(
+        workUpdate = WorkUpdate("A", Set.empty),
+        existingGraph = WorkGraph(Set(WorkNode("A", List("B"), "A+B"))),
+        expectedNodes = Set(
+          WorkNode("A", List(), "A"),
+          WorkNode("B", List(), "B")
         )
-      }
+      )
+    }
 
-      it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
-        assertWorkGraphUpdaterBehavesCorrectly(
-          workUpdate = WorkUpdate("B", Set.empty),
-          existingGraph = WorkGraph(Set(
+    it("updating A->B->C with B gives A+B:(A->B, B) and C:C") {
+      assertWorkGraphUpdaterBehavesCorrectly(
+        workUpdate = WorkUpdate("B", Set.empty),
+        existingGraph = WorkGraph(
+          Set(
             WorkNode("A", List("B"), "A+B+C"),
             WorkNode("B", List("C"), "A+B+C")
           )),
-          expectedNodes = Set(
-            WorkNode("A", List("B"), "A+B"),
-            WorkNode("B", List(), "A+B"),
-            WorkNode("C", List(), "C")
-          )
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B"),
+          WorkNode("B", List(), "A+B"),
+          WorkNode("C", List(), "C")
         )
-      }
+      )
+    }
 
-      it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
-        assertWorkGraphUpdaterBehavesCorrectly(
-          workUpdate = WorkUpdate("B", Set("C")),
-          existingGraph = WorkGraph(Set(
+    it("updating A<->B->C with B->C gives A+B+C:(A->B, B->C, C)") {
+      assertWorkGraphUpdaterBehavesCorrectly(
+        workUpdate = WorkUpdate("B", Set("C")),
+        existingGraph = WorkGraph(
+          Set(
             WorkNode("A", List("B"), "A+B+C"),
             WorkNode("B", List("A", "C"), "A+B+C"),
             WorkNode("C", List(), "A+B+C")
           )),
-          expectedNodes = Set(
-            WorkNode("A", List("B"), "A+B+C"),
-            WorkNode("B", List("C"), "A+B+C"),
-            WorkNode("C", List(), "A+B+C")
-          )
+        expectedNodes = Set(
+          WorkNode("A", List("B"), "A+B+C"),
+          WorkNode("B", List("C"), "A+B+C"),
+          WorkNode("C", List(), "A+B+C")
         )
+      )
     }
   }
 
