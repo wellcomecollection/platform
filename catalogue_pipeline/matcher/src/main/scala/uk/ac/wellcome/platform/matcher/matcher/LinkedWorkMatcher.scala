@@ -15,12 +15,14 @@ class LinkedWorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
 
   private def matchLinkedWorks(
     work: UnidentifiedWork): Future[Set[IdentifierList]] = {
-    val workNodeUpdate = WorkUpdate(work)
+    val workUpdate = WorkUpdate(work)
 
     for {
-      existingGraph <- workGraphStore.findAffectedWorks(workNodeUpdate)
-      updatedGraph = WorkGraphUpdater.update(workNodeUpdate,
-        existingGraph = existingGraph)
+      existingGraph <- workGraphStore.findAffectedWorks(workUpdate)
+      updatedGraph = WorkGraphUpdater.update(
+        workUpdate = workUpdate,
+        existingGraph = existingGraph
+      )
       _ <- workGraphStore.put(updatedGraph)
 
     } yield {
