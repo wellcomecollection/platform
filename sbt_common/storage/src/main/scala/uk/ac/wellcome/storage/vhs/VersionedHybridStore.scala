@@ -36,6 +36,9 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
   // The HybridRecordEnricher combines this with the HybridRecord, and stores
   // both of them as a single row in DynamoDB.
   //
+  // Update and version logic (e.g., do not store this record if a newer record already exists)
+  // is handled through the mappings ifNotExisting and ifExisting
+  //
   def updateRecord[DynamoRow](id: String)(ifNotExisting: => (T, Metadata))(
     ifExisting: (T, Metadata) => (T, Metadata))(
     implicit enricher: HybridRecordEnricher.Aux[Metadata, DynamoRow],
