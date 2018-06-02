@@ -5,7 +5,6 @@ import scalikejdbc._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.idminter.fixtures
-import uk.ac.wellcome.platform.idminter.fixtures.DatabaseConfig
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
 
