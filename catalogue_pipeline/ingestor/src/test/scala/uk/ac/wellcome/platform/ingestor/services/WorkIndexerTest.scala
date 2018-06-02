@@ -44,11 +44,13 @@ class WorkIndexerTest
       withWorkIndexerFixtures[Assertion](esType, elasticClient) {
         workIndexer =>
           val future = Future.sequence(
-            (1 to 2).map(_ => workIndexer.indexWork(
-              work = work,
-              esIndex = indexName,
-              esType = esType
-            ))
+            (1 to 2).map(
+              _ =>
+                workIndexer.indexWork(
+                  work = work,
+                  esIndex = indexName,
+                  esType = esType
+              ))
           )
 
           whenReady(future) { _ =>
