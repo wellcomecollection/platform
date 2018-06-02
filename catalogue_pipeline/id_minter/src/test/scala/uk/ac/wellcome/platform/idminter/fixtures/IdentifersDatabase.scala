@@ -120,7 +120,6 @@ trait IdentifiersDatabase
     val tableName: String = alphabetic take 10 mkString
 
     val identifiersDatabase: SQLSyntax = SQLSyntax.createUnsafely(databaseName)
-    val identifiersTable: SQLSyntax = SQLSyntax.createUnsafely(tableName)
 
     val identifiersTableConfig = IdentifiersTableConfig(
       database = databaseName,
