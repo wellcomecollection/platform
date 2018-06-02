@@ -43,8 +43,10 @@ class IdMinterWorkerTest
               modifyServer = (server: EmbeddedHttpServer) => {
                 server.bind[IdentifiersDao].toInstance(identifiersDao)
               }) { _ =>
-              val database: SQLSyntax = SQLSyntax.createUnsafely(identifiersTableConfig.database)
-              val table: SQLSyntax = SQLSyntax.createUnsafely(identifiersTableConfig.tableName)
+              val database: SQLSyntax =
+                SQLSyntax.createUnsafely(identifiersTableConfig.database)
+              val table: SQLSyntax =
+                SQLSyntax.createUnsafely(identifiersTableConfig.tableName)
 
               eventually {
                 val fields = DB readOnly { implicit session =>
