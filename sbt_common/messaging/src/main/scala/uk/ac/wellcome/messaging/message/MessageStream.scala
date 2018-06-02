@@ -5,27 +5,22 @@ import akka.actor.ActorSystem
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.google.inject.Inject
-import io.circe.{Decoder, Encoder}
+import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
 import scala.concurrent.Future
 
-class MessageStream[T] @Inject()(actorSystem: ActorSystem,
-                                 sqsClient: AmazonSQSAsync,
-                                 s3Client: AmazonS3,
-                                 messageReaderConfig: MessageReaderConfig,
-                                 metricsSender: MetricsSender)(
-  implicit encoder: Encoder[T],
-  decoder: Decoder[T]) {
-
-  private val s3TypeStore = new S3TypeStore[T](
-    s3Client = s3Client
-  )
+class MessageStream[T] @Inject()(
+  actorSystem: ActorSystem,
+  sqsClient: AmazonSQSAsync,
+  s3Client: AmazonS3,
+  messageReaderConfig: MessageReaderConfig,
+  metricsSender: MetricsSender)(implicit objectStore: ObjectStore[T]) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,
@@ -48,7 +43,7 @@ class MessageStream[T] @Inject()(actorSystem: ActorSystem,
     for {
       messagePointer <- Future.fromTry(
         fromJson[MessagePointer](notification.Message))
-      deserialisedObject <- s3TypeStore.get(messagePointer.src)
+      deserialisedObject <- objectStore.get(messagePointer.src)
       _ <- process(deserialisedObject)
     } yield ()
 }

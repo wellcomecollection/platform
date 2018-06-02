@@ -17,7 +17,7 @@ import uk.ac.wellcome.finatra.storage.{
   S3ClientModule,
   VHSConfigModule
 }
-import uk.ac.wellcome.platform.sierra_bib_merger.modules.SierraBibMergerModule
+import uk.ac.wellcome.platform.sierra_bib_merger.modules._
 import uk.ac.wellcome.sierra_adapter.modules.SierraTransformableModule
 
 object ServerMain extends Server
@@ -28,8 +28,9 @@ class Server extends HttpServer {
   override val modules = Seq(
     VHSConfigModule,
     DynamoClientModule,
-    SierraBibMergerModule,
     SierraTransformableModule,
+    SierraBibMergerModule,
+    ExecutionContextModule,
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,

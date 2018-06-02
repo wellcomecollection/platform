@@ -24,6 +24,7 @@ import uk.ac.wellcome.finatra.storage.{
   S3ConfigModule
 }
 import uk.ac.wellcome.platform.matcher.modules.{
+  ExecutionContextModule,
   MatcherModule,
   RecorderWorkEntryModule
 }
@@ -45,6 +46,7 @@ class Server extends HttpServer {
     DynamoClientModule,
     MatcherModule,
     RecorderWorkEntryModule,
+    ExecutionContextModule,
     AkkaModule
   )
 

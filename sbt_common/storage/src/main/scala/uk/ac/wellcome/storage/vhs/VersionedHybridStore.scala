@@ -3,19 +3,28 @@ package uk.ac.wellcome.storage.vhs
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import com.gu.scanamo.DynamoFormat
-import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.{S3ObjectLocation, S3ObjectStore}
+
 import uk.ac.wellcome.storage.type_classes._
 import uk.ac.wellcome.storage.type_classes.Migration._
+
+import uk.ac.wellcome.storage.dynamo.{UpdateExpressionGenerator, VersionedDao}
+import uk.ac.wellcome.storage.type_classes.{
+  HybridRecordEnricher,
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
+import uk.ac.wellcome.storage.type_classes._
 import uk.ac.wellcome.storage.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.{KeyPrefix, ObjectLocation, ObjectStore}
 
 import scala.concurrent.Future
 
 case class EmptyMetadata()
 
-class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
+class VersionedHybridStore[T, Metadata, Store <: ObjectStore[T]] @Inject()(
   vhsConfig: VHSConfig,
-  s3ObjectStore: Store,
+  objectStore: Store,
   dynamoDbClient: AmazonDynamoDB
 ) {
   val versionedDao = new VersionedDao(
@@ -107,13 +116,13 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
     updateExpressionGenerator: UpdateExpressionGenerator[DynamoRow]
   ) = {
 
-    val futureUri = s3ObjectStore.put(vhsConfig.s3Config.bucketName)(
+    val futureUri = objectStore.put(vhsConfig.s3Config.bucketName)(
       t,
-      keyPrefix = buildKeyPrefix(id)
+      keyPrefix = KeyPrefix(buildKeyPrefix(id))
     )
 
     futureUri.flatMap {
-      case S3ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
+      case ObjectLocation(_, key) => versionedDao.updateRecord(f(key))
     }
   }
 
@@ -146,10 +155,10 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
         val hybridRecord = dynamoRow.migrateTo[HybridRecord]
         val metadata = dynamoRow.migrateTo[Metadata]
 
-        s3ObjectStore
+        objectStore
           .get(
-            S3ObjectLocation(
-              bucket = vhsConfig.s3Config.bucketName,
+            ObjectLocation(
+              namespace = vhsConfig.s3Config.bucketName,
               key = hybridRecord.s3key
             )
           )

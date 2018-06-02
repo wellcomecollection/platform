@@ -5,6 +5,7 @@ import io.circe.generic.extras.{AutoDerivation, Configuration}
 import io.circe.java8.time.TimeInstances
 import io.circe.parser._
 import io.circe.syntax._
+import io.circe._
 import io.circe.{Decoder, Encoder, Json}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 

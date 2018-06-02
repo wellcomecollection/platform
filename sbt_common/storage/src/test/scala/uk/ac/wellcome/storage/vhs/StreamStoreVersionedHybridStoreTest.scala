@@ -1,9 +1,11 @@
 package uk.ac.wellcome.storage.vhs
 
 import java.io.{ByteArrayInputStream, InputStream}
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.storage.s3.S3StreamStore
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -11,7 +13,6 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class StreamStoreVersionedHybridStoreTest
@@ -26,13 +27,45 @@ class StreamStoreVersionedHybridStoreTest
   private def stringify(is: InputStream) =
     scala.io.Source.fromInputStream(is).mkString
 
-  def withS3StreamStoreFixtures[R](
+  def withStreamVHS[Metadata, R](
+    bucket: Bucket,
+    table: Table,
+    globalS3Prefix: String = defaultGlobalS3Prefix)(
     testWith: TestWith[
-      (Bucket,
-       Table,
-       VersionedHybridStore[InputStream, EmptyMetadata, S3StreamStore]),
-      R]
-  ): R =
+      VersionedHybridStore[InputStream, Metadata, ObjectStore[InputStream]],
+      R])(
+    implicit objectStore: ObjectStore[InputStream]
+  ): R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+
+    val dynamoConfig =
+      DynamoConfig(table = table.name, index = Some(table.index))
+
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
+    )
+
+    val store = new VersionedHybridStore[
+      InputStream,
+      Metadata,
+      ObjectStore[InputStream]](
+      vhsConfig = vhsConfig,
+      objectStore = objectStore,
+      dynamoDbClient = dynamoDbClient
+    )
+
+    testWith(store)
+  }
+
+  def withS3StreamStoreFixtures[R](
+    testWith: TestWith[(Bucket,
+                        Table,
+                        VersionedHybridStore[InputStream,
+                                             EmptyMetadata,
+                                             ObjectStore[InputStream]]),
+                       R]): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
         withStreamVHS[EmptyMetadata, R](bucket, table) { vhs =>

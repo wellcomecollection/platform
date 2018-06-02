@@ -22,6 +22,7 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -30,6 +31,8 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationMessageReceiverTest
     extends FunSpec
@@ -67,6 +70,9 @@ class NotificationMessageReceiverTest
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
+
+    // Required for MessageWriter
+    implicit val storageBackend = new S3StorageBackend(s3Client)
 
     val messageWriter =
       new MessageWriter[UnidentifiedWork](
