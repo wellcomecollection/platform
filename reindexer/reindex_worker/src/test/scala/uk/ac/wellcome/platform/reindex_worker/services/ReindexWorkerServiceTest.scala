@@ -13,7 +13,7 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
@@ -72,15 +72,9 @@ class ReindexWorkerServiceTest
   def withReindexService[R](metricsSender: MetricsSender, table: Table)(
     testWith: TestWith[ReindexService, R]) = {
     val reindexService = new ReindexService(
-      dynamoDBClient = dynamoDbClient,
-      metricsSender = metricsSender,
-      versionedDao = new VersionedDao(
-        dynamoDbClient = dynamoDbClient,
-        dynamoConfig =
-          DynamoConfig(table = table.name, index = Some(table.index))
-      ),
-      dynamoConfig =
-        DynamoConfig(table = table.name, index = Some(table.index))
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(table = table.name, index = table.index),
+      metricsSender = metricsSender
     )
     testWith(reindexService)
   }

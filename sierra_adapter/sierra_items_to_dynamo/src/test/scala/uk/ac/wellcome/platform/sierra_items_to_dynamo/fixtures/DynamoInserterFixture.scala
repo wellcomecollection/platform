@@ -13,7 +13,7 @@ trait DynamoInserterFixture extends LocalDynamoDbVersioned {
     val dynamoInserter = new DynamoInserter(
       new VersionedDao(
         dynamoDbClient,
-        dynamoConfig = DynamoConfig(table.name, Some(table.index))
+        dynamoConfig = DynamoConfig(table = table.name, index = table.index)
       )
     )
 

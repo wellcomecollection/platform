@@ -47,7 +47,7 @@ trait LocalVersionedHybridStore
     implicit encoder: Encoder[T],
     decoder: Decoder[T]): R = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val dynamoConfig = DynamoConfig(table = table.name, Some(table.index))
+    val dynamoConfig = DynamoConfig(table = table.name, index = table.index)
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,
@@ -74,8 +74,7 @@ trait LocalVersionedHybridStore
     : R = {
     val s3Config = S3Config(bucketName = bucket.name)
 
-    val dynamoConfig =
-      DynamoConfig(table = table.name, index = Some(table.index))
+    val dynamoConfig = DynamoConfig(table = table.name, index = table.index)
 
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
@@ -102,8 +101,7 @@ trait LocalVersionedHybridStore
     testWith: TestWith[VersionedHybridStore[String, M, S3StringStore], R])
     : R = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val dynamoConfig =
-      DynamoConfig(table = table.name, index = Some(table.index))
+    val dynamoConfig = DynamoConfig(table = table.name, index = table.index)
     val vhsConfig = VHSConfig(
       dynamoConfig = dynamoConfig,
       s3Config = s3Config,

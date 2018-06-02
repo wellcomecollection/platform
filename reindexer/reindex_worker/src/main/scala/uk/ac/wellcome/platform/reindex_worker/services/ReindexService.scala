@@ -18,64 +18,57 @@ import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
 
 import scala.concurrent.Future
 
-class ReindexService @Inject()(dynamoDBClient: AmazonDynamoDB,
-                               metricsSender: MetricsSender,
-                               versionedDao: VersionedDao,
-                               dynamoConfig: DynamoConfig)
+class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
+                               dynamoConfig: DynamoConfig,
+                               metricsSender: MetricsSender)
     extends Logging {
 
-  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
-    info(s"ReindexService running $reindexJob")
+  val versionedDao = new VersionedDao(
+    dynamoDbClient = dynamoDbClient,
+    dynamoConfig = dynamoConfig
+  )
 
-    val table = Table[ReindexRecord](dynamoConfig.table)
+  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] =
+    Future {
+      info(s"ReindexService running $reindexJob")
 
-    val index = table.index(dynamoConfig.index.get)
+      val table = Table[ReindexRecord](dynamoConfig.table)
 
-    // We start by querying DynamoDB for every record in the reindex shard
-    // that has an out-of-date reindexVersion.  If a shard was especially
-    // large, this might cause out-of-memory errors -- in practice, we're
-    // hoping that the shards/individual records are small enough for this
-    // not to be a problem.
-    val futureResults: Future[List[Either[DynamoReadError, ReindexRecord]]] =
-      Future {
-        Scanamo.exec(dynamoDBClient)(
+      val index = table.index(indexName = dynamoConfig.index)
+
+      // We start by querying DynamoDB for every record in the reindex shard
+      // that has an out-of-date reindexVersion.  If a shard was especially
+      // large, this might cause out-of-memory errors -- in practice, we're
+      // hoping that the shards/individual records are small enough for this
+      // not to be a problem.
+      val results: List[Either[DynamoReadError, ReindexRecord]] =
+        Scanamo.exec(dynamoDbClient)(
           index.query(
             'reindexShard -> reindexJob.shardId and
               KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
           )
         )
+
+      val outdatedRecords: List[ReindexRecord] = results.map {
+        case Left(err: DynamoReadError) => {
+          warn(s"Failed to read Dynamo records: $err")
+          throw GracefulFailureException(
+            new RuntimeException(s"Error in the DynamoDB query: $err")
+          )
+        }
+        case Right(r: ReindexRecord) => r
       }
 
-    val futureOutdatedRecords: Future[List[ReindexRecord]] =
-      futureResults.map { results =>
-        results.map { extractRecord(_) }
-      }
-
-    // Then we PUT all the records.  It might be more efficient to do a
-    // bulk update, but this will do for now.
-    futureOutdatedRecords.flatMap { (outdatedRecords: List[ReindexRecord]) =>
-      Future.sequence(outdatedRecords.map {
-        updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
-      })
+      // Then we PUT all the records.  It might be more efficient to do a
+      // bulk update, but this will do for now.
+      outdatedRecords
+        .map { record: ReindexRecord =>
+          val updatedRecord =
+            record.copy(reindexVersion = reindexJob.desiredVersion)
+          versionedDao.updateRecord[ReindexRecord](updatedRecord)
+        }
+        .map { _ =>
+          ()
+        }
     }
-  }
-
-  private def extractRecord(
-    scanamoResult: Either[DynamoReadError, ReindexRecord]): ReindexRecord =
-    scanamoResult match {
-      case Left(err: DynamoReadError) => {
-        warn(s"Failed to read Dynamo records: $err")
-        throw GracefulFailureException(
-          new RuntimeException(s"Error in the DynamoDB query: $err")
-        )
-      }
-      case Right(r: ReindexRecord) => r
-    }
-
-  private def updateIndividualRecord(record: ReindexRecord,
-                                     desiredVersion: Int): Future[Unit] = {
-    val updatedRecord = record.copy(reindexVersion = desiredVersion)
-
-    versionedDao.updateRecord[ReindexRecord](updatedRecord)
-  }
 }

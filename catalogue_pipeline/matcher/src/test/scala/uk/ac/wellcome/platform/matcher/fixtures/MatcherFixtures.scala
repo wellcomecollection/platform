@@ -116,7 +116,8 @@ trait MatcherFixtures
   def withWorkNodeDao[R](table: Table)(testWith: TestWith[WorkNodeDao, R]): R = {
     val workNodeDao = new WorkNodeDao(
       dynamoDbClient,
-      DynamoConfig(table.name, Some(table.index)))
+      DynamoConfig(table = table.name, index = table.index)
+    )
     testWith(workNodeDao)
   }
 
