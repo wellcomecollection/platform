@@ -35,8 +35,6 @@ trait S3 extends Logging with Eventually {
   protected val accessKey = "accessKey1"
   protected val secretKey = "verySecretKey1"
 
-  implicit val storageBackend = new S3StorageBackend(s3Client)
-
   def s3LocalFlags(bucket: Bucket) = s3ClientLocalFlags ++ Map(
     "aws.s3.bucketName" -> bucket.name
   )
@@ -54,6 +52,8 @@ trait S3 extends Logging with Eventually {
     accessKey = accessKey,
     secretKey = secretKey
   )
+
+  implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withLocalS3Bucket[R] =
     fixture[Bucket, R](
