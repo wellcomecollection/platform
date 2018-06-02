@@ -71,7 +71,11 @@ class WorkIndexerTest
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
-        val future = workIndexer.indexWork(olderWork, indexName)
+        val future = workIndexer.indexWork(
+          work = olderWork,
+          esIndex = indexName,
+          esType = esType
+        )
 
         whenReady(future) { _ =>
           // Give Elasticsearch enough time to ingest the work
