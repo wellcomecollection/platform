@@ -28,7 +28,7 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
     dynamoConfig = dynamoConfig
   )
 
-  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
+  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = Future.sequence {
     info(s"ReindexService running $reindexJob")
 
     val table = Table[ReindexRecord](dynamoConfig.table)
@@ -40,33 +40,15 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
     // large, this might cause out-of-memory errors -- in practice, we're
     // hoping that the shards/individual records are small enough for this
     // not to be a problem.
-    val futureResults: Future[List[Either[DynamoReadError, ReindexRecord]]] =
-      Future {
-        Scanamo.exec(dynamoDbClient)(
-          index.query(
-            'reindexShard -> reindexJob.shardId and
-              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
-          )
+    val results: List[Either[DynamoReadError, ReindexRecord]] =
+      Scanamo.exec(dynamoDbClient)(
+        index.query(
+          'reindexShard -> reindexJob.shardId and
+            KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
         )
-      }
+      )
 
-    val futureOutdatedRecords: Future[List[ReindexRecord]] =
-      futureResults.map { results =>
-        results.map { extractRecord(_) }
-      }
-
-    // Then we PUT all the records.  It might be more efficient to do a
-    // bulk update, but this will do for now.
-    futureOutdatedRecords.flatMap { (outdatedRecords: List[ReindexRecord]) =>
-      Future.sequence(outdatedRecords.map {
-        updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
-      })
-    }
-  }
-
-  private def extractRecord(
-    scanamoResult: Either[DynamoReadError, ReindexRecord]): ReindexRecord =
-    scanamoResult match {
+    val outdatedRecords: List[ReindexRecord] = results.map {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
         throw GracefulFailureException(
@@ -76,10 +58,11 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       case Right(r: ReindexRecord) => r
     }
 
-  private def updateIndividualRecord(record: ReindexRecord,
-                                     desiredVersion: Int): Future[Unit] = {
-    val updatedRecord = record.copy(reindexVersion = desiredVersion)
-
-    versionedDao.updateRecord[ReindexRecord](updatedRecord)
+    // Then we PUT all the records.  It might be more efficient to do a
+    // bulk update, but this will do for now.
+    outdatedRecords.map { record: ReindexRecord =>
+      val updatedRecord = record.copy(reindexVersion = reindexJob.desiredVersion)
+      versionedDao.updateRecord[ReindexRecord](updatedRecord)
+    }
   }
 }
