@@ -22,8 +22,9 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
-
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class IngestorWorkerServiceTest
     extends FunSpec

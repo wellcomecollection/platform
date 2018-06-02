@@ -18,6 +18,7 @@ import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.platform.ingestor.modules.{
+  ExecutionContextModule,
   IdentifiedWorkModule,
   IngestorWorkerModule,
   WorksIndexModule
@@ -37,6 +38,7 @@ class Server extends HttpServer {
     IngestorWorkerModule,
     ElasticClientModule,
     ElasticConfigModule,
+    ExecutionContextModule,
     WorksIndexModule,
     IdentifiedWorkModule
   )

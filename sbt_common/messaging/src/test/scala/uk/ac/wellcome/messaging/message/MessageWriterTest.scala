@@ -4,7 +4,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -38,7 +38,7 @@ class MessageWriterTest
             val messagePointer = pointer.get
 
             inside(messagePointer) {
-              case MessagePointer(S3ObjectLocation(bucketName, key)) => {
+              case MessagePointer(ObjectLocation(bucketName, key)) => {
                 bucketName shouldBe bucket.name
 
                 getContentFromS3(bucket, key) shouldBe toJson(message).get

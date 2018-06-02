@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.recorder
 
-import io.circe.Decoder
-import io.circe.generic.extras.semiauto.deriveDecoder
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
@@ -10,11 +8,13 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class RecorderFeatureTest
     extends FunSpec
@@ -23,9 +23,6 @@ class RecorderFeatureTest
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging {
-
-  implicit val decoder: Decoder[UnidentifiedWork] =
-    deriveDecoder[UnidentifiedWork]
 
   it("receives a transformed Work, and saves it to the VHS") {
     val title = "Not from Guildford after all"
@@ -55,8 +52,8 @@ class RecorderFeatureTest
             withServer(flags) { _ =>
               val messageBody = put[UnidentifiedWork](
                 obj = work,
-                location = S3ObjectLocation(
-                  bucket = bucket.name,
+                location = ObjectLocation(
+                  namespace = bucket.name,
                   key = "work_message.json"
                 )
               )
@@ -75,5 +72,4 @@ class RecorderFeatureTest
       }
     }
   }
-
 }

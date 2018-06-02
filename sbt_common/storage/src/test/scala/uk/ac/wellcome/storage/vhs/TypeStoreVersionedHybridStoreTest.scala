@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.vhs
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -12,7 +12,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class ExampleRecord(
@@ -34,7 +33,7 @@ class TypeStoreVersionedHybridStoreTest
                         Table,
                         VersionedHybridStore[ExampleRecord,
                                              EmptyMetadata,
-                                             S3TypeStore[ExampleRecord]]),
+                                             ObjectStore[ExampleRecord]]),
                        R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
