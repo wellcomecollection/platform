@@ -19,31 +19,17 @@ import uk.ac.wellcome.platform.api.finatra.exceptions.{
   ElasticsearchResponseExceptionMapper,
   GeneralExceptionMapper
 }
+import uk.ac.wellcome.platform.api.modules.ApiConfigModule
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(
+    ApiConfigModule,
     ElasticClientModule,
     ElasticConfigModule
   )
-
-  flag(name = "api.host", default = "localhost:8888", help = "API hostname")
-  flag(name = "api.scheme", default = "https", help = "API protocol scheme")
-  flag(name = "api.pageSize", default = 10, help = "API default page size")
-
-  private final val apiName =
-    flag(name = "api.name", default = "catalogue", help = "API name path part")
-  flag[String](
-    name = "api.prefix",
-    default = "/" + apiName(),
-    help = "API path prefix")
-
-  flag(
-    name = "api.context.suffix",
-    default = "/context.json",
-    help = "Relative API JSON-LD context")
 
   override def jacksonModule = DisplayJacksonModule
 

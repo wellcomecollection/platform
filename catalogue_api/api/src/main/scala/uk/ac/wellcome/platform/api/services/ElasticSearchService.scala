@@ -4,14 +4,17 @@ import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchResponse
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
+import uk.ac.wellcome.elasticsearch.ElasticConfig
 
 import scala.concurrent.Future
 
 @Singleton
-class ElasticSearchService @Inject()(@Flag("es.type") documentType: String,
-                                     elasticClient: HttpClient) {
+class ElasticSearchService @Inject()(elasticClient: HttpClient,
+                                     elasticConfig: ElasticConfig) {
+
+  val documentType = elasticConfig.documentType
 
   def findResultById(canonicalId: String,
                      indexName: String): Future[GetResponse] =

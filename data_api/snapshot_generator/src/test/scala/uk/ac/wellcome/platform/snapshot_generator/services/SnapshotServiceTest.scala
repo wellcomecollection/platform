@@ -67,7 +67,6 @@ class SnapshotServiceTest
       elasticClient = elasticClient,
       elasticConfig = elasticConfig,
       akkaS3Client = s3AkkaClient,
-      s3Endpoint = localS3EndpointUrl,
       objectMapper = mapper
     )
 
@@ -319,7 +318,6 @@ class SnapshotServiceTest
               elasticClient = elasticClient,
               elasticConfig = elasticConfig,
               akkaS3Client = s3Client,
-              s3Endpoint = localS3EndpointUrl,
               objectMapper = mapper
             )
             val snapshotJob = SnapshotJob(

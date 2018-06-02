@@ -1,10 +1,10 @@
 package uk.ac.wellcome.platform.api.services
 
 import com.sksamuel.elastic4s.http.search.SearchHit
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.api.models.ResultList
+import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
 import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
 @Singleton
-class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
+class WorksService @Inject()(apiConfig: ApiConfig,
                              searchService: ElasticSearchService) {
 
   def findWorkById(canonicalId: String,
@@ -26,7 +26,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
       }
 
   def listWorks(indexName: String,
-                pageSize: Int = defaultPageSize,
+                pageSize: Int = apiConfig.defaultPageSize,
                 pageNumber: Int = 1): Future[ResultList] =
     searchService
       .listResults(
@@ -46,7 +46,7 @@ class WorksService @Inject()(@Flag("api.pageSize") defaultPageSize: Int,
 
   def searchWorks(query: String,
                   indexName: String,
-                  pageSize: Int = defaultPageSize,
+                  pageSize: Int = apiConfig.defaultPageSize,
                   pageNumber: Int = 1): Future[ResultList] =
     searchService
       .simpleStringQueryResults(

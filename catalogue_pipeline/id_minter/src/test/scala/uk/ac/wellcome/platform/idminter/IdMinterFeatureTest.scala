@@ -33,13 +33,13 @@ class IdMinterFeatureTest
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
-          withIdentifiersDatabase { dbConfig =>
+          withIdentifiersDatabase { identifiersTableConfig =>
             val flags =
-              dbConfig.flags ++
+              identifiersLocalDbFlags(identifiersTableConfig) ++
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
-              eventuallyTableExists(dbConfig)
+              eventuallyTableExists(identifiersTableConfig)
 
               val miroID = "M0001234"
               val title = "A limerick about a lion"
@@ -91,10 +91,10 @@ class IdMinterFeatureTest
   it("continues if something fails processing a message") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
+        withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
             val flags =
-              dbConfig.flags ++
+              identifiersLocalDbFlags(identifiersTableConfig) ++
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>

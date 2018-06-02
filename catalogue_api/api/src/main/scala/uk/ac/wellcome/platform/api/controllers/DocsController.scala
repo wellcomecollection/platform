@@ -1,23 +1,20 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.twitter.inject.annotations.Flag
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import io.swagger.util.Json
 import io.swagger.models.{Info, Scheme, Swagger}
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.display.models.ApiVersions
+import uk.ac.wellcome.platform.api.models.ApiConfig
 
 object ApiV1Swagger extends Swagger
 object ApiV2Swagger extends Swagger
 
 @Singleton
-class DocsController @Inject()(
-  @Flag("api.scheme") apiScheme: String,
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.host") apiHost: String
-) extends Controller {
-  prefix(apiPrefix) {
+class DocsController @Inject()(apiConfig: ApiConfig) extends Controller {
+  prefix(apiConfig.pathPrefix) {
     setupSwaggerEndpoint(ApiVersions.v1, ApiV1Swagger)
     setupSwaggerEndpoint(ApiVersions.v2, ApiV2Swagger)
   }
@@ -27,16 +24,14 @@ class DocsController @Inject()(
     get(s"/$version/swagger.json") { request: Request =>
       response.ok.json(
         Json.mapper.writeValueAsString(
-          buildSwagger(swagger, apiScheme, apiHost, apiPrefix, version)))
+          buildSwagger(swagger, apiConfig = apiConfig, apiVersion = version)))
     }
   }
 
   private def buildSwagger(swagger: Swagger,
-                           apiScheme: String,
-                           apiHost: String,
-                           apiPrefix: String,
+                           apiConfig: ApiConfig,
                            apiVersion: ApiVersions.Value): Swagger = {
-    val scheme = apiScheme match {
+    val scheme = apiConfig.scheme match {
       case "https" => Scheme.HTTPS
       case _ => Scheme.HTTP
     }
@@ -47,7 +42,7 @@ class DocsController @Inject()(
         .version(apiVersion.toString)
         .title("Catalogue"))
     swagger.scheme(scheme)
-    swagger.host(apiHost)
+    swagger.host(apiConfig.host)
     // Had to remove the basePath because of this "improvement"
     // https://github.com/jakehschwartz/finatra-swagger/pull/27
     // all paths now are including the prefix which means they
