@@ -25,8 +25,8 @@ trait IdentifiersDatabase
   val password = "password"
 
   def eventuallyTableExists(tableConfig: IdentifiersTableConfig) = eventually {
-    val database = tableConfig.database
-    val table = tableConfig.tableName
+    val database: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.database)
+    val table: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.tableName)
 
     val fields = DB readOnly { implicit session =>
       sql"DESCRIBE $database.$table"
