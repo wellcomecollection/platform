@@ -17,15 +17,14 @@ import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.s3.{S3Config, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration._
 
 trait MatcherFixtures
@@ -66,7 +65,8 @@ trait MatcherFixtures
   def withMatcherMessageReceiver[R](
     queue: SQS.Queue,
     storageBucket: Bucket,
-    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R]) = {
+    topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R])(
+    implicit objectStore: ObjectStore[RecorderWorkEntry]) = {
     val storageS3Config = S3Config(storageBucket.name)
     val snsWriter =
       new SNSWriter(snsClient, SNSConfig(topic.arn))
@@ -76,8 +76,6 @@ trait MatcherFixtures
         withLocalDynamoDbTable { table =>
           withWorkGraphStore(table) { workGraphStore =>
             withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-              implicit val executionContext: ExecutionContextExecutor =
-                actorSystem.dispatcher
               val sqsStream = new SQSStream[NotificationMessage](
                 actorSystem = actorSystem,
                 sqsClient = asyncSqsClient,
@@ -87,7 +85,7 @@ trait MatcherFixtures
               val matcherMessageReceiver = new MatcherMessageReceiver(
                 sqsStream,
                 snsWriter,
-                new S3TypeStore[RecorderWorkEntry](s3Client),
+                objectStore,
                 storageS3Config,
                 actorSystem,
                 linkedWorkMatcher)

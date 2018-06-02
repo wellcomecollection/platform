@@ -5,18 +5,18 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   hash_key       = "workId"
 
   attribute {
-    name = "id"
+    name = "workId"
     type = "S"
   }
 
   attribute {
-    name = "componentId"
+    name = "setId"
     type = "S"
   }
 
   global_secondary_index {
     name            = "${var.matcher_table_index}"
-    hash_key        = "componentId"
+    hash_key        = "setId"
     write_capacity  = 1
     read_capacity   = 1
     projection_type = "ALL"

@@ -26,6 +26,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     MysqlModule,
     AkkaModule,
+    ExecutionContextModule,
     IdMinterWorkerModule,
     SQSClientModule,
     SNSClientModule,

@@ -2,20 +2,22 @@ package uk.ac.wellcome.platform.ingestor.modules
 
 import javax.inject.Singleton
 import com.google.inject.Provides
-import com.twitter.inject.TwitterModule
-import io.circe.generic.extras.semiauto.{deriveDecoder, deriveEncoder}
-import io.circe.{Decoder, Encoder}
+import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext
 
 object IdentifiedWorkModule extends TwitterModule {
   @Provides
   @Singleton
-  def provideIdentifiedWorkDecoder(): Decoder[IdentifiedWork] =
-    deriveDecoder[IdentifiedWork]
+  def provideUnidentifiedWorkStore(
+    injector: Injector): ObjectStore[IdentifiedWork] = {
+    implicit val storageBackend = injector.instance[S3StorageBackend]
+    implicit val executionContext = injector.instance[ExecutionContext]
 
-  @Provides
-  @Singleton
-  def provideIdentifiedWorkEncoder(): Encoder[IdentifiedWork] =
-    deriveEncoder[IdentifiedWork]
+    ObjectStore[IdentifiedWork]
+  }
 }
