@@ -66,5 +66,4 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
         versionedDao.updateRecord[ReindexRecord](updatedRecord)
       }.map { _ => () }
     }
-  }
 }
