@@ -10,7 +10,6 @@ import uk.ac.wellcome.test.fixtures._
 trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
   this: Suite =>
   def withWorkIndexer[R](
-    esType: String,
     elasticClient: HttpClient,
     metricsSender: MetricsSender)(testWith: TestWith[WorkIndexer, R]): R = {
     val workIndexer = new WorkIndexer(

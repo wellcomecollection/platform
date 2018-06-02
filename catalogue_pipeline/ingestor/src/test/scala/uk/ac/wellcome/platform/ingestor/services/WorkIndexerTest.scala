@@ -44,7 +44,11 @@ class WorkIndexerTest
       withWorkIndexerFixtures[Assertion](esType, elasticClient) {
         workIndexer =>
           val future = Future.sequence(
-            (1 to 2).map(_ => workIndexer.indexWork(work, indexName))
+            (1 to 2).map(_ => workIndexer.indexWork(
+              work = work,
+              esIndex = indexName,
+              esType = esType
+            ))
           )
 
           whenReady(future) { _ =>
@@ -88,7 +92,11 @@ class WorkIndexerTest
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
 
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
-        val future = workIndexer.indexWork(updatedWork, indexName)
+        val future = workIndexer.indexWork(
+          work = updatedWork,
+          esIndex = indexName,
+          esType = esType
+        )
 
         whenReady(future) { _ =>
           assertElasticsearchEventuallyHasWork(

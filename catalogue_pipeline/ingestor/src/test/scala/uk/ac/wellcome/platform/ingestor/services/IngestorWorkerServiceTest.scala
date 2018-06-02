@@ -162,7 +162,9 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[IngestorWorkerService, R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withWorkIndexer[R](itemType, elasticClient, metricsSender) {
+        withWorkIndexer[R](
+          elasticClient = elasticClient,
+          metricsSender = metricsSender) {
           workIndexer =>
             withIngestorWorkerService[R](
               esIndexV1,
