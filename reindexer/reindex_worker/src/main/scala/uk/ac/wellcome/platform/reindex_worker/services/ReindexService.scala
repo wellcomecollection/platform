@@ -28,41 +28,43 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
     dynamoConfig = dynamoConfig
   )
 
-  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = Future.sequence {
-    info(s"ReindexService running $reindexJob")
+  def runReindex(reindexJob: ReindexJob): Future[List[Unit]] =
+    Future.sequence {
+      info(s"ReindexService running $reindexJob")
 
-    val table = Table[ReindexRecord](dynamoConfig.table)
+      val table = Table[ReindexRecord](dynamoConfig.table)
 
-    val index = table.index(indexName = dynamoConfig.index)
+      val index = table.index(indexName = dynamoConfig.index)
 
-    // We start by querying DynamoDB for every record in the reindex shard
-    // that has an out-of-date reindexVersion.  If a shard was especially
-    // large, this might cause out-of-memory errors -- in practice, we're
-    // hoping that the shards/individual records are small enough for this
-    // not to be a problem.
-    val results: List[Either[DynamoReadError, ReindexRecord]] =
-      Scanamo.exec(dynamoDbClient)(
-        index.query(
-          'reindexShard -> reindexJob.shardId and
-            KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+      // We start by querying DynamoDB for every record in the reindex shard
+      // that has an out-of-date reindexVersion.  If a shard was especially
+      // large, this might cause out-of-memory errors -- in practice, we're
+      // hoping that the shards/individual records are small enough for this
+      // not to be a problem.
+      val results: List[Either[DynamoReadError, ReindexRecord]] =
+        Scanamo.exec(dynamoDbClient)(
+          index.query(
+            'reindexShard -> reindexJob.shardId and
+              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+          )
         )
-      )
 
-    val outdatedRecords: List[ReindexRecord] = results.map {
-      case Left(err: DynamoReadError) => {
-        warn(s"Failed to read Dynamo records: $err")
-        throw GracefulFailureException(
-          new RuntimeException(s"Error in the DynamoDB query: $err")
-        )
+      val outdatedRecords: List[ReindexRecord] = results.map {
+        case Left(err: DynamoReadError) => {
+          warn(s"Failed to read Dynamo records: $err")
+          throw GracefulFailureException(
+            new RuntimeException(s"Error in the DynamoDB query: $err")
+          )
+        }
+        case Right(r: ReindexRecord) => r
       }
-      case Right(r: ReindexRecord) => r
-    }
 
-    // Then we PUT all the records.  It might be more efficient to do a
-    // bulk update, but this will do for now.
-    outdatedRecords.map { record: ReindexRecord =>
-      val updatedRecord = record.copy(reindexVersion = reindexJob.desiredVersion)
-      versionedDao.updateRecord[ReindexRecord](updatedRecord)
+      // Then we PUT all the records.  It might be more efficient to do a
+      // bulk update, but this will do for now.
+      outdatedRecords.map { record: ReindexRecord =>
+        val updatedRecord =
+          record.copy(reindexVersion = reindexJob.desiredVersion)
+        versionedDao.updateRecord[ReindexRecord](updatedRecord)
+      }
     }
-  }
 }
