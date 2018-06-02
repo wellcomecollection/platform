@@ -18,6 +18,8 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class SierraBibMergerWorkerServiceTest
     extends FunSpec
     with MockitoSugar

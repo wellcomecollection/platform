@@ -1,13 +1,9 @@
 package uk.ac.wellcome.platform.recorder.modules
 
 import akka.actor.ActorSystem
-import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
-import javax.inject.Singleton
-import uk.ac.wellcome.platform.recorder.GlobalExecutionContext
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
 
-import scala.concurrent.ExecutionContext
 
 object RecorderModule extends TwitterModule {
 

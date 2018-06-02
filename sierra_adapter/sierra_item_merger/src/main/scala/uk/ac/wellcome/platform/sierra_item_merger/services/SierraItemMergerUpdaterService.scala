@@ -11,16 +11,16 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.platform.sierra_item_merger.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
 
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-  versionedHybridStore: VersionedHybridStore[SierraTransformable,
+                                                versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
-                                             S3TypeStore[SierraTransformable]],
-  metrics: MetricsSender
+                                             ObjectStore[SierraTransformable]],
+                                                metrics: MetricsSender
 ) extends Logging {
 
   val sourceName = "sierra"
