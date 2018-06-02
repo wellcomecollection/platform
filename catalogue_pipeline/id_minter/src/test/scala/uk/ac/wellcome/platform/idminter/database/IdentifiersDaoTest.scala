@@ -18,21 +18,20 @@ class IdentifiersDaoTest
 
   def withIdentifiersDao[R](
     testWith: TestWith[(IdentifiersDao, IdentifiersTable), R]): R =
-    withIdentifiersDatabase {
-      case (rdsClientConfig, identifiersTableConfig) =>
-        val identifiersTable = new IdentifiersTable(identifiersTableConfig)
+    withIdentifiersDatabase { identifiersTableConfig =>
+      val identifiersTable = new IdentifiersTable(identifiersTableConfig)
 
-        new TableProvisioner(rdsClientConfig)
-          .provision(
-            database = identifiersTableConfig.database,
-            tableName = identifiersTableConfig.tableName
-          )
+      new TableProvisioner(rdsClientConfig)
+        .provision(
+          database = identifiersTableConfig.database,
+          tableName = identifiersTableConfig.tableName
+        )
 
-        val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
+      val identifiersDao = new IdentifiersDao(DB.connect(), identifiersTable)
 
-        eventuallyTableExists(identifiersTableConfig)
+      eventuallyTableExists(identifiersTableConfig)
 
-        testWith((identifiersDao, identifiersTable))
+      testWith((identifiersDao, identifiersTable))
     }
 
   describe("lookupID") {

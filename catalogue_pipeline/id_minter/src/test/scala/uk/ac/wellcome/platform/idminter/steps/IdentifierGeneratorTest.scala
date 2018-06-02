@@ -28,32 +28,31 @@ class IdentifierGeneratorTest
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
                                    None)(
     testWith: TestWith[(IdentifierGenerator, IdentifiersTable), R]) =
-    withIdentifiersDatabase[R] {
-      case (rdsClientConfig, identifiersTableConfig) =>
-        val identifiersTable = new IdentifiersTable(identifiersTableConfig)
+    withIdentifiersDatabase[R] { identifiersTableConfig=>
+      val identifiersTable = new IdentifiersTable(identifiersTableConfig)
 
-        new TableProvisioner(rdsClientConfig)
-          .provision(
-            database = identifiersTableConfig.database,
-            tableName = identifiersTableConfig.tableName
-          )
-
-        val identifiersDao = maybeIdentifiersDao.getOrElse(
-          new IdentifiersDao(DB.connect(), identifiersTable)
+      new TableProvisioner(rdsClientConfig)
+        .provision(
+          database = identifiersTableConfig.database,
+          tableName = identifiersTableConfig.tableName
         )
 
-        withActorSystem { actorSystem =>
-          withMetricsSender(actorSystem) { metricsSender =>
-            val identifierGenerator = new IdentifierGenerator(
-              identifiersDao,
-              metricsSender
-            )
+      val identifiersDao = maybeIdentifiersDao.getOrElse(
+        new IdentifiersDao(DB.connect(), identifiersTable)
+      )
 
-            eventuallyTableExists(identifiersTableConfig)
+      withActorSystem { actorSystem =>
+        withMetricsSender(actorSystem) { metricsSender =>
+          val identifierGenerator = new IdentifierGenerator(
+            identifiersDao,
+            metricsSender
+          )
 
-            testWith((identifierGenerator, identifiersTable))
-          }
+          eventuallyTableExists(identifiersTableConfig)
+
+          testWith((identifierGenerator, identifiersTable))
         }
+      }
     }
 
   it("queries the database and return a matching canonical id") {
