@@ -17,10 +17,10 @@ import uk.ac.wellcome.storage.ObjectStore
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
-                                                versionedHybridStore: VersionedHybridStore[SierraTransformable,
+  versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
                                              ObjectStore[SierraTransformable]],
-                                                metrics: MetricsSender
+  metrics: MetricsSender
 ) extends Logging {
 
   val sourceName = "sierra"

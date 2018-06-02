@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.recorder.services.RecorderWorkerService
 
-
 object RecorderModule extends TwitterModule {
 
   // eagerly load worker service

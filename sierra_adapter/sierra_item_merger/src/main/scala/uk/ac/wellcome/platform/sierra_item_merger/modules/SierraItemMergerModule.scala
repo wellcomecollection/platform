@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.sierra_item_merger.services.SierraItemMergerWorkerService
 
-
 object SierraItemMergerModule extends TwitterModule {
 
   // eagerly load worker service
