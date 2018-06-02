@@ -42,12 +42,12 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       // hoping that the shards/individual records are small enough for this
       // not to be a problem.
       val results: List[Either[DynamoReadError, ReindexRecord]] =
-      Scanamo.exec(dynamoDbClient)(
-        index.query(
-          'reindexShard -> reindexJob.shardId and
-            KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+        Scanamo.exec(dynamoDbClient)(
+          index.query(
+            'reindexShard -> reindexJob.shardId and
+              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
+          )
         )
-      )
 
       val outdatedRecords: List[ReindexRecord] = results.map {
         case Left(err: DynamoReadError) => {
@@ -61,9 +61,14 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
 
       // Then we PUT all the records.  It might be more efficient to do a
       // bulk update, but this will do for now.
-      outdatedRecords.map { record: ReindexRecord =>
-        val updatedRecord = record.copy(reindexVersion = reindexJob.desiredVersion)
-        versionedDao.updateRecord[ReindexRecord](updatedRecord)
-      }.map { _ => () }
+      outdatedRecords
+        .map { record: ReindexRecord =>
+          val updatedRecord =
+            record.copy(reindexVersion = reindexJob.desiredVersion)
+          versionedDao.updateRecord[ReindexRecord](updatedRecord)
+        }
+        .map { _ =>
+          ()
+        }
     }
 }
