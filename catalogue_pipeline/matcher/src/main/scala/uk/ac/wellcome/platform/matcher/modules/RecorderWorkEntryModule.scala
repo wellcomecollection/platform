@@ -15,7 +15,7 @@ object RecorderWorkEntryModule extends TwitterModule {
   @Provides
   @Singleton
   def provideRecorderWorkEntryStore(
-                                    injector: Injector): ObjectStore[RecorderWorkEntry] = {
+    injector: Injector): ObjectStore[RecorderWorkEntry] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
