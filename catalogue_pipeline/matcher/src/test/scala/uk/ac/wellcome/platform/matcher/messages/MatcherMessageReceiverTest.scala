@@ -6,11 +6,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.MatchedIdentifiers
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.LinkedWorksIdentifiersList
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -33,7 +32,7 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(
+                MatcherResult(
                   Set(MatchedIdentifiers(Set("sierra-system-number/id"))))
               )
             }
@@ -60,7 +59,7 @@ class MatcherMessageReceiverTest
             eventually {
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(Set(MatchedIdentifiers(
+                MatcherResult(Set(MatchedIdentifiers(
                   Set("sierra-system-number/A", "sierra-system-number/B"))))
               )
             }
@@ -89,7 +88,7 @@ class MatcherMessageReceiverTest
 
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(
+                MatcherResult(
                   Set(
                     MatchedIdentifiers(
                       Set(
@@ -108,7 +107,7 @@ class MatcherMessageReceiverTest
 
                 assertMessageSent(
                   topic,
-                  LinkedWorksIdentifiersList(
+                  MatcherResult(
                     Set(
                       MatchedIdentifiers(
                         Set(
@@ -143,7 +142,7 @@ class MatcherMessageReceiverTest
 
               assertMessageSent(
                 topic,
-                LinkedWorksIdentifiersList(
+                MatcherResult(
                   Set(
                     MatchedIdentifiers(
                       Set(
@@ -162,7 +161,7 @@ class MatcherMessageReceiverTest
 
                 assertMessageSent(
                   topic,
-                  LinkedWorksIdentifiersList(
+                  MatcherResult(
                     Set(
                       MatchedIdentifiers(Set(
                         "sierra-system-number/A"
@@ -180,16 +179,14 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertMessageSent(
-    topic: Topic,
-    identifiersList: LinkedWorksIdentifiersList) = {
+  private def assertMessageSent(topic: Topic, matcherResult: MatcherResult) = {
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
     val actualMatchedWorkLists = snsMessages.map { snsMessage =>
-      fromJson[LinkedWorksIdentifiersList](snsMessage.message).get
+      fromJson[MatcherResult](snsMessage.message).get
     }
-    actualMatchedWorkLists should contain(identifiersList)
+    actualMatchedWorkLists should contain(matcherResult)
   }
 
   private def sendSQS(queue: SQS.Queue,
