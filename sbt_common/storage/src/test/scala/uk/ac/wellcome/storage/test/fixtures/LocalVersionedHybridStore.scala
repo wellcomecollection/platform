@@ -10,14 +10,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{
-  HybridRecord,
-  VHSConfig,
-  VersionedHybridStore
-}
+import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
+
 
 trait LocalVersionedHybridStore
     extends LocalDynamoDbVersioned
@@ -58,7 +55,6 @@ trait LocalVersionedHybridStore
       objectStore = objectStore,
       dynamoDbClient = dynamoDbClient
     )
-
     testWith(store)
   }
 
@@ -70,19 +66,31 @@ trait LocalVersionedHybridStore
     )
 
   def getJsonFor[T <: Id](bucket: Bucket, table: Table, record: T) = {
-    val hybridRecord = getHybridRecord(bucket, table, record.id)
+    val hybridRecord = getHybridRecord(table, record.id)
 
     getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
   }
 
   def getContentFor(bucket: Bucket, table: Table, id: String) = {
-    val hybridRecord = getHybridRecord(bucket, table, id)
+    val hybridRecord = getHybridRecord(table, id)
 
     getContentFromS3(bucket, hybridRecord.s3key)
   }
 
-  private def getHybridRecord(bucket: Bucket, table: Table, id: String) =
+  protected def getHybridRecord(table: Table, id: String): HybridRecord =
     Scanamo.get[HybridRecord](dynamoDbClient)(table.name)('id -> id) match {
+      case None => throw new RuntimeException(s"No object with id $id found!")
+      case Some(read) =>
+        read match {
+          case Left(error) =>
+            throw new RuntimeException(s"Error reading from dynamo: $error")
+          case Right(record) => record
+        }
+    }
+
+  protected def getRecordMetadata[T](table: Table, id: String)
+                                  (implicit dynamoFormat: DynamoFormat[T])=
+    Scanamo.get[T](dynamoDbClient)(table.name)('id -> id) match {
       case None => throw new RuntimeException(s"No object with id $id found!")
       case Some(read) =>
         read match {
