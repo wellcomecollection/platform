@@ -1,7 +1,10 @@
 package uk.ac.wellcome.messaging.sqs
 
 import akka.actor.ActorSystem
-import com.amazonaws.services.dynamodbv2.model.{ConditionalCheckFailedException, ProvisionedThroughputExceededException}
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  ProvisionedThroughputExceededException
+}
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Decoder
@@ -31,10 +34,12 @@ class SQSToDynamoStream[T] @Inject()(actorSystem: ActorSystem,
       t <- Future.fromTry(fromJson[T](message.Message))
       _ <- store(t).recover {
         case e: ConditionalCheckFailedException =>
-          logger.warn(s"Processing $message failed a Conditional Update: ${e.getMessage}")
+          logger.warn(
+            s"Processing $message failed a Conditional Update: ${e.getMessage}")
           throw GracefulFailureException(e)
         case e: ProvisionedThroughputExceededException =>
-          logger.warn(s"Processing $message hit DynamoDB throughput limits: ${e.getMessage}")
+          logger.warn(
+            s"Processing $message hit DynamoDB throughput limits: ${e.getMessage}")
           throw GracefulFailureException(e)
       }
     } yield ()
