@@ -64,7 +64,7 @@ class VersionedDao @Inject()(
         case Left(scanamoError) => {
           val exception = new RuntimeException(scanamoError.toString)
 
-          warn(s"Failed to updating Dynamo record: $id", exception)
+          warn(s"Failed to update Dynamo record: $id", exception)
 
           throw exception
         }
