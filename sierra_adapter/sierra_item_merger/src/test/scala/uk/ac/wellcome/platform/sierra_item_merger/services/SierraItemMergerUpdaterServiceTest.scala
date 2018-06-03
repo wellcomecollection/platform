@@ -117,9 +117,9 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            val f1 = hybridStore.updateRecord(oldRecord.id)(
-              ifNotExisting = (oldRecord, SourceMetadata(oldRecord.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+            val f1 = hybridStore.updateRecord(oldRecord.id)(ifNotExisting =
+              (oldRecord, SourceMetadata(oldRecord.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val anotherItem = sierraItemRecord(
               id = "i999",
@@ -140,9 +140,9 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             whenReady(f1) { _ =>
-              val f2 = hybridStore.updateRecord(newRecord.id)(
-                ifNotExisting = (newRecord, SourceMetadata(newRecord.sourceName)))(
-                ifExisting = (t, m) => (t, m))
+              val f2 = hybridStore.updateRecord(newRecord.id)(ifNotExisting =
+                (newRecord, SourceMetadata(newRecord.sourceName)))(ifExisting =
+                (t, m) => (t, m))
 
               whenReady(f2) { _ =>
                 whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
@@ -199,9 +199,9 @@ class SierraItemMergerUpdaterServiceTest
                 ))
             )
 
-            val f1 = hybridStore.updateRecord(oldRecord.id)(
-              ifNotExisting = (oldRecord, SourceMetadata(oldRecord.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+            val f1 = hybridStore.updateRecord(oldRecord.id)(ifNotExisting =
+              (oldRecord, SourceMetadata(oldRecord.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             whenReady(f1) { _ =>
               val newItemRecord = sierraItemRecord(
@@ -230,7 +230,9 @@ class SierraItemMergerUpdaterServiceTest
   it("unlinks an item if it is updated with an unlinked item") {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) { hybridStore =>
+        withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+          bucket,
+          table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val itemId = "i3000003"
 
@@ -257,12 +259,16 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              ifNotExisting = (sierraTransformable1, SourceMetadata(sierraTransformable1.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              ifNotExisting = (sierraTransformable2, SourceMetadata(sierraTransformable2.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -339,12 +345,16 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              ifNotExisting = (sierraTransformable1, SourceMetadata(sierraTransformable1.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              ifNotExisting = (sierraTransformable2, SourceMetadata(sierraTransformable2.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -416,12 +426,16 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              ifNotExisting = (sierraTransformable1, SourceMetadata(sierraTransformable1.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              ifNotExisting = (sierraTransformable2, SourceMetadata(sierraTransformable2.sourceName)))(
-              ifExisting = (t, m) => (t, m))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -483,8 +497,8 @@ class SierraItemMergerUpdaterServiceTest
                 ))
             )
 
-            val f1 = hybridStore.updateRecord(sierraRecord.id)(
-              ifNotExisting = (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
+            val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
+              (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
               ifExisting = (t, m) => (t, m))
 
             val oldItemRecord = sierraItemRecord(
@@ -517,8 +531,8 @@ class SierraItemMergerUpdaterServiceTest
               sourceId = bibId
             )
 
-            val f1 = hybridStore.updateRecord(sierraRecord.id)(
-              ifNotExisting = (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
+            val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
+              (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
               ifExisting = (t, m) => (t, m))
 
             val itemRecord = sierraItemRecord(

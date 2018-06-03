@@ -26,13 +26,14 @@ class RecorderWorkerService @Inject()(
   def processMessage(work: UnidentifiedWork): Future[Unit] = {
     val newRecorderEntry = RecorderWorkEntry(work)
 
-    versionedHybridStore.updateRecord(newRecorderEntry.id)((newRecorderEntry, EmptyMetadata()))(
+    versionedHybridStore.updateRecord(newRecorderEntry.id)(
+      (newRecorderEntry, EmptyMetadata()))(
       (existingEntry, existingMetadata) =>
         if (existingEntry.work.version > newRecorderEntry.work.version) {
           (existingEntry, existingMetadata)
         } else {
           (newRecorderEntry, EmptyMetadata())
-        }
+      }
     )
   }
 

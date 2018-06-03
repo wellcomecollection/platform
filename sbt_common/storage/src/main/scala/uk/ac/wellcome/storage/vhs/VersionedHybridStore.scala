@@ -58,9 +58,10 @@ class VersionedHybridStore[T, Metadata, Store <: S3ObjectStore[T]] @Inject()(
             storedS3Record,
             storedMetadata)) =>
         debug(s"Existing object $id")
-        val (transformedS3Record, transformedMetadata) = ifExisting(storedS3Record, storedMetadata)
+        val (transformedS3Record, transformedMetadata) =
+          ifExisting(storedS3Record, storedMetadata)
 
-        if (transformedS3Record != storedS3Record || transformedMetadata != storedMetadata ) {
+        if (transformedS3Record != storedS3Record || transformedMetadata != storedMetadata) {
           debug("existing object changed, updating")
           putObject(
             id,

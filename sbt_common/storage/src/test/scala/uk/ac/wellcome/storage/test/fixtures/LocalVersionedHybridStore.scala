@@ -150,8 +150,8 @@ trait LocalVersionedHybridStore
         }
     }
 
-  protected def getRecordMetadata[T](table: Table, id: String)
-                                  (implicit dynamoFormat: DynamoFormat[T])=
+  protected def getRecordMetadata[T](table: Table, id: String)(
+    implicit dynamoFormat: DynamoFormat[T]) =
     Scanamo.get[T](dynamoDbClient)(table.name)('id -> id) match {
       case None => throw new RuntimeException(s"No object with id $id found!")
       case Some(read) =>

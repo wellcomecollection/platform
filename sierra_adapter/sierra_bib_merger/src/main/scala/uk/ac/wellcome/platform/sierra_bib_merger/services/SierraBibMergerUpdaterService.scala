@@ -27,7 +27,9 @@ class SierraBibMergerUpdaterService @Inject()(
     versionedHybridStore.updateRecord(Sourced.id(sourceName, bibRecord.id))(
       (SierraTransformable(bibRecord), SourceMetadata(sourceName)))(
       (existingSierraTransformable, existingMetadata) => {
-        (BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord), existingMetadata)
+        (
+          BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord),
+          existingMetadata)
       }
     )
   }

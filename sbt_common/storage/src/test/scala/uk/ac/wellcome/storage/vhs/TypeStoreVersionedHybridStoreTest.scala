@@ -54,9 +54,8 @@ class TypeStoreVersionedHybridStoreTest
             content = "One ocelot in orange"
           )
 
-          val future = hybridStore.updateRecord(record.id)(
-            ifNotExisting = (record, EmptyMetadata()))(
-            ifExisting = (t, m) => (t, m))
+          val future = hybridStore.updateRecord(record.id)(ifNotExisting =
+            (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           whenReady(future) { _ =>
             getJsonFor(bucket, table, record) shouldBe toJson(record).get
@@ -73,9 +72,8 @@ class TypeStoreVersionedHybridStoreTest
             content = "Hairy hyenas howling hatefully"
           )
           val putFuture =
-            hybridStore.updateRecord(id)(
-              ifNotExisting = (record, EmptyMetadata()))(
-              ifExisting = (t, m) => (t, m))
+            hybridStore.updateRecord(id)(ifNotExisting =
+              (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)

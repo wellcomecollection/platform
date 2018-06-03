@@ -51,9 +51,8 @@ class StreamStoreVersionedHybridStoreTest
           val content = "A thousand thinking thanes thanking a therapod"
           val inputStream = new ByteArrayInputStream(content.getBytes)
 
-          val future = hybridStore.updateRecord(id)(
-            ifNotExisting = (inputStream, emptyMetadata))(
-            ifExisting = (t, m) => (t, m))
+          val future = hybridStore.updateRecord(id)(ifNotExisting =
+            (inputStream, emptyMetadata))(ifExisting = (t, m) => (t, m))
 
           whenReady(future) { _ =>
             getContentFor(bucket, table, id) shouldBe content
@@ -69,9 +68,8 @@ class StreamStoreVersionedHybridStoreTest
           val inputStream = new ByteArrayInputStream(content.getBytes)
 
           val putFuture =
-            hybridStore.updateRecord(id)(
-              ifNotExisting = (inputStream, emptyMetadata))(
-              ifExisting = (t, m) => (t, m))
+            hybridStore.updateRecord(id)(ifNotExisting =
+              (inputStream, emptyMetadata))(ifExisting = (t, m) => (t, m))
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)
