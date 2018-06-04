@@ -54,9 +54,8 @@ class TypeStoreVersionedHybridStoreTest
             content = "One ocelot in orange"
           )
 
-          val future =
-            hybridStore.updateRecord(record.id)(record)((t, _) => t)(
-              EmptyMetadata())
+          val future = hybridStore.updateRecord(record.id)(ifNotExisting =
+            (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           whenReady(future) { _ =>
             getJsonFor(bucket, table, record) shouldBe toJson(record).get
@@ -66,14 +65,15 @@ class TypeStoreVersionedHybridStoreTest
 
     it("retrieves the specified type") {
       withS3TypeStoreFixtures {
-        case (bucket, table, hybridStore) =>
+        case (_, _, hybridStore) =>
           val id = Random.nextString(5)
           val record = ExampleRecord(
             id = Random.nextString(5),
             content = "Hairy hyenas howling hatefully"
           )
           val putFuture =
-            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
+            hybridStore.updateRecord(id)(ifNotExisting =
+              (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)

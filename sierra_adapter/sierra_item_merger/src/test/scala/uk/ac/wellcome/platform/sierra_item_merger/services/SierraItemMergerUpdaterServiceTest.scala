@@ -117,9 +117,9 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            val f1 = hybridStore.updateRecord(oldRecord.id)(
-              oldRecord
-            )((t, _) => t)(SourceMetadata(oldRecord.sourceName))
+            val f1 = hybridStore.updateRecord(oldRecord.id)(ifNotExisting =
+              (oldRecord, SourceMetadata(oldRecord.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val anotherItem = sierraItemRecord(
               id = "i999",
@@ -140,9 +140,9 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             whenReady(f1) { _ =>
-              val f2 = hybridStore.updateRecord(newRecord.id)(
-                newRecord
-              )((t, _) => t)(SourceMetadata(newRecord.sourceName))
+              val f2 = hybridStore.updateRecord(newRecord.id)(ifNotExisting =
+                (newRecord, SourceMetadata(newRecord.sourceName)))(ifExisting =
+                (t, m) => (t, m))
 
               whenReady(f2) { _ =>
                 whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
@@ -199,9 +199,9 @@ class SierraItemMergerUpdaterServiceTest
                 ))
             )
 
-            val f1 = hybridStore.updateRecord(oldRecord.id)(
-              oldRecord
-            )((t, _) => t)(SourceMetadata(oldRecord.sourceName))
+            val f1 = hybridStore.updateRecord(oldRecord.id)(ifNotExisting =
+              (oldRecord, SourceMetadata(oldRecord.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             whenReady(f1) { _ =>
               val newItemRecord = sierraItemRecord(
@@ -259,26 +259,21 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              sierraTransformable1
-            )((_, _) => sierraTransformable1)(
-              SourceMetadata(sierraTransformable1.sourceName))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              sierraTransformable2
-            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
               unlinkedBibIds = List(bibId1),
               modifiedDate = itemRecord.modifiedDate.plusSeconds(1)
-            )
-
-            val expectedItemData = Map(
-              itemRecord.id -> itemRecord.copy(
-                bibIds = List(bibId2),
-                unlinkedBibIds = List(bibId1),
-                modifiedDate = unlinkItemRecord.modifiedDate
-              )
             )
 
             val unlinkItemRecordFuture = for {
@@ -291,6 +286,13 @@ class SierraItemMergerUpdaterServiceTest
                 itemData = Map.empty
               )
 
+              val expectedItemData = Map(
+                itemRecord.id -> itemRecord.copy(
+                  bibIds = List(bibId2),
+                  unlinkedBibIds = List(bibId1),
+                  modifiedDate = unlinkItemRecord.modifiedDate
+                )
+              )
               val expectedSierraRecord2 = sierraTransformable2.copy(
                 itemData = expectedItemData
               )
@@ -343,13 +345,16 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              sierraTransformable1
-            )((_, _) => sierraTransformable1)(
-              SourceMetadata(sierraTransformable1.sourceName))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              sierraTransformable2
-            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -421,13 +426,16 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
-              sierraTransformable1
-            )((_, _) => sierraTransformable1)(
-              SourceMetadata(sierraTransformable1.sourceName))
+              ifNotExisting = (
+                sierraTransformable1,
+                SourceMetadata(sierraTransformable1.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val f2 = hybridStore.updateRecord(sierraTransformable2.id)(
-              sierraTransformable2
-            )((t, _) => t)(SourceMetadata(sierraTransformable2.sourceName))
+              ifNotExisting = (
+                sierraTransformable2,
+                SourceMetadata(sierraTransformable2.sourceName)))(ifExisting =
+              (t, m) => (t, m))
 
             val unlinkItemRecord = itemRecord.copy(
               bibIds = List(bibId2),
@@ -489,9 +497,9 @@ class SierraItemMergerUpdaterServiceTest
                 ))
             )
 
-            val f1 = hybridStore.updateRecord(sierraRecord.id)(
-              sierraRecord
-            )((t, _) => t)(SourceMetadata(sierraRecord.sourceName))
+            val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
+              (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
+              ifExisting = (t, m) => (t, m))
 
             val oldItemRecord = sierraItemRecord(
               id = id,
@@ -523,9 +531,9 @@ class SierraItemMergerUpdaterServiceTest
               sourceId = bibId
             )
 
-            val f1 = hybridStore.updateRecord(sierraRecord.id)(
-              sierraRecord
-            )((t, _) => t)(SourceMetadata(sierraRecord.sourceName))
+            val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
+              (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
+              ifExisting = (t, m) => (t, m))
 
             val itemRecord = sierraItemRecord(
               id = "i7000007",
