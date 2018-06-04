@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8
+"""
+Find chatty CloudWatch log groups.
+
+This script looks at all the log groups in your account, and prints a
+bar chart showing the groups with the most stored logs.  This can be helpful
+whe trying to find unusually chatty applications.
+
+"""
 
 import boto3
 
