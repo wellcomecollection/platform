@@ -51,23 +51,34 @@ def print_bar_chart(data):
         # If the bar is empty, add a left one-eighth block
         bar = bar or  '▏'
 
-        print(f'{label.rjust(longest_label_length)} ▏ {count:#14d} {bar}')
+        print(f'{label.rjust(longest_label_length)} ▏ {count:#6.2f} {bar}')
 
 
 if __name__ == '__main__':
 
-    # All our log group names are of one of two forms:
-    #
-    #   platform/:service_name
-    #   /aws/lambda/:lambda_name
-    #
-    # We don't care about the prefix, so we can strip it off to make the
-    # results easier to read.
-    #
-    stored_sizes = {
-        group['logGroupName'].split('/')[-1]: group['storedBytes']
-        for group in describe_all_log_groups()
-    }
+    stored_sizes = {}
+
+    for group in describe_all_log_groups():
+
+        # All our log group names are of one of two forms:
+        #
+        #   platform/:service_name
+        #   /aws/lambda/:lambda_name
+        #
+        # We don't care about the prefix, so we can strip it off to make the
+        # results easier to read.
+        #
+        name = group['logGroupName'].split('/')[-1]
+
+        # The CloudWatch API counts stored bytes.  This isn't an especially
+        # useful metric, so convert it to gigabytes instead.
+        size = group['storedBytes'] / 1024 / 1024 / 1024
+
+        stored_sizes[name] = size
+    # stored_sizes = {
+    #     : group['storedBytes']
+    #     for group in describe_all_log_groups()
+    # }
 
     import collections
     chattiest_groups = collections.Counter(stored_sizes).most_common(10)
