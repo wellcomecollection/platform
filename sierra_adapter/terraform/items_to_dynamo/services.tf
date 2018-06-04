@@ -3,7 +3,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_to_dynamo_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "sierra_items_to_dynamo"
 
   source_queue_name  = "${module.demultiplexer_queue.name}"
@@ -35,4 +35,6 @@ module "sierra_to_dynamo_service" {
   enable_alb_alarm = false
 
   max_capacity = 50
+
+  log_retention_in_days = 60
 }

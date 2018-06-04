@@ -7,7 +7,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "sierra_${local.resource_type_singular}_merger"
 
   source_queue_name  = "${module.updates_queue.name}"
@@ -38,5 +38,7 @@ module "sierra_merger_service" {
 
   enable_alb_alarm = false
 
-  max_capacity = 50
+  max_capacity = 15
+
+  log_retention_in_days = 60
 }
