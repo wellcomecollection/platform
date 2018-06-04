@@ -1,7 +1,7 @@
 # Lambda for tracking deployment status in dynamo db
 
 module "lambda_service_deployment_status" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name        = "service_deployment_status"
   description = "Lambda for tracking deployment status in dynamo db"
@@ -15,6 +15,8 @@ module "lambda_service_deployment_status" {
 
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/monitoring/deployment_tracking/service_deployment_status.zip"
+
+  log_retention_in_days = 60
 }
 
 module "trigger_service_deployment_status" {
