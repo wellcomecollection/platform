@@ -253,9 +253,9 @@ class MatcherMessageReceiverTest
 
   it("does not match a lower version") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queue =>
+      withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+          withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) { _ =>
             // process Work V2
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
@@ -270,7 +270,7 @@ class MatcherMessageReceiverTest
             processAndAssertMatchedWorkIs(
               workAv2,
               expectedMatchedWorkAv2,
-              queue,
+              queuePair.queue,
               storageBucket,
               topic)
 
@@ -280,10 +280,10 @@ class MatcherMessageReceiverTest
               identifiers = List(aIdentifier),
               version = 1)
 
-            sendSQS(queue, storageBucket, workAv1)
-            Thread.sleep(2000)
+            sendSQS(queuePair.queue, storageBucket, workAv1)
             eventually {
-              noMessagesAreWaitingIn(queue)
+              noMessagesAreWaitingIn(queuePair.queue)
+              noMessagesAreWaitingIn(queuePair.dlq)
               assertLastMatchedResultIs(topic, expectedMatchedWorkAv2)
             }
           }

@@ -79,10 +79,10 @@ class MatcherFeatureTest
   it(
     "does not process a message if the work version is older than that already stored") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueue { queue =>
+      withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
-            withMatcherServer(queue, storageBucket, topic, table) { _ =>
+            withMatcherServer(queuePair.queue, storageBucket, topic, table) { _ =>
               val existingWorkVersion = 2
               val updatedWorkVersion = 1
 
@@ -108,11 +108,11 @@ class MatcherFeatureTest
                   s3Client = s3Client,
                   bucket = storageBucket)
 
-              sqsClient.sendMessage(queue.url, toJson(workSqsMessage).get)
+              sqsClient.sendMessage(queuePair.queue.url, toJson(workSqsMessage).get)
 
-              Thread.sleep(2000)
               eventually {
-                noMessagesAreWaitingIn(queue)
+                noMessagesAreWaitingIn(queuePair.queue)
+                noMessagesAreWaitingIn(queuePair.dlq)
                 listMessagesReceivedFromSNS(topic).size shouldBe 0
               }
             }
