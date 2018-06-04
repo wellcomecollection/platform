@@ -1,13 +1,19 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{Concept, Identifiable, IdentifierType, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  Concept,
+  Identifiable,
+  IdentifierType,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 
 class SierraConceptsTest extends FunSpec with Matchers {
 
   it("extracts identifiers from subfield 0") {
-    val concept = Concept(label = "Perservering puffins push past perspiration")
+    val concept =
+      Concept(label = "Perservering puffins push past perspiration")
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
       concept = concept,
