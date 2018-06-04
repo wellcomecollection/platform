@@ -67,6 +67,37 @@ class SierraConceptsTest extends FunSpec with Matchers {
     )
   }
 
+  it("strips the (DNLM) prefix from identifiers") {
+    val concept = Concept(label = "Importing iguanas ignoring instructions")
+
+    val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
+      concept = concept,
+      varField = VarField(
+        fieldTag = "p",
+        marcTag = "655",
+        indicator1 = "",
+        indicator2 = "0",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "ignorance"),
+          MarcSubfield(tag = "0", content = "i00001"),
+          MarcSubfield(tag = "0", content = "(DNLM)i00001")
+        )
+      )
+    )
+
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("lc-subjects"),
+      value = "i00001",
+      ontologyType = "Concept"
+    )
+
+    maybeIdentifiedConcept shouldBe Identifiable(
+      concept,
+      sourceIdentifier = sourceIdentifier,
+      identifiers = List(sourceIdentifier)
+    )
+  }
+
   it("throws an error if it sees too many subfield 0 instances") {
     val caught = intercept[RuntimeException] {
       transformer.identifyPrimaryConcept[Concept](
