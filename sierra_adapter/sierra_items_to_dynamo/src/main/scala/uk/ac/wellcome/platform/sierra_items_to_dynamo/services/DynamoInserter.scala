@@ -7,7 +7,8 @@ import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DynamoInserter @Inject()(versionedDao: VersionedDao)(implicit ec: ExecutionContext) {
+class DynamoInserter @Inject()(versionedDao: VersionedDao)(
+  implicit ec: ExecutionContext) {
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] = {
     versionedDao.getRecord[SierraItemRecord](record.id).flatMap {

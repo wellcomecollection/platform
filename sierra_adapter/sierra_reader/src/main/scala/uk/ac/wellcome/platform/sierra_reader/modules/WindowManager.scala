@@ -20,7 +20,8 @@ class WindowManager @Inject()(
   s3client: AmazonS3,
   s3Config: S3Config,
   sierraConfig: SierraConfig
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {
     info(

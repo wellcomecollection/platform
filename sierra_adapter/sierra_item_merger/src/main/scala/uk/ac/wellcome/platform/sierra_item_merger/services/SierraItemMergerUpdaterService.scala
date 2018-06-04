@@ -20,7 +20,8 @@ class SierraItemMergerUpdaterService @Inject()(
                                              SourceMetadata,
                                              ObjectStore[SierraTransformable]],
   metrics: MetricsSender
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   val sourceName = "sierra"
 

@@ -16,8 +16,15 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
-import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{
+  DisplayWorkToJsonStringFlow,
+  IdentifiedWorkToVisibleDisplayWork,
+  StringToGzipFlow
+}
+import uk.ac.wellcome.platform.snapshot_generator.models.{
+  CompletedSnapshotJob,
+  SnapshotJob
+}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,9 +34,8 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 elasticClient: HttpClient,
                                 elasticConfig: ElasticConfig,
                                 objectMapper: ObjectMapper)(
-                               implicit ec: ExecutionContext
-)
-    extends Logging {
+  implicit ec: ExecutionContext
+) extends Logging {
   implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
 
