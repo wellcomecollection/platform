@@ -33,7 +33,8 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
     info(s"ReindexService running $reindexJob")
     val table = Table[ReindexRecord](dynamoConfig.table)
-    for {
+
+    val outdatedRecordsFuture: Future[List[ReindexRecord]] = for {
       index: SecondaryIndex[ReindexRecord] <- Future.fromTry(Try {
         table.index(indexName = dynamoConfig.index)
       })
@@ -52,22 +53,17 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
         )
       }
 
-      outdatedRecords: List[ReindexRecord] = results.map {
-        extractRecord(_)
-      }
+      outdatedRecords: List[ReindexRecord] = results.map(extractRecord)
+    } yield outdatedRecords
 
-      // Then we PUT all the records.  It might be more efficient to do a
-      // bulk update, but this will do for now.
-      outdatedRecords
-        .map { record: ReindexRecord =>
-          val updatedRecord =
-            record.copy(reindexVersion = reindexJob.desiredVersion)
-          versionedDao.updateRecord[ReindexRecord](updatedRecord)
-        }
-        .map { _ =>
-          ()
-        }
+    // Then we PUT all the records.  It might be more efficient to do a
+    // bulk update, but this will do for now.
+    outdatedRecordsFuture.flatMap {
+      outdatedRecords: List[ReindexRecord] => Future.sequence {
+        outdatedRecords.map { updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion) }
+      }
     }
+  }
 
   private def extractRecord(
     scanamoResult: Either[DynamoReadError, ReindexRecord]): ReindexRecord =
