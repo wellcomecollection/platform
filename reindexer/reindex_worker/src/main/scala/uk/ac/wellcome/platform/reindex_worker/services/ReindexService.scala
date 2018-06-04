@@ -69,7 +69,8 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
         }
     }
 
-  private def extractRecord(scanamoResult: Either[DynamoReadError, ReindexRecord]): ReindexRecord =
+  private def extractRecord(
+    scanamoResult: Either[DynamoReadError, ReindexRecord]): ReindexRecord =
     scanamoResult match {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
@@ -80,7 +81,8 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       case Right(r: ReindexRecord) => r
     }
 
-  private def updateIndividualRecord(record: ReindexRecord, desiredVersion: Int): Future[Unit] = {
+  private def updateIndividualRecord(record: ReindexRecord,
+                                     desiredVersion: Int): Future[Unit] = {
     val updatedRecord = record.copy(reindexVersion = desiredVersion)
     versionedDao.updateRecord[ReindexRecord](updatedRecord)
   }
