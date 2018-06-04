@@ -41,6 +41,7 @@ trait SierraConcepts extends MarcUtils {
     val identifierSubfieldContents = varField.subfields
       .filter { _.tag == "0" }
       .map { _.content }
+      .map { _.replaceFirst("^\\(DNLM\\)", "") }
       .distinct
 
     identifierSubfieldContents match {
