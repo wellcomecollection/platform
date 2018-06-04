@@ -1,5 +1,5 @@
 module "lambda_drain_ecs_container_instance" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name        = "drain_ecs_container_instance"
   description = "Drain ECS container instance when the corresponding EC2 instance is being terminated"
@@ -8,6 +8,8 @@ module "lambda_drain_ecs_container_instance" {
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/drain_ecs_container_instance.zip"
+
+  log_retention_in_days = 60
 }
 
 module "trigger_drain_ecs_container_instance" {
