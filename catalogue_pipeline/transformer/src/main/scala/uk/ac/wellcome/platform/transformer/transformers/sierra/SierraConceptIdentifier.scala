@@ -22,7 +22,7 @@ import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 object SierraConceptIdentifier {
 
   def maybeFindIdentifier(varField: VarField,
-                          identifierSubfield: MarcSubfield,
+                          identifierSubfieldContent: String,
                           ontologyType: String): Option[SourceIdentifier] = {
     val maybeIdentifierType = varField.indicator2 match {
       case None => None
@@ -47,7 +47,7 @@ object SierraConceptIdentifier {
         Some(
           SourceIdentifier(
             identifierType = identifierType,
-            value = identifierSubfield.content,
+            value = identifierSubfieldContent,
             ontologyType = ontologyType
           ))
     }

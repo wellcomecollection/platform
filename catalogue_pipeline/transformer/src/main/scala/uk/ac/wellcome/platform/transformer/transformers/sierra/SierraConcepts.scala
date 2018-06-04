@@ -30,7 +30,7 @@ trait SierraConcepts extends MarcUtils {
         maybeAddIdentifier[T](
           concept = concept,
           varField = varField,
-          identifierSubfield = identifierSubfield
+          identifierSubfieldContent = identifierSubfield.content
         )
       case _ =>
         throw new RuntimeException(
@@ -43,10 +43,10 @@ trait SierraConcepts extends MarcUtils {
   private def maybeAddIdentifier[T <: AbstractConcept](
     concept: T,
     varField: VarField,
-    identifierSubfield: MarcSubfield): MaybeDisplayable[T] = {
+    identifierSubfieldContent: String): MaybeDisplayable[T] = {
     val maybeSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
-      identifierSubfield = identifierSubfield,
+      identifierSubfieldContent = identifierSubfieldContent,
       ontologyType = concept.ontologyType
     )
 
