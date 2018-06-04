@@ -67,8 +67,6 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
             record.copy(reindexVersion = reindexJob.desiredVersion)
           versionedDao.updateRecord[ReindexRecord](updatedRecord)
         }
-        .map { _ =>
-          ()
-        }
+        .map { _ => () }
     }
 }
