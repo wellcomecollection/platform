@@ -27,6 +27,7 @@ class Server extends HttpServer {
     MysqlModule,
     IdentifiersTableConfigModule,
     AkkaModule,
+    ExecutionContextModule,
     IdMinterWorkerModule,
     SQSClientModule,
     SNSClientModule,

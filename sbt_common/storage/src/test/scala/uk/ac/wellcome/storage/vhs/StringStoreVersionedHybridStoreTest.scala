@@ -1,14 +1,16 @@
 package uk.ac.wellcome.storage.vhs
 
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.storage.GlobalExecutionContext.context
-import uk.ac.wellcome.storage.s3.S3StringStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.util.Random
 
@@ -21,11 +23,41 @@ class StringStoreVersionedHybridStoreTest
 
   import uk.ac.wellcome.storage.dynamo._
 
+  def withStringVHS[Metadata, R](
+    bucket: Bucket,
+    table: Table,
+    globalS3Prefix: String = defaultGlobalS3Prefix)(
+    testWith: TestWith[
+      VersionedHybridStore[String, Metadata, ObjectStore[String]],
+      R])(
+    implicit objectStore: ObjectStore[String]
+  ): R = {
+    val s3Config = S3Config(bucketName = bucket.name)
+
+    val dynamoConfig =
+      DynamoConfig(table = table.name, maybeIndex = Some(table.index))
+
+    val vhsConfig = VHSConfig(
+      dynamoConfig = dynamoConfig,
+      s3Config = s3Config,
+      globalS3Prefix = globalS3Prefix
+    )
+
+    val store =
+      new VersionedHybridStore[String, Metadata, ObjectStore[String]](
+        vhsConfig = vhsConfig,
+        objectStore = objectStore,
+        dynamoDbClient = dynamoDbClient
+      )
+
+    testWith(store)
+  }
+
   def withS3StringStoreFixtures[R](
     testWith: TestWith[
       (Bucket,
        Table,
-       VersionedHybridStore[String, EmptyMetadata, S3StringStore]),
+       VersionedHybridStore[String, EmptyMetadata, ObjectStore[String]]),
       R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
