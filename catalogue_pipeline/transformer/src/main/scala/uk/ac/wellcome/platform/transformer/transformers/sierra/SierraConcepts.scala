@@ -22,15 +22,34 @@ trait SierraConcepts extends MarcUtils {
   protected def identifyPrimaryConcept[T <: AbstractConcept](
     concept: T,
     varField: VarField): MaybeDisplayable[T] = {
-    val identifierSubfields = varField.subfields.filter { _.tag == "0" }
+    val identifierSubfields = varField.subfields
+      .filter { _.tag == "0" }
 
-    identifierSubfields.distinct match {
+    // We've seen some MARC records where subfield $0 is repeated with
+    // the same value:
+    //
+    //    ['D000056', 'D000056']
+    //
+    // We've also seen MARC records where the contents is repeated with
+    // the prefix (DNLM), for example:
+    //
+    //    ['D049671', '(DNLM)D049671']
+    //
+    // Here the prefix is denoting the authority it came from, which is
+    // an artefact of the original Sierra import.  We don't need it --
+    // indeed, the authority is specified elsewhere!  So we can discard it.
+    val identifierSubfieldContents = varField.subfields
+      .filter { _.tag == "0" }
+      .map { _.content }
+      .distinct
+
+    identifierSubfieldContents match {
       case Seq() => Unidentifiable(agent = concept)
-      case Seq(identifierSubfield) =>
+      case Seq(subfieldContent) =>
         maybeAddIdentifier[T](
           concept = concept,
           varField = varField,
-          identifierSubfieldContent = identifierSubfield.content
+          identifierSubfieldContent = subfieldContent
         )
       case _ =>
         throw new RuntimeException(
