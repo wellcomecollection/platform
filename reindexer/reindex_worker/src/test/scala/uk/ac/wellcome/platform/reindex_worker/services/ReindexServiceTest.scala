@@ -169,11 +169,12 @@ class ReindexServiceTest
           reindexVersion: Int
         )
 
-        Scanamo.put(dynamoDbClient)(table.name)(BadRecord(
-          id = "badId1",
-          reindexShard = shardName,
-          reindexVersion = currentVersion
-        ))
+        Scanamo.put(dynamoDbClient)(table.name)(
+          BadRecord(
+            id = "badId1",
+            reindexShard = shardName,
+            reindexVersion = currentVersion
+          ))
 
         val reindexJob = ReindexJob(
           shardId = shardName,
@@ -182,7 +183,7 @@ class ReindexServiceTest
 
         val future = reindexService.runReindex(reindexJob)
         whenReady(future.failed) {
-          _ shouldBe a [GracefulFailureException]
+          _ shouldBe a[GracefulFailureException]
         }
       }
     }

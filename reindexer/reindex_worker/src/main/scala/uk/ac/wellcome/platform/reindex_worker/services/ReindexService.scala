@@ -58,9 +58,11 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
 
     // Then we PUT all the records.  It might be more efficient to do a
     // bulk update, but this will do for now.
-    outdatedRecordsFuture.flatMap {
-      outdatedRecords: List[ReindexRecord] => Future.sequence {
-        outdatedRecords.map { updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion) }
+    outdatedRecordsFuture.flatMap { outdatedRecords: List[ReindexRecord] =>
+      Future.sequence {
+        outdatedRecords.map {
+          updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
+        }
       }
     }
   }
