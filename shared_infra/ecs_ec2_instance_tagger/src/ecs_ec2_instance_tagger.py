@@ -24,6 +24,7 @@ import os
 
 import boto3
 from botocore.exceptions import ClientError
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def create_tags(ec2_client, ec2_instance_id, event_detail):
@@ -55,9 +56,8 @@ def create_tags(ec2_client, ec2_instance_id, event_detail):
     )
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     ec2_client = boto3.client('ec2')
     s3_client = boto3.client('s3')
 

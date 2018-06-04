@@ -5,6 +5,8 @@ import json
 
 import boto3
 
+from wellcome_aws_utils.lambda_utils import log_on_error
+
 
 def _send_metric(client, namespace, metric_data):
     print(f'sending metric for {namespace}: {metric_data!r}')
@@ -56,8 +58,7 @@ def send_assertions_to_cloudwatch(client, event):
     print(f'resp = {resp}')
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     client = boto3.client('cloudwatch')
     send_assertions_to_cloudwatch(client, event)

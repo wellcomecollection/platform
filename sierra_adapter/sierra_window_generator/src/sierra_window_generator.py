@@ -8,8 +8,7 @@ import os
 
 import boto3
 import pytz
-
-
+from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
@@ -26,9 +25,8 @@ def build_window(minutes):
     }
 
 
+@log_on_error
 def main(event=None, _ctxt=None, sns_client=None):
-    print(f'event = {event!r}')
-
     sns_client = sns_client or boto3.client('sns')
 
     topic_arn = os.environ['TOPIC_ARN']
