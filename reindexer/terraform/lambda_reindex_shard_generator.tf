@@ -1,5 +1,5 @@
 module "shard_generator_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v6.4.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name      = "reindex_shard_generator"
   s3_bucket = "${var.infra_bucket}"
@@ -14,6 +14,8 @@ module "shard_generator_lambda" {
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
+  log_retention_in_days = 60
 }
 
 module "trigger_shard_generator_lambda" {

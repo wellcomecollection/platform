@@ -1,5 +1,5 @@
 module "reindex_job_creator_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name      = "reindex_job_creator"
   s3_bucket = "${var.infra_bucket}"
@@ -14,6 +14,8 @@ module "reindex_job_creator_lambda" {
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
+  log_retention_in_days = 60
 }
 
 module "trigger_reindex_job_creator_lambda" {
