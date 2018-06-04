@@ -10,7 +10,7 @@ import os
 import attr
 import boto3
 import requests
-from wellcome_aws_utils import log_on_error
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 from cloudwatch_alarms import (
     build_cloudwatch_url,
