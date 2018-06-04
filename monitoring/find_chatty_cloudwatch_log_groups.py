@@ -57,7 +57,7 @@ def print_bar_chart(data):
             bar += chr(ord('█') + (8 - remainder))
 
         # If the bar is empty, add a left one-eighth block
-        bar = bar or  '▏'
+        bar = bar or '▏'
 
         print(f'{label.rjust(longest_label_length)} ▏ {count:#6.2f} {bar}')
 
