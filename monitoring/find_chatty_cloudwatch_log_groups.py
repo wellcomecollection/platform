@@ -19,13 +19,57 @@ def describe_all_log_groups():
         yield from page['logGroups']
 
 
+def print_bar_chart(data):
+    """
+    Given a list of two-tuples (label, size), print a bar chart to the
+    console representing this data.
+
+    See: https://alexwlchan.net/2018/05/ascii-bar-charts/
+
+    """
+    max_value = max(count for _, count in data)
+    increment = max_value / 25
+
+    longest_label_length = max(len(label) for label, _ in data)
+
+    for label, count in data:
+
+        # The ASCII block elements come in chunks of 8, so we work out how
+        # many fractions of 8 we need.
+        # https://en.wikipedia.org/wiki/Block_Elements
+        bar_chunks, remainder = divmod(int(count * 8 / increment), 8)
+
+        # First draw the full width chunks
+        bar = '█' * bar_chunks
+
+        # Then add the fractional part.  The Unicode code points for
+        # block elements are (8/8), (7/8), (6/8), ... , so we need to
+        # work backwards.
+        if remainder > 0:
+            bar += chr(ord('█') + (8 - remainder))
+
+        # If the bar is empty, add a left one-eighth block
+        bar = bar or  '▏'
+
+        print(f'{label.rjust(longest_label_length)} ▏ {count:#14d} {bar}')
+
+
 if __name__ == '__main__':
+
+    # All our log group names are of one of two forms:
+    #
+    #   platform/:service_name
+    #   /aws/lambda/:lambda_name
+    #
+    # We don't care about the prefix, so we can strip it off to make the
+    # results easier to read.
+    #
     stored_sizes = {
-        group['logGroupName']: group['storedBytes']
+        group['logGroupName'].split('/')[-1]: group['storedBytes']
         for group in describe_all_log_groups()
     }
 
     import collections
-    from pprint import pprint
+    chattiest_groups = collections.Counter(stored_sizes).most_common(10)
 
-    pprint(collections.Counter(stored_sizes).most_common(10))
+    print_bar_chart(chattiest_groups)
