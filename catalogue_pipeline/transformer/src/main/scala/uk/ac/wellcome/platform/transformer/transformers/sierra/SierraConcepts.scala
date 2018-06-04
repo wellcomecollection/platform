@@ -19,7 +19,7 @@ trait SierraConcepts extends MarcUtils {
   //
   // Note that some identifiers have an identifier scheme in
   // indicator 2, but no ID.  In this case, we just ignore it.
-  protected def identifyPrimaryConcept[T <: AbstractConcept](
+  def identifyPrimaryConcept[T <: AbstractConcept](
     concept: T,
     varField: VarField): MaybeDisplayable[T] = {
     val identifierSubfields = varField.subfields
