@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
-import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.source.VarField
 
 // Implements logic for finding a source identifier for varFields with
 // MARC tag 648, 650, 651 and 655.  These are the fields we use for genre
@@ -22,7 +22,7 @@ import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 object SierraConceptIdentifier {
 
   def maybeFindIdentifier(varField: VarField,
-                          identifierSubfield: MarcSubfield,
+                          identifierSubfieldContent: String,
                           ontologyType: String): Option[SourceIdentifier] = {
     val maybeIdentifierType = varField.indicator2 match {
       case None => None
@@ -47,7 +47,7 @@ object SierraConceptIdentifier {
         Some(
           SourceIdentifier(
             identifierType = identifierType,
-            value = identifierSubfield.content,
+            value = identifierSubfieldContent,
             ontologyType = ontologyType
           ))
     }

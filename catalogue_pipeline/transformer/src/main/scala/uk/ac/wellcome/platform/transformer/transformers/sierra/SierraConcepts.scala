@@ -19,18 +19,38 @@ trait SierraConcepts extends MarcUtils {
   //
   // Note that some identifiers have an identifier scheme in
   // indicator 2, but no ID.  In this case, we just ignore it.
-  protected def identifyPrimaryConcept[T <: AbstractConcept](
+  def identifyPrimaryConcept[T <: AbstractConcept](
     concept: T,
     varField: VarField): MaybeDisplayable[T] = {
-    val identifierSubfields = varField.subfields.filter { _.tag == "0" }
+    val identifierSubfields = varField.subfields
+      .filter { _.tag == "0" }
 
-    identifierSubfields.distinct match {
+    // We've seen some MARC records where subfield $0 is repeated with
+    // the same value:
+    //
+    //    ['D000056', 'D000056']
+    //
+    // We've also seen MARC records where the contents is repeated with
+    // the prefix (DNLM), for example:
+    //
+    //    ['D049671', '(DNLM)D049671']
+    //
+    // Here the prefix is denoting the authority it came from, which is
+    // an artefact of the original Sierra import.  We don't need it --
+    // indeed, the authority is specified elsewhere!  So we can discard it.
+    val identifierSubfieldContents = varField.subfields
+      .filter { _.tag == "0" }
+      .map { _.content }
+      .map { _.replaceFirst("^\\(DNLM\\)", "") }
+      .distinct
+
+    identifierSubfieldContents match {
       case Seq() => Unidentifiable(agent = concept)
-      case Seq(identifierSubfield) =>
+      case Seq(subfieldContent) =>
         maybeAddIdentifier[T](
           concept = concept,
           varField = varField,
-          identifierSubfield = identifierSubfield
+          identifierSubfieldContent = subfieldContent
         )
       case _ =>
         throw new RuntimeException(
@@ -43,10 +63,10 @@ trait SierraConcepts extends MarcUtils {
   private def maybeAddIdentifier[T <: AbstractConcept](
     concept: T,
     varField: VarField,
-    identifierSubfield: MarcSubfield): MaybeDisplayable[T] = {
+    identifierSubfieldContent: String): MaybeDisplayable[T] = {
     val maybeSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
-      identifierSubfield = identifierSubfield,
+      identifierSubfieldContent = identifierSubfieldContent,
       ontologyType = concept.ontologyType
     )
 
