@@ -1,5 +1,5 @@
 module "transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "transformer"
 
   memory = "2560"
@@ -33,6 +33,8 @@ module "transformer" {
   enable_alb_alarm = false
 
   max_capacity = 15
+
+  log_retention_in_days = 60
 }
 
 module "transformer_dynamo_to_sns" {
