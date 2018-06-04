@@ -2,31 +2,16 @@ package uk.ac.wellcome.platform.snapshot_generator
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.elasticsearch.{
-  ElasticClientModule,
-  ElasticConfigModule
-}
-import uk.ac.wellcome.finatra.messaging.{
-  SNSClientModule,
-  SNSConfigModule,
-  SQSClientModule,
-  SQSConfigModule
-}
+import uk.ac.wellcome.finatra.elasticsearch.{ElasticClientModule, ElasticConfigModule}
+import uk.ac.wellcome.finatra.messaging.{SNSClientModule, SNSConfigModule, SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ConfigModule
-import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{
-  AkkaS3ClientModule,
-  SnapshotGeneratorWorkerModule
-}
+import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{AkkaS3ClientModule, SnapshotGeneratorWorkerModule}
 
 object ServerMain extends Server
 
@@ -46,7 +31,8 @@ class Server extends HttpServer {
     ElasticClientModule,
     ElasticConfigModule,
     SnapshotGeneratorWorkerModule,
-    AkkaModule
+    AkkaModule,
+    ExecutionContextModule
   )
 
   override def jacksonModule = DisplayJacksonModule

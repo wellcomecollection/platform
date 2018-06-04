@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.transformable.{
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.platform.transformer.GlobalExecutionContext.context
+import .context
 import uk.ac.wellcome.platform.transformer.transformers.{
   CalmTransformableTransformer,
   MiroTransformableTransformer,

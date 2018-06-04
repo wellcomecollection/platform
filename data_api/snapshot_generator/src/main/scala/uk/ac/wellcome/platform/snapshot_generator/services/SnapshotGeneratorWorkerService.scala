@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.snapshot_generator.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.snapshot_generator.models.SnapshotJob
 import uk.ac.wellcome.utils.JsonUtil._
 

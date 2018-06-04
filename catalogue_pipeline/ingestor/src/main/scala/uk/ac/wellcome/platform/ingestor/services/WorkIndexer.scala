@@ -13,7 +13,7 @@ import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.ingestor.GlobalExecutionContext.context
+import .context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
