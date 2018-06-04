@@ -26,13 +26,14 @@ trait SerialisationStrategy[T] {
 
 object SerialisationStrategy {
 
-  def apply[T](implicit strategy: SerialisationStrategy[T]): SerialisationStrategy[T] =
+  def apply[T](
+    implicit strategy: SerialisationStrategy[T]): SerialisationStrategy[T] =
     strategy
 
   implicit def typeStorageStrategy[T](
-                                       implicit jsonStorageStrategy: SerialisationStrategy[Json],
-                                       encoder: Encoder[T],
-                                       decoder: Decoder[T]
+    implicit jsonStorageStrategy: SerialisationStrategy[Json],
+    encoder: Encoder[T],
+    decoder: Decoder[T]
   ) = new SerialisationStrategy[T] {
     def toStream(t: T): StorageStream = jsonStorageStrategy.toStream(t.asJson)
     def fromStream(input: InputStream) =

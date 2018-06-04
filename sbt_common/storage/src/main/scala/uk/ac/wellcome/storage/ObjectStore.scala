@@ -31,9 +31,9 @@ object ObjectStore {
     store
 
   implicit def createObjectStore[T, R <: StorageBackend](
-                                                          implicit storageStrategy: SerialisationStrategy[T],
-                                                          storageBackend: R,
-                                                          ec: ExecutionContext): ObjectStore[T] = new ObjectStore[T] {
+    implicit storageStrategy: SerialisationStrategy[T],
+    storageBackend: R,
+    ec: ExecutionContext): ObjectStore[T] = new ObjectStore[T] {
     def put(namespace: String)(
       t: T,
       keyPrefix: KeyPrefix = KeyPrefix(""),
