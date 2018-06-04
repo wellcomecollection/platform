@@ -1,5 +1,5 @@
 module "snapshot_scheduler_lambda" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.5"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name = "snapshot_scheduler"
 
@@ -18,6 +18,8 @@ module "snapshot_scheduler_lambda" {
     PUBLIC_OBJECT_KEY_V1 = "${var.public_object_key_v1}"
     PUBLIC_OBJECT_KEY_V2 = "${var.public_object_key_v2}"
   }
+
+  log_retention_in_days = 30
 }
 
 module "trigger_snapshot_scheduler_lambda" {

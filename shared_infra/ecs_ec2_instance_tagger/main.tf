@@ -1,7 +1,7 @@
 # Lambda for tagging EC2 instances with ECS cluster/container instance id
 
 module "lambda_ecs_ec2_instance_tagger" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   name        = "ecs_ec2_instance_tagger"
   description = "Tag an EC2 instance with ECS cluster/container instance id"
@@ -15,6 +15,8 @@ module "lambda_ecs_ec2_instance_tagger" {
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/ecs_ec2_instance_tagger.zip"
+
+  log_retention_in_days = 30
 }
 
 module "trigger_ecs_ec2_instance_tagger" {

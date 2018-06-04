@@ -1,5 +1,5 @@
 module "reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v6.4.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "reindexer"
 
   source_queue_name = "${module.reindexer_queue.name}"
@@ -29,6 +29,8 @@ module "reindexer" {
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 
   enable_alb_alarm = false
+
+  log_retention_in_days = 30
 }
 
 resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {

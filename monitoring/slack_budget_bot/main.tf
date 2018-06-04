@@ -1,5 +1,5 @@
 module "slack_budget_bot" {
-  source        = "git::https://github.com/wellcometrust/terraform-modules.git//ecs_script_task?ref=v1.0.0"
+  source        = "git::https://github.com/wellcometrust/terraform-modules.git//ecs_script_task?ref=v10.2.2"
   task_name     = "slack_budget_bot"
   app_uri       = "${module.ecr_repository_slack_budget_bot.repository_url}:${var.release_ids["slack_budget_bot"]}"
   task_role_arn = "${module.ecs_slack_budget_bot_iam.task_role_arn}"
@@ -9,6 +9,8 @@ module "slack_budget_bot" {
     "{\"name\": \"ACCOUNT_ID\", \"value\": \"${var.account_id}\"}",
     "{\"name\": \"SLACK_WEBHOOK\", \"value\": \"${var.slack_webhook}\"}",
   ]
+
+  log_retention_in_days = 30
 }
 
 module "ecs_slack_budget_bot_iam" {

@@ -1,5 +1,5 @@
 module "gatling_loris" {
-  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v1.0.0"
+  source        = "git::https://github.com/wellcometrust/terraform.git//ecs_script_task?ref=v10.2.2"
   task_name     = "gatling_loris"
   app_uri       = "${module.ecr_repository_gatling.repository_url}:${var.release_ids["gatling"]}"
   task_role_arn = "${module.ecs_gatling_iam.task_role_arn}"
@@ -11,6 +11,8 @@ module "gatling_loris" {
     "{\"name\": \"RESULTS_TOPIC_ARN\", \"value\": \"${module.load_test_results.arn}\"}",
     "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
   ]
+
+  log_retention_in_days = 30
 }
 
 module "gatling_catalogue_api" {

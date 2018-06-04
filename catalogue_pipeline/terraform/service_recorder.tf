@@ -1,5 +1,5 @@
 module "recorder" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "recorder"
 
   source_queue_name  = "${module.recorder_queue.name}"
@@ -34,4 +34,6 @@ module "recorder" {
   enable_alb_alarm = false
 
   max_capacity = 15
+
+  log_retention_in_days = 30
 }
