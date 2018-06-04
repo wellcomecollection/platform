@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.goobi_reader
 
+import java.time.Instant
+
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
@@ -13,7 +15,8 @@ class GoobiReaderFeatureTest
       with Eventually
       with Matchers
       with ExtendedPatience
-      with GoobiReaderFixtures{
+      with GoobiReaderFixtures {
+  private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
 
   it("gets an S3 notification and puts the new record in VHS") {
     withLocalS3Bucket { bucket =>
@@ -22,7 +25,8 @@ class GoobiReaderFeatureTest
           val id = "mets-0001"
           val sourceKey = s"$id.xml"
           val contents = "muddling the machinations of morose METS"
-          val notificationMessage = aNotificationMessage(queue.arn, s3Notification(sourceKey, bucket.name))
+          val notificationMessage =
+            aNotificationMessage(queue.arn, s3Notification(sourceKey, bucket.name, eventTime))
 
           s3Client.putObject(bucket.name, sourceKey, contents)
           sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
@@ -46,5 +50,4 @@ class GoobiReaderFeatureTest
       }
     }
   }
-
 }

@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.goobi_reader.services
 
 import java.io.InputStream
+import java.time.Instant
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -12,7 +13,6 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.Decoder
 import io.circe.generic.semiauto.deriveDecoder
-import org.joda.time.format.ISODateTimeFormat
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
@@ -67,14 +67,20 @@ class GoobiReaderWorkerService @Inject()(
     val bucketName = r.getS3.getBucket.getName
     val objectKey = r.getS3.getObject.getKey
     val id = objectKey.replaceAll(".xml", "")
-    val dateFormatter = ISODateTimeFormat.dateTime()
-    val eventTime = dateFormatter.print(r.getEventTime)
+    val updateEventTime: Instant = Instant.ofEpochMilli(r.getEventTime.getMillis)
 
     val eventuallyContent = Future {
-       s3Client.getObject(bucketName, objectKey).getObjectContent
+      s3Client.getObject(bucketName, objectKey).getObjectContent
     }
     eventuallyContent.flatMap( content => {
-      versionedHybridStore.updateRecord(id = id)(ifNotExisting = content)(ifExisting = (t, _) => t)(GoobiRecordMetadata(eventTime))
+      versionedHybridStore.updateRecord(id = id)(
+        ifNotExisting = (content, GoobiRecordMetadata(updateEventTime)))(
+        ifExisting = (existingContent, existingMetadata) => {
+          if (existingMetadata.eventTime.isBefore(updateEventTime))
+            (content, GoobiRecordMetadata(updateEventTime))
+          else
+            (existingContent, existingMetadata)
+        })
     })
   }
 }

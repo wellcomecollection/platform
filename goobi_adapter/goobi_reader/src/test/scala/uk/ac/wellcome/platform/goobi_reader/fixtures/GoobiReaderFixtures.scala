@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.goobi_reader.fixtures
 
-import org.joda.time.format.{DateTimeFormatter, ISODateTimeFormat}
+import java.time.{Instant, ZoneOffset}
+import java.time.format.DateTimeFormatter
+
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -12,8 +14,6 @@ import scala.util.Random
 
 trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
 
-  val dateFormat: DateTimeFormatter = ISODateTimeFormat.dateTime()
-
   def aNotificationMessage(topicArn: String, message: String) =
     NotificationMessage(
       MessageId = Random.alphanumeric take 5 mkString,
@@ -22,14 +22,17 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
       Message   = message
     )
 
-  def s3Notification(sourceKey: String, bucketName: String, eventTime: String = "2018-01-01T01:00:00.000Z")=
+  private val dateTimeFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC)
+
+  def s3Notification(sourceKey: String, bucketName: String, eventTime: Instant)=
     s"""{
         | "Records": [
         |     {
         |         "eventVersion": "2.0",
         |         "eventSource": "aws:s3",
         |         "awsRegion": "eu-west-1",
-        |         "eventTime": "$eventTime",
+        |         "eventTime": "${dateTimeFormatter.format(eventTime)}",
         |         "eventName": "ObjectCreated:Put",
         |         "userIdentity": {
         |             "principalId": "AWS:AIDAJCQOG2NMLPWL7OVGQ"
