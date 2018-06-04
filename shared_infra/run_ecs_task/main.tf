@@ -10,7 +10,7 @@ module "lambda_run_ecs_task" {
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/run_ecs_task.zip"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_run_ecs_task" {

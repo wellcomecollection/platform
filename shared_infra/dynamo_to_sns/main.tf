@@ -16,7 +16,7 @@ module "lambda_dynamo_to_sns" {
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/dynamo_to_sns.zip"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_dynamo_to_sns" {

@@ -35,5 +35,5 @@ module "recorder" {
 
   max_capacity = 15
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }

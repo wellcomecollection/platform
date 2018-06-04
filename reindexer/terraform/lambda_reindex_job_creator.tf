@@ -15,7 +15,7 @@ module "reindex_job_creator_lambda" {
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_reindex_job_creator_lambda" {

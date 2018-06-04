@@ -36,7 +36,7 @@ module "matcher" {
 
   max_capacity = 15
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "matcher_dynamo_to_sns" {

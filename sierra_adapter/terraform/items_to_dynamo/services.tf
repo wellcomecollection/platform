@@ -36,5 +36,5 @@ module "sierra_to_dynamo_service" {
 
   max_capacity = 50
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }

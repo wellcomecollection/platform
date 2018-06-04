@@ -16,7 +16,7 @@ module "lambda_service_deployment_status" {
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/monitoring/deployment_tracking/service_deployment_status.zip"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_service_deployment_status" {

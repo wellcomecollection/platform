@@ -52,5 +52,5 @@ module "snapshot_generator" {
 
   scale_down_period_in_minutes = 30
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }

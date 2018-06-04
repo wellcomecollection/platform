@@ -30,7 +30,7 @@ module "reindexer" {
 
   enable_alb_alarm = false
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {

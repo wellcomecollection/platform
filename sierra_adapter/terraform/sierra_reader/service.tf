@@ -45,5 +45,5 @@ module "sierra_reader_service" {
 
   max_capacity = 1
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }

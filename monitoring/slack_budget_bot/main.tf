@@ -10,7 +10,7 @@ module "slack_budget_bot" {
     "{\"name\": \"SLACK_WEBHOOK\", \"value\": \"${var.slack_webhook}\"}",
   ]
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "ecs_slack_budget_bot_iam" {

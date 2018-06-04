@@ -34,7 +34,7 @@ module "transformer" {
 
   max_capacity = 15
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "transformer_dynamo_to_sns" {

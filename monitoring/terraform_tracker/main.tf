@@ -16,7 +16,7 @@ module "lambda_terraform_tracker" {
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 data "aws_sns_topic" "trigger_topic" {

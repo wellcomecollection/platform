@@ -16,7 +16,7 @@ module "window_generator_lambda" {
     "WINDOW_LENGTH_MINUTES" = "${var.window_length_minutes}"
   }
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_sierra_window_generator_lambda" {

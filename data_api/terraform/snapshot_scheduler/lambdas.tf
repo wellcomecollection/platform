@@ -19,7 +19,7 @@ module "snapshot_scheduler_lambda" {
     PUBLIC_OBJECT_KEY_V2 = "${var.public_object_key_v2}"
   }
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_snapshot_scheduler_lambda" {

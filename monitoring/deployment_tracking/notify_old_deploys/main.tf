@@ -19,7 +19,7 @@ module "lambda_notify_old_deploys" {
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/monitoring/deployment_tracking/notify_old_deploys.zip"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_notify_old_deploys" {

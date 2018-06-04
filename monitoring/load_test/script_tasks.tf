@@ -12,7 +12,7 @@ module "gatling_loris" {
     "{\"name\": \"S3_BUCKET\", \"value\": \"${var.monitoring_bucket_id}\"}",
   ]
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "gatling_catalogue_api" {

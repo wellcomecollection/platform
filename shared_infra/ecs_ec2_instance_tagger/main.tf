@@ -16,7 +16,7 @@ module "lambda_ecs_ec2_instance_tagger" {
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/shared_infra/ecs_ec2_instance_tagger.zip"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_ecs_ec2_instance_tagger" {

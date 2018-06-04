@@ -16,7 +16,7 @@ module "lambda_update_service_list" {
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  log_retention_in_days = 60
+  log_retention_in_days = 30
 }
 
 module "trigger_update_service_list" {
