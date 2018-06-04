@@ -78,8 +78,8 @@ class SierraConceptsTest extends FunSpec with Matchers {
           indicator2 = "0",
           subfields = List(
             MarcSubfield(tag = "a", content = "hitchhiking"),
-            MarcSubfield(tag = "0", content = "lcsh/xxx"),
-            MarcSubfield(tag = "0", content = "lcsh/yyy")
+            MarcSubfield(tag = "0", content = "u/xxx"),
+            MarcSubfield(tag = "0", content = "u/yyy")
           )
         )
       )
