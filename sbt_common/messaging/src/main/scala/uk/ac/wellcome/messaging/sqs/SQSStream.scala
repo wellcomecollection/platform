@@ -37,6 +37,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     implicit decoderT: Decoder[T]): Future[Done] =
     SqsSource(sqsConfig.queueUrl)(sqsClient)
       .mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
+        info(s"Processing message ${message.getMessageId}")
         val metricName = s"${streamName}_ProcessMessage"
         metricsSender.timeAndCount(
           metricName,
