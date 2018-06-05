@@ -56,18 +56,16 @@ class SierraConceptsTest extends FunSpec with Matchers {
           MarcSubfield(tag = "a", content = "martians"),
           MarcSubfield(tag = "0", content = "lcsh/bbb"),
           MarcSubfield(tag = "0", content = "lcsh/bbb"),
-
           // Including the (DNLM) prefix
           MarcSubfield(tag = "0", content = "(DNLM)lcsh/bbb"),
-
           // With trailing punctuation
           MarcSubfield(tag = "0", content = "lcsh/bbb."),
-
           // Including whitespace
           MarcSubfield(tag = "0", content = "lcsh / bbb"),
-
           // Including a MESH URL prefix
-          MarcSubfield(tag = "0", content = "https://id.nlm.nih.gov/mesh/lcsh/bbb")
+          MarcSubfield(
+            tag = "0",
+            content = "https://id.nlm.nih.gov/mesh/lcsh/bbb")
         )
       )
     )
