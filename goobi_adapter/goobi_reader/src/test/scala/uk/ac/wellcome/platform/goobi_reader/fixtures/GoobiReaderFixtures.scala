@@ -17,15 +17,19 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
   def aNotificationMessage(topicArn: String, message: String) =
     NotificationMessage(
       MessageId = Random.alphanumeric take 5 mkString,
-      TopicArn  = topicArn,
-      Subject   = "Test notification in GoobiReaderFeatureTest",
-      Message   = message
+      TopicArn = topicArn,
+      Subject = "Test notification in GoobiReaderFeatureTest",
+      Message = message
     )
 
   private val dateTimeFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC)
+    DateTimeFormatter
+      .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+      .withZone(ZoneOffset.UTC)
 
-  def anS3Notification(sourceKey: String, bucketName: String, eventTime: Instant)=
+  def anS3Notification(sourceKey: String,
+                       bucketName: String,
+                       eventTime: Instant) =
     s"""{
         | "Records": [
         |     {
@@ -65,8 +69,6 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
         | ]
         |}""".stripMargin
 
-
   def goobiReaderLocalFlags(queue: Queue, bucket: Bucket, table: Table) =
     sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table, "goobi")
 }
-

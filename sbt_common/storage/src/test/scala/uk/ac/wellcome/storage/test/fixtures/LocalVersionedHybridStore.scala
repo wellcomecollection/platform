@@ -10,7 +10,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.{HybridRecord, VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  HybridRecord,
+  VHSConfig,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -33,9 +37,9 @@ trait LocalVersionedHybridStore
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
   def withTypeVHS[T, Metadata, R](bucket: Bucket,
-                                        table: Table,
-                                        globalS3Prefix: String =
-                                          defaultGlobalS3Prefix)(
+                                  table: Table,
+                                  globalS3Prefix: String =
+                                    defaultGlobalS3Prefix)(
     testWith: TestWith[VersionedHybridStore[T, Metadata, ObjectStore[T]], R])(
     implicit objectStore: ObjectStore[T]
   ): R = {

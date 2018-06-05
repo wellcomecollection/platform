@@ -22,7 +22,9 @@ class GoobiReaderWorkerService @Inject()(
   s3Client: AmazonS3,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
-  versionedHybridStore: VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]]
+  versionedHybridStore: VersionedHybridStore[InputStream,
+                                             GoobiRecordMetadata,
+                                             ObjectStore[InputStream]]
 ) extends Logging {
 
   implicit val actorSystem: ActorSystem = system
@@ -37,7 +39,8 @@ class GoobiReaderWorkerService @Inject()(
   private def processMessage(snsNotification: NotificationMessage) = {
     debug(s"Received notification: $snsNotification")
     for {
-      eventNotification <- Future.fromTry(fromJson[S3Event](snsNotification.Message))
+      eventNotification <- Future.fromTry(
+        fromJson[S3Event](snsNotification.Message))
       _ <- Future.sequence(eventNotification.Records.map(updateRecord))
     } yield ()
   }
@@ -51,9 +54,9 @@ class GoobiReaderWorkerService @Inject()(
     val eventuallyContent = Future {
       s3Client.getObject(bucketName, objectKey).getObjectContent
     }
-    eventuallyContent.flatMap( updatedContent => {
-      versionedHybridStore.updateRecord(id = id)(
-        ifNotExisting = (updatedContent, GoobiRecordMetadata(updateEventTime)))(
+    eventuallyContent.flatMap(updatedContent => {
+      versionedHybridStore.updateRecord(id = id)(ifNotExisting =
+        (updatedContent, GoobiRecordMetadata(updateEventTime)))(
         ifExisting = (existingContent, existingMetadata) => {
           if (existingMetadata.eventTime.isBefore(updateEventTime))
             (updatedContent, GoobiRecordMetadata(updateEventTime))

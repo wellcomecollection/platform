@@ -11,11 +11,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 class GoobiReaderFeatureTest
     extends FunSpec
-      with fixtures.Server
-      with Eventually
-      with Matchers
-      with ExtendedPatience
-      with GoobiReaderFixtures {
+    with fixtures.Server
+    with Eventually
+    with Matchers
+    with ExtendedPatience
+    with GoobiReaderFixtures {
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
 
   it("gets an S3 notification and puts the new record in VHS") {
@@ -26,7 +26,9 @@ class GoobiReaderFeatureTest
           val sourceKey = s"$id.xml"
           val contents = "muddling the machinations of morose METS"
           val notificationMessage =
-            aNotificationMessage(queue.arn, anS3Notification(sourceKey, bucket.name, eventTime))
+            aNotificationMessage(
+              queue.arn,
+              anS3Notification(sourceKey, bucket.name, eventTime))
 
           s3Client.putObject(bucket.name, sourceKey, contents)
           sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
