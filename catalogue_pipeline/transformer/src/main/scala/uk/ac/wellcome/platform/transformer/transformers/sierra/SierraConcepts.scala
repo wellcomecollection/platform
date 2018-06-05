@@ -50,8 +50,8 @@ trait SierraConcepts extends MarcUtils {
       .filter { _.tag == "0" }
       .map { _.content }
       .map { _.replaceFirst("^\\(DNLM\\)", "") }
-      .map { _.replaceAll("[.\\s]", "") }
       .map { _.replaceFirst("^https://id\\.nlm\\.nih\\.gov/mesh/", "") }
+      .map { _.replaceAll("[.\\s]", "") }
       .distinct
 
     identifierSubfieldContents match {
