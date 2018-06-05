@@ -32,7 +32,7 @@ trait LocalVersionedHybridStore
       "aws.vhs.dynamo.tableName" -> table.name
     ) ++ s3ClientLocalFlags ++ dynamoClientLocalFlags
 
-  def withTypeVHS[T <: Id, Metadata, R](bucket: Bucket,
+  def withTypeVHS[T, Metadata, R](bucket: Bucket,
                                         table: Table,
                                         globalS3Prefix: String =
                                           defaultGlobalS3Prefix)(

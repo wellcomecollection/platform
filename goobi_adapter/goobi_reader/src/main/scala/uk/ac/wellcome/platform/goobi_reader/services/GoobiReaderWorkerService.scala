@@ -11,14 +11,12 @@ import com.amazonaws.services.s3.event.S3EventNotification
 import com.amazonaws.services.s3.model.AmazonS3Exception
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import io.circe.Decoder
-import io.circe.generic.semiauto.deriveDecoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.S3StreamStore
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -30,14 +28,12 @@ class GoobiReaderWorkerService @Inject()(
   s3Client: AmazonS3,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
-  versionedHybridStore: VersionedHybridStore[InputStream, GoobiRecordMetadata, S3StreamStore]
+  versionedHybridStore: VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]]
 ) extends Logging {
 
   implicit val actorSystem: ActorSystem = system
   implicit val materialiser: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
-
-  implicit val decoderT: Decoder[SQSMessage] = deriveDecoder[SQSMessage]
 
   sqsStream.foreach(
     streamName = this.getClass.getSimpleName,

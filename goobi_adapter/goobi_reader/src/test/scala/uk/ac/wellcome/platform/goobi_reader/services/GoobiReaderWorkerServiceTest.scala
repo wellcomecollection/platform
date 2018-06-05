@@ -19,13 +19,15 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.s3.S3StreamStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith, fixture}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.duration._
 
@@ -195,11 +197,11 @@ class GoobiReaderWorkerServiceTest
 
   private def withS3StreamStoreFixtures[R](testWith: TestWith[(Bucket,
     Table,
-    VersionedHybridStore[InputStream, GoobiRecordMetadata, S3StreamStore]),
+    VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]]),
     R]): R =
     withLocalS3Bucket[R] { bucket =>
       withLocalDynamoDbTable[R] { table =>
-        withStreamVHS[GoobiRecordMetadata, R](bucket, table, goobiS3Prefix) { vhs =>
+        withTypeVHS[InputStream, GoobiRecordMetadata, R](bucket, table, goobiS3Prefix) { vhs =>
           testWith((bucket, table, vhs))
         }
       }
@@ -233,7 +235,7 @@ class GoobiReaderWorkerServiceTest
     }
 
   private def withGoobiReaderWorkerServiceAndVhs[R](s3Client: AmazonS3)(testWith: TestWith[
-    (Bucket, Queue, Table, VersionedHybridStore[InputStream, GoobiRecordMetadata, S3StreamStore], GoobiReaderWorkerService), R]): R =
+    (Bucket, Queue, Table, VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]], GoobiReaderWorkerService), R]): R =
     withActorSystem { actorSystem =>
       withLocalSqsQueue { queue =>
         withMetricsSender(actorSystem) { metricsSender =>
