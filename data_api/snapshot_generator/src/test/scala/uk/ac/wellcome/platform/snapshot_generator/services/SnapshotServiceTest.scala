@@ -35,6 +35,8 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class SnapshotServiceTest
     extends FunSpec
     with ScalaFutures

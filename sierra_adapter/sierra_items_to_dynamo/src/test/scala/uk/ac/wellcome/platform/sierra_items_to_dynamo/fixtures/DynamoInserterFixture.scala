@@ -6,6 +6,8 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait DynamoInserterFixture extends LocalDynamoDbVersioned {
 
   def withDynamoInserter[R](table: Table)(

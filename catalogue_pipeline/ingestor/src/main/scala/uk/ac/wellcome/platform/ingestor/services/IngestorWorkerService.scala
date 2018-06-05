@@ -6,17 +6,16 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
-import .context
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class IngestorWorkerService @Inject()(
   elasticConfig: ElasticConfig,
   identifiedWorkIndexer: WorkIndexer,
   messageStream: MessageStream[IdentifiedWork],
-  system: ActorSystem) {
+  system: ActorSystem)(implicit ec: ExecutionContext) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 

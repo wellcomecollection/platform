@@ -2,22 +2,14 @@ package uk.ac.wellcome.platform.sierra_reader
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.sierra_reader.modules.{
-  ReaderConfigModule,
-  SierraConfigModule,
-  SierraReaderModule
-}
+import uk.ac.wellcome.platform.sierra_reader.modules.{ReaderConfigModule, SierraConfigModule, SierraReaderModule}
 
 object ServerMain extends Server
 

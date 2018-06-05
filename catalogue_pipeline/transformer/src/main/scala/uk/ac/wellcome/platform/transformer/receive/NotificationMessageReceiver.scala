@@ -8,25 +8,15 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
-import .context
-import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class NotificationMessageReceiver @Inject()(
@@ -36,7 +26,8 @@ class NotificationMessageReceiver @Inject()(
   metricsSender: MetricsSender)(
   implicit miroTransformableStore: ObjectStore[MiroTransformable],
   calmTransformableStore: ObjectStore[CalmTransformable],
-  sierraTransformableStore: ObjectStore[SierraTransformable]
+  sierraTransformableStore: ObjectStore[SierraTransformable],
+  ec: ExecutionContext
 ) extends Logging {
 
   def receiveMessage(message: NotificationMessage): Future[Unit] = {
