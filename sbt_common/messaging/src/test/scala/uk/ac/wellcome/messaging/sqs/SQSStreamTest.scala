@@ -69,9 +69,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          verify(metricsSender, times(1)).count(
-            equalTo("test-stream_ProcessMessage"),
-            any[Future[Unit]]())
+          verify(metricsSender, times(1))
+            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())
         }
     }
   }

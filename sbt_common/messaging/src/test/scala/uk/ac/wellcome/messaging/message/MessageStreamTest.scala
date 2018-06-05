@@ -18,7 +18,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class MessageStreamTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with Messaging
     with Akka
@@ -70,9 +70,8 @@ class MessageStreamTest
           process = process(received))
 
         eventually {
-          verify(metricsSender, times(1)).count(
-            equalTo("test-stream_ProcessMessage"),
-            any[Future[Unit]]())
+          verify(metricsSender, times(1))
+            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())
         }
     }
   }

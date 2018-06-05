@@ -30,9 +30,7 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWork(work: IdentifiedWork,
-                esIndex: String,
-                esType: String) = {
+  def indexWork(work: IdentifiedWork, esIndex: String, esType: String) = {
 
     info(s"Indexing work ${work.canonicalId}")
 
@@ -49,14 +47,12 @@ class WorkIndexer @Inject()(
       }
       .recover {
         case e: ResponseException
-          if getErrorType(e).contains(
-            "version_conflict_engine_exception") =>
+            if getErrorType(e).contains("version_conflict_engine_exception") =>
           warn(
             s"Trying to index work ${work.canonicalId} with older version: skipping.")
           ()
         case e: TimeoutException =>
-          warn(
-            s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
+          warn(s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
           throw new GracefulFailureException(e)
         case e: Throwable =>
           error(

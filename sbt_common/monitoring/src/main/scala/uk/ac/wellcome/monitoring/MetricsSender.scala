@@ -5,7 +5,12 @@ import java.util.Date
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
+import akka.stream.{
+  ActorMaterializer,
+  OverflowStrategy,
+  QueueOfferResult,
+  ThrottleMode
+}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
@@ -19,7 +24,7 @@ import scala.util.{Failure, Success}
 class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
                               actorSystem: ActorSystem,
                               metricsConfig: MetricsConfig)
-  extends Logging {
+    extends Logging {
 
   implicit val system = actorSystem
   implicit val materialiser = ActorMaterializer()
@@ -36,20 +41,24 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
         new PutMetricDataRequest()
           .withNamespace(metricsConfig.namespace)
           .withMetricData(metricDataSeq: _*)
-      ))
+    ))
 
-  val source: Source[MetricDatum, SourceQueueWithComplete[MetricDatum]] = Source
-    .queue[MetricDatum](5000, OverflowStrategy.backpressure)
+  val source: Source[MetricDatum, SourceQueueWithComplete[MetricDatum]] =
+    Source
+      .queue[MetricDatum](5000, OverflowStrategy.backpressure)
 
-  val materializer = Flow[MetricDatum].groupedWithin(
-    metricDataListMaxSize,
-    metricsConfig.flushInterval)
+  val materializer = Flow[MetricDatum]
+    .groupedWithin(metricDataListMaxSize, metricsConfig.flushInterval)
 
   val sourceQueue: SourceQueueWithComplete[MetricDatum] =
     source
       .viaMat(materializer)(Keep.left)
       // Make sure we don't exceed aws rate limit
-      .throttle(maxPutMetricDataRequestsPerSecond, 1 second, 0, ThrottleMode.shaping)
+      .throttle(
+        maxPutMetricDataRequestsPerSecond,
+        1 second,
+        0,
+        ThrottleMode.shaping)
       .to(sink)
       .run()
 
