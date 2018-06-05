@@ -85,7 +85,7 @@ class SierraTransformableTransformerTest
       s"""{
           |"id": "$itemId",
           |"location": {
-          |   "code": "$locationType",
+          |   "code": "${locationType.id}",
           |   "name": "$locationLabel"
           | }
           |}""".stripMargin
