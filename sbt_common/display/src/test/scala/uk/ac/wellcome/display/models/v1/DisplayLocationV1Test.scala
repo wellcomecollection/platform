@@ -50,7 +50,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
 
   describe("DisplayPhysicalLocationV1") {
     it("should create a DisplayPhysicalLocationV1 from a PhysicalLocation") {
-      val locationType = "sgmed"
+      val locationType = LocationType("sgmed")
       val locationLabel = "The collection of cold cauldrons"
       val physicalLocation =
         PhysicalLocation(locationType = locationType, label = locationLabel)

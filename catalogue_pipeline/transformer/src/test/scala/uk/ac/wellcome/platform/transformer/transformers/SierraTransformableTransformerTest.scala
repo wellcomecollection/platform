@@ -75,7 +75,7 @@ class SierraTransformableTransformerTest
     val modifiedDate = Instant.now
     val bibId = "6262626"
     val itemId = "6363636"
-    val locationType = "sgmed"
+    val locationType = LocationType("sgmed")
     val locationLabel = "A museum of mermaids"
     val bibData =
       s"""{

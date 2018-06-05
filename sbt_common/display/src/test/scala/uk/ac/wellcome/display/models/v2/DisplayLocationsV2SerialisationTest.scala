@@ -6,6 +6,7 @@ import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedItem,
   IdentifiedWork,
+  LocationType,
   PhysicalLocation
 }
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -18,7 +19,7 @@ class DisplayLocationsV2SerialisationTest
 
   it("serialises a physical location correctly") {
     val physicalLocation = PhysicalLocation(
-      locationType = "smeg",
+      locationType = LocationType("smegd"),
       label = "a stack of slick slimes"
     )
 
