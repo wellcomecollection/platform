@@ -154,7 +154,7 @@ class GoobiReaderWorkerServiceTest
       eventually {
         assertQueueEmpty(queue)
         assertQueueHasSize(dlq, 1)
-        assertDynamoTableHasNoRecords(table)
+        assertDynamoTableIsEmpty(table)
         assertS3StorageIsEmpty(bucket)
         verify(mockMetricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
@@ -175,7 +175,7 @@ class GoobiReaderWorkerServiceTest
       eventually {
         assertQueueEmpty(queue)
         assertQueueHasSize(dlq, 1)
-        assertDynamoTableHasNoRecords(table)
+        assertDynamoTableIsEmpty(table)
         assertS3StorageIsEmpty(bucket)
         verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
@@ -199,7 +199,7 @@ class GoobiReaderWorkerServiceTest
       eventually {
         assertQueueEmpty(queue)
         assertQueueHasSize(dlq, 1)
-        assertDynamoTableHasNoRecords(table)
+        assertDynamoTableIsEmpty(table)
         assertS3StorageIsEmpty(bucket)
         verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
@@ -213,7 +213,7 @@ class GoobiReaderWorkerServiceTest
     getContentFromS3(bucket, getHybridRecord(table, id).s3key) shouldBe expectedContents
   }
 
-  def assertDynamoTableHasNoRecords(table: Table)= {
+  def assertDynamoTableIsEmpty(table: Table)= {
     Scanamo.scan[HybridRecord](dynamoDbClient)(table.name) shouldBe empty
   }
 
