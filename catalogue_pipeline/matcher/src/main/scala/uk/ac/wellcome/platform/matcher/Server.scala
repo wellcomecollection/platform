@@ -8,7 +8,7 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
   SNSClientModule,
@@ -45,7 +45,8 @@ class Server extends HttpServer {
     DynamoClientModule,
     MatcherModule,
     RecorderWorkEntryModule,
-    AkkaModule
+    AkkaModule,
+    ExecutionContextModule
   )
 
   override def configureHttp(router: HttpRouter) {

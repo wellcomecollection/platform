@@ -5,18 +5,16 @@ import com.google.inject.Inject
 import io.circe.Json
 import uk.ac.wellcome.messaging.message.{MessageStream, MessageWriter}
 import uk.ac.wellcome.platform.idminter.steps.IdEmbedder
-import uk.ac.wellcome.platform.idminter.GlobalExecutionContext.context
-
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class IdMinterWorkerService @Inject()(
   idEmbedder: IdEmbedder,
   writer: MessageWriter[Json],
   messageStream: MessageStream[Json],
   system: ActorSystem
-) {
+)(implicit ec: ExecutionContext) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 

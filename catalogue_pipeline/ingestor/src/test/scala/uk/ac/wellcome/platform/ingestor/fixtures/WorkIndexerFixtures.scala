@@ -7,6 +7,8 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.ingestor.services.WorkIndexer
 import uk.ac.wellcome.test.fixtures._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait WorkIndexerFixtures extends Akka with MetricsSenderFixture {
   this: Suite =>
   def withWorkIndexer[R](

@@ -11,7 +11,6 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
 import javax.inject.Inject
 import javax.naming.ConfigurationException
-
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
@@ -27,16 +26,16 @@ import uk.ac.wellcome.platform.snapshot_generator.models.{
   SnapshotJob
 }
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
-import uk.ac.wellcome.platform.snapshot_generator.GlobalExecutionContext.context
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SnapshotService @Inject()(actorSystem: ActorSystem,
                                 akkaS3Client: S3Client,
                                 elasticClient: HttpClient,
                                 elasticConfig: ElasticConfig,
-                                objectMapper: ObjectMapper)
-    extends Logging {
+                                objectMapper: ObjectMapper)(
+  implicit ec: ExecutionContext
+) extends Logging {
   implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
 

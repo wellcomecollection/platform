@@ -9,7 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.elasticsearch.{
   ElasticClientModule,
@@ -46,7 +46,8 @@ class Server extends HttpServer {
     ElasticClientModule,
     ElasticConfigModule,
     SnapshotGeneratorWorkerModule,
-    AkkaModule
+    AkkaModule,
+    ExecutionContextModule
   )
 
   override def jacksonModule = DisplayJacksonModule

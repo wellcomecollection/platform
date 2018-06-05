@@ -8,7 +8,7 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
@@ -17,10 +17,7 @@ import uk.ac.wellcome.finatra.storage.{
   S3ClientModule,
   VHSConfigModule
 }
-import uk.ac.wellcome.platform.sierra_item_merger.modules.{
-  ExecutionContextModule,
-  SierraItemMergerModule
-}
+import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
 import uk.ac.wellcome.sierra_adapter.modules.SierraTransformableModule
 
 object ServerMain extends Server

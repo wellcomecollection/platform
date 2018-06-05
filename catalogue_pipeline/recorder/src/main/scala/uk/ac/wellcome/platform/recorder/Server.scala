@@ -8,7 +8,7 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
   MessageConfigModule,
@@ -22,7 +22,6 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.recorder.modules.{
-  ExecutionContextModule,
   RecorderModule,
   RecorderWorkEntryModule,
   UnidentifiedWorkModule

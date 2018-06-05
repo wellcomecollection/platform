@@ -23,6 +23,8 @@ import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFix
 import scala.concurrent.Future
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class DynamoInserterTest
     extends FunSpec
     with Matchers
