@@ -50,7 +50,11 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     objectField(fieldName).fields(
       keywordField("type"),
       keywordField("ontologyType"),
-      keywordField("locationType"),
+      objectField("locationType").fields(
+        keywordField("id"),
+        keywordField("label"),
+        keywordField("ontologyType")
+      ),
       keywordField("label"),
       textField("url"),
       textField("credit"),

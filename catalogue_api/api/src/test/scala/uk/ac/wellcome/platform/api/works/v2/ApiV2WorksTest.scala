@@ -3,12 +3,7 @@ package uk.ac.wellcome.platform.api.works.v2
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.models.work.internal.{
-  DigitalLocation,
-  IdentifierType,
-  License_CCBY,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksTest extends ApiV2WorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
