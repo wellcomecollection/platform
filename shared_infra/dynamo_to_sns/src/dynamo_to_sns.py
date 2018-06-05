@@ -8,6 +8,7 @@ import os
 import boto3
 
 from wellcome_aws_utils.dynamo_event import create_dynamo_events
+from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
@@ -38,6 +39,7 @@ def get_sns_messages(trigger_event, stream_view_type):
             )
 
 
+@log_on_error
 def main(event, _ctxt=None, sns_client=None):
     print(f'Received event: {event!r}')
 

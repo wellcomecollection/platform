@@ -5,13 +5,21 @@ import uk.ac.wellcome.platform.api.services.{
   ElasticSearchService,
   WorksService
 }
+import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait WorksServiceFixture { this: Suite =>
   def withWorksService(searchService: ElasticSearchService)(
     testWith: TestWith[WorksService, Assertion]) = {
     val worksService = new WorksService(
-      defaultPageSize = 10,
+      apiConfig = ApiConfig(
+        host = "example.org",
+        scheme = "https",
+        defaultPageSize = 10,
+        name = "testing",
+        pathPrefix = "/catalogue/works",
+        contextSuffix = "/conext.json"
+      ),
       searchService = searchService
     )
     testWith(worksService)

@@ -30,7 +30,7 @@ trait TransformableMessageUtils {
     JsonUtil.toJson(calmTransformable).get
   }
 
-  def createValidEmptySierraBibSQSMessage(
+  def createValidEmptySierraBibNotificationMessage(
     id: String,
     s3Client: AmazonS3,
     bucket: Bucket

@@ -6,6 +6,7 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
@@ -21,7 +22,7 @@ import uk.ac.wellcome.platform.transformer.transformers.{
   MiroTransformableTransformer,
   SierraTransformableTransformer
 }
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -32,8 +33,11 @@ class NotificationMessageReceiver @Inject()(
   messageWriter: MessageWriter[UnidentifiedWork],
   s3Client: AmazonS3,
   s3Config: S3Config,
-  metricsSender: MetricsSender)
-    extends Logging {
+  metricsSender: MetricsSender)(
+  implicit miroTransformableStore: ObjectStore[MiroTransformable],
+  calmTransformableStore: ObjectStore[CalmTransformable],
+  sierraTransformableStore: ObjectStore[SierraTransformable]
+) extends Logging {
 
   def receiveMessage(message: NotificationMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
@@ -62,19 +66,12 @@ class NotificationMessageReceiver @Inject()(
     )
   }
 
-  val miroTransformableStore =
-    new S3TypeStore[MiroTransformable](s3Client)
-  val calmTransformableStore =
-    new S3TypeStore[CalmTransformable](s3Client)
-  val sierraTransformableStore =
-    new S3TypeStore[SierraTransformable](s3Client)
-
   private def getTransformable(
     hybridRecord: HybridRecord,
     sourceMetadata: SourceMetadata
   ) = {
-    val s3ObjectLocation = S3ObjectLocation(
-      bucket = s3Config.bucketName,
+    val s3ObjectLocation = ObjectLocation(
+      namespace = s3Config.bucketName,
       key = hybridRecord.s3key
     )
 

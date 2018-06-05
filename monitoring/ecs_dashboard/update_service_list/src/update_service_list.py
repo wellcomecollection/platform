@@ -12,13 +12,14 @@ import os
 
 import boto3
 
-from wellcome_lambda_utils.ecs_utils import (
+from wellcome_aws_utils.ecs_utils import (
     get_cluster_arns,
     get_service_arns,
     describe_service,
     describe_cluster,
     EcsThrottleException
 )
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def _create_event_dict(event):
@@ -116,8 +117,8 @@ def create_boto_client(service, role_arn):
     )
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
     assumable_roles = (
         [s for s in os.environ["ASSUMABLE_ROLES"].split(",") if s]
     )

@@ -1,12 +1,9 @@
 package uk.ac.wellcome.platform.api
 
 import uk.ac.wellcome.display.models.ApiVersions
+import uk.ac.wellcome.platform.api.models.ApiConfig
 
 object ContextHelper {
-  def buildContextUri(apiScheme: String,
-                      apiHost: String,
-                      apiPrefix: String,
-                      version: ApiVersions.Value,
-                      apiContextSuffix: String) =
-    s"$apiScheme://$apiHost$apiPrefix/$version$apiContextSuffix"
+  def buildContextUri(apiConfig: ApiConfig, version: ApiVersions.Value) =
+    s"${apiConfig.scheme}://${apiConfig.host}${apiConfig.pathPrefix}/$version${apiConfig.contextSuffix}"
 }

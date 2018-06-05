@@ -17,8 +17,7 @@ class WorkNodeDao @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  val index = dynamoConfig.index.getOrElse(
-    throw new RuntimeException("Index cannot be empty!"))
+  val index = dynamoConfig.index
 
   def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
     Future {

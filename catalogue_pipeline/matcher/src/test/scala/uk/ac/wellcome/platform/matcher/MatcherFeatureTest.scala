@@ -5,15 +5,10 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  WorkIdentifier,
-  WorkNode
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.WorkGraphIdentifiersList
 import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -62,11 +57,11 @@ class MatcherFeatureTest
 
                 snsMessages.map { snsMessage =>
                   val identifiersList =
-                    fromJson[WorkGraphIdentifiersList](snsMessage.message).get
+                    fromJson[MatcherResult](snsMessage.message).get
 
-                  identifiersList.linkedWorks shouldBe
-                    Set(MatchedIdentifiers(
-                      Set(WorkIdentifier("sierra-system-number/A", 1))))
+                  identifiersList shouldBe
+                    MatcherResult(Set(MatchedIdentifiers(
+                      Set(WorkIdentifier("sierra-system-number/A", 1)))))
                 }
               }
             }

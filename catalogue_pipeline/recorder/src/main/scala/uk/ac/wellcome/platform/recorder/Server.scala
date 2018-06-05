@@ -22,6 +22,7 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.recorder.modules.{
+  ExecutionContextModule,
   RecorderModule,
   RecorderWorkEntryModule,
   UnidentifiedWorkModule
@@ -33,6 +34,7 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.recorder Recorder"
   override val modules = Seq(
+    ExecutionContextModule,
     VHSConfigModule,
     MessageConfigModule,
     DynamoClientModule,

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSMessage, SQSStream}
+import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -17,9 +17,14 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  SierraResourceTypes
+}
 
 import collection.JavaConverters._
 
@@ -48,6 +53,14 @@ class SierraReaderWorkerServiceTest
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueue { queue =>
           withLocalS3Bucket { bucket =>
+            val sierraConfig = SierraConfig(
+              resourceType = resourceType,
+              apiUrl = apiUrl,
+              oauthKey = "key",
+              oauthSec = "secret",
+              fields = fields
+            )
+
             val worker = new SierraReaderWorkerService(
               system = actorSystem,
               sqsStream = new SQSStream(
@@ -65,14 +78,10 @@ class SierraReaderWorkerServiceTest
               windowManager = new WindowManager(
                 s3Client,
                 S3Config(bucket.name),
-                fields,
-                resourceType),
-              batchSize = batchSize,
-              resourceType = resourceType,
-              apiUrl = apiUrl,
-              sierraOauthKey = "key",
-              sierraOauthSecret = "secret",
-              fields = fields
+                sierraConfig = sierraConfig
+              ),
+              readerConfig = ReaderConfig(batchSize = batchSize),
+              sierraConfig = sierraConfig
             )
 
             testWith(FixtureParams(worker, queue, bucket))
@@ -97,15 +106,17 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map {
         label =>
@@ -142,14 +153,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -205,14 +218,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      sqsClient.sendMessage(fixtures.queue.url, toJson(sqsMessage).get)
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      sqsClient.sendMessage(
+        fixtures.queue.url,
+        toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -252,15 +267,16 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
-        ex shouldBe a[GracefulFailureException]
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldBe a[GracefulFailureException]
       }
 
     }
@@ -280,16 +296,17 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val sqsMessage =
-        SQSMessage(
-          Some("subject"),
-          message,
-          "topic",
-          "messageType",
-          "timestamp")
+      val notificationMessage =
+        NotificationMessage(
+          Subject = "subject",
+          Message = message,
+          TopicArn = "topic",
+          MessageId = "message-id"
+        )
 
-      whenReady(fixtures.worker.processMessage(sqsMessage).failed) { ex =>
-        ex shouldNot be(a[GracefulFailureException])
+      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+        ex =>
+          ex shouldNot be(a[GracefulFailureException])
       }
     }
   }

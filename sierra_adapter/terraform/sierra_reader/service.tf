@@ -3,7 +3,7 @@ locals {
 }
 
 module "sierra_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "${local.service_name}"
 
   source_queue_name  = "${module.windows_queue.name}"
@@ -44,4 +44,6 @@ module "sierra_reader_service" {
   enable_alb_alarm = false
 
   max_capacity = 1
+
+  log_retention_in_days = 30
 }

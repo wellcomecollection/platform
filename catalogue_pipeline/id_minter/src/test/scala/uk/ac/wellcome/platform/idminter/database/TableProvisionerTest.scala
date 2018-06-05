@@ -14,14 +14,14 @@ class TableProvisionerTest
     with Matchers {
 
   it("should create the Identifiers table") {
-    withIdentifiersDatabase { databaseConfig =>
-      val databaseName = databaseConfig.databaseName
-      val tableName = databaseConfig.tableName
+    withIdentifiersDatabase { identifiersTableConfig =>
+      val databaseName = identifiersTableConfig.database
+      val tableName = identifiersTableConfig.tableName
 
-      new TableProvisioner(host, port, username, password)
+      new TableProvisioner(rdsClientConfig)
         .provision(databaseName, tableName)
 
-      eventuallyTableExists(databaseConfig)
+      eventuallyTableExists(identifiersTableConfig)
     }
   }
 }

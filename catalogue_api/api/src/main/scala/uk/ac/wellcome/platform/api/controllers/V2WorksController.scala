@@ -1,32 +1,25 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.twitter.inject.annotations.Flag
 import javax.inject.{Inject, Singleton}
+
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
+import uk.ac.wellcome.elasticsearch.ElasticConfig
+import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.services.WorksService
 
 @Singleton
-class V2WorksController @Inject()(
-  @Flag("api.prefix") apiPrefix: String,
-  @Flag("api.context.suffix") apiContextSuffix: String,
-  @Flag("api.host") apiHost: String,
-  @Flag("api.scheme") apiScheme: String,
-  @Flag("api.pageSize") defaultPageSize: Int,
-  @Flag("es.index.v2") indexName: String,
-  worksService: WorksService)
+class V2WorksController @Inject()(apiConfig: ApiConfig,
+                                  elasticConfig: ElasticConfig,
+                                  worksService: WorksService)
     extends WorksController(
-      apiPrefix = apiPrefix,
-      apiContextSuffix = apiContextSuffix,
-      apiHost = apiHost,
-      apiScheme = apiScheme,
-      indexName = indexName,
-      defaultPageSize = defaultPageSize,
+      apiConfig = apiConfig,
+      indexName = elasticConfig.indexV2name,
       worksService = worksService
     ) {
   implicit protected val swagger = ApiV2Swagger
 
-  prefix(s"$apiPrefix/${ApiVersions.v2.toString}") {
+  prefix(s"${apiConfig.pathPrefix}/${ApiVersions.v2.toString}") {
     setupResultListEndpoint(ApiVersions.v2, "/works", DisplayWorkV2.apply)
     setupSingleWorkEndpoint(ApiVersions.v2, "/works/:id", DisplayWorkV2.apply)
   }

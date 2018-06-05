@@ -18,6 +18,8 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class SierraBibMergerWorkerServiceTest
     extends FunSpec
     with MockitoSugar
@@ -38,12 +40,11 @@ class SierraBibMergerWorkerServiceTest
         sqsClient.sendMessage(
           queue.url,
           toJson(
-            SQSMessage(
-              subject = Some("default-subject"),
-              body = "null",
-              topic = "",
-              messageType = "",
-              timestamp = "")).get)
+            NotificationMessage(
+              Subject = "default-subject",
+              Message = "null",
+              TopicArn = "",
+              MessageId = "")).get)
 
         eventually {
           assertQueueEmpty(queue)

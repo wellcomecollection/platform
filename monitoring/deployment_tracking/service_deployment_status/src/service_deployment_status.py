@@ -11,17 +11,18 @@ import os
 
 import boto3
 
-from wellcome_lambda_utils.ecs_utils import (
+from wellcome_aws_utils.ecs_utils import (
     EcsThrottleException
 )
 
-from wellcome_lambda_utils.deployment_utils import (
+from wellcome_aws_utils.deployment_utils import (
     get_deployments_from_ecs,
     get_deployments_from_dynamo,
     put_deployment_in_dynamo,
     delete_deployment_in_dynamo,
     update_deployment_in_dynamo
 )
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def _find_in_deployments(deployment_list, key):
@@ -79,9 +80,8 @@ def run_operations(operations, table):
     }
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     table_name = os.environ["TABLE_NAME"]
 
     ecs_client = boto3.client('ecs')

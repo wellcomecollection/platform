@@ -17,7 +17,8 @@ import os
 import boto3
 
 from wellcome_lambda_utils.deployment_utils import get_deployments_from_dynamo
-from wellcome_lambda_utils.sns_utils import publish_sns_message
+from wellcome_aws_utils.lambda_utils import log_on_error
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
 def _old_deployment(age_boundary_mins, deployment):
@@ -36,9 +37,8 @@ def filter_old_deployments(deployments, age_boundary_mins):
     )
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     table_name = os.environ["TABLE_NAME"]
     topic_arn = os.environ["TOPIC_ARN"]
     age_boundary_mins = int(os.environ["AGE_BOUNDARY_MINS"])

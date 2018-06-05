@@ -7,6 +7,7 @@ import json
 import os
 
 from botocore.vendored import requests
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def to_bitly(url, access_token):
@@ -24,9 +25,8 @@ def to_bitly(url, access_token):
         return url
 
 
+@log_on_error
 def main(event, context):
-    print(f'event = {event!r}')
-
     infra_bucket = os.environ['INFRA_BUCKET']
     slack_webhook = os.environ['SLACK_WEBHOOK']
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']

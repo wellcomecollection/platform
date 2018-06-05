@@ -32,33 +32,33 @@ class SierraBibMergerFeatureTest
                       updatedDate: String,
                       title: String = "Lehrbuch und Atlas der Gastroskopie") =
     s"""
-      |{
-      |      "id": "$id",
-      |      "updatedDate": "$updatedDate",
-      |      "createdDate": "1999-11-01T16:36:51Z",
-      |      "deleted": false,
-      |      "suppressed": false,
-      |      "lang": {
-      |        "code": "ger",
-      |        "name": "German"
-      |      },
-      |      "title": "$title",
-      |      "author": "Schindler, Rudolf, 1888-",
-      |      "materialType": {
-      |        "code": "a",
-      |        "value": "Books"
-      |      },
-      |      "bibLevel": {
-      |        "code": "m",
-      |        "value": "MONOGRAPH"
-      |      },
-      |      "publishYear": 1923,
-      |      "catalogDate": "1999-01-01",
-      |      "country": {
-      |        "code": "gw ",
-      |        "name": "Germany"
-      |      }
-      |    }
+       |{
+       |      "id": "$id",
+       |      "updatedDate": "$updatedDate",
+       |      "createdDate": "1999-11-01T16:36:51Z",
+       |      "deleted": false,
+       |      "suppressed": false,
+       |      "lang": {
+       |        "code": "ger",
+       |        "name": "German"
+       |      },
+       |      "title": "$title",
+       |      "author": "Schindler, Rudolf, 1888-",
+       |      "materialType": {
+       |        "code": "a",
+       |        "value": "Books"
+       |      },
+       |      "bibLevel": {
+       |        "code": "m",
+       |        "value": "MONOGRAPH"
+       |      },
+       |      "publishYear": 1923,
+       |      "catalogDate": "1999-01-01",
+       |      "country": {
+       |        "code": "gw ",
+       |        "name": "Germany"
+       |      }
+       |    }
     """.stripMargin
 
   implicit val encoder = Encoder[SierraTransformable]
@@ -194,8 +194,9 @@ class SierraBibMergerFeatureTest
               )
 
               hybridStore
-                .updateRecord(oldRecord.id)(oldRecord)((t, _) => t)(
-                  SourceMetadata(oldRecord.sourceName))
+                .updateRecord(oldRecord.id)(
+                  (oldRecord, SourceMetadata(oldRecord.sourceName)))((t, m) =>
+                  (t, m))
                 .map { _ =>
                   sendMessageToSQS(toJson(record).get, queue)
                 }
@@ -252,9 +253,10 @@ class SierraBibMergerFeatureTest
               )
 
               hybridStore
-                .updateRecord(expectedSierraTransformable.id)(
-                  expectedSierraTransformable)((t, _) => t)(
-                  SourceMetadata(expectedSierraTransformable.sourceName))
+                .updateRecord(expectedSierraTransformable.id)((
+                  expectedSierraTransformable,
+                  SourceMetadata(expectedSierraTransformable.sourceName)))(
+                  (t, m) => (t, m))
                 .map { _ =>
                   sendMessageToSQS(toJson(record).get, queue)
                 }
@@ -299,8 +301,9 @@ class SierraBibMergerFeatureTest
               )
 
               val future =
-                hybridStore.updateRecord(newRecord.id)(newRecord)((t, _) => t)(
-                  SourceMetadata(newRecord.sourceName))
+                hybridStore.updateRecord(newRecord.id)(
+                  (newRecord, SourceMetadata(newRecord.sourceName)))((t, m) =>
+                  (t, m))
 
               future.map { _ =>
                 sendMessageToSQS(toJson(record).get, queue)

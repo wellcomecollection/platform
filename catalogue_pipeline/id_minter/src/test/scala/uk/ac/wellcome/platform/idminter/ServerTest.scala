@@ -17,9 +17,9 @@ class ServerTest
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
-          withIdentifiersDatabase { dbConfig =>
+          withIdentifiersDatabase { identifiersTableConfig =>
             val flags = messagingLocalFlags(bucket, topic, queue) ++
-              dbConfig.flags
+              identifiersLocalDbFlags(identifiersTableConfig)
 
             withServer(flags) { server =>
               server.httpGet(

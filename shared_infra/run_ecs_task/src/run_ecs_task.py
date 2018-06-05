@@ -12,13 +12,13 @@ message should be a JSON string that includes "cluster", "task_defintiion",
 
 import boto3
 
-from wellcome_lambda_utils.ecs_utils import run_task
-from wellcome_lambda_utils.sns_utils import extract_json_message
+from wellcome_aws_utils.ecs_utils import run_task
+from wellcome_aws_utils.lambda_utils import log_on_error
+from wellcome_aws_utils.sns_utils import extract_json_message
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     message_data = extract_json_message(event)
 
     response = run_task(

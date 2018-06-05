@@ -7,11 +7,11 @@ import json
 import os
 
 from botocore.vendored import requests
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
+@log_on_error
 def main(event, context):
-    print(f'event = {event!r}')
-
     slack_webhook = os.environ['SLACK_WEBHOOK']
 
     message = event['Records'][0]['Sns']

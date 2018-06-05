@@ -9,14 +9,14 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.ObjectStore
 
 import scala.concurrent.Future
 
 class SierraBibMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
-                                             S3TypeStore[SierraTransformable]],
+                                             ObjectStore[SierraTransformable]],
   metrics: MetricsSender
 ) extends Logging {
 
@@ -25,10 +25,12 @@ class SierraBibMergerUpdaterService @Inject()(
     val sourceName = "sierra"
 
     versionedHybridStore.updateRecord(Sourced.id(sourceName, bibRecord.id))(
-      SierraTransformable(bibRecord))(
-      (existingSierraTransformable, _) => {
-        BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord)
+      (SierraTransformable(bibRecord), SourceMetadata(sourceName)))(
+      (existingSierraTransformable, existingMetadata) => {
+        (
+          BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord),
+          existingMetadata)
       }
-    )(SourceMetadata(sourceName = sourceName))
+    )
   }
 }

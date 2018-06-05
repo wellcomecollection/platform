@@ -6,15 +6,16 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.WorkGraphIdentifiersList
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MatcherMessageReceiverTest
     extends FunSpec
@@ -35,7 +36,7 @@ class MatcherMessageReceiverTest
             // Work Av1 created without any matched works
             val updatedWork = anUnidentifiedSierraWork
             val expectedMatchedWorks =
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(MatchedIdentifiers(
                   Set(WorkIdentifier("sierra-system-number/id", 1)))))
 
@@ -65,7 +66,7 @@ class MatcherMessageReceiverTest
             // Work Av1 matched to B (before B exists hence version 0)
             // need to match to works that do not exist to support
             // bi-directionally matched works without deadlocking (A->B, B->A)
-            val expectedMatchedWorks = WorkGraphIdentifiersList(
+            val expectedMatchedWorks = MatcherResult(
               Set(
                 MatchedIdentifiers(Set(
                   WorkIdentifier("sierra-system-number/A", 1),
@@ -94,7 +95,7 @@ class MatcherMessageReceiverTest
               sourceIdentifier = aIdentifier,
               identifiers = List(aIdentifier))
 
-            val expectedMatchedWorks = WorkGraphIdentifiersList(
+            val expectedMatchedWorks = MatcherResult(
               Set(
                 MatchedIdentifiers(Set(
                   WorkIdentifier("sierra-system-number/A", 1)
@@ -114,7 +115,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workBv1,
-              WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+              MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
               storageBucket,
@@ -128,7 +129,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workAv2,
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 2),
@@ -145,7 +146,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workCv1,
-              WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+              MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/C", 1))))),
               queue,
               storageBucket,
@@ -159,9 +160,10 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workBv2,
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(
+
                     Set(
                       WorkIdentifier("sierra-system-number/A", 2),
                       WorkIdentifier("sierra-system-number/B", 2),
@@ -189,7 +191,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workAv1,
-              WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+              MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/A", 1))))),
               queue,
               storageBucket,
@@ -203,7 +205,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workBv1,
-              WorkGraphIdentifiersList(Set(MatchedIdentifiers(
+              MatcherResult(Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/B", 1))))),
               queue,
               storageBucket,
@@ -217,7 +219,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workAv2MatchedToB,
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 2),
@@ -235,7 +237,7 @@ class MatcherMessageReceiverTest
 
             processAndAssertMatchedWorkIs(
               workAv3WithNoMatchingWorks,
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(
                     Set(WorkIdentifier("sierra-system-number/A", 3))),
@@ -263,7 +265,7 @@ class MatcherMessageReceiverTest
               identifiers = List(aIdentifier)
             )
 
-            val expectedMatchedWorkAv2 = WorkGraphIdentifiersList(
+            val expectedMatchedWorkAv2 = MatcherResult(
               Set(MatchedIdentifiers(
                 Set(WorkIdentifier("sierra-system-number/A", 2)))))
 
@@ -294,7 +296,7 @@ class MatcherMessageReceiverTest
 
   private def processAndAssertMatchedWorkIs(
     workToMatch: UnidentifiedWork,
-    expectedMatchedWorks: WorkGraphIdentifiersList,
+    expectedMatchedWorks: MatcherResult,
     queue: SQS.Queue,
     storageBucket: Bucket,
     topic: Topic): Any = {
@@ -309,12 +311,13 @@ class MatcherMessageReceiverTest
 
   private def assertLastMatchedResultIs(
     topic: Topic,
-    identifiersList: WorkGraphIdentifiersList) = {
+    identifiersList: MatcherResult) = {
+
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
 
     val actualMatchedWorkLists = snsMessages.map { snsMessage =>
-      fromJson[WorkGraphIdentifiersList](snsMessage.message).get
+      fromJson[MatcherResult](snsMessage.message).get
     }
     actualMatchedWorkLists.last shouldBe identifiersList
   }

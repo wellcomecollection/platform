@@ -19,18 +19,48 @@ trait SierraConcepts extends MarcUtils {
   //
   // Note that some identifiers have an identifier scheme in
   // indicator 2, but no ID.  In this case, we just ignore it.
-  protected def identifyPrimaryConcept[T <: AbstractConcept](
+  def identifyPrimaryConcept[T <: AbstractConcept](
     concept: T,
     varField: VarField): MaybeDisplayable[T] = {
-    val identifierSubfields = varField.subfields.filter { _.tag == "0" }
+    val identifierSubfields = varField.subfields
+      .filter { _.tag == "0" }
 
-    identifierSubfields.distinct match {
+    // We've seen the following data in subfield $0 which needs to be
+    // normalisation:
+    //
+    //  * The same value repeated multiple times
+    //    ['D000056', 'D000056']
+    //
+    //  * The value repeated with the prefix (DNLM)
+    //    ['D049671', '(DNLM)D049671']
+    //
+    //    Here the prefix is denoting the authority it came from, which is
+    //    an artefact of the original Sierra import.  We don't need it.
+    //
+    //  * The value repeated with trailing punctuation
+    //    ['D004324', 'D004324.']
+    //
+    //  * The value repeated with varying whitespace
+    //    ['n  82105476 ', 'n 82105476']
+    //
+    //  * The value repeated with a MESH URL prefix
+    //    ['D049671', 'https://id.nlm.nih.gov/mesh/D049671']
+    //
+    val identifierSubfieldContents = varField.subfields
+      .filter { _.tag == "0" }
+      .map { _.content }
+      .map { _.replaceFirst("^\\(DNLM\\)", "") }
+      .map { _.replaceFirst("^https://id\\.nlm\\.nih\\.gov/mesh/", "") }
+      .map { _.replaceAll("[.\\s]", "") }
+      .distinct
+
+    identifierSubfieldContents match {
       case Seq() => Unidentifiable(agent = concept)
-      case Seq(identifierSubfield) =>
+      case Seq(subfieldContent) =>
         maybeAddIdentifier[T](
           concept = concept,
           varField = varField,
-          identifierSubfield = identifierSubfield
+          identifierSubfieldContent = subfieldContent
         )
       case _ =>
         throw new RuntimeException(
@@ -43,10 +73,10 @@ trait SierraConcepts extends MarcUtils {
   private def maybeAddIdentifier[T <: AbstractConcept](
     concept: T,
     varField: VarField,
-    identifierSubfield: MarcSubfield): MaybeDisplayable[T] = {
+    identifierSubfieldContent: String): MaybeDisplayable[T] = {
     val maybeSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
-      identifierSubfield = identifierSubfield,
+      identifierSubfieldContent = identifierSubfieldContent,
       ontologyType = concept.ontologyType
     )
 

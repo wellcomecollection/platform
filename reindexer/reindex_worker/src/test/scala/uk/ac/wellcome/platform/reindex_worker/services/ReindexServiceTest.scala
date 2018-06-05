@@ -1,13 +1,16 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
+import javax.naming.ConfigurationException
+
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -34,18 +37,23 @@ class ReindexServiceTest
     reindexVersion = currentVersion
   )
 
+  val exampleReindexJob = ReindexJob(
+    shardId = "sierra/000",
+    desiredVersion = 2
+  )
+
   private def withReindexService(table: Table)(
     testWith: TestWith[ReindexService, Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         val reindexService =
           new ReindexService(
-            dynamoDBClient = dynamoDbClient,
-            dynamoConfig = DynamoConfig(table.name, Some(table.index)),
-            metricsSender = metricsSender,
-            versionedDao = new VersionedDao(
-              dynamoDbClient = dynamoDbClient,
-              DynamoConfig(table.name, Some(table.index)))
+            dynamoDbClient = dynamoDbClient,
+            dynamoConfig = DynamoConfig(
+              table = table.name,
+              index = table.index
+            ),
+            metricsSender = metricsSender
           )
 
         testWith(reindexService)
@@ -140,17 +148,74 @@ class ReindexServiceTest
     }
   }
 
+  it("returns a failed Future if the reindex is only partially successful") {
+    withLocalDynamoDbTable { table =>
+      withReindexService(table) { reindexService =>
+        val inShardRecords = List(
+          exampleRecord.copy(id = "id1"),
+          exampleRecord.copy(id = "id2")
+        )
+
+        inShardRecords.foreach(record =>
+          Scanamo.put(dynamoDbClient)(table.name)(record))
+
+        // This record doesn't conform to our ReindexRecord type (it doesn't
+        // have a version field), but it is in the same reindex shard as
+        // the other two records -- so it will be picked up for reindexing,
+        // but won't succeed.
+        case class BadRecord(
+          id: String,
+          reindexShard: String,
+          reindexVersion: Int
+        )
+
+        Scanamo.put(dynamoDbClient)(table.name)(
+          BadRecord(
+            id = "badId1",
+            reindexShard = shardName,
+            reindexVersion = currentVersion
+          ))
+
+        val reindexJob = ReindexJob(
+          shardId = shardName,
+          desiredVersion = desiredVersion
+        )
+
+        val future = reindexService.runReindex(reindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[GracefulFailureException]
+        }
+      }
+    }
+  }
+
   it("returns a failed Future if there's a DynamoDB error") {
     withReindexService(Table("does-not-exist", "no-such-index")) { service =>
-      val reindexJob = ReindexJob(
-        shardId = "sierra/000",
-        desiredVersion = 2
-      )
-
-      val future = service.runReindex(reindexJob)
+      val future = service.runReindex(exampleReindexJob)
       whenReady(future.failed) {
         _ shouldBe a[ResourceNotFoundException]
       }
     }
   }
+
+  it("returns a failed Future if you don't specify a DynamoDB index") {
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        val service = new ReindexService(
+          dynamoDbClient = dynamoDbClient,
+          dynamoConfig = DynamoConfig(
+            table = "mytable",
+            maybeIndex = None
+          ),
+          metricsSender = metricsSender
+        )
+
+        val future = service.runReindex(exampleReindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[ConfigurationException]
+        }
+      }
+    }
+  }
+
 }

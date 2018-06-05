@@ -30,10 +30,11 @@ class IdMinterWorkerTest
   it("should create the Identifiers table in MySQL upon startup") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
+        withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
             val flags =
-              messagingLocalFlags(bucket, topic, queue) ++ dbConfig.flags
+              messagingLocalFlags(bucket, topic, queue) ++ identifiersLocalDbFlags(
+                identifiersTableConfig)
 
             val identifiersDao = mock[IdentifiersDao]
 
@@ -42,8 +43,10 @@ class IdMinterWorkerTest
               modifyServer = (server: EmbeddedHttpServer) => {
                 server.bind[IdentifiersDao].toInstance(identifiersDao)
               }) { _ =>
-              val database = dbConfig.database
-              val table = dbConfig.table
+              val database: SQLSyntax =
+                SQLSyntax.createUnsafely(identifiersTableConfig.database)
+              val table: SQLSyntax =
+                SQLSyntax.createUnsafely(identifiersTableConfig.tableName)
 
               eventually {
                 val fields = DB readOnly { implicit session =>

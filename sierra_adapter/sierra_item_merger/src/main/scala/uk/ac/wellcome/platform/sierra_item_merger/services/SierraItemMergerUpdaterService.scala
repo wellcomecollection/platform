@@ -11,15 +11,15 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.s3.S3TypeStore
 import uk.ac.wellcome.platform.sierra_item_merger.GlobalExecutionContext.context
+import uk.ac.wellcome.storage.ObjectStore
 
 import scala.concurrent.Future
 
 class SierraItemMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
-                                             S3TypeStore[SierraTransformable]],
+                                             ObjectStore[SierraTransformable]],
   metrics: MetricsSender
 ) extends Logging {
 
@@ -29,30 +29,32 @@ class SierraItemMergerUpdaterService @Inject()(
 
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
       versionedHybridStore.updateRecord(Sourced.id(sourceName, bibId))(
-        ifNotExisting = SierraTransformable(
-          sourceId = bibId,
-          itemData = Map(itemRecord.id -> itemRecord)
-        ))(ifExisting = (existingSierraTransformable, _) => {
-        ItemLinker.linkItemRecord(
-          existingSierraTransformable,
-          itemRecord
-        )
-      })(SourceMetadata(sourceName))
+        ifNotExisting = (
+          SierraTransformable(
+            sourceId = bibId,
+            itemData = Map(itemRecord.id -> itemRecord)),
+          SourceMetadata(sourceName)))(
+        ifExisting = (existingSierraTransformable, _) => {
+          (
+            ItemLinker.linkItemRecord(existingSierraTransformable, itemRecord),
+            SourceMetadata(sourceName))
+        })
     }
 
     val unlinkUpdateFutures: Seq[Future[Unit]] =
       itemRecord.unlinkedBibIds.map { unlinkedBibId =>
         versionedHybridStore.updateRecord(
           Sourced.id(sourceName, unlinkedBibId))(
-          throw GracefulFailureException(
+          ifNotExisting = throw GracefulFailureException(
             new RuntimeException(
               s"Missing Bib record to unlink: $unlinkedBibId")
-          )
-        )((record, _) => ItemUnlinker.unlinkItemRecord(record, itemRecord))(
-          SourceMetadata(sourceName))
+          ))(
+          ifExisting = (record, _) =>
+            (
+              ItemUnlinker.unlinkItemRecord(record, itemRecord),
+              SourceMetadata(sourceName))
+        )
       }
-
     Future.sequence(mergeUpdateFutures ++ unlinkUpdateFutures).map(_ => ())
   }
-
 }

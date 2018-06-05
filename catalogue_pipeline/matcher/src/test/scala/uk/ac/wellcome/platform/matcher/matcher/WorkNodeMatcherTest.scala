@@ -8,12 +8,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
   WorkIdentifier,
   WorkNode
 }
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models._
+import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
 import scala.concurrent.Future
@@ -31,10 +31,11 @@ class WorkNodeMatcherTest
       withWorkGraphStore(table) { workGraphStore =>
         withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
           whenReady(linkedWorkMatcher.matchWork(anUnidentifiedSierraWork)) {
-            identifiersList =>
+            matcherResult =>
               val workId = "sierra-system-number/id"
-              identifiersList shouldBe
-                WorkGraphIdentifiersList(
+
+              matcherResult shouldBe
+                MatcherResult(
                   Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
 
               val savedLinkedWork = Scanamo
@@ -60,7 +61,7 @@ class WorkNodeMatcherTest
             identifiers = List(identifierA, identifierB))
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(Set(
                     WorkIdentifier("sierra-system-number/A", 1),
@@ -120,7 +121,7 @@ class WorkNodeMatcherTest
 
           whenReady(linkedWorkMatcher.matchWork(work)) { identifiersList =>
             identifiersList shouldBe
-              WorkGraphIdentifiersList(
+              MatcherResult(
                 Set(
                   MatchedIdentifiers(
                     Set(

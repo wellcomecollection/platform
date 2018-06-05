@@ -1,5 +1,5 @@
 module "lambda_post_to_slack" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v1.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/monitoring/post_to_slack.zip"
@@ -15,6 +15,8 @@ module "lambda_post_to_slack" {
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
+
+  log_retention_in_days = 30
 }
 
 module "trigger_post_to_slack_dlqs_not_empty" {

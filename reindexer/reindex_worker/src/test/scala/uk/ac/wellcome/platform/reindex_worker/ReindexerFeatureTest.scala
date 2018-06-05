@@ -91,8 +91,7 @@ class ReindexerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table) ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> table.index)
+            table) ++ sqsLocalFlags(queue)
 
           withServer(flags) { _ =>
             val expectedRecords =
@@ -118,8 +117,7 @@ class ReindexerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags
             : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table) ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> table.index)
+            table) ++ sqsLocalFlags(queue)
 
           withServer(flags) { _ =>
             createReindexableData(queue, table)
@@ -151,9 +149,9 @@ class ReindexerFeatureTest
       withLocalSnsTopic { topic =>
         withLocalDynamoDbTable { table =>
           val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table
-            .copy(name = "non_existent_table")) ++ sqsLocalFlags(queue) ++ Map(
-            "aws.dynamo.indexName" -> table.index)
+            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
+            table
+              .copy(name = "non_existent_table")) ++ sqsLocalFlags(queue)
 
           withServer(flags) { _ =>
             createReindexableData(queue, table)

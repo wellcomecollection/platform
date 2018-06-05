@@ -13,7 +13,11 @@ import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.sierra_reader.modules.SierraReaderModule
+import uk.ac.wellcome.platform.sierra_reader.modules.{
+  ReaderConfigModule,
+  SierraConfigModule,
+  SierraReaderModule
+}
 
 object ServerMain extends Server
 
@@ -22,6 +26,8 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.sierra_reader SierraReader"
   override val modules = Seq(
     SierraReaderModule,
+    ReaderConfigModule,
+    SierraConfigModule,
     MetricsSenderModule,
     S3ClientModule,
     S3ConfigModule,

@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.sierra_reader.modules
 import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.models.SierraConfig
 import uk.ac.wellcome.platform.sierra_reader.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -21,8 +20,7 @@ case class WindowStatus(id: Option[String], offset: Int)
 class WindowManager @Inject()(
   s3client: AmazonS3,
   s3Config: S3Config,
-  @Flag("sierra.fields") fields: String,
-  resourceType: SierraResourceTypes.Value
+  sierraConfig: SierraConfig
 ) extends Logging {
 
   def getCurrentStatus(window: String): Future[WindowStatus] = Future {
@@ -82,7 +80,7 @@ class WindowManager @Inject()(
   }
 
   def buildWindowShard(window: String) =
-    s"records_${resourceType.toString}/${buildWindowLabel(window)}/"
+    s"records_${sierraConfig.resourceType.toString}/${buildWindowLabel(window)}/"
 
   def buildWindowLabel(window: String) =
     // Window is a string like [2013-12-01T01:01:01Z,2013-12-01T01:01:01Z].

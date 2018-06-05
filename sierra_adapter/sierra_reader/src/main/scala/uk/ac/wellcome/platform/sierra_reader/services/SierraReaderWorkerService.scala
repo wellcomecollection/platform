@@ -6,14 +6,17 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.Logging
-import com.twitter.inject.annotations.Flag
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.SierraResourceTypes
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.{
   WindowManager,
@@ -26,16 +29,12 @@ import uk.ac.wellcome.platform.sierra_reader.sink.SequentialS3Sink
 
 class SierraReaderWorkerService @Inject()(
   system: ActorSystem,
-  sqsStream: SQSStream[SQSMessage],
+  sqsStream: SQSStream[NotificationMessage],
   windowManager: WindowManager,
   s3client: AmazonS3,
   s3Config: S3Config,
-  @Flag("reader.batchSize") batchSize: Int,
-  resourceType: SierraResourceTypes.Value,
-  @Flag("sierra.apiUrl") apiUrl: String,
-  @Flag("sierra.oauthKey") sierraOauthKey: String,
-  @Flag("sierra.oauthSecret") sierraOauthSecret: String,
-  @Flag("sierra.fields") fields: String
+  readerConfig: ReaderConfig,
+  sierraConfig: SierraConfig
 ) extends Logging {
 
   implicit val actorSystem = system
@@ -47,9 +46,9 @@ class SierraReaderWorkerService @Inject()(
     process = processMessage
   )
 
-  def processMessage(sqsMessage: SQSMessage): Future[Unit] =
+  def processMessage(norificationMessage: NotificationMessage): Future[Unit] =
     for {
-      messageString <- Future(sqsMessage.body)
+      messageString <- Future(norificationMessage.Message)
       window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
@@ -61,7 +60,8 @@ class SierraReaderWorkerService @Inject()(
 
     info(s"Running the stream with window=$window and status=$windowStatus")
 
-    val baseParams = Map("updatedDate" -> window, "fields" -> fields)
+    val baseParams =
+      Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
       case None => baseParams
@@ -75,15 +75,17 @@ class SierraReaderWorkerService @Inject()(
     )
 
     val sierraSource = SierraSource(
-      apiUrl,
-      sierraOauthKey,
-      sierraOauthSecret,
+      apiUrl = sierraConfig.apiUrl,
+      oauthKey = sierraConfig.oauthKey,
+      oauthSecret = sierraConfig.oauthSec,
       throttleRate = ThrottleRate(3, per = 1.second),
-      timeoutMs = 60000)(resourceType = resourceType.toString, params)
+      timeoutMs = 60000)(
+      resourceType = sierraConfig.resourceType.toString,
+      params)
 
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow())
-      .grouped(batchSize)
+      .grouped(readerConfig.batchSize)
       .map(recordBatch => recordBatch.asJson)
       .zipWithIndex
       .runWith(s3sink)
@@ -93,7 +95,8 @@ class SierraReaderWorkerService @Inject()(
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
-        s"windows_${resourceType.toString}_complete/${windowManager.buildWindowLabel(window)}",
+        s"windows_${sierraConfig.resourceType.toString}_complete/${windowManager
+          .buildWindowLabel(window)}",
         "")
     }
   }

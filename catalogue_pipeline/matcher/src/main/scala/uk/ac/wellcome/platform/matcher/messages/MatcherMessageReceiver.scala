@@ -8,7 +8,8 @@ import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.models.VersionConflictException
-import uk.ac.wellcome.storage.s3.{S3Config, S3ObjectLocation, S3TypeStore}
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -17,7 +18,7 @@ import scala.concurrent.{ExecutionContextExecutor, Future}
 class MatcherMessageReceiver @Inject()(
   messageStream: SQSStream[NotificationMessage],
   snsWriter: SNSWriter,
-  s3TypeStore: S3TypeStore[RecorderWorkEntry],
+  s3TypeStore: ObjectStore[RecorderWorkEntry],
   storageS3Config: S3Config,
   actorSystem: ActorSystem,
   linkedWorkMatcher: WorkMatcher)
@@ -32,7 +33,7 @@ class MatcherMessageReceiver @Inject()(
       hybridRecord <- Future.fromTry(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
-        S3ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
+        ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
       identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
         message = toJson(identifiersList).get,

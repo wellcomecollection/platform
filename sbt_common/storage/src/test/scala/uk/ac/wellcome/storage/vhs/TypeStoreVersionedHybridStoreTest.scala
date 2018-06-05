@@ -3,7 +3,7 @@ package uk.ac.wellcome.storage.vhs
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.storage.s3.S3TypeStore
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -12,7 +12,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class ExampleRecord(
@@ -34,7 +33,7 @@ class TypeStoreVersionedHybridStoreTest
                         Table,
                         VersionedHybridStore[ExampleRecord,
                                              EmptyMetadata,
-                                             S3TypeStore[ExampleRecord]]),
+                                             ObjectStore[ExampleRecord]]),
                        R]
   ): R =
     withLocalS3Bucket[R] { bucket =>
@@ -54,9 +53,8 @@ class TypeStoreVersionedHybridStoreTest
             content = "One ocelot in orange"
           )
 
-          val future =
-            hybridStore.updateRecord(record.id)(record)((t, _) => t)(
-              EmptyMetadata())
+          val future = hybridStore.updateRecord(record.id)(ifNotExisting =
+            (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           whenReady(future) { _ =>
             getJsonFor(bucket, table, record) shouldBe toJson(record).get
@@ -66,14 +64,15 @@ class TypeStoreVersionedHybridStoreTest
 
     it("retrieves the specified type") {
       withS3TypeStoreFixtures {
-        case (bucket, table, hybridStore) =>
+        case (_, _, hybridStore) =>
           val id = Random.nextString(5)
           val record = ExampleRecord(
             id = Random.nextString(5),
             content = "Hairy hyenas howling hatefully"
           )
           val putFuture =
-            hybridStore.updateRecord(id)(record)((t, _) => t)(EmptyMetadata())
+            hybridStore.updateRecord(id)(ifNotExisting =
+              (record, EmptyMetadata()))(ifExisting = (t, m) => (t, m))
 
           val getFuture = putFuture.flatMap { _ =>
             hybridStore.getRecord(id)

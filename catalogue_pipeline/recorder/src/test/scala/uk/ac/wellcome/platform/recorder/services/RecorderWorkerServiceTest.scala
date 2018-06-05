@@ -22,6 +22,8 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class RecorderWorkerServiceTest
     extends FunSpec
     with Matchers
@@ -158,29 +160,27 @@ class RecorderWorkerServiceTest
     table: Table,
     bucket: Bucket,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
-    withMessageReader[UnidentifiedWork, Unit](bucket, queue) { messageReader =>
-      withActorSystem { actorSystem =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          withLocalSqsQueue { queue =>
-            withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
-              bucket = bucket,
-              table = table) { versionedHybridStore =>
-              withMessageStream[UnidentifiedWork, R](
-                actorSystem,
-                bucket,
-                queue,
-                metricsSender) { messageStream =>
-                val workerService = new RecorderWorkerService(
-                  versionedHybridStore = versionedHybridStore,
-                  messageStream = messageStream,
-                  system = actorSystem
-                )
+    withActorSystem { actorSystem =>
+      withMetricsSender(actorSystem) { metricsSender =>
+        withLocalSqsQueue { queue =>
+          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
+            bucket = bucket,
+            table = table) { versionedHybridStore =>
+            withMessageStream[UnidentifiedWork, R](
+              actorSystem,
+              bucket,
+              queue,
+              metricsSender) { messageStream =>
+              val workerService = new RecorderWorkerService(
+                versionedHybridStore = versionedHybridStore,
+                messageStream = messageStream,
+                system = actorSystem
+              )
 
-                try {
-                  testWith(workerService)
-                } finally {
-                  workerService.stop()
-                }
+              try {
+                testWith(workerService)
+              } finally {
+                workerService.stop()
               }
             }
           }

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.matcher.storage
 
+import javax.naming.ConfigurationException
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{
   BatchGetItemRequest,
@@ -62,7 +64,8 @@ class WorkNodeDaoTest
 
         val matcherGraphDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(matcherGraphDao.get(Set("A")).failed) { failedException =>
           failedException shouldBe expectedException
@@ -122,7 +125,8 @@ class WorkNodeDaoTest
           .thenThrow(expectedException)
         val workNodeDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
           failedException =>
@@ -169,7 +173,8 @@ class WorkNodeDaoTest
           .thenThrow(expectedException)
         val workNodeDao = new WorkNodeDao(
           dynamoDbClient,
-          DynamoConfig(table.name, Some(table.index)))
+          DynamoConfig(table = table.name, index = table.index)
+        )
 
         whenReady(workNodeDao.put(WorkNode("A", 1, List("B"), "A+B")).failed) {
           failedException =>
@@ -179,9 +184,12 @@ class WorkNodeDaoTest
     }
   }
 
-  it("cannot be instantiated if dynamoConfig.index is a None") {
-    intercept[RuntimeException] {
-      new WorkNodeDao(dynamoDbClient, DynamoConfig("something", None))
+  it("cannot be instantiated if dynamoConfig.maybeIndex is None") {
+    intercept[ConfigurationException] {
+      new WorkNodeDao(
+        dynamoDbClient = dynamoDbClient,
+        dynamoConfig = DynamoConfig(table = "something", maybeIndex = None)
+      )
     }
   }
 

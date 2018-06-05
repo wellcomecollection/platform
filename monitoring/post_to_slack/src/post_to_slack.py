@@ -10,6 +10,7 @@ import os
 import attr
 import boto3
 import requests
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 from cloudwatch_alarms import (
     build_cloudwatch_url,
@@ -200,9 +201,8 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
     return slack_data
 
 
+@log_on_error
 def main(event, _ctxt=None):
-    print(f'event = {event!r}')
-
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
     slack_critical_hook = os.environ['CRITICAL_SLACK_WEBHOOK']
     slack_noncritical_hook = os.environ['NONCRITICAL_SLACK_WEBHOOK']

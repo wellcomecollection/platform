@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v8.1.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "ingestor"
 
   source_queue_name  = "${module.es_ingest_queue.name}"
@@ -48,4 +48,6 @@ module "ingestor" {
   enable_alb_alarm = false
 
   max_capacity = 15
+
+  log_retention_in_days = 30
 }

@@ -6,18 +6,13 @@ import scalikejdbc.{AutoSession, ConnectionPool, DB, SQLSyntax}
 import uk.ac.wellcome.test.fixtures.TestWith
 import scalikejdbc._
 import uk.ac.wellcome.platform.idminter.database.FieldDescription
+import uk.ac.wellcome.platform.idminter.models.{
+  IdentifiersTableConfig,
+  RDSClientConfig
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
-
-case class DatabaseConfig(
-  databaseName: String,
-  tableName: String,
-  database: SQLSyntax,
-  table: SQLSyntax,
-  flags: Map[String, String],
-  session: AutoSession.type
-)
 
 trait IdentifiersDatabase
     extends Eventually
@@ -29,9 +24,9 @@ trait IdentifiersDatabase
   val username = "root"
   val password = "password"
 
-  def eventuallyTableExists(databaseConfig: DatabaseConfig) = eventually {
-    val database = databaseConfig.database
-    val table = databaseConfig.table
+  def eventuallyTableExists(tableConfig: IdentifiersTableConfig) = eventually {
+    val database: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.database)
+    val table: SQLSyntax = SQLSyntax.createUnsafely(tableConfig.tableName)
 
     val fields = DB readOnly { implicit session =>
       sql"DESCRIBE $database.$table"
@@ -80,7 +75,28 @@ trait IdentifiersDatabase
     Stream continually nextAlpha
   }
 
-  def withIdentifiersDatabase[R](testWith: TestWith[DatabaseConfig, R]) = {
+  val rdsClientConfig = RDSClientConfig(
+    host = host,
+    port = port,
+    username = username,
+    password = password
+  )
+
+  val rdsClientFlags = Map(
+    "aws.rds.host" -> host,
+    "aws.rds.port" -> port,
+    "aws.rds.userName" -> username,
+    "aws.rds.password" -> password
+  )
+
+  def identifiersLocalDbFlags(identifiersTableConfig: IdentifiersTableConfig) =
+    rdsClientFlags ++ Map(
+      "aws.rds.identifiers.table" -> identifiersTableConfig.tableName,
+      "aws.rds.identifiers.database" -> identifiersTableConfig.database
+    )
+
+  def withIdentifiersDatabase[R](
+    testWith: TestWith[IdentifiersTableConfig, R]) = {
     Class.forName("com.mysql.jdbc.Driver")
     ConnectionPool.singleton(s"jdbc:mysql://$host:$port", username, password)
 
@@ -104,30 +120,16 @@ trait IdentifiersDatabase
     val tableName: String = alphabetic take 10 mkString
 
     val identifiersDatabase: SQLSyntax = SQLSyntax.createUnsafely(databaseName)
-    val identifiersTable: SQLSyntax = SQLSyntax.createUnsafely(tableName)
 
-    val flags = Map(
-      "aws.rds.host" -> host,
-      "aws.rds.port" -> port,
-      "aws.rds.userName" -> username,
-      "aws.rds.password" -> password,
-      "aws.rds.identifiers.table" -> tableName,
-      "aws.rds.identifiers.database" -> databaseName
-    )
-
-    val config = DatabaseConfig(
-      databaseName = databaseName,
-      tableName = tableName,
-      database = identifiersDatabase,
-      table = identifiersTable,
-      flags = flags,
-      session = session
+    val identifiersTableConfig = IdentifiersTableConfig(
+      database = databaseName,
+      tableName = tableName
     )
 
     try {
       sql"CREATE DATABASE $identifiersDatabase".execute().apply()
 
-      testWith(config)
+      testWith(identifiersTableConfig)
     } finally {
       DB localTx { implicit session =>
         sql"DROP DATABASE IF EXISTS $identifiersDatabase".execute().apply()

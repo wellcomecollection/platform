@@ -1,11 +1,7 @@
 package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  WorkIdentifier,
-  WorkNode
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -16,7 +12,7 @@ import scala.concurrent.Future
 
 class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
   def matchWork(work: UnidentifiedWork) =
-    matchLinkedWorks(work).map(WorkGraphIdentifiersList)
+    matchLinkedWorks(work).map(MatcherResult)
 
   type FutureMatched = Future[Set[MatchedIdentifiers]]
 

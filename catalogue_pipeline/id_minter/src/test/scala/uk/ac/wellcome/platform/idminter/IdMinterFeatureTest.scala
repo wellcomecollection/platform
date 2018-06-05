@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.storage.s3.S3ObjectLocation
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -33,13 +33,13 @@ class IdMinterFeatureTest
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalS3Bucket { bucket =>
-          withIdentifiersDatabase { dbConfig =>
+          withIdentifiersDatabase { identifiersTableConfig =>
             val flags =
-              dbConfig.flags ++
+              identifiersLocalDbFlags(identifiersTableConfig) ++
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
-              eventuallyTableExists(dbConfig)
+              eventuallyTableExists(identifiersTableConfig)
 
               val miroID = "M0001234"
               val title = "A limerick about a lion"
@@ -61,8 +61,8 @@ class IdMinterFeatureTest
               (1 to messageCount).foreach { i =>
                 val messageBody = put[UnidentifiedWork](
                   obj = work,
-                  location = S3ObjectLocation(
-                    bucket = bucket.name,
+                  location = ObjectLocation(
+                    namespace = bucket.name,
                     key = s"$i.json"
                   )
                 )
@@ -91,10 +91,10 @@ class IdMinterFeatureTest
   it("continues if something fails processing a message") {
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
-        withIdentifiersDatabase { dbConfig =>
+        withIdentifiersDatabase { identifiersTableConfig =>
           withLocalS3Bucket { bucket =>
             val flags =
-              dbConfig.flags ++
+              identifiersLocalDbFlags(identifiersTableConfig) ++
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
@@ -118,8 +118,8 @@ class IdMinterFeatureTest
 
               val messageBody = put[UnidentifiedWork](
                 obj = work,
-                location = S3ObjectLocation(
-                  bucket = bucket.name,
+                location = ObjectLocation(
+                  namespace = bucket.name,
                   key = s"key.json"
                 )
               )
