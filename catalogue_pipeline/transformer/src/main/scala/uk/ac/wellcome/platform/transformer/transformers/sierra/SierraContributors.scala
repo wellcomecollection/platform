@@ -126,9 +126,11 @@ trait SierraContributors extends MarcUtils {
 
     maybeSubfieldA match {
       case Some(content) => content
-      case None => throw GracefulFailureException(new RuntimeException(
-        s"Unable to find subfield $$a?  $subfields"
-      ))
+      case None =>
+        throw GracefulFailureException(
+          new RuntimeException(
+            s"Unable to find subfield $$a?  $subfields"
+          ))
     }
   }
 
@@ -180,8 +182,9 @@ trait SierraContributors extends MarcUtils {
         )
       }
       case _ =>
-        throw GracefulFailureException(new RuntimeException(
-          s"Multiple identifiers in subfield $$0: $codes"))
+        throw GracefulFailureException(
+          new RuntimeException(
+            s"Multiple identifiers in subfield $$0: $codes"))
     }
   }
 }
