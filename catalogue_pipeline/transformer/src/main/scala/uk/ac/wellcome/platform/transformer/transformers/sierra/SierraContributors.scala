@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData}
@@ -117,10 +118,18 @@ trait SierraContributors extends MarcUtils {
 
   private def getLabel(subfields: List[MarcSubfield]): String = {
     // Extract the label from subfield $a.  This is a non-repeatable
-    // field in the MARC spec, so collectFirst is okay.
-    subfields.collectFirst {
+    // field in the MARC spec, but we have seen records where it
+    // doesn't appear.
+    val maybeSubfieldA = subfields.collectFirst {
       case MarcSubfield("a", content) => content
-    }.get
+    }
+
+    maybeSubfieldA match {
+      case Some(content) => content
+      case None => throw GracefulFailureException(new RuntimeException(
+        s"Unable to find subfield $$a?  $subfields"
+      ))
+    }
   }
 
   private def getContributionRoles(
@@ -171,8 +180,8 @@ trait SierraContributors extends MarcUtils {
         )
       }
       case _ =>
-        throw new RuntimeException(
-          s"Multiple identifiers in subfield $$0: $codes")
+        throw GracefulFailureException(new RuntimeException(
+          s"Multiple identifiers in subfield $$0: $codes"))
     }
   }
 }
