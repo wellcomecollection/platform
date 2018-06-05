@@ -26,7 +26,7 @@ variable "es_config_snapshot" {
   description = "Elasticcloud config for the snapshot generator"
   type        = "map"
 
-  default     = {
+  default = {
     index_v1 = "v1-20180530-new-identifier-schemes"
     index_v2 = "v2-20180530-new-identifier-schemes"
     doc_type = "work"
