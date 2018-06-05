@@ -67,7 +67,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
           MarcSubfield(tag = "0", content = "lcsh / bbb"),
 
           // Including a MESH URL prefix
-          MarcSubfield(tag = "0", content = "https://id.nlm.nih.gov/lcsh/bbb")
+          MarcSubfield(tag = "0", content = "https://id.nlm.nih.gov/mesh/lcsh/bbb")
         )
       )
     )
