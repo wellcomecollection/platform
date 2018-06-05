@@ -9,11 +9,12 @@ class SierraLocationTest extends FunSpec with Matchers {
   val transformer = new SierraLocation {}
 
   it("should extract location from item data") {
+    val locationTypeCode = "sgmed"
     val locationType = LocationType("sgmed")
     val label = "A museum of mermaids"
     val itemData = SierraItemData(
       id = "i1234567",
-      location = Some(SierraItemLocation(locationType, label))
+      location = Some(SierraItemLocation(locationTypeCode, label))
     )
 
     val expectedLocation = PhysicalLocation(locationType, label)
