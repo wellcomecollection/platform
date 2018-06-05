@@ -15,8 +15,8 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.WorkNode
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 class WorkNodeDaoTest
@@ -40,13 +40,15 @@ class WorkNodeDaoTest
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          val workNodeA = WorkNode("A", List("B"), "A+B")
-          val workNodeB = WorkNode("B", Nil, "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
-          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
+          val existingLinkedWorkA: WorkNode =
+            WorkNode("A", 1, List("B"), "A+B")
+          val existingLinkedWorkB: WorkNode = WorkNode("B", 0, Nil, "A+B")
 
-          whenReady(workNodeDao.get(Set("A", "B"))) { workNodeSet =>
-            workNodeSet shouldBe Set(workNodeA, workNodeB)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+
+          whenReady(workNodeDao.get(Set("A", "B"))) { work =>
+            work shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
           }
         }
       }
@@ -56,8 +58,10 @@ class WorkNodeDaoTest
       withLocalDynamoDbTable { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED!")
+
         when(dynamoDbClient.batchGetItem(any[BatchGetItemRequest]))
           .thenThrow(expectedException)
+
         val matcherGraphDao = new WorkNodeDao(
           dynamoDbClient,
           DynamoConfig(table = table.name, index = table.index)
@@ -98,14 +102,16 @@ class WorkNodeDaoTest
 
     it("returns WorkNodes which are stored in DynamoDB") {
       withLocalDynamoDbTable { table =>
-        withWorkNodeDao(table) { workNodeDao =>
-          val workNodeA = WorkNode("A", List("B"), "A+B")
-          val workNodeB = WorkNode("B", Nil, "A+B")
-          Scanamo.put(dynamoDbClient)(table.name)(workNodeA)
-          Scanamo.put(dynamoDbClient)(table.name)(workNodeB)
+        withWorkNodeDao(table) { matcherGraphDao =>
+          val existingWorkNodeA: WorkNode = WorkNode("A", 1, List("B"), "A+B")
+          val existingWorkNodeB: WorkNode = WorkNode("B", 0, Nil, "A+B")
 
-          whenReady(workNodeDao.getByComponentIds(Set("A+B"))) { workNodeSet =>
-            workNodeSet shouldBe Set(workNodeA, workNodeB)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeB)
+
+          whenReady(matcherGraphDao.getByComponentIds(Set("A+B"))) {
+            linkedWorks =>
+              linkedWorks shouldBe Set(existingWorkNodeA, existingWorkNodeB)
           }
         }
       }
@@ -149,11 +155,11 @@ class WorkNodeDaoTest
     it("puts a WorkNode") {
       withLocalDynamoDbTable { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          val workNode = WorkNode("A", List("B"), "A+B")
-          whenReady(workNodeDao.put(workNode)) { _ =>
-            val savedWorkNode =
+          val work = WorkNode("A", 1, List("B"), "A+B")
+          whenReady(workNodeDao.put(work)) { _ =>
+            val savedLinkedWork =
               Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
-            savedWorkNode shouldBe Some(Right(workNode))
+            savedLinkedWork shouldBe Some(Right(work))
           }
         }
       }
@@ -170,7 +176,7 @@ class WorkNodeDaoTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        whenReady(workNodeDao.put(WorkNode("A", List("B"), "A+B")).failed) {
+        whenReady(workNodeDao.put(WorkNode("A", 1, List("B"), "A+B")).failed) {
           failedException =>
             failedException shouldBe expectedException
         }

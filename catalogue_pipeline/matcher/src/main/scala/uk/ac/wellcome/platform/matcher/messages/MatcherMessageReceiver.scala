@@ -2,10 +2,12 @@ package uk.ac.wellcome.platform.matcher.messages
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
+import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.platform.matcher.matcher.LinkedWorkMatcher
+import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
+import uk.ac.wellcome.platform.matcher.models.VersionConflictException
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -19,14 +21,15 @@ class MatcherMessageReceiver @Inject()(
   s3TypeStore: ObjectStore[RecorderWorkEntry],
   storageS3Config: S3Config,
   actorSystem: ActorSystem,
-  linkedWorkMatcher: LinkedWorkMatcher) {
+  linkedWorkMatcher: WorkMatcher)
+    extends Logging {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] = {
-    for {
+    (for {
       hybridRecord <- Future.fromTry(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
@@ -36,7 +39,9 @@ class MatcherMessageReceiver @Inject()(
         message = toJson(identifiersList).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
-    } yield ()
+    } yield ()).recover {
+      case e: VersionConflictException => warn(e.getMessage)
+    }
   }
 
   def stop(): Future[Terminated] = {

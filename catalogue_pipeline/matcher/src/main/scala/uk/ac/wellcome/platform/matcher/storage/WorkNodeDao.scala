@@ -6,7 +6,7 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.platform.matcher.models.WorkNode
+import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.storage.GlobalExecutionContext._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
