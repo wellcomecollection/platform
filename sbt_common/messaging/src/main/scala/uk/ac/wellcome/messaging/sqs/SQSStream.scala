@@ -39,9 +39,9 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       .mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
         debug(s"Processing message ${message.getMessageId}")
         val metricName = s"${streamName}_ProcessMessage"
-        metricsSender.timeAndCount(
-          metricName,
-          () => readAndProcess(streamName, message, process))
+        val op = readAndProcess(streamName, message, process)
+
+        metricsSender.count(metricName, op)
       }
       .map { m =>
         debug(s"Deleting message ${m.getMessageId}")

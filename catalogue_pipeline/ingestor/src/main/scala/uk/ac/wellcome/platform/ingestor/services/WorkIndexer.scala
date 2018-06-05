@@ -32,42 +32,37 @@ class WorkIndexer @Inject()(
 
   def indexWork(work: IdentifiedWork,
                 esIndex: String,
-                esType: String): Future[Any] = {
+                esType: String) = {
 
-    metricsSender.timeAndCount[Any](
-      "ingestor-index-work",
-      () => {
-        info(s"Indexing work ${work.canonicalId}")
+    info(s"Indexing work ${work.canonicalId}")
 
-        elasticClient
-          .execute {
-            indexInto(esIndex / esType)
-              .version(work.version)
-              .versionType(VersionType.EXTERNAL_GTE)
-              .id(work.canonicalId)
-              .doc(work)
-          }
-          .map { _ =>
-            info(s"Successfully indexed work ${work.canonicalId}")
-          }
-          .recover {
-            case e: ResponseException
-                if getErrorType(e).contains(
-                  "version_conflict_engine_exception") =>
-              warn(
-                s"Trying to index work ${work.canonicalId} with older version: skipping.")
-              ()
-            case e: TimeoutException =>
-              warn(
-                s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
-              throw new GracefulFailureException(e)
-            case e: Throwable =>
-              error(
-                s"Error indexing work ${work.canonicalId} into Elasticsearch",
-                e)
-              throw e
-          }
+    elasticClient
+      .execute {
+        indexInto(esIndex / esType)
+          .version(work.version)
+          .versionType(VersionType.EXTERNAL_GTE)
+          .id(work.canonicalId)
+          .doc(work)
       }
-    )
+      .map { _ =>
+        info(s"Successfully indexed work ${work.canonicalId}")
+      }
+      .recover {
+        case e: ResponseException
+          if getErrorType(e).contains(
+            "version_conflict_engine_exception") =>
+          warn(
+            s"Trying to index work ${work.canonicalId} with older version: skipping.")
+          ()
+        case e: TimeoutException =>
+          warn(
+            s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
+          throw new GracefulFailureException(e)
+        case e: Throwable =>
+          error(
+            s"Error indexing work ${work.canonicalId} into Elasticsearch",
+            e)
+          throw e
+      }
   }
 }

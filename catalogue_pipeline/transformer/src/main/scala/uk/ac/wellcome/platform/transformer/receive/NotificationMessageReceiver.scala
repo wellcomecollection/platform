@@ -29,47 +29,42 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class NotificationMessageReceiver @Inject()(
-  messageWriter: MessageWriter[UnidentifiedWork],
-  s3Client: AmazonS3,
-  s3Config: S3Config,
-  metricsSender: MetricsSender)(
-  implicit miroTransformableStore: ObjectStore[MiroTransformable],
-  calmTransformableStore: ObjectStore[CalmTransformable],
-  sierraTransformableStore: ObjectStore[SierraTransformable],
-  ec: ExecutionContext
-) extends Logging {
+                                             messageWriter: MessageWriter[UnidentifiedWork],
+                                             s3Client: AmazonS3,
+                                             s3Config: S3Config,
+                                             metricsSender: MetricsSender)(
+                                             implicit miroTransformableStore: ObjectStore[MiroTransformable],
+                                             calmTransformableStore: ObjectStore[CalmTransformable],
+                                             sierraTransformableStore: ObjectStore[SierraTransformable],
+                                             ec: ExecutionContext
+                                           ) extends Logging {
 
   def receiveMessage(message: NotificationMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
-    metricsSender.timeAndCount(
-      "transform-time",
-      () => {
-        val futurePublishAttempt = for {
-          hybridRecord <- Future.fromTry(
-            fromJson[HybridRecord](message.Message))
-          sourceMetadata <- Future.fromTry(
-            fromJson[SourceMetadata](message.Message))
-          transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
-          cleanRecord <- Future.fromTry(
-            transformTransformable(transformableRecord, hybridRecord.version))
-          publishResult <- publishMessage(cleanRecord)
-        } yield publishResult
 
-        futurePublishAttempt
-          .recover {
-            case e: ParsingFailure =>
-              info("Recoverable failure parsing HybridRecord from message", e)
-              throw GracefulFailureException(e)
-          }
-          .map(_ => ())
+    val futurePublishAttempt = for {
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      sourceMetadata <- Future.fromTry(fromJson[SourceMetadata](message.Message))
+      transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
+      cleanRecord <- Future.fromTry(
+        transformTransformable(transformableRecord, hybridRecord.version))
+      publishResult <- publishMessage(cleanRecord)
+    } yield publishResult
+
+    futurePublishAttempt
+      .recover {
+        case e: ParsingFailure =>
+          info("Recoverable failure parsing HybridRecord from message", e)
+          throw GracefulFailureException(e)
       }
-    )
+      .map(_ => ())
+
   }
 
   private def getTransformable(
-    hybridRecord: HybridRecord,
-    sourceMetadata: SourceMetadata
-  ) = {
+                                hybridRecord: HybridRecord,
+                                sourceMetadata: SourceMetadata
+                              ) = {
     val s3ObjectLocation = ObjectLocation(
       namespace = s3Config.bucketName,
       key = hybridRecord.s3key
@@ -83,9 +78,9 @@ class NotificationMessageReceiver @Inject()(
   }
 
   private def transformTransformable(
-    transformable: Transformable,
-    version: Int
-  ): Try[Option[UnidentifiedWork]] = {
+                                      transformable: Transformable,
+                                      version: Int
+                                    ): Try[Option[UnidentifiedWork]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -107,7 +102,7 @@ class NotificationMessageReceiver @Inject()(
   }
 
   private def publishMessage(
-    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+                              maybeWork: Option[UnidentifiedWork]): Future[Unit] =
     maybeWork.fold(Future.successful(())) { work =>
       messageWriter.write(
         work,

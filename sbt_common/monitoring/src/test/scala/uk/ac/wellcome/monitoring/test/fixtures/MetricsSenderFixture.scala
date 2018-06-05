@@ -35,9 +35,9 @@ trait MetricsSenderFixture
       val metricsSender = mock[MetricsSender]
 
       when(
-        metricsSender.timeAndCount(
+        metricsSender.count(
           anyString(),
-          any[() => Future[Unit]]()
+          any[Future[Unit]]()
         )
       ).thenAnswer(new Answer[Future[Unit]] {
         override def answer(invocation: InvocationOnMock): Future[Unit] = {

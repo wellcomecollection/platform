@@ -18,14 +18,8 @@ class IdEmbedder @Inject()(
   identifierGenerator: IdentifierGenerator)(implicit ec: ExecutionContext)
     extends Logging {
 
-  def embedId(json: Json): Future[Json] = {
-    metricsSender.timeAndCount(
-      "generate-id",
-      () =>
-        Future {
-          iterate(root.each, addIdentifierToJson(json))
-      }
-    )
+  def embedId(json: Json): Future[Json] = Future {
+    iterate(root.each, addIdentifierToJson(json))
   }
 
   @tailrec
