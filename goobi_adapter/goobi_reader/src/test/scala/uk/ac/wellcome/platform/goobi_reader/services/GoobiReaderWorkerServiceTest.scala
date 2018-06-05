@@ -152,11 +152,9 @@ class GoobiReaderWorkerServiceTest
       sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
       eventually {
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-        assertDynamoTableIsEmpty(table)
-        assertS3StorageIsEmpty(bucket)
-        verify(mockMetricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+        assertMessageSentToDlq(queue, dlq)
+        assertUpdateNotSaved(bucket, table)
+        assertFailureMetricNotIncremented(mockMetricsSender)
       }
     }
   }
@@ -173,13 +171,10 @@ class GoobiReaderWorkerServiceTest
       sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
       eventually {
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-        assertDynamoTableIsEmpty(table)
-        assertS3StorageIsEmpty(bucket)
-        verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+        assertMessageSentToDlq(queue, dlq)
+        assertUpdateNotSaved(bucket, table)
+        assertFailureMetricIncremented(mockMetricsSender)
       }
-
     }
   }
 
@@ -197,11 +192,9 @@ class GoobiReaderWorkerServiceTest
       sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
       eventually {
-        assertQueueEmpty(queue)
-        assertQueueHasSize(dlq, 1)
-        assertDynamoTableIsEmpty(table)
-        assertS3StorageIsEmpty(bucket)
-        verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+        assertMessageSentToDlq(queue, dlq)
+        assertUpdateNotSaved(bucket, table)
+        assertFailureMetricIncremented(mockMetricsSender)
       }
     }
   }
@@ -213,11 +206,29 @@ class GoobiReaderWorkerServiceTest
     getContentFromS3(bucket, getHybridRecord(table, id).s3key) shouldBe expectedContents
   }
 
-  def assertDynamoTableIsEmpty(table: Table)= {
+  private def assertMessageSentToDlq(queue: Queue, dlq: Queue) = {
+    assertQueueEmpty(queue)
+    assertQueueHasSize(dlq, 1)
+  }
+
+  private def assertFailureMetricNotIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+  }
+
+  private def assertUpdateNotSaved(bucket: Bucket, table: Table) = {
+    assertDynamoTableIsEmpty(table)
+    assertS3StorageIsEmpty(bucket)
+  }
+
+  private def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+  }
+
+  private def assertDynamoTableIsEmpty(table: Table)= {
     Scanamo.scan[HybridRecord](dynamoDbClient)(table.name) shouldBe empty
   }
 
-  def assertS3StorageIsEmpty(bucket: Bucket) = {
+  private def assertS3StorageIsEmpty(bucket: Bucket) = {
     s3Client.listObjects(bucket.name).getObjectSummaries shouldBe empty
   }
 

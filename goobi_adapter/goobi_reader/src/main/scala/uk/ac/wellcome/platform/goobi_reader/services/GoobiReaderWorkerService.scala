@@ -51,12 +51,12 @@ class GoobiReaderWorkerService @Inject()(
     val eventuallyContent = Future {
       s3Client.getObject(bucketName, objectKey).getObjectContent
     }
-    eventuallyContent.flatMap( content => {
+    eventuallyContent.flatMap( updatedContent => {
       versionedHybridStore.updateRecord(id = id)(
-        ifNotExisting = (content, GoobiRecordMetadata(updateEventTime)))(
+        ifNotExisting = (updatedContent, GoobiRecordMetadata(updateEventTime)))(
         ifExisting = (existingContent, existingMetadata) => {
           if (existingMetadata.eventTime.isBefore(updateEventTime))
-            (content, GoobiRecordMetadata(updateEventTime))
+            (updatedContent, GoobiRecordMetadata(updateEventTime))
           else
             (existingContent, existingMetadata)
         })
