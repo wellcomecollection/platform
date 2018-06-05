@@ -4,7 +4,8 @@ module "api_romulus_v1" {
   name     = "romulus"
   prod_api = "${var.production_api}"
 
-  es_config = "${var.es_config_romulus}"
+  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_config              = "${var.es_config_romulus}"
 
   prod_api_release_id       = "${var.production_api == "romulus" ? var.pinned_romulus_api : var.pinned_remus_api}"
   prod_api_nginx_release_id = "${var.production_api == "romulus" ? var.pinned_romulus_api_nginx : var.pinned_remus_api_nginx}"
@@ -32,7 +33,8 @@ module "api_remus_v1" {
   name     = "remus"
   prod_api = "${var.production_api}"
 
-  es_config = "${var.es_config_remus}"
+  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_config              = "${var.es_config_remus}"
 
   prod_api_release_id       = "${var.production_api == "romulus" ? var.pinned_romulus_api : var.pinned_remus_api}"
   prod_api_nginx_release_id = "${var.production_api == "romulus" ? var.pinned_romulus_api_nginx : var.pinned_remus_api_nginx}"
