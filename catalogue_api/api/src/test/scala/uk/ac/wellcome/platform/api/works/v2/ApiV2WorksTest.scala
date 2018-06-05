@@ -631,7 +631,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           canonicalId = "1234",
           title = "A thorn in the thumb tells a traumatic tale",
           thumbnail = DigitalLocation(
-            locationType = "thumbnail-image",
+            locationType = LocationType("thumbnail-image"),
             url = "https://iiif.example.org/1234/default.jpg",
             license = License_CCBY
           )

@@ -3,12 +3,7 @@ package uk.ac.wellcome.platform.api.works.v1
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.models.work.internal.{
-  DigitalLocation,
-  IdentifierType,
-  License_CCBY,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal._
 
 class ApiV1WorksTest extends ApiV1WorksTestBase {
 
@@ -610,7 +605,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           canonicalId = "1234",
           title = "A thorn in the thumb tells a traumatic tale",
           thumbnail = DigitalLocation(
-            locationType = "thumbnail-image",
+            locationType = LocationType("thumbnail-image"),
             url = "https://iiif.example.org/1234/default.jpg",
             license = License_CCBY
           )

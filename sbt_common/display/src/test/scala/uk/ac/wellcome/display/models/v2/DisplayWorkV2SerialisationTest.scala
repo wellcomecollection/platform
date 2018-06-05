@@ -118,7 +118,7 @@ class DisplayWorkV2SerialisationTest
 
   it("includes credit information in DisplayWorkV2 serialisation") {
     val location = DigitalLocation(
-      locationType = "thumbnail-image",
+      locationType = LocationType("thumbnail-image"),
       url = "",
       credit = Some("Wellcome Collection"),
       license = License_CCBY
@@ -288,7 +288,7 @@ class DisplayWorkV2SerialisationTest
       canonicalId = "1234",
       title = "A thorn in the thumb tells a traumatic tale",
       thumbnail = DigitalLocation(
-        locationType = "thumbnail-image",
+        locationType = LocationType("thumbnail-image"),
         url = "https://iiif.example.org/1234/default.jpg",
         license = License_CCBY
       )

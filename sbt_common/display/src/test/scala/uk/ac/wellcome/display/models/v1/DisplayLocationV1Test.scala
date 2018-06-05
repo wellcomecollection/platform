@@ -4,6 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{
   DigitalLocation,
   License_CCBY,
+  LocationType,
   PhysicalLocation
 }
 
@@ -12,7 +13,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
   describe("DisplayDigitalLocationV1") {
     it("should read a DigitalLocation as a DisplayDigitalLocationV1 correctly") {
       val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
-      val locationType = "thumbnail-image"
+      val locationType = LocationType("thumbnail-image")
 
       val internalLocation = DigitalLocation(
         locationType = locationType,
@@ -33,7 +34,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
 
     it("should read the credit field from a Location correctly") {
       val location = DigitalLocation(
-        locationType = "thumbnail-image",
+        locationType = LocationType("thumbnail-image"),
         url = "",
         credit = Some("Science Museum, Wellcome"),
         license = License_CCBY

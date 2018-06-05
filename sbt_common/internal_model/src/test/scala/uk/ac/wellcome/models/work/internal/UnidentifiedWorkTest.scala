@@ -197,7 +197,11 @@ class UnidentifiedWorkTest
       |      ],
       |      "locations": [
       |        {
-      |          "locationType": "location",
+      |          "locationType": {
+      |            "id": "${LocationType("thumbnail-image").id}",
+      |            "label": "${LocationType("thumbnail-image").label}",
+      |            "ontologyType": "LocationType"
+      |          },
       |          "url" : "",
       |          "credit" : null,
       |          "license": $license_CCBYJson,
@@ -239,7 +243,7 @@ class UnidentifiedWorkTest
     """.stripMargin
 
   val location = DigitalLocation(
-    locationType = "location",
+    locationType = LocationType("thumbnail-image"),
     url = "",
     license = License_CCBY
   )
