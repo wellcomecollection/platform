@@ -7,15 +7,6 @@ locals {
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   terminal_failure_alarm_arn = "${data.terraform_remote_state.shared_infra.terminal_failure_alarm_arn}"
 
-  es_name     = "${data.terraform_remote_state.catalogue_api.prod_es_name}"
-  es_region   = "${data.terraform_remote_state.catalogue_api.prod_es_region}"
-  es_port     = "${data.terraform_remote_state.catalogue_api.prod_es_port}"
-  es_index_v1 = "${data.terraform_remote_state.catalogue_api.prod_es_index_v1}"
-  es_index_v2 = "${data.terraform_remote_state.catalogue_api.prod_es_index_v2}"
-  es_doc_type = "${data.terraform_remote_state.catalogue_api.prod_es_doc_type}"
-  es_username = "${data.terraform_remote_state.catalogue_api.prod_es_username}"
-  es_password = "${data.terraform_remote_state.catalogue_api.prod_es_password}"
-
   alb_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_client_error_alarm_arn}"
 

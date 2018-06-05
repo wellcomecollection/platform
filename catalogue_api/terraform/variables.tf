@@ -67,14 +67,29 @@ variable "api_stage_host" {
   default     = "api-stage.wellcomecollection.org"
 }
 
+variable "es_cluster_credentials" {
+  description = "Credentials for the Elasticsearch cluster"
+  type        = "map"
+}
+
 variable "es_config_romulus" {
   description = "Elasticcloud config for romulus"
   type        = "map"
-  default     = {}
+
+  default = {
+    index_v1 = "v1-20180530-new-identifier-schemes"
+    index_v2 = "v2-20180530-new-identifier-schemes"
+    doc_type = "work"
+  }
 }
 
 variable "es_config_remus" {
   description = "Elasticcloud config for remus"
   type        = "map"
-  default     = {}
+
+  default = {
+    index_v1 = "v1-20180530-new-identifier-schemes"
+    index_v2 = "v2-20180530-new-identifier-schemes"
+    doc_type = "work"
+  }
 }

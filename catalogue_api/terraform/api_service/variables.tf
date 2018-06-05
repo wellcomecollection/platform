@@ -28,6 +28,10 @@ variable "alb_cloudwatch_id" {}
 variable "alb_server_error_alarm_arn" {}
 variable "alb_client_error_alarm_arn" {}
 
+variable "es_cluster_credentials" {
+  type = "map"
+}
+
 variable "es_config" {
   type = "map"
 }

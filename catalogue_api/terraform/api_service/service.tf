@@ -11,8 +11,8 @@ data "template_file" "es_cluster_host" {
   template = "$${name}.$${region}.aws.found.io"
 
   vars {
-    name   = "${var.es_config["name"]}"
-    region = "${var.es_config["region"]}"
+    name   = "${var.es_cluster_credentials["name"]}"
+    region = "${var.es_cluster_credentials["region"]}"
   }
 }
 
@@ -41,13 +41,13 @@ module "service" {
   env_vars = {
     api_host    = "${local.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
-    es_port     = "${var.es_config["port"]}"
+    es_port     = "${var.es_cluster_credentials["port"]}"
+    es_username = "${var.es_cluster_credentials["username"]}"
+    es_password = "${var.es_cluster_credentials["password"]}"
+    es_protocol = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1 = "${var.es_config["index_v1"]}"
     es_index_v2 = "${var.es_config["index_v2"]}"
     es_doc_type = "${var.es_config["doc_type"]}"
-    es_username = "${var.es_config["username"]}"
-    es_password = "${var.es_config["password"]}"
-    es_protocol = "${var.es_config["protocol"]}"
   }
 
   env_vars_length = 11

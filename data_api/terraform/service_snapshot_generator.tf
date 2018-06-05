@@ -2,8 +2,8 @@ data "template_file" "es_cluster_host_snapshot" {
   template = "$${name}.$${region}.aws.found.io"
 
   vars {
-    name   = "${var.es_config_snapshot["name"]}"
-    region = "${var.es_config_snapshot["region"]}"
+    name   = "${var.es_cluster_credentials["name"]}"
+    region = "${var.es_cluster_credentials["region"]}"
   }
 }
 
@@ -21,14 +21,14 @@ module "snapshot_generator" {
     queue_url         = "${module.snapshot_generator_queue.id}"
     topic_arn         = "${module.snapshot_generation_complete_topic.arn}"
     es_host           = "${data.template_file.es_cluster_host_snapshot.rendered}"
-    es_port           = "${var.es_config_snapshot["port"]}"
-    es_name           = "${var.es_config_snapshot["name"]}"
+    es_port           = "${var.es_cluster_credentials["port"]}"
+    es_name           = "${var.es_cluster_credentials["name"]}"
+    es_username       = "${var.es_cluster_credentials["username"]}"
+    es_password       = "${var.es_cluster_credentials["password"]}"
+    es_protocol       = "${var.es_cluster_credentials["protocol"]}"
     es_index_v1       = "${var.es_config_snapshot["index_v1"]}"
     es_index_v2       = "${var.es_config_snapshot["index_v2"]}"
     es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
-    es_username       = "${var.es_config_snapshot["username"]}"
-    es_password       = "${var.es_config_snapshot["password"]}"
-    es_protocol       = "${var.es_config_snapshot["protocol"]}"
     metrics_namespace = "snapshot_generator"
   }
 
