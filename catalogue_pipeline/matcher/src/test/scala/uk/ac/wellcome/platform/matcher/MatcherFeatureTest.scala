@@ -5,7 +5,12 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -77,39 +82,42 @@ class MatcherFeatureTest
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withLocalDynamoDbTable { table =>
-            withMatcherServer(queuePair.queue, storageBucket, topic, table) { _ =>
-              val existingWorkVersion = 2
-              val updatedWorkVersion = 1
+            withMatcherServer(queuePair.queue, storageBucket, topic, table) {
+              _ =>
+                val existingWorkVersion = 2
+                val updatedWorkVersion = 1
 
-              val existingWorkAv2 = WorkNode(
-                id = "sierra-system-number/A",
-                version = existingWorkVersion,
-                linkedIds = Nil,
-                componentId = "sierra-system-number/A"
-              )
-              Scanamo.put(dynamoDbClient)(table.name)(existingWorkAv2)
+                val existingWorkAv2 = WorkNode(
+                  id = "sierra-system-number/A",
+                  version = existingWorkVersion,
+                  linkedIds = Nil,
+                  componentId = "sierra-system-number/A"
+                )
+                Scanamo.put(dynamoDbClient)(table.name)(existingWorkAv2)
 
-              val workAv1 = UnidentifiedWork(
-                sourceIdentifier = sourceIdentifierA,
-                identifiers = List(sourceIdentifierA),
-                title = Some("Work"),
-                version = updatedWorkVersion
-              )
+                val workAv1 = UnidentifiedWork(
+                  sourceIdentifier = sourceIdentifierA,
+                  identifiers = List(sourceIdentifierA),
+                  title = Some("Work"),
+                  version = updatedWorkVersion
+                )
 
-              val workSqsMessage: NotificationMessage =
-                hybridRecordNotificationMessage(
-                  message = toJson(RecorderWorkEntry(workAv1)).get,
-                  version = updatedWorkVersion,
-                  s3Client = s3Client,
-                  bucket = storageBucket)
+                val workSqsMessage: NotificationMessage =
+                  hybridRecordNotificationMessage(
+                    message = toJson(RecorderWorkEntry(workAv1)).get,
+                    version = updatedWorkVersion,
+                    s3Client = s3Client,
+                    bucket = storageBucket)
 
-              sqsClient.sendMessage(queuePair.queue.url, toJson(workSqsMessage).get)
+                sqsClient.sendMessage(
+                  queuePair.queue.url,
+                  toJson(workSqsMessage).get)
 
-              eventually {
-                noMessagesAreWaitingIn(queuePair.queue)
-                noMessagesAreWaitingIn(queuePair.dlq)
-                listMessagesReceivedFromSNS(topic).size shouldBe 0
-              }
+                eventually {
+                  noMessagesAreWaitingIn(queuePair.queue)
+                  noMessagesAreWaitingIn(queuePair.dlq)
+                  listMessagesReceivedFromSNS(topic).size shouldBe 0
+                }
             }
           }
         }

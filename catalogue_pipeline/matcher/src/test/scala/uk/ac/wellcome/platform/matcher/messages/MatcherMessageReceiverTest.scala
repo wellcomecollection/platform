@@ -6,7 +6,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -163,7 +167,6 @@ class MatcherMessageReceiverTest
               MatcherResult(
                 Set(
                   MatchedIdentifiers(
-
                     Set(
                       WorkIdentifier("sierra-system-number/A", 2),
                       WorkIdentifier("sierra-system-number/B", 2),
@@ -257,37 +260,38 @@ class MatcherMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) { _ =>
-            // process Work V2
-            val workAv2 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = aIdentifier,
-              version = 2,
-              identifiers = List(aIdentifier)
-            )
+          withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) {
+            _ =>
+              // process Work V2
+              val workAv2 = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = aIdentifier,
+                version = 2,
+                identifiers = List(aIdentifier)
+              )
 
-            val expectedMatchedWorkAv2 = MatcherResult(
-              Set(MatchedIdentifiers(
-                Set(WorkIdentifier("sierra-system-number/A", 2)))))
+              val expectedMatchedWorkAv2 = MatcherResult(
+                Set(MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
 
-            processAndAssertMatchedWorkIs(
-              workAv2,
-              expectedMatchedWorkAv2,
-              queuePair.queue,
-              storageBucket,
-              topic)
+              processAndAssertMatchedWorkIs(
+                workAv2,
+                expectedMatchedWorkAv2,
+                queuePair.queue,
+                storageBucket,
+                topic)
 
-            // Work V1 is sent but not matched
-            val workAv1 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = aIdentifier,
-              identifiers = List(aIdentifier),
-              version = 1)
+              // Work V1 is sent but not matched
+              val workAv1 = anUnidentifiedSierraWork.copy(
+                sourceIdentifier = aIdentifier,
+                identifiers = List(aIdentifier),
+                version = 1)
 
-            sendSQS(queuePair.queue, storageBucket, workAv1)
-            eventually {
-              noMessagesAreWaitingIn(queuePair.queue)
-              noMessagesAreWaitingIn(queuePair.dlq)
-              assertLastMatchedResultIs(topic, expectedMatchedWorkAv2)
-            }
+              sendSQS(queuePair.queue, storageBucket, workAv1)
+              eventually {
+                noMessagesAreWaitingIn(queuePair.queue)
+                noMessagesAreWaitingIn(queuePair.dlq)
+                assertLastMatchedResultIs(topic, expectedMatchedWorkAv2)
+              }
           }
         }
       }
@@ -309,9 +313,8 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def assertLastMatchedResultIs(
-    topic: Topic,
-    identifiersList: MatcherResult) = {
+  private def assertLastMatchedResultIs(topic: Topic,
+                                        identifiersList: MatcherResult) = {
 
     val snsMessages = listMessagesReceivedFromSNS(topic)
     snsMessages.size should be >= 1
