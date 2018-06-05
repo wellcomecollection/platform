@@ -25,7 +25,7 @@ trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
   private val dateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC)
 
-  def s3Notification(sourceKey: String, bucketName: String, eventTime: Instant)=
+  def anS3Notification(sourceKey: String, bucketName: String, eventTime: Instant)=
     s"""{
         | "Records": [
         |     {

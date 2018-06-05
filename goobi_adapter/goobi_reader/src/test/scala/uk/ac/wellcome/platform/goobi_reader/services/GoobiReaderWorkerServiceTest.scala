@@ -6,15 +6,15 @@ import java.time.temporal.ChronoUnit
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import com.gu.scanamo.Scanamo
+import org.mockito.Matchers.{any, anyDouble, endsWith}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.goobi_reader.GoobiRecordMetadata
@@ -26,9 +26,9 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith, fixture}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.duration._
 
 class GoobiReaderWorkerServiceTest
@@ -50,14 +50,14 @@ class GoobiReaderWorkerServiceTest
   private val updatedContentsStorageKey = s"$goobiS3Prefix/10/$id/536b51f7"
 
   it("processes a notification") {
-  withGoobiReaderWorkerService(s3Client) { case (bucket, queue, table, workerService) =>
+  withGoobiReaderWorkerService(s3Client) { case (bucket, QueuePair(queue, _), _, table) =>
       s3Client.putObject(bucket.name, sourceKey, contents)
 
-      workerService.processMessage(
-        aNotificationMessage(
+      val message = aNotificationMessage(
           topicArn = queue.arn,
-          message = s3Notification(sourceKey, bucket.name, eventTime)
-        ))
+          message = anS3Notification(sourceKey, bucket.name, eventTime)
+      )
+      sqsClient.sendMessage(queue.url, toJson(message).get)
 
       eventually {
         val expectedRecord = HybridRecord(
@@ -71,7 +71,7 @@ class GoobiReaderWorkerServiceTest
   }
 
   it("doesn't overwrite a newer work with an older work") {
-  withGoobiReaderWorkerServiceAndVhs(s3Client) { case (bucket, queue, table, vhs, workerService) =>
+  withGoobiReaderWorkerServiceAndVhs(s3Client) { case (bucket, queue, table, vhs) =>
     val contentStream = new ByteArrayInputStream(contents.getBytes)
     vhs.updateRecord(id = id)(
       ifNotExisting = (contentStream, GoobiRecordMetadata(eventTime)))(
@@ -86,15 +86,14 @@ class GoobiReaderWorkerServiceTest
       assertRecordStored(expectedRecord, expectedMetadata, contents, table, bucket)
     }
 
-
       s3Client.putObject(bucket.name, sourceKey, contents)
 
       val olderEventTime = eventTime.minus(1, ChronoUnit.HOURS)
       val message = aNotificationMessage(
         topicArn = queue.arn,
-        message = s3Notification(sourceKey, bucket.name, olderEventTime))
+        message = anS3Notification(sourceKey, bucket.name, olderEventTime))
 
-      workerService.processMessage(message)
+      sqsClient.sendMessage(queue.url, toJson(message).get)
 
       eventually {
         val expectedRecord = HybridRecord(
@@ -109,7 +108,7 @@ class GoobiReaderWorkerServiceTest
   }
 
   it("overwrites an older work with an newer work") {
-    withGoobiReaderWorkerServiceAndVhs(s3Client) { case (bucket, queue, table, vhs, workerService) =>
+    withGoobiReaderWorkerServiceAndVhs(s3Client) { case (bucket, queue, table, vhs) =>
       val contentStream = new ByteArrayInputStream(contents.getBytes)
       vhs.updateRecord(id = id)(
         ifNotExisting = (contentStream, GoobiRecordMetadata(eventTime)))(
@@ -127,9 +126,9 @@ class GoobiReaderWorkerServiceTest
       val newerEventTime = eventTime.plus(1, ChronoUnit.HOURS)
       val message = aNotificationMessage(
         topicArn = queue.arn,
-        message = s3Notification(sourceKey, bucket.name, newerEventTime))
+        message = anS3Notification(sourceKey, bucket.name, newerEventTime))
 
-      workerService.processMessage(message)
+      sqsClient.sendMessage(queue.url, toJson(message).get)
 
       eventually {
         val expectedRecord = HybridRecord(
@@ -143,47 +142,66 @@ class GoobiReaderWorkerServiceTest
     }
   }
 
-  it("fails with a GracefulFailureException if Json cannot be parsed") {
-    withGoobiReaderWorkerService(s3Client) { case (_, queue, _, workerService) =>
+  it("fails gracefully if Json cannot be parsed") {
+    withGoobiReaderWorkerService(s3Client) { case (bucket, QueuePair(queue, dlq), mockMetricsSender, table) =>
       val notificationMessage = aNotificationMessage(
         topicArn = queue.arn,
         message = "NotJson"
       )
-      whenReady(workerService.processMessage(notificationMessage).failed) { actualException =>
-        actualException shouldBe a[GracefulFailureException]
-        actualException.getMessage shouldBe "Unable to parse Json String."
+
+      sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+      eventually {
+        assertQueueEmpty(queue)
+        assertQueueHasSize(dlq, 1)
+        assertDynamoTableHasNoRecords(table)
+        assertS3StorageIsEmpty(bucket)
+        verify(mockMetricsSender, never()).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
     }
   }
 
-  it("fails with a GracefulFailureException if content cannot be fetched") {
-    withGoobiReaderWorkerService(s3Client) { case (bucket, queue, _, workerService) =>
+  it("does not fail gracefully if content cannot be fetched") {
+    withGoobiReaderWorkerService(s3Client) { case (bucket, QueuePair(queue, dlq), mockMetricsSender, table) =>
       val sourceKey = "NotThere.xml"
 
       val notificationMessage = aNotificationMessage(
         topicArn = queue.arn,
-        message = s3Notification(sourceKey, bucket.name, eventTime)
+        message = anS3Notification(sourceKey, bucket.name, eventTime)
       )
-      whenReady(workerService.processMessage(notificationMessage).failed) { actualException =>
-        actualException shouldBe a[GracefulFailureException]
-        actualException.getMessage should include("The specified key does not exist")
+
+      sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+      eventually {
+        assertQueueEmpty(queue)
+        assertQueueHasSize(dlq, 1)
+        assertDynamoTableHasNoRecords(table)
+        assertS3StorageIsEmpty(bucket)
+        verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
+
     }
   }
 
-  it("fails with a GracefulFailureException if there is an unexpected failure") {
+  it("does not fail gracefully when there is an unexpected failure") {
     val mockClient = mock[AmazonS3Client]
     val expectedException = new RuntimeException("Failed!")
     when(mockClient.getObject(any[String], any[String])).thenThrow(expectedException)
-    withGoobiReaderWorkerService(mockClient) { case (bucket, queue, _, workerService) =>
+    withGoobiReaderWorkerService(mockClient) { case (bucket, QueuePair(queue, dlq), mockMetricsSender, table) =>
       val sourceKey = "any.xml"
       val notificationMessage = aNotificationMessage(
         topicArn = queue.arn,
-        message = s3Notification(sourceKey, bucket.name, eventTime)
+        message = anS3Notification(sourceKey, bucket.name, eventTime)
       )
-      whenReady(workerService.processMessage(notificationMessage).failed) { actualException =>
-        actualException shouldBe a[GracefulFailureException]
-        actualException.getMessage shouldBe "Failed!"
+
+      sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+      eventually {
+        assertQueueEmpty(queue)
+        assertQueueHasSize(dlq, 1)
+        assertDynamoTableHasNoRecords(table)
+        assertS3StorageIsEmpty(bucket)
+        verify(mockMetricsSender, times(3)).incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
       }
     }
   }
@@ -193,6 +211,14 @@ class GoobiReaderWorkerServiceTest
     getHybridRecord(table, id) shouldBe expectedRecord
     getRecordMetadata[GoobiRecordMetadata](table, id).toString shouldBe expectedMetadata.toString
     getContentFromS3(bucket, getHybridRecord(table, id).s3key) shouldBe expectedContents
+  }
+
+  def assertDynamoTableHasNoRecords(table: Table)= {
+    Scanamo.scan[HybridRecord](dynamoDbClient)(table.name) shouldBe empty
+  }
+
+  def assertS3StorageIsEmpty(bucket: Bucket) = {
+    s3Client.listObjects(bucket.name).getObjectSummaries shouldBe empty
   }
 
   private def withS3StreamStoreFixtures[R](testWith: TestWith[(Bucket,
@@ -221,13 +247,14 @@ class GoobiReaderWorkerServiceTest
       )
     )
 
-  private def withGoobiReaderWorkerService[R](s3Client: AmazonS3)(testWith: TestWith[(Bucket, Queue, Table, GoobiReaderWorkerService), R]): R =
+  private def withGoobiReaderWorkerService[R](s3Client: AmazonS3)(testWith: TestWith[(Bucket, QueuePair, MetricsSender, Table), R]): R =
     withActorSystem { actorSystem =>
-      withLocalSqsQueue { queue =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          withSqsStream(actorSystem, queue, metricsSender) { sqsStream =>
+      withLocalSqsQueueAndDlq { case queuePair @QueuePair(queue, dlq) =>
+        withMockMetricSender { mockMetricsSender =>
+          withSqsStream(actorSystem, queue, mockMetricsSender) { sqsStream =>
             withS3StreamStoreFixtures { case (bucket, table, vhs) =>
-              testWith((bucket, queue, table, new GoobiReaderWorkerService(s3Client, actorSystem, sqsStream, vhs)))
+              new GoobiReaderWorkerService(s3Client, actorSystem, sqsStream, vhs)
+              testWith((bucket, queuePair, mockMetricsSender, table))
             }
           }
         }
@@ -235,13 +262,14 @@ class GoobiReaderWorkerServiceTest
     }
 
   private def withGoobiReaderWorkerServiceAndVhs[R](s3Client: AmazonS3)(testWith: TestWith[
-    (Bucket, Queue, Table, VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]], GoobiReaderWorkerService), R]): R =
+    (Bucket, Queue, Table, VersionedHybridStore[InputStream, GoobiRecordMetadata, ObjectStore[InputStream]]), R]): R =
     withActorSystem { actorSystem =>
       withLocalSqsQueue { queue =>
         withMetricsSender(actorSystem) { metricsSender =>
           withSqsStream(actorSystem, queue, metricsSender) { sqsStream =>
             withS3StreamStoreFixtures { case (bucket, table, vhs) =>
-              testWith((bucket, queue, table, vhs, new GoobiReaderWorkerService(s3Client, actorSystem, sqsStream, vhs)))
+              new GoobiReaderWorkerService(s3Client, actorSystem, sqsStream, vhs)
+              testWith((bucket, queue, table, vhs))
             }
           }
         }

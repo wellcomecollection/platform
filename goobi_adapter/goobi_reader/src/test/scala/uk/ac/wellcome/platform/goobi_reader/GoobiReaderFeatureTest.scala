@@ -26,7 +26,7 @@ class GoobiReaderFeatureTest
           val sourceKey = s"$id.xml"
           val contents = "muddling the machinations of morose METS"
           val notificationMessage =
-            aNotificationMessage(queue.arn, s3Notification(sourceKey, bucket.name, eventTime))
+            aNotificationMessage(queue.arn, anS3Notification(sourceKey, bucket.name, eventTime))
 
           s3Client.putObject(bucket.name, sourceKey, contents)
           sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
