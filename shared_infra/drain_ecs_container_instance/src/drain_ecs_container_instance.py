@@ -13,7 +13,8 @@ import time
 
 import boto3
 
-from wellcome_lambda_utils.sns_utils import publish_sns_message
+from wellcome_aws_utils.lambda_utils import log_on_error
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
 def set_container_instance_to_draining(
@@ -137,9 +138,8 @@ def drain_ecs_container_instance(asg_client, ec2_client, ecs_client, sns_client,
             )
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     asg_client = boto3.client("autoscaling")
     ec2_client = boto3.client("ec2")
     ecs_client = boto3.client('ecs')

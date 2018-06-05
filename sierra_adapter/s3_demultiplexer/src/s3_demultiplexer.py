@@ -27,8 +27,10 @@ import os
 import boto3
 
 from wellcome_aws_utils import s3_utils, sns_utils
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
+@log_on_error
 def main(event, _ctxt=None, s3_client=None, sns_client=None):
     print(f'event = {event!r}')
 

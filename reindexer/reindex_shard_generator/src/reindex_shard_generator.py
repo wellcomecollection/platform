@@ -5,6 +5,7 @@ import os
 import boto3
 import botocore
 from wellcome_aws_utils.dynamo_event import DynamoEvent
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 from shard_manager import create_reindex_shard
 
@@ -17,6 +18,7 @@ SOURCE_SIZES = {
 SHARD_SIZE = 1500
 
 
+@log_on_error
 def main(event, _ctxt=None, dynamodb_client=None):
     print(f'event={event!r}')
 

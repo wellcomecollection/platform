@@ -7,6 +7,7 @@ import boto3
 from botocore.exceptions import ClientError
 from tenacity import retry, wait_exponential, retry_if_exception
 from wellcome_aws_utils import sns_utils
+from wellcome_aws_utils.lambda_utils import log_on_error
 
 
 def should_retry(err):
@@ -75,9 +76,8 @@ def _run(table, event):
             print(f'No work to do for {record.message}')
 
 
+@log_on_error
 def main(event, _):
-    print(f'event = {event!r}')
-
     table_name = os.environ["TABLE_NAME"]
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
