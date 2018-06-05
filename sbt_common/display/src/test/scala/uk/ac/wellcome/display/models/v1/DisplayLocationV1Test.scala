@@ -25,7 +25,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
       displayLocation shouldBe a[DisplayDigitalLocationV1]
       val displayDigitalLocation =
         displayLocation.asInstanceOf[DisplayDigitalLocationV1]
-      displayDigitalLocation.locationType shouldBe locationType
+      displayDigitalLocation.locationType shouldBe locationType.id
       displayDigitalLocation.url shouldBe thumbnailUrl
       displayDigitalLocation.license shouldBe DisplayLicenseV1(
         internalLocation.license)
@@ -58,7 +58,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
       val displayLocation = DisplayLocationV1(physicalLocation)
 
       displayLocation shouldBe DisplayPhysicalLocationV1(
-        locationType,
+        locationType = locationType.id,
         locationLabel)
     }
   }

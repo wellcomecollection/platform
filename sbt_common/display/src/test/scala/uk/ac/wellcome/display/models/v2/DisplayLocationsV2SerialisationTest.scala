@@ -19,7 +19,7 @@ class DisplayLocationsV2SerialisationTest
 
   it("serialises a physical location correctly") {
     val physicalLocation = PhysicalLocation(
-      locationType = LocationType("smegd"),
+      locationType = LocationType("sgmed"),
       label = "a stack of slick slimes"
     )
 

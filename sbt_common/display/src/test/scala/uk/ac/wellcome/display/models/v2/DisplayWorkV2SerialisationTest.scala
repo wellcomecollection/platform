@@ -155,7 +155,7 @@ class DisplayWorkV2SerialisationTest
                           |           {
                           |             "type": "${location.ontologyType}",
                           |             "url": "",
-                          |             "locationType": "${location.locationType}",
+                          |             "locationType": ${locationType(location.locationType)},
                           |             "license": ${license(location.license)},
                           |             "credit": "${location.credit.get}"
                           |           }

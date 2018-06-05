@@ -15,8 +15,8 @@ case class DisplayIdentifierType(
 }
 
 object DisplayIdentifierType {
-  def apply(identifierType: IdentifierType): DisplayLocationType =
-    DisplayLocationType(
+  def apply(identifierType: IdentifierType): DisplayIdentifierType =
+    DisplayIdentifierType(
       id = identifierType.id,
       label = identifierType.label
     )
