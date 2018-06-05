@@ -28,10 +28,20 @@ variable "rds_password" {
   description = "Password7 for the RDS database"
 }
 
+variable "es_cluster_credentials" {
+  description = "Credentials for the Elasticsearch cluster"
+  type        = "map"
+}
+
 variable "es_config_ingestor" {
   description = "ElasticCloud config for the ingestor"
   type        = "map"
-  default     = {}
+
+  default = {
+    index_v1 = "v1-20180530-new-identifier-schemes"
+    index_v2 = "v2-20180530-new-identifier-schemes"
+    doc_type = "work"
+  }
 }
 
 variable "matcher_table_index" {
