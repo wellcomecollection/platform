@@ -36,7 +36,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def digitalLocation(loc: DigitalLocation) =
     s"""{
       "type": "${loc.ontologyType}",
-      "locationType": "${loc.locationType}",
+      "locationType": ${locationType(loc.locationType)},
       "url": "${loc.url}",
       "license": ${license(loc.license)}
     }"""
@@ -45,10 +45,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
     s"""
        {
         "type": "${loc.ontologyType}",
-        "locationType": "${loc.locationType}",
+        "locationType": ${locationType(loc.locationType)},
         "label": "${loc.label}"
        }
      """
+
+  def locationType(locType: LocationType): String
 
   def license(license: License): String
 

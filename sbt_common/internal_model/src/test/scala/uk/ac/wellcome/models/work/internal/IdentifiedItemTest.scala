@@ -32,7 +32,11 @@ class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
       |  ],
       |  "locations": [
       |    {
-      |      "locationType": "location",
+      |      "locationType": {
+      |        "id": "${LocationType("thumbnail-image").id}",
+      |        "label": "${LocationType("thumbnail-image").label}",
+      |        "ontologyType": "LocationType"
+      |      },
       |      "url" : "",
       |      "credit" : null,
       |      "license": {
@@ -50,7 +54,7 @@ class IdentifiedItemTest extends FunSpec with Matchers with JsonTestUtil {
     """.stripMargin
 
   val location = DigitalLocation(
-    locationType = "location",
+    locationType = LocationType("thumbnail-image"),
     url = "",
     license = License_CCBY
   )

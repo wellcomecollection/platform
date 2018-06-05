@@ -220,7 +220,7 @@ class MiroTransformableTransformer
   private def getThumbnail(miroData: MiroTransformableData,
                            miroId: String): Location = {
     DigitalLocation(
-      locationType = "thumbnail-image",
+      locationType = LocationType("thumbnail-image"),
       url = buildImageApiURL(miroId, "thumbnail"),
       license = chooseLicense(miroData.useRestrictions.get)
     )
@@ -242,7 +242,7 @@ class MiroTransformableTransformer
         ),
         locations = List(
           DigitalLocation(
-            locationType = "iiif-image",
+            locationType = LocationType("iiif-image"),
             url = buildImageApiURL(miroId, "info"),
             credit = getCredit(miroData),
             license = chooseLicense(miroData.useRestrictions.get)

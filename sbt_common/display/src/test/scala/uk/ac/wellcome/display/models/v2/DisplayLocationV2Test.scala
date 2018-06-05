@@ -4,6 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{
   DigitalLocation,
   License_CCBY,
+  LocationType,
   PhysicalLocation
 }
 
@@ -12,7 +13,7 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
   describe("DisplayDigitalLocationV2") {
     it("should read a DigitalLocation as a DisplayDigitalLocationV2 correctly") {
       val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
-      val locationType = "thumbnail-image"
+      val locationType = LocationType("thumbnail-image")
 
       val internalLocation = DigitalLocation(
         locationType = locationType,
@@ -24,7 +25,8 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
       displayLocation shouldBe a[DisplayDigitalLocationV2]
       val displayDigitalLocation =
         displayLocation.asInstanceOf[DisplayDigitalLocationV2]
-      displayDigitalLocation.locationType shouldBe locationType
+      displayDigitalLocation.locationType shouldBe DisplayLocationType(
+        locationType)
       displayDigitalLocation.url shouldBe thumbnailUrl
       displayDigitalLocation.license shouldBe DisplayLicenseV2(
         internalLocation.license)
@@ -33,7 +35,7 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
 
     it("should read the credit field from a Location correctly") {
       val location = DigitalLocation(
-        locationType = "thumbnail-image",
+        locationType = LocationType("thumbnail-image"),
         url = "",
         credit = Some("Science Museum, Wellcome"),
         license = License_CCBY
@@ -49,7 +51,7 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
 
   describe("DisplayPhysicalLocationV2") {
     it("should create a DisplayPhysicalLocationV2 from a PhysicalLocation") {
-      val locationType = "sgmed"
+      val locationType = LocationType("sgmed")
       val locationLabel = "The collection of cold cauldrons"
       val physicalLocation =
         PhysicalLocation(locationType = locationType, label = locationLabel)
@@ -57,7 +59,7 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
       val displayLocation = DisplayLocationV2(physicalLocation)
 
       displayLocation shouldBe DisplayPhysicalLocationV2(
-        locationType,
+        locationType = DisplayLocationType(locationType),
         locationLabel)
     }
   }

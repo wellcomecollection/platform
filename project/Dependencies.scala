@@ -18,6 +18,7 @@ object Dependencies {
     val circeVersion = "0.9.0"
     val scalaCheckVersion = "1.13.4"
     val scalaCheckShapelessVersion = "1.1.6"
+    val scalaCsv = "1.3.5"
     val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
@@ -133,7 +134,9 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
   ) ++ akkaDependencies ++ guiceDependencies
 
-  val internalModelDependencies = dynamoDependencies
+  val internalModelDependencies = dynamoDependencies ++ Seq(
+    "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
+  )
 
   // Application specific dependency groups
   val sierraAdapterCommonDependencies = Seq(

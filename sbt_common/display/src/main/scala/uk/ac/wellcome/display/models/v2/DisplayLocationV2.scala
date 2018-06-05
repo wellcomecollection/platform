@@ -21,13 +21,15 @@ object DisplayLocationV2 {
   def apply(location: Location): DisplayLocationV2 = location match {
     case l: DigitalLocation =>
       DisplayDigitalLocationV2(
-        locationType = l.locationType,
+        locationType = DisplayLocationType(l.locationType),
         url = l.url,
         credit = l.credit,
         license = DisplayLicenseV2(l.license)
       )
     case l: PhysicalLocation =>
-      DisplayPhysicalLocationV2(locationType = l.locationType, label = l.label)
+      DisplayPhysicalLocationV2(
+        locationType = DisplayLocationType(l.locationType),
+        label = l.label)
   }
 }
 
@@ -39,7 +41,7 @@ case class DisplayDigitalLocationV2(
   @ApiModelProperty(
     value = "The type of location that an item is accessible from.",
     allowableValues = "thumbnail-image, iiif-image"
-  ) locationType: String,
+  ) locationType: DisplayLocationType,
   @ApiModelProperty(
     dataType = "String",
     value = "The URL of the digital asset."
@@ -65,7 +67,7 @@ case class DisplayPhysicalLocationV2(
   @ApiModelProperty(
     value = "The type of location that an item is accessible from.",
     allowableValues = ""
-  ) locationType: String,
+  ) locationType: DisplayLocationType,
   @ApiModelProperty(
     dataType = "String",
     value = "The title or other short name of the location."

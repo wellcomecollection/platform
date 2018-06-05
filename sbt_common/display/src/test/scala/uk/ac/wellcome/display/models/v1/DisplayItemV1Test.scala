@@ -8,7 +8,7 @@ class DisplayItemV1Test extends FunSpec with Matchers {
 
   val location: Location = {
     val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
-    val locationType = "thumbnail-image"
+    val locationType = LocationType("thumbnail-image")
 
     DigitalLocation(
       locationType = locationType,

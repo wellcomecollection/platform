@@ -2,7 +2,11 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.Suite
 import uk.ac.wellcome.display.models.DisplaySerialisationTestBase
-import uk.ac.wellcome.models.work.internal.{License, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  License,
+  LocationType,
+  SourceIdentifier
+}
 
 trait DisplayV1SerialisationTestBase extends DisplaySerialisationTestBase {
   this: Suite =>
@@ -21,4 +25,9 @@ trait DisplayV1SerialisationTestBase extends DisplaySerialisationTestBase {
       "identifierScheme": "${identifier.identifierType.id}",
       "value": "${identifier.value}"
     }"""
+
+  def locationType(locType: LocationType): String =
+    s"""
+       |"${locType.id}"
+     """.stripMargin
 }

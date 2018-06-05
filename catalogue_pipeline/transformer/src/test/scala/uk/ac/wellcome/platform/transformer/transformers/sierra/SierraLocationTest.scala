@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.PhysicalLocation
+import uk.ac.wellcome.models.work.internal.{LocationType, PhysicalLocation}
 import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraItemLocation
@@ -12,11 +12,12 @@ class SierraLocationTest extends FunSpec with Matchers {
   val transformer = new SierraLocation {}
 
   it("should extract location from item data") {
-    val locationType = "sgmed"
+    val locationTypeCode = "sgmed"
+    val locationType = LocationType("sgmed")
     val label = "A museum of mermaids"
     val itemData = SierraItemData(
       id = "i1234567",
-      location = Some(SierraItemLocation(locationType, label))
+      location = Some(SierraItemLocation(locationTypeCode, label))
     )
 
     val expectedLocation = PhysicalLocation(locationType, label)
