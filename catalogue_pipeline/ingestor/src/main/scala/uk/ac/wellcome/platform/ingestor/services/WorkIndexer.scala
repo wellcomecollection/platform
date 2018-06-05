@@ -21,7 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class WorkIndexer @Inject()(
   elasticClient: HttpClient,
   metricsSender: MetricsSender
-)(implicit ec: ExecutionContext) extends Logging
+)(implicit ec: ExecutionContext)
+    extends Logging
     with ElasticsearchExceptionManager {
 
   implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {

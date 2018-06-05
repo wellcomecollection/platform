@@ -13,8 +13,9 @@ import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class IdEmbedder @Inject()(metricsSender: MetricsSender,
-                           identifierGenerator: IdentifierGenerator)(implicit ec: ExecutionContext)
+class IdEmbedder @Inject()(
+  metricsSender: MetricsSender,
+  identifierGenerator: IdentifierGenerator)(implicit ec: ExecutionContext)
     extends Logging {
 
   def embedId(json: Json): Future[Json] = {
