@@ -193,6 +193,9 @@ trait WorksUtil {
   )
 
   def digitalLocationWith(url: String, license: License): DigitalLocation = {
-    DigitalLocation(locationType = LocationType("iiif-image"), url = url, license = license)
+    DigitalLocation(
+      locationType = LocationType("iiif-image"),
+      url = url,
+      license = license)
   }
 }

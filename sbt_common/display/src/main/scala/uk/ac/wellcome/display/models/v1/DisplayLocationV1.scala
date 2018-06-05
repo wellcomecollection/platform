@@ -27,7 +27,9 @@ object DisplayLocationV1 {
         license = DisplayLicenseV1(l.license)
       )
     case l: PhysicalLocation =>
-      DisplayPhysicalLocationV1(locationType = l.locationType.id, label = l.label)
+      DisplayPhysicalLocationV1(
+        locationType = l.locationType.id,
+        label = l.label)
   }
 }
 

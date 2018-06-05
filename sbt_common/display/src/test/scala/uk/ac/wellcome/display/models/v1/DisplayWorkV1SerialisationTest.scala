@@ -147,7 +147,8 @@ class DisplayWorkV1SerialisationTest
                           |           {
                           |             "type": "${location.ontologyType}",
                           |             "url": "",
-                          |             "locationType": ${locationType(location.locationType)},
+                          |             "locationType": ${locationType(
+                            location.locationType)},
                           |             "license": ${license(location.license)},
                           |             "credit": "${location.credit.get}"
                           |           }

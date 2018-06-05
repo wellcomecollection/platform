@@ -25,7 +25,8 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
       displayLocation shouldBe a[DisplayDigitalLocationV2]
       val displayDigitalLocation =
         displayLocation.asInstanceOf[DisplayDigitalLocationV2]
-      displayDigitalLocation.locationType shouldBe DisplayLocationType(locationType)
+      displayDigitalLocation.locationType shouldBe DisplayLocationType(
+        locationType)
       displayDigitalLocation.url shouldBe thumbnailUrl
       displayDigitalLocation.license shouldBe DisplayLicenseV2(
         internalLocation.license)
