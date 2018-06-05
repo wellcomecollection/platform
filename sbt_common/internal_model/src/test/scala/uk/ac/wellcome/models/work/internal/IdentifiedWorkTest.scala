@@ -168,7 +168,11 @@ class IdentifiedWorkTest
       |    }
       |  ],
       |  "thumbnail": {
-      |    "locationType": "location",
+      |    "locationType": {
+      |      "id": "${LocationType("thumbnail-image").id}",
+      |      "label": "${LocationType("thumbnail-image").label}",
+      |      "ontologyType": "LocationType"
+      |    },
       |    "url" : "",
       |    "credit" : null,
       |    "license": $license_CCBYJson,

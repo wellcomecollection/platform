@@ -13,7 +13,7 @@ class LocationTypeTest extends FunSpec with Matchers {
 
   it("throws an error if looking up a non-existent location type") {
     val caught = intercept[GracefulFailureException] {
-      IdentifierType(platformId = "DoesNotExist")
+      LocationType(id = "DoesNotExist")
     }
     caught.e.getMessage shouldBe "Unrecognised location type: [DoesNotExist]"
   }
