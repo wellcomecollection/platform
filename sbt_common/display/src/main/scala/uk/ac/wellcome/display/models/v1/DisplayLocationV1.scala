@@ -21,13 +21,13 @@ object DisplayLocationV1 {
   def apply(location: Location): DisplayLocationV1 = location match {
     case l: DigitalLocation =>
       DisplayDigitalLocationV1(
-        locationType = l.locationType,
+        locationType = l.locationType.id,
         url = l.url,
         credit = l.credit,
         license = DisplayLicenseV1(l.license)
       )
     case l: PhysicalLocation =>
-      DisplayPhysicalLocationV1(locationType = l.locationType, label = l.label)
+      DisplayPhysicalLocationV1(locationType = l.locationType.id, label = l.label)
   }
 }
 
