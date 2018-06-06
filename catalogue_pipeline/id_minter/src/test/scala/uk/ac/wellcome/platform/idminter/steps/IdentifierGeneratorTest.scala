@@ -6,22 +6,19 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   TableProvisioner
 }
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 
 import scala.util.{Failure, Success}
 
 class IdentifierGeneratorTest
     extends FunSpec
-    with Akka
     with fixtures.IdentifiersDatabase
-    with MetricsSenderFixture
     with Matchers
     with MockitoSugar {
 
@@ -41,18 +38,10 @@ class IdentifierGeneratorTest
         new IdentifiersDao(DB.connect(), identifiersTable)
       )
 
-      withActorSystem { actorSystem =>
-        withMetricsSender(actorSystem) { metricsSender =>
-          val identifierGenerator = new IdentifierGenerator(
-            identifiersDao,
-            metricsSender
-          )
+      val identifierGenerator = new IdentifierGenerator(identifiersDao)
+      eventuallyTableExists(identifiersTableConfig)
 
-          eventuallyTableExists(identifiersTableConfig)
-
-          testWith((identifierGenerator, identifiersTable))
-        }
-      }
+      testWith((identifierGenerator, identifiersTable))
     }
 
   it("queries the database and return a matching canonical id") {
@@ -123,37 +112,33 @@ class IdentifierGeneratorTest
   it("returns a failure if it fails registering a new identifier") {
     val identifiersDao = mock[IdentifiersDao]
 
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Work",
-          value = "1234"
-        )
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      "Work",
+      value = "1234"
+    )
 
-        val triedLookup = identifiersDao.lookupId(
-          sourceIdentifier = sourceIdentifier
-        )
+    val triedLookup = identifiersDao.lookupId(
+      sourceIdentifier = sourceIdentifier
+    )
 
-        when(triedLookup)
-          .thenReturn(Success(None))
+    when(triedLookup)
+      .thenReturn(Success(None))
 
-        val expectedException = new Exception("Noooo")
+    val expectedException = new Exception("Noooo")
 
-        when(identifiersDao.saveIdentifier(any[Identifier]()))
-          .thenReturn(Failure(expectedException))
+    when(identifiersDao.saveIdentifier(any[Identifier]()))
+      .thenReturn(Failure(expectedException))
 
-        withIdentifierGenerator(Some(identifiersDao)) {
-          case (identifierGenerator, identifiersTable) =>
-            val triedGeneratingId =
-              identifierGenerator.retrieveOrGenerateCanonicalId(
-                sourceIdentifier
-              )
+    withIdentifierGenerator(Some(identifiersDao)) {
+      case (identifierGenerator, identifiersTable) =>
+        val triedGeneratingId =
+          identifierGenerator.retrieveOrGenerateCanonicalId(
+            sourceIdentifier
+          )
 
-            triedGeneratingId shouldBe a[Failure[_]]
-            triedGeneratingId.failed.get shouldBe expectedException
-        }
-      }
+        triedGeneratingId shouldBe a[Failure[_]]
+        triedGeneratingId.failed.get shouldBe expectedException
     }
   }
 

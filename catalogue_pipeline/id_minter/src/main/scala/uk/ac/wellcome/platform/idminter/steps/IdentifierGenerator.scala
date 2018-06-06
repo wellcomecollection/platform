@@ -3,17 +3,13 @@ package uk.ac.wellcome.platform.idminter.steps
 import com.google.inject.Inject
 import com.twitter.inject.{Logging, TwitterModuleFlags}
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.idminter.database.IdentifiersDao
 import uk.ac.wellcome.platform.idminter.models.Identifier
 import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.util.Try
 
-class IdentifierGenerator @Inject()(
-  identifiersDao: IdentifiersDao,
-  metricsSender: MetricsSender
-) extends Logging
+class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao) extends Logging
     with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(
@@ -25,16 +21,8 @@ class IdentifierGenerator @Inject()(
           sourceIdentifier = identifier
         )
         .flatMap {
-          case Some(id) =>
-            metricsSender.incrementCount("found-old-id")
-            Try(id.CanonicalId)
-          case None =>
-            val result =
-              generateAndSaveCanonicalId(identifier)
-            if (result.isSuccess)
-              metricsSender.incrementCount("generated-new-id")
-
-            result
+          case Some(id) => Try(id.CanonicalId)
+          case None => generateAndSaveCanonicalId(identifier)
         }
     }.flatten
   }
