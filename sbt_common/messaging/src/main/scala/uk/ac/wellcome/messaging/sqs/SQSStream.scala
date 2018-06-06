@@ -37,8 +37,8 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M2](f: Source[Message,NotUsed] => Source[Message,M2]) =
-    f(source)
+  def runStream[M2](f: Source[(Message,T),NotUsed] => Source[Message,M2]) =
+    f(source.map(read(_).get))
     .map { m =>
     debug(s"Deleting message ${m.getMessageId}")
     (m, MessageAction.Delete)
@@ -47,31 +47,27 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
     runStream(
-      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
+      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) { case (message, t) =>
         debug(s"Processing message ${message.getMessageId}")
         val metricName = s"${streamName}_ProcessMessage"
         metricsSender.count(
           metricName,
-          readAndProcess(streamName, message, process))
+          readAndProcess(streamName, t, process)).map(_ => message)
       })
 
   private def readAndProcess(
     streamName: String,
-    message: Message,
+    message: T,
     process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
-    debug(s"Processing message ${message.getMessageId}")
-    val processMessageFuture = for {
-      t <- Future.fromTry(read(message))
-      _ <- process(t)
-    } yield message
+    val processMessageFuture = process(message)
 
     processMessageFuture.failed.foreach {
       case exception: GracefulFailureException =>
         logger.warn(
-          s"Graceful failure processing message ${message.getMessageId}: ${exception.getMessage}")
+          s"Graceful failure processing message: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
-          s"Unrecognised failure while processing message ${message.getMessageId}",
+          s"Unrecognised failure while processing message: ${exception.getMessage}",
           exception)
     }
     processMessageFuture
