@@ -67,10 +67,6 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
         logger.error(
           s"Unrecognised failure while processing message ${message.getMessageId}",
           exception)
-        metricsSender.incrementCount(
-          metricName = s"${streamName}_MessageProcessingFailure",
-          count = 1.0
-        )
     }
     processMessageFuture
   }
