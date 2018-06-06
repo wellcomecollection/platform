@@ -6,7 +6,6 @@ import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe.{Json, _}
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.annotation.tailrec
@@ -14,7 +13,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 class IdEmbedder @Inject()(
-  metricsSender: MetricsSender,
   identifierGenerator: IdentifierGenerator)(implicit ec: ExecutionContext)
     extends Logging {
 

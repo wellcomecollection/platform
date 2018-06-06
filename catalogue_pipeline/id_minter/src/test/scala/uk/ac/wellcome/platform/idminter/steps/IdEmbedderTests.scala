@@ -6,7 +6,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -22,23 +21,19 @@ class IdEmbedderTests
     with MockitoSugar
     with Akka
     with JsonTestUtil
-    with MetricsSenderFixture
     with ExtendedPatience {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val identifierGenerator: IdentifierGenerator =
-          mock[IdentifierGenerator]
+      val identifierGenerator: IdentifierGenerator =
+        mock[IdentifierGenerator]
 
-        val idEmbedder = new IdEmbedder(
-          metricsSender = metricsSender,
-          identifierGenerator = identifierGenerator
-        )
+      val idEmbedder = new IdEmbedder(
+        identifierGenerator = identifierGenerator
+      )
 
-        testWith((identifierGenerator, idEmbedder))
-      }
+      testWith((identifierGenerator, idEmbedder))
     }
   }
 
