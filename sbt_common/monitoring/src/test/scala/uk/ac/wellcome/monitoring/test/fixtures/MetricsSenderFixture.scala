@@ -51,11 +51,11 @@ trait MetricsSenderFixture
 
   def assertFailureMetricNotIncremented(mockMetricsSender: MetricsSender) = {
     verify(mockMetricsSender, never())
-      .incrementCount(endsWith("_processMessage_failure"))
+      .incrementCount(endsWith("_ProcessMessage_failure"))
   }
 
   def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
     verify(mockMetricsSender, times(3))
-      .incrementCount(endsWith("_processMessage_failure"))
+      .incrementCount(endsWith("_ProcessMessage_failure"))
   }
 }
