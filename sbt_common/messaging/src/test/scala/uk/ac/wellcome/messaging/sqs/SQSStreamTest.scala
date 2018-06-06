@@ -90,9 +90,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-
           verify(metricsSender, never())
-            .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+            .incrementCount(endsWith("_failure"), anyDouble())
           received shouldBe empty
 
           assertQueueEmpty(queue)

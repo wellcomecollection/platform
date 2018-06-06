@@ -2,8 +2,8 @@ package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
 import grizzled.slf4j.Logging
-import org.mockito.Matchers.{any, anyString}
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{any, anyDouble, anyString, endsWith}
+import org.mockito.Mockito.{never, times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
@@ -49,4 +49,13 @@ trait MetricsSenderFixture
     }
   )
 
+  def assertFailureMetricNotIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, never())
+      .incrementCount(endsWith("_processMessage_failure"), anyDouble())
+  }
+
+  private def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, times(3))
+      .incrementCount(endsWith("_processMessage_failure"), anyDouble())
+  }
 }

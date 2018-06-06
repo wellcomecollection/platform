@@ -93,7 +93,7 @@ class MessageStreamTest
         eventually {
 
           verify(metricsSender, never())
-            .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+            .incrementCount(endsWith("_processMessage_failure"), anyDouble())
           received shouldBe empty
 
           assertQueueEmpty(queue)
@@ -137,7 +137,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(3)).incrementCount(
-            metricName = "test-stream_MessageProcessingFailure",
+            metricName = "test-stream_processMessage_failure",
             count = 1.0)
 
           received shouldBe empty

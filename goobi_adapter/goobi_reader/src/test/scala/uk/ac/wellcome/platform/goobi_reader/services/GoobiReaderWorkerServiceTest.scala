@@ -247,21 +247,9 @@ class GoobiReaderWorkerServiceTest
     assertQueueHasSize(dlq, 1)
   }
 
-  private def assertFailureMetricNotIncremented(
-    mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, never())
-      .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
-  }
-
   private def assertUpdateNotSaved(bucket: Bucket, table: Table) = {
     assertDynamoTableIsEmpty(table)
     assertS3StorageIsEmpty(bucket)
-  }
-
-  private def assertFailureMetricIncremented(
-    mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(3))
-      .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
   }
 
   private def assertDynamoTableIsEmpty(table: Table) = {

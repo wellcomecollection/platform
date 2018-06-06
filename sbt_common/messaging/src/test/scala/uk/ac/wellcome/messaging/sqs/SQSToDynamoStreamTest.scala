@@ -33,6 +33,8 @@ class SQSToDynamoStreamTest
     toJson(TestNotificationMessage(obj)).get
 
   private val streamName = "test-sqs-to-dynamo"
+  private val failureMetricName = s"${streamName}_ProcessMessage_failure"
+
   it("processes messages") {
     withFixtures {
       case (mockMetricSender, QueuePair(queue, dlq), stream) =>
@@ -43,7 +45,7 @@ class SQSToDynamoStreamTest
         eventually {
           messages should contain only testObject
           verify(mockMetricSender, never())
-            .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+            .incrementCount(failureMetricName, 1.0)
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
         }
@@ -68,7 +70,7 @@ class SQSToDynamoStreamTest
 
         eventually {
           verify(mockMetricSender, never())
-            .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+            .incrementCount(failureMetricName, 1.0)
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -86,7 +88,7 @@ class SQSToDynamoStreamTest
 
           eventually {
             verify(mockMetricSender, never())
-              .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+              .incrementCount(failureMetricName, 1.0)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
@@ -106,7 +108,7 @@ class SQSToDynamoStreamTest
 
           eventually {
             verify(mockMetricSender, times(3))
-              .incrementCount(s"${streamName}_MessageProcessingFailure", 1.0)
+              .incrementCount(failureMetricName, 1.0)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
