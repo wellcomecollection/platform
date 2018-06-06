@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
 class MetricsSenderTest
-  extends FunSpec
+    extends FunSpec
     with MockitoSugar
     with Matchers
     with ScalaFutures
@@ -124,8 +124,8 @@ class MetricsSenderTest
         val f = Future.successful(())
         val metricName = "bar"
 
-        val futures = (1 to 40).map(i =>
-          metricsSender.count(s"$metricName", f))
+        val futures =
+          (1 to 40).map(i => metricsSender.count(s"$metricName", f))
 
         whenReady(Future.sequence(futures)) { _ =>
           eventually {
@@ -163,7 +163,8 @@ class MetricsSenderTest
 
         // Each PutMetricRequest is made of 20 MetricDatum so we need
         // 20 * 150 = 3000 calls to incrementCount to get 150 PutMetricData calls
-        val futures = (1 to 3000).map(i => metricsSender.count(s"${i}_$metricName", f))
+        val futures =
+          (1 to 3000).map(i => metricsSender.count(s"${i}_$metricName", f))
 
         val promisedInstant = Promise[Instant]
 
