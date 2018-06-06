@@ -5,11 +5,9 @@ import org.scalatest.Suite
 import uk.ac.wellcome.platform.ingestor.services.WorkIndexer
 import uk.ac.wellcome.test.fixtures._
 
-
-trait WorkIndexerFixtures extends Akka {
-  this: Suite =>
-  def withWorkIndexer[R](
-    elasticClient: HttpClient)(testWith: TestWith[WorkIndexer, R]): R = {
+trait WorkIndexerFixtures extends Akka { this: Suite =>
+  def withWorkIndexer[R](elasticClient: HttpClient)(
+    testWith: TestWith[WorkIndexer, R]): R = {
     val workIndexer = new WorkIndexer(elasticClient = elasticClient)
     testWith(workIndexer)
   }
