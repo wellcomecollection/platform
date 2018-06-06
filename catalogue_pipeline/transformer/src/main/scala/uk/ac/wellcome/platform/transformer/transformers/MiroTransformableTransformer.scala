@@ -39,12 +39,14 @@ class MiroTransformableTransformer
             subjects = getSubjects(miroData),
             contributors = getContributors(miroData),
             genres = getGenres(miroData),
-            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+            thumbnail =
+              Some(getThumbnail(miroData, miroTransformable.sourceId)),
             items = getItems(miroData, miroTransformable.sourceId)
           ))
       } catch {
         case e: ShouldNotTransformException => {
-          warn(s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
+          warn(
+            s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
           None
         }
       }

@@ -225,11 +225,13 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it("returns None for Miro records with usage restrictions that mean we suppress the image") {
+  it(
+    "returns None for Miro records with usage restrictions that mean we suppress the image") {
     val miroTransformable = MiroTransformable(
       sourceId = "P0000001",
       MiroCollection = "TestCollection",
-      data = buildJSONForWork("""
+      data = buildJSONForWork(
+        """
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
       """)

@@ -22,7 +22,9 @@ trait MiroLicenses {
     maybeUseRestrictions match {
 
       // These images need more data.
-      case None => throw new ShouldNotTransformException("No usage restriction specified!")
+      case None =>
+        throw new ShouldNotTransformException(
+          "No usage restriction specified!")
 
       case Some(useRestrictions) =>
         useRestrictions match {
@@ -40,8 +42,12 @@ trait MiroLicenses {
           // like Tandem Vault, but we have seen some of these strings in the
           // catalogue data -- for now, explicitly mark these as "do not transform"
           // so they don't end up on the DLQ.
-          case "Do not use" => throw new ShouldNotTransformException("Usage restriction is 'Do not use'")
-          case "Image withdrawn, see notes" => throw new ShouldNotTransformException("Usage restriction is 'Image withdrawn'")
+          case "Do not use" =>
+            throw new ShouldNotTransformException(
+              "Usage restriction is 'Do not use'")
+          case "Image withdrawn, see notes" =>
+            throw new ShouldNotTransformException(
+              "Usage restriction is 'Image withdrawn'")
         }
     }
 
