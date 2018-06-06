@@ -12,8 +12,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Try
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class IdEmbedderTests
     extends FunSpec
     with ScalaFutures
