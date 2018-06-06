@@ -1,6 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{AbstractAgent, MaybeDisplayable, ProductionEvent}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractAgent,
+  MaybeDisplayable,
+  ProductionEvent
+}
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 
 trait SierraProduction {
@@ -15,7 +19,8 @@ trait SierraProduction {
   // but it would be a cataloguing error -- we should reject it, and flag it
   // to the librarians.
   //
-  def getProduction(bibData: SierraBibData): List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
+  def getProduction(bibData: SierraBibData)
+    : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
 //    val marc260fields = bibData.varFields.filter { _.fieldTag == Some("260") }
 //    val marc264fields = bibData.varFields.filter { _.fieldTag == Some("264") }
     List()

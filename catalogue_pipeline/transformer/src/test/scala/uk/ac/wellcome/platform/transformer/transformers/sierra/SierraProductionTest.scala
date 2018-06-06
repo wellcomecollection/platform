@@ -1,7 +1,11 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{AbstractAgent, MaybeDisplayable, ProductionEvent}
+import uk.ac.wellcome.models.work.internal.{
+  AbstractAgent,
+  MaybeDisplayable,
+  ProductionEvent
+}
 import uk.ac.wellcome.platform.transformer.source.{SierraBibData, VarField}
 
 class SierraProductionTest extends FunSpec with Matchers {
