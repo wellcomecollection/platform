@@ -62,7 +62,7 @@ class MetricsSenderTest
             val metricData = putMetricDataRequest.getMetricData
             metricData should have size 1
             metricData.asScala.exists { metricDatum =>
-              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "success"
+              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == s"${metricName}_success"
             } shouldBe true
           }
         }
@@ -99,7 +99,7 @@ class MetricsSenderTest
             metricData should have size 1
 
             metricData.asScala.exists { metricDatum =>
-              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "failure"
+              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == s"${metricName}_failure"
             } shouldBe true
           }
         }
