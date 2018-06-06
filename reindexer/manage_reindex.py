@@ -3,7 +3,7 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] [--desired_version=<VERSION>] [--table=<TABLE>]
+Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] (--increment | --desired_version=<VERSION>) [--table=<TABLE>]
        manage_reindex.py -h | --help
 
 Actions:
@@ -12,6 +12,7 @@ Actions:
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
+  --increment           Increment whatever version is already in the table
   --desired_version=<VERSION>
                         Desired version of all rows in the reindexed table
   --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
@@ -56,7 +57,6 @@ def _update_shard(client, table_name, shard):
     )
 
 
-
 def _all_records_in_shard(client, table_name):
     """Generates every row in a particular shard."""
     paginator = client.get_paginator('scan')
@@ -65,7 +65,7 @@ def _all_records_in_shard(client, table_name):
             yield i
 
 
-def _all_shards(client, table_name):
+def _all_shard_names(client, table_name):
     """Generates the name of all current shards."""
     for shard in _all_records_in_shard(client=client, table_name=table_name):
         yield shard['shardId']['S']
@@ -74,12 +74,25 @@ def _all_shards(client, table_name):
 def _count_current_shards(client, prefix, table_name):
     """How many shards are there in the current table?"""
     best_seen = None
-    for s in _all_shards(client=client, table_name=table_name):
+    for s in _all_shard_names(client=client, table_name=table_name):
         if s.startswith(prefix):
             value = int(s.replace(prefix, '').strip('/'))
             if (best_seen is None) or (value > best_seen):
                 best_seen = value
 
+    return best_seen
+
+
+def _get_current_max_desired_capacity(client, table_name, prefix):
+    """
+    Given a prefix, find the highest desired capacity of any reindex
+    record within that prefix.
+    """
+    best_seen = 0
+    for shard in _all_records_in_shard(client=client, table_name=table_name):
+        if not shard['shardId']['S'].startswith(prefix):
+            continue
+        best_seen = max(best_seen, int(shard['desiredVersion']['N']))
     return best_seen
 
 
@@ -120,8 +133,19 @@ if __name__ == '__main__':
 
         prefix = args['--prefix']
         count = int(args['--count'] or '0')
-        desired_version = int(args['--desired_version'] or '1')
         table_name = args['--table'] or default_table_name
+
+        if args['--desired_version']:
+            desired_version = int(args['--desired_version'])
+        elif args['--increment']:
+            current_max_version = _get_current_max_desired_capacity(
+                client=client,
+                table_name=table_name,
+                prefix=prefix
+            )
+            desired_version = current_max_version + 1
+
+        print(f'Updating all shards in {prefix} to {desired_version}')
 
         if count == 0:
             count = _count_current_shards(
