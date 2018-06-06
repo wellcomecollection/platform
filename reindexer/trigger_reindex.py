@@ -3,11 +3,8 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
-       manage_reindex.py -h | --help
-
-Actions:
-  update-shards         Create or update shards in the reindex tracker table.
+Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
+       trigger_reindex.py -h | --help
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
@@ -124,34 +121,31 @@ def create_shards(client, prefix, desired_version, count, table_name):
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
-    default_table_name = 'ReindexShardTracker'
+    client = boto3.client('dynamodb')
 
-    if args['update-shards']:
-        client = boto3.client('dynamodb')
+    prefix = args['--prefix']
+    count = int(args['--count'] or '0')
+    table_name = args['--table'] or 'ReindexShardTracker'
 
-        prefix = args['--prefix']
-        count = int(args['--count'] or '0')
-        table_name = args['--table'] or default_table_name
+    current_max_version = _get_current_max_desired_capacity(
+        client=client,
+        table_name=table_name,
+        prefix=prefix
+    )
+    desired_version = current_max_version + 1
+    print(f'Updating all shards in {prefix} to {desired_version}')
 
-        current_max_version = _get_current_max_desired_capacity(
+    if count == 0:
+        count = _count_current_shards(
             client=client,
             table_name=table_name,
             prefix=prefix
         )
-        desired_version = current_max_version + 1
-        print(f'Updating all shards in {prefix} to {desired_version}')
 
-        if count == 0:
-            count = _count_current_shards(
-                client=client,
-                table_name=table_name,
-                prefix=prefix
-            )
-
-        create_shards(
-            client=client,
-            prefix=prefix,
-            desired_version=desired_version,
-            count=count,
-            table_name=table_name
-        )
+    create_shards(
+        client=client,
+        prefix=prefix,
+        desired_version=desired_version,
+        count=count,
+        table_name=table_name
+    )
