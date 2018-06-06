@@ -20,7 +20,10 @@ trait MiroSubjects {
     val keywords: List[String] = miroData.keywords.getOrElse(List())
 
     val keywordsUnauth: List[String] =
-      miroData.keywordsUnauth.getOrElse(List())
+      miroData.keywordsUnauth match {
+        case Some(maybeKeywords) => maybeKeywords.flatten
+        case None => List()
+      }
 
     (keywords ++ keywordsUnauth).map { keyword =>
       Subject[Unidentifiable[Concept]](
