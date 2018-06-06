@@ -19,7 +19,7 @@ class IngestorWorkerService @Inject()(
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
-  def processMessage(work: IdentifiedWork): Future[Unit] = {
+  private def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =
       Future.fromTry(Try(decideTargetIndices(work)))
     futureIndices.flatMap { indices =>
