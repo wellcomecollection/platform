@@ -1,9 +1,11 @@
 package uk.ac.wellcome.messaging.message
 
-import akka.Done
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Source
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
+import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -28,6 +30,8 @@ class MessageStream[T] @Inject()(
     sqsConfig = messageReaderConfig.sqsConfig,
     metricsSender = metricsSender
   )
+
+  def runStream[M](f: Source[Message,NotUsed] => Source[Message,M]) = sqsStream.runStream(f)
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
