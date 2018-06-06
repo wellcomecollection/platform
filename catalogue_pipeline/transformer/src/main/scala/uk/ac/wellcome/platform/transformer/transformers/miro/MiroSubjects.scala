@@ -24,7 +24,7 @@ trait MiroSubjects {
         case Some(maybeKeywords) => maybeKeywords.flatten
         case None => List()
       }
-      miroData.keywordsUnauth.getOrElse(List())
+    miroData.keywordsUnauth.getOrElse(List())
 
     (keywords ++ keywordsUnauth).map { keyword =>
       Subject[Unidentifiable[Concept]](
