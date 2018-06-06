@@ -19,7 +19,7 @@ case class MiroTransformableData(
   @JsonKey("image_cleared") cleared: Option[String],
   @JsonKey("image_copyright_cleared") copyrightCleared: Option[String],
   @JsonKey("image_keywords") keywords: Option[List[String]],
-  @JsonKey("image_keywords_unauth") keywordsUnauth: Option[List[String]],
+  @JsonKey("image_keywords_unauth") keywordsUnauth: Option[List[Option[String]]],
   @JsonKey("image_phys_format") physFormat: Option[String],
   @JsonKey("image_lc_genre") lcGenre: Option[String],
   @JsonKey("image_tech_file_size") techFileSize: Option[List[String]],
