@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
+import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
@@ -33,21 +34,26 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     ActorMaterializerSettings(system).withSupervisionStrategy(decider))
   implicit val dispatcher = system.dispatcher
 
+  private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
+  private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
+
+  def toRunnableGraph[M1,M2](f: Source[Message,M1] => Source[Message,M2]) =
+    f(source)
+    .map { m =>
+    debug(s"Deleting message ${m.getMessageId}")
+    (m, MessageAction.Delete)
+  }.toMat(sink)(Keep.right)
+
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
-    SqsSource(sqsConfig.queueUrl)(sqsClient)
-      .mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
+    toRunnableGraph(
+      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
         debug(s"Processing message ${message.getMessageId}")
         val metricName = s"${streamName}_ProcessMessage"
-        val op = readAndProcess(streamName, message, process)
-
-        metricsSender.count(metricName, op)
-      }
-      .map { m =>
-        debug(s"Deleting message ${m.getMessageId}")
-        (m, MessageAction.Delete)
-      }
-      .runWith(SqsAckSink(sqsConfig.queueUrl)(sqsClient))
+        metricsSender.count(
+          metricName,
+          readAndProcess(streamName, message, process))
+      }).run()
 
   private def readAndProcess(
     streamName: String,
