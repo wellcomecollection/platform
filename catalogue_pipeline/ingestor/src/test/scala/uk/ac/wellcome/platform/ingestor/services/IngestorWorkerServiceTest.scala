@@ -11,7 +11,11 @@ import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierType,
+  SourceIdentifier
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.ObjectLocation
@@ -46,7 +50,8 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-          withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { case (QueuePair(queue,_),bucket) =>
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
             val messageBody = put[IdentifiedWork](
               obj = work,
               location = ObjectLocation(
@@ -65,8 +70,8 @@ class IngestorWorkerServiceTest
               work,
               indexName = esIndexV2,
               itemType = itemType)
-          }
         }
+      }
     }
   }
 
@@ -81,7 +86,8 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-          withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { case(QueuePair(queue,_), bucket) =>
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
             val messageBody = put[IdentifiedWork](
               obj = work,
               location = ObjectLocation(
@@ -100,8 +106,8 @@ class IngestorWorkerServiceTest
               work,
               indexName = esIndexV2,
               itemType = itemType)
-          }
         }
+      }
     }
   }
 
@@ -116,20 +122,21 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) { case (QueuePair(queue,dlq), bucket) =>
-          val messageBody = put[IdentifiedWork](
-            obj = work,
-            location = ObjectLocation(
-              namespace = bucket.name,
-              key = s"work.json"
+        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+            val messageBody = put[IdentifiedWork](
+              obj = work,
+              location = ObjectLocation(
+                namespace = bucket.name,
+                key = s"work.json"
+              )
             )
-          )
-          sqsClient.sendMessage(queue.url, messageBody)
+            sqsClient.sendMessage(queue.url, messageBody)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-          }
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
         }
       }
     }
@@ -138,60 +145,59 @@ class IngestorWorkerServiceTest
   it("returns a failed Future if indexing into Elasticsearch fails") {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
-          withLocalS3Bucket { bucket =>
-
-            withMessageStream[IdentifiedWork, Assertion](
-              actorSystem,
-              bucket,
-              queue,
-              metricsSender) { messageStream =>
-              val brokenRestClient: RestClient = RestClient
-                .builder(new HttpHost("localhost", 9800, "http"))
-                .setHttpClientConfigCallback(
-                  new ElasticCredentials("elastic", "changeme"))
-                .build()
-
-              val brokenElasticClient: HttpClient =
-                HttpClient.fromRestClient(brokenRestClient)
-
-              val brokenWorkIndexer = new WorkIndexer(
-                elasticClient = brokenElasticClient,
-                metricsSender = metricsSender
-              )
-
-              withIngestorWorkerService[Assertion](
-                esIndexV1 = "works-v1",
-                esIndexV2 = "works-v2",
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, dlq) =>
+            withLocalS3Bucket { bucket =>
+              withMessageStream[IdentifiedWork, Assertion](
                 actorSystem,
-                brokenWorkIndexer,
-                messageStream) { _ =>
+                bucket,
+                queue,
+                metricsSender) { messageStream =>
+                val brokenRestClient: RestClient = RestClient
+                  .builder(new HttpHost("localhost", 9800, "http"))
+                  .setHttpClientConfigCallback(
+                    new ElasticCredentials("elastic", "changeme"))
+                  .build()
 
+                val brokenElasticClient: HttpClient =
+                  HttpClient.fromRestClient(brokenRestClient)
 
-        val miroSourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "B000675"
-        )
-
-        val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
-
-                val messageBody = put[IdentifiedWork](
-                  obj = work,
-                  location = ObjectLocation(
-                    namespace = bucket.name,
-                    key = s"work.json"
-                  )
+                val brokenWorkIndexer = new WorkIndexer(
+                  elasticClient = brokenElasticClient,
+                  metricsSender = metricsSender
                 )
-                sqsClient.sendMessage(queue.url, messageBody)
 
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
+                withIngestorWorkerService[Assertion](
+                  esIndexV1 = "works-v1",
+                  esIndexV2 = "works-v2",
+                  actorSystem,
+                  brokenWorkIndexer,
+                  messageStream) { _ =>
+                  val miroSourceIdentifier = SourceIdentifier(
+                    identifierType = IdentifierType("miro-image-number"),
+                    ontologyType = "Work",
+                    value = "B000675"
+                  )
+
+                  val work =
+                    createWork().copy(sourceIdentifier = miroSourceIdentifier)
+
+                  val messageBody = put[IdentifiedWork](
+                    obj = work,
+                    location = ObjectLocation(
+                      namespace = bucket.name,
+                      key = s"work.json"
+                    )
+                  )
+                  sqsClient.sendMessage(queue.url, messageBody)
+
+                  eventually {
+                    assertQueueEmpty(queue)
+                    assertQueueHasSize(dlq, 1)
+                  }
                 }
               }
             }
-          }
         }
       }
     }
@@ -199,55 +205,56 @@ class IngestorWorkerServiceTest
 
   private def withIngestorWorkerService[R](
     esIndexV1: String,
-    esIndexV2: String)(testWith: TestWith[(QueuePair,Bucket), R]): R = {
+    esIndexV2: String)(testWith: TestWith[(QueuePair, Bucket), R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-          withLocalS3Bucket { bucket =>
-            withWorkIndexer[R](
-              elasticClient = elasticClient,
-              metricsSender = metricsSender) { workIndexer =>
-              withMessageStream[IdentifiedWork, R](
-                actorSystem,
-                bucket,
-                queue,
-                metricsSender) { messageStream =>
-                withIngestorWorkerService[R](
-                  esIndexV1,
-                  esIndexV2,
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, dlq) =>
+            withLocalS3Bucket { bucket =>
+              withWorkIndexer[R](
+                elasticClient = elasticClient,
+                metricsSender = metricsSender) { workIndexer =>
+                withMessageStream[IdentifiedWork, R](
                   actorSystem,
-                  workIndexer,
-                  messageStream) { _ =>
-                  testWith((queuePair, bucket))
+                  bucket,
+                  queue,
+                  metricsSender) { messageStream =>
+                  withIngestorWorkerService[R](
+                    esIndexV1,
+                    esIndexV2,
+                    actorSystem,
+                    workIndexer,
+                    messageStream) { _ =>
+                    testWith((queuePair, bucket))
+                  }
                 }
               }
             }
-          }
         }
       }
     }
   }
 
-  private def withIngestorWorkerService[R](esIndexV1: String,
-                                           esIndexV2: String,
-                                           actorSystem: ActorSystem,
-                                           workIndexer: WorkIndexer,
-                                           messageStream: MessageStream[IdentifiedWork]
-                                          )(
+  private def withIngestorWorkerService[R](
+    esIndexV1: String,
+    esIndexV2: String,
+    actorSystem: ActorSystem,
+    workIndexer: WorkIndexer,
+    messageStream: MessageStream[IdentifiedWork])(
     testWith: TestWith[IngestorWorkerService, R]): R = {
-          val elasticConfig = ElasticConfig(
-            documentType = itemType,
-            indexV1name = esIndexV1,
-            indexV2name = esIndexV2
-          )
+    val elasticConfig = ElasticConfig(
+      documentType = itemType,
+      indexV1name = esIndexV1,
+      indexV2name = esIndexV2
+    )
 
-          val ingestorWorkerService = new IngestorWorkerService(
-            elasticConfig = elasticConfig,
-            identifiedWorkIndexer = workIndexer,
-            messageStream = messageStream,
-            system = actorSystem
-          )
+    val ingestorWorkerService = new IngestorWorkerService(
+      elasticConfig = elasticConfig,
+      identifiedWorkIndexer = workIndexer,
+      messageStream = messageStream,
+      system = actorSystem
+    )
 
-          testWith(ingestorWorkerService)
-        }
+    testWith(ingestorWorkerService)
+  }
 }
