@@ -56,10 +56,8 @@ def _update_shard(client, table_name, shard):
     )
 
 
-def _all_shards(table_name):
+def _all_shards(client, table_name):
     """Generates the name of all current shards."""
-    client = boto3.client('dynamodb')
-
     kwargs = {
         'TableName': table_name,
         'AttributesToGet': ['shardId']
@@ -76,10 +74,10 @@ def _all_shards(table_name):
             break
 
 
-def _count_current_shards(prefix, table_name):
+def _count_current_shards(client, prefix, table_name):
     """How many shards are there in the current table?"""
     best_seen = None
-    for s in _all_shards(table_name):
+    for s in _all_shards(client=client, table_name=table_name):
         if s.startswith(prefix):
             value = int(s.replace(prefix, '').strip('/'))
             if (best_seen is None) or (value > best_seen):
@@ -88,14 +86,12 @@ def _count_current_shards(prefix, table_name):
     return best_seen
 
 
-def create_shards(prefix, desired_version, count, table_name):
+def create_shards(client, prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
         {'shardId': f'{prefix}/{i}', 'desiredVersion': desired_version}
         for i in range(count)
     ]
-
-    client = boto3.client('dynamodb')
 
     # Implementation note: this is potentially quite slow, as we make a new
     # UPDATE request for every shard we want to write to DynamoDB.  The
@@ -123,15 +119,22 @@ if __name__ == '__main__':
     default_table_name = 'ReindexShardTracker'
 
     if args['update-shards']:
+        client = boto3.client('dynamodb')
+
         prefix = args['--prefix']
         count = int(args['--count'] or '0')
         desired_version = int(args['--desired_version'] or '1')
         table_name = args['--table'] or default_table_name
 
         if count == 0:
-            count = _count_current_shards(table_name=table_name, prefix=prefix)
+            count = _count_current_shards(
+                client=client,
+                table_name=table_name,
+                prefix=prefix
+            )
 
         create_shards(
+            client=client,
             prefix=prefix,
             desired_version=desired_version,
             count=count,
