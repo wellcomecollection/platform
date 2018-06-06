@@ -3,7 +3,7 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] (--increment | --desired_version=<VERSION>) [--table=<TABLE>]
+Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
        manage_reindex.py -h | --help
 
 Actions:
@@ -12,9 +12,6 @@ Actions:
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
-  --increment           Increment whatever version is already in the table
-  --desired_version=<VERSION>
-                        Desired version of all rows in the reindexed table
   --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
   -h --help             Print this help message
 
@@ -120,7 +117,8 @@ def create_shards(client, prefix, desired_version, count, table_name):
     #
     # If you're finding this script to be too slow, this is where to start.
     for shard in tqdm.tqdm(new_shards):
-        _update_shard(client=client, table_name=table_name, shard=shard)
+        print(f'Update {shard}')
+        # _update_shard(client=client, table_name=table_name, shard=shard)
 
 
 if __name__ == '__main__':
@@ -135,16 +133,12 @@ if __name__ == '__main__':
         count = int(args['--count'] or '0')
         table_name = args['--table'] or default_table_name
 
-        if args['--desired_version']:
-            desired_version = int(args['--desired_version'])
-        elif args['--increment']:
-            current_max_version = _get_current_max_desired_capacity(
-                client=client,
-                table_name=table_name,
-                prefix=prefix
-            )
-            desired_version = current_max_version + 1
-
+        current_max_version = _get_current_max_desired_capacity(
+            client=client,
+            table_name=table_name,
+            prefix=prefix
+        )
+        desired_version = current_max_version + 1
         print(f'Updating all shards in {prefix} to {desired_version}')
 
         if count == 0:
