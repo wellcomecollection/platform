@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.MiroTransformable
-
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 import uk.ac.wellcome.platform.transformer.transformers.miro._
@@ -12,35 +12,42 @@ class MiroTransformableTransformer
     with MiroContributors
     with MiroGenres
     with MiroLicenses
-    with MiroSubjects {
+    with MiroSubjects
+    with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType(miroTransformable: MiroTransformable,
                                 version: Int): Try[Option[UnidentifiedWork]] =
     Try {
-
       val miroData = MiroTransformableData.create(miroTransformable.data)
       val (title, description) = getTitleAndDescription(miroData)
 
-      Some(
-        UnidentifiedWork(
-          title = Some(title),
-          sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            ontologyType = "Work",
-            value = miroTransformable.sourceId),
-          version = version,
-          identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
-          description = description,
-          lettering = miroData.suppLettering,
-          createdDate =
-            getCreatedDate(miroData, miroTransformable.MiroCollection),
-          subjects = getSubjects(miroData),
-          contributors = getContributors(miroData),
-          genres = getGenres(miroData),
-          thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-          items = getItems(miroData, miroTransformable.sourceId)
-        ))
+      try {
+        Some(
+          UnidentifiedWork(
+            title = Some(title),
+            sourceIdentifier = SourceIdentifier(
+              identifierType = IdentifierType("miro-image-number"),
+              ontologyType = "Work",
+              value = miroTransformable.sourceId),
+            version = version,
+            identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
+            description = description,
+            lettering = miroData.suppLettering,
+            createdDate =
+              getCreatedDate(miroData, miroTransformable.MiroCollection),
+            subjects = getSubjects(miroData),
+            contributors = getContributors(miroData),
+            genres = getGenres(miroData),
+            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+            items = getItems(miroData, miroTransformable.sourceId)
+          ))
+      } catch {
+        case e: ShouldNotTransformException => {
+          warn(s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
+          None
+        }
+      }
     }
 
   /*

@@ -30,5 +30,12 @@ trait MiroLicenses {
       // These mappings are defined in Christy's document
       case "Academics" => License_CCBYNC
 
+      // These images should really be removed entirely and sent to something
+      // like Tandem Vault, but we have seen some of these strings in the
+      // catalogue data -- for now, explicitly mark these as "do not transform"
+      // so they don't end up on the DLQ.
+      case "Do not use" => throw new ShouldNotTransformException("Usage restriction is 'Do not use'")
+      case "Image withdrawn, see notes" => throw new ShouldNotTransformException("Usage restriction is 'Image withdrawn'")
+
     }
 }
