@@ -24,7 +24,7 @@ resource "aws_cloudwatch_metric_alarm" "snapshot_scheduler_queue_not_empty" {
   statistic           = "Average"
 
   dimensions {
-    QueueName = "${aws_sqs_queue.snapshot_generator_queue.name}"
+    QueueName = "${module.snapshot_generator_queue.name}"
   }
 
   alarm_actions = ["${local.dlq_alarm_arn}"]
