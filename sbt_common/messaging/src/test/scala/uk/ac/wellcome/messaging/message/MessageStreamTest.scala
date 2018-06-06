@@ -136,8 +136,8 @@ class MessageStreamTest
           process = process(received))
 
         eventually {
-          verify(metricsSender, times(3)).incrementCount(
-            metricName = "test-stream_ProcessMessage_failure")
+          verify(metricsSender, times(3))
+            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
 
           received shouldBe empty
 

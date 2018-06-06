@@ -9,7 +9,8 @@ import uk.ac.wellcome.platform.idminter.utils.Identifiable
 
 import scala.util.Try
 
-class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao) extends Logging
+class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
+    extends Logging
     with TwitterModuleFlags {
 
   def retrieveOrGenerateCanonicalId(
