@@ -17,7 +17,7 @@ object Common {
       "-feature",
       "-language:postfixOps"
     ),
-    parallelExecution in Test := false,
+    parallelExecution in Test := true,
     libraryDependencies ++= Dependencies.sharedDependencies
   ) ++
     Search.settings ++
