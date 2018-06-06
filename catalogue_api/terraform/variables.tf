@@ -26,37 +26,6 @@ variable "release_ids" {
   type        = "map"
 }
 
-# These variables will change fairly regularly, whenever we want to swap the
-# staging and production APIs.
-
-variable "production_api" {
-  description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
-}
-
-variable "pinned_romulus_api" {
-  description = "Which version of the API image to pin romulus to, if any"
-  default     = "3709fe4bc8d54c07709f8b11e995f40ad6ca39f7"
-}
-
-variable "pinned_romulus_api_nginx" {
-  description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
-}
-
-variable "pinned_remus_api" {
-  description = "Which version of the API image to pin remus to, if any"
-  default     = ""
-}
-
-variable "pinned_remus_api_nginx" {
-  description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
-}
-
-# These variables change less frequently -- the service blocks in services.tf
-# will choose which variable to use based on the value of `production_api`.
-
 variable "api_prod_host" {
   description = "Hostname to use for the production API"
   default     = "api.wellcomecollection.org"
@@ -70,6 +39,34 @@ variable "api_stage_host" {
 variable "es_cluster_credentials" {
   description = "Credentials for the Elasticsearch cluster"
   type        = "map"
+}
+
+# These variables will change fairly regularly, whenever we want to swap the
+# staging and production APIs.
+
+variable "production_api" {
+  description = "Which version of the API is production? (romulus | remus)"
+  default     = "remus"
+}
+
+variable "pinned_romulus_api" {
+  description = "Which version of the API image to pin romulus to, if any"
+  default     = ""
+}
+
+variable "pinned_romulus_api_nginx" {
+  description = "Which version of the nginx API image to pin romulus to, if any"
+  default     = ""
+}
+
+variable "pinned_remus_api" {
+  description = "Which version of the API image to pin remus to, if any"
+  default     = "58d71745bc3b50ef0bde45be7e27a63e1dee4b1a"
+}
+
+variable "pinned_remus_api_nginx" {
+  description = "Which version of the nginx API image to pin remus to, if any"
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "es_config_romulus" {
@@ -88,8 +85,8 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-20180530-new-identifier-schemes"
-    index_v2 = "v2-20180530-new-identifier-schemes"
+    index_v1 = "v1-2018-06-05-new-location-types"
+    index_v2 = "v2-2018-06-05-new-location-types"
     doc_type = "work"
   }
 }
