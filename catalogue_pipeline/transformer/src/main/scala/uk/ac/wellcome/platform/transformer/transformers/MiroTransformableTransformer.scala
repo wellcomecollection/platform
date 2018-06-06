@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.MiroTransformable
-
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 import uk.ac.wellcome.platform.transformer.transformers.miro._
@@ -11,35 +11,45 @@ class MiroTransformableTransformer
     extends TransformableTransformer[MiroTransformable]
     with MiroContributors
     with MiroGenres
-    with MiroSubjects {
+    with MiroLicenses
+    with MiroSubjects
+    with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType(miroTransformable: MiroTransformable,
                                 version: Int): Try[Option[UnidentifiedWork]] =
     Try {
-
       val miroData = MiroTransformableData.create(miroTransformable.data)
       val (title, description) = getTitleAndDescription(miroData)
 
-      Some(
-        UnidentifiedWork(
-          title = Some(title),
-          sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            ontologyType = "Work",
-            value = miroTransformable.sourceId),
-          version = version,
-          identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
-          description = description,
-          lettering = miroData.suppLettering,
-          createdDate =
-            getCreatedDate(miroData, miroTransformable.MiroCollection),
-          subjects = getSubjects(miroData),
-          contributors = getContributors(miroData),
-          genres = getGenres(miroData),
-          thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-          items = getItems(miroData, miroTransformable.sourceId)
-        ))
+      try {
+        Some(
+          UnidentifiedWork(
+            title = Some(title),
+            sourceIdentifier = SourceIdentifier(
+              identifierType = IdentifierType("miro-image-number"),
+              ontologyType = "Work",
+              value = miroTransformable.sourceId),
+            version = version,
+            identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
+            description = description,
+            lettering = miroData.suppLettering,
+            createdDate =
+              getCreatedDate(miroData, miroTransformable.MiroCollection),
+            subjects = getSubjects(miroData),
+            contributors = getContributors(miroData),
+            genres = getGenres(miroData),
+            thumbnail =
+              Some(getThumbnail(miroData, miroTransformable.sourceId)),
+            items = getItems(miroData, miroTransformable.sourceId)
+          ))
+      } catch {
+        case e: ShouldNotTransformException => {
+          warn(
+            s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
+          None
+        }
+      }
     }
 
   /*
@@ -222,7 +232,7 @@ class MiroTransformableTransformer
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
       url = buildImageApiURL(miroId, "thumbnail"),
-      license = chooseLicense(miroData.useRestrictions.get)
+      license = chooseLicense(miroData.useRestrictions)
     )
   }
 
@@ -245,7 +255,7 @@ class MiroTransformableTransformer
             locationType = LocationType("iiif-image"),
             url = buildImageApiURL(miroId, "info"),
             credit = getCredit(miroData),
-            license = chooseLicense(miroData.useRestrictions.get)
+            license = chooseLicense(miroData.useRestrictions)
           )
         )
       ))
@@ -366,32 +376,4 @@ class MiroTransformableTransformer
 
     imageUriTemplate.format(iiifImageApiBaseUri, miroID)
   }
-
-  /** If the image has a non-empty image_use_restrictions field, choose which
-    *  license (if any) we're going to assign to the thumbnail for this work.
-    *
-    *  The mappings in this function are based on a document provided by
-    *  Christy Henshaw (MIRO drop-downs.docx).  There are still some gaps in
-    *  that, we'll have to come back and update this code later.
-    *
-    *  For now, this mapping only covers use restrictions seen in the
-    *  V collection.  We'll need to extend this for other licenses later.
-    *
-    *  TODO: Expand this mapping to cover all of MIRO.
-    *  TODO: Update these mappings based on the final version of Christy's
-    *        document.
-    */
-  private def chooseLicense(useRestrictions: String): License =
-    useRestrictions match {
-
-      // Certain strings map directly onto license types
-      case "CC-0" => License_CC0
-      case "CC-BY" => License_CCBY
-      case "CC-BY-NC" => License_CCBYNC
-      case "CC-BY-NC-ND" => License_CCBYNCND
-
-      // These mappings are defined in Christy's document
-      case "Academics" => License_CCBYNC
-    }
-
 }
