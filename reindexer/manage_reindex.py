@@ -56,22 +56,19 @@ def _update_shard(client, table_name, shard):
     )
 
 
+
+def _all_records_in_shard(client, table_name):
+    """Generates every row in a particular shard."""
+    paginator = client.get_paginator('scan')
+    for page in paginator.paginate(TableName=table_name):
+        for i in page['Items']:
+            yield i
+
+
 def _all_shards(client, table_name):
     """Generates the name of all current shards."""
-    kwargs = {
-        'TableName': table_name,
-        'AttributesToGet': ['shardId']
-    }
-
-    while True:
-        resp = client.scan(**kwargs)
-        for i in resp['Items']:
-            yield i['shardId']['S']
-
-        try:
-            kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
-        except KeyError:
-            break
+    for shard in _all_records_in_shard(client=client, table_name=table_name):
+        yield shard['shardId']['S']
 
 
 def _count_current_shards(client, prefix, table_name):
