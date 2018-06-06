@@ -22,7 +22,6 @@ module "snapshot_generator" {
     topic_arn         = "${module.snapshot_generation_complete_topic.arn}"
     es_host           = "${data.template_file.es_cluster_host_snapshot.rendered}"
     es_port           = "${var.es_cluster_credentials["port"]}"
-    es_name           = "${var.es_cluster_credentials["name"]}"
     es_username       = "${var.es_cluster_credentials["username"]}"
     es_password       = "${var.es_cluster_credentials["password"]}"
     es_protocol       = "${var.es_cluster_credentials["protocol"]}"
@@ -32,7 +31,7 @@ module "snapshot_generator" {
     metrics_namespace = "snapshot_generator"
   }
 
-  env_vars_length = 12
+  env_vars_length = 11
 
   memory = 3072
   cpu    = 2048
