@@ -6,9 +6,9 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 import scala.util.Try
 
 class IngestorWorkerService @Inject()(
@@ -17,7 +17,13 @@ class IngestorWorkerService @Inject()(
   messageStream: MessageStream[IdentifiedWork],
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
-  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  messageStream.runStream { source =>
+    source.groupedWithin(100, 10 seconds).mapAsyncUnordered(10){messages =>
+      Future.sequence(messages.map{case (message,identifiedWork) =>
+        processMessage(identifiedWork).map(_=> message)
+      })
+    }.mapConcat(identity)
+  }
 
   private def processMessage(work: IdentifiedWork): Future[Unit] = {
     val futureIndices: Future[List[String]] =

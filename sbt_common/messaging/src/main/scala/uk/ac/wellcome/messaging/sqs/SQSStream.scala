@@ -37,8 +37,8 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M2](f: Source[(Message,T),NotUsed] => Source[Message,M2]) =
-    f(source.map(read(_).get))
+  def runStream[M2](f: Source[(Message,T),NotUsed] => Source[Message,M2])(implicit decoder: Decoder[T]) =
+    f(source.map(message => (message, read(message).get)))
     .map { m =>
     debug(s"Deleting message ${m.getMessageId}")
     (m, MessageAction.Delete)
@@ -58,7 +58,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private def readAndProcess(
     streamName: String,
     message: T,
-    process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
+    process: T => Future[Unit]) = {
     val processMessageFuture = process(message)
 
     processMessageFuture.failed.foreach {
