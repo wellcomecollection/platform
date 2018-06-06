@@ -2,7 +2,7 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   name           = "works-graph"
   read_capacity  = 1
   write_capacity = 1
-  hash_key       = "workId"
+  hash_key       = "id"
 
   attribute {
     name = "id"
