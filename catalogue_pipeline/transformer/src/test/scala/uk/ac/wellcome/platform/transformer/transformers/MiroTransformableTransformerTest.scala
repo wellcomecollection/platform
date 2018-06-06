@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.internal._
 
 class MiroTransformableTransformerTest
@@ -222,6 +223,21 @@ class MiroTransformableTransformerTest
     work.contributors shouldBe List(
       Contributor(agent = Unidentifiable(Agent("Gyokushō, a cät Ôwnêr")))
     )
+  }
+
+  it("returns None for Miro records with usage restrictions that mean we suppress the image") {
+    val miroTransformable = MiroTransformable(
+      sourceId = "P0000001",
+      MiroCollection = "TestCollection",
+      data = buildJSONForWork("""
+        "image_title": "Private pictures of perilous penguins",
+        "image_use_restrictions": "Do not use"
+      """)
+    )
+
+    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
+    triedMaybeWork.isSuccess shouldBe true
+    triedMaybeWork.get shouldBe None
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
