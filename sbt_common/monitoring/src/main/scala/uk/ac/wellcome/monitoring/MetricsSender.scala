@@ -67,14 +67,10 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
     f
   }
 
-  def incrementCount(
-    metricName: String,
-    count: Double = 1.0
-  ): Future[QueueOfferResult] = {
-
+  def incrementCount(metricName: String): Future[QueueOfferResult] = {
     val metricDatum = new MetricDatum()
       .withMetricName(metricName)
-      .withValue(count)
+      .withValue(1.0)
       .withUnit(StandardUnit.Count)
       .withTimestamp(new Date())
 

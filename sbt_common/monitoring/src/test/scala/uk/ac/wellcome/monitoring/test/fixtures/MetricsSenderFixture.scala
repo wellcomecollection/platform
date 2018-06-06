@@ -2,7 +2,7 @@ package uk.ac.wellcome.monitoring.test.fixtures
 
 import akka.actor.ActorSystem
 import grizzled.slf4j.Logging
-import org.mockito.Matchers.{any, anyDouble, anyString, endsWith}
+import org.mockito.Matchers.{any, anyString, endsWith}
 import org.mockito.Mockito.{never, times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -51,11 +51,11 @@ trait MetricsSenderFixture
 
   def assertFailureMetricNotIncremented(mockMetricsSender: MetricsSender) = {
     verify(mockMetricsSender, never())
-      .incrementCount(endsWith("_processMessage_failure"), anyDouble())
+      .incrementCount(endsWith("_processMessage_failure"))
   }
 
-  private def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
+  def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
     verify(mockMetricsSender, times(3))
-      .incrementCount(endsWith("_processMessage_failure"), anyDouble())
+      .incrementCount(endsWith("_processMessage_failure"))
   }
 }

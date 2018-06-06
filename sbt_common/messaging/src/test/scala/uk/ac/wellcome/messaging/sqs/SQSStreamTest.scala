@@ -2,7 +2,7 @@ package uk.ac.wellcome.messaging.sqs
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
+import org.mockito.Matchers.{any, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -91,7 +91,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, never())
-            .incrementCount(endsWith("_failure"), anyDouble())
+            .incrementCount(endsWith("_failure"))
           received shouldBe empty
 
           assertQueueEmpty(queue)

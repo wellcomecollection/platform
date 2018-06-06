@@ -50,8 +50,7 @@ class SierraBibMergerWorkerServiceTest
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
           verify(metricsSender, never()).incrementCount(
-            "SierraBibMergerUpdaterService_processMessage_failure",
-            1.0)
+            "SierraBibMergerUpdaterService_processMessage_failure")
         }
     }
   }

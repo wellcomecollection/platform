@@ -2,7 +2,7 @@ package uk.ac.wellcome.messaging.message
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
+import org.mockito.Matchers.{any, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -71,7 +71,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())
+            .count(equalTo("test-stream_processMessage"), any[Future[Unit]]())
         }
     }
   }
@@ -93,7 +93,7 @@ class MessageStreamTest
         eventually {
 
           verify(metricsSender, never())
-            .incrementCount(endsWith("_processMessage_failure"), anyDouble())
+            .incrementCount(endsWith("_processMessage_failure"))
           received shouldBe empty
 
           assertQueueEmpty(queue)
@@ -137,8 +137,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(3)).incrementCount(
-            metricName = "test-stream_processMessage_failure",
-            count = 1.0)
+            metricName = "test-stream_processMessage_failure")
 
           received shouldBe empty
 

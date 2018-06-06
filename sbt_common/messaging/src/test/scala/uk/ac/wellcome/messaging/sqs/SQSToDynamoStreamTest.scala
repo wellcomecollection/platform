@@ -45,7 +45,7 @@ class SQSToDynamoStreamTest
         eventually {
           messages should contain only testObject
           verify(mockMetricSender, never())
-            .incrementCount(failureMetricName, 1.0)
+            .incrementCount(failureMetricName)
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
         }
@@ -70,7 +70,7 @@ class SQSToDynamoStreamTest
 
         eventually {
           verify(mockMetricSender, never())
-            .incrementCount(failureMetricName, 1.0)
+            .incrementCount(failureMetricName)
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -88,7 +88,7 @@ class SQSToDynamoStreamTest
 
           eventually {
             verify(mockMetricSender, never())
-              .incrementCount(failureMetricName, 1.0)
+              .incrementCount(failureMetricName)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
@@ -108,7 +108,7 @@ class SQSToDynamoStreamTest
 
           eventually {
             verify(mockMetricSender, times(3))
-              .incrementCount(failureMetricName, 1.0)
+              .incrementCount(failureMetricName)
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 1)
           }
