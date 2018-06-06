@@ -26,6 +26,21 @@ variable "release_ids" {
   type        = "map"
 }
 
+variable "api_prod_host" {
+  description = "Hostname to use for the production API"
+  default     = "api.wellcomecollection.org"
+}
+
+variable "api_stage_host" {
+  description = "Hostname to use for the production API"
+  default     = "api-stage.wellcomecollection.org"
+}
+
+variable "es_cluster_credentials" {
+  description = "Credentials for the Elasticsearch cluster"
+  type        = "map"
+}
+
 # These variables will change fairly regularly, whenever we want to swap the
 # staging and production APIs.
 
@@ -52,24 +67,6 @@ variable "pinned_remus_api" {
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = ""
-}
-
-# These variables change less frequently -- the service blocks in services.tf
-# will choose which variable to use based on the value of `production_api`.
-
-variable "api_prod_host" {
-  description = "Hostname to use for the production API"
-  default     = "api.wellcomecollection.org"
-}
-
-variable "api_stage_host" {
-  description = "Hostname to use for the production API"
-  default     = "api-stage.wellcomecollection.org"
-}
-
-variable "es_cluster_credentials" {
-  description = "Credentials for the Elasticsearch cluster"
-  type        = "map"
 }
 
 variable "es_config_romulus" {
