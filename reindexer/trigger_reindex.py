@@ -114,8 +114,7 @@ def create_shards(client, prefix, desired_version, count, table_name):
     #
     # If you're finding this script to be too slow, this is where to start.
     for shard in tqdm.tqdm(new_shards):
-        print(f'Update {shard}')
-        # _update_shard(client=client, table_name=table_name, shard=shard)
+        _update_shard(client=client, table_name=table_name, shard=shard)
 
 
 if __name__ == '__main__':
