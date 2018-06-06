@@ -72,7 +72,7 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
     f
   }
 
-  def incrementCount(
+  private def incrementCount(
     metricName: String,
     count: Double = 1.0
   ): Future[QueueOfferResult] = {
