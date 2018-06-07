@@ -563,6 +563,44 @@ class SierraTransformableTransformerTest
       Subject(content, List(Unidentifiable(Concept(content)))))
   }
 
+
+  it("adds production events if possible") {
+    val id = "9876789"
+    val placeLabel = "London"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Loosely lamenting the lemons of London",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "260",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$placeLabel"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val work = transformDataToWork(id = id, data = data)
+    work.production shouldBe List(
+      ProductionEvent(
+        places = List(Place(placeLabel)),
+        agents = List(),
+        dates = List(),
+        productionFunction = None
+      )
+    )
+  }
+
   private def transformDataToWork(id: String, data: String): UnidentifiedWork = {
     val bibRecord = SierraBibRecord(
       id = id,
