@@ -59,6 +59,16 @@ class SierraProductionTest extends FunSpec with Matchers {
       )
     }
 
+    it("sets the function as None if it only has subfields a/b/c") {
+      val production = transform260ToProduction(subfields = List(
+        MarcSubfield(tag = "a", content = "New York"),
+        MarcSubfield(tag = "b", content = "Xerox Films"),
+        MarcSubfield(tag = "c", content = "1973")
+      ))
+
+      production.productionFunction shouldBe None
+    }
+
     it("populates places from a and e, and sets the function as Manufacture") {
       val production = transform260ToProduction(subfields = List(
         MarcSubfield(tag = "a", content = "New York, N.Y."),
