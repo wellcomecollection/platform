@@ -242,7 +242,8 @@ class IdentifiedWorkTest
       |          "ontologyType": "Place"
       |        }
       |      ],
-      |      "function": null
+      |      "function": null,
+      |      "ontologyType": "ProductionEvent"
       |    }
       |  ],
       |   "language": {

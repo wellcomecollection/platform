@@ -240,7 +240,8 @@ class UnidentifiedWorkTest
       |          "ontologyType": "Place"
       |        }
       |      ],
-      |      "function": null
+      |      "function": null,
+      |      "ontologyType": "ProductionEvent"
       |    }
       |  ],
       |   "language": {
