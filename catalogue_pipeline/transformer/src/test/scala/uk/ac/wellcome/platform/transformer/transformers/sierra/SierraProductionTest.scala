@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   MaybeDisplayable,
@@ -15,6 +16,27 @@ class SierraProductionTest extends FunSpec with Matchers {
       varFields = List(),
       expectedProduction = List()
     )
+  }
+
+  it("throws an error if both 260 and 264 are present") {
+    transformVarFieldsAndAssertIsError(
+      varFields = List(
+        VarField(marcTag = Some("260"), fieldTag = "a"),
+        VarField(marcTag = Some("264"), fieldTag = "a")
+      )
+    )
+  }
+
+  private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
+    val bibData = SierraBibData(
+      id = "p1000001",
+      title = Some("Practical production of poisonous panthers"),
+      varFields = varFields
+    )
+
+    intercept[GracefulFailureException] {
+      transformer.getProduction(bibData)
+    }
   }
 
   private def transformVarFieldsAndAssertProductionIsCorrect(

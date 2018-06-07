@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   MaybeDisplayable,
@@ -21,8 +22,18 @@ trait SierraProduction {
   //
   def getProduction(bibData: SierraBibData)
     : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
-//    val marc260fields = bibData.varFields.filter { _.fieldTag == Some("260") }
-//    val marc264fields = bibData.varFields.filter { _.fieldTag == Some("264") }
+    val maybeMarc260fields = bibData.varFields.filter { _.marcTag == Some("260") }
+    val maybeMarc264fields = bibData.varFields.filter { _.marcTag == Some("264") }
+
+    (maybeMarc260fields, maybeMarc264fields) match {
+      case (Nil, Nil) => List()
+      case (_, Nil) => List()
+      case (Nil, _) => List()
+      case (_, _) => throw new GracefulFailureException(new RuntimeException(
+        "Record has both 260 and 264 fields; this is a cataloguing error."
+      ))
+    }
+
     List()
   }
 }
