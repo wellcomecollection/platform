@@ -134,7 +134,8 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     period("places"),
     identified("agents", agent),
     date("dates"),
-    identified("function", concept)
+    identified("function", concept),
+    keywordField("ontologyType")
   )
 
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
