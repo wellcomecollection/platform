@@ -134,7 +134,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     period("places"),
     identified("agents", agent),
     date("dates"),
-    objectField("function", concept),
+    objectField("function").fields(concept),
     keywordField("ontologyType")
   )
 
