@@ -100,6 +100,22 @@ class SierraProductionTest extends FunSpec with Matchers {
 
       production.productionFunction shouldBe Some(Concept("Manufacture"))
     }
+
+    it("populates dates from c and g, and sets the function as Manufacture") {
+      val production = transform260ToProduction(subfields = List(
+        MarcSubfield(tag = "c", content = "1981"),
+        MarcSubfield(tag = "g", content = "April 15, 1977"),
+        MarcSubfield(tag = "g", content = "1973 printing"),
+      ))
+
+      production.dates shouldBe List(
+        Period(label = "1981"),
+        Period(label = "April 15, 1977"),
+        Period(label = "1973 printing")
+      )
+
+      production.productionFunction shouldBe Some(Concept("Manufacture"))
+    }
   }
 
   // multiple instances of 260

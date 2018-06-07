@@ -55,25 +55,27 @@ trait SierraProduction {
   // in the transform rules.
   // TODO: Check if this is okay.
   //
+  // Note: a, b, c, e, f and g are all repeatable fields in the MARC spec.
+  //
+  // https://www.loc.gov/marc/bibliographic/bd260.html
+  //
   private def getProductionFrom260Fields(varFields: List[VarField]) =
     varFields.map { vf =>
       val places = placesFromSubfields(vf, subfieldTag = "a")
       val agents = agentsFromSubfields(vf, subfieldTag = "b")
-
-      val dates: List[Period] = vf.subfields
-        .filter { _.tag == "c" }
-        .map { sf: MarcSubfield => Period(label = sf.content) }
+      val dates = datesFromSubfields(vf, subfieldTag = "c")
 
       val extraPlaces = placesFromSubfields(vf, subfieldTag = "e")
       val extraAgents = agentsFromSubfields(vf, subfieldTag = "f")
+      val extraDates = datesFromSubfields(vf, subfieldTag = "g")
 
-      val productionFunction = if (extraPlaces != Nil || extraAgents != Nil) {
+      val productionFunction = if (extraPlaces != Nil || extraAgents != Nil || extraDates != Nil) {
         Some(Concept(label = "Manufacture"))
       } else None
 
       ProductionEvent(
         places = places ++ extraPlaces,
-        dates = dates,
+        dates = dates ++ extraDates,
         agents = agents ++ extraAgents,
         productionFunction = productionFunction
       )
@@ -89,4 +91,9 @@ trait SierraProduction {
       .filter { _.tag == subfieldTag}
       .map { sf: MarcSubfield => Agent(label = sf.content) }
       .map { ag: Agent => Unidentifiable(ag) }
+
+  private def datesFromSubfields(vf: VarField, subfieldTag: String): List[Period] =
+    vf.subfields
+      .filter { _.tag == subfieldTag}
+      .map { sf: MarcSubfield => Period(label = sf.content) }
 }
