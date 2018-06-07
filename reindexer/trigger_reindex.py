@@ -3,17 +3,12 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: manage_reindex.py update-shards --prefix=<PREFIX> [--count=<COUNT>] [--desired_version=<VERSION>] [--table=<TABLE>]
-       manage_reindex.py -h | --help
-
-Actions:
-  update-shards         Create or update shards in the reindex tracker table.
+Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
+       trigger_reindex.py -h | --help
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
-  --desired_version=<VERSION>
-                        Desired version of all rows in the reindexed table
   --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
   -h --help             Print this help message
 
@@ -56,30 +51,24 @@ def _update_shard(client, table_name, shard):
     )
 
 
-def _all_shards(table_name):
+def _all_records_in_shard(client, table_name):
+    """Generates every row in a particular shard."""
+    paginator = client.get_paginator('scan')
+    for page in paginator.paginate(TableName=table_name):
+        for i in page['Items']:
+            yield i
+
+
+def _all_shard_names(client, table_name):
     """Generates the name of all current shards."""
-    client = boto3.client('dynamodb')
-
-    kwargs = {
-        'TableName': table_name,
-        'AttributesToGet': ['shardId']
-    }
-
-    while True:
-        resp = client.scan(**kwargs)
-        for i in resp['Items']:
-            yield i['shardId']['S']
-
-        try:
-            kwargs['ExclusiveStartKey'] = resp['LastEvaluatedKey']
-        except KeyError:
-            break
+    for shard in _all_records_in_shard(client=client, table_name=table_name):
+        yield shard['shardId']['S']
 
 
-def _count_current_shards(prefix, table_name):
+def _count_current_shards(client, prefix, table_name):
     """How many shards are there in the current table?"""
     best_seen = None
-    for s in _all_shards(table_name):
+    for s in _all_shard_names(client=client, table_name=table_name):
         if s.startswith(prefix):
             value = int(s.replace(prefix, '').strip('/'))
             if (best_seen is None) or (value > best_seen):
@@ -88,14 +77,25 @@ def _count_current_shards(prefix, table_name):
     return best_seen
 
 
-def create_shards(prefix, desired_version, count, table_name):
+def _get_current_max_desired_capacity(client, table_name, prefix):
+    """
+    Given a prefix, find the highest desired capacity of any reindex
+    record within that prefix.
+    """
+    best_seen = 0
+    for shard in _all_records_in_shard(client=client, table_name=table_name):
+        if not shard['shardId']['S'].startswith(prefix):
+            continue
+        best_seen = max(best_seen, int(shard['desiredVersion']['N']))
+    return best_seen
+
+
+def create_shards(client, prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
         {'shardId': f'{prefix}/{i}', 'desiredVersion': desired_version}
         for i in range(count)
     ]
-
-    client = boto3.client('dynamodb')
 
     # Implementation note: this is potentially quite slow, as we make a new
     # UPDATE request for every shard we want to write to DynamoDB.  The
@@ -120,20 +120,31 @@ def create_shards(prefix, desired_version, count, table_name):
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
-    default_table_name = 'ReindexShardTracker'
+    client = boto3.client('dynamodb')
 
-    if args['update-shards']:
-        prefix = args['--prefix']
-        count = int(args['--count'] or '0')
-        desired_version = int(args['--desired_version'] or '1')
-        table_name = args['--table'] or default_table_name
+    prefix = args['--prefix']
+    count = int(args['--count'] or '0')
+    table_name = args['--table'] or 'ReindexShardTracker'
 
-        if count == 0:
-            count = _count_current_shards(table_name=table_name, prefix=prefix)
+    current_max_version = _get_current_max_desired_capacity(
+        client=client,
+        table_name=table_name,
+        prefix=prefix
+    )
+    desired_version = current_max_version + 1
+    print(f'Updating all shards in {prefix} to {desired_version}')
 
-        create_shards(
-            prefix=prefix,
-            desired_version=desired_version,
-            count=count,
-            table_name=table_name
+    if count == 0:
+        count = _count_current_shards(
+            client=client,
+            table_name=table_name,
+            prefix=prefix
         )
+
+    create_shards(
+        client=client,
+        prefix=prefix,
+        desired_version=desired_version,
+        count=count,
+        table_name=table_name
+    )
