@@ -1,12 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.internal.{
-  AbstractAgent,
-  MaybeDisplayable,
-  ProductionEvent
-}
-import uk.ac.wellcome.platform.transformer.source.SierraBibData
+import uk.ac.wellcome.models.work.internal.{AbstractAgent, MaybeDisplayable, Place, ProductionEvent}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
 trait SierraProduction {
 
@@ -27,13 +23,31 @@ trait SierraProduction {
 
     (maybeMarc260fields, maybeMarc264fields) match {
       case (Nil, Nil) => List()
-      case (_, Nil) => List()
+      case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
       case (Nil, _) => List()
       case (_, _) => throw new GracefulFailureException(new RuntimeException(
         "Record has both 260 and 264 fields; this is a cataloguing error."
       ))
     }
-
-    List()
   }
+
+  // Populate wwork:production from MARC tag 260.
+  //
+  // The rules are as follows:
+  //
+  //  - Populate "places" from subfield "a" and type as "Place"
+  //
+  private def getProductionFrom260Fields(varFields: List[VarField]) =
+    varFields.map { vf =>
+      val places: List[Place] = vf.subfields
+        .filter { _.tag == "a" }
+        .map { sf: MarcSubfield => Place(label = sf.content) }
+
+      ProductionEvent(
+        places = places,
+        dates = List(),
+        agents = List(),
+        productionFunction = None
+      )
+    }
 }
