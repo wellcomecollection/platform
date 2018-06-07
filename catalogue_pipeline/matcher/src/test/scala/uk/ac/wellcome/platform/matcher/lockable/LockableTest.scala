@@ -1,13 +1,16 @@
 package uk.ac.wellcome.platform.matcher.lockable
 
+import java.util.concurrent.ForkJoinPool
+
 import com.gu.scanamo._
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.LocalLockTableDynamoDb
+import scala.collection.parallel.ForkJoinTaskSupport
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.util.Random
-
 import uk.ac.wellcome.storage.dynamo._
+
 
 class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   import Lockable._
@@ -102,6 +105,54 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
       val secondUnlock = secondUnlockOp.left.get
 
       secondUnlock shouldBe a[UnlockFailure]
+    }
+  }
+
+  it("only one processes can lock/unlock a locked Thing") {
+    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+      implicit val lockingService = new DynamoLockingService(
+        dynamoDbClient, table.name)
+
+      val lockUnlockCycles = 100
+      val parallelism = 8
+
+      // All locks/unlocks except one will fail in each cycle
+      val expectedFailedLockCount = parallelism - 1
+
+      val id = Random.nextString(32)
+      val thingToStore = ThingToStore(id, "value")
+
+      val taskSupport = new ForkJoinTaskSupport(
+        new ForkJoinPool(parallelism))
+
+      (1 to lockUnlockCycles).map(_ => {
+
+        // Create parallel collection for locking
+        val thingsToStore = (1 to parallelism)
+          .map(_ => thingToStore).par
+
+        // Set parallelism via taskSupport
+        thingsToStore.tasksupport = taskSupport
+
+        val locks = thingsToStore.map(_.lock)
+        val (lockLefts, lockRights) = locks.partition(_.isLeft)
+
+        lockLefts.size shouldBe expectedFailedLockCount
+        lockRights.size shouldBe 1
+
+        // Create parallel collection for unlocking
+        val thingsToUnlock = (1 to parallelism)
+          .map(_ => lockRights.head.right.get).par
+
+        // Set parallelism via taskSupport
+        thingsToUnlock.tasksupport = taskSupport
+
+        val unlocks = thingsToUnlock.map(_.unlock)
+        val (unlockLefts, unlockRights) = unlocks.partition(_.isLeft)
+
+        unlockLefts.size shouldBe expectedFailedLockCount
+        unlockRights.size shouldBe 1
+      })
     }
   }
 }
