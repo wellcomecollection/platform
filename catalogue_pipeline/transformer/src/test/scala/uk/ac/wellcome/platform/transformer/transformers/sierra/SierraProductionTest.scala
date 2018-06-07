@@ -21,23 +21,31 @@ class SierraProductionTest extends FunSpec with Matchers {
   }
 
   describe("MARC field 260") {
-    val varField = VarField(
-      marcTag = Some("260"),
-      fieldTag = "a",
-      subfields = List(
+    it("populates places from subfield a") {
+      val production = transform260ToProduction(subfields = List(
         MarcSubfield(tag = "a", content = "Paris"),
         MarcSubfield(tag = "a", content = "London")
-      )
-    )
-
-    it("populates places from subfield a") {
-      val production = transformToProduction(varFields = List(varField)).head
+      ))
 
       production.places shouldBe List(
         Place(label = "Paris"),
         Place(label = "London")
       )
     }
+  }
+
+  // Test helpers
+
+  private def transform260ToProduction(subfields: List[MarcSubfield]) = {
+    val varFields = List(
+      VarField(
+        marcTag = Some("260"),
+        fieldTag = "a",
+        subfields = subfields
+      )
+    )
+
+    transformToProduction(varFields = varFields).head
   }
 
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
