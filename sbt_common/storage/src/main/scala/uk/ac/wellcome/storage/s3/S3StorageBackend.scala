@@ -32,13 +32,13 @@ class S3StorageBackend @Inject()(s3Client: AmazonS3)(
 
     val generatedMetadata = generateMetadata(metadata)
 
-    info(s"Attempt: PUT object to s3://$bucketName/$key")
+    debug(s"Attempt: PUT object to s3://$bucketName/$key")
     val putObject = Future {
       s3Client.putObject(bucketName, key, input, generatedMetadata)
     }
 
     putObject.map { _ =>
-      info(s"Success: PUT object to s3://$bucketName/$key")
+      debug(s"Success: PUT object to s3://$bucketName/$key")
       ObjectLocation(bucketName, key)
     }
   }
@@ -47,7 +47,7 @@ class S3StorageBackend @Inject()(s3Client: AmazonS3)(
     val bucketName = location.namespace
     val key = location.key
 
-    info(s"Attempt: GET object from s3://$bucketName/$key")
+    debug(s"Attempt: GET object from s3://$bucketName/$key")
 
     val futureInputStream = Future {
       s3Client.getObject(bucketName, key).getObjectContent
@@ -55,7 +55,7 @@ class S3StorageBackend @Inject()(s3Client: AmazonS3)(
 
     futureInputStream.foreach {
       case _ =>
-        info(s"Success: GET object from s3://$bucketName/$key")
+        debug(s"Success: GET object from s3://$bucketName/$key")
     }
 
     futureInputStream

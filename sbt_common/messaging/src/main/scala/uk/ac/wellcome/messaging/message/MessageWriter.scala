@@ -47,7 +47,7 @@ class MessageWriter[T] @Inject()(
       )
       pointer <- Future.fromTry(toJson(MessagePointer(location)))
       publishAttempt <- sns.writeMessage(pointer, subject)
-      _ = info(publishAttempt)
+      _ = debug(publishAttempt)
     } yield ()
 
   }

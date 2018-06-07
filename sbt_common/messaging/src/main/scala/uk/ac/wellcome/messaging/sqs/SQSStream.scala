@@ -37,14 +37,14 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     implicit decoderT: Decoder[T]): Future[Done] =
     SqsSource(sqsConfig.queueUrl)(sqsClient)
       .mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
-        info(s"Processing message ${message.getMessageId}")
+        debug(s"Processing message ${message.getMessageId}")
         val metricName = s"${streamName}_ProcessMessage"
         metricsSender.timeAndCount(
           metricName,
           () => readAndProcess(streamName, message, process))
       }
       .map { m =>
-        info(s"Deleting message ${m.getMessageId}")
+        debug(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
       .runWith(SqsAckSink(sqsConfig.queueUrl)(sqsClient))
@@ -53,7 +53,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     streamName: String,
     message: Message,
     process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
-    info(s"Processing message ${message.getMessageId}")
+    debug(s"Processing message ${message.getMessageId}")
     val processMessageFuture = for {
       t <- Future.fromTry(read(message))
       _ <- process(t)
