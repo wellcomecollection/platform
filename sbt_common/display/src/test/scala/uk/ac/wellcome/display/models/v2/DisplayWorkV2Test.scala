@@ -304,6 +304,27 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
   }
 
+  it("extracts production events from a work") {
+    val productionEvent = ProductionEvent(
+      places = List(Place("London")),
+      agents = List(Unidentifiable(Agent("Macmillan"))),
+      dates = List(Period("2005")),
+      function = Some(Concept("Manufacture"))
+    )
+
+    val work = IdentifiedWork(
+      canonicalId = "ecgxstzd",
+      title = Some("Events entailing the exegesis of empires"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      production = List(productionEvent)
+    )
+
+    val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
+    displayWork.production shouldBe List(
+      DisplayProductionEvent(productionEvent, includesIdentifiers = false))
+  }
+
   describe("correctly uses the WorksIncludes.identifiers include") {
     val publisherSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),

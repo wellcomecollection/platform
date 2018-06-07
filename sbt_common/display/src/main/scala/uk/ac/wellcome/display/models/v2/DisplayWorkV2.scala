@@ -70,6 +70,9 @@ case class DisplayWorkV2(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
+    value = "Relates a work to its production events."
+  ) production: List[DisplayProductionEvent] = List(),
+  @ApiModelProperty(
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAbstractAgentV2] = List(),
   @ApiModelProperty(
@@ -141,6 +144,9 @@ case object DisplayWorkV2 {
             DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
+      production = work.production.map {
+        DisplayProductionEvent(_, includesIdentifiers = includes.identifiers)
+      },
       publishers = work.publishers.map {
         DisplayAbstractAgentV2(_, includesIdentifiers = includes.identifiers)
       },
