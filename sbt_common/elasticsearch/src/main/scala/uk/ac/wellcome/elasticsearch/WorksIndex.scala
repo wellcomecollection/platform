@@ -89,6 +89,8 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     keywordField("ontologyType")
   )
 
+  def period(fieldName: String) = labelledTextField(fieldName)
+
   def identified(fieldName: String, fields: Seq[FieldDefinition]) =
     objectField(fieldName).fields(
       textField("type"),
@@ -128,6 +130,13 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     keywordField("ontologyType")
   )
 
+  val production = objectField("production").fields(
+    period("places"),
+    identified("agents", agent),
+    date("dates"),
+    identified("function", concept)
+  )
+
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
     Seq(
       keywordField("canonicalId"),
@@ -155,6 +164,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       items,
       identified("publishers", agent),
       date("publicationDate"),
+      production,
       language,
       location("thumbnail"),
       textField("dimensions")
