@@ -39,7 +39,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   },
                |   {
                |     "type": "Work",
@@ -57,7 +58,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   },
                |   {
                |     "type": "Work",
@@ -75,7 +77,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }
                |  ]
                |}
@@ -157,7 +160,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |       }]}
                | ],
                | "publishers": [ ],
-               | "placesOfPublication": [ ]
+               | "placesOfPublication": [ ],
+               | "production": [ ]
                |}
           """.stripMargin
           )
@@ -197,7 +201,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
-               | "placesOfPublication": [ ]
+               | "placesOfPublication": [ ],
+               | "production": [ ]
                |}
           """.stripMargin
           )
@@ -243,7 +248,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }]
                |   }
                |  ]
@@ -279,7 +285,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }]
                |   }
                |  ]
@@ -315,7 +322,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }]
                |   }
                |  ]
@@ -374,7 +382,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }
                |  ]
                |}""".stripMargin
@@ -428,7 +437,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   },
                |   {
                |     "type": "Work",
@@ -439,7 +449,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }
                |  ]
                |}
@@ -481,7 +492,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
-               | "placesOfPublication": [ ]
+               | "placesOfPublication": [ ],
+               | "production": [ ]
                |}
           """.stripMargin
           )
@@ -521,7 +533,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
-               | "placesOfPublication": [ ]
+               | "placesOfPublication": [ ],
+               | "production": [ ]
                |}
           """.stripMargin
           )
@@ -542,7 +555,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "subjects": [ ],
                | "genres": [ ],
                | "publishers": [ ],
-               | "placesOfPublication": [ ]
+               | "placesOfPublication": [ ],
+               | "production": [ ]
                |}
           """.stripMargin
           )
@@ -584,7 +598,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }
                |  ]
                |}
@@ -608,7 +623,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "placesOfPublication": [ ],
+               |     "production": [ ]
                |   }
                |  ]
                |}
@@ -650,6 +666,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "genres": [ ],
                |     "publishers": [ ],
                |     "placesOfPublication": [ ],
+               |     "production": [ ],
                |     "thumbnail": ${location(work.thumbnail.get)}
                |    }
                |  ]
@@ -699,7 +716,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
-                 |     "placesOfPublication": [ ]
+                 |     "placesOfPublication": [ ],
+                 |     "production": [ ]
                  |   }
                  |  ]
                  |}
