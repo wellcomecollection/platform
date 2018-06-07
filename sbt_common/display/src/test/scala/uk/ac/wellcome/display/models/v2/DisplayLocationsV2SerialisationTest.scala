@@ -50,7 +50,8 @@ class DisplayLocationsV2SerialisationTest
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
-                            |  "placesOfPublication": [ ]
+                            |  "placesOfPublication": [ ],
+                            |  "production": [ ]
                             |}""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)

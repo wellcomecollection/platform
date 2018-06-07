@@ -52,7 +52,8 @@ class DisplayWorkV2SerialisationTest
        | "subjects": [ ],
        | "genres": [ ],
        | "publishers": [ ],
-       | "placesOfPublication": [ ]
+       | "placesOfPublication": [ ],
+       | "production": [ ]
        |}
           """.stripMargin
 
@@ -84,7 +85,8 @@ class DisplayWorkV2SerialisationTest
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "placesOfPublication": [ ],
+                          | "production": [ ]
                           |}
           """.stripMargin
 
@@ -109,7 +111,8 @@ class DisplayWorkV2SerialisationTest
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "placesOfPublication": [ ],
+                          | "production": [ ]
                           |}
           """.stripMargin
 
@@ -147,6 +150,7 @@ class DisplayWorkV2SerialisationTest
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ],
+                          |     "production": [ ],
                           |     "items": [
                           |       {
                           |         "id": "${item.canonicalId}",
@@ -190,7 +194,8 @@ class DisplayWorkV2SerialisationTest
                             workWithSubjects.subjects)} ],
                           |     "genres": [ ],
                           |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
+                          |     "placesOfPublication": [ ],
+                          |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -223,7 +228,8 @@ class DisplayWorkV2SerialisationTest
                           |     "subjects": [ ],
                           |     "genres": [ ${genres(workWithSubjects.genres)} ],
                           |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
+                          |     "placesOfPublication": [ ],
+                          |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -252,7 +258,8 @@ class DisplayWorkV2SerialisationTest
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "placesOfPublication": [ ],
+                          | "production": [ ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -277,7 +284,8 @@ class DisplayWorkV2SerialisationTest
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "placesOfPublication": [ ],
+                          | "production": [ ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -306,6 +314,7 @@ class DisplayWorkV2SerialisationTest
                           |     "genres": [ ],
                           |     "publishers": [ ],
                           |     "placesOfPublication": [ ],
+                          |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }
           """.stripMargin
