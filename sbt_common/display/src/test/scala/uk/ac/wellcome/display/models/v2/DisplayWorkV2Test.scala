@@ -241,12 +241,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   describe("correctly uses the WorksIncludes.identifiers include") {
-    val publisherSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/boo",
-      ontologyType = "Agent"
-    )
-
     val contributorAgentSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),
       value = "lcnames/007",
@@ -318,13 +312,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             identifiers = List(contributorPersonSourceIdentifier)
           ),
           roles = List()
-        )
-      ),
-      publishers = List(
-        Identified(
-          Agent(label = "Brilliant Books"),
-          canonicalId = "bq5s3rzs",
-          identifiers = List(publisherSourceIdentifier)
         )
       ),
       items = List(
