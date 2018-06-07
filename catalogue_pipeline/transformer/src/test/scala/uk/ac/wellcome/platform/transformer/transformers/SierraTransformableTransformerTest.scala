@@ -167,14 +167,15 @@ class SierraTransformableTransformerTest
     val title = "Hi Diddle Dee Dee"
     val lettering = "An actor's life for me"
 
-    val publisherFields = List(
+    val productionFields = List(
       VarField(
         fieldTag = "p",
         marcTag = "260",
         indicator1 = " ",
         indicator2 = " ",
         subfields = List(
-          MarcSubfield(tag = "b", content = "Peaceful Poetry")
+          MarcSubfield(tag = "b", content = "Peaceful Poetry"),
+          MarcSubfield(tag = "c", content = "1923.")
         )
       )
     )
@@ -210,22 +211,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val publishingDateFields = List(
-      VarField(
-        fieldTag = "?",
-        marcTag = "260",
-        indicator1 = " ",
-        indicator2 = " ",
-        subfields = List(
-          MarcSubfield(
-            tag = "c",
-            content = "1923."
-          )
-        )
-      )
-    )
-
-    val marcFields = publisherFields ++ descriptionFields ++ letteringFields ++ publishingDateFields
+    val marcFields = productionFields ++ descriptionFields ++ letteringFields
 
     val data =
       s"""
@@ -255,10 +241,15 @@ class SierraTransformableTransformerTest
       version = 1,
       identifiers = List(sourceIdentifier, sierraIdentifier),
       description = Some("A delightful description of a dead daisy."),
-      publishers =
-        List(Unidentifiable(Organisation(label = "Peaceful Poetry"))),
-      lettering = Some(lettering),
-      publicationDate = Some(Period("1923."))
+      production = List(
+        ProductionEvent(
+          places = List(),
+          agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
+          dates = List(Period("1923.")),
+          function = None
+        )
+      ),
+      lettering = Some(lettering)
     )
   }
 
@@ -375,36 +366,6 @@ class SierraTransformableTransformerTest
 
     val work = transformDataToWork(id = id, data = data)
     work.extent shouldBe Some(extent)
-  }
-
-  it("includes place of publications") {
-    val id = "8008008"
-    val place = "Purple pages"
-
-    val data =
-      s"""
-         | {
-         |   "id": "$id",
-         |   "title": "English earwigs earn evidence of evil",
-         |   "varFields": [
-         |     {
-         |       "fieldTag": "a",
-         |       "marcTag": "260",
-         |       "ind1": " ",
-         |       "ind2": " ",
-         |       "subfields": [
-         |         {
-         |           "tag": "a",
-         |           "content": "$place"
-         |         }
-         |       ]
-         |     }
-         |   ]
-         | }
-      """.stripMargin
-
-    val work = transformDataToWork(id = id, data = data)
-    work.placesOfPublication shouldBe List(Place(label = place))
   }
 
   it("includes the work type, if present") {

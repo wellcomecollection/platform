@@ -25,11 +25,8 @@ class SierraTransformableTransformer
     with SierraItems
     with SierraLanguage
     with SierraLettering
-    with SierraPublishers
     with SierraTitle
     with SierraLocation
-    with SierraPublicationDate
-    with SierraPlaceOfPublication
     with SierraProduction
     with SierraDimensions
     with SierraSubjects
@@ -63,11 +60,8 @@ class SierraTransformableTransformer
               extent = getExtent(sierraBibData),
               lettering = getLettering(sierraBibData),
               items = getItems(sierraTransformable),
-              publishers = getPublishers(sierraBibData),
               visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               production = getProduction(sierraBibData),
-              publicationDate = getPublicationDate(sierraBibData),
-              placesOfPublication = getPlacesOfPublication(sierraBibData),
               language = getLanguage(sierraBibData),
               contributors = getContributors(sierraBibData),
               dimensions = getDimensions(sierraBibData),
