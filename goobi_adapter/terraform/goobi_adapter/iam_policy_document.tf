@@ -1,5 +1,5 @@
 data "aws_s3_bucket" "goobi_data" {
-  bucket = "${var.goobi_items_bucket_name}"
+  bucket = "${var.goobi_mets_bucket_name}"
 }
 
 data "aws_iam_policy_document" "allow_s3_access" {
@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "allow_s3_access" {
   }
 }
 
-data "aws_iam_policy_document" "read_from_goobi_items_q" {
+data "aws_iam_policy_document" "read_from_goobi_mets_q" {
   statement {
     actions = [
       "sqs:DeleteMessage",
@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "read_from_goobi_items_q" {
     ]
 
     resources = [
-      "${module.goobi_items_queue.arn}",
+      "${module.goobi_mets_queue.arn}",
     ]
   }
 }

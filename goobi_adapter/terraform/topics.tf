@@ -1,3 +1,8 @@
+resource "aws_sns_topic" "goobi_notifications_topic" {
+  name = "s3-goobi-event-notifications"
+  policy = "${data.aws_iam_policy_document.publish_to_topic.json}"
+}
+
 data "aws_iam_policy_document" "publish_to_topic" {
   statement {
     actions = [
@@ -19,10 +24,5 @@ data "aws_iam_policy_document" "publish_to_topic" {
       values =["${aws_s3_bucket.goobi_adapter.arn}"]
     }
   }
-}
-
-resource "aws_sns_topic" "goobi_notifications_topic" {
-  name = "s3-goobi-event-notifications"
-  policy = "${data.aws_iam_policy_document.publish_to_topic.json}"
 }
 

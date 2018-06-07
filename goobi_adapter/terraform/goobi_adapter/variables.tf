@@ -1,6 +1,6 @@
-variable "goobi_items_queue_name" {}
-variable "goobi_items_bucket_name" {}
-variable "goobi_items_topic" {}
+variable "goobi_mets_queue_name" {}
+variable "goobi_mets_bucket_name" {}
+variable "goobi_mets_topic" {}
 
 variable "release_id" {}
 variable "ecr_repository_url" {}

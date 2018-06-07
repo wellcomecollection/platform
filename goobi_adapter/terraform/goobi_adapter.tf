@@ -1,8 +1,8 @@
 module "goobi_adapter" {
   source                  = "./goobi_adapter"
-  goobi_items_queue_name  = "goobi_items"
-  goobi_items_bucket_name = "${aws_s3_bucket.goobi_adapter.id}"
-  goobi_items_topic       = "${aws_sns_topic.goobi_notifications_topic.name}"
+  goobi_mets_queue_name  = "goobi_mets"
+  goobi_mets_bucket_name = "${aws_s3_bucket.goobi_adapter.id}"
+  goobi_mets_topic       = "${aws_sns_topic.goobi_notifications_topic.name}"
 
   release_id         = "${var.release_ids["goobi_reader"]}"
   ecr_repository_url = "${module.ecr_repository_goobi_reader.repository_url}"

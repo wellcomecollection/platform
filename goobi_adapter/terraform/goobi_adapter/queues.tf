@@ -1,9 +1,9 @@
-module "goobi_items_queue" {
+module "goobi_mets_queue" {
   source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v8.0.0"
-  queue_name  = "${var.goobi_items_queue_name}"
+  queue_name  = "${var.goobi_mets_queue_name}"
   aws_region  = "${var.aws_region}"
   account_id  = "${var.account_id}"
-  topic_names = ["${var.goobi_items_topic}"]
+  topic_names = ["${var.goobi_mets_topic}"]
 
   visibility_timeout_seconds = 300
 

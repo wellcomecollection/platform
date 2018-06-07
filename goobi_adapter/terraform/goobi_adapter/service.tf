@@ -9,11 +9,11 @@ module "goobi_reader_service" {
   ecr_repository_url = "${var.ecr_repository_url}"
   release_id         = "${var.release_id}"
 
-  source_queue_name = "${module.goobi_items_queue.name}"
-  source_queue_arn  = "${module.goobi_items_queue.arn}"
+  source_queue_name = "${module.goobi_mets_queue.name}"
+  source_queue_arn  = "${module.goobi_mets_queue.arn}"
 
   env_vars = {
-    goobi_items_queue_url  = "${module.goobi_items_queue.id}"
+    goobi_mets_queue_url  = "${module.goobi_mets_queue.id}"
     metrics_namespace      = "${local.service_name}"
     vhs_goobi_tablename    = "${var.vhs_goobi_tablename}"
     vhs_goobi_bucketname   = "${var.vhs_goobi_bucketname}"
