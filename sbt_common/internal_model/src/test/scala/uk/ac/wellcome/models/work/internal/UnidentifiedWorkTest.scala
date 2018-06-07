@@ -226,15 +226,31 @@ class UnidentifiedWorkTest
       |    }
       |  ],
       |  "visible":true,
-      |  "publicationDate": {
-      |    "label": "$publicationDate",
-      |    "ontologyType": "Period"
-      |  },
-      |  "placesOfPublication": [
-      |   {
-      |     "label": "Madrid",
-      |     "ontologyType": "Place"
-      |   }
+      |  "production": [
+      |    {
+      |      "agents": [
+      |        {
+      |          "agent": {
+      |            "label": "MIT Press",
+      |            "type": "Agent"
+      |          },
+      |          "type": "Unidentifiable"
+      |        }
+      |      ],
+      |      "dates": [
+      |        {
+      |          "label": "$publicationDate",
+      |          "ontologyType": "Period"
+      |        }
+      |      ],
+      |      "places": [
+      |        {
+      |          "label": "Madrid",
+      |          "ontologyType": "Place"
+      |        }
+      |      ],
+      |      "function": null
+      |    }
       |  ],
       |   "language": {
       |     "id": "${language.id}",
@@ -270,12 +286,6 @@ class UnidentifiedWorkTest
     locations = List(location)
   )
 
-  val publisher = Organisation(
-    label = "MIT Press"
-  )
-
-  val publishers = List(Unidentifiable(publisher))
-
   val unidentifiedWork = UnidentifiedWork(
     title = Some("title"),
     sourceIdentifier = workIdentifier,
@@ -295,9 +305,14 @@ class UnidentifiedWorkTest
     genres = List(genre),
     thumbnail = Some(location),
     items = List(item),
-    publishers = publishers,
-    publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(Place("Madrid")),
+    production = List(
+      ProductionEvent(
+        places = List(Place(label = "Madrid")),
+        agents = List(Unidentifiable(Agent(label = "MIT Press"))),
+        dates = List(Period(publicationDate)),
+        function = None
+      )
+    ),
     language = Some(language),
     dimensions = Some(dimensions)
   )
