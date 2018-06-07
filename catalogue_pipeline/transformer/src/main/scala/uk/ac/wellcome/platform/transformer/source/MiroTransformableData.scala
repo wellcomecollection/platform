@@ -54,8 +54,25 @@ case object MiroTransformableData {
   def create(data: String): MiroTransformableData = {
     val unescapedData = unescapeHtml(data)
 
+    // We have a very small number of records where the image_source_code
+    // field is a list, not a string.  They all contain the value
+    // ["GUS", "TO-DELETE"], which causes a JSON decoding error.  We could
+    // define a custom Circe decoder for this, but that's more complicated
+    // than it's worth!  A string substitution is a good enough workaround.
+    //
+    val tidiedData = unescapedData.replaceAllLiterally(
+      """
+        "image_source_code":["GUS","TO-DELETE"]
+      """.trim,
+      """
+        "image_source_code":"GUS"
+      """.trim
+    )
+
+    println(s"@@AWLC ||${tidiedData}||")
+
     val tryMiroTransformableData =
-      createMiroTransformableData(unescapedData)
+      createMiroTransformableData(tidiedData)
 
     val miroTransformableData: MiroTransformableData =
       tryMiroTransformableData match {
