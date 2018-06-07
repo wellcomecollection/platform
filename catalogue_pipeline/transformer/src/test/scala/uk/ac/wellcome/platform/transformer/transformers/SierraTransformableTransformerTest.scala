@@ -596,7 +596,7 @@ class SierraTransformableTransformerTest
         places = List(Place(placeLabel)),
         agents = List(),
         dates = List(),
-        productionFunction = None
+        function = None
       )
     )
   }

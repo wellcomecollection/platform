@@ -4,6 +4,6 @@ case class ProductionEvent[+T <: IdentityState[AbstractAgent]](
   places: List[Place],
   agents: List[T],
   dates: List[Period],
-  productionFunction: Option[Concept],
+  function: Option[Concept],
   ontologyType: String = "ProductionEvent"
 )

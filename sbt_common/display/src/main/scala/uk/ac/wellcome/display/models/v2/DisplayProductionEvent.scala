@@ -25,7 +25,7 @@ object DisplayProductionEvent {
       places = productionEvent.places.map { DisplayPlace(_) },
       agents = productionEvent.agents.map { DisplayAbstractAgentV2(_, includesIdentifiers = includesIdentifiers) },
       dates = productionEvent.dates.map { DisplayPeriod(_) },
-      function = productionEvent.productionFunction.map { concept: Concept =>
+      function = productionEvent.function.map { concept: Concept =>
         DisplayConcept(label = concept.label)
       }
     )

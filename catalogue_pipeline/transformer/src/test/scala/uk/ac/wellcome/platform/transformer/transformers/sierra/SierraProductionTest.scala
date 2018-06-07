@@ -69,7 +69,7 @@ class SierraProductionTest extends FunSpec with Matchers {
         MarcSubfield(tag = "c", content = "1973")
       ))
 
-      production.productionFunction shouldBe None
+      production.function shouldBe None
     }
 
     it("populates places from a and e, and sets the function as Manufacture") {
@@ -85,7 +85,7 @@ class SierraProductionTest extends FunSpec with Matchers {
         Place(label = "[Philadelphia]")
       )
 
-      production.productionFunction shouldBe Some(Concept("Manufacture"))
+      production.function shouldBe Some(Concept("Manufacture"))
     }
 
     it("populates agents from b and f, and sets the function as Manufacture") {
@@ -101,7 +101,7 @@ class SierraProductionTest extends FunSpec with Matchers {
         Unidentifiable(Agent(label = "US Dept of Energy"))
       )
 
-      production.productionFunction shouldBe Some(Concept("Manufacture"))
+      production.function shouldBe Some(Concept("Manufacture"))
     }
 
     it("populates dates from c and g, and sets the function as Manufacture") {
@@ -117,7 +117,7 @@ class SierraProductionTest extends FunSpec with Matchers {
         Period(label = "1973 printing")
       )
 
-      production.productionFunction shouldBe Some(Concept("Manufacture"))
+      production.function shouldBe Some(Concept("Manufacture"))
     }
 
     it("picks up multiple instances of the 260 field") {
@@ -155,7 +155,7 @@ class SierraProductionTest extends FunSpec with Matchers {
             Unidentifiable(Agent("CTD Printers"))
           ),
           dates = List(Period("1976"), Period("1974")),
-          productionFunction = Some(Concept("Manufacture"))
+          function = Some(Concept("Manufacture"))
         ),
         ProductionEvent(
           places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
@@ -164,7 +164,7 @@ class SierraProductionTest extends FunSpec with Matchers {
             Unidentifiable(Agent("National Technical Information Service"))
           ),
           dates = List(Period("1974-")),
-          productionFunction = None
+          function = None
         )
       )
 
@@ -277,13 +277,13 @@ class SierraProductionTest extends FunSpec with Matchers {
           places = List(Place("Columbia, S.C.")),
           agents = List(Unidentifiable(Agent("H.W. Williams Co."))),
           dates = List(Period("1982")),
-          productionFunction = Some(Concept("Publication"))
+          function = Some(Concept("Publication"))
         ),
         ProductionEvent(
           places = List(Place("Washington")),
           agents = List(Unidentifiable(Agent("U.S. G.P.O."))),
           dates = List(Period("1981-")),
-          productionFunction = Some(Concept("Distribution"))
+          function = Some(Concept("Distribution"))
         )
       )
 
@@ -328,7 +328,7 @@ class SierraProductionTest extends FunSpec with Matchers {
     )
 
     val production = transformToProduction(varFields = varFields).head
-    production.productionFunction shouldBe Some(Concept(expectedFunction))
+    production.function shouldBe Some(Concept(expectedFunction))
   }
 
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {

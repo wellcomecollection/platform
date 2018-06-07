@@ -77,7 +77,7 @@ trait SierraProduction {
         places = places ++ extraPlaces,
         agents = agents ++ extraAgents,
         dates = dates ++ extraDates,
-        productionFunction = productionFunction
+        function = productionFunction
       )
     }
 
@@ -123,7 +123,7 @@ trait SierraProduction {
       places = places,
       agents = agents,
       dates = dates,
-      productionFunction = productionFunction
+      function = productionFunction
     )
   }
 

@@ -9,7 +9,7 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
       places = List(Place("London")),
       agents = List(Unidentifiable(Agent("Macmillan"))),
       dates = List(Period("2005")),
-      productionFunction = Some(Concept("Manufacture"))
+      function = Some(Concept("Manufacture"))
     )
 
     val displayProductionEvent = DisplayProductionEvent(
@@ -32,7 +32,7 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
       places = List(Place("New York")),
       agents = List(Unidentifiable(Agent("US GPO"))),
       dates = List(Period("2010")),
-      productionFunction = None
+      function = None
     )
 
     val displayProductionEvent = DisplayProductionEvent(
