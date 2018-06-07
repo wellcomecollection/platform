@@ -7,6 +7,7 @@ data "aws_iam_policy_document" "allow_s3_access" {
     actions = [
       "s3:GetObject",
     ]
+
     resources = [
       "${data.aws_s3_bucket.goobi_data.arn}",
       "${data.aws_s3_bucket.goobi_data.arn}/*",
@@ -20,6 +21,7 @@ data "aws_iam_policy_document" "read_from_goobi_items_q" {
       "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
     ]
+
     resources = [
       "${module.goobi_items_queue.arn}",
     ]
@@ -31,6 +33,7 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
     actions = [
       "cloudwatch:PutMetricData",
     ]
+
     resources = [
       "*",
     ]

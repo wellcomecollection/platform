@@ -4,15 +4,16 @@ module "goobi_adapter" {
   goobi_items_bucket_name = "${aws_s3_bucket.goobi_adapter.id}"
   goobi_items_topic       = "${module.goobi_bucket_notifications_topic.name}"
 
-  release_id              = "${var.release_ids["goobi_reader"]}"
-  ecr_repository_url      = "${module.ecr_repository_goobi_reader.repository_url}"
+  release_id         = "${var.release_ids["goobi_reader"]}"
+  ecr_repository_url = "${module.ecr_repository_goobi_reader.repository_url}"
 
-  dlq_alarm_arn           = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
-  vpc_id                  = "${module.vpc_goobi_adapter.vpc_id}"
-//  cluster_name            = "${aws_ecs_cluster.goobi_adapter_cluster.name}"
-//  ecs_launch_type         = "FARGATE"
-  account_id              = "${data.aws_caller_identity.current.account_id}"
+  vpc_id = "${module.vpc_goobi_adapter.vpc_id}"
+
+  //  cluster_name            = "${aws_ecs_cluster.goobi_adapter_cluster.name}"
+  //  ecs_launch_type         = "FARGATE"
+  account_id = "${data.aws_caller_identity.current.account_id}"
 
   cluster_name = "${module.goobi_adapter_cluster.cluster_name}"
 

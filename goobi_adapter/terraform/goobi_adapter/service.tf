@@ -9,12 +9,12 @@ module "goobi_reader_service" {
   ecr_repository_url = "${var.ecr_repository_url}"
   release_id         = "${var.release_id}"
 
-  source_queue_name  = "${module.goobi_items_queue.name}"
-  source_queue_arn   = "${module.goobi_items_queue.arn}"
+  source_queue_name = "${module.goobi_items_queue.name}"
+  source_queue_arn  = "${module.goobi_items_queue.arn}"
 
   env_vars = {
     goobi_items_queue_url = "${module.goobi_items_queue.id}"
-    metrics_namespace = "${local.service_name}"
+    metrics_namespace     = "${local.service_name}"
   }
 
   env_vars_length = 2
@@ -22,9 +22,10 @@ module "goobi_reader_service" {
   cpu    = 512
   memory = 2048
 
-  cluster_name    = "${var.cluster_name}"
-//  ecs_launch_type = "${var.ecs_launch_type}"
-  vpc_id          = "${var.vpc_id}"
+  cluster_name = "${var.cluster_name}"
+
+  //  ecs_launch_type = "${var.ecs_launch_type}"
+  vpc_id = "${var.vpc_id}"
 
   alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
   alb_listener_https_arn     = "${var.alb_listener_https_arn}"
