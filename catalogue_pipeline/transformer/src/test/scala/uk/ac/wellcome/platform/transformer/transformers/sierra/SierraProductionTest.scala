@@ -150,20 +150,20 @@ class SierraProductionTest extends FunSpec with Matchers {
       val expectedProductions = List(
         ProductionEvent(
           places = List(Place("London"), Place("Twickenham")),
-          dates = List(Period("1976"), Period("1974")),
           agents = List(
             Unidentifiable(Agent("Arts Council of Great Britain")),
             Unidentifiable(Agent("CTD Printers"))
           ),
+          dates = List(Period("1976"), Period("1974")),
           productionFunction = Some(Concept("Manufacture"))
         ),
         ProductionEvent(
           places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
-          dates = List(Period("1974-")),
           agents = List(
             Unidentifiable(Agent("Toxicology Information Program, National Library of Medicine")),
             Unidentifiable(Agent("National Technical Information Service"))
           ),
+          dates = List(Period("1974-")),
           productionFunction = None
         )
       )

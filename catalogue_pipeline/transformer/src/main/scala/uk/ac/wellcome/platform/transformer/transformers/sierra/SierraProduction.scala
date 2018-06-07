@@ -75,8 +75,8 @@ trait SierraProduction {
 
       ProductionEvent(
         places = places ++ extraPlaces,
-        dates = dates ++ extraDates,
         agents = agents ++ extraAgents,
+        dates = dates ++ extraDates,
         productionFunction = productionFunction
       )
     }
