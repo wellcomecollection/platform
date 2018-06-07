@@ -365,8 +365,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "contributors": [],
                |     "subjects": [ ],
                |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ],
                |     "production": [ ]
                |   }
                |  ]
