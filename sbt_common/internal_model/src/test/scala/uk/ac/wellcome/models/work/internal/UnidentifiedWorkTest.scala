@@ -216,15 +216,6 @@ class UnidentifiedWorkTest
       |      "ontologyType": "Item"
       |    }
       |  ],
-      |  "publishers" : [
-      |    {
-      |      "agent" : {
-      |        "label" : "MIT Press",
-      |        "type" : "Organisation"
-      |      },
-      |      "type" : "Unidentifiable"
-      |    }
-      |  ],
       |  "visible":true,
       |  "production": [
       |    {
