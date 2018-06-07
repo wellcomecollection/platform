@@ -49,8 +49,6 @@ class DisplayLocationsV2SerialisationTest
                             |  "items": [ ${items(work.items)} ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
-                            |  "publishers": [],
-                            |  "placesOfPublication": [ ],
                             |  "production": [ ]
                             |}""".stripMargin
 
