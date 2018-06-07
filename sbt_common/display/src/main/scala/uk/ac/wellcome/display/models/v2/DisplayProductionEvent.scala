@@ -6,7 +6,8 @@ import uk.ac.wellcome.models.work.internal._
 
 @ApiModel(
   value = "ProductionEvent",
-  description = "An event contributing to the production, publishing or distribution of a work."
+  description =
+    "An event contributing to the production, publishing or distribution of a work."
 )
 case class DisplayProductionEvent(
   @ApiModelProperty places: List[DisplayPlace],
@@ -23,7 +24,9 @@ object DisplayProductionEvent {
             includesIdentifiers: Boolean): DisplayProductionEvent = {
     DisplayProductionEvent(
       places = productionEvent.places.map { DisplayPlace(_) },
-      agents = productionEvent.agents.map { DisplayAbstractAgentV2(_, includesIdentifiers = includesIdentifiers) },
+      agents = productionEvent.agents.map {
+        DisplayAbstractAgentV2(_, includesIdentifiers = includesIdentifiers)
+      },
       dates = productionEvent.dates.map { DisplayPeriod(_) },
       function = productionEvent.function.map { concept: Concept =>
         DisplayConcept(label = concept.label)

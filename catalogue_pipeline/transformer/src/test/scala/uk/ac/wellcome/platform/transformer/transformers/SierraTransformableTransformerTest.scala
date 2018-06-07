@@ -524,7 +524,6 @@ class SierraTransformableTransformerTest
       Subject(content, List(Unidentifiable(Concept(content)))))
   }
 
-
   it("adds production events if possible") {
     val id = "9876789"
     val placeLabel = "London"

@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 trait SierraProduction {
 
@@ -18,16 +22,22 @@ trait SierraProduction {
   //
   def getProduction(bibData: SierraBibData)
     : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
-    val maybeMarc260fields = bibData.varFields.filter { _.marcTag == Some("260") }
-    val maybeMarc264fields = bibData.varFields.filter { _.marcTag == Some("264") }
+    val maybeMarc260fields = bibData.varFields.filter {
+      _.marcTag == Some("260")
+    }
+    val maybeMarc264fields = bibData.varFields.filter {
+      _.marcTag == Some("264")
+    }
 
     (maybeMarc260fields, maybeMarc264fields) match {
       case (Nil, Nil) => List()
       case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
       case (Nil, marc264fields) => getProductionFrom264Fields(marc264fields)
-      case (_, _) => throw new GracefulFailureException(new RuntimeException(
-        "Record has both 260 and 264 fields; this is a cataloguing error."
-      ))
+      case (_, _) =>
+        throw new GracefulFailureException(
+          new RuntimeException(
+            "Record has both 260 and 264 fields; this is a cataloguing error."
+          ))
     }
   }
 
@@ -69,9 +79,10 @@ trait SierraProduction {
       val extraAgents = agentsFromSubfields(vf, subfieldTag = "f")
       val extraDates = datesFromSubfields(vf, subfieldTag = "g")
 
-      val productionFunction = if (extraPlaces != Nil || extraAgents != Nil || extraDates != Nil) {
-        Some(Concept(label = "Manufacture"))
-      } else None
+      val productionFunction =
+        if (extraPlaces != Nil || extraAgents != Nil || extraDates != Nil) {
+          Some(Concept(label = "Manufacture"))
+        } else None
 
       ProductionEvent(
         places = places ++ extraPlaces,
@@ -102,44 +113,57 @@ trait SierraProduction {
   // https://www.loc.gov/marc/bibliographic/bd264.html
   //
   private def getProductionFrom264Fields(varFields: List[VarField]) =
-  varFields.map { vf =>
-    val places = placesFromSubfields(vf, subfieldTag = "a")
-    val agents = agentsFromSubfields(vf, subfieldTag = "b")
-    val dates = datesFromSubfields(vf, subfieldTag = "c")
+    varFields.map { vf =>
+      val places = placesFromSubfields(vf, subfieldTag = "a")
+      val agents = agentsFromSubfields(vf, subfieldTag = "b")
+      val dates = datesFromSubfields(vf, subfieldTag = "c")
 
-    val productionFunctionLabel = vf.indicator2 match {
-      case Some("0") => "Production"
-      case Some("1") => "Publication"
-      case Some("2") => "Distribution"
-      case Some("3") => "Manufacture"
-      case other => throw GracefulFailureException(new RuntimeException(
-        s"Unrecognised second indicator for production function: [$other]"
-      ))
+      val productionFunctionLabel = vf.indicator2 match {
+        case Some("0") => "Production"
+        case Some("1") => "Publication"
+        case Some("2") => "Distribution"
+        case Some("3") => "Manufacture"
+        case other =>
+          throw GracefulFailureException(new RuntimeException(
+            s"Unrecognised second indicator for production function: [$other]"
+          ))
+      }
+
+      val productionFunction = Some(Concept(label = productionFunctionLabel))
+
+      ProductionEvent(
+        places = places,
+        agents = agents,
+        dates = dates,
+        function = productionFunction
+      )
     }
 
-    val productionFunction = Some(Concept(label = productionFunctionLabel))
-
-    ProductionEvent(
-      places = places,
-      agents = agents,
-      dates = dates,
-      function = productionFunction
-    )
-  }
-
-  private def placesFromSubfields(vf: VarField, subfieldTag: String): List[Place] =
+  private def placesFromSubfields(vf: VarField,
+                                  subfieldTag: String): List[Place] =
     vf.subfields
-      .filter { _.tag == subfieldTag}
-      .map { sf: MarcSubfield => Place(label = sf.content) }
+      .filter { _.tag == subfieldTag }
+      .map { sf: MarcSubfield =>
+        Place(label = sf.content)
+      }
 
-  private def agentsFromSubfields(vf: VarField, subfieldTag: String): List[Unidentifiable[Agent]] =
+  private def agentsFromSubfields(
+    vf: VarField,
+    subfieldTag: String): List[Unidentifiable[Agent]] =
     vf.subfields
-      .filter { _.tag == subfieldTag}
-      .map { sf: MarcSubfield => Agent(label = sf.content) }
-      .map { ag: Agent => Unidentifiable(ag) }
+      .filter { _.tag == subfieldTag }
+      .map { sf: MarcSubfield =>
+        Agent(label = sf.content)
+      }
+      .map { ag: Agent =>
+        Unidentifiable(ag)
+      }
 
-  private def datesFromSubfields(vf: VarField, subfieldTag: String): List[Period] =
+  private def datesFromSubfields(vf: VarField,
+                                 subfieldTag: String): List[Period] =
     vf.subfields
-      .filter { _.tag == subfieldTag}
-      .map { sf: MarcSubfield => Period(label = sf.content) }
+      .filter { _.tag == subfieldTag }
+      .map { sf: MarcSubfield =>
+        Period(label = sf.content)
+      }
 }

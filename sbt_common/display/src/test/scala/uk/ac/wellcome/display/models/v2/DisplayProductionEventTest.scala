@@ -13,15 +13,17 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
     )
 
     val displayProductionEvent = DisplayProductionEvent(
-      productionEvent, includesIdentifiers = false
+      productionEvent,
+      includesIdentifiers = false
     )
     displayProductionEvent shouldBe DisplayProductionEvent(
       places = List(DisplayPlace(label = "London")),
-      agents = List(DisplayAgentV2(
-        id = None,
-        identifiers = None,
-        label = "Macmillan"
-      )),
+      agents = List(
+        DisplayAgentV2(
+          id = None,
+          identifiers = None,
+          label = "Macmillan"
+        )),
       dates = List(DisplayPeriod(label = "2005")),
       function = Some(DisplayConcept(label = "Manufacture"))
     )
@@ -36,7 +38,8 @@ class DisplayProductionEventTest extends FunSpec with Matchers {
     )
 
     val displayProductionEvent = DisplayProductionEvent(
-      productionEvent, includesIdentifiers = false
+      productionEvent,
+      includesIdentifiers = false
     )
     displayProductionEvent.function shouldBe None
   }
