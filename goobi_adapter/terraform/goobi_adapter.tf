@@ -22,4 +22,8 @@ module "goobi_adapter" {
   alb_cloudwatch_id          = "${module.goobi_adapter_cluster.alb_cloudwatch_id}"
   alb_listener_http_arn      = "${module.goobi_adapter_cluster.alb_listener_http_arn}"
   alb_listener_https_arn     = "${module.goobi_adapter_cluster.alb_listener_https_arn}"
+
+  goobi_vhs_tablename           = "${local.goobi_vhs_table_name}"
+  goobi_vhs_bucketname          = "${local.goobi_vhs_bucket_name}"
+  goobi_vhs_full_access_policy  = "${local.goobi_vhs_full_access_policy}"
 }

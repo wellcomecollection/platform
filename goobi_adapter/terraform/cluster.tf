@@ -1,5 +1,5 @@
 //resource "aws_ecs_cluster" "goobi_adapter_cluster" {
-//  name = "goobi-adapter-cluster"
+//  name = "goobi-adapter"
 //}
 module "goobi_adapter_cluster" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
@@ -18,5 +18,5 @@ module "goobi_adapter_cluster" {
 
   alb_log_bucket_id = "${local.alb_log_bucket_id}"
 
-  asg_spot_max = "10"
+  asg_spot_max = "5"
 }

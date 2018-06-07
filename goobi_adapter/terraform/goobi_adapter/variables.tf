@@ -21,3 +21,7 @@ variable "alb_listener_https_arn" {}
 variable "alb_listener_http_arn" {}
 variable "alb_server_error_alarm_arn" {}
 variable "alb_client_error_alarm_arn" {}
+variable "goobi_vhs_tablename" {}
+variable "goobi_vhs_bucketname" {}
+variable "goobi_vhs_full_access_policy" {}
+

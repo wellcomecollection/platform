@@ -1,2 +1,5 @@
 -aws.sqs.queue.url=${goobi_items_queue_url}
 -aws.metrics.namespace=${metrics_namespace}
+-aws.vhs.dynamo.tableName=${goobi_vhs_tablename}
+-aws.vhs.s3.bucketName=${goobi_vhs_bucketname}
+-aws.vhs.s3.globalPrefix=goobi

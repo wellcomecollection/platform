@@ -13,11 +13,13 @@ module "goobi_reader_service" {
   source_queue_arn  = "${module.goobi_items_queue.arn}"
 
   env_vars = {
-    goobi_items_queue_url = "${module.goobi_items_queue.id}"
-    metrics_namespace     = "${local.service_name}"
+    goobi_items_queue_url  = "${module.goobi_items_queue.id}"
+    metrics_namespace      = "${local.service_name}"
+    goobi_vhs_tablename    = "${var.goobi_vhs_tablename}"
+    goobi_vhs_bucketname   = "${var.goobi_vhs_bucketname}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 4
 
   cpu    = 512
   memory = 2048
