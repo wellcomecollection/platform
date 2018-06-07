@@ -19,28 +19,26 @@ class IngestorWorkerService @Inject()(
 
   messageStream.runStream { source =>
     source.groupedWithin(100, 10 seconds).mapAsyncUnordered(10){messages =>
-      Future.sequence(messages.map{case (message,identifiedWork) =>
-        processMessage(identifiedWork).map(_=> message)
-      })
-    }.mapConcat(identity)
+      val works = messages.map{case (_,identifiedWork) => identifiedWork}
+      val processWorksFuture = processMessages(works)
+      processWorksFuture.map(_ => messages.map(_._1))
+      }
+    .mapConcat(identity)
   }
 
-  private def processMessage(work: IdentifiedWork): Future[Unit] = {
-    val futureIndices: Future[List[String]] =
-      Future.fromTry(Try(decideTargetIndices(work)))
-    futureIndices.flatMap { indices =>
-      val futureResults = indices.map { esIndex =>
-        identifiedWorkIndexer.indexWork(
-          work = work,
-          esIndex = esIndex,
-          esType = elasticConfig.documentType
-        )
-      }
-      Future.sequence(futureResults).map { _ =>
-        ()
-      }
-    }
-  }
+  private def processMessages(works: Seq[IdentifiedWork]): Future[Unit] =
+    for {
+      indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(works)))
+      _ <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
+          identifiedWorkIndexer.indexWorks(
+            works = sortedWorks,
+            esIndex = index,
+            esType = elasticConfig.documentType
+          )
+        })
+
+      } yield ()
+
   def stop(): Future[Terminated] = {
     system.terminate()
   }
@@ -66,4 +64,15 @@ class IngestorWorkerService @Inject()(
     }
 
   }
+
+  private def sortInTargetIndices(works: Seq[IdentifiedWork]): Map[String, Seq[IdentifiedWork]] =
+    works.foldLeft(Map[String, Seq[IdentifiedWork]]()){(resultMap, work) =>
+      val indices = decideTargetIndices(work)
+      val workUpdateMap = indices.map { index =>
+        val existingWorks = resultMap.getOrElse(index, Nil)
+        val updatedWorks = existingWorks :+ work
+        (index, updatedWorks)
+      }.toMap
+      workUpdateMap ++ resultMap
+    }
 }
