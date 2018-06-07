@@ -5,16 +5,10 @@ import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{
-  ElasticClientBuilder,
-  ElasticConfig,
-  ElasticSearchIndex,
-  WorksIndex
-}
+import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig, ElasticSearchIndex, WorksIndex}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
-import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
@@ -92,35 +86,34 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchEventuallyHasWork(work: IdentifiedWork,
-                                           indexName: String,
-                                           itemType: String) = {
-    val workJson = toJson(work).get
+  def assertElasticsearchEventuallyHasWork(indexName: String, itemType: String, works: IdentifiedWork*) = {
+    works.map { work =>
+      val workJson = toJson(work).get
 
-    eventually {
-      val hits = elasticClient
-        .execute(search(s"$indexName/$itemType").matchAllQuery().limit(100))
-        .map { _.hits.hits }
-        .await
+      eventually {
+        val getResponse = elasticClient
+          .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+          .await
 
-      hits should have size 1
+        getResponse.exists shouldBe true
 
-      assertJsonStringsAreEqual(hits.head.sourceAsString, workJson)
+        assertJsonStringsAreEqual(getResponse.sourceAsString, workJson)
+      }
     }
   }
 
-  def assertElasticsearchNeverHasWork(work: IdentifiedWork,
-                                      indexName: String,
-                                      itemType: String) = {
+  def assertElasticsearchNeverHasWork(indexName: String, itemType: String, works: IdentifiedWork*) = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)
 
-    val hit = elasticClient
-      .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
-      .await
+    works.foreach { work =>
+      val hit = elasticClient
+        .execute(get(work.canonicalId).from(s"$indexName/$itemType"))
+        .await
 
-    hit.found shouldBe false
+      hit.found shouldBe false
+    }
   }
 
   def insertIntoElasticsearch(indexName: String,

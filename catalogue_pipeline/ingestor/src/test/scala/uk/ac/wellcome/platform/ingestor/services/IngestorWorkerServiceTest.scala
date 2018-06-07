@@ -50,7 +50,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
             val messageBody = put[IdentifiedWork](
               obj = work,
@@ -61,15 +61,9 @@ class IngestorWorkerServiceTest
             )
             sqsClient.sendMessage(queue.url, messageBody)
 
-            assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = esIndexV1,
-              itemType = itemType)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, work)
 
-            assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = esIndexV2,
-              itemType = itemType)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, work)
         }
       }
     }
@@ -86,7 +80,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
             val messageBody = put[IdentifiedWork](
               obj = work,
@@ -97,18 +91,57 @@ class IngestorWorkerServiceTest
             )
             sqsClient.sendMessage(queue.url, messageBody)
 
-            assertElasticsearchNeverHasWork(
-              work,
-              indexName = esIndexV1,
-              itemType = itemType)
+            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, work)
 
-            assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = esIndexV2,
-              itemType = itemType)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, work)
         }
       }
     }
+  }
+
+  it("inserts a mixture of miro and sierra works into the correct indices") {
+    val miroWork1 = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M1"), canonicalId = "m1")
+    val miroWork2 = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M2"), canonicalId = "m2")
+    val sierraWork1 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S1"), canonicalId = "s1")
+    val sierraWork2 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"), canonicalId = "s2")
+
+
+    val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
+
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
+
+            works.foreach { work =>
+              val messageBody = put[IdentifiedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"${work.canonicalId}.json"
+                )
+              )
+
+              sqsClient.sendMessage(queue.url, messageBody)
+            }
+
+            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, sierraWork1, sierraWork2)
+
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, works: _*)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork1, miroWork2)
+        }
+      }
+    }
+
+  }
+
+  private def createIdentifier(identifierType: String, value: String) = {
+    SourceIdentifier(
+      identifierType = IdentifierType(identifierType),
+      ontologyType = "Work",
+      value = value
+    )
   }
 
   it("fails inserting a non sierra or miro identified work") {
@@ -122,7 +155,7 @@ class IngestorWorkerServiceTest
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        withIngestorWorkerService[Assertion](esIndexV1, esIndexV2) {
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             val messageBody = put[IdentifiedWork](
               obj = work,
@@ -140,6 +173,42 @@ class IngestorWorkerServiceTest
         }
       }
     }
+  }
+
+  it("inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
+    val miroWork = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M1"))
+    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"))
+    val invalidWork = createWork().copy(sourceIdentifier = createIdentifier("calm-system-number", "C1"))
+
+    val works = List(miroWork, sierraWork, invalidWork)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+
+            works.foreach { work =>
+              val messageBody = put[IdentifiedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"${work.canonicalId}.json"
+                )
+              )
+
+              sqsClient.sendMessage(queue.url, messageBody)
+            }
+
+            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, sierraWork)
+
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, miroWork, sierraWork)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork)
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, 1)
+        }
+      }
+    }
+
   }
 
   it("returns a failed Future if indexing into Elasticsearch fails") {

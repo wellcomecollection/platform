@@ -55,8 +55,8 @@ class IngestorFeatureTest
               indexNameV2,
               itemType)
             withServer(flags) { _ =>
-              assertElasticsearchEventuallyHasWork(work, indexNameV1, itemType)
-              assertElasticsearchEventuallyHasWork(work, indexNameV2, itemType)
+              assertElasticsearchEventuallyHasWork(indexNameV1, itemType, work)
+              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
             }
           }
         }
@@ -89,8 +89,8 @@ class IngestorFeatureTest
               indexNameV2,
               itemType)
             withServer(flags) { _ =>
-              assertElasticsearchEventuallyHasWork(work, indexNameV2, itemType)
-              assertElasticsearchNeverHasWork(work, indexNameV1, itemType)
+              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
+              assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
             }
           }
         }
