@@ -107,14 +107,26 @@ trait SierraProduction {
     val agents = agentsFromSubfields(vf, subfieldTag = "b")
     val dates = datesFromSubfields(vf, subfieldTag = "c")
 
+    val productionFunctionLabel = vf.indicator2 match {
+      case Some("0") => "Production"
+      case Some("1") => "Publication"
+      case Some("2") => "Distribution"
+      case Some("3") => "Manufacture"
+      case other => throw GracefulFailureException(new RuntimeException(
+        s"Unrecognised second indicator for production function: [$other]"
+      ))
+    }
+
+    val productionFunction = Some(Concept(label = productionFunctionLabel))
+
     ProductionEvent(
       places = places,
       agents = agents,
       dates = dates,
-      productionFunction = None
+      productionFunction = productionFunction
     )
   }
-  
+
   private def placesFromSubfields(vf: VarField, subfieldTag: String): List[Place] =
     vf.subfields
       .filter { _.tag == subfieldTag}

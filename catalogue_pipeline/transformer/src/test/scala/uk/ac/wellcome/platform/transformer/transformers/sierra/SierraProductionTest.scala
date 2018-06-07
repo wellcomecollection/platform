@@ -213,6 +213,40 @@ class SierraProductionTest extends FunSpec with Matchers {
         Period(label = "copyright 2005")
       )
     }
+
+    describe("production function") {
+      it("sets Production from 2nd indicator == 0") {
+        checkProductionFunctionFor264(indicator2 = "0", expectedFunction = "Production")
+      }
+
+      it("sets Publication from 2nd indicator == 1") {
+        checkProductionFunctionFor264(indicator2 = "1", expectedFunction = "Publication")
+      }
+
+      it("sets Distribution from 2nd indicator == 2") {
+        checkProductionFunctionFor264(indicator2 = "2", expectedFunction = "Distribution")
+      }
+
+      it("sets Manufacture from 2nd indicator == 3") {
+        checkProductionFunctionFor264(indicator2 = "3", expectedFunction = "Manufacture")
+      }
+
+      it("throws an error if the 2nd indicator is unrecognised") {
+        val varFields = List(
+          VarField(
+            marcTag = Some("264"),
+            fieldTag = "a",
+            indicator2 = Some("x")
+          )
+        )
+
+        val caught = intercept[GracefulFailureException] {
+          transformToProduction(varFields)
+        }
+
+        caught.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
+      }
+    }
   }
 
   // Test helpers
@@ -239,6 +273,19 @@ class SierraProductionTest extends FunSpec with Matchers {
     )
 
     transformToProduction(varFields = varFields).head
+  }
+
+  private def checkProductionFunctionFor264(indicator2: String, expectedFunction: String) = {
+    val varFields = List(
+      VarField(
+        marcTag = Some("264"),
+        fieldTag = "a",
+        indicator2 = Some(indicator2)
+      )
+    )
+
+    val production = transformToProduction(varFields = varFields).head
+    production.productionFunction shouldBe Some(Concept(expectedFunction))
   }
 
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
