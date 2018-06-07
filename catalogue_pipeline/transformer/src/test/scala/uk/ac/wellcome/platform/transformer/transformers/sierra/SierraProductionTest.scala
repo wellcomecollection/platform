@@ -84,6 +84,22 @@ class SierraProductionTest extends FunSpec with Matchers {
 
       production.productionFunction shouldBe Some(Concept("Manufacture"))
     }
+
+    it("populates agents from b and f, and sets the function as Manufacture") {
+      val production = transform260ToProduction(subfields = List(
+        MarcSubfield(tag = "b", content = "Macmillan"),
+        MarcSubfield(tag = "f", content = "Sussex Tapes"),
+        MarcSubfield(tag = "f", content = "US Dept of Energy"),
+      ))
+
+      production.agents shouldBe List(
+        Unidentifiable(Agent(label = "Macmillan")),
+        Unidentifiable(Agent(label = "Sussex Tapes")),
+        Unidentifiable(Agent(label = "US Dept of Energy"))
+      )
+
+      production.productionFunction shouldBe Some(Concept("Manufacture"))
+    }
   }
 
   // multiple instances of 260

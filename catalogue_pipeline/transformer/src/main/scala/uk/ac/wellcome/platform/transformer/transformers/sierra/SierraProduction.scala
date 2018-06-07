@@ -47,6 +47,9 @@ trait SierraProduction {
   //  - Extra agents from subfield "f"
   //  - Extra dates from subfield "g"
   //
+  // If we don't have any of these fields, we can't tell what the
+  // productionFunction is, so we should leave it as "None".
+  //
   // Note: Regardless of their order in the MARC, these fields _always_
   // appear after a/b/c.  This is an implementation detail, not described
   // in the transform rules.
@@ -55,26 +58,23 @@ trait SierraProduction {
   private def getProductionFrom260Fields(varFields: List[VarField]) =
     varFields.map { vf =>
       val places = placesFromSubfields(vf, subfieldTag = "a")
-
-      val agents: List[Unidentifiable[Agent]] = vf.subfields
-        .filter { _.tag == "b" }
-        .map { sf: MarcSubfield => Agent(label = sf.content) }
-        .map { ag: Agent => Unidentifiable(ag) }
+      val agents = agentsFromSubfields(vf, subfieldTag = "b")
 
       val dates: List[Period] = vf.subfields
         .filter { _.tag == "c" }
         .map { sf: MarcSubfield => Period(label = sf.content) }
 
       val extraPlaces = placesFromSubfields(vf, subfieldTag = "e")
+      val extraAgents = agentsFromSubfields(vf, subfieldTag = "f")
 
-      val productionFunction = if (extraPlaces != Nil) {
+      val productionFunction = if (extraPlaces != Nil || extraAgents != Nil) {
         Some(Concept(label = "Manufacture"))
       } else None
 
       ProductionEvent(
         places = places ++ extraPlaces,
         dates = dates,
-        agents = agents,
+        agents = agents ++ extraAgents,
         productionFunction = productionFunction
       )
     }
@@ -83,4 +83,10 @@ trait SierraProduction {
     vf.subfields
       .filter { _.tag == subfieldTag}
       .map { sf: MarcSubfield => Place(label = sf.content) }
+
+  private def agentsFromSubfields(vf: VarField, subfieldTag: String): List[Unidentifiable[Agent]] =
+    vf.subfields
+      .filter { _.tag == subfieldTag}
+      .map { sf: MarcSubfield => Agent(label = sf.content) }
+      .map { ag: Agent => Unidentifiable(ag) }
 }
