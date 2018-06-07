@@ -1,6 +1,3 @@
-//resource "aws_ecs_cluster" "goobi_adapter_cluster" {
-//  name = "goobi-adapter"
-//}
 module "goobi_adapter_cluster" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
   name   = "goobi-adapter"
