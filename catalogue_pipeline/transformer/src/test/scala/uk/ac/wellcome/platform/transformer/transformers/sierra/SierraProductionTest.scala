@@ -44,7 +44,39 @@ class SierraProductionTest extends FunSpec with Matchers {
         Unidentifiable(Agent(label = "Vogue"))
       )
     }
+
+    it("populates dates from subfield c") {
+      val production = transform260ToProduction(subfields = List(
+        MarcSubfield(tag = "c", content = "1955."),
+        MarcSubfield(tag = "c", content = "1984."),
+        MarcSubfield(tag = "c", content = "1999.")
+      ))
+
+      production.dates shouldBe List(
+        Period(label = "1955."),
+        Period(label = "1984."),
+        Period(label = "1999.")
+      )
+    }
+
+    it("populates places from a and e, and sets the function as Manufacture") {
+      val production = transform260ToProduction(subfields = List(
+        MarcSubfield(tag = "a", content = "New York, N.Y."),
+        MarcSubfield(tag = "e", content = "Reston, Va."),
+        MarcSubfield(tag = "e", content = "[Philadelphia]"),
+      ))
+
+      production.places shouldBe List(
+        Place(label = "New York, N.Y."),
+        Place(label = "Reston, Va."),
+        Place(label = "[Philadelphia]")
+      )
+
+      production.productionFunction shouldBe Some(Concept("Manufacture"))
+    }
   }
+
+  // multiple instances of 260
 
   // Test helpers
 

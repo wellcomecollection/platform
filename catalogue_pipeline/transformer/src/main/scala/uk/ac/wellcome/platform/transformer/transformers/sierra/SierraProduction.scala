@@ -37,23 +37,50 @@ trait SierraProduction {
   //
   //  - Populate "places" from subfield "a" and type as "Place"
   //  - Populate "agents" from subfield "b" and type as "Agent"
+  //  - Populate "dates" from subfield "c" and type as "Period"
+  //
+  // If any of the following fields are included, we add them to the
+  // existing places/agents/dates field, _and_ set the productionFunction
+  // to "Manufacture":
+  //
+  //  - Extra places from subfield "e"
+  //  - Extra agents from subfield "f"
+  //  - Extra dates from subfield "g"
+  //
+  // Note: Regardless of their order in the MARC, these fields _always_
+  // appear after a/b/c.  This is an implementation detail, not described
+  // in the transform rules.
+  // TODO: Check if this is okay.
   //
   private def getProductionFrom260Fields(varFields: List[VarField]) =
     varFields.map { vf =>
-      val places: List[Place] = vf.subfields
-        .filter { _.tag == "a" }
-        .map { sf: MarcSubfield => Place(label = sf.content) }
+      val places = placesFromSubfields(vf, subfieldTag = "a")
 
       val agents: List[Unidentifiable[Agent]] = vf.subfields
         .filter { _.tag == "b" }
         .map { sf: MarcSubfield => Agent(label = sf.content) }
         .map { ag: Agent => Unidentifiable(ag) }
 
+      val dates: List[Period] = vf.subfields
+        .filter { _.tag == "c" }
+        .map { sf: MarcSubfield => Period(label = sf.content) }
+
+      val extraPlaces = placesFromSubfields(vf, subfieldTag = "e")
+
+      val productionFunction = if (extraPlaces != Nil) {
+        Some(Concept(label = "Manufacture"))
+      } else None
+
       ProductionEvent(
-        places = places,
-        dates = List(),
+        places = places ++ extraPlaces,
+        dates = dates,
         agents = agents,
-        productionFunction = None
+        productionFunction = productionFunction
       )
     }
+
+  private def placesFromSubfields(vf: VarField, subfieldTag: String): List[Place] =
+    vf.subfields
+      .filter { _.tag == subfieldTag}
+      .map { sf: MarcSubfield => Place(label = sf.content) }
 }
