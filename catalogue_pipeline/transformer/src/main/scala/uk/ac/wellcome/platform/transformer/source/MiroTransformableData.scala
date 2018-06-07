@@ -68,7 +68,7 @@ case object MiroTransformableData {
         "image_source_code":"GUS"
       """.trim
     )
-    
+
     val tryMiroTransformableData =
       createMiroTransformableData(tidiedData)
 
