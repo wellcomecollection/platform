@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.internal.{AbstractAgent, MaybeDisplayable, Place, ProductionEvent}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
 
 trait SierraProduction {
@@ -36,6 +36,7 @@ trait SierraProduction {
   // The rules are as follows:
   //
   //  - Populate "places" from subfield "a" and type as "Place"
+  //  - Populate "agents" from subfield "b" and type as "Agent"
   //
   private def getProductionFrom260Fields(varFields: List[VarField]) =
     varFields.map { vf =>
@@ -43,10 +44,15 @@ trait SierraProduction {
         .filter { _.tag == "a" }
         .map { sf: MarcSubfield => Place(label = sf.content) }
 
+      val agents: List[Unidentifiable[Agent]] = vf.subfields
+        .filter { _.tag == "b" }
+        .map { sf: MarcSubfield => Agent(label = sf.content) }
+        .map { ag: Agent => Unidentifiable(ag) }
+
       ProductionEvent(
         places = places,
         dates = List(),
-        agents = List(),
+        agents = agents,
         productionFunction = None
       )
     }
