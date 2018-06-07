@@ -247,6 +247,48 @@ class SierraProductionTest extends FunSpec with Matchers {
         caught.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
       }
     }
+
+    it("picks up multiple instances of the 264 field") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "a",
+          indicator2 = Some("1"),
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Columbia, S.C."),
+            MarcSubfield(tag = "b", content = "H.W. Williams Co."),
+            MarcSubfield(tag = "c", content = "1982")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "a",
+          indicator2 = Some("2"),
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Washington"),
+            MarcSubfield(tag = "b", content = "U.S. G.P.O."),
+            MarcSubfield(tag = "c", content = "1981-")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("Columbia, S.C.")),
+          agents = List(Unidentifiable(Agent("H.W. Williams Co."))),
+          dates = List(Period("1982")),
+          productionFunction = Some(Concept("Publication"))
+        ),
+        ProductionEvent(
+          places = List(Place("Washington")),
+          agents = List(Unidentifiable(Agent("U.S. G.P.O."))),
+          dates = List(Period("1981-")),
+          productionFunction = Some(Concept("Distribution"))
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
   }
 
   // Test helpers
@@ -268,7 +310,8 @@ class SierraProductionTest extends FunSpec with Matchers {
       VarField(
         marcTag = Some("264"),
         fieldTag = "a",
-        subfields = subfields
+        subfields = subfields,
+        indicator2 = Some("1")
       )
     )
 
