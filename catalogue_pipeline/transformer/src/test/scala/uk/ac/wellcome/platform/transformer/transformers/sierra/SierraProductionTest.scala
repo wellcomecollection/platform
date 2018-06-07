@@ -172,12 +172,67 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
   }
 
+  // Examples are taken from the MARC spec for field 264.
+  // https://www.loc.gov/marc/bibliographic/bd264.html
+
+  describe("MARC field 264") {
+    it("populates places from subfield a") {
+      val production = transform264ToProduction(subfields = List(
+        MarcSubfield(tag = "a", content = "Boston"),
+        MarcSubfield(tag = "a", content = "Cambridge")
+      ))
+
+      production.places shouldBe List(
+        Place(label = "Boston"),
+        Place(label = "Cambridge")
+      )
+    }
+
+    it("populates agents from subfield b") {
+      val production = transform264ToProduction(subfields = List(
+        MarcSubfield(tag = "b", content = "ABC Publishers"),
+        MarcSubfield(tag = "b", content = "Iverson Company")
+      ))
+
+      production.agents shouldBe List(
+        Unidentifiable(Agent(label = "ABC Publishers")),
+        Unidentifiable(Agent(label = "Iverson Company"))
+      )
+    }
+
+    it("populates dates from subfield c") {
+      val production = transform264ToProduction(subfields = List(
+        MarcSubfield(tag = "c", content = "2002"),
+        MarcSubfield(tag = "c", content = "1983"),
+        MarcSubfield(tag = "c", content = "copyright 2005")
+      ))
+
+      production.dates shouldBe List(
+        Period(label = "2002"),
+        Period(label = "1983"),
+        Period(label = "copyright 2005")
+      )
+    }
+  }
+
   // Test helpers
 
   private def transform260ToProduction(subfields: List[MarcSubfield]) = {
     val varFields = List(
       VarField(
         marcTag = Some("260"),
+        fieldTag = "a",
+        subfields = subfields
+      )
+    )
+
+    transformToProduction(varFields = varFields).head
+  }
+
+  private def transform264ToProduction(subfields: List[MarcSubfield]) = {
+    val varFields = List(
+      VarField(
+        marcTag = Some("264"),
         fieldTag = "a",
         subfields = subfields
       )
