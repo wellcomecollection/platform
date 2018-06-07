@@ -2,7 +2,7 @@ module "goobi_adapter" {
   source                  = "./goobi_adapter"
   goobi_items_queue_name  = "goobi_items"
   goobi_items_bucket_name = "${aws_s3_bucket.goobi_adapter.id}"
-  goobi_items_topic       = "${module.goobi_bucket_notifications_topic.name}"
+  goobi_items_topic       = "${aws_sns_topic.goobi_notifications_topic.name}"
 
   release_id         = "${var.release_ids["goobi_reader"]}"
   ecr_repository_url = "${module.ecr_repository_goobi_reader.repository_url}"
@@ -11,8 +11,6 @@ module "goobi_adapter" {
 
   vpc_id = "${module.vpc_goobi_adapter.vpc_id}"
 
-  //  cluster_name            = "${aws_ecs_cluster.goobi_adapter_cluster.name}"
-  //  ecs_launch_type         = "FARGATE"
   account_id = "${data.aws_caller_identity.current.account_id}"
 
   cluster_name = "${module.goobi_adapter_cluster.cluster_name}"
@@ -23,7 +21,7 @@ module "goobi_adapter" {
   alb_listener_http_arn      = "${module.goobi_adapter_cluster.alb_listener_http_arn}"
   alb_listener_https_arn     = "${module.goobi_adapter_cluster.alb_listener_https_arn}"
 
-  goobi_vhs_tablename           = "${local.goobi_vhs_table_name}"
-  goobi_vhs_bucketname          = "${local.goobi_vhs_bucket_name}"
-  goobi_vhs_full_access_policy  = "${local.goobi_vhs_full_access_policy}"
+  vhs_goobi_tablename           = "${local.vhs_goobi_table_name}"
+  vhs_goobi_bucketname          = "${local.vhs_goobi_bucket_name}"
+  vhs_goobi_full_access_policy  = "${local.vhs_goobi_full_access_policy}"
 }

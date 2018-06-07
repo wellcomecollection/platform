@@ -15,8 +15,8 @@ module "goobi_reader_service" {
   env_vars = {
     goobi_items_queue_url  = "${module.goobi_items_queue.id}"
     metrics_namespace      = "${local.service_name}"
-    goobi_vhs_tablename    = "${var.goobi_vhs_tablename}"
-    goobi_vhs_bucketname   = "${var.goobi_vhs_bucketname}"
+    vhs_goobi_tablename    = "${var.vhs_goobi_tablename}"
+    vhs_goobi_bucketname   = "${var.vhs_goobi_bucketname}"
   }
 
   env_vars_length = 4
@@ -26,7 +26,6 @@ module "goobi_reader_service" {
 
   cluster_name = "${var.cluster_name}"
 
-  //  ecs_launch_type = "${var.ecs_launch_type}"
   vpc_id = "${var.vpc_id}"
 
   alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"

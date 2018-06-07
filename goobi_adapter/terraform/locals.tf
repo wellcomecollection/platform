@@ -8,7 +8,7 @@ locals {
 
   alb_log_bucket_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
-  goobi_vhs_full_access_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_full_access_policy}"
-  goobi_vhs_table_name         = "${data.terraform_remote_state.catalogue_pipeline.vhs_table_name}"
-  goobi_vhs_bucket_name        = "${data.terraform_remote_state.catalogue_pipeline.vhs_bucket_name}"
+  vhs_goobi_full_access_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_goobi_full_access_policy}"
+  vhs_goobi_table_name         = "${data.terraform_remote_state.catalogue_pipeline.vhs_goobi_table_name}"
+  vhs_goobi_bucket_name        = "${data.terraform_remote_state.catalogue_pipeline.vhs_goobi_bucket_name}"
 }
