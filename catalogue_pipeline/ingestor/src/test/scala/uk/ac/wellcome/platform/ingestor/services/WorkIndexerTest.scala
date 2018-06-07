@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 class WorkIndexerTest
@@ -29,10 +28,7 @@ class WorkIndexerTest
         val future = workIndexer.indexWorks(List(work), indexName, esType)
 
         whenReady(future) { _ =>
-          assertElasticsearchEventuallyHasWork(
-            work,
-            indexName = indexName,
-            itemType = esType)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, work)
         }
       }
     }
@@ -42,7 +38,7 @@ class WorkIndexerTest
     val work = createVersionedWork()
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
-      withWorkIndexerFixtures[Assertion](esType, elasticClient) {
+      withWorkIndexerFixtures(esType, elasticClient) {
         workIndexer =>
           val future = Future.sequence(
             (1 to 2).map(
@@ -55,10 +51,7 @@ class WorkIndexerTest
           )
 
           whenReady(future) { _ =>
-            assertElasticsearchEventuallyHasWork(
-              work,
-              indexName = indexName,
-              itemType = esType)
+            assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, work)
           }
       }
     }
@@ -82,10 +75,7 @@ class WorkIndexerTest
           // Give Elasticsearch enough time to ingest the work
           Thread.sleep(700)
 
-          assertElasticsearchEventuallyHasWork(
-            work,
-            indexName = indexName,
-            itemType = esType)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, work)
         }
       }
     }
@@ -106,10 +96,7 @@ class WorkIndexerTest
         )
 
         whenReady(future) { _ =>
-          assertElasticsearchEventuallyHasWork(
-            updatedWork,
-            indexName = indexName,
-            itemType = esType)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, updatedWork)
         }
       }
     }
