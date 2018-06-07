@@ -155,4 +155,74 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
       })
     }
   }
+
+  it("locks a list of Things") {
+    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+      implicit val lockingService = new DynamoLockingService(
+        dynamoDbClient, table.name)
+
+      val lockableList = (1 to 10).map(i => ThingToStore(s"$i", "value"))
+      val lockedList = lockableList.lock
+
+      lockedList shouldBe a[Right[_,_]]
+
+      val locks = lockedList.right.get
+
+      locks.head shouldBe a[Locked[_]]
+
+      lockableList.foreach((thing: ThingToStore) => {
+        val actualStored = Scanamo
+          .get[RowLock](dynamoDbClient)(table.name)('id -> thing.id)
+        val rowLock = actualStored.get.right.get
+
+        rowLock.id shouldBe thing.id
+      })
+    }
+  }
+
+    it("will fail to lock a sequence of Things if any element is locked") {
+      withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+        implicit val lockingService = new DynamoLockingService(
+          dynamoDbClient, table.name)
+
+        val lockableList = (1 to 10).map(i => ThingToStore(s"$i", "value"))
+        val singleLock = lockableList.head.lock
+
+        singleLock shouldBe a[Right[_,_]]
+
+        val seqLock = lockableList.lock
+
+        seqLock shouldBe a[Left[_,_]]
+      }
+    }
+
+  it("will maintain lock state if a seq lock fails") {
+    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+      implicit val lockingService = new DynamoLockingService(
+        dynamoDbClient, table.name)
+
+      val lockableList = (1 to 10).map(i => ThingToStore(s"$i", "value"))
+
+      val listHead = lockableList.head
+      val listTail = lockableList.tail
+
+      val singleLock = listHead.lock
+      singleLock shouldBe a[Right[_,_]]
+
+      val seqLock = lockableList.lock
+      seqLock shouldBe a[Left[_,_]]
+
+      val actualStored = Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> listHead.id)
+      val rowLock = actualStored.get.right.get
+
+      rowLock.id shouldBe listHead.id
+
+      listTail.foreach((thing: ThingToStore) => {
+        val actualStored = Scanamo
+          .get[RowLock](dynamoDbClient)(table.name)('id -> thing.id)
+
+        actualStored shouldBe None
+      })
+    }
+  }
 }
