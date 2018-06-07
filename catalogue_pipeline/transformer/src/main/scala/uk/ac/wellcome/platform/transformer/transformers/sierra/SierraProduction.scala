@@ -24,7 +24,7 @@ trait SierraProduction {
     (maybeMarc260fields, maybeMarc264fields) match {
       case (Nil, Nil) => List()
       case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
-      case (Nil, _) => List()
+      case (Nil, marc264fields) => getProductionFrom264Fields(marc264fields)
       case (_, _) => throw new GracefulFailureException(new RuntimeException(
         "Record has both 260 and 264 fields; this is a cataloguing error."
       ))
@@ -81,6 +81,40 @@ trait SierraProduction {
       )
     }
 
+  // Populate wwork:production from MARC tag 264.
+  //
+  // The rules are as follows:
+  //
+  //  - Populate "places" from subfield "a" and type as "Place"
+  //  - Populate "agents" from subfield "b" and type as "Agent"
+  //  - Populate "dates" from subfield "c" and type as "Period"
+  //
+  // The production function is set based on the second indicator, as defined
+  // in the MARC spec.
+  //
+  //  - 0 = Production
+  //  - 1 = Publication
+  //  - 2 = Distribution
+  //  - 3 = Manufacture
+  //
+  // Note that a, b and c are repeatable fields.
+  //
+  // https://www.loc.gov/marc/bibliographic/bd264.html
+  //
+  private def getProductionFrom264Fields(varFields: List[VarField]) =
+  varFields.map { vf =>
+    val places = placesFromSubfields(vf, subfieldTag = "a")
+    val agents = agentsFromSubfields(vf, subfieldTag = "b")
+    val dates = datesFromSubfields(vf, subfieldTag = "c")
+
+    ProductionEvent(
+      places = places,
+      agents = agents,
+      dates = dates,
+      productionFunction = None
+    )
+  }
+  
   private def placesFromSubfields(vf: VarField, subfieldTag: String): List[Place] =
     vf.subfields
       .filter { _.tag == subfieldTag}
