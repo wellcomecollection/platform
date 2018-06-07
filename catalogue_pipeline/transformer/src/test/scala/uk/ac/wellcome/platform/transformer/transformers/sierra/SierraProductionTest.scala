@@ -20,6 +20,9 @@ class SierraProductionTest extends FunSpec with Matchers {
     )
   }
 
+  // Examples are taken from the MARC spec for field 260.
+  // https://www.loc.gov/marc/bibliographic/bd260.html
+
   describe("MARC field 260") {
     it("populates places from subfield a") {
       val production = transform260ToProduction(subfields = List(
@@ -116,9 +119,58 @@ class SierraProductionTest extends FunSpec with Matchers {
 
       production.productionFunction shouldBe Some(Concept("Manufacture"))
     }
-  }
 
-  // multiple instances of 260
+    it("picks up multiple instances of the 260 field") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "a",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "London"),
+            MarcSubfield(tag = "b", content = "Arts Council of Great Britain"),
+            MarcSubfield(tag = "c", content = "1976"),
+            MarcSubfield(tag = "e", content = "Twickenham"),
+            MarcSubfield(tag = "f", content = "CTD Printers"),
+            MarcSubfield(tag = "g", content = "1974")
+          )
+        ),
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "a",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Bethesda, Md"),
+            MarcSubfield(tag = "b", content = "Toxicology Information Program, National Library of Medicine"),
+            MarcSubfield(tag = "a", content = "Springfield, Va"),
+            MarcSubfield(tag = "b", content = "National Technical Information Service"),
+            MarcSubfield(tag = "c", content = "1974-")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("London"), Place("Twickenham")),
+          dates = List(Period("1976"), Period("1974")),
+          agents = List(
+            Unidentifiable(Agent("Arts Council of Great Britain")),
+            Unidentifiable(Agent("CTD Printers"))
+          ),
+          productionFunction = Some(Concept("Manufacture"))
+        ),
+        ProductionEvent(
+          places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
+          dates = List(Period("1974-")),
+          agents = List(
+            Unidentifiable(Agent("Toxicology Information Program, National Library of Medicine")),
+            Unidentifiable(Agent("National Technical Information Service"))
+          ),
+          productionFunction = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+  }
 
   // Test helpers
 
