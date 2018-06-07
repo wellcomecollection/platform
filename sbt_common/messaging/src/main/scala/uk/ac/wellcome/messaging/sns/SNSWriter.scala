@@ -21,7 +21,7 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
           toPublishRequest(message = message, subject = subject))
       }
     }.map { publishResult =>
-        info(
+        debug(
           s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
         PublishAttempt(Right(publishResult.getMessageId))
       }

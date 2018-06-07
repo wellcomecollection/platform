@@ -57,7 +57,7 @@ class VersionedDao @Inject()(
     updateExpressionGenerator: UpdateExpressionGenerator[T]
   ): Future[Unit] = Future {
     val id = idGetter.id(record)
-    info(s"Attempting to update Dynamo record: $id")
+    debug(s"Attempting to update Dynamo record: $id")
 
     updateBuilder(record).map { ops =>
       Scanamo.exec(dynamoDbClient)(ops) match {
@@ -69,7 +69,7 @@ class VersionedDao @Inject()(
           throw exception
         }
         case Right(_) => {
-          info(s"Successfully updated Dynamo record: $id")
+          debug(s"Successfully updated Dynamo record: $id")
         }
       }
     }
@@ -79,10 +79,10 @@ class VersionedDao @Inject()(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {
     val table = Table[T](dynamoConfig.table)
 
-    info(s"Attempting to retrieve Dynamo record: $id")
+    debug(s"Attempting to retrieve Dynamo record: $id")
     Scanamo.exec(dynamoDbClient)(table.get('id -> id)) match {
       case Some(Right(record)) => {
-        info(s"Successfully retrieved Dynamo record: $id")
+        debug(s"Successfully retrieved Dynamo record: $id")
 
         Some(record)
       }
@@ -96,7 +96,7 @@ class VersionedDao @Inject()(
 
         throw exception
       case None => {
-        info(s"No Dynamo record found for id: $id")
+        debug(s"No Dynamo record found for id: $id")
 
         None
       }
