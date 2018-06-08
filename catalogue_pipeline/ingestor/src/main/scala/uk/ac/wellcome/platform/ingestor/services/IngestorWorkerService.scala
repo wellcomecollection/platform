@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.{ActorSystem, Terminated}
+import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
@@ -17,16 +18,21 @@ class IngestorWorkerService @Inject()(
   messageStream: MessageStream[IdentifiedWork],
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
+  case class MessageBundle(message:Message, work: IdentifiedWork, indices: Set[String])
+
   messageStream.runStream { source =>
-    source.groupedWithin(100, 10 seconds).mapAsyncUnordered(1){messages =>
-      val works = messages.map{case (_,identifiedWork) => identifiedWork}
-      val processWorksFuture = processMessages(works)
-      processWorksFuture.map(_ => messages.map(_._1))
+    source
+      .map{case (message, identifiedWork) =>
+        MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
       }
-    .mapConcat(identity)
+      .groupedWithin(100, 5 seconds).mapAsyncUnordered(10){ messages =>
+        val processWorksFuture = processMessages(messages)
+        processWorksFuture.map(_ => messages.map(_.message))
+      }
+      .mapConcat(identity)
   }
 
-  private def processMessages(works: Seq[IdentifiedWork]): Future[Unit] =
+  private def processMessages(works: Seq[MessageBundle]): Future[Unit] =
     for {
       indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(works)))
       _ <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
@@ -47,17 +53,17 @@ class IngestorWorkerService @Inject()(
   // * Miro works are indexed in both v1 and v2 indices.
   // * Sierra works are indexed only in the v2 index.
   // * Works from any other source are not expected so they are discarded.
-  private def decideTargetIndices(work: IdentifiedWork): List[String] = {
+  private def decideTargetIndices(work: IdentifiedWork): Set[String] = {
     val miroIdentifier = IdentifierType("miro-image-number")
     val sierraIdentifier = IdentifierType("sierra-system-number")
     work.sourceIdentifier.identifierType.id match {
       case miroIdentifier.id =>
-        List(
+        Set(
           elasticConfig.indexV1name,
           elasticConfig.indexV2name
         )
       case sierraIdentifier.id =>
-        List(elasticConfig.indexV2name)
+        Set(elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
           s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}"))
@@ -65,9 +71,8 @@ class IngestorWorkerService @Inject()(
 
   }
 
-  private def sortInTargetIndices(works: Seq[IdentifiedWork]): Map[String, Seq[IdentifiedWork]] =
-    works.foldLeft(Map[String, Seq[IdentifiedWork]]()){(resultMap, work) =>
-      val indices = decideTargetIndices(work)
+  private def sortInTargetIndices(works: Seq[MessageBundle]): Map[String, Seq[IdentifiedWork]] =
+    works.foldLeft(Map[String, Seq[IdentifiedWork]]()){case (resultMap, MessageBundle(_, work, indices)) =>
       val workUpdateMap = indices.map { index =>
         val existingWorks = resultMap.getOrElse(index, Nil)
         val updatedWorks = existingWorks :+ work

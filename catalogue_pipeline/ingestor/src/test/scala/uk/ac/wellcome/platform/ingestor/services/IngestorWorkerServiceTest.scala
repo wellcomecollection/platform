@@ -176,9 +176,9 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
-    val miroWork = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M1"))
-    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"))
-    val invalidWork = createWork().copy(sourceIdentifier = createIdentifier("calm-system-number", "C1"))
+    val miroWork = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M"), canonicalId = "m")
+    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"), canonicalId = "s")
+    val invalidWork = createWork().copy(sourceIdentifier = createIdentifier("calm-altref-no", "C1"), canonicalId = "c")
 
     val works = List(miroWork, sierraWork, invalidWork)
 
@@ -203,8 +203,10 @@ class IngestorWorkerServiceTest
 
             assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, miroWork, sierraWork)
             assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork)
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
         }
       }
     }
@@ -277,7 +279,7 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[(QueuePair, Bucket), R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlqAndTimeout(15) {
+        withLocalSqsQueueAndDlqAndTimeout(10) {
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
               withWorkIndexer[R](elasticClient = elasticClient) {
