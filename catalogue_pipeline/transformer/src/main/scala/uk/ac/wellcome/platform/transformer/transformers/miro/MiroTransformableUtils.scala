@@ -16,8 +16,9 @@ trait MiroTransformableUtils {
     * of (key, value) tuples.  Note: we don't use a map because keys aren't
     * guaranteed to be unique.
     */
-  def zipMiroFields(keys: List[Option[String]],
-                    values: List[Option[String]]): List[(Option[String], Option[String])] = {
+  def zipMiroFields(
+    keys: List[Option[String]],
+    values: List[Option[String]]): List[(Option[String], Option[String])] = {
     if (keys.lengthCompare(values.length) != 0) {
       throw new RuntimeException(
         s"Different lengths! keys=$keys, values=$values"

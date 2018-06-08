@@ -13,8 +13,10 @@ case class MiroTransformableData(
   // encounters a null. Hence this weird type signature
   @JsonKey("image_creator") creator: Option[List[Option[String]]] = None,
   @JsonKey("image_image_desc") description: Option[String] = None,
-  @JsonKey("image_image_desc_academic") academicDescription: Option[String] = None,
-  @JsonKey("image_secondary_creator") secondaryCreator: Option[List[String]] = None,
+  @JsonKey("image_image_desc_academic") academicDescription: Option[String] =
+    None,
+  @JsonKey("image_secondary_creator") secondaryCreator: Option[List[String]] =
+    None,
   @JsonKey("image_artwork_date") artworkDate: Option[String] = None,
   @JsonKey("image_cleared") cleared: Option[String] = None,
   @JsonKey("image_copyright_cleared") copyrightCleared: Option[String] = None,

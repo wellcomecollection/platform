@@ -72,17 +72,17 @@ trait MiroIdentifiers extends MiroTransformableUtils {
     // put them all in the same identifier scheme, because we're not doing
     // any transformation or cleaning.
     val libraryRefsList: List[SourceIdentifier] =
-    zipMiroFields(
-      keys = miroData.libraryRefDepartment,
-      values = miroData.libraryRefId)
-      .collect {
-        case (Some(label), Some(value)) =>
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-library-reference"),
-            ontologyType = "Work",
-            value = s"$label $value"
-          )
-      }
+      zipMiroFields(
+        keys = miroData.libraryRefDepartment,
+        values = miroData.libraryRefId)
+        .collect {
+          case (Some(label), Some(value)) =>
+            SourceIdentifier(
+              identifierType = IdentifierType("miro-library-reference"),
+              ontologyType = "Work",
+              value = s"$label $value"
+            )
+        }
 
     miroIDList ++ sierraList ++ libraryRefsList
   }

@@ -11,7 +11,8 @@ class MiroIdentifiersTest extends FunSpec with Matchers {
       innopacID = Some("L 35411 \n\n15551040")
     )
 
-    val identifiers = transformer.getIdentifiers(miroData = miroData, miroId = "L0035411")
+    val identifiers =
+      transformer.getIdentifiers(miroData = miroData, miroId = "L0035411")
 
     identifiers shouldBe List(
       SourceIdentifier(
