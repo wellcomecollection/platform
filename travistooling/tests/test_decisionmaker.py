@@ -103,6 +103,11 @@ from travistooling.decisions import (
     # Changes to the data_science/scripts folder only trigger the format tests
     ('data_science/scripts/foo.py', 'loris-test', IgnoredPath, False),
     ('data_science/scripts/bar.py', 'travis-format', CheckedByTravisFormat, True),
+
+    # Scripts that are one deep in a stack only trigger the format tests
+    ('reindexer/trigger_reindex.py', 'travis-format', CheckedByTravisFormat, True),
+    ('reindexer/trigger_reindex.py', 'post_to_slack-publish', ExclusivelyAffectsAnotherTask, False),
+    ('reindexer/trigger_reindex.py', 'ingestor-test', ExclusivelyAffectsAnotherTask, False),
 ])
 def test_does_file_affect_build_task(path, task, exc_class, is_significant):
     with pytest.raises(exc_class) as err:

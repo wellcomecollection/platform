@@ -154,6 +154,16 @@ def does_file_affect_build_task(path, task):
     if path == 'run_autoformat.py' and task != 'travis-format':
         raise ExclusivelyAffectsAnotherTask('travis-format')
 
+    # We have a number of scripts that live in the top of a stack, which
+    # contain useful code for that stack, but which aren't part of another
+    # task.  They should be checked by travis-format, but that's it.
+    if (
+        path.endswith('.py') and
+        path.count(os.path.sep) == 1 and
+        task != 'travis-format'
+    ):
+        raise ExclusivelyAffectsAnotherTask('travis-format')
+
     # If we can't decide if a file affects a build job, we assume it's
     # significant and run the job just-in-case.
     raise UnrecognisedFile()
