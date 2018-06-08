@@ -23,6 +23,20 @@ class MiroTransformableTransformer
       val (title, description) = getTitleAndDescription(miroData)
 
       try {
+
+        // We had a request to remove records from contributor GUS from
+        // the API after we'd done the initial sort of the Miro data.
+        // We removed them from Elasticsearch by hand, but we don't want
+        // them to reappear on reindex.
+        //
+        // Until we can move them to Tandem Vault or Cold Store, we'll throw
+        // them away at this point.
+        if (miroData.sourceCode == Some("GUS")) {
+          throw new ShouldNotTransformException(
+            "Images from contributor GUS should not be sent to the pipeline"
+          )
+        }
+
         Some(
           UnidentifiedWork(
             title = Some(title),
