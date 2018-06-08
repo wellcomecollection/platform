@@ -1,21 +1,28 @@
 package uk.ac.wellcome.platform.matcher.lockable
 
+import java.time.{Duration, Instant}
 import java.util.concurrent.ForkJoinPool
 
 import com.gu.scanamo._
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.LocalLockTableDynamoDb
+
 import scala.collection.parallel.ForkJoinTaskSupport
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.util.Random
-import uk.ac.wellcome.storage.dynamo._
-
 
 class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
 
   import Lockable._
   import com.gu.scanamo.syntax._
+
+  implicit val instantLongFormat =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 
   case class ThingToStore(id: String, value: String)
 
@@ -56,6 +63,43 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
       val secondLock = secondLockOp.left.get
 
       secondLock shouldBe a[LockFailures[_]]
+    }
+  }
+
+  it("can lock a locked Thing that has expired") {
+    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+      implicit val lockingService = new DynamoLockingService(
+        dynamoDbClient, table.name)
+
+      val id = Random.nextString(32)
+      val thingToStore = ThingToStore(id, "value")
+
+      // Write a lock
+      val firstLockOp = thingToStore.lock
+      val firstLock = firstLockOp.right.get
+
+      firstLock shouldBe Locked(thingToStore)
+
+      // Try to lock, expecting to fail
+      val secondLockOp = thingToStore.lock
+      val secondLock = secondLockOp.left.get
+
+      secondLock shouldBe a[LockFailures[_]]
+
+      // Get the created RowLock
+      val actualStored = Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
+      val rowLock = actualStored.get.right.get
+
+      // Update the RowLock to be expired
+      val expiryTimeInThePast = Instant.now().minus(Duration.ofSeconds(1))
+      val updatedRowLock = rowLock.copy(expires = expiryTimeInThePast)
+      Scanamo.put[RowLock](dynamoDbClient)(table.name)(updatedRowLock)
+
+      // Retry locking expecting a success
+      val thirdLockOp = thingToStore.lock
+      val thirdLock = thirdLockOp.right.get
+
+      thirdLock shouldBe Locked(thingToStore)
     }
   }
 
