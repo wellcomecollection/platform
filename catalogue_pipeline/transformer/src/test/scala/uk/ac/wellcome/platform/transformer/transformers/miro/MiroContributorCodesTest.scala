@@ -14,6 +14,11 @@ class MiroContributorCodesTest extends FunSpec with Matchers {
       "Jenny Nichols")
   }
 
+  it("uses the uppercased version of a contributor code") {
+    transformer.lookupContributorCode(miroId = "B0000001", code = "csp") shouldBe Some(
+      "Wellcome Collection")
+  }
+
   it("returns None if it cannot find a contributor code") {
     transformer.lookupContributorCode(miroId = "XXX", code = "XXX") shouldBe None
   }

@@ -45,14 +45,20 @@ trait MiroContributorCodes {
   // We look in the general contributor map first, and if that fails,
   // we fallback to the per-record map.
   //
-  def lookupContributorCode(miroId: String, code: String): Option[String] =
-    contributorMap.get(code) match {
+  def lookupContributorCode(miroId: String, code: String): Option[String] = {
+
+    // All the codes in our map are uppercase, but some of the Miro records
+    // use lowercased versions, so we cast everything to ALL CAPS just in case.
+    val creditCode = code.toUpperCase()
+
+    contributorMap.get(creditCode) match {
       case Some(creditLine) => Some(creditLine)
       case None => {
         perRecordContributorMap.get(miroId) match {
-          case Some(perRecordMap) => perRecordMap.get(code)
+          case Some(perRecordMap) => perRecordMap.get(creditCode)
           case None => None
         }
       }
     }
+  }
 }
