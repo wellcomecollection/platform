@@ -1,35 +1,13 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
-import java.io.InputStream
-
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
-import uk.ac.wellcome.utils.JsonUtil.toMap
 
-import scala.io.Source
-
-trait MiroContributors {
-
-  // This JSON resource gives us credit lines for contributor codes.
-  //
-  // It is constructed as a map with fields drawn from the `contributors.xml`
-  // export from Miro, with:
-  //
-  //     - `contributor_id` as the key
-  //     - `contributor_credit_line` as the value
-  //
-  // Note that the checked-in file has had some manual edits for consistency,
-  // and with a lot of the Wellcome-related strings replaced with
-  // "Wellcome Collection".  There are also a handful of manual edits
-  // where the fields in Miro weren't filled in correctly.
-  val stream: InputStream = getClass
-    .getResourceAsStream("/miro_contributor_map.json")
-  val contributorMap =
-    toMap[String](Source.fromInputStream(stream).mkString).get
-
+trait MiroContributors extends MiroContributorCodes {
   /* Populate wwork:contributors.  We use the <image_creator> tag from the Miro XML. */
-  def getContributors(miroData: MiroTransformableData)
+  def getContributors(miroId: String, miroData: MiroTransformableData)
     : List[Contributor[Unidentifiable[Agent]]] = {
     val primaryCreators = miroData.creator match {
       case Some(maybeCreators) =>
@@ -51,12 +29,20 @@ trait MiroContributors {
 
     // We also add the contributor code for the non-historical images, but
     // only if the contributor *isn't* Wellcome Collection.v
-    val contributorCreators = miroData.sourceCode match {
+    val maybeContributorCreator = miroData.sourceCode match {
       case Some(code) =>
-        contributorMap(code.toUpperCase) match {
-          case "Wellcome Collection" => List()
-          case contributor => List(Unidentifiable(Agent(contributor)))
+        lookupContributorCode(miroId = miroId, code = code) match {
+          case Some("Wellcome Collection") => None
+          case Some(s) => Some(s)
+          case None => throw GracefulFailureException(new RuntimeException(
+            s"Unable to look up contributor credit line for ${miroData.sourceCode} on ${miroId}"
+          ))
         }
+      case None => None
+    }
+
+    val contributorCreators = maybeContributorCreator match {
+      case Some(contributor) => List(Unidentifiable(Agent(contributor)))
       case None => List()
     }
 
