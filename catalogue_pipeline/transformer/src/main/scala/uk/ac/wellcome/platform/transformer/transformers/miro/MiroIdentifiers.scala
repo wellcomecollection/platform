@@ -18,7 +18,21 @@ trait MiroIdentifiers extends MiroTransformableUtils {
     // We add a b-prefix because everything in Miro is a bibliographic record,
     // but there are other types in Sierra (e.g. item, holding) with matching
     // IDs but different prefixes.
-    val sierraList: List[SourceIdentifier] = miroData.innopacID match {
+
+    // First, a note: one of the Miro records has a bit of weird data in
+    // this fields; specifically:
+    //
+    //    'L 35411 \n\n15551040'
+    //
+    // We fix that here, for this record only, so the change is documented.
+    //
+    val innopacIdField = if (miroId == "L0035411") {
+      miroData.innopacID.map { _.replaceAll("L 35411 \n\n", "") }
+    } else {
+      miroData.innopacID
+    }
+
+    val sierraList: List[SourceIdentifier] = innopacIdField match {
       case Some(s) => {
 
         // The ID in the Miro record is an 8-digit number with a check digit

@@ -8,7 +8,7 @@ class MiroIdentifiersTest extends FunSpec with Matchers {
 
   it("fixes the malformed INNOPAC ID on L0035411") {
     val miroData = MiroTransformableData(
-      innopacID = Some("L 35411 \\n\\n15551040")
+      innopacID = Some("L 35411 \n\n15551040")
     )
 
     val identifiers = transformer.getIdentifiers(miroData = miroData, miroId = "L0035411")
