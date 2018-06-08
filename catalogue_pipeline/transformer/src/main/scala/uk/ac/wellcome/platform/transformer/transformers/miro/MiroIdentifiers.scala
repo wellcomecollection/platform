@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.transformers.miro
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
-trait MiroIdentifiers {
+trait MiroIdentifiers extends MiroTransformableUtils {
   def getIdentifiers(miroData: MiroTransformableData,
                      miroId: String): List[SourceIdentifier] = {
     val miroIDList = List(
