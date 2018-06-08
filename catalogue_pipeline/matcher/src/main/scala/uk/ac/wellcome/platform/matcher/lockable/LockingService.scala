@@ -7,6 +7,9 @@ trait LockingService {
   def unlockRow(id: Identifier): Either[UnlockFailure, Unit]
 }
 
+case class LockFailure(t: Identifier, message: String)
+case class UnlockFailure(t: Identifier, message: String)
+
 case class Identifier(value: String)
 case class RowLock(
   id: String,

@@ -1,7 +1,34 @@
 package uk.ac.wellcome.platform.matcher.lockable
 
-case class Locked[T](t: T) {
-  def unlock(implicit lockable: Lockable[T]): Either[UnlockFailure, T]= {
-    lockable.unlock(this)
+import uk.ac.wellcome.storage.type_classes.IdGetter
+
+case class Locked[T](t: T)
+
+object Locked {
+
+  implicit class LockedOps[T](a: Locked[T])(implicit lockable: Lockable[T], idGetter: IdGetter[T]) {
+    def unlock: Either[UnlockFailures[T], T]= {
+      lockable.unlock(a)
+    }
+  }
+
+  implicit class LockedSeqOps[T](a: IndexedSeq[Locked[T]])(implicit lockable: Lockable[T], idGetter: IdGetter[T]) {
+    def unlock: Either[UnlockFailures[T], IndexedSeq[T]]= {
+      val locked = a.map(Lockable[T].unlock)
+
+      val (leftEither, rightEither) = locked.partition(_.isLeft)
+      val (left, right) =
+        (leftEither.map(_.left.get), rightEither.map(_.right.get))
+
+      if(left.nonEmpty) {
+        val failed = left.foldLeft[IndexedSeq[Locked[T]]](IndexedSeq.empty)(
+          (acc, o) => acc ++ o.failed)
+        val succeeded = right
+
+        Left(UnlockFailures(failed, succeeded))
+      } else {
+        Right(right)
+      }
+    }
   }
 }

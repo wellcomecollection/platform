@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.matcher.lockable
 import uk.ac.wellcome.storage.type_classes.IdGetter
 
 trait Lockable[T] {
-  def lock(t: T): Either[LockFailure, Locked[T]]
-  def unlock(t: Locked[T]): Either[UnlockFailure, T]
+  def lock(t: T): Either[LockFailures[T], Locked[T]]
+  def unlock(t: Locked[T]): Either[UnlockFailures[T], T]
 }
 
 object Lockable {
@@ -17,29 +17,20 @@ object Lockable {
 
   implicit class LockableListOps[A: Lockable](a: IndexedSeq[A])(
     implicit idGetter: IdGetter[A]) {
-    def lock: Either[LockFailure, IndexedSeq[Locked[A]]] = {
+    def lock: Either[LockFailures[A], IndexedSeq[Locked[A]]] = {
       val locked = a.map(Lockable[A].lock)
 
       val (leftEither, rightEither) = locked.partition(_.isLeft)
-      val (left, right) =
+      val (left, right: IndexedSeq[Locked[A]]) =
         (leftEither.map(_.left.get), rightEither.map(_.right.get))
 
       if(left.nonEmpty) {
-        val unlocks = right.map(_.unlock)
+        val failed = left.foldLeft[IndexedSeq[A]](IndexedSeq.empty)(
+          (acc, o) => acc ++ o.failed)
 
-        val (unlockLeftEither, unlockRightEither) = unlocks.partition(_.isLeft)
+        val succeeded = right
 
-        val (unlockLeft, unlockRight) =
-          (unlockLeftEither.map(_.left.get), unlockRightEither.map(_.right.get))
-
-        // If we get here both our locking operation
-        // and out attempt to back it out have failed
-        // time to give up!
-        if(unlockLeft.nonEmpty) {
-          throw new RuntimeException("Error attmepting to unlock contended lock!")
-        }
-
-        Left(LockFailure("Could not lock sequence!"))
+        Left(LockFailures(failed, succeeded))
       } else {
         Right(right)
       }
@@ -52,18 +43,22 @@ object Lockable {
       idGetter: IdGetter[T]
   ): Lockable[T] = new Lockable[T] {
 
-    def lock(t: T): Either[LockFailure, Locked[T]] = {
+    def lock(t: T): Either[LockFailures[T], Locked[T]] = {
       val identifier = Identifier(idGetter.id(t))
-      val lock = lockingService.lockRow(identifier)
+      val lock: Either[LockFailure, RowLock] = lockingService.lockRow(identifier)
 
-      lock.map(_ => Locked(t))
+      lock
+        .left.map(_ => LockFailures(IndexedSeq(t), IndexedSeq.empty))
+        .right.map(_ => Locked(t))
     }
 
-    def unlock(lockedT: Locked[T]): Either[UnlockFailure, T] = {
+    def unlock(lockedT: Locked[T]): Either[UnlockFailures[T], T] = {
       val identifier = Identifier(idGetter.id(lockedT.t))
       val unlock = lockingService.unlockRow(identifier)
 
-      unlock.map(_ => lockedT.t)
+      unlock
+        .left.map(_ => UnlockFailures(IndexedSeq(lockedT), IndexedSeq.empty))
+        .right.map(_ => lockedT.t)
     }
   }
 }

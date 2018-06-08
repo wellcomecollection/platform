@@ -38,7 +38,7 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, tableName: 
     debug(s"Got $result when creating $rowLock")
 
     result
-      .left.map(e => LockFailure(e.toString))
+      .left.map(e => LockFailure(id, e.toString))
       .right.map(_ => rowLock)
   }
 
@@ -55,7 +55,7 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, tableName: 
     debug(s"Got $result when unlocking $id")
 
     result
-      .left.map(e => UnlockFailure(e.toString))
+      .left.map(e => UnlockFailure(id, e.toString))
       .right.map(_ => ())
   }
 }
