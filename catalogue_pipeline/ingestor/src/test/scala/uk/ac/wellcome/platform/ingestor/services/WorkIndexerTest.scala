@@ -102,6 +102,46 @@ class WorkIndexerTest
     }
   }
 
+  it("inserts a list of works into elasticsearch and returns them"){
+    val works = (1 to 5).map { i =>
+      createVersionedWork().copy(canonicalId = s"$i-workid")
+    }
+
+    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
+        val future = workIndexer.indexWorks(works, indexName, esType)
+
+        whenReady(future) { successfullyInserted =>
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, works:_*)
+          successfullyInserted should contain theSameElementsAs works
+        }
+      }
+    }
+  }
+
+  it("inserts a list of works into elasticsearch and return the list of works that succeeded inserting"){
+    val validWorks = (1 to 5).map { i =>
+      createVersionedWork().copy(canonicalId = s"$i-workid")
+    }
+    val newVersionWork = createVersionedWork().copy(canonicalId = "updated-work", version = 2)
+    val oldVersionWork = newVersionWork.copy(version = 1)
+
+    val works = validWorks :+ oldVersionWork
+
+    withLocalElasticsearchIndex(itemType = esType) { indexName =>
+      insertIntoElasticsearch(indexName = indexName, itemType = esType, newVersionWork)
+      withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
+        val future = workIndexer.indexWorks(works, indexName, esType)
+
+        whenReady(future) { successfullyInserted =>
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, validWorks:_*)
+          assertElasticsearchEventuallyHasWork(indexName = indexName, itemType = esType, newVersionWork)
+          successfullyInserted should contain theSameElementsAs validWorks
+        }
+      }
+    }
+  }
+
   def createVersionedWork(version: Int = 1): IdentifiedWork =
     createWorks(count = 1).head
       .copy(version = version)
