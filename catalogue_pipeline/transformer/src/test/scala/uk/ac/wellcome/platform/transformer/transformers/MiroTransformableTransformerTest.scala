@@ -246,8 +246,7 @@ class MiroTransformableTransformerTest
     val miroTransformable = MiroTransformable(
       sourceId = "G0000001",
       MiroCollection = "TestCollection",
-      data = buildJSONForWork(
-        """
+      data = buildJSONForWork("""
         "image_source_code": "GUS"
       """)
     )
