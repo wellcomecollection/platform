@@ -242,6 +242,21 @@ class MiroTransformableTransformerTest
     triedMaybeWork.get shouldBe None
   }
 
+  it("returns None for Miro records from contributor GUS") {
+    val miroTransformable = MiroTransformable(
+      sourceId = "G0000001",
+      MiroCollection = "TestCollection",
+      data = buildJSONForWork(
+        """
+        "image_source_code": "GUS"
+      """)
+    )
+
+    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
+    triedMaybeWork.isSuccess shouldBe true
+    triedMaybeWork.get shouldBe None
+  }
+
   private def transformRecordAndCheckSierraSystemNumber(
     innopacId: String,
     expectedSierraNumber: String,
