@@ -23,4 +23,3 @@ variable "alb_client_error_alarm_arn" {}
 variable "vhs_goobi_tablename" {}
 variable "vhs_goobi_bucketname" {}
 variable "vhs_goobi_full_access_policy" {}
-

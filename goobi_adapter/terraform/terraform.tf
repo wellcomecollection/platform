@@ -28,4 +28,3 @@ data "terraform_remote_state" "catalogue_pipeline" {
     region = "eu-west-1"
   }
 }
-

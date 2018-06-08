@@ -13,10 +13,10 @@ module "goobi_reader_service" {
   source_queue_arn  = "${module.goobi_mets_queue.arn}"
 
   env_vars = {
-    goobi_mets_queue_url  = "${module.goobi_mets_queue.id}"
-    metrics_namespace      = "${local.service_name}"
-    vhs_goobi_tablename    = "${var.vhs_goobi_tablename}"
-    vhs_goobi_bucketname   = "${var.vhs_goobi_bucketname}"
+    goobi_mets_queue_url = "${module.goobi_mets_queue.id}"
+    metrics_namespace    = "${local.service_name}"
+    vhs_goobi_tablename  = "${var.vhs_goobi_tablename}"
+    vhs_goobi_bucketname = "${var.vhs_goobi_bucketname}"
   }
 
   env_vars_length = 4

@@ -43,9 +43,9 @@ class GoobiReaderWorkerService @Inject()(
         fromJson[S3Event](snsNotification.Message))
       _ <- Future.sequence(eventNotification.Records.map(updateRecord))
     } yield ()
-    eventuallyProcessedMessages.failed.foreach {
-      e: Throwable =>
-        error(s"Error processing message with SNS-MessageId=${snsNotification.MessageId}. Exception ${e.getClass.getCanonicalName} $e.getMessage")
+    eventuallyProcessedMessages.failed.foreach { e: Throwable =>
+      error(
+        s"Error processing message with SNS-MessageId=${snsNotification.MessageId}. Exception ${e.getClass.getCanonicalName} $e.getMessage")
     }
     eventuallyProcessedMessages
   }

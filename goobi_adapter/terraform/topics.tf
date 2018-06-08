@@ -1,5 +1,5 @@
 resource "aws_sns_topic" "goobi_notifications_topic" {
-  name = "s3-goobi-event-notifications"
+  name   = "s3-goobi-event-notifications"
   policy = "${data.aws_iam_policy_document.publish_to_topic.json}"
 }
 
@@ -10,8 +10,8 @@ data "aws_iam_policy_document" "publish_to_topic" {
     ]
 
     principals = {
-      type = "Service",
-      identifiers = [ "s3.amazonaws.com" ]
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
     }
 
     resources = [
@@ -19,10 +19,9 @@ data "aws_iam_policy_document" "publish_to_topic" {
     ]
 
     condition = {
-      test = "ArnLike"
+      test     = "ArnLike"
       variable = "aws:SourceArn"
-      values =["${aws_s3_bucket.goobi_adapter.arn}"]
+      values   = ["${aws_s3_bucket.goobi_adapter.arn}"]
     }
   }
 }
-
