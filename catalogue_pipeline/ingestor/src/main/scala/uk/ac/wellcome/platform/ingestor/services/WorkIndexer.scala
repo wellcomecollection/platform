@@ -3,13 +3,13 @@ package uk.ac.wellcome.platform.ingestor.services
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.bulk.BulkResponse
 import com.twitter.inject.Logging
 import javax.inject.{Inject, Singleton}
-import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
@@ -28,7 +28,7 @@ class WorkIndexer @Inject()(
 
   def indexWorks(works: Seq[IdentifiedWork],
                 esIndex: String,
-                esType: String): Future[Any] = {
+                esType: String): Future[Seq[IdentifiedWork]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
@@ -44,21 +44,12 @@ class WorkIndexer @Inject()(
           .execute {
             bulk(inserts)
           }
-          .map { _ =>
-            debug(s"Successfully indexed works ${works.map(_.canonicalId).mkString(", ")}")
-          }
-          .recover {
-            case e: ResponseException
-                if getErrorType(e).contains(
-                  "version_conflict_engine_exception") =>
-//              warn(
-//                s"Trying to index work ${work.canonicalId} with older version: skipping.")
-              ()
-            case e: Throwable =>
-//              error(
-//                s"Error indexing work ${work.canonicalId} into Elasticsearch",
-//                e)
-              throw e
+          .map { bulkResponse: BulkResponse =>
+            val successfulIds = bulkResponse.successes.map(_.id)
+            debug(s"Successfully indexed works $successfulIds")
+            works.filter(w => {
+              successfulIds.contains(w.canonicalId)
+            })
           }
       }
 }
