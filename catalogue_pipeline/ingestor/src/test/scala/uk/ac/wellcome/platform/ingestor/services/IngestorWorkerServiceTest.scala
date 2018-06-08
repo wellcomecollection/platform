@@ -105,14 +105,12 @@ class IngestorWorkerServiceTest
     val sierraWork1 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S1"), canonicalId = "s1")
     val sierraWork2 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"), canonicalId = "s2")
 
-
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
-
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
-          case (QueuePair(queue, _), bucket) =>
+          case (QueuePair(queue, dlq), bucket) =>
 
             works.foreach { work =>
               val messageBody = put[IdentifiedWork](
@@ -130,6 +128,8 @@ class IngestorWorkerServiceTest
 
             assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, works: _*)
             assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork1, miroWork2)
+
+            assertQueueEmpty(dlq)
         }
       }
     }
@@ -277,7 +277,7 @@ class IngestorWorkerServiceTest
     esIndexV2: String)(testWith: TestWith[(QueuePair, Bucket), R]): R = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueueAndDlq {
+        withLocalSqsQueueAndDlqAndTimeout(15) {
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
               withWorkIndexer[R](elasticClient = elasticClient) {

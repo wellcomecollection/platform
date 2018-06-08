@@ -18,7 +18,7 @@ class IngestorWorkerService @Inject()(
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
   messageStream.runStream { source =>
-    source.groupedWithin(100, 10 seconds).mapAsyncUnordered(10){messages =>
+    source.groupedWithin(100, 10 seconds).mapAsyncUnordered(1){messages =>
       val works = messages.map{case (_,identifiedWork) => identifiedWork}
       val processWorksFuture = processMessages(works)
       processWorksFuture.map(_ => messages.map(_._1))
@@ -73,6 +73,6 @@ class IngestorWorkerService @Inject()(
         val updatedWorks = existingWorks :+ work
         (index, updatedWorks)
       }.toMap
-      workUpdateMap ++ resultMap
+      resultMap ++ workUpdateMap
     }
 }
