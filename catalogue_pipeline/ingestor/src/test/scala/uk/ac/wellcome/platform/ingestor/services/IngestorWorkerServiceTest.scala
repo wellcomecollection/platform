@@ -163,8 +163,7 @@ class IngestorWorkerServiceTest
                   HttpClient.fromRestClient(brokenRestClient)
 
                 val brokenWorkIndexer = new WorkIndexer(
-                  elasticClient = brokenElasticClient,
-                  metricsSender = metricsSender
+                  elasticClient = brokenElasticClient
                 )
 
                 withIngestorWorkerService[Assertion](
@@ -198,6 +197,7 @@ class IngestorWorkerServiceTest
                 }
               }
             }
+
         }
       }
     }
@@ -211,23 +211,22 @@ class IngestorWorkerServiceTest
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
-              withWorkIndexer[R](
-                elasticClient = elasticClient,
-                metricsSender = metricsSender) { workIndexer =>
-                withMessageStream[IdentifiedWork, R](
-                  actorSystem,
-                  bucket,
-                  queue,
-                  metricsSender) { messageStream =>
-                  withIngestorWorkerService[R](
-                    esIndexV1,
-                    esIndexV2,
+              withWorkIndexer[R](elasticClient = elasticClient) {
+                workIndexer =>
+                  withMessageStream[IdentifiedWork, R](
                     actorSystem,
-                    workIndexer,
-                    messageStream) { _ =>
-                    testWith((queuePair, bucket))
+                    bucket,
+                    queue,
+                    metricsSender) { messageStream =>
+                    withIngestorWorkerService[R](
+                      esIndexV1,
+                      esIndexV2,
+                      actorSystem,
+                      workIndexer,
+                      messageStream) { _ =>
+                      testWith((queuePair, bucket))
+                    }
                   }
-                }
               }
             }
         }

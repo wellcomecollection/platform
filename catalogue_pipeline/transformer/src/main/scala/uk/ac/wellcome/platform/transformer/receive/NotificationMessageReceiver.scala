@@ -41,29 +41,25 @@ class NotificationMessageReceiver @Inject()(
 
   def receiveMessage(message: NotificationMessage): Future[Unit] = {
     debug(s"Starting to process message $message")
-    metricsSender.timeAndCount(
-      "transform-time",
-      () => {
-        val futurePublishAttempt = for {
-          hybridRecord <- Future.fromTry(
-            fromJson[HybridRecord](message.Message))
-          sourceMetadata <- Future.fromTry(
-            fromJson[SourceMetadata](message.Message))
-          transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
-          cleanRecord <- Future.fromTry(
-            transformTransformable(transformableRecord, hybridRecord.version))
-          publishResult <- publishMessage(cleanRecord)
-        } yield publishResult
 
-        futurePublishAttempt
-          .recover {
-            case e: ParsingFailure =>
-              info("Recoverable failure parsing HybridRecord from message", e)
-              throw GracefulFailureException(e)
-          }
-          .map(_ => ())
+    val futurePublishAttempt = for {
+      hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
+      sourceMetadata <- Future.fromTry(
+        fromJson[SourceMetadata](message.Message))
+      transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
+      cleanRecord <- Future.fromTry(
+        transformTransformable(transformableRecord, hybridRecord.version))
+      publishResult <- publishMessage(cleanRecord)
+    } yield publishResult
+
+    futurePublishAttempt
+      .recover {
+        case e: ParsingFailure =>
+          info("Recoverable failure parsing HybridRecord from message", e)
+          throw GracefulFailureException(e)
       }
-    )
+      .map(_ => ())
+
   }
 
   private def getTransformable(

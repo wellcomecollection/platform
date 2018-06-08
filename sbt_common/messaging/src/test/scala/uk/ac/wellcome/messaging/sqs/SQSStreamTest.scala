@@ -2,7 +2,7 @@ package uk.ac.wellcome.messaging.sqs
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import org.mockito.Matchers.{any, anyDouble, endsWith, eq => equalTo}
+import org.mockito.Matchers.{any, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -69,9 +69,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          verify(metricsSender, times(1)).timeAndCount(
-            equalTo("test-stream_ProcessMessage"),
-            any[() => Future[Unit]]())
+          verify(metricsSender, times(1))
+            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())
         }
     }
   }
@@ -91,9 +90,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-
           verify(metricsSender, never())
-            .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
+            .incrementCount(endsWith("_failure"))
           received shouldBe empty
 
           assertQueueEmpty(queue)

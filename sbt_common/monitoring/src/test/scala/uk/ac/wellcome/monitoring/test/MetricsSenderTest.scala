@@ -29,8 +29,8 @@ class MetricsSenderTest
 
   import org.mockito.Mockito._
 
-  describe("timeAndCount") {
-    it("records the time and count of a successful future") {
+  describe("count") {
+    it("counts a successful future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
         val metricsConfig = MetricsConfig(
@@ -45,12 +45,14 @@ class MetricsSenderTest
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
         val expectedResult = "foo"
-        val timedFunction = () => Future { Thread.sleep(100); expectedResult }
+        val f = Future {
+          expectedResult
+        }
         val metricName = "bar"
 
-        val future = metricsSender.timeAndCount(metricName, timedFunction)
+        metricsSender.count(metricName, f)
 
-        whenReady(future) { result =>
+        whenReady(f) { result =>
           result shouldBe expectedResult
           eventually {
 
@@ -58,20 +60,16 @@ class MetricsSenderTest
 
             val putMetricDataRequest = capture.getValue
             val metricData = putMetricDataRequest.getMetricData
-            metricData should have size 2
+            metricData should have size 1
             metricData.asScala.exists { metricDatum =>
-              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "success"
-            } shouldBe true
-
-            metricData.asScala.exists { metricDatum =>
-              (metricDatum.getValue >= 100) && (metricDatum.getMetricName == "bar")
+              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == s"${metricName}_success"
             } shouldBe true
           }
         }
       }
     }
 
-    it("records the time and count of a failed future") {
+    it("counts a failed future") {
       withActorSystem { actorSystem =>
         val amazonCloudWatch = mock[AmazonCloudWatch]
         val metricsConfig = MetricsConfig(
@@ -85,25 +83,23 @@ class MetricsSenderTest
         )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
-        val timedFunction = () => Future { throw new RuntimeException() }
+        val f = Future {
+          throw new RuntimeException()
+        }
         val metricName = "bar"
 
-        val future = metricsSender.timeAndCount(metricName, timedFunction)
+        metricsSender.count(metricName, f)
 
-        whenReady(future.failed) { _ =>
+        whenReady(f.failed) { _ =>
           eventually {
             verify(amazonCloudWatch, times(1)).putMetricData(capture.capture())
 
             val putMetricDataRequest = capture.getValue
             val metricData = putMetricDataRequest.getMetricData
-            metricData should have size 2
+            metricData should have size 1
 
             metricData.asScala.exists { metricDatum =>
-              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == "failure"
-            } shouldBe true
-
-            metricData.asScala.exists { metricDatum =>
-              metricDatum.getMetricName == "bar"
+              (metricDatum.getValue == 1.0) && metricDatum.getMetricName == s"${metricName}_failure"
             } shouldBe true
           }
         }
@@ -122,13 +118,14 @@ class MetricsSenderTest
           actorSystem = actorSystem,
           metricsConfig = metricsConfig
         )
+
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
-        val emptyFunction = () => Future.successful(())
+        val f = Future.successful(())
         val metricName = "bar"
 
-        val futures = (1 to 15).map(i =>
-          metricsSender.timeAndCount(s"${i}_$metricName", emptyFunction))
+        val futures =
+          (1 to 40).map(i => metricsSender.count(s"$metricName", f))
 
         whenReady(Future.sequence(futures)) { _ =>
           eventually {
@@ -138,7 +135,7 @@ class MetricsSenderTest
             putMetricDataRequests should have size 2
 
             putMetricDataRequests.asScala.head.getMetricData should have size 20
-            putMetricDataRequests.asScala.tail.head.getMetricData should have size 10
+            putMetricDataRequests.asScala.tail.head.getMetricData should have size 20
           }
         }
       }
@@ -158,12 +155,16 @@ class MetricsSenderTest
         )
         val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
 
+        val f = Future.successful(())
+        val metricName = "bar"
+
         val expectedDuration = (1 second).toMillis
         val startTime = Instant.now
 
         // Each PutMetricRequest is made of 20 MetricDatum so we need
         // 20 * 150 = 3000 calls to incrementCount to get 150 PutMetricData calls
-        val futures = (1 to 3000).map(i => metricsSender.incrementCount("bar"))
+        val futures =
+          (1 to 3000).map(i => metricsSender.count(s"${i}_$metricName", f))
 
         val promisedInstant = Promise[Instant]
 
@@ -183,64 +184,6 @@ class MetricsSenderTest
         whenReady(promisedInstant.future) { endTime =>
           val gap: Long = ChronoUnit.MILLIS.between(startTime, endTime)
           gap shouldBe >(expectedDuration)
-        }
-      }
-    }
-  }
-
-  describe("incrementCount") {
-    it("calls putMetricData with the correct value") {
-      withActorSystem { actorSystem =>
-        val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsConfig = MetricsConfig(
-          namespace = "test",
-          flushInterval = 100 milliseconds
-        )
-        val metricsSender = new MetricsSender(
-          amazonCloudWatch = amazonCloudWatch,
-          actorSystem = actorSystem,
-          metricsConfig = metricsConfig
-        )
-        val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
-
-        val expectedValue = 3.0F
-
-        val metricFuture = metricsSender.incrementCount("foo", expectedValue)
-
-        whenReady(metricFuture) { _ =>
-          eventually {
-            verify(amazonCloudWatch).putMetricData(capture.capture())
-            capture.getValue.getMetricData.asScala.head.getValue shouldBe expectedValue
-          }
-        }
-      }
-    }
-  }
-
-  describe("sendTime") {
-    it("calls putMetricData with the correct value") {
-      withActorSystem { actorSystem =>
-        val amazonCloudWatch = mock[AmazonCloudWatch]
-        val metricsConfig = MetricsConfig(
-          namespace = "test",
-          flushInterval = 100 milliseconds
-        )
-        val metricsSender = new MetricsSender(
-          amazonCloudWatch = amazonCloudWatch,
-          actorSystem = actorSystem,
-          metricsConfig = metricsConfig
-        )
-        val capture = ArgumentCaptor.forClass(classOf[PutMetricDataRequest])
-
-        val expectedValue = 5 millis
-
-        val metricFuture = metricsSender.sendTime("foo", expectedValue)
-
-        whenReady(metricFuture) { _ =>
-          eventually {
-            verify(amazonCloudWatch).putMetricData(capture.capture())
-            capture.getValue.getMetricData.asScala.head.getValue shouldBe expectedValue.length
-          }
         }
       }
     }

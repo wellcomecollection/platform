@@ -169,8 +169,7 @@ class SierraItemsToDynamoWorkerServiceTest
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
           verify(metricsSender, never()).incrementCount(
-            "SierraItemsToDynamoWorkerService_MessageProcessingFailure",
-            1.0)
+            "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
         }
     }
   }

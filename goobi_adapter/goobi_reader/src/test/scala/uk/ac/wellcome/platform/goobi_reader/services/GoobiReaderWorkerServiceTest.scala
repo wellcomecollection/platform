@@ -7,8 +7,8 @@ import java.time.temporal.ChronoUnit
 import akka.actor.ActorSystem
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
-import org.mockito.Matchers.{any, anyDouble, endsWith}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -247,21 +247,9 @@ class GoobiReaderWorkerServiceTest
     assertQueueHasSize(dlq, 1)
   }
 
-  private def assertFailureMetricNotIncremented(
-    mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, never())
-      .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
-  }
-
   private def assertUpdateNotSaved(bucket: Bucket, table: Table) = {
     assertDynamoTableIsEmpty(table)
     assertS3StorageIsEmpty(bucket)
-  }
-
-  private def assertFailureMetricIncremented(
-    mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(3))
-      .incrementCount(endsWith("_MessageProcessingFailure"), anyDouble())
   }
 
   private def assertDynamoTableIsEmpty(table: Table) = {
