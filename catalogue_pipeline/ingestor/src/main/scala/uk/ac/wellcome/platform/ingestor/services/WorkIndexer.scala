@@ -14,7 +14,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class WorkIndexer @Inject()(
