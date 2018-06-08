@@ -36,7 +36,7 @@ module "goobi_reader_service" {
 
   enable_alb_alarm = false
 
-  max_capacity = 1
+  max_capacity = 15
 
   log_retention_in_days = 30
 }
