@@ -15,19 +15,6 @@ data "aws_iam_policy_document" "allow_s3_access" {
   }
 }
 
-data "aws_iam_policy_document" "read_from_goobi_mets_q" {
-  statement {
-    actions = [
-      "sqs:DeleteMessage",
-      "sqs:ReceiveMessage",
-    ]
-
-    resources = [
-      "${module.goobi_mets_queue.arn}",
-    ]
-  }
-}
-
 data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
   statement {
     actions = [

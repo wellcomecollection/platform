@@ -5,7 +5,7 @@ resource "aws_iam_role_policy" "allow_s3_access" {
 
 resource "aws_iam_role_policy" "allow_read_from_goobi_mets_q" {
   role   = "${module.goobi_reader_service.task_role_name}"
-  policy = "${data.aws_iam_policy_document.read_from_goobi_mets_q.json}"
+  policy = "${module.goobi_mets_queue.read_policy}"
 }
 
 resource "aws_iam_role_policy" "push_cloudwatch_metric" {
