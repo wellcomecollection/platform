@@ -1,5 +1,10 @@
-# Digital Platform
-The new Wellcome Collection digital platform, exploring approaches to building an API that searches our archive collections.
+# Platform
+
+The Wellcome Collection digital platform, building APIs for searching and browsing our archive collections.
+
+You can read documentation for our APIs at <https://developers.wellcomecollection.org/>.
+
+You are free to copy, modify, and distribute Platform code with attribution under the terms of the MIT license. See the LICENSE file for details.
 
 [![Build Status](https://travis-ci.org/wellcometrust/platform.svg?branch=master)](https://travis-ci.org/wellcometrust/platform)
 
@@ -12,7 +17,26 @@ The new Wellcome Collection digital platform, exploring approaches to building a
 ### User led development
 We intend to be led by the needs of the user first, and to be pragmatic about technical decisions in that light. Prototyping is part of the process of discovering the shape of an eventual API.
 
-## Developing in the open
+### Developing in the open
 We intend to develop in the open, so that others can learn from our mistakes and successes. We also want to be transparent on the state of work in progress and provide a forum to raise issues and discuss approaches.
 
 Everything we create will be open-source, under an MIT license. We will package things that are useful to others as standalone components, so that they can be easily re-used outside of our platform.
+
+## Other repos
+
+Code for the platform is split across multiple repositories:
+
+*   [wellcometrust/aws_utils][awsutils] is a Python library containing AWS-related utilities that we use in our AWS Lambdas
+
+*   [wellcometrust/dockerfiles][dockerfiles] contains Dockerfiles for components of the platform, including most of our build system
+
+*   [wellcometrust/sierra-streams-source][sierrastreams] is a Scala library that provides Akka Streams from objects in a [Sierra API][sierra].
+    Sierra is the library management system we use at Wellcome Collection, and one of the data sources for the platform.
+
+*   [wellcometrust/terraform-modules][terraformmods] contains reusable Terraform modules that we use to define our infrastructure
+
+[awsutils]: https://github.com/wellcometrust/aws_utils
+[dockerfiles]: https://github.com/wellcometrust/dockerfiles
+[terraformmods]: https://github.com/wellcometrust/terraform-modules
+[sierrastreams]: https://github.com/wellcometrust/sierra-streams-source
+[sierra]: https://techdocs.iii.com/sierraapi/Default.htm
