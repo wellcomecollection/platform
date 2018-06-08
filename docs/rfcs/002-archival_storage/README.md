@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 21 May 2018.**
+**Last updated: 08 June 2018.**
 
 ## Problem statement
 
@@ -46,15 +46,15 @@ These services will need to provide accessions in the BagIt bag format, gzip-com
 
 ### Storage
 
-Assets will be stored on S3, with master assets stored separately from access derivatives. A full set of derivatives will be stored for all assets, which will be used for access. Master assets will be additionally replicated to a second AWS region, with a Glacier lifecycle policy. All asset storage will have S3 versioning enabled.
+Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to a second AWS region, using cross-region replication. All asset storage will have S3 versioning enabled.
 
 #### Locations
 
 The storage service will use three S3 buckets:
 
-- Master asset storage (S3 Glacier, Dublin)
-- Master asset storage replica (S3 Glacier, Frankfurt)
-- Derivative asset storage (S3 IA, Dublin)
+- Archival asset storage (S3 Glacier, Dublin)
+- Archival asset storage replica (S3 Glacier, Frankfurt)
+- Access asset storage (S3 IA, Dublin)
 
 Within each bucket, assets will be namespaced by source and shard, e.g.:
 
@@ -63,7 +63,7 @@ Within each bucket, assets will be namespaced by source and shard, e.g.:
 
 #### Assets
 
-Assets will be stored in the above S3 locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed in archival storage. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above S3 locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed in S3. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -72,6 +72,8 @@ Assets will be stored in the above S3 locations inside the BagIt bags that were 
 > - a “bagit.txt” file that identifies the directory as a bag, the version of the BagIt specification that it adheres to, and the character encoding used for tag files
 
 From: [BagIt on Wikipedia](https://en.wikipedia.org/wiki/BagIt)
+
+Access copies may be in the same format as the archival copy, or a derivative format if this is more appropriate for access. For example, we would store high bitrate video masters as archival copies and lower bitrate videos as access copies. Any additional preservation formats created during the ingest workflow will be treated in the same way as any other asset, with separate archival and access copies.
 
 #### Storage manifest
 
@@ -205,18 +207,18 @@ b22036593/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master",
-      "url": "s3://masterbucket/digitised/b22036593/"
+      "locationType": "s3-archive",
+      "url": "s3://archivebucket/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master-replica",
-      "url": "s3://replicabucket/digitised/b22036593/"
+      "locationType": "s3-archive-replica",
+      "url": "s3://archivebucket-replica/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master",
-      "url": "s3://derivativesbucket/digitised/b22036593/"
+      "locationType": "s3-access",
+      "url": "s3://accessbucket/digitised/b22036593/"
     }
   ],
   "description": "A account of a voyage to New South Wales",
@@ -327,18 +329,18 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master",
-      "url": "s3://masterbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": "s3-archive",
+      "url": "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master-replica",
-      "url": "s3://replicabucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": "s3-archive-replica",
+      "url": "s3://archivebucket-replica/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-master",
-      "url": "s3://derivativesbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": "s3-access",
+      "url": "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     }
   ],
   "description": "GC253_1046",
