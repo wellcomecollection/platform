@@ -32,7 +32,6 @@ trait MatcherFixtures
     with SQS
     with SNS
     with LocalLinkedWorkDynamoDb
-    with LocalLockTableDynamoDb
     with MetricsSenderFixture
     with S3 {
 

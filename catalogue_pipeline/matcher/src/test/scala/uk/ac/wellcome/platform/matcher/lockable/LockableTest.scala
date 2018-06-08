@@ -27,7 +27,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   case class ThingToStore(id: String, value: String)
 
   it("locks a Thing") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -47,7 +47,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("cannot lock a locked Thing") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -67,7 +67,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("can lock a locked Thing that has expired") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -104,7 +104,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("unlocks a locked Thing") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -129,7 +129,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("cannot unlock an unlocked Thing") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -154,7 +154,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("only one process can lock/unlock a locked Thing") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -202,7 +202,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("locks a list of Things") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -226,7 +226,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("fails to lock a sequence of Things if any element is locked") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -242,7 +242,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("provides failed and succeeded things when failing to lock a sequence") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -268,7 +268,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("unlocks a list of locked Things") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
@@ -301,7 +301,7 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
   }
 
   it("provides failed and succeeded things when failing to unlock a sequence") {
-    withLocalDynamoDbTable { table: LocalDynamoDb.Table =>
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { table: LocalDynamoDb.Table =>
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 

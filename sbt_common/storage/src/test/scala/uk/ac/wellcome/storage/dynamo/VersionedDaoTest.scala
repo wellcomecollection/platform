@@ -40,7 +40,7 @@ class VersionedDaoTest
   }
 
   def withFixtures[R](testWith: TestWith[(Table, VersionedDao), R]): R = {
-    withLocalDynamoDbTable[R] { table =>
+    withLocalDynamoDbTable[R] { table: Table =>
       withVersionedDao[R](table) { versionedDao =>
         testWith((table, versionedDao))
       }
