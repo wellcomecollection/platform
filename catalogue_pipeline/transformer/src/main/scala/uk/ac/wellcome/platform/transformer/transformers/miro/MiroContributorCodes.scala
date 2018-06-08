@@ -45,13 +45,13 @@ trait MiroContributorCodes {
   // we fallback to the per-record map.
   //
   def lookupContributorCode(miroId: String, code: String): Option[String] =
-  contributorMap.get(code) match {
-    case Some(creditLine) => Some(creditLine)
-    case None => {
-      perRecordContributorMap.get(miroId) match {
-        case Some(perRecordMap) => perRecordMap.get(code)
-        case None => None
+    contributorMap.get(code) match {
+      case Some(creditLine) => Some(creditLine)
+      case None => {
+        perRecordContributorMap.get(miroId) match {
+          case Some(perRecordMap) => perRecordMap.get(code)
+          case None => None
+        }
       }
     }
-  }
 }

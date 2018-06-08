@@ -34,9 +34,10 @@ trait MiroContributors extends MiroContributorCodes {
         lookupContributorCode(miroId = miroId, code = code) match {
           case Some("Wellcome Collection") => None
           case Some(s) => Some(s)
-          case None => throw GracefulFailureException(new RuntimeException(
-            s"Unable to look up contributor credit line for ${miroData.sourceCode} on ${miroId}"
-          ))
+          case None =>
+            throw GracefulFailureException(new RuntimeException(
+              s"Unable to look up contributor credit line for ${miroData.sourceCode} on ${miroId}"
+            ))
         }
       case None => None
     }
