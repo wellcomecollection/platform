@@ -41,7 +41,6 @@ def _should_run_tests(task, travis_event_type):
     """
     Should we run the tests?
     """
-    return True
     if travis_event_type == 'cron':
         print('*** We always run tests in cron!')
         return True
