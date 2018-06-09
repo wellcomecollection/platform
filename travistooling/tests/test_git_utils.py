@@ -31,7 +31,7 @@ def test_known_change_diff():
         #
         # In that case, we check we're seeing the expected exit code,
         # but we don't need to run this branch in the tests.
-        assert err.value.code == 128
+        assert err.code == 128
 
     assert get_changed_paths('1228fc9^', '1228fc9') == set([
         'travistooling/decisionmaker.py',
