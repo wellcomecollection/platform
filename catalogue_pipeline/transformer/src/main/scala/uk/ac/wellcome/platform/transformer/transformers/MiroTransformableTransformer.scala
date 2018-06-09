@@ -54,7 +54,10 @@ class MiroTransformableTransformer
             createdDate =
               getCreatedDate(miroData, miroTransformable.MiroCollection),
             subjects = getSubjects(miroData),
-            contributors = getContributors(miroData),
+            contributors = getContributors(
+              miroId = miroTransformable.sourceId,
+              miroData = miroData
+            ),
             genres = getGenres(miroData),
             thumbnail =
               Some(getThumbnail(miroData, miroTransformable.sourceId)),
