@@ -244,6 +244,16 @@ class MiroTransformableTransformerTest
     )
   }
 
+  it("returns None for images which don't have copyright clearance") {
+    assertTransformReturnsNone(
+      data = """{
+        "image_cleared": "Y",
+        "image_copyright_cleared": "N",
+        "image_tech_file_size": ["1000000"],
+        "image_use_restrictions": "CC-BY"
+      }"""
+    )
+  }
 
   private def assertTransformReturnsNone(data: String) = {
     val miroTransformable = MiroTransformable(

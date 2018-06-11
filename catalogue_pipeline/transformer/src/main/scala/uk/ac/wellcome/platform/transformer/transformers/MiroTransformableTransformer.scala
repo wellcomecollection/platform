@@ -40,6 +40,16 @@ class MiroTransformableTransformer
           )
         }
 
+        // These images should really have been removed from the pipeline
+        // already, but we have at least one instance (B0010525).  It was
+        // throwing a MatchError when we tried to pick a license, so handle
+        // it properly here.
+        if (miroData.copyrightCleared != Some("Y")) {
+          throw new ShouldNotTransformException(
+            s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+          )
+        }
+
         Some(
           UnidentifiedWork(
             title = Some(title),
