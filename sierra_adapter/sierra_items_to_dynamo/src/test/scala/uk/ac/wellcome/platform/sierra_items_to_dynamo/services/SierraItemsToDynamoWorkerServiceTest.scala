@@ -8,7 +8,6 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSToDynamoStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -22,7 +21,6 @@ import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.storage.dynamo._
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec
@@ -47,16 +45,14 @@ class SierraItemsToDynamoWorkerServiceTest
           withLocalSqsQueueAndDlq {
             case queuePair @ QueuePair(queue, dlq) =>
               withMockMetricSender { metricsSender =>
-                withSQSStream[NotificationMessage, R](
+                withSQSStream[SierraRecord, R](
                   actorSystem,
                   queue,
                   metricsSender) { sqsStream =>
                   val sierraItemsToDynamoWorkerService =
                     new SierraItemsToDynamoWorkerService(
                       system = actorSystem,
-                      new SQSToDynamoStream[SierraRecord](
-                        actorSystem,
-                        sqsStream),
+                      sqsStream = sqsStream,
                       dynamoInserter = dynamoInserter
                     )
 

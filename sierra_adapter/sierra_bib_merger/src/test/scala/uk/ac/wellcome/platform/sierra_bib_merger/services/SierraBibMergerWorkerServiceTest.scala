@@ -63,22 +63,19 @@ class SierraBibMergerWorkerServiceTest
       withMockMetricSender { metricsSender =>
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, dlq) =>
-            withSQSStream[NotificationMessage, R](system, queue, metricsSender) {
+            withSQSStream[SierraRecord, R](system, queue, metricsSender) {
               sqsStream =>
                 withLocalDynamoDbTable { table =>
                   withLocalS3Bucket { storageBucket =>
                     withTypeVHS[SierraTransformable, SourceMetadata, R](
                       storageBucket,
                       table) { vhs =>
-                      val sqsToDynamoStream =
-                        new SQSToDynamoStream[SierraRecord](system, sqsStream)
-
                       val mergerUpdaterService =
                         new SierraBibMergerUpdaterService(vhs, metricsSender)
 
                       val worker = new SierraBibMergerWorkerService(
                         system,
-                        sqsToDynamoStream,
+                        sqsStream = sqsStream,
                         mergerUpdaterService)
                       testWith((metricsSender, queuePair, worker))
                     }
