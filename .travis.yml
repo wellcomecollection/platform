@@ -65,7 +65,7 @@ before_cache:
   - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 script:
-  - travis_wait ./run_travis_task.py
+  - ./run_travis_task.py
 
 env:
   global:
