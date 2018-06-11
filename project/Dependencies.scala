@@ -24,6 +24,10 @@ object Dependencies {
     val scalaGraphVersion = "1.12.5"
   }
 
+  lazy val platformVersions = new {
+    val storage = "1.0.1"
+  }
+
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
@@ -121,14 +125,15 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
-    "io.circe" %% "circe-yaml" % "0.8.0"
+    "io.circe" %% "circe-yaml" % "0.8.0",
+    "uk.ac.wellcome" % "scala-storage" % platformVersions.storage
   ) ++ akkaDependencies ++ dynamoDependencies ++ guiceDependencies ++ testDependencies
 
-  val commonStorageDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  ) ++ dynamoDependencies ++ guiceDependencies
-
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+
+  val finatraStorageDependencies = Seq(
+    "uk.ac.wellcome" % "scala-storage" % platformVersions.storage
+  )
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
