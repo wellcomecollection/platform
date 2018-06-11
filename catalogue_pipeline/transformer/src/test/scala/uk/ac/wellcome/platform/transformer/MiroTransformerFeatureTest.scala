@@ -37,7 +37,7 @@ class MiroTransformerFeatureTest
                 message = createValidMiroTransformableJson(
                   MiroID = miroID,
                   MiroCollection = "foo",
-                  data = buildJSONForWork(""""image_title": "$title"""")
+                  data = buildJSONForWork(s""""image_title": "$title"""")
                 ),
                 sourceName = "miro",
                 s3Client = s3Client,
