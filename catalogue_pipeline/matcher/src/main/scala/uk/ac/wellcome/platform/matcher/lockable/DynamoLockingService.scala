@@ -10,7 +10,7 @@ import com.gu.scanamo.syntax.{attributeExists, not}
 import grizzled.slf4j.Logging
 import javax.inject.Inject
 
-class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, tableName: String)
+class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: DynamoLockingServiceConfig)
   extends LockingService with Logging {
 
   implicit val instantLongFormat =
@@ -21,7 +21,7 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, tableName: 
     )
 
   private val defaultDuration = Duration.ofSeconds(10)
-  private val table = Table[RowLock](tableName)
+  private val table = Table[RowLock](config.tableName)
 
   private def createRowLock(id: Identifier) = {
     val created = Instant.now()
@@ -65,3 +65,5 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, tableName: 
       .right.map(_ => ())
   }
 }
+
+case class DynamoLockingServiceConfig(tableName: String)
