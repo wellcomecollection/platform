@@ -53,11 +53,6 @@ lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
   .dependsOn(storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
-// Storage depends on some models in the common lib.
-lazy val storage = doSharedLibrarySetup(project, "sbt_common/storage")
-  .dependsOn(common % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
-
 lazy val finatra_akka = doSharedLibrarySetup(project, "sbt_common/finatra_akka")
   .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
 
@@ -75,8 +70,7 @@ lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_m
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .dependsOn(storage % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
+  .settings(libraryDependencies ++= Dependencies.finatraStorageDependencies)
 
 lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
   .dependsOn(monitoring % "compile->compile;test->test")
