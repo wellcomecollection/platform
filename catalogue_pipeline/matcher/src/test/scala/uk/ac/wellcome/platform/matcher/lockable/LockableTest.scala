@@ -305,11 +305,11 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
       implicit val lockingService = new DynamoLockingService(
         dynamoDbClient, table.name)
 
-      val lockableList: IndexedSeq[ThingToStore] = (1 to 10).map(i => ThingToStore(s"$i", "value"))
+      val lockableList: Iterable[ThingToStore] = (1 to 10).map(i => ThingToStore(s"$i", "value"))
       val tailLock = lockableList.tail.lock
       tailLock shouldBe a[Right[_, _]]
 
-      val locks: IndexedSeq[Locked[ThingToStore]] = tailLock.right.get
+      val locks: Iterable[Locked[ThingToStore]] = tailLock.right.get
       lockableList.tail.foreach((thing: ThingToStore) => {
         val actualStored = Scanamo
           .get[RowLock](dynamoDbClient)(table.name)('id -> thing.id)
@@ -318,8 +318,8 @@ class LockableTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         rowLock.id shouldBe thing.id
       })
 
-      val fakeUnlockedSeq: IndexedSeq[Locked[ThingToStore]] =
-        locks ++ IndexedSeq(Locked[ThingToStore](lockableList.head))
+      val fakeUnlockedSeq: Iterable[Locked[ThingToStore]] =
+        locks ++ Iterable(Locked[ThingToStore](lockableList.head))
 
       val unlockedThings = fakeUnlockedSeq.unlock
 

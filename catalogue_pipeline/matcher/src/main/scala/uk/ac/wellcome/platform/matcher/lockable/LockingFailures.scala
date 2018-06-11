@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.matcher.lockable
 sealed trait LockingFailures
 
 case class LockFailures[T](
-  failed: IndexedSeq[T],
-  succeeded: IndexedSeq[Locked[T]]
+  failed: Iterable[T],
+  succeeded: Iterable[Locked[T]]
 ) extends LockingFailures
 
 case class UnlockFailures[T](
-  failed: IndexedSeq[Locked[T]],
-  succeeded: IndexedSeq[T]
+  failed: Iterable[Locked[T]],
+  succeeded: Iterable[T]
 ) extends LockingFailures

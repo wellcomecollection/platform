@@ -15,17 +15,17 @@ object Lockable {
     def lock = Lockable[A].lock(a)
   }
 
-  implicit class LockableListOps[A: Lockable](a: IndexedSeq[A])(
+  implicit class LockableListOps[A: Lockable](a: Iterable[A])(
     implicit idGetter: IdGetter[A]) {
-    def lock: Either[LockFailures[A], IndexedSeq[Locked[A]]] = {
+    def lock: Either[LockFailures[A], Iterable[Locked[A]]] = {
       val locked = a.map(Lockable[A].lock)
 
       val (leftEither, rightEither) = locked.partition(_.isLeft)
-      val (left, right: IndexedSeq[Locked[A]]) =
+      val (left, right: Iterable[Locked[A]]) =
         (leftEither.map(_.left.get), rightEither.map(_.right.get))
 
       if(left.nonEmpty) {
-        val failed = left.foldLeft[IndexedSeq[A]](IndexedSeq.empty)(
+        val failed = left.foldLeft[Iterable[A]](Iterable.empty)(
           (acc, o) => acc ++ o.failed)
 
         val succeeded = right
@@ -48,7 +48,7 @@ object Lockable {
       val lock: Either[LockFailure, RowLock] = lockingService.lockRow(identifier)
 
       lock
-        .left.map(_ => LockFailures(IndexedSeq(t), IndexedSeq.empty))
+        .left.map(_ => LockFailures(Iterable(t), Iterable.empty))
         .right.map(_ => Locked(t))
     }
 
@@ -57,7 +57,7 @@ object Lockable {
       val unlock = lockingService.unlockRow(identifier)
 
       unlock
-        .left.map(_ => UnlockFailures(IndexedSeq(lockedT), IndexedSeq.empty))
+        .left.map(_ => UnlockFailures(Iterable(lockedT), Iterable.empty))
         .right.map(_ => lockedT.t)
     }
   }
