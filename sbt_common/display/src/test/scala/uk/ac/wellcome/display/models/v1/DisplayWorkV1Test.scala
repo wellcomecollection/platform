@@ -2,6 +2,7 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 
 class DisplayWorkV1Test extends FunSpec with Matchers {
@@ -65,73 +66,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       includes = WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(List())
-  }
-
-  describe("publishers") {
-    it("parses a work without any publishers") {
-      val work = IdentifiedWork(
-        title = Some("A goading giraffe is galling"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "gsfmhw7v",
-        publishers = List()
-      )
-
-      val displayWork = DisplayWorkV1(work)
-      displayWork.publishers shouldBe List()
-    }
-
-    it("parses a work with agent publishers") {
-      val work = IdentifiedWork(
-        title = Some("A hammerhead hamster is harrowing"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "hz2hrba9",
-        publishers = List(
-          Unidentifiable(Agent("Henry Hare")),
-          Unidentifiable(Agent("Harriet Heron"))
-        )
-      )
-
-      val displayWork = DisplayWorkV1(work)
-      displayWork.publishers shouldBe List(
-        DisplayAgentV1(
-          id = None,
-          identifiers = None,
-          label = "Henry Hare",
-          ontologyType = "Agent"),
-        DisplayAgentV1(
-          id = None,
-          identifiers = None,
-          label = "Harriet Heron",
-          ontologyType = "Agent")
-      )
-    }
-
-    it("parses a work with agents and organisations as publishers") {
-      val work = IdentifiedWork(
-        title = Some("Jumping over jackals in Japan"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "j7tw9jv3",
-        publishers = List(
-          Unidentifiable(Agent("Janet Jackson")),
-          Unidentifiable(Organisation("Juniper Journals"))
-        )
-      )
-
-      val displayWork = DisplayWorkV1(work)
-      displayWork.publishers shouldBe List(
-        DisplayAgentV1(id = None, identifiers = None, label = "Janet Jackson"),
-        DisplayOrganisationV1(
-          id = None,
-          identifiers = None,
-          label = "Juniper Journals")
-      )
-    }
   }
 
   it("extracts creators from a Work with Unidentifiable Contributors") {
@@ -218,19 +152,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         label = "Juniper Journals"
       )
     )
-  }
-
-  it("gets the publicationDate from a Work") {
-    val work = IdentifiedWork(
-      title = Some("Calling a cacophany of cats to consume carrots"),
-      canonicalId = "c4kauupf",
-      sourceIdentifier = sourceIdentifier,
-      publicationDate = Some(Period("c1900")),
-      version = 1
-    )
-
-    val displayWork = DisplayWorkV1(work)
-    displayWork.publicationDate shouldBe Some(DisplayPeriodV1("c1900"))
   }
 
   it("gets the physicalDescription from a Work") {
@@ -397,20 +318,37 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       version = 1
     )
 
-    val caught = intercept[RuntimeException] {
+    val caught = intercept[GracefulFailureException] {
       DisplayWorkV1(work)
     }
 
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
-    val publisherSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/pp",
-      ontologyType = "Agent"
+  it("errors if you try to convert a work with non-empty production field") {
+    val work = IdentifiedWork(
+      canonicalId = "pejk5skd",
+      title = Some("Perhaps production of pasta is perfunctory?"),
+      sourceIdentifier = sourceIdentifier,
+      production = List(
+        ProductionEvent(
+          places = List(),
+          agents = List(),
+          dates = List(),
+          function = Some(Concept("Manufacture"))
+        )
+      ),
+      version = 1
     )
 
+    val caught = intercept[GracefulFailureException] {
+      DisplayWorkV1(work)
+    }
+
+    caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
+  }
+
+  describe("correctly uses the WorksIncludes.identifiers include") {
     val creatorAgentSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),
       value = "lcnames/pp",
@@ -466,13 +404,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           roles = List()
         )
       ),
-      publishers = List(
-        Identified(
-          Agent(label = "Percy Publisher"),
-          canonicalId = "p6gxycfb",
-          identifiers = List(publisherSourceIdentifier)
-        )
-      ),
       items = List(
         IdentifiedItem(
           canonicalId = "pwaazubr",
@@ -495,10 +426,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           None,
           None,
           None)
-      }
-
-      it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe None
       }
 
       it("items") {
@@ -529,11 +456,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
           .map { List(_) }
           .map { Some(_) }
         displayWork.creators.map { _.identifiers } shouldBe expectedIdentifiers
-      }
-
-      it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(publisherSourceIdentifier)))
       }
 
       it("items") {

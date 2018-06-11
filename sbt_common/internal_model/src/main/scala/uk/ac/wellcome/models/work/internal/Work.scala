@@ -16,8 +16,7 @@ trait Work {
   val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val genres: List[Genre[IdentityState[AbstractConcept]]]
   val thumbnail: Option[Location]
-  val publishers: List[IdentityState[AbstractAgent]]
-  val publicationDate: Option[Period]
+  val production: List[ProductionEvent[IdentityState[AbstractAgent]]]
   val language: Option[Language]
   val dimensions: Option[String]
   val visible: Boolean
@@ -40,9 +39,7 @@ case class UnidentifiedWork(
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]] = Nil,
   thumbnail: Option[Location] = None,
   items: List[UnidentifiedItem] = Nil,
-  publishers: List[MaybeDisplayable[AbstractAgent]] = Nil,
-  publicationDate: Option[Period] = None,
-  placesOfPublication: List[Place] = Nil,
+  production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   visible: Boolean = true,
@@ -66,9 +63,7 @@ case class IdentifiedWork(
   genres: List[Genre[Displayable[AbstractConcept]]] = Nil,
   thumbnail: Option[Location] = None,
   items: List[IdentifiedItem] = Nil,
-  publishers: List[Displayable[AbstractAgent]] = Nil,
-  publicationDate: Option[Period] = None,
-  placesOfPublication: List[Place] = Nil,
+  production: List[ProductionEvent[Displayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   visible: Boolean = true,

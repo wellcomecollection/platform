@@ -167,14 +167,15 @@ class SierraTransformableTransformerTest
     val title = "Hi Diddle Dee Dee"
     val lettering = "An actor's life for me"
 
-    val publisherFields = List(
+    val productionFields = List(
       VarField(
         fieldTag = "p",
         marcTag = "260",
         indicator1 = " ",
         indicator2 = " ",
         subfields = List(
-          MarcSubfield(tag = "b", content = "Peaceful Poetry")
+          MarcSubfield(tag = "b", content = "Peaceful Poetry"),
+          MarcSubfield(tag = "c", content = "1923.")
         )
       )
     )
@@ -210,22 +211,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val publishingDateFields = List(
-      VarField(
-        fieldTag = "?",
-        marcTag = "260",
-        indicator1 = " ",
-        indicator2 = " ",
-        subfields = List(
-          MarcSubfield(
-            tag = "c",
-            content = "1923."
-          )
-        )
-      )
-    )
-
-    val marcFields = publisherFields ++ descriptionFields ++ letteringFields ++ publishingDateFields
+    val marcFields = productionFields ++ descriptionFields ++ letteringFields
 
     val data =
       s"""
@@ -235,15 +221,6 @@ class SierraTransformableTransformerTest
          | "varFields": ${toJson(marcFields).get}
          |}
         """.stripMargin
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
 
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
@@ -256,18 +233,23 @@ class SierraTransformableTransformerTest
       value = id
     )
 
-    transformedSierraRecord.get shouldBe Some(
-      UnidentifiedWork(
-        title = Some(title),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = List(sourceIdentifier, sierraIdentifier),
-        description = Some("A delightful description of a dead daisy."),
-        publishers =
-          List(Unidentifiable(Organisation(label = "Peaceful Poetry"))),
-        lettering = Some(lettering),
-        publicationDate = Some(Period("1923."))
-      )
+    val work = transformDataToWork(id = id, data = data)
+
+    work shouldBe UnidentifiedWork(
+      title = Some(title),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      identifiers = List(sourceIdentifier, sierraIdentifier),
+      description = Some("A delightful description of a dead daisy."),
+      production = List(
+        ProductionEvent(
+          places = List(),
+          agents = List(Unidentifiable(Agent(label = "Peaceful Poetry"))),
+          dates = List(Period("1923.")),
+          function = None
+        )
+      ),
+      lettering = Some(lettering)
     )
   }
 
@@ -284,35 +266,8 @@ class SierraTransformableTransformerTest
          |}
         """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b17898717"
-    )
-    val sierraIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-identifier"),
-      ontologyType = "Work",
-      value = id
-    )
-
-    transformedSierraRecord.get shouldBe Some(
-      UnidentifiedWork(
-        title = Some(title),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = List(sourceIdentifier, sierraIdentifier),
-        visible = false,
-        publicationDate = None)
-    )
+    val work = transformDataToWork(id = id, data = data)
+    work.visible shouldBe false
   }
 
   it("makes suppressed works invisible") {
@@ -328,35 +283,8 @@ class SierraTransformableTransformerTest
          |}
         """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b00010005"
-    )
-    val sierraIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-identifier"),
-      ontologyType = "Work",
-      value = id
-    )
-
-    transformedSierraRecord.get shouldBe Some(
-      UnidentifiedWork(
-        title = Some(title),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = List(sourceIdentifier, sierraIdentifier),
-        visible = false,
-        publicationDate = None)
-    )
+    val work = transformDataToWork(id = id, data = data)
+    work.visible shouldBe false
   }
 
   it("transforms bib records that don't have a title") {
@@ -376,16 +304,8 @@ class SierraTransformableTransformerTest
          |}
         """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.title shouldBe None
+    val work = transformDataToWork(id = id, data = data)
+    work.title shouldBe None
   }
 
   it("includes the physical description, if present") {
@@ -414,17 +334,8 @@ class SierraTransformableTransformerTest
         | }
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.physicalDescription shouldBe Some(
-      physicalDescription)
+    val work = transformDataToWork(id = id, data = data)
+    work.physicalDescription shouldBe Some(physicalDescription)
   }
 
   it("includes the extent, if present") {
@@ -453,56 +364,8 @@ class SierraTransformableTransformerTest
         | }
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.extent shouldBe Some(extent)
-  }
-
-  it("includes place of publications") {
-    val id = "8008008"
-    val place = "Purple pages"
-
-    val data =
-      s"""
-         | {
-         |   "id": "$id",
-         |   "title": "English earwigs earn evidence of evil",
-         |   "varFields": [
-         |     {
-         |       "fieldTag": "a",
-         |       "marcTag": "260",
-         |       "ind1": " ",
-         |       "ind2": " ",
-         |       "subfields": [
-         |         {
-         |           "tag": "a",
-         |           "content": "$place"
-         |         }
-         |       ]
-         |     }
-         |   ]
-         | }
-      """.stripMargin
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.placesOfPublication should contain only Place(
-      label = place)
-
+    val work = transformDataToWork(id = id, data = data)
+    work.extent shouldBe Some(extent)
   }
 
   it("includes the work type, if present") {
@@ -511,7 +374,7 @@ class SierraTransformableTransformerTest
     val workTypeValue =
       "A parchment of penguin pemmican pierced playfully with pencils."
 
-    val workType = WorkType(
+    val expectedWorkType = WorkType(
       id = workTypeId,
       label = workTypeValue
     )
@@ -529,33 +392,13 @@ class SierraTransformableTransformerTest
          | }
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.workType shouldBe Some(workType)
+    val work = transformDataToWork(id = id, data = data)
+    work.workType shouldBe Some(expectedWorkType)
   }
 
   it("uses the full Sierra system number as the source identifier") {
     val id = "9000009"
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData = Some(
-        SierraBibRecord(
-          id = id,
-          data = s"""{"id": "$id"}""",
-          modifiedDate = now()
-        ))
-    )
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
+    val data = s"""{"id": "$id"}"""
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
@@ -563,37 +406,28 @@ class SierraTransformableTransformerTest
       value = "b90000092"
     )
 
-    transformedSierraRecord.get.get.sourceIdentifier shouldBe expectedSourceIdentifier
+    val work = transformDataToWork(id = id, data = data)
+    work.sourceIdentifier shouldBe expectedSourceIdentifier
   }
 
   it("uses the lang for the language field") {
     val id = "1020201"
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData = Some(
-        SierraBibRecord(
-          id = id,
-          data = s"""{
-            "id": "$id",
-            "lang": {
-              "code": "fra",
-              "name": "French"
-            }
-          }""",
-          modifiedDate = now()
-        ))
-    )
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
+    val data =
+      s"""{
+         |  "id": "$id",
+         |  "lang": {
+         |    "code": "fra",
+         |    "name": "French"
+         |  }
+         |}""".stripMargin
 
     val expectedLanguage = Language(
       id = "fra",
       label = "French"
     )
 
-    transformedSierraRecord.get.get.language.get shouldBe expectedLanguage
+    val work = transformDataToWork(id = id, data = data)
+    work.language.get shouldBe expectedLanguage
   }
 
   it("extracts contributor information if present") {
@@ -622,16 +456,8 @@ class SierraTransformableTransformerTest
           | }
        """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.contributors shouldBe List(
+    val work = transformDataToWork(id = id, data = data)
+    work.contributors shouldBe List(
       Contributor[MaybeDisplayable[AbstractAgent]](
         Unidentifiable(Person(label = name)))
     )
@@ -663,16 +489,8 @@ class SierraTransformableTransformerTest
          | }
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.dimensions shouldBe Some(dimensions)
+    val work = transformDataToWork(id = id, data = data)
+    work.dimensions shouldBe Some(dimensions)
   }
 
   it("extracts subjects if present") {
@@ -701,18 +519,66 @@ class SierraTransformableTransformerTest
          | }
       """.stripMargin
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())))
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get.get.subjects shouldBe List(
+    val work = transformDataToWork(id = id, data = data)
+    work.subjects shouldBe List(
       Subject(content, List(Unidentifiable(Concept(content)))))
   }
 
+  it("adds production events if possible") {
+    val id = "9876789"
+    val placeLabel = "London"
+
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Loosely lamenting the lemons of London",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "260",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "a",
+         |           "content": "$placeLabel"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val work = transformDataToWork(id = id, data = data)
+    work.production shouldBe List(
+      ProductionEvent(
+        places = List(Place(placeLabel)),
+        agents = List(),
+        dates = List(),
+        function = None
+      )
+    )
+  }
+
+  private def transformDataToWork(id: String, data: String): UnidentifiedWork = {
+    val bibRecord = SierraBibRecord(
+      id = id,
+      data = data,
+      modifiedDate = now()
+    )
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData = Some(bibRecord)
+    )
+
+    val transformedSierraRecord = transformer.transform(
+      transformable = sierraTransformable,
+      version = 1
+    )
+
+    transformedSierraRecord.isSuccess shouldBe true
+    transformedSierraRecord.get.get
+  }
 }

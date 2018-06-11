@@ -70,16 +70,8 @@ case class DisplayWorkV2(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
-    value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgentV2] = List(),
-  @ApiModelProperty(
-    value = "Show a list of places of publication."
-  ) placesOfPublication: List[DisplayPlace] = List(),
-  @ApiModelProperty(
-    dataType = "uk.ac.wellcome.display.models.v2.DisplayPeriod",
-    value =
-      "Relates the publication of a work to a date when the work has been formally published."
-  ) publicationDate: Option[DisplayPeriod] = None,
+    value = "Relates a work to its production events."
+  ) production: List[DisplayProductionEvent] = List(),
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
@@ -141,11 +133,9 @@ case object DisplayWorkV2 {
             DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map {
-        DisplayAbstractAgentV2(_, includesIdentifiers = includes.identifiers)
+      production = work.production.map {
+        DisplayProductionEvent(_, includesIdentifiers = includes.identifiers)
       },
-      publicationDate = work.publicationDate.map { DisplayPeriod(_) },
-      placesOfPublication = work.placesOfPublication.map { DisplayPlace(_) },
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )

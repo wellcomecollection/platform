@@ -219,23 +219,33 @@ class IdentifiedWorkTest
       |      "ontologyType": "Item"
       |    }
       |  ],
-      |  "publishers": [
+      |  "production": [
       |    {
-      |      "agent" : {
-      |        "label" : "MIT Press",
-      |        "type" : "Organisation"
-      |      },
-      |      "type" : "Unidentifiable"
+      |      "agents": [
+      |        {
+      |          "agent": {
+      |            "label": "MIT Press",
+      |            "type": "Agent"
+      |          },
+      |          "type": "Unidentifiable"
+      |        }
+      |      ],
+      |      "dates": [
+      |        {
+      |          "label": "$publicationDate",
+      |          "ontologyType": "Period"
+      |        }
+      |      ],
+      |      "places": [
+      |        {
+      |          "label": "Spain",
+      |          "ontologyType": "Place"
+      |        }
+      |      ],
+      |      "function": null,
+      |      "ontologyType": "ProductionEvent"
       |    }
       |  ],
-      |  "publicationDate": {
-      |    "label": "$publicationDate",
-      |    "ontologyType": "Period"
-      |  },
-      |  "placesOfPublication": [{
-      |   "label": "Spain",
-      |   "ontologyType": "Place"
-      |  }],
       |   "language": {
       |     "id": "${language.id}",
       |     "label": "${language.label}",
@@ -272,12 +282,6 @@ class IdentifiedWorkTest
     locations = List(location)
   )
 
-  val publisher = Organisation(
-    label = "MIT Press"
-  )
-
-  val publishers = List(Unidentifiable(publisher))
-
   val identifiedWork = IdentifiedWork(
     canonicalId = "canonicalId",
     title = Some("title"),
@@ -295,9 +299,14 @@ class IdentifiedWorkTest
     genres = List(genre),
     thumbnail = Some(location),
     items = List(item),
-    publishers = publishers,
-    publicationDate = Some(Period(publicationDate)),
-    placesOfPublication = List(Place(label = "Spain")),
+    production = List(
+      ProductionEvent(
+        places = List(Place(label = "Spain")),
+        agents = List(Unidentifiable(Agent(label = "MIT Press"))),
+        dates = List(Period(publicationDate)),
+        function = None
+      )
+    ),
     language = Some(language),
     dimensions = Some(dimensions)
   )

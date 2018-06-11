@@ -68,8 +68,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "contributors": [${contributor(works(0).contributors(0))}],
                |     "subjects": [ ],
                |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "production": [ ]
                |   },
                |   {
                |     "type": "Work",
@@ -86,8 +85,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "contributors": [${contributor(works(1).contributors(0))}],
                |     "subjects": [ ],
                |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "production": [ ]
                |   }
                |  ]
                |}
@@ -126,8 +124,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "contributors": [],
                |     "subjects": [ ],
                |     "genres": [ ],
-               |     "publishers": [ ],
-               |     "placesOfPublication": [ ]
+               |     "production": [ ]
                |   }
                |  ]
                |}""".stripMargin

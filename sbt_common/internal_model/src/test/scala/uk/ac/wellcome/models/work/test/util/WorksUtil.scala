@@ -127,6 +127,7 @@ trait WorksUtil {
       contributors = List(
         Contributor(agent = Unidentifiable(creator))
       ),
+      production = List(),
       items = items,
       visible = visible
     )

@@ -38,8 +38,8 @@ variable "es_config_ingestor" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
+    index_v1 = "v1-2018-06-07-production-field"
+    index_v2 = "v2-2018-06-07-production-field"
     doc_type = "work"
   }
 }

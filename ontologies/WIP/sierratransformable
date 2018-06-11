@@ -459,38 +459,20 @@
    *
 
 
-   * Populate wwork:publicationDate. Rules:
-   * 
-   * 1. For bibliographic records where "260" is populated
-   * 2. Platform "publicationDate" "label" populate with 260 subfield "c"
-   * 3. Type as "Period"
-   * 4. Also all bibliographic records use "publishYear"
-   * 5. Platform "year" populate from "publishYear"
-   *
-   *
-   * Example: 
-   *   "publicationDate": {
-   *     "label": "23 May 1932",
-   *     "type": "Period" 
-   *  },
-   * 
-   *
-   * Example of how we might pull out year or date when we know it in the future:
-   * 
-   *   "publicationDate": {
-   *     "label": "May 23 1932",
-   *     "type": "Period" ,
-   *     "year": "1932" ,
-   *     "date" : "05-23-1932"
-   *  },
-   */
+    // @@AWLC
+    // 260 is historical
+    // 264 is what we're moving towards
+    // is an error to have neither
+
+    // 260 had no indicator, so used presence of subfields
+    // no productionFunction if unsure
 
    /* Populate wwork:production 260
    * 
    * 1. For bibliographic records where "260" is populated
    * 2. Populate "places" from subfield "a" and type as "Place".
    * 3. Populate "agents" from subfield "b" and type as "Agent"
-   * 4. Populate "periods" from subfield "c" and type as "Periods"    
+   * 4. Populate "dates" from subfield "c" and type as "Periods"
    * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
    * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
    * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
@@ -551,6 +533,8 @@
    *  ]
    *
    */
+
+    // 264 function is controlled
 
    /* Populate wwork:production 264
    * 
@@ -617,21 +601,6 @@
    *
    */
 
-
-   /* Populate wwork:publishers
-   * 
-   * 1. For bibliographic records where "260" is populated. If "260" is not populated look at "264".
-   * 2. Platform "publishers" "label" populate with 260 subfield "b"
-   * 3. Type as "Organisation"
-   *
-   * Example:
-   *    "publishers": [
-   *     {
-   *        "label": "H. Humphrey" ,
-   *        "type": "Organisation" 
-   *     }
-   *     ],
-   */
 
    /* Populate wwork:lettering: Rules:
    *

@@ -3,6 +3,7 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   Contributor,
@@ -106,8 +107,23 @@ case object DisplayWorkV1 {
   def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV1 = {
 
     if (!work.visible) {
-      throw new RuntimeException(
-        s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork")
+      throw GracefulFailureException(
+        new RuntimeException(
+          s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
+        ))
+    }
+
+    // The "production" field on work contains information that should go
+    // into the publisher-specific fields.
+    //
+    // In practice, the V1 display model should only be used to serialise Miro
+    // data, which never populates the production field -- so rather than
+    // writing and testing code to tease it out, just error here instead.
+    if (work.production != Nil) {
+      throw GracefulFailureException(
+        new RuntimeException(
+          s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
+        ))
     }
 
     DisplayWorkV1(
@@ -144,11 +160,9 @@ case object DisplayWorkV1 {
             DisplayItemV1(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      publishers = work.publishers.map {
-        DisplayAbstractAgentV1(_, includesIdentifiers = includes.identifiers)
-      },
-      publicationDate = work.publicationDate.map { DisplayPeriodV1(_) },
-      placesOfPublication = work.placesOfPublication.map { DisplayPlaceV1(_) },
+      publishers = List(),
+      publicationDate = None,
+      placesOfPublication = List(),
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )

@@ -67,91 +67,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     displayWork.identifiers shouldBe Some(List())
   }
 
-  describe("publishers") {
-    it("parses a work without any publishers") {
-      val work = IdentifiedWork(
-        title = Some("A goading giraffe is galling"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "gsfmhw7v",
-        publishers = List()
-      )
-
-      val displayWork = DisplayWorkV2(work)
-      displayWork.publishers shouldBe List()
-    }
-
-    it("parses a work with agent publishers") {
-      val work = IdentifiedWork(
-        title = Some("A hammerhead hamster is harrowing"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "hz2hrba9",
-        publishers = List(
-          Unidentifiable(Agent("Henry Hare")),
-          Unidentifiable(Agent("Harriet Heron"))
-        )
-      )
-
-      val displayWork = DisplayWorkV2(work)
-      displayWork.publishers shouldBe List(
-        DisplayAgentV2(
-          id = None,
-          identifiers = None,
-          label = "Henry Hare",
-          ontologyType = "Agent"),
-        DisplayAgentV2(
-          id = None,
-          identifiers = None,
-          label = "Harriet Heron",
-          ontologyType = "Agent")
-      )
-    }
-
-    it("parses a work with agents and organisations as publishers") {
-      val work = IdentifiedWork(
-        title = Some("Jumping over jackals in Japan"),
-        sourceIdentifier = sourceIdentifier,
-        version = 1,
-        identifiers = Nil,
-        canonicalId = "j7tw9jv3",
-        publishers = List(
-          Unidentifiable(Agent("Janet Jackson")),
-          Unidentifiable(Organisation("Juniper Journals"))
-        )
-      )
-
-      val displayWork = DisplayWorkV2(work)
-      displayWork.publishers shouldBe List(
-        DisplayAgentV2(id = None, identifiers = None, label = "Janet Jackson"),
-        DisplayOrganisationV2(
-          id = None,
-          identifiers = None,
-          label = "Juniper Journals")
-      )
-    }
-  }
-
-  it("gets the publicationDate from a Work") {
-    val work = IdentifiedWork(
-      title = Some("Calling a cacophany of cats to consume carrots"),
-      canonicalId = "c4kauupf",
-      sourceIdentifier = sourceIdentifier,
-      publicationDate = Some(Period("c1900")),
-      version = 1
-    )
-
-    val displayWork = DisplayWorkV2(work)
-    displayWork.publicationDate shouldBe Some(
-      DisplayPeriod(
-        id = None,
-        identifiers = None,
-        label = "c1900"
-      ))
-  }
-
   it("gets the physicalDescription from a Work") {
     val physicalDescription = "A magnificent mural of magpies"
 
@@ -304,13 +219,28 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
-    val publisherSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/boo",
-      ontologyType = "Agent"
+  it("extracts production events from a work") {
+    val productionEvent = ProductionEvent(
+      places = List(Place("London")),
+      agents = List(Unidentifiable(Agent("Macmillan"))),
+      dates = List(Period("2005")),
+      function = Some(Concept("Manufacture"))
     )
 
+    val work = IdentifiedWork(
+      canonicalId = "ecgxstzd",
+      title = Some("Events entailing the exegesis of empires"),
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      production = List(productionEvent)
+    )
+
+    val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
+    displayWork.production shouldBe List(
+      DisplayProductionEvent(productionEvent, includesIdentifiers = false))
+  }
+
+  describe("correctly uses the WorksIncludes.identifiers include") {
     val contributorAgentSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),
       value = "lcnames/007",
@@ -384,13 +314,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           roles = List()
         )
       ),
-      publishers = List(
-        Identified(
-          Agent(label = "Brilliant Books"),
-          canonicalId = "bq5s3rzs",
-          identifiers = List(publisherSourceIdentifier)
-        )
-      ),
       items = List(
         IdentifiedItem(
           canonicalId = "bksy8rkc",
@@ -448,10 +371,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         agents.map { _.identifiers } shouldBe List(None, None, None)
       }
 
-      it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe None
-      }
-
       it("items") {
         val displayWork =
           DisplayWorkV2(work, includes = WorksIncludes(items = true))
@@ -492,11 +411,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         val agents: List[DisplayAbstractAgentV2] =
           displayWork.contributors.map { _.agent }
         agents.map { _.identifiers } shouldBe expectedIdentifiers
-      }
-
-      it("publishers") {
-        displayWork.publishers.head.identifiers shouldBe Some(
-          List(DisplayIdentifierV2(publisherSourceIdentifier)))
       }
 
       it("items") {

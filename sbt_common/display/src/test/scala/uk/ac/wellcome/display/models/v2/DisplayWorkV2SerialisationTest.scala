@@ -51,8 +51,7 @@ class DisplayWorkV2SerialisationTest
        | ],
        | "subjects": [ ],
        | "genres": [ ],
-       | "publishers": [ ],
-       | "placesOfPublication": [ ]
+       | "production": [ ]
        |}
           """.stripMargin
 
@@ -83,8 +82,7 @@ class DisplayWorkV2SerialisationTest
                           | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "production": [ ]
                           |}
           """.stripMargin
 
@@ -108,8 +106,7 @@ class DisplayWorkV2SerialisationTest
                           | "items": [ ],
                           | "subjects": [ ],
                           | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "production": [ ]
                           |}
           """.stripMargin
 
@@ -145,8 +142,7 @@ class DisplayWorkV2SerialisationTest
                           |     "contributors": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ],
+                          |     "production": [ ],
                           |     "items": [
                           |       {
                           |         "id": "${item.canonicalId}",
@@ -189,8 +185,7 @@ class DisplayWorkV2SerialisationTest
                           |     "subjects": [ ${subjects(
                             workWithSubjects.subjects)} ],
                           |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
+                          |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -222,8 +217,7 @@ class DisplayWorkV2SerialisationTest
                           |     "contributors": [],
                           |     "subjects": [ ],
                           |     "genres": [ ${genres(workWithSubjects.genres)} ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ]
+                          |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -251,8 +245,7 @@ class DisplayWorkV2SerialisationTest
                           | "identifiers": [ ${identifier(srcIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "production": [ ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -276,8 +269,7 @@ class DisplayWorkV2SerialisationTest
                           | "identifiers": [ ],
                           | "subjects": [ ],
                           | "genres": [ ],
-                          | "publishers": [ ],
-                          | "placesOfPublication": [ ]
+                          | "production": [ ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -304,8 +296,7 @@ class DisplayWorkV2SerialisationTest
                           |     "contributors": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
-                          |     "publishers": [ ],
-                          |     "placesOfPublication": [ ],
+                          |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }
           """.stripMargin
