@@ -34,7 +34,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
 
     // TODO: handle gracefully, don't TryBackoff ad infinitum
     blocking {
-      info(s"Matching ($sourceIdentifier)")
+      debug(s"Matching ($sourceIdentifier)")
 
       val i = identifiers.i
       val query = withSQL {
@@ -61,7 +61,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
   def saveIdentifier(identifier: Identifier): Try[Any] = {
     Try {
       blocking {
-        info(s"putting new identifier $identifier")
+        debug(s"Putting new identifier $identifier")
         withSQL {
           insert
             .into(identifiers)
