@@ -227,28 +227,29 @@ class MiroTransformableTransformerTest
 
   it(
     "returns None for Miro records with usage restrictions that mean we suppress the image") {
-    val miroTransformable = MiroTransformable(
-      sourceId = "P0000001",
-      MiroCollection = "TestCollection",
+    assertTransformReturnsNone(
       data = buildJSONForWork(
         """
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
       """)
     )
-
-    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
-    triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get shouldBe None
   }
 
   it("returns None for Miro records from contributor GUS") {
-    val miroTransformable = MiroTransformable(
-      sourceId = "G0000001",
-      MiroCollection = "TestCollection",
+    assertTransformReturnsNone(
       data = buildJSONForWork("""
         "image_source_code": "GUS"
       """)
+    )
+  }
+
+
+  private def assertTransformReturnsNone(data: String) = {
+    val miroTransformable = MiroTransformable(
+      sourceId = "G0000001",
+      MiroCollection = "TestCollection",
+      data = data
     )
 
     val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
