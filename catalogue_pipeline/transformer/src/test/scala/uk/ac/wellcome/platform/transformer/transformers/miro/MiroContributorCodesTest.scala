@@ -11,7 +11,7 @@ class MiroContributorCodesTest extends FunSpec with Matchers {
   it(
     "looks up a contributor code in the per-record map if it's absent from the general map") {
     transformer.lookupContributorCode(miroId = "B0006507", code = "CSC") shouldBe Some(
-      "Jenny Nichols")
+      "Jenny Nichols, Wellcome Trust Centre for Stem Cell Research")
   }
 
   it("uses the uppercased version of a contributor code") {
