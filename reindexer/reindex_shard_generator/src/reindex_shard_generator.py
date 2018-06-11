@@ -20,8 +20,6 @@ SHARD_SIZE = 1500
 
 @log_on_error
 def main(event, _ctxt=None, dynamodb_client=None):
-    print(f'event={event!r}')
-
     dynamodb_client = dynamodb_client or boto3.client('dynamodb')
     table_name = os.environ['TABLE_NAME']
 

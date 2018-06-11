@@ -32,8 +32,6 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 
 @log_on_error
 def main(event, _ctxt=None, s3_client=None, sns_client=None):
-    print(f'event = {event!r}')
-
     topic_arn = os.environ["TOPIC_ARN"]
 
     s3_client = s3_client or boto3.client('s3')

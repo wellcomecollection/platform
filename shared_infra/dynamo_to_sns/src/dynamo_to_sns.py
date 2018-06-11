@@ -41,8 +41,6 @@ def get_sns_messages(trigger_event, stream_view_type):
 
 @log_on_error
 def main(event, _ctxt=None, sns_client=None):
-    print(f'Received event: {event!r}')
-
     topic_arn = os.environ['TOPIC_ARN']
     topic_name = topic_arn.split(":")[-1]
     stream_view_type = os.environ.get('STREAM_VIEW_TYPE', 'FULL_EVENT')
