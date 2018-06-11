@@ -59,8 +59,8 @@ class VersionedDao @Inject()(
     val id = idGetter.id(record)
     debug(s"Attempting to update Dynamo record: $id")
 
-    updateBuilder(record).map { ops =>
-      Scanamo.exec(dynamoDbClient)(ops) match {
+    updateBuilder(record) match {
+      case Some(ops) => Scanamo.exec(dynamoDbClient)(ops) match {
         case Left(scanamoError) => {
           val exception = new RuntimeException(scanamoError.toString)
 
@@ -72,6 +72,7 @@ class VersionedDao @Inject()(
           debug(s"Successfully updated Dynamo record: $id")
         }
       }
+      case None => ()
     }
   }
 
