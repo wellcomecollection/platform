@@ -19,9 +19,10 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(table.name)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
-          .withKeyType(KeyType.HASH))
+        .withKeySchema(
+          new KeySchemaElement()
+            .withAttributeName("id")
+            .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")

@@ -56,12 +56,14 @@ trait LocalDynamoDb extends Eventually with ExtendedPatience {
     }
   )
 
-  def withSpecifiedLocalDynamoDbTable[R](createTable: (AmazonDynamoDB) => Table): Fixture[Table, R] = fixture[Table, R](
-    create = createTable(dynamoDbClient),
-    destroy = { _ =>
-      deleteAllTables()
-    }
-  )
+  def withSpecifiedLocalDynamoDbTable[R](
+    createTable: (AmazonDynamoDB) => Table): Fixture[Table, R] =
+    fixture[Table, R](
+      create = createTable(dynamoDbClient),
+      destroy = { _ =>
+        deleteAllTables()
+      }
+    )
 
   def createTable(table: LocalDynamoDb.Table): Table
 

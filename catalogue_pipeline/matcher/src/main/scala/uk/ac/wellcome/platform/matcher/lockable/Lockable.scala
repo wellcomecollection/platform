@@ -24,9 +24,9 @@ object Lockable {
       val (left, right: Iterable[Locked[A]]) =
         (leftEither.map(_.left.get), rightEither.map(_.right.get))
 
-      if(left.nonEmpty) {
-        val failed = left.foldLeft[Iterable[A]](Iterable.empty)(
-          (acc, o) => acc ++ o.failed)
+      if (left.nonEmpty) {
+        val failed = left.foldLeft[Iterable[A]](Iterable.empty)((acc, o) =>
+          acc ++ o.failed)
 
         val succeeded = right
 
@@ -38,27 +38,29 @@ object Lockable {
   }
 
   implicit def createLockable[T, L <: LockingService](
-    implicit
-      lockingService: L,
-      idGetter: IdGetter[T]
+    implicit lockingService: L,
+    idGetter: IdGetter[T]
   ): Lockable[T] = new Lockable[T] {
 
     def lock(t: T): Either[LockFailures[T], Locked[T]] = {
       val identifier = Identifier(idGetter.id(t))
-      val lock: Either[LockFailure, RowLock] = lockingService.lockRow(identifier)
+      val lock: Either[LockFailure, RowLock] =
+        lockingService.lockRow(identifier)
 
-      lock
-        .left.map(_ => LockFailures(Iterable(t), Iterable.empty))
-        .right.map(_ => Locked(t))
+      lock.left
+        .map(_ => LockFailures(Iterable(t), Iterable.empty))
+        .right
+        .map(_ => Locked(t))
     }
 
     def unlock(lockedT: Locked[T]): Either[UnlockFailures[T], T] = {
       val identifier = Identifier(idGetter.id(lockedT.t))
       val unlock = lockingService.unlockRow(identifier)
 
-      unlock
-        .left.map(_ => UnlockFailures(Iterable(lockedT), Iterable.empty))
-        .right.map(_ => lockedT.t)
+      unlock.left
+        .map(_ => UnlockFailures(Iterable(lockedT), Iterable.empty))
+        .right
+        .map(_ => lockedT.t)
     }
   }
 }

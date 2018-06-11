@@ -10,8 +10,10 @@ import com.gu.scanamo.syntax.{attributeExists, not}
 import grizzled.slf4j.Logging
 import javax.inject.Inject
 
-class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: DynamoLockingServiceConfig)
-  extends LockingService with Logging {
+class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB,
+                                     config: DynamoLockingServiceConfig)
+    extends LockingService
+    with Logging {
 
   implicit val instantLongFormat =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
@@ -36,16 +38,16 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: Dyn
     debug(s"Trying to create RowLock: $rowLock")
 
     val scanamoOps = table
-      .given(not(attributeExists('id)) or Condition('expires < rowLock.expires.getEpochSecond))
+      .given(
+        not(attributeExists('id)) or Condition(
+          'expires < rowLock.expires.getEpochSecond))
       .put(rowLock)
 
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
 
     debug(s"Got $result when creating $rowLock")
 
-    result
-      .left.map(e => LockFailure(id, e.toString))
-      .right.map(_ => rowLock)
+    result.left.map(e => LockFailure(id, e.toString)).right.map(_ => rowLock)
   }
 
   def unlockRow(id: Identifier): Either[UnlockFailure, Unit] = {
@@ -53,16 +55,14 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: Dyn
     debug(s"Trying to unlock row: $id")
 
     val scanamoOps = table
-      .given(attributeExists('id) )
+      .given(attributeExists('id))
       .delete('id -> id.value)
 
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
 
     debug(s"Got $result when unlocking $id")
 
-    result
-      .left.map(e => UnlockFailure(id, e.toString))
-      .right.map(_ => ())
+    result.left.map(e => UnlockFailure(id, e.toString)).right.map(_ => ())
   }
 }
 
