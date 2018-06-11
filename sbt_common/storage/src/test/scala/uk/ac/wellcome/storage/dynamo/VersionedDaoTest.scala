@@ -274,10 +274,12 @@ class VersionedDaoTest
 
     describe("DynamoDB failures") {
       it("returns a GracefulFailureException if we exceed throughput limits") {
-        val exceptionThrownByUpdateItem = new ProvisionedThroughputExceededException(
-          "You tried to write to DynamoDB too quickly!"
-        )
-        val expectedException = GracefulFailureException(exceptionThrownByUpdateItem)
+        val exceptionThrownByUpdateItem =
+          new ProvisionedThroughputExceededException(
+            "You tried to write to DynamoDB too quickly!"
+          )
+        val expectedException =
+          GracefulFailureException(exceptionThrownByUpdateItem)
 
         assertRequestFailsWithCorrectException(
           exceptionThrownByUpdateItem = exceptionThrownByUpdateItem,
@@ -285,11 +287,13 @@ class VersionedDaoTest
         )
       }
 
-      it("returns a GracefulFailureException if we fail the conditional update") {
+      it(
+        "returns a GracefulFailureException if we fail the conditional update") {
         val exceptionThrownByUpdateItem = new ConditionalCheckFailedException(
           "true is not equal to false!"
         )
-        val expectedException = GracefulFailureException(exceptionThrownByUpdateItem)
+        val expectedException =
+          GracefulFailureException(exceptionThrownByUpdateItem)
 
         assertRequestFailsWithCorrectException(
           exceptionThrownByUpdateItem = exceptionThrownByUpdateItem,
