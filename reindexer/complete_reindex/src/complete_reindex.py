@@ -83,5 +83,3 @@ def main(event, _):
     table = dynamodb.Table(table_name)
 
     _run(table, event)
-
-    print(f'Done with {event!r}!')
