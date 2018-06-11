@@ -5,12 +5,11 @@ import com.gu.scanamo._
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.type_classes.IdGetter
 
 class LockingDao[T](dynamoDbClient: AmazonDynamoDB, config: LockingDaoConfig)(
   implicit
     lockingService: DynamoLockingService,
-    idGetter: IdGetter[T],
+//    idGetter: IdGetter[T],
     evidence: DynamoFormat[T]
 ) extends Logging {
 
@@ -29,10 +28,10 @@ class LockingDao[T](dynamoDbClient: AmazonDynamoDB, config: LockingDaoConfig)(
     val foo: Either[LockFailure, Option[Either[DynamoReadError, T]]] = locked.right.map(_ => get(identifier))
 
     foo match {
-      case Right(Some(Right(t: T))) => Some(Right(Locked(t)))
+      case Right(Some(Right(t))) => Some(Right(Locked(t)))
       case Right(Some(Left(e: DynamoReadError))) => Some(Left(LockingDaoFailure(e.toString)))
       case Right(None) => None
-      case Left
+      case _ => Some(Left(LockingDaoFailure("")))
     }
   }
 }
