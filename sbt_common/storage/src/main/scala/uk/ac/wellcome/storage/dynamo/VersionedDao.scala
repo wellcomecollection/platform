@@ -1,20 +1,24 @@
 package uk.ac.wellcome.storage.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
+  ProvisionedThroughputExceededException
+}
 import com.google.inject.Inject
-import com.gu.scanamo.error.ScanamoError
+import com.gu.scanamo.error.{ConditionNotMet, ScanamoError}
 import com.gu.scanamo.ops.ScanamoOps
 import com.gu.scanamo.query.{KeyEquals, UniqueKey}
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.storage.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.type_classes.{
   IdGetter,
   VersionGetter,
   VersionUpdater
 }
-
-import uk.ac.wellcome.storage.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
@@ -61,11 +65,11 @@ class VersionedDao @Inject()(
 
     updateBuilder(record) match {
       case Some(ops) => Scanamo.exec(dynamoDbClient)(ops) match {
+        case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
+          throw GracefulFailureException(e)
         case Left(scanamoError) => {
           val exception = new RuntimeException(scanamoError.toString)
-
           warn(s"Failed to update Dynamo record: $id", exception)
-
           throw exception
         }
         case Right(_) => {
@@ -74,6 +78,8 @@ class VersionedDao @Inject()(
       }
       case None => ()
     }
+  }.recover {
+    case t: ProvisionedThroughputExceededException => throw GracefulFailureException(t)
   }
 
   def getRecord[T](id: String)(
