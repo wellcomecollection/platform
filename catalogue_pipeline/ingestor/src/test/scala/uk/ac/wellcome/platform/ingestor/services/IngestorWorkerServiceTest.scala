@@ -1,21 +1,21 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
+import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
+import com.sksamuel.elastic4s.http.ElasticDsl.{booleanField, intField, keywordField, mapping, objectField, textField}
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
+import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
+import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials, ElasticSearchIndex}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.ObjectLocation
@@ -25,6 +25,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
 
 class IngestorWorkerServiceTest
     extends FunSpec
@@ -213,6 +214,88 @@ class IngestorWorkerServiceTest
 
   }
 
+  it("deletes successfully ingested works from the queue, including older versions of already ingested works") {
+    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "s1"), canonicalId = "s1")
+    val newSierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "s2"), canonicalId = "s2", version = 2)
+    val oldSierraWork = newSierraWork.copy(version = 1)
+
+    val works = List(sierraWork, oldSierraWork)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        insertIntoElasticsearch(indexName = esIndexV2, itemType = itemType, newSierraWork)
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+
+            works.foreach { work =>
+              val messageBody = put[IdentifiedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"${work.canonicalId}.json"
+                )
+              )
+
+              sqsClient.sendMessage(queue.url, messageBody)
+            }
+
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, sierraWork, newSierraWork)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
+            }
+        }
+      }
+    }
+
+  }
+
+  it("deletes successfully ingested works from the queue, does not delete others") {
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex
+
+    val sierraWork = IdentifiedWork(
+      canonicalId = "s1",
+      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
+      title = Some("s1 title"),
+      version = 1)
+    val sierraWorkDoesNotMatchMapping = IdentifiedWork(
+      canonicalId = "s2",
+      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
+      title = Some("s2 title"),
+      version = 1,
+      subjects = List(Subject(label = "crystallography", concepts = Nil)))
+
+    val works = List(sierraWork, sierraWorkDoesNotMatchMapping)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(subsetOfFieldsIndex, indexName = (Random.alphanumeric take 10 mkString) toLowerCase) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+
+            works.foreach { work =>
+              val messageBody = put[IdentifiedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"${work.canonicalId}.json"
+                )
+              )
+
+              sqsClient.sendMessage(queue.url, messageBody)
+            }
+
+            assertElasticsearchNeverHasWork(indexName = esIndexV2, itemType = itemType, sierraWorkDoesNotMatchMapping)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, sierraWork)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
+        }
+      }
+    }
+
+  }
+
   it("returns a failed Future if indexing into Elasticsearch fails") {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -326,5 +409,52 @@ class IngestorWorkerServiceTest
     )
 
     testWith(ingestorWorkerService)
+  }
+
+  class SubsetOfFieldsWorksIndex extends ElasticSearchIndex {
+    override val httpClient: HttpClient = elasticClient
+
+    def sourceIdentifierFields = Seq(
+      keywordField("ontologyType"),
+      objectField("identifierType").fields(
+        keywordField("id"),
+        keywordField("label"),
+        keywordField("ontologyType")
+      ),
+      keywordField("value")
+    )
+
+    val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
+      Seq(
+        keywordField("canonicalId"),
+        intField("version"),
+        objectField("sourceIdentifier")
+          .fields(sourceIdentifierFields),
+        textField("title").fields(
+          textField("english").analyzer(EnglishLanguageAnalyzer)),
+        booleanField("visible"),
+        objectField("identifiers"),
+        objectField("subjects"),
+        keywordField("workType"),
+        keywordField("description"),
+        keywordField("physicalDescription"),
+        keywordField("extent"),
+        keywordField("lettering"),
+        keywordField("createdDate"),
+        keywordField("language"),
+        keywordField("thumbnail"),
+        keywordField("publicationDate"),
+        keywordField("dimensions"),
+        objectField("contributors"),
+        objectField("genres"),
+        objectField("items"),
+        objectField("publishers"),
+        objectField("placesOfPublication"),
+        keywordField("ontologyType")
+      )
+
+    override val mappingDefinition: MappingDefinition = mapping(itemType)
+      .dynamic(DynamicMapping.Strict)
+      .as(rootIndexFields)
   }
 }

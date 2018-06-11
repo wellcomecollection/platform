@@ -26,16 +26,18 @@ class IngestorWorkerService @Inject()(
         MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
       }
       .groupedWithin(100, 5 seconds).mapAsyncUnordered(10){ messages =>
-        val processWorksFuture = processMessages(messages)
-        processWorksFuture.map(_ => messages.map(_.message))
+        val futureSuccessfulWorks = processMessages(messages)
+        futureSuccessfulWorks.map(sucessfulWorks => messages.filter{ case MessageBundle(message, identifiedWork, _) =>
+          sucessfulWorks.contains(identifiedWork)
+        }.map(_.message))
       }
       .mapConcat(identity)
   }
 
-  private def processMessages(works: Seq[MessageBundle]): Future[Unit] =
+  private def processMessages(works: Seq[MessageBundle]): Future[Seq[IdentifiedWork]] =
     for {
       indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(works)))
-      _ <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
+      successfulWorks <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
           identifiedWorkIndexer.indexWorks(
             works = sortedWorks,
             esIndex = index,
@@ -43,7 +45,7 @@ class IngestorWorkerService @Inject()(
           )
         })
 
-      } yield ()
+      } yield (successfulWorks.flatten.toSeq)
 
   def stop(): Future[Terminated] = {
     system.terminate()
