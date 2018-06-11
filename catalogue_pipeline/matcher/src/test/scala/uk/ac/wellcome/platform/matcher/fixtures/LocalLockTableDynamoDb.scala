@@ -38,4 +38,32 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
 
     table
   }
+
+  def createThingTable(dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
+    val tableName = Random.alphanumeric.take(10).mkString
+
+    val table = Table(tableName, "")
+
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(table.name)
+        .withKeySchema(new KeySchemaElement()
+          .withAttributeName("id")
+          .withKeyType(KeyType.HASH))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("id")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+    )
+
+    eventually {
+      waitUntilActive(dynamoDbClient, table.name)
+    }
+
+    table
+  }
 }

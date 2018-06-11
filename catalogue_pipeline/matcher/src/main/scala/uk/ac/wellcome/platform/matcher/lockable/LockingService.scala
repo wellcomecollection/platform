@@ -10,7 +10,7 @@ trait LockingService {
 case class LockFailure(t: Identifier, message: String)
 case class UnlockFailure(t: Identifier, message: String)
 
-case class Identifier(value: String)
+case class Identifier(id: String)
 case class RowLock(
   id: String,
   created: Instant,

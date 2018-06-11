@@ -20,18 +20,20 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: Dyn
       _.getEpochSecond
     )
 
-  private val defaultDuration = Duration.ofSeconds(10)
+  private val defaultDuration = Duration.ofSeconds(3600)
   private val table = Table[RowLock](config.tableName)
 
-  private def createRowLock(id: Identifier) = {
+  private def getExpiry = {
     val created = Instant.now()
     val expires = created.plus(defaultDuration)
 
-    RowLock(id.value, created, expires)
+    (created, expires)
   }
 
+
   def lockRow(id: Identifier): Either[LockFailure, RowLock] = {
-    val rowLock = createRowLock(id)
+    val (created, expires) = getExpiry
+    val rowLock = RowLock(id.id, created, expires)
 
     debug(s"Trying to create RowLock: $rowLock")
 
@@ -54,7 +56,7 @@ class DynamoLockingService @Inject()(dynamoDBClient: AmazonDynamoDB, config: Dyn
 
     val scanamoOps = table
       .given(attributeExists('id) )
-      .delete('id -> id.value)
+      .delete('id -> id.id)
 
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
 
