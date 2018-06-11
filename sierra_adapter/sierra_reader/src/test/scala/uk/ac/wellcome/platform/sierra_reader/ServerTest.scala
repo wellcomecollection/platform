@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.fixtures.S3
 
 class ServerTest extends FunSpec with fixtures.Server with S3 with SQS {
 
