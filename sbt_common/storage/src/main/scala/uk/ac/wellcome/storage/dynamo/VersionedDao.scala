@@ -30,6 +30,7 @@ class VersionedDao @Inject()(
     idGetter: IdGetter[T],
     updateExpressionGenerator: UpdateExpressionGenerator[T]
   ): Option[ScanamoOps[Either[ScanamoError, T]]] = {
+
     val version = versionGetter.version(record)
     val newVersion = version + 1
 
