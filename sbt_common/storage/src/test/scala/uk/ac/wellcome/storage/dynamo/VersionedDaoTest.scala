@@ -308,11 +308,11 @@ class VersionedDaoTest
 
       def assertRequestFailsWithCorrectException(
         exceptionThrownByUpdateItem: Throwable,
-        expectedException: Throwable) {
+        expectedException: Throwable) = {
         withLocalDynamoDbTable { table =>
           val mockDynamoDbClient = mock[AmazonDynamoDB]
 
-          when(dynamoDbClient.updateItem(any[UpdateItemRequest]))
+          when(mockDynamoDbClient.updateItem(any[UpdateItemRequest]))
             .thenThrow(exceptionThrownByUpdateItem)
 
           val failingDao = new VersionedDao(
