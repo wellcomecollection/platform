@@ -153,10 +153,7 @@ trait SierraProduction {
     vf.subfields
       .filter { _.tag == subfieldTag }
       .map { sf: MarcSubfield =>
-        Agent(label = sf.content)
-      }
-      .map { ag: Agent =>
-        Unidentifiable(ag)
+        Unidentifiable(Agent(label = sf.content))
       }
 
   private def datesFromSubfields(vf: VarField,
