@@ -52,7 +52,7 @@ class SierraItemMergerFeatureTest
               )
 
               eventually {
-                assertStored[SierraTransformable](
+                assertStored(
                   bucket,
                   table,
                   expectedSierraTransformable)
@@ -107,11 +107,11 @@ class SierraItemMergerFeatureTest
                   itemData = Map(id2 -> record2)
                 )
 
-                assertStored[SierraTransformable](
+                assertStored(
                   bucket,
                   table,
                   expectedSierraTransformable1)
-                assertStored[SierraTransformable](
+                assertStored(
                   bucket,
                   table,
                   expectedSierraTransformable2)
@@ -122,6 +122,12 @@ class SierraItemMergerFeatureTest
       }
     }
   }
+
+  private def assertStored(bucket: Bucket, table: Table, record: SierraTransformable) =
+    assertJsonStringsAreEqual(
+      getJsonFor[SierraTransformable](bucket, table, record),
+      toJson(record).get
+    )
 
   private def sendItemRecordToSQS(itemRecord: SierraItemRecord, queue: Queue) = {
     val message = NotificationMessage(

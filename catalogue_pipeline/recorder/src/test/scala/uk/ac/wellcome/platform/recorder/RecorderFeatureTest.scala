@@ -61,10 +61,11 @@ class RecorderFeatureTest
               sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
-                assertStored[RecorderWorkEntry](
-                  bucket,
-                  table,
-                  RecorderWorkEntry(work))
+                val record = RecorderWorkEntry(work)
+                assertJsonStringsAreEqual(
+                  getJsonFor[RecorderWorkEntry](bucket, table, record),
+                  toJson(record).get
+                )
               }
             }
           }
