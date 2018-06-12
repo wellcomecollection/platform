@@ -24,15 +24,14 @@ class IngestorWorkerService @Inject()(
         MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
       }
       .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval).mapAsyncUnordered(10){ messages =>
-        val eventualMessageBundles = processMessages(messages)
-        eventualMessageBundles.map(sucessfulWorks => messages.filter{ case MessageBundle(message, identifiedWork, _) =>
-          sucessfulWorks.contains(identifiedWork)
-        }.map(_.message))
-      }
+      for {
+        successfulMessageBundles <- processMessages(messages.toList)
+      } yield successfulMessageBundles.map(_.message)
+    }
       .mapConcat(identity)
   }
 
-  private def processMessages(messageBundles: Seq[MessageBundle]): Future[Seq[MessageBundle]] =
+  private def processMessages(messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
     for {
       indicesToWorksMap <- Future.successful(sortInTargetIndices(messageBundles))
       listOfEither <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
@@ -44,11 +43,8 @@ class IngestorWorkerService @Inject()(
         })
 
       } yield {
-      listOfEither.partition(_.isLeft) match {
-        case (indicesToLeftEithers, _) =>
-          val failedWorks = indicesToLeftEithers.collect { case Left(works) => works }.flatten.toSeq
-          messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}
-      }
+      val failedWorks = listOfEither.collect { case Left(works) => works }.flatten.toList
+      messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}
     }
 
   def stop(): Future[Terminated] = {
@@ -77,8 +73,8 @@ class IngestorWorkerService @Inject()(
 
   }
 
-  private def sortInTargetIndices(works: Seq[MessageBundle]): Map[String, Seq[IdentifiedWork]] =
-    works.foldLeft(Map[String, Seq[IdentifiedWork]]()){case (resultMap, MessageBundle(_, work, indices)) =>
+  private def sortInTargetIndices(works: List[MessageBundle]): Map[String, List[IdentifiedWork]] =
+    works.foldLeft(Map[String, List[IdentifiedWork]]()){case (resultMap, MessageBundle(_, work, indices)) =>
       val workUpdateMap = indices.map { index =>
         val existingWorks = resultMap.getOrElse(index, Nil)
         val updatedWorks = existingWorks :+ work
