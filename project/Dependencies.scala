@@ -25,7 +25,7 @@ object Dependencies {
   }
 
   lazy val platformVersions = new {
-    val storage = "1.0.0"
+    val storage = "1.0.2"
   }
 
   // External Library dependency groups
@@ -126,13 +126,15 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0",
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage
+    "uk.ac.wellcome" %% "storage" % platformVersions.storage,
+    "uk.ac.wellcome" %% "storage" % platformVersions.storage % "test" classifier "tests"
   ) ++ akkaDependencies ++ dynamoDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val finatraStorageDependencies = Seq(
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage
+    "uk.ac.wellcome" %% "storage" % platformVersions.storage,
+    "uk.ac.wellcome" %% "storage" % platformVersions.storage % "test" classifier "tests"
   )
 
   val commonMonitoringDependencies = Seq(
