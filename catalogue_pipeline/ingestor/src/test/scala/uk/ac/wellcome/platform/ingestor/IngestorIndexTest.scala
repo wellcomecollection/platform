@@ -28,12 +28,7 @@ class IngestorIndexTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
-          indexNameV1,
-          indexNameV2,
-          itemType)
-
-        withServer(flags) { _ =>
+        withServer(queue, bucket, indexNameV1, indexNameV2, itemType){ _ =>
           eventuallyIndexExists(indexNameV1)
           eventuallyIndexExists(indexNameV2)
         }
