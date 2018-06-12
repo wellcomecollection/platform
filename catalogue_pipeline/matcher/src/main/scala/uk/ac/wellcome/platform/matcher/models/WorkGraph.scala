@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.matcher.models
 
 import uk.ac.wellcome.models.matcher.WorkNode
+import uk.ac.wellcome.platform.matcher.lockable.Locked
 
 // This holds a collection of nodes in our graph database.
 //
@@ -8,4 +9,4 @@ import uk.ac.wellcome.models.matcher.WorkNode
 // this collection describes an entire graph -- a subgraph of the
 // entire graph in our database.
 //
-case class WorkGraph(nodes: Set[WorkNode])
+case class WorkGraph(nodes: Set[Locked[WorkNode]])

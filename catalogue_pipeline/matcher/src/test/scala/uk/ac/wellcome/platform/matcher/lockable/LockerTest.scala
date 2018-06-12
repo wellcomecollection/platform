@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.matcher.lockable
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.error.DynamoReadError
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.LocalLockTableDynamoDb
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
@@ -30,7 +29,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         val putRecord = Scanamo.put(dynamoDbClient)(thingTable.name)(thingToStore)
         putRecord shouldBe a[None.type]
 
-        val lockableThing = locker.lock[ThingToStore, DynamoReadError](
+        val lockableThing = locker.lock[ThingToStore](
           Identifier(thingToStore.id)) _
 
         val maybeLockedThing = lockableThing(
@@ -68,7 +67,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         val lock = lockOp.right.get
         lock shouldBe Locked(thingToStore)
 
-        val lockableThing = locker.lock[ThingToStore, DynamoReadError](
+        val lockableThing = locker.lock[ThingToStore](
           Identifier(thingToStore.id)) _
 
         // Try to gain lock get thing
@@ -98,7 +97,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         val id = Random.nextString(32)
         val thingToStore = ThingToStore(id, "value")
 
-        val lockableThing = locker.lock[ThingToStore, DynamoReadError](
+        val lockableThing = locker.lock[ThingToStore](
           Identifier(thingToStore.id)) _
 
         // Try to gain lock get thing
@@ -132,7 +131,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         // Check all puts successfully returned None
         putList.count(_.isEmpty) shouldBe putList.size
 
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Perform locking operation
         val maybeLockedThings = lockableThings(
@@ -168,7 +167,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         putList.count(_.isEmpty) shouldBe putList.size
 
         // Prepare locking operation
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Set lock table state
         val lockOp = idToFail.lock
@@ -202,7 +201,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         val thingList = identifierList.map(id => ThingToStore(id.id, "value"))
 
         // Prepare locking operation
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Perform locking operation
         val maybeLockedThings = lockableThings(
@@ -230,7 +229,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         val identifierList = (1 to 10).map(i => Identifier(i.toString))
         val thingList = identifierList.map(id => ThingToStore(id.id, "value"))
 
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Perform locking operation
         val maybeLockedThings = lockableThings(
@@ -264,7 +263,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         // Check all puts successfully returned None
         putList.count(_.isEmpty) shouldBe putList.size
 
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Perform locking operation
         val maybeLockedThings = lockableThings(
@@ -298,7 +297,7 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
         // Check all puts successfully returned None
         putList.count(_.isEmpty) shouldBe putList.size
 
-        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+        val lockableThings = locker.lockAll[ThingToStore](identifierList) _
 
         // Perform locking operation
         val maybeLockedThings = lockableThings(

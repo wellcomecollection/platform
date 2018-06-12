@@ -14,7 +14,7 @@ object Locked {
   }
 
   implicit class LockedSeqOps[T](a: Iterable[Locked[T]])(implicit lockable: Lockable[T], idGetter: IdGetter[T]) {
-    def unlock: Either[UnlockFailures[T], Iterable[T]]= {
+    def unlock: Either[UnlockFailures[T], Iterable[T]] = {
       val locked = a.map(Lockable[T].unlock)
 
       val (leftEither, rightEither) = locked.partition(_.isLeft)

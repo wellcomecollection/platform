@@ -14,7 +14,7 @@ trait Locker[L <: LockingService] extends Logging {
   private def lock(identifier: Identifier) =
     lockingService.lockRow(identifier)
 
-  private def successfulLock[T, F](id: Identifier, getResult: Option[Either[F, T]]) =
+  private def successfulLock[T](id: Identifier, getResult: Option[Either[_, T]]) =
     getResult match {
       case Some(Right(t)) => Some(Right(Locked(t)))
       case Some(Left(e)) =>
@@ -25,9 +25,9 @@ trait Locker[L <: LockingService] extends Logging {
   private def failedLock(lockFailure: LockFailure) =
     Some(Left(lockFailure))
 
-  def lock[T, F](id: Identifier)(get: => Option[Either[F, T]]): Option[Either[LockFailure, Locked[T]]] = {
+  def lock[T](id: Identifier)(get: => Option[Either[_, T]]): Option[Either[LockFailure, Locked[T]]] = {
 
-    type MaybeGot = Option[Either[F, T]]
+    type MaybeGot = Option[Either[_, T]]
 
     val locked: Either[LockFailure, RowLock] = lock(id)
 
@@ -38,14 +38,14 @@ trait Locker[L <: LockingService] extends Logging {
     }
   }
 
-  def lockAll[T, F](ids: Iterable[Identifier])(getAll: => Iterable[Either[F, T]])(implicit idGetter: IdGetter[T]): Either[LockFailures[Identifier], Iterable[Locked[T]]] = {
+  def lockAll[T](ids: Iterable[Identifier])(getAll: => Iterable[Either[_, T]])(implicit idGetter: IdGetter[T]): Either[LockFailures[Identifier], Iterable[Locked[T]]] = {
     ids.lock.right.flatMap((locks: Iterable[Locked[Identifier]]) => {
 
-      val getAllResult: Iterable[Either[F, T]] = Try(getAll) match {
+      val getAllResult: Iterable[Either[_, T]] = Try(getAll) match {
         case Success(result) => result
         case Failure(e) => {
           error(s"Failed to get $ids after locking!", e)
-          Iterable.empty[Either[F, T]]
+          Iterable.empty[Either[_, T]]
         }
       }
 
