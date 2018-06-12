@@ -1,11 +1,11 @@
 package uk.ac.wellcome.messaging.sqs
 
-import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Keep, Source}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.{Done, NotUsed}
 import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
@@ -25,34 +25,41 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
                              metricsSender: MetricsSender)
     extends Logging {
 
-  val decider: Supervision.Decider = {
-    case _: Exception => Supervision.Resume
+  def decider(metricName: String): Supervision.Decider = {
+    case e: Exception =>
+      metricsSender.count(metricName, Future.failed(e))
+      Supervision.Resume
     case _ => Supervision.Stop
   }
+
   implicit val system = actorSystem
-  implicit val materializer = ActorMaterializer(
-    ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+
   implicit val dispatcher = system.dispatcher
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M2](f: Source[(Message,T),NotUsed] => Source[Message,M2])(implicit decoder: Decoder[T]) =
+  def runStream[M2](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M2])(implicit decoder: Decoder[T]) = {
+    val metricName = s"${streamName}_ProcessMessage"
+
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withSupervisionStrategy(decider(metricName)))
+
     f(source.map(message => (message, read(message).get)))
-    .map { m =>
-    debug(s"Deleting message ${m.getMessageId}")
-    (m, MessageAction.Delete)
-  }.toMat(sink)(Keep.right).run()
+      .map { m =>
+        metricsSender.count(metricName, Future.successful(()))
+        debug(s"Deleting message ${m.getMessageId}")
+        (m, MessageAction.Delete)
+      }
+      .toMat(sink)(Keep.right).run()
+  }
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
-    runStream(
+    runStream(s"$streamName",
       _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) { case (message, t) =>
         debug(s"Processing message ${message.getMessageId}")
-        val metricName = s"${streamName}_ProcessMessage"
-        metricsSender.count(
-          metricName,
-          readAndProcess(streamName, t, process)).map(_ => message)
+        readAndProcess(streamName, t, process).map(_ => message)
       })
 
   private def readAndProcess(
