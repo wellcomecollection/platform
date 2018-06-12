@@ -60,8 +60,8 @@ cache:
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
 before_cache:
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
-  - find $HOME/.sbt        -name "*.lock"               -print -delete
+  - sudo find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - sudo find $HOME/.sbt        -name "*.lock"               -print -delete
 
 script:
   - ./run_travis_task.py
