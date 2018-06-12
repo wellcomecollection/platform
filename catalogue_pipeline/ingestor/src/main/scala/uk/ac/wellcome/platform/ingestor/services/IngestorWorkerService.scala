@@ -24,15 +24,15 @@ class IngestorWorkerService @Inject()(
         MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
       }
       .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval).mapAsyncUnordered(10){ messages =>
-        val futureSuccessfulWorks = processMessages(messages)
-        futureSuccessfulWorks.map(sucessfulWorks => messages.filter{ case MessageBundle(message, identifiedWork, _) =>
+        val eventualMessageBundles = processMessages(messages)
+        eventualMessageBundles.map(sucessfulWorks => messages.filter{ case MessageBundle(message, identifiedWork, _) =>
           sucessfulWorks.contains(identifiedWork)
         }.map(_.message))
       }
       .mapConcat(identity)
   }
 
-  private def processMessages(messageBundles: Seq[MessageBundle]): Future[Seq[IdentifiedWork]] =
+  private def processMessages(messageBundles: Seq[MessageBundle]): Future[Seq[MessageBundle]] =
     for {
       indicesToWorksMap <- Future.successful(sortInTargetIndices(messageBundles))
       listOfEither <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
@@ -47,7 +47,7 @@ class IngestorWorkerService @Inject()(
       listOfEither.partition(_.isLeft) match {
         case (indicesToLeftEithers, _) =>
           val failedWorks = indicesToLeftEithers.collect { case Left(works) => works }.flatten.toSeq
-          messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}.map {_.work}
+          messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}
       }
     }
 

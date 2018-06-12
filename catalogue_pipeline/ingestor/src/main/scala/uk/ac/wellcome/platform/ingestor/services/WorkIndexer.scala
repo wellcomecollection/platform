@@ -9,10 +9,9 @@ import javax.inject.{Inject, Singleton}
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WorkIndexer @Inject()(
