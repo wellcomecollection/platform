@@ -101,7 +101,8 @@ class SQSStreamTest
     }
   }
 
-  it("sends a failure metric if it doesn't fail gracefully when processing a message") {
+  it(
+    "sends a failure metric if it doesn't fail gracefully when processing a message") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), metricsSender) =>
         val exampleObject = ExampleObject("some value 1")
@@ -172,12 +173,14 @@ class SQSStreamTest
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction{case (message, t) =>
-              received.add(t)
-              message
-            })
-            )
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(Flow.fromFunction {
+                case (message, t) =>
+                  received.add(t)
+                  message
+              }))
 
           eventually {
             received should contain theSameElementsAs List(
@@ -187,8 +190,8 @@ class SQSStreamTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
 
-              verify(metricsSender, times(2))
-                .incrementCount("test-stream_ProcessMessage_success")
+            verify(metricsSender, times(2))
+              .incrementCount("test-stream_ProcessMessage_success")
           }
       }
     }
@@ -199,10 +202,11 @@ class SQSStreamTest
           val exampleObject = ExampleObject("Example value 1")
           sendMessage(queue, exampleObject)
 
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction(_ =>
-              throw new RuntimeException("BOOOM!")))
-          )
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(
+                Flow.fromFunction(_ => throw new RuntimeException("BOOOM!"))))
 
           eventually {
             assertQueueEmpty(queue)
@@ -235,12 +239,14 @@ class SQSStreamTest
           sendMessage(queue, exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction{case (message, t) =>
-              received.add(t)
-              message
-            })
-          )
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(Flow.fromFunction {
+                case (message, t) =>
+                  received.add(t)
+                  message
+              }))
 
           eventually {
             received should contain theSameElementsAs List(

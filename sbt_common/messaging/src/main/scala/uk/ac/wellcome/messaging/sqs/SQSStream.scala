@@ -39,11 +39,15 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M](streamName: String, modifySource: Source[(Message,T),NotUsed] => Source[Message,M])(implicit decoder: Decoder[T]): Future[Done] = {
+  def runStream[M](
+    streamName: String,
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, M])(
+    implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
     implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system).withSupervisionStrategy(decider(metricName)))
+      ActorMaterializerSettings(system).withSupervisionStrategy(
+        decider(metricName)))
 
     modifySource(source.map(message => (message, read(message).get)))
       .map { m =>
@@ -51,21 +55,24 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
         debug(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
-      .toMat(sink)(Keep.right).run()
+      .toMat(sink)(Keep.right)
+      .run()
   }
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
-    runStream(s"$streamName",
-      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) { case (message, t) =>
-        debug(s"Processing message ${message.getMessageId}")
-        readAndProcess(streamName, t, process).map(_ => message)
-      })
+    runStream(
+      s"$streamName",
+      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
+        case (message, t) =>
+          debug(s"Processing message ${message.getMessageId}")
+          readAndProcess(streamName, t, process).map(_ => message)
+      }
+    )
 
-  private def readAndProcess(
-    streamName: String,
-    message: T,
-    process: T => Future[Unit]) = {
+  private def readAndProcess(streamName: String,
+                             message: T,
+                             process: T => Future[Unit]) = {
     val processMessageFuture = process(message)
 
     processMessageFuture.failed.foreach {

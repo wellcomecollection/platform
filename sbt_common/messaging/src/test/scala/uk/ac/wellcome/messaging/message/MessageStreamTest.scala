@@ -195,11 +195,14 @@ class MessageStreamTest
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
 
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction{case (message, t) =>
-              received.add(t)
-              message
-            }))
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(Flow.fromFunction {
+                case (message, t) =>
+                  received.add(t)
+                  message
+              }))
 
           eventually {
             received should contain theSameElementsAs List(
@@ -220,10 +223,11 @@ class MessageStreamTest
           val exampleObject = ExampleObject("some value")
           sendMessage(bucket, queue, exampleObject)
 
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction(_ =>
-              throw new RuntimeException("BOOOM!")))
-          )
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(
+                Flow.fromFunction(_ => throw new RuntimeException("BOOOM!"))))
 
           eventually {
             assertQueueEmpty(queue)
@@ -256,12 +260,14 @@ class MessageStreamTest
           sendMessage(bucket, queue, exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
-          messageStream.runStream("test-stream",
-            source => source.via(Flow.fromFunction{case (message, t) =>
-              received.add(t)
-              message
-            })
-          )
+          messageStream.runStream(
+            "test-stream",
+            source =>
+              source.via(Flow.fromFunction {
+                case (message, t) =>
+                  received.add(t)
+                  message
+              }))
 
           eventually {
             received should contain theSameElementsAs List(
