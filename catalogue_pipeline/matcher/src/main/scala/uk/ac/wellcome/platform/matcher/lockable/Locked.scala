@@ -2,7 +2,8 @@ package uk.ac.wellcome.platform.matcher.lockable
 
 import uk.ac.wellcome.storage.type_classes.IdGetter
 
-case class Locked[T](t: T)
+sealed trait Locks
+case class Locked[T](t: T) extends Locks
 
 object Locked {
 

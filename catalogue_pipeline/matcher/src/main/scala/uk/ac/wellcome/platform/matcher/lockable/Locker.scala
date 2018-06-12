@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.matcher.lockable
 
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.storage.type_classes.IdGetter
+
+import scala.util.{Failure, Success, Try}
 
 trait Locker[L <: LockingService] extends Logging {
 
@@ -28,33 +31,46 @@ trait Locker[L <: LockingService] extends Logging {
 
     val locked: Either[LockFailure, RowLock] = lock(id)
 
-    locked.right.map(_ => get) match {
-      case Right(r: MaybeGot) => successfulLock(id, r)
+    locked.right.map(_ => Try(get)) match {
+      case Right(Success(r: MaybeGot)) => successfulLock(id, r)
+      case Right(Failure(e)) => failedLock(LockFailure(id, e.toString))
       case Left(l: LockFailure) => failedLock(l)
     }
   }
 
-  def lockAll[T, F](ids: Iterable[Identifier])(getAll: => Iterable[Either[F, T]]): Either[LockFailures[Identifier], Iterable[Locked[T]]] = {
-    val identifierLocks: Either[LockFailures[Identifier], Iterable[Locked[Identifier]]] = ids.lock
+  def lockAll[T, F](ids: Iterable[Identifier])(getAll: => Iterable[Either[F, T]])(implicit idGetter: IdGetter[T]): Either[LockFailures[Identifier], Iterable[Locked[T]]] = {
+    ids.lock.right.flatMap((locks: Iterable[Locked[Identifier]]) => {
 
-
-
-    if(identifierLocks.isRight) {
-      val gotten = getAll
-      val (leftEither, rightEither) = gotten.partition(_.isLeft)
-      val (left, right) =
-        (leftEither.map(_.left.get), rightEither.map(_.right.get))
-
-      if(left.isEmpty) {
-        Right(right.map(Locked(_)))
-      } else {
-        identifierLocks
-          .right.map(_ => Iterable.empty[Locked[T]])
+      val getAllResult: Iterable[Either[F, T]] = Try(getAll) match {
+        case Success(result) => result
+        case Failure(e) => {
+          error(s"Failed to get $ids after locking!", e)
+          Iterable.empty[Either[F, T]]
+        }
       }
 
-    } else {
-      identifierLocks
-        .right.map(_ => Iterable.empty[Locked[T]])
-    }
+      val rights = getAllResult
+        .filter(_.isRight)
+        .map(_.right.get)
+
+      val idsOfT = rights
+        .map(idGetter.id)
+        .toSet
+
+      val idsOfLocks = locks
+        .map(_.t.id)
+        .toSet
+
+      if(idsOfT.sameElements(idsOfLocks)) {
+        Right(
+          rights.map(Locked(_))
+        )
+      } else {
+        Left(
+          LockFailures(Iterable.empty[Identifier], locks)
+        )
+      }
+    })
+
   }
 }
