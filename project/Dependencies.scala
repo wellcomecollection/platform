@@ -5,7 +5,7 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.5.9"
     val akkaStreamAlpakkaS3 = "0.17"
-    val aws = "1.11.95"
+    val aws = "1.11.225"
     val apacheLogging = "2.8.2"
     val finatra = "18.4.0"
     val guice = "4.2.0"
@@ -25,7 +25,7 @@ object Dependencies {
   }
 
   lazy val platformVersions = new {
-    val storage = "1.0.2"
+    val storage = "1.0.3"
   }
 
   // External Library dependency groups
