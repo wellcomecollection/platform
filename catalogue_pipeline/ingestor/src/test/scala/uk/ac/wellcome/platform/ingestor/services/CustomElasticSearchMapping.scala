@@ -41,13 +41,11 @@ trait CustomElasticSearchMapping {
         keywordField("createdDate"),
         keywordField("language"),
         keywordField("thumbnail"),
-        keywordField("publicationDate"),
         keywordField("dimensions"),
         objectField("contributors"),
         objectField("genres"),
         objectField("items"),
-        objectField("publishers"),
-        objectField("placesOfPublication"),
+        objectField("production"),
         keywordField("ontologyType")
       )
 
