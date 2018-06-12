@@ -31,14 +31,14 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream{ source =>
+  def runStream[M](f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream("", source =>
     f(source.mapAsyncUnordered(10){case (message, notification) =>
       for {
         deserialisedObject <- deserialiseObject(notification.Message)
 
       } yield (message,deserialisedObject)
     })
-  }
+  )
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
