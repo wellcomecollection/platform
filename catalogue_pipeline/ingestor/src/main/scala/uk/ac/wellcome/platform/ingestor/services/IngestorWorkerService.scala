@@ -8,8 +8,8 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class IngestorWorkerService @Inject()(
@@ -34,10 +34,10 @@ class IngestorWorkerService @Inject()(
       .mapConcat(identity)
   }
 
-  private def processMessages(works: Seq[MessageBundle]): Future[Seq[IdentifiedWork]] =
+  private def processMessages(messageBundles: Seq[MessageBundle]): Future[Seq[IdentifiedWork]] =
     for {
-      indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(works)))
-      successfulWorks <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
+      indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(messageBundles)))
+      listOfEither <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
           identifiedWorkIndexer.indexWorks(
             works = sortedWorks,
             esIndex = index,
@@ -45,7 +45,13 @@ class IngestorWorkerService @Inject()(
           )
         })
 
-      } yield (successfulWorks.flatten.toSeq)
+      } yield {
+      listOfEither.partition(_.isLeft) match {
+        case (indicesToLeftEithers, _) =>
+          val failedWorks = indicesToLeftEithers.collect { case Left(works) => works }.flatten.toSeq
+          messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}.map {_.work}
+      }
+    }
 
   def stop(): Future[Terminated] = {
     system.terminate()

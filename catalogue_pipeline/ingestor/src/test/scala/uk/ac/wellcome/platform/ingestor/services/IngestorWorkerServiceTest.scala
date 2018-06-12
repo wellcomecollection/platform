@@ -260,7 +260,7 @@ class IngestorWorkerServiceTest
       version = 1)
     val sierraWorkDoesNotMatchMapping = IdentifiedWork(
       canonicalId = "s2",
-      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
+      sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       title = Some("s2 title"),
       version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil)))
@@ -286,6 +286,53 @@ class IngestorWorkerServiceTest
 
             assertElasticsearchNeverHasWork(indexName = esIndexV2, itemType = itemType, sierraWorkDoesNotMatchMapping)
             assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, sierraWork)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
+        }
+      }
+    }
+
+  }
+
+  it("does not delete from the queue messages that succeed ingesting into one index but not the other") {
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex
+
+    val miroWork = IdentifiedWork(
+      canonicalId = "s1",
+      sourceIdentifier = createIdentifier("miro-image-number", "m1"),
+      title = Some("s1 title"),
+      version = 1)
+    val miroWorkDoesNotMatchV2Mapping = IdentifiedWork(
+      canonicalId = "s2",
+      sourceIdentifier = createIdentifier("miro-image-number", "m2"),
+      title = Some("s2 title"),
+      version = 1,
+      subjects = List(Subject(label = "crystallography", concepts = Nil)))
+
+    val works = List(miroWork, miroWorkDoesNotMatchV2Mapping)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(subsetOfFieldsIndex, indexName = (Random.alphanumeric take 10 mkString) toLowerCase) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+
+            works.foreach { work =>
+              val messageBody = put[IdentifiedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"${work.canonicalId}.json"
+                )
+              )
+
+              sqsClient.sendMessage(queue.url, messageBody)
+            }
+
+            assertElasticsearchNeverHasWork(indexName = esIndexV2, itemType = itemType, miroWorkDoesNotMatchV2Mapping)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, miroWork)
+            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork, miroWorkDoesNotMatchV2Mapping)
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
