@@ -28,7 +28,7 @@ class WorkIndexer @Inject()(
 
   def indexWorks(works: Seq[IdentifiedWork],
                 esIndex: String,
-                esType: String): Future[Seq[IdentifiedWork]] = {
+                esType: String): Future[Either[Seq[IdentifiedWork], Seq[IdentifiedWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
@@ -45,11 +45,23 @@ class WorkIndexer @Inject()(
             bulk(inserts)
           }
           .map { bulkResponse: BulkResponse =>
-            val successfulIds = bulkResponse.successes.map(_.id)
-            debug(s"Successfully indexed works $successfulIds")
-            works.filter(w => {
-              successfulIds.contains(w.canonicalId)
-            })
+            val actualFailures = filterVersionConflictErrors(bulkResponse)
+
+            if(actualFailures.nonEmpty) {
+              val failedIds = actualFailures.map(_.id)
+              debug(s"Failed indexing works $failedIds")
+
+              Left(works.filter(w => {
+                failedIds.contains(w.canonicalId)
+              }))
+            }
+            else Right(works)
           }
       }
+
+  private def filterVersionConflictErrors(bulkResponse: BulkResponse) = {
+    bulkResponse.failures.filterNot(bulkResponseItem =>
+      bulkResponseItem.error.exists(bulkError => bulkError.`type`.contains("version_conflict_engine_exception"))
+    )
+  }
 }
