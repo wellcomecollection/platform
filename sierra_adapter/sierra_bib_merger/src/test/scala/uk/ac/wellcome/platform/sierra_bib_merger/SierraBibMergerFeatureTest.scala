@@ -89,10 +89,7 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraTransformable)
+                assertStored(bucket, table, expectedSierraTransformable)
               }
             }
           }
@@ -143,14 +140,8 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record2)
 
               eventually {
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraTransformable1)
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraTransformable2)
+                assertStored(bucket, table, expectedSierraTransformable1)
+                assertStored(bucket, table, expectedSierraTransformable2)
               }
             }
           }
@@ -205,10 +196,7 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraTransformable)
+                assertStored(bucket, table, expectedSierraTransformable)
               }
             }
           }
@@ -265,10 +253,7 @@ class SierraBibMergerFeatureTest
               // enough time for this update to have gone through (if it was going to).
               Thread.sleep(5000)
 
-              assertStored(
-                bucket,
-                table,
-                expectedSierraTransformable)
+              assertStored(bucket, table, expectedSierraTransformable)
             }
           }
         }
@@ -313,10 +298,7 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraTransformable)
+                assertStored(bucket, table, expectedSierraTransformable)
               }
             }
           }
@@ -325,7 +307,9 @@ class SierraBibMergerFeatureTest
     }
   }
 
-  private def assertStored(bucket: Bucket, table: Table, record: SierraTransformable) =
+  private def assertStored(bucket: Bucket,
+                           table: Table,
+                           record: SierraTransformable) =
     assertJsonStringsAreEqual(
       getJsonFor[SierraTransformable](bucket, table, record),
       toJson(record).get

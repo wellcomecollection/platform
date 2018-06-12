@@ -63,10 +63,7 @@ class SierraItemMergerUpdaterServiceTest
                     newItemRecord.id -> newItemRecord
                   ))
 
-              assertStored(
-                bucket,
-                table,
-                expectedSierraTransformable)
+              assertStored(bucket, table, expectedSierraTransformable)
             }
           }
         }
@@ -153,10 +150,7 @@ class SierraItemMergerUpdaterServiceTest
                       itemData = Map(itemRecord.id -> itemRecord)
                     )
 
-                  assertStored(
-                    bucket,
-                    table,
-                    expectedNewSierraTransformable)
+                  assertStored(bucket, table, expectedNewSierraTransformable)
 
                   val expectedUpdatedSierraTransformable = oldRecord.copy(
                     itemData = Map(
@@ -215,10 +209,7 @@ class SierraItemMergerUpdaterServiceTest
                   itemData = Map(id -> newItemRecord)
                 )
 
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord)
+                assertStored(bucket, table, expectedSierraRecord)
               }
             }
           }
@@ -297,14 +288,8 @@ class SierraItemMergerUpdaterServiceTest
                 itemData = expectedItemData
               )
 
-              assertStored(
-                bucket,
-                table,
-                expectedSierraRecord1)
-              assertStored(
-                bucket,
-                table,
-                expectedSierraRecord2)
+              assertStored(bucket, table, expectedSierraRecord1)
+              assertStored(bucket, table, expectedSierraRecord2)
             }
           }
         }
@@ -378,14 +363,8 @@ class SierraItemMergerUpdaterServiceTest
                   itemData = expectedItemData
                 )
 
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord1)
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord2)
+                assertStored(bucket, table, expectedSierraRecord1)
+                assertStored(bucket, table, expectedSierraRecord2)
               }
             }
           }
@@ -461,14 +440,8 @@ class SierraItemMergerUpdaterServiceTest
                   itemData = expectedItemData
                 )
 
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord1)
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord2)
+                assertStored(bucket, table, expectedSierraRecord1)
+                assertStored(bucket, table, expectedSierraRecord2)
               }
             }
           }
@@ -550,10 +523,7 @@ class SierraItemMergerUpdaterServiceTest
                   )
                 )
 
-                assertStored(
-                  bucket,
-                  table,
-                  expectedSierraRecord)
+                assertStored(bucket, table, expectedSierraRecord)
               }
             }
           }
@@ -585,7 +555,9 @@ class SierraItemMergerUpdaterServiceTest
     }
   }
 
-  private def assertStored(bucket: Bucket, table: Table, record: SierraTransformable) =
+  private def assertStored(bucket: Bucket,
+                           table: Table,
+                           record: SierraTransformable) =
     assertJsonStringsAreEqual(
       getJsonFor[SierraTransformable](bucket, table, record),
       toJson(record).get
