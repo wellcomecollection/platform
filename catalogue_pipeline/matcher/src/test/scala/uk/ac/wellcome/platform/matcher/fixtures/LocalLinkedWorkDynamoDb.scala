@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.matcher.fixtures
 
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 
 trait LocalLinkedWorkDynamoDb
   extends LocalDynamoDb
