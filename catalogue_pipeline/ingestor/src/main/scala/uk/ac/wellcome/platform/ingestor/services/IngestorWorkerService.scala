@@ -3,20 +3,18 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.actor.{ActorSystem, Terminated}
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
+import uk.ac.wellcome.platform.ingestor.IngestorConfig
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class IngestorWorkerService @Inject()(
-  elasticConfig: ElasticConfig,
-  identifiedWorkIndexer: WorkIndexer,
-  messageStream: MessageStream[IdentifiedWork],
-  system: ActorSystem)(implicit ec: ExecutionContext) {
+                                       ingestorConfig: IngestorConfig,
+                                       identifiedWorkIndexer: WorkIndexer,
+                                       messageStream: MessageStream[IdentifiedWork],
+                                       system: ActorSystem)(implicit ec: ExecutionContext) {
 
   case class MessageBundle(message:Message, work: IdentifiedWork, indices: Set[String])
 
@@ -25,7 +23,7 @@ class IngestorWorkerService @Inject()(
       .map{case (message, identifiedWork) =>
         MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
       }
-      .groupedWithin(100, 5 seconds).mapAsyncUnordered(10){ messages =>
+      .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval).mapAsyncUnordered(10){ messages =>
         val futureSuccessfulWorks = processMessages(messages)
         futureSuccessfulWorks.map(sucessfulWorks => messages.filter{ case MessageBundle(message, identifiedWork, _) =>
           sucessfulWorks.contains(identifiedWork)
@@ -36,12 +34,12 @@ class IngestorWorkerService @Inject()(
 
   private def processMessages(messageBundles: Seq[MessageBundle]): Future[Seq[IdentifiedWork]] =
     for {
-      indicesToWorksMap <- Future.fromTry(Try(sortInTargetIndices(messageBundles)))
+      indicesToWorksMap <- Future.successful(sortInTargetIndices(messageBundles))
       listOfEither <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
           identifiedWorkIndexer.indexWorks(
             works = sortedWorks,
             esIndex = index,
-            esType = elasticConfig.documentType
+            esType = ingestorConfig.elasticConfig.documentType
           )
         })
 
@@ -67,11 +65,11 @@ class IngestorWorkerService @Inject()(
     work.sourceIdentifier.identifierType.id match {
       case miroIdentifier.id =>
         Set(
-          elasticConfig.indexV1name,
-          elasticConfig.indexV2name
+          ingestorConfig.elasticConfig.indexV1name,
+          ingestorConfig.elasticConfig.indexV2name
         )
       case sierraIdentifier.id =>
-        Set(elasticConfig.indexV2name)
+        Set(ingestorConfig.elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
           s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}"))

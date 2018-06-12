@@ -13,12 +13,14 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
+import scala.concurrent.duration._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
@@ -430,14 +432,19 @@ class IngestorWorkerServiceTest
     workIndexer: WorkIndexer,
     messageStream: MessageStream[IdentifiedWork])(
     testWith: TestWith[IngestorWorkerService, R]): R = {
-    val elasticConfig = ElasticConfig(
+
+    val ingestorConfig = IngestorConfig(
+      batchSize = 100,
+      flushInterval = 5 seconds,
+    elasticConfig = ElasticConfig(
       documentType = itemType,
       indexV1name = esIndexV1,
       indexV2name = esIndexV2
     )
+    )
 
     val ingestorWorkerService = new IngestorWorkerService(
-      elasticConfig = elasticConfig,
+      ingestorConfig = ingestorConfig,
       identifiedWorkIndexer = workIndexer,
       messageStream = messageStream,
       system = actorSystem
