@@ -134,7 +134,7 @@ object Dependencies {
   val finatraStorageDependencies = Seq(
     "uk.ac.wellcome" %% "storage" % platformVersions.storage,
     "uk.ac.wellcome" %% "storage" % platformVersions.storage % "test" classifier "tests"
-  ) ++ guiceDependencies
+  ) ++ finatraDependencies ++ guiceDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
