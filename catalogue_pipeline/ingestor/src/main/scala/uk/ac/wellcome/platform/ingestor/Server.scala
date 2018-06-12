@@ -19,6 +19,7 @@ import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.platform.ingestor.modules.{
   IdentifiedWorkModule,
+  IngestorConfigModule,
   IngestorWorkerModule,
   WorksIndexModule
 }
@@ -39,7 +40,8 @@ class Server extends HttpServer {
     ElasticConfigModule,
     ExecutionContextModule,
     WorksIndexModule,
-    IdentifiedWorkModule
+    IdentifiedWorkModule,
+    IngestorConfigModule
   )
 
   override def configureHttp(router: HttpRouter) {

@@ -1,20 +1,17 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import java.util.concurrent.TimeoutException
-
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
+import com.sksamuel.elastic4s.http.bulk.BulkResponse
 import com.twitter.inject.Logging
 import javax.inject.{Inject, Singleton}
-import org.elasticsearch.client.ResponseException
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WorkIndexer @Inject()(
@@ -28,35 +25,40 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWork(work: IdentifiedWork, esIndex: String, esType: String) = {
+  def indexWorks(works: Seq[IdentifiedWork], esIndex: String, esType: String)
+    : Future[Either[Seq[IdentifiedWork], Seq[IdentifiedWork]]] = {
 
-    info(s"Indexing work ${work.canonicalId}")
+    debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
+
+    val inserts = works.map { work =>
+      indexInto(esIndex / esType)
+        .version(work.version)
+        .versionType(VersionType.EXTERNAL_GTE)
+        .id(work.canonicalId)
+        .doc(work)
+    }
 
     elasticClient
       .execute {
-        indexInto(esIndex / esType)
-          .version(work.version)
-          .versionType(VersionType.EXTERNAL_GTE)
-          .id(work.canonicalId)
-          .doc(work)
+        bulk(inserts)
       }
-      .map { _ =>
-        info(s"Successfully indexed work ${work.canonicalId}")
+      .map { bulkResponse: BulkResponse =>
+        val actualFailures = filterVersionConflictErrors(bulkResponse)
+
+        if (actualFailures.nonEmpty) {
+          val failedIds = actualFailures.map(_.id)
+          debug(s"Failed indexing works $failedIds")
+
+          Left(works.filter(w => {
+            failedIds.contains(w.canonicalId)
+          }))
+        } else Right(works)
       }
-      .recover {
-        case e: ResponseException
-            if getErrorType(e).contains("version_conflict_engine_exception") =>
-          warn(
-            s"Trying to index work ${work.canonicalId} with older version: skipping.")
-          ()
-        case e: TimeoutException =>
-          warn(s"Timeout indexing work ${work.canonicalId} into Elasticsearch")
-          throw new GracefulFailureException(e)
-        case e: Throwable =>
-          error(
-            s"Error indexing work ${work.canonicalId} into Elasticsearch",
-            e)
-          throw e
-      }
+  }
+
+  private def filterVersionConflictErrors(bulkResponse: BulkResponse) = {
+    bulkResponse.failures.filterNot(bulkResponseItem =>
+      bulkResponseItem.error.exists(bulkError =>
+        bulkError.`type`.contains("version_conflict_engine_exception")))
   }
 }

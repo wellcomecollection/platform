@@ -88,14 +88,18 @@ trait SQS extends Matchers {
     }
   )
 
-  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]) =
+  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]): R =
+    withLocalSqsQueueAndDlqAndTimeout(1)(testWith)
+
+  def withLocalSqsQueueAndDlqAndTimeout[R](visibilityTimeout: Int)(
+    testWith: TestWith[QueuePair, R]): R =
     withLocalSqsQueue { dlq =>
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = sqsClient.createQueue(new CreateQueueRequest()
         .withQueueName(queueName)
         .withAttributes(Map(
           "RedrivePolicy" -> s"""{"maxReceiveCount":"3", "deadLetterTargetArn":"${dlq.arn}"}""",
-          "VisibilityTimeout" -> "1").asJava))
+          "VisibilityTimeout" -> s"$visibilityTimeout").asJava))
       val arn = sqsClient
         .getQueueAttributes(response.getQueueUrl, List("QueueArn").asJava)
         .getAttributes

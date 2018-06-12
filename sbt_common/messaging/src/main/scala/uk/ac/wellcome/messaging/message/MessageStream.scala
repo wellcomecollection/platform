@@ -1,9 +1,11 @@
 package uk.ac.wellcome.messaging.message
 
-import akka.Done
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
+import akka.stream.scaladsl.Source
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
+import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
 import io.circe.Decoder
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -29,6 +31,19 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
+  def runStream[M](streamName: String,
+                   f: Source[(Message, T), NotUsed] => Source[Message, M]) =
+    sqsStream.runStream(
+      streamName,
+      source =>
+        f(source.mapAsyncUnordered(10) {
+          case (message, notification) =>
+            for {
+              deserialisedObject <- deserialiseObject(notification.Message)
+            } yield (message, deserialisedObject)
+        })
+    )
+
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
     sqsStream.foreach(
@@ -41,9 +56,13 @@ class MessageStream[T] @Inject()(
   private def processMessagePointer(notification: NotificationMessage,
                                     process: T => Future[Unit]): Future[Unit] =
     for {
-      messagePointer <- Future.fromTry(
-        fromJson[MessagePointer](notification.Message))
-      deserialisedObject <- objectStore.get(messagePointer.src)
+      deserialisedObject <- deserialiseObject(notification.Message)
       _ <- process(deserialisedObject)
     } yield ()
+
+  private def deserialiseObject(messageString: String) =
+    for {
+      messagePointer <- Future.fromTry(fromJson[MessagePointer](messageString))
+      deserialisedObject <- objectStore.get(messagePointer.src)
+    } yield deserialisedObject
 }

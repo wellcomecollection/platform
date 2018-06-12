@@ -1,40 +1,67 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.{ActorSystem, Terminated}
+import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.platform.ingestor.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 class IngestorWorkerService @Inject()(
-  elasticConfig: ElasticConfig,
+  ingestorConfig: IngestorConfig,
   identifiedWorkIndexer: WorkIndexer,
   messageStream: MessageStream[IdentifiedWork],
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
-  messageStream.foreach(this.getClass.getSimpleName, processMessage)
+  case class MessageBundle(message: Message,
+                           work: IdentifiedWork,
+                           indices: Set[String])
 
-  private def processMessage(work: IdentifiedWork): Future[Unit] = {
-    val futureIndices: Future[List[String]] =
-      Future.fromTry(Try(decideTargetIndices(work)))
-    futureIndices.flatMap { indices =>
-      val futureResults = indices.map { esIndex =>
-        identifiedWorkIndexer.indexWork(
-          work = work,
-          esIndex = esIndex,
-          esType = elasticConfig.documentType
-        )
-      }
-      Future.sequence(futureResults).map { _ =>
-        ()
+  messageStream.runStream(
+    this.getClass.getSimpleName,
+    source =>
+      source
+        .map {
+          case (message, identifiedWork) =>
+            MessageBundle(
+              message,
+              identifiedWork,
+              decideTargetIndices(identifiedWork))
+        }
+        .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
+        .mapAsyncUnordered(10) { messages =>
+          for {
+            successfulMessageBundles <- processMessages(messages.toList)
+          } yield successfulMessageBundles.map(_.message)
+        }
+        .mapConcat(identity)
+  )
+
+  private def processMessages(
+    messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
+    for {
+      indicesToWorksMap <- Future.successful(
+        sortInTargetIndices(messageBundles))
+      listOfEither <- Future.sequence(indicesToWorksMap.map {
+        case (index, sortedWorks) =>
+          identifiedWorkIndexer.indexWorks(
+            works = sortedWorks,
+            esIndex = index,
+            esType = ingestorConfig.elasticConfig.documentType
+          )
+      })
+
+    } yield {
+      val failedWorks =
+        listOfEither.collect { case Left(works) => works }.flatten.toList
+      messageBundles.filterNot {
+        case MessageBundle(_, work, _) => failedWorks.contains(work)
       }
     }
-  }
+
   def stop(): Future[Terminated] = {
     system.terminate()
   }
@@ -43,21 +70,33 @@ class IngestorWorkerService @Inject()(
   // * Miro works are indexed in both v1 and v2 indices.
   // * Sierra works are indexed only in the v2 index.
   // * Works from any other source are not expected so they are discarded.
-  private def decideTargetIndices(work: IdentifiedWork): List[String] = {
+  private def decideTargetIndices(work: IdentifiedWork): Set[String] = {
     val miroIdentifier = IdentifierType("miro-image-number")
     val sierraIdentifier = IdentifierType("sierra-system-number")
     work.sourceIdentifier.identifierType.id match {
       case miroIdentifier.id =>
-        List(
-          elasticConfig.indexV1name,
-          elasticConfig.indexV2name
+        Set(
+          ingestorConfig.elasticConfig.indexV1name,
+          ingestorConfig.elasticConfig.indexV2name
         )
       case sierraIdentifier.id =>
-        List(elasticConfig.indexV2name)
+        Set(ingestorConfig.elasticConfig.indexV2name)
       case _ =>
         throw GracefulFailureException(new RuntimeException(
           s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}"))
     }
 
   }
+
+  private def sortInTargetIndices(
+    works: List[MessageBundle]): Map[String, List[IdentifiedWork]] =
+    works.foldLeft(Map[String, List[IdentifiedWork]]()) {
+      case (resultMap, MessageBundle(_, work, indices)) =>
+        val workUpdateMap = indices.map { index =>
+          val existingWorks = resultMap.getOrElse(index, Nil)
+          val updatedWorks = existingWorks :+ work
+          (index, updatedWorks)
+        }.toMap
+        resultMap ++ workUpdateMap
+    }
 }
