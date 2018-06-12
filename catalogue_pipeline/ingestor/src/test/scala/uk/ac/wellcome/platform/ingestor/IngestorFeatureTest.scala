@@ -50,11 +50,8 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
-              indexNameV1,
-              indexNameV2,
-              itemType)
-            withServer(flags) { _ =>
+
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
               assertElasticsearchEventuallyHasWork(indexNameV1, itemType, work)
               assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
             }
@@ -84,11 +81,7 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
-              indexNameV1,
-              indexNameV2,
-              itemType)
-            withServer(flags) { _ =>
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
               assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
               assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
             }
@@ -103,12 +96,7 @@ class IngestorFeatureTest
       withLocalS3Bucket { bucket =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
-              indexNameV1,
-              indexNameV2,
-              itemType) ++ s3LocalFlags(bucket)
-
-            withServer(flags) { _ =>
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
               val invalidMessage = toJson(
                 NotificationMessage(
                   Subject = "identified-item",
