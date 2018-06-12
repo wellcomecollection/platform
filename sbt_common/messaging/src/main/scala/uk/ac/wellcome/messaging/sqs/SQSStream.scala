@@ -39,13 +39,13 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M])(implicit decoder: Decoder[T]): Future[Done] = {
+  def runStream[M](streamName: String, modifySource: Source[(Message,T),NotUsed] => Source[Message,M])(implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
     implicit val materializer = ActorMaterializer(
       ActorMaterializerSettings(system).withSupervisionStrategy(decider(metricName)))
 
-    f(source.map(message => (message, read(message).get)))
+    modifySource(source.map(message => (message, read(message).get)))
       .map { m =>
         metricsSender.count(metricName, Future.successful(()))
         debug(s"Deleting message ${m.getMessageId}")
