@@ -3,11 +3,8 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{
-  VersionConflictException,
-  WorkGraph,
-  WorkUpdate
-}
+import uk.ac.wellcome.platform.matcher.lockable.Locked
+import uk.ac.wellcome.platform.matcher.models.{VersionConflictException, WorkGraph, WorkUpdate}
 
 import scala.collection.immutable.Iterable
 
@@ -15,8 +12,8 @@ object WorkGraphUpdater {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
     val existingVersion =
-      existingGraph.nodes.find(_.id == workUpdate.workId) match {
-        case Some(lw) => lw.version
+      existingGraph.nodes.find(_.t.id == workUpdate.workId) match {
+        case Some(workNode) => workNode.t.version
         case None => 0
       }
     if (existingVersion >= workUpdate.version) {
@@ -33,11 +30,11 @@ object WorkGraphUpdater {
       existingGraphWithoutUpdatedNode(workUpdate.workId, existingGraph.nodes)
 
     val nodeVersions = filteredLinkedWorks.map { linkedWork =>
-      (linkedWork.id, linkedWork.version)
+      (linkedWork.t.id, linkedWork.t.version)
     }.toMap + (workUpdate.workId -> workUpdate.version)
 
     val edges = filteredLinkedWorks.flatMap(linkedWork => {
-      toEdges(linkedWork.id, linkedWork.linkedIds)
+      toEdges(linkedWork.t.id, linkedWork.t.linkedIds)
     }) ++ toEdges(workUpdate.workId, workUpdate.referencedWorkIds)
 
     val nodes = existingGraph.nodes.flatMap(linkedWork => {
@@ -56,19 +53,19 @@ object WorkGraphUpdater {
           val nodeIds = component.nodes.map(_.value).toList
           val componentIdentifier = nodeIds.sorted.mkString("+")
           component.nodes.map(node => {
-            WorkNode(
+            Locked(WorkNode(
               node.value,
               nodeVersions.getOrElse(node.value, 0),
               adjacentNodeIds(node),
-              componentIdentifier)
+              componentIdentifier))
           })
         })
         .toSet
     )
   }
 
-  private def allNodes(linkedWork: WorkNode) = {
-    linkedWork.id +: linkedWork.linkedIds
+  private def allNodes(linkedWork: Locked[WorkNode]) = {
+    linkedWork.t.id +: linkedWork.t.linkedIds
   }
 
   private def toEdges(workId: String, linkedWorkIds: Iterable[String]) = {
@@ -77,7 +74,7 @@ object WorkGraphUpdater {
 
   private def existingGraphWithoutUpdatedNode(
     workId: String,
-    linkedWorksList: Set[WorkNode]) = {
-    linkedWorksList.filterNot(_.id == workId)
+    linkedWorksList: Set[Locked[WorkNode]]) = {
+    linkedWorksList.filterNot(_.t.id == workId)
   }
 }

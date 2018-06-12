@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import javax.naming.ConfigurationException
-
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{
   BatchGetItemRequest,

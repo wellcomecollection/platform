@@ -1,16 +1,13 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.gu.scanamo.Scanamo
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
+import uk.ac.wellcome.platform.matcher.lockable.Locked
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
-
-import scala.concurrent.Future
 
 class WorkGraphStoreTest
     extends FunSpec
@@ -32,8 +29,7 @@ class WorkGraphStoreTest
       }
     }
 
-    it(
-      "returns a WorkNode if it has no links and it's the only node in the setId") {
+    it("returns a WorkNode if it has no links and it's the only node in the setId") {
       withLocalDynamoDbTable { table =>
         withWorkGraphStore(table) { workGraphStore =>
           val work =
@@ -43,7 +39,7 @@ class WorkGraphStoreTest
           whenReady(
             workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
             linkedWorkGraph =>
-              linkedWorkGraph shouldBe WorkGraph(Set(work))
+              linkedWorkGraph shouldBe WorkGraph(Set(Locked(work)))
           }
         }
       }
@@ -169,7 +165,7 @@ class WorkGraphStoreTest
           val workNodeA = WorkNode("A", version = 0, List("B"), "A+B")
           val workNodeB = WorkNode("B", version = 0, Nil, "A+B")
 
-          whenReady(workGraphStore.put(WorkGraph(Set(workNodeA, workNodeB)))) {
+          whenReady(workGraphStore.put(WorkGraph(Set(Locked(workNodeA), Locked(workNodeB))))) {
             _ =>
               val savedLinkedWorks = Scanamo
                 .scan[WorkNode](dynamoDbClient)(table.name)
@@ -192,7 +188,7 @@ class WorkGraphStoreTest
 
         whenReady(
           workGraphStore
-            .put(WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B"))))
+            .put(WorkGraph(Set(Locked(WorkNode("A", version = 0, Nil, "A+B")))))
             .failed) { failedException =>
           failedException shouldBe expectedException
         }

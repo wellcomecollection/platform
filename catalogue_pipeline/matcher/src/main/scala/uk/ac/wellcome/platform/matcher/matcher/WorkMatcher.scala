@@ -1,13 +1,9 @@
 package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier,
-  WorkNode
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.platform.matcher.lockable.Locked
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
@@ -36,12 +32,12 @@ class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
 
   private def convertToIdentifiersList(graph: WorkGraph) = {
     groupBySetId(graph).map {
-      case (_, workNodes: Set[WorkNode]) =>
-        MatchedIdentifiers(workNodes.map(WorkIdentifier(_)))
+      case (_, workNodes: Set[Locked[WorkNode]]) =>
+        MatchedIdentifiers(workNodes.map(workNode => WorkIdentifier(workNode.t)))
     }.toSet
   }
 
   private def groupBySetId(updatedGraph: WorkGraph) =
-    updatedGraph.nodes.groupBy(_.componentId)
+    updatedGraph.nodes.groupBy(_.t.componentId)
 
 }

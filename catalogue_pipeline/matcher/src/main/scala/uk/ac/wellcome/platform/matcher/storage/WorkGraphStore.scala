@@ -1,13 +1,13 @@
 package uk.ac.wellcome.platform.matcher.storage
 
 import com.google.inject.Inject
-import com.gu.scanamo.error.DynamoReadError
-import com.twitter.inject.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
+import uk.ac.wellcome.platform.matcher.lockable.Locked.LockedSeqOps
 import uk.ac.wellcome.platform.matcher.lockable._
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.storage.GlobalExecutionContext._
+import uk.ac.wellcome.storage.type_classes.IdGetter
 
 import scala.concurrent.Future
 
@@ -20,30 +20,30 @@ class WorkGraphStore @Inject()(
 
   import Lockable._
 
-  private def unlockFailureStrategy[T](lockedList: Iterable[Locked[T]]) = {
-    lockedList.unlock match {
-      case Left(unlockFailures) =>
-        warn(s"Failed to unlock $unlockFailures after locking")
-      case Right(_) =>
-        debug(s"Successfully released part of a failed batch lock.")
-    }
-
-    throw new GracefulFailureException(
-      new RuntimeException("Failed to perform batched unlock."))
-  }
-
-  private def getLockedWorks[T](locks: Either[LockFailures[T], Iterable[Locked[WorkNode]]]) = {
+  private def getLockedWorks[T](locks: Either[LockFailures[T], Iterable[Locked[WorkNode]]])(implicit idGetter: IdGetter[T], lockable: Lockable[T]): Iterable[Locked[WorkNode]] = {
     locks match {
       case Right(workNodes) => workNodes.toSet
-      case Left(lockFailures) =>  unlockFailureStrategy(lockFailures.succeeded)
+      case Left(lockFailures) => lockFailures.succeeded.unlock match {
+        case Left(unlockFailures) =>
+          warn(s"Failed to unlock $unlockFailures after locking")
+        case Right(_) =>
+          debug(s"Successfully released part of a failed batch lock.")
+      }
+        Iterable.empty
     }
   }
 
-  private def getUnlockedWorks[T](unlocks: Either[UnlockFailures[WorkNode], Iterable[WorkNode]]) = {
+  private def getUnlockedWorks(unlocks: Either[UnlockFailures[WorkNode], Iterable[WorkNode]]) : Iterable[WorkNode] = {
     unlocks match {
       case Right(workNodes) => workNodes.toSet
-      case Left(unlockFailures: LockingFailures) => unlockFailureStrategy(unlockFailures.failed)
+      case Left(unlockFailures: LockingFailures) => unlockFailures.failed.unlock match {
+        case Left(unlockFailures) =>
+          warn(s"Failed to unlock $unlockFailures after locking")
+        case Right(_) =>
+          debug(s"Successfully released part of a failed batch lock.")
+      }
     }
+    Iterable.empty
   }
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = Future {
@@ -53,13 +53,13 @@ class WorkGraphStore @Inject()(
 
     val directlyAffectedWorks = getLockedWorks(directlyAffectedWorksLocks)
 
-    val affectedComponentIds = directlyAffectedWorks.map(_.t.componentId)
+    val affectedComponentIds = directlyAffectedWorks.map(_.t.componentId).toSet
 
     val affectedWorksLocks = workNodeDao.getByComponentIds(affectedComponentIds).lock
 
     val affectedWorks = getLockedWorks(affectedWorksLocks)
 
-    WorkGraph(affectedWorks)
+    WorkGraph(affectedWorks.toSet)
   }
 
   def put(graph: WorkGraph): Future[Set[WorkNode]] = Future {
@@ -67,6 +67,6 @@ class WorkGraphStore @Inject()(
 
     val unlocks = graph.nodes.unlock
 
-    getUnlockedWorks(unlocks)
+    getUnlockedWorks(unlocks).toSet
   }
 }
