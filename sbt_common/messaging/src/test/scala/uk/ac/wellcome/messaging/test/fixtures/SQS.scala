@@ -88,9 +88,11 @@ trait SQS extends Matchers {
     }
   )
 
-  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]): R = withLocalSqsQueueAndDlqAndTimeout(1)(testWith)
+  def withLocalSqsQueueAndDlq[R](testWith: TestWith[QueuePair, R]): R =
+    withLocalSqsQueueAndDlqAndTimeout(1)(testWith)
 
-  def withLocalSqsQueueAndDlqAndTimeout[R](visibilityTimeout: Int)(testWith: TestWith[QueuePair, R]): R =
+  def withLocalSqsQueueAndDlqAndTimeout[R](visibilityTimeout: Int)(
+    testWith: TestWith[QueuePair, R]): R =
     withLocalSqsQueue { dlq =>
       val queueName: String = Random.alphanumeric take 10 mkString
       val response = sqsClient.createQueue(new CreateQueueRequest()
