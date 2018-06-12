@@ -105,12 +105,56 @@ class LockerTest extends FunSpec with Matchers with LocalLockTableDynamoDb {
 
         val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
 
+        // Perform locking operation
         val maybeLockedThings = lockableThings(
           Scanamo.getAll[ThingToStore](dynamoDbClient)(tableName = thingTable.name)('id -> thingList.map(_.id).toSet )
         )
 
         maybeLockedThings shouldBe a[Right[_,_]]
         maybeLockedThings.right.get shouldBe thingList.map(Locked(_)).toSet
+      }
+    }
+  }
+
+  it("fails when unable to lock a iterable of Things") {
+    withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable: LocalDynamoDb.Table =>
+      withSpecifiedLocalDynamoDbTable(createThingTable _) { thingTable: LocalDynamoDb.Table =>
+
+        import Lockable._
+
+        implicit val dynamoLockingService = new DynamoLockingService(
+          dynamoDbClient, DynamoLockingServiceConfig(lockTable.name))
+
+        val locker = new Locker[DynamoLockingService] {
+          override implicit val lockingService = dynamoLockingService
+        }
+
+        val identifierList = (1 to 10).toList.map(i => Identifier(i.toString))
+        val thingList = identifierList.map(id => ThingToStore(id.id, "value"))
+        val idToFail :: idsToLock = identifierList.reverse
+
+        val putList = thingList.map(Scanamo.put(dynamoDbClient)(thingTable.name)(_))
+
+        // Check all puts successfully returned None
+        putList.count(_.isEmpty) shouldBe putList.size
+
+        // Prepare locking operation
+        val lockableThings = locker.lockAll[ThingToStore, DynamoReadError](identifierList) _
+
+        // Set lock table state
+        val lockOp = idToFail.lock
+        val lock = lockOp.right.get
+        lock shouldBe Locked(idToFail)
+
+        // Perform locking operation
+        val maybeLockedThings = lockableThings(
+          Scanamo.getAll[ThingToStore](dynamoDbClient)(tableName = thingTable.name)('id -> thingList.map(_.id).toSet )
+        )
+
+        maybeLockedThings shouldBe a[Left[_,_]]
+        maybeLockedThings.left.get shouldBe a[LockFailures[_]]
+        maybeLockedThings.left.get.failed shouldBe List(idToFail)
+        maybeLockedThings.left.get.succeeded.toSet shouldBe idsToLock.map(Locked(_)).toSet
       }
     }
   }

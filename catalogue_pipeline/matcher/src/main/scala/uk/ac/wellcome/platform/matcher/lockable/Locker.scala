@@ -34,25 +34,27 @@ trait Locker[L <: LockingService] extends Logging {
     }
   }
 
-  def lockAll[T, F](ids: Iterable[Identifier])(getAll: => Iterable[Either[F, T]]): Either[LockAllFailure[F], Iterable[Locked[T]]] = {
+  def lockAll[T, F](ids: Iterable[Identifier])(getAll: => Iterable[Either[F, T]]): Either[LockFailures[Identifier], Iterable[Locked[T]]] = {
     val identifierLocks: Either[LockFailures[Identifier], Iterable[Locked[Identifier]]] = ids.lock
 
-    val gotten: Iterable[Either[F, T]] = if(identifierLocks.isRight) {
-      getAll
-    } else {
-      Iterable.empty
-    }
 
-    val (leftEither, rightEither) = gotten.partition(_.isLeft)
-    val (left, right) =
-      (leftEither.map(_.left.get), rightEither.map(_.right.get))
 
-    if(left.isEmpty) {
-      Right(right.map(Locked(_)))
+    if(identifierLocks.isRight) {
+      val gotten = getAll
+      val (leftEither, rightEither) = gotten.partition(_.isLeft)
+      val (left, right) =
+        (leftEither.map(_.left.get), rightEither.map(_.right.get))
+
+      if(left.isEmpty) {
+        Right(right.map(Locked(_)))
+      } else {
+        identifierLocks
+          .right.map(_ => Iterable.empty[Locked[T]])
+      }
+
     } else {
-      Left(LockAllFailure(ids, left))
+      identifierLocks
+        .right.map(_ => Iterable.empty[Locked[T]])
     }
   }
 }
-
-case class LockAllFailure[F](ids: Iterable[Identifier], failures: Iterable[F])
