@@ -6,7 +6,6 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
