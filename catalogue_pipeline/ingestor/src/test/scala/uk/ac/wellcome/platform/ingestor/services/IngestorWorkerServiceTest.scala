@@ -1,17 +1,13 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import akka.actor.ActorSystem
-import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
-import com.sksamuel.elastic4s.http.ElasticDsl.{booleanField, intField, keywordField, mapping, objectField, textField}
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import org.apache.http.HttpHost
 import org.elasticsearch.client.RestClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials, ElasticSearchIndex}
+import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
@@ -36,7 +32,7 @@ class IngestorWorkerServiceTest
     with S3
     with WorkIndexerFixtures
     with Messaging
-    with WorksUtil {
+    with WorksUtil with CustomElasticSearchMapping {
 
   val itemType = "work"
 
@@ -135,14 +131,6 @@ class IngestorWorkerServiceTest
       }
     }
 
-  }
-
-  private def createIdentifier(identifierType: String, value: String) = {
-    SourceIdentifier(
-      identifierType = IdentifierType(identifierType),
-      ontologyType = "Work",
-      value = value
-    )
   }
 
   it("fails inserting a non sierra or miro identified work") {
@@ -251,7 +239,7 @@ class IngestorWorkerServiceTest
   }
 
   it("deletes successfully ingested works from the queue, does not delete others") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
     val sierraWork = IdentifiedWork(
       canonicalId = "s1",
@@ -297,7 +285,7 @@ class IngestorWorkerServiceTest
   }
 
   it("does not delete from the queue messages that succeed ingesting into one index but not the other") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
     val miroWork = IdentifiedWork(
       canonicalId = "s1",
@@ -458,50 +446,11 @@ class IngestorWorkerServiceTest
     testWith(ingestorWorkerService)
   }
 
-  class SubsetOfFieldsWorksIndex extends ElasticSearchIndex {
-    override val httpClient: HttpClient = elasticClient
-
-    def sourceIdentifierFields = Seq(
-      keywordField("ontologyType"),
-      objectField("identifierType").fields(
-        keywordField("id"),
-        keywordField("label"),
-        keywordField("ontologyType")
-      ),
-      keywordField("value")
+  private def createIdentifier(identifierType: String, value: String) = {
+    SourceIdentifier(
+      identifierType = IdentifierType(identifierType),
+      ontologyType = "Work",
+      value = value
     )
-
-    val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
-      Seq(
-        keywordField("canonicalId"),
-        intField("version"),
-        objectField("sourceIdentifier")
-          .fields(sourceIdentifierFields),
-        textField("title").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        booleanField("visible"),
-        objectField("identifiers"),
-        objectField("subjects"),
-        keywordField("workType"),
-        keywordField("description"),
-        keywordField("physicalDescription"),
-        keywordField("extent"),
-        keywordField("lettering"),
-        keywordField("createdDate"),
-        keywordField("language"),
-        keywordField("thumbnail"),
-        keywordField("publicationDate"),
-        keywordField("dimensions"),
-        objectField("contributors"),
-        objectField("genres"),
-        objectField("items"),
-        objectField("publishers"),
-        objectField("placesOfPublication"),
-        keywordField("ontologyType")
-      )
-
-    override val mappingDefinition: MappingDefinition = mapping(itemType)
-      .dynamic(DynamicMapping.Strict)
-      .as(rootIndexFields)
   }
 }
