@@ -2,6 +2,7 @@ package uk.ac.wellcome.messaging.message
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
+import akka.stream.scaladsl.Flow
 import org.mockito.Matchers.{any, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
@@ -180,6 +181,97 @@ class MessageStreamTest
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 2)
         }
+    }
+  }
+
+  describe("runStream") {
+    it("processes messages off a queue") {
+      withMessageStreamFixtures {
+        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+          val exampleObject1 = ExampleObject("some value 1")
+          sendMessage(bucket, queue, exampleObject1)
+          val exampleObject2 = ExampleObject("some value 2")
+          sendMessage(bucket, queue, exampleObject2)
+
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
+
+          messageStream.runStream("test-stream",
+            source => source.via(Flow.fromFunction{case (message, t) =>
+              received.add(t)
+              message
+            }))
+
+          eventually {
+            received should contain theSameElementsAs List(
+              exampleObject1,
+              exampleObject2)
+
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+            verify(metricsSender, times(2))
+              .incrementCount("test-stream_ProcessMessage_success")
+          }
+      }
+    }
+
+    it("does not delete failed messages and sends a failure metric") {
+      withMessageStreamFixtures {
+        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+          val exampleObject = ExampleObject("some value")
+          sendMessage(bucket, queue, exampleObject)
+
+          messageStream.runStream("test-stream",
+            source => source.via(Flow.fromFunction(_ =>
+              throw new RuntimeException("BOOOM!")))
+          )
+
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, 1)
+
+            verify(metricsSender, times(3))
+              .incrementCount("test-stream_ProcessMessage_failure")
+          }
+      }
+    }
+
+    it("continues reading if processing of some messages fails") {
+      withMessageStreamFixtures {
+        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
+          val exampleObject1 = ExampleObject("some value 1")
+          val exampleObject2 = ExampleObject("some value 2")
+
+          sqsClient.sendMessage(
+            queue.url,
+            "not valid json"
+          )
+
+          sendMessage(bucket, queue, exampleObject1)
+
+          sqsClient.sendMessage(
+            queue.url,
+            "another not valid json"
+          )
+
+          sendMessage(bucket, queue, exampleObject2)
+
+          val received = new ConcurrentLinkedQueue[ExampleObject]()
+          messageStream.runStream("test-stream",
+            source => source.via(Flow.fromFunction{case (message, t) =>
+              received.add(t)
+              message
+            })
+          )
+
+          eventually {
+            received should contain theSameElementsAs List(
+              exampleObject1,
+              exampleObject2)
+
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, size = 2)
+          }
+      }
     }
   }
 }

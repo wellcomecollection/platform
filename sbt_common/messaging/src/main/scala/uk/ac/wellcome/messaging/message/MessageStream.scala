@@ -31,11 +31,10 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream("", source =>
+  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream(streamName, source =>
     f(source.mapAsyncUnordered(10){case (message, notification) =>
       for {
         deserialisedObject <- deserialiseObject(notification.Message)
-
       } yield (message,deserialisedObject)
     })
   )
