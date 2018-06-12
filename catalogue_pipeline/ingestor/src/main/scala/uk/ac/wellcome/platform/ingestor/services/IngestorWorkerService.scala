@@ -18,7 +18,7 @@ class IngestorWorkerService @Inject()(
 
   case class MessageBundle(message:Message, work: IdentifiedWork, indices: Set[String])
 
-  messageStream.runStream { source =>
+  messageStream.runStream (this.getClass.getSimpleName,source =>
     source
       .map{case (message, identifiedWork) =>
         MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
@@ -29,7 +29,7 @@ class IngestorWorkerService @Inject()(
       } yield successfulMessageBundles.map(_.message)
     }
       .mapConcat(identity)
-  }
+  )
 
   private def processMessages(messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
     for {
