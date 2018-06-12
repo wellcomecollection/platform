@@ -123,7 +123,6 @@ object Dependencies {
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0",
     "uk.ac.wellcome" %% "storage" % platformVersions.storage,
