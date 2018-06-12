@@ -1,13 +1,7 @@
 package uk.ac.wellcome.platform.ingestor.services
 
-import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
-import com.sksamuel.elastic4s.http.ElasticDsl.{booleanField, intField, keywordField, mapping, objectField, textField}
-import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
-import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -23,7 +17,7 @@ class WorkIndexerTest
     with Matchers
     with ElasticsearchFixtures
     with WorksUtil
-    with WorkIndexerFixtures {
+    with WorkIndexerFixtures with CustomElasticSearchMapping {
 
   val esType = "work"
 
@@ -130,7 +124,7 @@ class WorkIndexerTest
   }
 
   it("inserts a list of works into elasticsearch and return the list of works that failed inserting"){
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex
+    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(elasticClient, esType)
     val validWorks = (1 to 5).map { i =>
       IdentifiedWork(
         canonicalId = s"s$i",
@@ -160,53 +154,6 @@ class WorkIndexerTest
     }
   }
 
-  class SubsetOfFieldsWorksIndex extends ElasticSearchIndex {
-    override val httpClient: HttpClient = elasticClient
-
-    def sourceIdentifierFields = Seq(
-      keywordField("ontologyType"),
-      objectField("identifierType").fields(
-        keywordField("id"),
-        keywordField("label"),
-        keywordField("ontologyType")
-      ),
-      keywordField("value")
-    )
-
-    val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
-      Seq(
-        keywordField("canonicalId"),
-        intField("version"),
-        objectField("sourceIdentifier")
-          .fields(sourceIdentifierFields),
-        textField("title").fields(
-          textField("english").analyzer(EnglishLanguageAnalyzer)),
-        booleanField("visible"),
-        objectField("identifiers"),
-        objectField("subjects"),
-        keywordField("workType"),
-        keywordField("description"),
-        keywordField("physicalDescription"),
-        keywordField("extent"),
-        keywordField("lettering"),
-        keywordField("createdDate"),
-        keywordField("language"),
-        keywordField("thumbnail"),
-        keywordField("publicationDate"),
-        keywordField("dimensions"),
-        objectField("contributors"),
-        objectField("genres"),
-        objectField("items"),
-        objectField("publishers"),
-        objectField("placesOfPublication"),
-        keywordField("ontologyType")
-      )
-
-    override val mappingDefinition: MappingDefinition = mapping(esType)
-      .dynamic(DynamicMapping.Strict)
-      .as(rootIndexFields)
-  }
-
   private def createIdentifier(identifierType: String, value: String) = {
     SourceIdentifier(
       identifierType = IdentifierType(identifierType),
@@ -214,6 +161,7 @@ class WorkIndexerTest
       value = value
     )
   }
+
   def createVersionedWork(version: Int = 1): IdentifiedWork =
     createWorks(count = 1).head
       .copy(version = version)
