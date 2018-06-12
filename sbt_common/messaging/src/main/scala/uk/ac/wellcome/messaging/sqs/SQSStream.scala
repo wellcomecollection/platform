@@ -39,7 +39,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-  def runStream[M2](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M2])(implicit decoder: Decoder[T]) = {
+  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M])(implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
     implicit val materializer = ActorMaterializer(

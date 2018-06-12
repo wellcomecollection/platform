@@ -1,17 +1,16 @@
 package uk.ac.wellcome.messaging.message
 
-import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Source
+import akka.{Done, NotUsed}
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import io.circe.Decoder
+import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
@@ -31,29 +30,21 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream(streamName, source =>
-    f(source.mapAsyncUnordered(10){case (message, notification) =>
+  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M]): Future[Done] = sqsStream.runStream(streamName, source =>
+    f(source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism){case (message, notification) =>
       for {
         deserialisedObject <- deserialiseObject(notification.Message)
       } yield (message,deserialisedObject)
     })
   )
 
-  def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
-    sqsStream.foreach(
-      streamName = streamName,
-      process = (notification: NotificationMessage) =>
-        processMessagePointer(notification, process)
-    )
+  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] = {
+    runStream(streamName, source => source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) { case (message, t) =>
+      for {
+        _ <- process(t)
+      } yield message
+    })
   }
-
-  private def processMessagePointer(notification: NotificationMessage,
-                                    process: T => Future[Unit]): Future[Unit] =
-    for {
-      deserialisedObject <- deserialiseObject(notification.Message)
-      _ <- process(deserialisedObject)
-    } yield ()
 
   private def deserialiseObject(messageString: String) = for {
     messagePointer <- Future.fromTry(
