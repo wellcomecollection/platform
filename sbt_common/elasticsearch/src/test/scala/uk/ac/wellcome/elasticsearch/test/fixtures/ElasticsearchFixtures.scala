@@ -5,7 +5,12 @@ import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig, ElasticSearchIndex, WorksIndex}
+import uk.ac.wellcome.elasticsearch.{
+  ElasticClientBuilder,
+  ElasticConfig,
+  ElasticSearchIndex,
+  WorksIndex
+}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -86,7 +91,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchEventuallyHasWork(indexName: String, itemType: String, works: IdentifiedWork*) = {
+  def assertElasticsearchEventuallyHasWork(indexName: String,
+                                           itemType: String,
+                                           works: IdentifiedWork*) = {
     works.map { work =>
       val workJson = toJson(work).get
 
@@ -102,7 +109,9 @@ trait ElasticsearchFixtures
     }
   }
 
-  def assertElasticsearchNeverHasWork(indexName: String, itemType: String, works: IdentifiedWork*) = {
+  def assertElasticsearchNeverHasWork(indexName: String,
+                                      itemType: String,
+                                      works: IdentifiedWork*) = {
     // Let enough time pass to account for elasticsearch
     // eventual consistency before asserting
     Thread.sleep(500)

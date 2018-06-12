@@ -31,13 +31,18 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](streamName: String, f: Source[(Message,T),NotUsed] => Source[Message,M]) = sqsStream.runStream(streamName, source =>
-    f(source.mapAsyncUnordered(10){case (message, notification) =>
-      for {
-        deserialisedObject <- deserialiseObject(notification.Message)
-      } yield (message,deserialisedObject)
-    })
-  )
+  def runStream[M](streamName: String,
+                   f: Source[(Message, T), NotUsed] => Source[Message, M]) =
+    sqsStream.runStream(
+      streamName,
+      source =>
+        f(source.mapAsyncUnordered(10) {
+          case (message, notification) =>
+            for {
+              deserialisedObject <- deserialiseObject(notification.Message)
+            } yield (message, deserialisedObject)
+        })
+    )
 
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderN: Decoder[NotificationMessage]): Future[Done] = {
@@ -55,9 +60,9 @@ class MessageStream[T] @Inject()(
       _ <- process(deserialisedObject)
     } yield ()
 
-  private def deserialiseObject(messageString: String) = for {
-    messagePointer <- Future.fromTry(
-      fromJson[MessagePointer](messageString))
-    deserialisedObject <- objectStore.get(messagePointer.src)
-  } yield deserialisedObject
+  private def deserialiseObject(messageString: String) =
+    for {
+      messagePointer <- Future.fromTry(fromJson[MessagePointer](messageString))
+      deserialisedObject <- objectStore.get(messagePointer.src)
+    } yield deserialisedObject
 }

@@ -25,42 +25,40 @@ class WorkIndexer @Inject()(
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedWork],
-                esIndex: String,
-                esType: String): Future[Either[Seq[IdentifiedWork], Seq[IdentifiedWork]]] = {
+  def indexWorks(works: Seq[IdentifiedWork], esIndex: String, esType: String)
+    : Future[Either[Seq[IdentifiedWork], Seq[IdentifiedWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 
-        val inserts = works.map { work =>
-          indexInto(esIndex / esType)
-            .version(work.version)
-            .versionType(VersionType.EXTERNAL_GTE)
-            .id(work.canonicalId)
-            .doc(work)
-        }
+    val inserts = works.map { work =>
+      indexInto(esIndex / esType)
+        .version(work.version)
+        .versionType(VersionType.EXTERNAL_GTE)
+        .id(work.canonicalId)
+        .doc(work)
+    }
 
-        elasticClient
-          .execute {
-            bulk(inserts)
-          }
-          .map { bulkResponse: BulkResponse =>
-            val actualFailures = filterVersionConflictErrors(bulkResponse)
-
-            if(actualFailures.nonEmpty) {
-              val failedIds = actualFailures.map(_.id)
-              debug(s"Failed indexing works $failedIds")
-
-              Left(works.filter(w => {
-                failedIds.contains(w.canonicalId)
-              }))
-            }
-            else Right(works)
-          }
+    elasticClient
+      .execute {
+        bulk(inserts)
       }
+      .map { bulkResponse: BulkResponse =>
+        val actualFailures = filterVersionConflictErrors(bulkResponse)
+
+        if (actualFailures.nonEmpty) {
+          val failedIds = actualFailures.map(_.id)
+          debug(s"Failed indexing works $failedIds")
+
+          Left(works.filter(w => {
+            failedIds.contains(w.canonicalId)
+          }))
+        } else Right(works)
+      }
+  }
 
   private def filterVersionConflictErrors(bulkResponse: BulkResponse) = {
     bulkResponse.failures.filterNot(bulkResponseItem =>
-      bulkResponseItem.error.exists(bulkError => bulkError.`type`.contains("version_conflict_engine_exception"))
-    )
+      bulkResponseItem.error.exists(bulkError =>
+        bulkError.`type`.contains("version_conflict_engine_exception")))
   }
 }

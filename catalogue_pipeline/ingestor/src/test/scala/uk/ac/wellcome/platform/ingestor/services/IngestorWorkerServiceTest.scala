@@ -11,7 +11,12 @@ import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType, SourceIdentifier, Subject}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifiedWork,
+  IdentifierType,
+  SourceIdentifier,
+  Subject
+}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -34,7 +39,8 @@ class IngestorWorkerServiceTest
     with S3
     with WorkIndexerFixtures
     with Messaging
-    with WorksUtil with CustomElasticSearchMapping {
+    with WorksUtil
+    with CustomElasticSearchMapping {
 
   val itemType = "work"
 
@@ -60,9 +66,15 @@ class IngestorWorkerServiceTest
             )
             sqsClient.sendMessage(queue.url, messageBody)
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, work)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              work)
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, work)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              work)
         }
       }
     }
@@ -90,19 +102,33 @@ class IngestorWorkerServiceTest
             )
             sqsClient.sendMessage(queue.url, messageBody)
 
-            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, work)
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              work)
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, work)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              work)
         }
       }
     }
   }
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
-    val miroWork1 = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M1"), canonicalId = "m1")
-    val miroWork2 = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M2"), canonicalId = "m2")
-    val sierraWork1 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S1"), canonicalId = "s1")
-    val sierraWork2 = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"), canonicalId = "s2")
+    val miroWork1 = createWork().copy(
+      sourceIdentifier = createIdentifier("miro-image-number", "M1"),
+      canonicalId = "m1")
+    val miroWork2 = createWork().copy(
+      sourceIdentifier = createIdentifier("miro-image-number", "M2"),
+      canonicalId = "m2")
+    val sierraWork1 = createWork().copy(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S1"),
+      canonicalId = "s1")
+    val sierraWork2 = createWork().copy(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
+      canonicalId = "s2")
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
@@ -110,7 +136,6 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-
             works.foreach { work =>
               val messageBody = put[IdentifiedWork](
                 obj = work,
@@ -123,10 +148,21 @@ class IngestorWorkerServiceTest
               sqsClient.sendMessage(queue.url, messageBody)
             }
 
-            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, sierraWork1, sierraWork2)
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              sierraWork1,
+              sierraWork2)
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, works: _*)
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork1, miroWork2)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              works: _*)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              miroWork1,
+              miroWork2)
 
             assertQueueEmpty(dlq)
         }
@@ -166,10 +202,17 @@ class IngestorWorkerServiceTest
     }
   }
 
-  it("inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
-    val miroWork = createWork().copy(sourceIdentifier = createIdentifier("miro-image-number", "M"), canonicalId = "m")
-    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "S2"), canonicalId = "s")
-    val invalidWork = createWork().copy(sourceIdentifier = createIdentifier("calm-altref-no", "C1"), canonicalId = "c")
+  it(
+    "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
+    val miroWork = createWork().copy(
+      sourceIdentifier = createIdentifier("miro-image-number", "M"),
+      canonicalId = "m")
+    val sierraWork = createWork().copy(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
+      canonicalId = "s")
+    val invalidWork = createWork().copy(
+      sourceIdentifier = createIdentifier("calm-altref-no", "C1"),
+      canonicalId = "c")
 
     val works = List(miroWork, sierraWork, invalidWork)
 
@@ -177,7 +220,6 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-
             works.foreach { work =>
               val messageBody = put[IdentifiedWork](
                 obj = work,
@@ -190,10 +232,20 @@ class IngestorWorkerServiceTest
               sqsClient.sendMessage(queue.url, messageBody)
             }
 
-            assertElasticsearchNeverHasWork(indexName = esIndexV1, itemType = itemType, sierraWork)
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              sierraWork)
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, miroWork, sierraWork)
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              miroWork,
+              sierraWork)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              miroWork)
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
@@ -204,19 +256,27 @@ class IngestorWorkerServiceTest
 
   }
 
-  it("deletes successfully ingested works from the queue, including older versions of already ingested works") {
-    val sierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "s1"), canonicalId = "s1")
-    val newSierraWork = createWork().copy(sourceIdentifier = createIdentifier("sierra-system-number", "s2"), canonicalId = "s2", version = 2)
+  it(
+    "deletes successfully ingested works from the queue, including older versions of already ingested works") {
+    val sierraWork = createWork().copy(
+      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
+      canonicalId = "s1")
+    val newSierraWork = createWork().copy(
+      sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
+      canonicalId = "s2",
+      version = 2)
     val oldSierraWork = newSierraWork.copy(version = 1)
 
     val works = List(sierraWork, oldSierraWork)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
-        insertIntoElasticsearch(indexName = esIndexV2, itemType = itemType, newSierraWork)
+        insertIntoElasticsearch(
+          indexName = esIndexV2,
+          itemType = itemType,
+          newSierraWork)
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-
             works.foreach { work =>
               val messageBody = put[IdentifiedWork](
                 obj = work,
@@ -229,7 +289,11 @@ class IngestorWorkerServiceTest
               sqsClient.sendMessage(queue.url, messageBody)
             }
 
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, sierraWork, newSierraWork)
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              sierraWork,
+              newSierraWork)
             eventually {
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
@@ -240,8 +304,10 @@ class IngestorWorkerServiceTest
 
   }
 
-  it("deletes successfully ingested works from the queue, does not delete others") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(elasticClient, itemType)
+  it(
+    "deletes successfully ingested works from the queue, does not delete others") {
+    val subsetOfFieldsIndex =
+      new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
     val sierraWork = IdentifiedWork(
       canonicalId = "s1",
@@ -253,41 +319,52 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       title = Some("s2 title"),
       version = 1,
-      subjects = List(Subject(label = "crystallography", concepts = Nil)))
+      subjects = List(Subject(label = "crystallography", concepts = Nil))
+    )
 
     val works = List(sierraWork, sierraWorkDoesNotMatchMapping)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(subsetOfFieldsIndex, indexName = (Random.alphanumeric take 10 mkString) toLowerCase) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
-          case (QueuePair(queue, dlq), bucket) =>
-
-            works.foreach { work =>
-              val messageBody = put[IdentifiedWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"${work.canonicalId}.json"
+      withLocalElasticsearchIndex(
+        subsetOfFieldsIndex,
+        indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
+        esIndexV2 =>
+          withIngestorWorkerService(esIndexV1, esIndexV2) {
+            case (QueuePair(queue, dlq), bucket) =>
+              works.foreach { work =>
+                val messageBody = put[IdentifiedWork](
+                  obj = work,
+                  location = ObjectLocation(
+                    namespace = bucket.name,
+                    key = s"${work.canonicalId}.json"
+                  )
                 )
-              )
 
-              sqsClient.sendMessage(queue.url, messageBody)
-            }
+                sqsClient.sendMessage(queue.url, messageBody)
+              }
 
-            assertElasticsearchNeverHasWork(indexName = esIndexV2, itemType = itemType, sierraWorkDoesNotMatchMapping)
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, sierraWork)
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
-            }
-        }
+              assertElasticsearchNeverHasWork(
+                indexName = esIndexV2,
+                itemType = itemType,
+                sierraWorkDoesNotMatchMapping)
+              assertElasticsearchEventuallyHasWork(
+                indexName = esIndexV2,
+                itemType = itemType,
+                sierraWork)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
+          }
       }
     }
 
   }
 
-  it("does not delete from the queue messages that succeed ingesting into one index but not the other") {
-    val subsetOfFieldsIndex = new SubsetOfFieldsWorksIndex(elasticClient, itemType)
+  it(
+    "does not delete from the queue messages that succeed ingesting into one index but not the other") {
+    val subsetOfFieldsIndex =
+      new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
     val miroWork = IdentifiedWork(
       canonicalId = "s1",
@@ -299,35 +376,48 @@ class IngestorWorkerServiceTest
       sourceIdentifier = createIdentifier("miro-image-number", "m2"),
       title = Some("s2 title"),
       version = 1,
-      subjects = List(Subject(label = "crystallography", concepts = Nil)))
+      subjects = List(Subject(label = "crystallography", concepts = Nil))
+    )
 
     val works = List(miroWork, miroWorkDoesNotMatchV2Mapping)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
-      withLocalElasticsearchIndex(subsetOfFieldsIndex, indexName = (Random.alphanumeric take 10 mkString) toLowerCase) { esIndexV2 =>
-        withIngestorWorkerService(esIndexV1, esIndexV2) {
-          case (QueuePair(queue, dlq), bucket) =>
-
-            works.foreach { work =>
-              val messageBody = put[IdentifiedWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"${work.canonicalId}.json"
+      withLocalElasticsearchIndex(
+        subsetOfFieldsIndex,
+        indexName = (Random.alphanumeric take 10 mkString) toLowerCase) {
+        esIndexV2 =>
+          withIngestorWorkerService(esIndexV1, esIndexV2) {
+            case (QueuePair(queue, dlq), bucket) =>
+              works.foreach { work =>
+                val messageBody = put[IdentifiedWork](
+                  obj = work,
+                  location = ObjectLocation(
+                    namespace = bucket.name,
+                    key = s"${work.canonicalId}.json"
+                  )
                 )
-              )
 
-              sqsClient.sendMessage(queue.url, messageBody)
-            }
+                sqsClient.sendMessage(queue.url, messageBody)
+              }
 
-            assertElasticsearchNeverHasWork(indexName = esIndexV2, itemType = itemType, miroWorkDoesNotMatchV2Mapping)
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV2, itemType = itemType, miroWork)
-            assertElasticsearchEventuallyHasWork(indexName = esIndexV1, itemType = itemType, miroWork, miroWorkDoesNotMatchV2Mapping)
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
-            }
-        }
+              assertElasticsearchNeverHasWork(
+                indexName = esIndexV2,
+                itemType = itemType,
+                miroWorkDoesNotMatchV2Mapping)
+              assertElasticsearchEventuallyHasWork(
+                indexName = esIndexV2,
+                itemType = itemType,
+                miroWork)
+              assertElasticsearchEventuallyHasWork(
+                indexName = esIndexV1,
+                itemType = itemType,
+                miroWork,
+                miroWorkDoesNotMatchV2Mapping)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
+          }
       }
     }
 
@@ -436,11 +526,11 @@ class IngestorWorkerServiceTest
     val ingestorConfig = IngestorConfig(
       batchSize = 100,
       flushInterval = 5 seconds,
-    elasticConfig = ElasticConfig(
-      documentType = itemType,
-      indexV1name = esIndexV1,
-      indexV2name = esIndexV2
-    )
+      elasticConfig = ElasticConfig(
+        documentType = itemType,
+        indexV1name = esIndexV1,
+        indexV2name = esIndexV2
+      )
     )
 
     val ingestorWorkerService = new IngestorWorkerService(

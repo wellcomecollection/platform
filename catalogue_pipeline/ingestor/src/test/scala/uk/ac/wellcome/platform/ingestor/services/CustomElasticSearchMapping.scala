@@ -1,7 +1,14 @@
 package uk.ac.wellcome.platform.ingestor.services
 
 import com.sksamuel.elastic4s.analyzers.EnglishLanguageAnalyzer
-import com.sksamuel.elastic4s.http.ElasticDsl.{booleanField, intField, keywordField, mapping, objectField, textField}
+import com.sksamuel.elastic4s.http.ElasticDsl.{
+  booleanField,
+  intField,
+  keywordField,
+  mapping,
+  objectField,
+  textField
+}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
@@ -9,7 +16,8 @@ import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
 
 trait CustomElasticSearchMapping {
 
-  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String) extends ElasticSearchIndex {
+  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)
+      extends ElasticSearchIndex {
     override val httpClient: HttpClient = elasticClient
 
     def sourceIdentifierFields = Seq(

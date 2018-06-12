@@ -28,7 +28,7 @@ class IngestorIndexTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        withServer(queue, bucket, indexNameV1, indexNameV2, itemType){ _ =>
+        withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
           eventuallyIndexExists(indexNameV1)
           eventuallyIndexExists(indexNameV2)
         }

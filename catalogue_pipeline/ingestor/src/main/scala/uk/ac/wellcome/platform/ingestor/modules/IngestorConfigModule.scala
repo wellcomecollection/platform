@@ -27,5 +27,6 @@ object IngestorConfigModule extends TwitterModule {
   )
 
   @Provides
-  def providesIngestorConfig(elasticConfig: ElasticConfig) = IngestorConfig(batchSize(), flushInterval(), elasticConfig)
+  def providesIngestorConfig(elasticConfig: ElasticConfig) =
+    IngestorConfig(batchSize(), flushInterval(), elasticConfig)
 }

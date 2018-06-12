@@ -10,16 +10,22 @@ import uk.ac.wellcome.platform.ingestor.{Server => AppServer}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait Server extends CloudWatch with Messaging with ElasticsearchFixtures { this: Suite =>
-  def withServer[R](queue: Queue, bucket: Bucket, indexNameV1: String, indexNameV2: String, itemType: String)(
-    testWith: TestWith[EmbeddedHttpServer, R]): R = {
+trait Server extends CloudWatch with Messaging with ElasticsearchFixtures {
+  this: Suite =>
+  def withServer[R](
+    queue: Queue,
+    bucket: Bucket,
+    indexNameV1: String,
+    indexNameV2: String,
+    itemType: String)(testWith: TestWith[EmbeddedHttpServer, R]): R = {
 
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
       flags = messageReaderLocalFlags(bucket, queue) ++ esLocalFlags(
         indexNameV1,
         indexNameV2,
-        itemType) ++ cloudWatchLocalFlags ++ Map("es.ingest.flushInterval" -> "5 seconds")
+        itemType) ++ cloudWatchLocalFlags ++ Map(
+        "es.ingest.flushInterval" -> "5 seconds")
     )
 
     server.start()

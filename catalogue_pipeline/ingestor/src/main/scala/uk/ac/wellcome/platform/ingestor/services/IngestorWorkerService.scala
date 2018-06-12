@@ -11,40 +11,55 @@ import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import scala.concurrent.{ExecutionContext, Future}
 
 class IngestorWorkerService @Inject()(
-                                       ingestorConfig: IngestorConfig,
-                                       identifiedWorkIndexer: WorkIndexer,
-                                       messageStream: MessageStream[IdentifiedWork],
-                                       system: ActorSystem)(implicit ec: ExecutionContext) {
+  ingestorConfig: IngestorConfig,
+  identifiedWorkIndexer: WorkIndexer,
+  messageStream: MessageStream[IdentifiedWork],
+  system: ActorSystem)(implicit ec: ExecutionContext) {
 
-  case class MessageBundle(message:Message, work: IdentifiedWork, indices: Set[String])
+  case class MessageBundle(message: Message,
+                           work: IdentifiedWork,
+                           indices: Set[String])
 
-  messageStream.runStream (this.getClass.getSimpleName,source =>
-    source
-      .map{case (message, identifiedWork) =>
-        MessageBundle(message, identifiedWork, decideTargetIndices(identifiedWork))
-      }
-      .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval).mapAsyncUnordered(10){ messages =>
-      for {
-        successfulMessageBundles <- processMessages(messages.toList)
-      } yield successfulMessageBundles.map(_.message)
-    }
-      .mapConcat(identity)
+  messageStream.runStream(
+    this.getClass.getSimpleName,
+    source =>
+      source
+        .map {
+          case (message, identifiedWork) =>
+            MessageBundle(
+              message,
+              identifiedWork,
+              decideTargetIndices(identifiedWork))
+        }
+        .groupedWithin(ingestorConfig.batchSize, ingestorConfig.flushInterval)
+        .mapAsyncUnordered(10) { messages =>
+          for {
+            successfulMessageBundles <- processMessages(messages.toList)
+          } yield successfulMessageBundles.map(_.message)
+        }
+        .mapConcat(identity)
   )
 
-  private def processMessages(messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
+  private def processMessages(
+    messageBundles: List[MessageBundle]): Future[List[MessageBundle]] =
     for {
-      indicesToWorksMap <- Future.successful(sortInTargetIndices(messageBundles))
-      listOfEither <-Future.sequence(indicesToWorksMap.map { case (index, sortedWorks) =>
+      indicesToWorksMap <- Future.successful(
+        sortInTargetIndices(messageBundles))
+      listOfEither <- Future.sequence(indicesToWorksMap.map {
+        case (index, sortedWorks) =>
           identifiedWorkIndexer.indexWorks(
             works = sortedWorks,
             esIndex = index,
             esType = ingestorConfig.elasticConfig.documentType
           )
-        })
+      })
 
-      } yield {
-      val failedWorks = listOfEither.collect { case Left(works) => works }.flatten.toList
-      messageBundles.filterNot{ case MessageBundle(_, work, _) => failedWorks.contains(work)}
+    } yield {
+      val failedWorks =
+        listOfEither.collect { case Left(works) => works }.flatten.toList
+      messageBundles.filterNot {
+        case MessageBundle(_, work, _) => failedWorks.contains(work)
+      }
     }
 
   def stop(): Future[Terminated] = {
@@ -73,13 +88,15 @@ class IngestorWorkerService @Inject()(
 
   }
 
-  private def sortInTargetIndices(works: List[MessageBundle]): Map[String, List[IdentifiedWork]] =
-    works.foldLeft(Map[String, List[IdentifiedWork]]()){case (resultMap, MessageBundle(_, work, indices)) =>
-      val workUpdateMap = indices.map { index =>
-        val existingWorks = resultMap.getOrElse(index, Nil)
-        val updatedWorks = existingWorks :+ work
-        (index, updatedWorks)
-      }.toMap
-      resultMap ++ workUpdateMap
+  private def sortInTargetIndices(
+    works: List[MessageBundle]): Map[String, List[IdentifiedWork]] =
+    works.foldLeft(Map[String, List[IdentifiedWork]]()) {
+      case (resultMap, MessageBundle(_, work, indices)) =>
+        val workUpdateMap = indices.map { index =>
+          val existingWorks = resultMap.getOrElse(index, Nil)
+          val updatedWorks = existingWorks :+ work
+          (index, updatedWorks)
+        }.toMap
+        resultMap ++ workUpdateMap
     }
 }
