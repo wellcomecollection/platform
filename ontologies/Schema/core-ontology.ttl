@@ -41,7 +41,12 @@ wcore:IdentifierType rdf:type owl:Class ;
 wcore:Location rdf:type owl:Class ;
     rdfs:label "Location" ;
     rdfs:comment "The location of that an item can be retrieved."@en ;
-    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .           
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> . 
+    
+wcore:Period rdf:type owl:Class ;
+    rdfs:label "Period" ;
+    rdfs:comment "A period of time."@en ;
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .               
     
 #### object properties ####
 
@@ -66,6 +71,12 @@ wcore:identifierType rdf:type owl:ObjectProperty ;
     rdfs:range wcore:IdentifierScheme ;
     rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .
     
+wcore:dates rdf:type owl:ObjectProperty ;
+    rdfs:label "dates"@en ;
+    rdfs:comment ""@en ;
+    rdfs:domain wcore:Thing ;
+    rdfs:range wcore:Period ;
+    rdfs:isDefinedBy <http://wellcomecollection.org/ontologies/core> .    
 
     
 ####### data properties #####
