@@ -1,10 +1,11 @@
 package uk.ac.wellcome.messaging.sqs
 
-import akka.Done
 import akka.actor.ActorSystem
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.stream.scaladsl.{Keep, Source}
+import akka.{Done, NotUsed}
 import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
@@ -24,48 +25,63 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
                              metricsSender: MetricsSender)
     extends Logging {
 
-  val decider: Supervision.Decider = {
-    case _: Exception => Supervision.Resume
+  def decider(metricName: String): Supervision.Decider = {
+    case e: Exception =>
+      metricsSender.count(metricName, Future.failed(e))
+      Supervision.Resume
     case _ => Supervision.Stop
   }
+
   implicit val system = actorSystem
-  implicit val materializer = ActorMaterializer(
-    ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+
   implicit val dispatcher = system.dispatcher
 
-  def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T]): Future[Done] =
-    SqsSource(sqsConfig.queueUrl)(sqsClient)
-      .mapAsyncUnordered(parallelism = sqsConfig.parallelism) { message =>
-        debug(s"Processing message ${message.getMessageId}")
-        val metricName = s"${streamName}_ProcessMessage"
-        val op = readAndProcess(streamName, message, process)
+  private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
+  private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
-        metricsSender.count(metricName, op)
-      }
+  def runStream[M](
+    streamName: String,
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, M])(
+    implicit decoder: Decoder[T]): Future[Done] = {
+    val metricName = s"${streamName}_ProcessMessage"
+
+    implicit val materializer = ActorMaterializer(
+      ActorMaterializerSettings(system).withSupervisionStrategy(
+        decider(metricName)))
+
+    modifySource(source.map(message => (message, read(message).get)))
       .map { m =>
+        metricsSender.count(metricName, Future.successful(()))
         debug(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
-      .runWith(SqsAckSink(sqsConfig.queueUrl)(sqsClient))
+      .toMat(sink)(Keep.right)
+      .run()
+  }
 
-  private def readAndProcess(
-    streamName: String,
-    message: Message,
-    process: T => Future[Unit])(implicit decoderT: Decoder[T]) = {
-    debug(s"Processing message ${message.getMessageId}")
-    val processMessageFuture = for {
-      t <- Future.fromTry(read(message))
-      _ <- process(t)
-    } yield message
+  def foreach(streamName: String, process: T => Future[Unit])(
+    implicit decoderT: Decoder[T]): Future[Done] =
+    runStream(
+      s"$streamName",
+      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
+        case (message, t) =>
+          debug(s"Processing message ${message.getMessageId}")
+          readAndProcess(streamName, t, process).map(_ => message)
+      }
+    )
+
+  private def readAndProcess(streamName: String,
+                             message: T,
+                             process: T => Future[Unit]) = {
+    val processMessageFuture = process(message)
 
     processMessageFuture.failed.foreach {
       case exception: GracefulFailureException =>
         logger.warn(
-          s"Graceful failure processing message ${message.getMessageId}: ${exception.getMessage}")
+          s"Graceful failure processing message: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
-          s"Unrecognised failure while processing message ${message.getMessageId}",
+          s"Unrecognised failure while processing message: ${exception.getMessage}",
           exception)
     }
     processMessageFuture
