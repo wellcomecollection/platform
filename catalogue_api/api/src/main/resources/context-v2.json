@@ -174,7 +174,7 @@
       "@id": "wev:agents"
     },
     "dates": {
-      "@id": "wev:dates"
+      "@id": "wcore:dates"
     },
     "locationType": {
       "@id": "wloc:locationType"

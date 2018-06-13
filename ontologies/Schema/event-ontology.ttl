@@ -67,7 +67,7 @@ wev:Work rdf:type owl:Class ;
 wev:Article rdf:type owl:Class ;
     rdfs:label "Article"@en ;
     rdfs:comment "A editorially created peice of content."@en ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .           
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .              
       
 #### object properties ####
 
@@ -139,7 +139,7 @@ wev:physicalDescription rdf:type owl:ObjectProperty ;
     rdfs:comment "Relates an exhibtion to its physical description."@en ;
     rdfs:domain wev:Exhibition ;
     rdfs:range wev:Article ;
-    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .
+    rdf:isDefinedBy <http://wellcomecollection.org/ontologies/event> .   
 
 ####### data properties #####
 
