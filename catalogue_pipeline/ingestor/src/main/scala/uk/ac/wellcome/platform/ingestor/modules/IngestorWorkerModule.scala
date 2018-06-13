@@ -5,7 +5,7 @@ import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.platform.ingestor.services.IngestorWorkerService
 
 object IngestorWorkerModule extends TwitterModule {
-  // eagerly load worker service
+
   override def singletonStartup(injector: Injector) {
     super.singletonStartup(injector)
     injector.instance[IngestorWorkerService]
