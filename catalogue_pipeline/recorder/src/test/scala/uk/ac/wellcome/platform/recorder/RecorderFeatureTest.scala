@@ -66,7 +66,11 @@ class RecorderFeatureTest
                 assertJsonStringsAreEqual(
                   // TODO: Drop the record parameter when scala-storage 1.1
                   // is released
-                  getJsonFor[RecorderWorkEntry](bucket, table, record, id = record.id),
+                  getJsonFor[RecorderWorkEntry](
+                    bucket,
+                    table,
+                    record,
+                    id = record.id),
                   toJson(record).get
                 )
               }
