@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,6 +23,7 @@ class SierraBibMergerFeatureTest
     with Eventually
     with MockitoSugar
     with ExtendedPatience
+    with JsonTestUtil
     with ScalaFutures
     with SQS
     with fixtures.Server
@@ -311,7 +312,9 @@ class SierraBibMergerFeatureTest
                            table: Table,
                            record: SierraTransformable) =
     assertJsonStringsAreEqual(
-      getJsonFor[SierraTransformable](bucket, table, record),
+      // TODO: Drop the record parameter when scala-storage 1.1
+      // is released
+      getJsonFor[SierraTransformable](bucket, table, record, id = record.id),
       toJson(record).get
     )
 

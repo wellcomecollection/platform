@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,6 +20,7 @@ class RecorderFeatureTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
+    with JsonTestUtil
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging {
@@ -63,7 +64,9 @@ class RecorderFeatureTest
               eventually {
                 val record = RecorderWorkEntry(work)
                 assertJsonStringsAreEqual(
-                  getJsonFor[RecorderWorkEntry](bucket, table, record),
+                  // TODO: Drop the record parameter when scala-storage 1.1
+                  // is released
+                  getJsonFor[RecorderWorkEntry](bucket, table, record, id = record.id),
                   toJson(record).get
                 )
               }

@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,6 +22,7 @@ import scala.concurrent.Future
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with ExtendedPatience
+    with JsonTestUtil
     with MockitoSugar
     with ScalaFutures
     with LocalVersionedHybridStore
@@ -558,8 +559,9 @@ class SierraItemMergerUpdaterServiceTest
   private def assertStored(bucket: Bucket,
                            table: Table,
                            record: SierraTransformable) =
+    // TODO: Drop the record parameter when scala-storage 1.1 is released
     assertJsonStringsAreEqual(
-      getJsonFor[SierraTransformable](bucket, table, record),
+      getJsonFor[SierraTransformable](bucket, table, record, id = record.id),
       toJson(record).get
     )
 }

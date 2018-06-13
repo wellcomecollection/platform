@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,6 +20,7 @@ class SierraItemMergerFeatureTest
     with Matchers
     with Eventually
     with ExtendedPatience
+    with JsonTestUtil
     with fixtures.Server
     with SQS
     with S3
@@ -117,6 +118,7 @@ class SierraItemMergerFeatureTest
   private def assertStored(bucket: Bucket,
                            table: Table,
                            record: SierraTransformable) =
+    // TODO: Drop the record parameter when scala-storage 1.1 is released
     assertJsonStringsAreEqual(
       getJsonFor[SierraTransformable](bucket, table, record),
       toJson(record).get
