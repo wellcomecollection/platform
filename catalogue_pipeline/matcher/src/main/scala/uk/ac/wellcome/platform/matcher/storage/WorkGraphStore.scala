@@ -10,18 +10,18 @@ import uk.ac.wellcome.storage.GlobalExecutionContext._
 import scala.concurrent.Future
 
 class WorkGraphStore @Inject()(
-  workNodeDao: WorkNodeDao
+  workNodeDao: WorkNodeDao,
+  dynamoLockingService: DynamoLockingService
 ) extends Logging {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {
     val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.workId
 
-    for {
-      directlyAffectedWorks <- workNodeDao.get(directlyAffectedWorkIds)
-      affectedComponentIds = directlyAffectedWorks.map(workNode =>
-        workNode.componentId)
-      affectedWorks <- workNodeDao.getByComponentIds(affectedComponentIds)
-    } yield WorkGraph(affectedWorks)
+    val directlyAffectedWorks = workNodeDao.get(directlyAffectedWorkIds)
+    val affectedComponentIds = directlyAffectedWorks.map(workNode => workNode.componentId)
+    val affectedWorks = workNodeDao.getByComponentIds(affectedComponentIds)
+
+    WorkGraph(affectedWorks)
   }
 
   def put(graph: WorkGraph)

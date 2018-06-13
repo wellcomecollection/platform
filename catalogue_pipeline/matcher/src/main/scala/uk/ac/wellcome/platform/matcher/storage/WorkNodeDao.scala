@@ -7,10 +7,7 @@ import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.storage.GlobalExecutionContext._
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-
-import scala.concurrent.Future
 
 class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
@@ -19,34 +16,29 @@ class WorkNodeDao @Inject()(
 
   val index = dynamoConfig.index
 
-  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = {
-    Future {
-      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
-    }
+  def put(work: WorkNode): Option[Either[DynamoReadError, WorkNode]] = {
+    Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
   }
 
-  def get(ids: Set[String]): Future[Set[WorkNode]] = {
-    Future {
-      Scanamo
-        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
-        .map {
-          case Right(works) => works
-          case Left(scanamoError) => {
-            val exception = new RuntimeException(scanamoError.toString)
-            error(
-              s"An error occurred while retrieving all workIds=$ids from DynamoDB",
-              exception)
-            throw exception
-          }
+  def get(ids: Set[String]): Set[WorkNode] = {
+    Scanamo
+      .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
+      .map {
+        case Right(works) => works
+        case Left(scanamoError) => {
+          val exception = new RuntimeException(scanamoError.toString)
+          error(
+            s"An error occurred while retrieving all workIds=$ids from DynamoDB",
+            exception)
+          throw exception
         }
-    }
+      }
   }
 
-  def getByComponentIds(setIds: Set[String]): Future[Set[WorkNode]] =
-    Future.sequence(setIds.map(getByComponentId)).map(_.flatten)
+  def getByComponentIds(setIds: Set[String]): Set[WorkNode] =
+    setIds.flatMap(getByComponentId)
 
   private def getByComponentId(componentId: String) = {
-    Future {
       Scanamo
         .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
           'componentId -> componentId)
@@ -63,6 +55,5 @@ class WorkNodeDao @Inject()(
             throw exception
           }
         }
-    }
   }
 }
