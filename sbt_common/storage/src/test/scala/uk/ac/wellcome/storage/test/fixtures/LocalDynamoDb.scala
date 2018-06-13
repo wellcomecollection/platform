@@ -45,6 +45,7 @@ trait LocalDynamoDb extends Eventually with ExtendedPatience {
 
   def withLocalDynamoDbTable[R]: Fixture[Table, R] = fixture[Table, R](
     create = {
+
       val tableName = Random.alphanumeric.take(10).mkString
       val indexName = Random.alphanumeric.take(10).mkString
 
@@ -54,6 +55,15 @@ trait LocalDynamoDb extends Eventually with ExtendedPatience {
       deleteAllTables()
     }
   )
+
+  def withSpecifiedLocalDynamoDbTable[R](
+    createTable: (AmazonDynamoDB) => Table): Fixture[Table, R] =
+    fixture[Table, R](
+      create = createTable(dynamoDbClient),
+      destroy = { _ =>
+        deleteAllTables()
+      }
+    )
 
   def createTable(table: LocalDynamoDb.Table): Table
 
