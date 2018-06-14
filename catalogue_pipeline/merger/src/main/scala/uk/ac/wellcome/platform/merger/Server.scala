@@ -6,9 +6,9 @@ import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceI
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SNSClientModule, SQSClientModule}
+import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
+import uk.ac.wellcome.platform.merger.modules.MergerWorkerModule
 
 
 
@@ -18,11 +18,9 @@ class Server extends HttpServer {
     MetricsSenderModule,
     AkkaModule,
     SQSClientModule,
-    SNSClientModule,
+    SQSConfigModule,
     ExecutionContextModule,
-    S3ClientModule,
-    S3ConfigModule,
-    MessageConfigModule,
+    MergerWorkerModule
   )
   override def configureHttp(router: HttpRouter) {
     router

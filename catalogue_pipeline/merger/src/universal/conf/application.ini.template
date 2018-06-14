@@ -1,5 +1,2 @@
 -aws.metrics.namespace=${metrics_namespace}
--aws.message.writer.sns.topic.arn=${sns_arn}
--aws.message.writer.s3.bucketName=${message_bucket_name}
--aws.message.reader.s3.bucketName=${message_bucket_name}
--aws.message.reader.sqs.queue.url=${merger_queue_id}
+-aws.sqs.queue.url=${merger_queue_id}

@@ -2,20 +2,18 @@ package uk.ac.wellcome.platform.merger.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.platform.merger.{Server => AppServer}
+import uk.ac.wellcome.test.fixtures.TestWith
 
-trait Server extends CloudWatch with Messaging { this: Suite =>
-  def withServer[R](bucket: Bucket, queue: Queue, topic: Topic)(
+trait Server extends CloudWatch with SQS { this: Suite =>
+  def withServer[R](queue: Queue)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
-      flags = messagingLocalFlags(bucket, topic, queue) ++ cloudWatchLocalFlags
+      flags = sqsLocalFlags(queue) ++ cloudWatchLocalFlags
     )
 
     server.start()

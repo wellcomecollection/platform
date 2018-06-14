@@ -15,9 +15,7 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalS3Bucket { bucket =>
-            withServer(bucket, queue, topic) { server =>
+            withServer(queue) { server =>
               server.httpGet(
                 path = "/management/healthcheck",
                 andExpect = Ok,
@@ -25,6 +23,4 @@ class ServerTest
             }
           }
         }
-      }
-  }
 }
