@@ -201,6 +201,7 @@ trait SQS extends Matchers {
     val messages = getMessages(queue)
 
     messages shouldBe empty
+    noMessagesAreWaitingIn(queue)
   }
 
   def assertQueueNotEmpty(queue: Queue) = {

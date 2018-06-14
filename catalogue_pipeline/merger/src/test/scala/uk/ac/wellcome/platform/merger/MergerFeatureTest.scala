@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.merger
 
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
@@ -13,7 +14,13 @@ class MergerFeatureTest extends FunSpec with Messaging with fixtures.Server with
           withServer(queue) { _ =>
             val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = "sierra/b123456", version = 1)))))
 
-            sqsClient.sendMessage(queue.url, toJson(matcherResult).get)
+            val notificationMessage = NotificationMessage(
+            MessageId = "MessageId",
+            TopicArn = "topic-arn",
+            Subject = "subject",
+            Message = toJson(matcherResult).get
+          )
+            sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
             eventually {
               assertQueueEmpty(queue)

@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
 import org.scalatest.FunSpec
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
@@ -11,6 +12,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MergerWorkerServiceTest extends FunSpec with SQS with Akka with ExtendedPatience with MetricsSenderFixture{
   case class TestObject(something: String)
@@ -20,22 +22,32 @@ class MergerWorkerServiceTest extends FunSpec with SQS with Akka with ExtendedPa
     withMergerWorkerServiceFixtures { case (QueuePair(queue, dlq), _) =>
               val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = "sierra/b123456", version = 1)))))
 
-              sqsClient.sendMessage(queue.url, toJson(matcherResult).get)
+      val notificationMessage = NotificationMessage(
+        MessageId = "MessageId",
+        TopicArn = "topic-arn",
+        Subject = "subject",
+        Message = toJson(matcherResult).get
+      )
+              sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
               eventually {
                 assertQueueEmpty(queue)
+
                 assertQueueEmpty(dlq)
               }
             }
-
-
   }
 
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures { case (QueuePair(queue, dlq), _) =>
           val testObject = TestObject("lallabalula")
-
-          sqsClient.sendMessage(queue.url, toJson(testObject).get)
+      val notificationMessage = NotificationMessage(
+        MessageId = "MessageId",
+        TopicArn = "topic-arn",
+        Subject = "subject",
+        Message = toJson(testObject).get
+      )
+      sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
           eventually {
             assertQueueEmpty(queue)
@@ -48,7 +60,7 @@ class MergerWorkerServiceTest extends FunSpec with SQS with Akka with ExtendedPa
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
         withMockMetricSender { metricsSender =>
-          withSQSStream[MatcherResult, R](actorSystem, queue, metricsSender) { sqsStream =>
+          withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
             withMergerWorkerService(actorSystem, sqsStream) { _ =>
               testWith((queuePair, metricsSender))
             }
@@ -58,7 +70,7 @@ class MergerWorkerServiceTest extends FunSpec with SQS with Akka with ExtendedPa
     }
   }
 
-  def withMergerWorkerService[R](actorSystem:ActorSystem, sqsStream: SQSStream[MatcherResult])(testWith: TestWith[MergerWorkerService, R]) = {
+  def withMergerWorkerService[R](actorSystem:ActorSystem, sqsStream: SQSStream[NotificationMessage])(testWith: TestWith[MergerWorkerService, R]) = {
     testWith(new MergerWorkerService(actorSystem, sqsStream))
   }
 }
