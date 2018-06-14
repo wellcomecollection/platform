@@ -22,8 +22,7 @@ class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
     for {
       graph <- workGraphStore.findAffectedWorks(update)
       updatedGraph = WorkGraphUpdater.update(update, graph)
-      _ <- workGraphStore.put(updatedGraph)
-
+      _ = workGraphStore.put(graph, updatedGraph)
     } yield {
       convertToIdentifiersList(updatedGraph)
     }
