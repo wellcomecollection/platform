@@ -559,9 +559,8 @@ class SierraItemMergerUpdaterServiceTest
   private def assertStored(bucket: Bucket,
                            table: Table,
                            record: SierraTransformable) =
-    // TODO: Drop the record parameter when scala-storage 1.1 is released
     assertJsonStringsAreEqual(
-      getJsonFor[SierraTransformable](bucket, table, record, id = record.id),
+      getJsonFor[SierraTransformable](bucket, table, id = record.id),
       toJson(record).get
     )
 }

@@ -314,9 +314,7 @@ class SierraBibMergerFeatureTest
                            table: Table,
                            record: SierraTransformable) =
     assertJsonStringsAreEqual(
-      // TODO: Drop the record parameter when scala-storage 1.1
-      // is released
-      getJsonFor[SierraTransformable](bucket, table, record, id = record.id),
+      getJsonFor[SierraTransformable](bucket, table, id = record.id),
       toJson(record).get
     )
 
