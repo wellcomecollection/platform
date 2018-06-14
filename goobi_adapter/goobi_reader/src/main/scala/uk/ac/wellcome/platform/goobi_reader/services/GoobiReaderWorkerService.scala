@@ -17,6 +17,7 @@ import uk.ac.wellcome.storage.vhs.VersionedHybridStore
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.util.Try
 
 class GoobiReaderWorkerService @Inject()(
   s3Client: AmazonS3,
@@ -39,8 +40,10 @@ class GoobiReaderWorkerService @Inject()(
   private def processMessage(snsNotification: NotificationMessage) = {
     debug(s"Received notification: $snsNotification")
     val eventuallyProcessedMessages = for {
-      eventNotification <- Future.fromTry(
-        fromJson[S3Event](snsNotification.Message))
+      // AWS events are URL encoded, which means that the object key is URL encoded
+      // The s3Client.putObject method doesn't want URL encoded keys, so decode it
+      urlDecodedMessage <- Future.fromTry(Try(java.net.URLDecoder.decode(snsNotification.Message, "utf-8")))
+      eventNotification <- Future.fromTry(fromJson[S3Event](urlDecodedMessage))
       _ <- Future.sequence(eventNotification.Records.map(updateRecord))
     } yield ()
     eventuallyProcessedMessages.failed.foreach { e: Throwable =>
@@ -52,7 +55,7 @@ class GoobiReaderWorkerService @Inject()(
 
   private def updateRecord(r: S3Record) = {
     val bucketName = r.s3.bucket.name
-    val objectKey = java.net.URLDecoder.decode(r.s3.`object`.key, "utf-8")
+    val objectKey = r.s3.`object`.key
     val id = objectKey.replaceAll(".xml", "")
     val updateEventTime = r.eventTime
 
