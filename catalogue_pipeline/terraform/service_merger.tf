@@ -8,10 +8,10 @@ module "merger" {
   release_id         = "${var.release_ids["merger"]}"
 
   env_vars = {
-    merger_queue_id         = "${module.merger_queue.id}"
-    topic_arn         = "${module.linked_works_topic.arn}"
+    merger_queue_id     = "${module.merger_queue.id}"
+    topic_arn           = "${module.linked_works_topic.arn}"
     message_bucket_name = "${aws_s3_bucket.messages.id}"
-    metrics_namespace = "merger"
+    metrics_namespace   = "merger"
   }
 
   env_vars_length = 4
