@@ -52,11 +52,12 @@ class GoobiReaderWorkerService @Inject()(
 
   private def updateRecord(r: S3Record) = {
     val bucketName = r.s3.bucket.name
-    val objectKey = r.s3.`object`.key
+    val objectKey = java.net.URLDecoder.decode(r.s3.`object`.key, "utf-8")
     val id = objectKey.replaceAll(".xml", "")
     val updateEventTime = r.eventTime
 
     val eventuallyContent = Future {
+      debug(s"trying to retrieve object s3://$bucketName/$objectKey")
       s3Client.getObject(bucketName, objectKey).getObjectContent
     }
     eventuallyContent.flatMap(updatedContent => {
