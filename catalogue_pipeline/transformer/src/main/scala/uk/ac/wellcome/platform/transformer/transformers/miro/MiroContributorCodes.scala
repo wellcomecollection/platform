@@ -21,7 +21,7 @@ trait MiroContributorCodes {
   // where the fields in Miro weren't filled in correctly.
   private val stream: InputStream = getClass
     .getResourceAsStream("/miro_contributor_map.json")
-  val contributorMap: Map[String, String] =
+  private val contributorMap: Map[String, String] =
     toMap[String](Source.fromInputStream(stream).mkString).get
 
   // This JSON resource gives us contributor codes on a per-record basis.
@@ -35,7 +35,7 @@ trait MiroContributorCodes {
   // that tells us what contributor codes mean on a per-record basis.
   private val perRecordStream: InputStream = getClass
     .getResourceAsStream("/miro_individual_record_contributor_map.json")
-  val perRecordContributorMap: Map[String, Map[String, String]] =
+  private val perRecordContributorMap: Map[String, Map[String, String]] =
     toMap[Map[String, String]](
       Source.fromInputStream(perRecordStream).mkString).get
 
