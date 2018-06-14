@@ -81,7 +81,7 @@ class MessageStreamTest
 
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (_,bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+      case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         sqsClient.sendMessage(
           queue.url,
           "not valid json"
@@ -189,7 +189,12 @@ class MessageStreamTest
   describe("runStream") {
     it("processes messages off a queue") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        case (
+            _,
+            bucket,
+            messageStream,
+            QueuePair(queue, dlq),
+            metricsSender) =>
           val exampleObject1 = ExampleObject("some value 1")
           sendMessage(bucket, queue, exampleObject1)
           val exampleObject2 = ExampleObject("some value 2")
@@ -221,7 +226,12 @@ class MessageStreamTest
 
     it("does not delete failed messages and sends a failure metric") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+        case (
+            _,
+            bucket,
+            messageStream,
+            QueuePair(queue, dlq),
+            metricsSender) =>
           val exampleObject = ExampleObject("some value")
           sendMessage(bucket, queue, exampleObject)
 

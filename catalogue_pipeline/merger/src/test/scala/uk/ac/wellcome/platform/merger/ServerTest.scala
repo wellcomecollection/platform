@@ -15,12 +15,12 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
-            withServer(queue) { server =>
-              server.httpGet(
-                path = "/management/healthcheck",
-                andExpect = Ok,
-                withJsonBody = """{"message": "ok"}""")
-            }
-          }
-        }
+      withServer(queue) { server =>
+        server.httpGet(
+          path = "/management/healthcheck",
+          andExpect = Ok,
+          withJsonBody = """{"message": "ok"}""")
+      }
+    }
+  }
 }
