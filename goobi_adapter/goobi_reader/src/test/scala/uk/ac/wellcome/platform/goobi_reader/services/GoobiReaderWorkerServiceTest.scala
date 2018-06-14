@@ -76,6 +76,39 @@ class GoobiReaderWorkerServiceTest
     }
   }
 
+  it("ingests an object with a space in the s3Key") {
+    withGoobiReaderWorkerService(s3Client) {
+      case (bucket, QueuePair(queue, _), _, table, _) =>
+        val sourceKey = s"$id work.xml"
+        val urlEncodedSourceKey =
+          java.net.URLEncoder.encode(sourceKey, "utf-8")
+        s3Client.putObject(bucket.name, sourceKey, contents)
+
+        val message = aNotificationMessage(
+          topicArn = queue.arn,
+          message =
+            anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
+        )
+        sqsClient.sendMessage(queue.url, toJson(message).get)
+
+        eventually {
+          val contentsStorageKey = s"$goobiS3Prefix/kr/$id work/cd92f8d3"
+
+          val expectedRecord = HybridRecord(
+            id = s"$id work",
+            version = 1,
+            s3key = contentsStorageKey
+          )
+          assertRecordStored(
+            expectedRecord,
+            GoobiRecordMetadata(eventTime),
+            contents,
+            table,
+            bucket)
+        }
+    }
+  }
+
   it("doesn't overwrite a newer work with an older work") {
     withGoobiReaderWorkerService(s3Client) {
       case (bucket, QueuePair(queue, dlq), _, table, vhs) =>
