@@ -53,6 +53,10 @@ trait S3 extends Logging with Eventually with Matchers{
     secretKey = secretKey
   )
 
+  eventually {
+    s3Client.listBuckets().asScala shouldBe Nil
+  }
+
   implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withLocalS3Bucket[R] =
@@ -60,9 +64,6 @@ trait S3 extends Logging with Eventually with Matchers{
       create = {
         val bucketName: String =
           (Random.alphanumeric take 10 mkString).toLowerCase
-        eventually {
-          s3Client.listBuckets().asScala shouldBe Nil
-        }
         s3Client.createBucket(bucketName)
         eventually { s3Client.doesBucketExistV2(bucketName) }
 
