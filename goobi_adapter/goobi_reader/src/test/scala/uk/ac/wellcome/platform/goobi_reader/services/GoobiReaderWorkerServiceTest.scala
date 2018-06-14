@@ -80,12 +80,14 @@ class GoobiReaderWorkerServiceTest
     withGoobiReaderWorkerService(s3Client) {
       case (bucket, QueuePair(queue, _), _, table, _) =>
         val sourceKey = s"$id work.xml"
-        val urlEncodedSourceKey = java.net.URLEncoder.encode(sourceKey, "utf-8")
+        val urlEncodedSourceKey =
+          java.net.URLEncoder.encode(sourceKey, "utf-8")
         s3Client.putObject(bucket.name, sourceKey, contents)
 
         val message = aNotificationMessage(
           topicArn = queue.arn,
-          message = anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
+          message =
+            anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
         )
         sqsClient.sendMessage(queue.url, toJson(message).get)
 
