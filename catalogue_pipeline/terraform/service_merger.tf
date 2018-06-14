@@ -9,12 +9,10 @@ module "merger" {
 
   env_vars = {
     merger_queue_id     = "${module.merger_queue.id}"
-    topic_arn           = "${module.linked_works_topic.arn}"
-    message_bucket_name = "${aws_s3_bucket.messages.id}"
     metrics_namespace   = "merger"
   }
 
-  env_vars_length = 4
+  env_vars_length = 2
 
   memory = 2048
   cpu    = 512
