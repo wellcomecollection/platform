@@ -25,7 +25,7 @@ object Dependencies {
   }
 
   lazy val platformVersions = new {
-    val storage = "1.1.0"
+    val storage = "1.2.0"
   }
 
   // External Library dependency groups
