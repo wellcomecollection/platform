@@ -255,6 +255,25 @@ class MiroTransformableTransformerTest
     )
   }
 
+  it(
+    "transforms an image with no credit line and an image-specific contributor code") {
+    val work = transformWork(
+      data = s"""
+        "image_credit_line": null,
+        "image_source_code": "FDN"
+      """,
+      MiroID = "B0011308"
+    )
+
+    val expectedDigitalLocation = DigitalLocation(
+      url = "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+      license = License_CCBY,
+      credit = Some("Ezra Feilden"),
+      locationType = LocationType("iiif-image")
+    )
+    work.items.head.locations shouldBe List(expectedDigitalLocation)
+  }
+
   private def assertTransformReturnsNone(data: String) = {
     val miroTransformable = MiroTransformable(
       sourceId = "G0000001",
