@@ -5,12 +5,12 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.matcher.MatcherResult
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MergerWorkerService @Inject()(
   system: ActorSystem,
   messageStream: MessageStream[MatcherResult]
-)(implicit ec: ExecutionContext) {
+) {
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 

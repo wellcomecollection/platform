@@ -112,25 +112,25 @@ trait Messaging
     testWith(stream)
   }
 
-  def withMessageStreamFixtures[R](
-    testWith: TestWith[(Bucket,
-    MessageStream[ExampleObject],
+  def withMessageStreamFixtures[T,R](
+    testWith: TestWith[(ActorSystem, Bucket,
+    MessageStream[T],
     QueuePair,
     MetricsSender),
     R]
-  ) = {
+  )(implicit objectStore: ObjectStore[T]) = {
 
     withActorSystem { actorSystem =>
       withLocalS3Bucket { bucket =>
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, _) =>
             withMockMetricSender { metricsSender =>
-              withMessageStream[ExampleObject, R](
+              withMessageStream[T, R](
                 actorSystem,
                 bucket,
                 queue,
                 metricsSender) { stream =>
-                testWith((bucket, stream, queuePair, metricsSender))
+                testWith((actorSystem, bucket, stream, queuePair, metricsSender))
               }
 
             }

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.merger.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.transformer.services.MergerWorkerService
+import uk.ac.wellcome.platform.merger.services.MergerWorkerService
 
 object MergerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
