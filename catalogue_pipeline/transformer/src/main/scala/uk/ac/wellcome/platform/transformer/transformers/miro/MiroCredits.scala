@@ -13,7 +13,8 @@ trait MiroCredits extends MiroContributorCodes {
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  def getCredit(miroId: String, miroData: MiroTransformableData): Option[String] = {
+  def getCredit(miroId: String,
+                miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
 
       // Some of the credit lines are inconsistent or use old names for
@@ -60,9 +61,9 @@ trait MiroCredits extends MiroContributorCodes {
       // Otherwise we carry through the contributor codes, which have
       // already been edited for consistency.
       case None =>
-
         miroData.sourceCode match {
-          case Some(code) => lookupContributorCode(miroId = miroId, code = code)
+          case Some(code) =>
+            lookupContributorCode(miroId = miroId, code = code)
           case None => None
         }
     }

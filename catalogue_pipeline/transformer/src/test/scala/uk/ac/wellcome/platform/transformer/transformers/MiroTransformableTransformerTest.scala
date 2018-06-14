@@ -255,7 +255,8 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it("transforms an image with no credit line and an image-specific contributor code") {
+  it(
+    "transforms an image with no credit line and an image-specific contributor code") {
     val work = transformWork(
       data = s"""
         "image_credit_line": null,

@@ -14,5 +14,5 @@ class MiroCreditsTest extends FunSpec with Matchers {
     ) shouldBe Some("Ezra Feilden")
   }
 
-  val transformer = new MiroCredits { }
+  val transformer = new MiroCredits {}
 }
