@@ -25,10 +25,19 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <-Future.fromTry(fromJson[MatcherResult] (message.Message))
-      maybeRecorderWorkEntry <- vhs.getRecord(matcherResult.works.head.identifiers.head.identifier)
-      work = maybeRecorderWorkEntry.get.work
-      _ <- SNSWriter.writeMessage(toJson(work).get, "merged-work")
+      identifiers = getWorksIdentifiers(matcherResult)
+      maybeRecorderWorkEntries <- Future.sequence(identifiers.map(identifier => vhs.getRecord(identifier)))
+      works = maybeRecorderWorkEntries.map(_.get.work)
+      _ <- Future.sequence(works.map( work => SNSWriter.writeMessage(toJson(work).get, "merged-work")))
     } yield ()
+
+  private def getWorksIdentifiers(matcherResult: MatcherResult) = {
+//    matcherResult.works.flatMap(matchedIdentifiers => matchedIdentifiers.identifiers.map(_.identifier))
+    for {
+      matchedIdentifiers <- matcherResult.works
+      workIdentifier <- matchedIdentifiers.identifiers
+    } yield workIdentifier.identifier
+  }
 
   def stop() = system.terminate()
 }

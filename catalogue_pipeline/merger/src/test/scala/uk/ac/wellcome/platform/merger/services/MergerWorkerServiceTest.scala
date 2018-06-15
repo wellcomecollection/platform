@@ -22,6 +22,7 @@ import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Akka with ExtendedPatience with MetricsSenderFixture with LocalVersionedHybridStore with SNS with JsonTestUtil{
   case class TestObject(something: String)
@@ -29,11 +30,22 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
   it("reads matcher result messages, retrieves the works from vhs and sends them to sns") {
 
           withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
-            val unidentifiedWork = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
-            val recorderWorkEntry = RecorderWorkEntry(unidentifiedWork)
-            val result = vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
+            val unidentifiedWork1 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
+            val unidentifiedWork2 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
+            val unidentifiedWork3 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b678910"), version = 1)
 
-            val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1)))))
+            val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
+            val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
+            val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
+
+            val entries = List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3)
+            val result = Future.sequence(entries.map { recorderWorkEntry=>
+              vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
+            })
+
+            val matchedIdentifiers1 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry1.id, version = 1), WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
+            val matchedIdentifiers2 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
+            val matcherResult = MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
 
             val notificationMessage = NotificationMessage(
               MessageId = "MessageId",
@@ -48,10 +60,9 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
                 assertQueueEmpty(queue)
                 assertQueueEmpty(dlq)
                 val messagesSent = listMessagesReceivedFromSNS(topic)
-                messagesSent should have size 1
-                println(messagesSent.head.message)
-                val actualWork = fromJson[UnidentifiedWork](messagesSent.head.message).get
-                actualWork shouldBe unidentifiedWork
+
+                val worksSent = messagesSent.map {message => fromJson[UnidentifiedWork](message.message).get}
+                worksSent should contain theSameElementsAs List(unidentifiedWork1, unidentifiedWork2, unidentifiedWork3)
               }
             }
           }
