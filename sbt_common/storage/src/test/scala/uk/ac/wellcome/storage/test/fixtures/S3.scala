@@ -8,6 +8,7 @@ import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3StorageBackend}
 import uk.ac.wellcome.test.fixtures._
+import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -25,7 +26,7 @@ object S3 {
 
 }
 
-trait S3 extends Logging with Eventually with Matchers {
+trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
 
   import S3._
 
@@ -53,15 +54,14 @@ trait S3 extends Logging with Eventually with Matchers {
     secretKey = secretKey
   )
 
-  eventually {
-    s3Client.listBuckets().asScala shouldBe Nil
-  }
-
   implicit val storageBackend = new S3StorageBackend(s3Client)
 
   def withLocalS3Bucket[R] =
     fixture[Bucket, R](
       create = {
+        eventually {
+          s3Client.listBuckets().asScala shouldBe Nil
+        }
         val bucketName: String =
           (Random.alphanumeric take 10 mkString).toLowerCase
         s3Client.createBucket(bucketName)
