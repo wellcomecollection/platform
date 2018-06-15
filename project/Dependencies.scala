@@ -122,7 +122,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ akkaDependencies ++ dynamoDependencies ++ guiceDependencies ++ testDependencies
+  ) ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val commonStorageDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
