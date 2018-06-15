@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
 import javax.inject.Inject
-import javax.naming.ConfigurationException
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
@@ -39,9 +38,7 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
   implicit val system: ActorSystem = actorSystem
   implicit val materializer = ActorMaterializer()
 
-  val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse(
-    throw new ConfigurationException("No S3 endpoint specified?")
-  )
+  val s3Endpoint = akkaS3Client.s3Settings.endpointUrl.getOrElse("s3:/")
 
   def buildLocation(bucketName: String, objectKey: String): Uri =
     Uri(s"$s3Endpoint/$bucketName/$objectKey")
@@ -71,8 +68,10 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     }
 
     uploadResult.map { _ =>
-      val targetLocation =
-        Uri(s"$s3Endpoint/$publicBucketName/$publicObjectKey")
+      val targetLocation = buildLocation(
+        bucketName = publicBucketName,
+        objectKey = publicObjectKey
+      )
 
       CompletedSnapshotJob(
         snapshotJob = snapshotJob,
