@@ -13,8 +13,8 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
 
   def createLockTable(dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
     val tableName = Random.alphanumeric.take(10).mkString
-
-    val table = Table(tableName, "")
+    val tableIndex = Random.alphanumeric.take(10).mkString
+    val table = Table(tableName, tableIndex)
 
     dynamoDbClient.createTable(
       new CreateTableRequest()
@@ -25,13 +25,27 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")
+            .withAttributeType("S"),
+          new AttributeDefinition()
+            .withAttributeName("contextId")
             .withAttributeType("S")
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))
-    )
-
+          .withWriteCapacityUnits(1L)
+        ).withGlobalSecondaryIndexes(
+        new GlobalSecondaryIndex()
+          .withIndexName(table.index)
+          .withProjection(
+            new Projection().withProjectionType(ProjectionType.ALL))
+          .withKeySchema(
+            new KeySchemaElement()
+              .withAttributeName("contextId")
+              .withKeyType(KeyType.HASH)
+          )
+          .withProvisionedThroughput(new ProvisionedThroughput()
+            .withReadCapacityUnits(1L)
+            .withWriteCapacityUnits(1L))))
     eventually {
       waitUntilActive(dynamoDbClient, table.name)
     }

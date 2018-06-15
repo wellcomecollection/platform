@@ -9,18 +9,20 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
+import scala.concurrent.{ExecutionContext, Future}
+
 class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig
-) extends Logging {
+  dynamoConfig: DynamoConfig)(
+  implicit context: ExecutionContext) extends Logging {
 
-  val index = dynamoConfig.index
+  private val index = dynamoConfig.index
 
-  def put(work: WorkNode): Option[Either[DynamoReadError, WorkNode]] = {
+  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = Future {
     Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
   }
 
-  def get(ids: Set[String]): Set[WorkNode] = {
+  def get(ids: Set[String]): Future[Set[WorkNode]] = Future {
     Scanamo
       .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
       .map {
@@ -35,10 +37,10 @@ class WorkNodeDao @Inject()(
       }
   }
 
-  def getByComponentIds(setIds: Set[String]): Set[WorkNode] =
-    setIds.flatMap(getByComponentId)
+  def getByComponentIds(setIds: Set[String]): Future[Set[WorkNode]] =
+    Future.sequence(setIds.map(getByComponentId)).map(_.flatten)
 
-  private def getByComponentId(componentId: String) = {
+  private def getByComponentId(componentId: String) = Future {
       Scanamo
         .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
           'componentId -> componentId)

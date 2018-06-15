@@ -16,12 +16,12 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class MatcherMessageReceiver @Inject()(
-  messageStream: SQSStream[NotificationMessage],
-  snsWriter: SNSWriter,
-  s3TypeStore: ObjectStore[RecorderWorkEntry],
-  storageS3Config: S3Config,
-  actorSystem: ActorSystem,
-  linkedWorkMatcher: WorkMatcher)
+                                        messageStream: SQSStream[NotificationMessage],
+                                        snsWriter: SNSWriter,
+                                        s3TypeStore: ObjectStore[RecorderWorkEntry],
+                                        storageS3Config: S3Config,
+                                        actorSystem: ActorSystem,
+                                        workMatcher: WorkMatcher)
     extends Logging {
 
   implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
@@ -34,7 +34,7 @@ class MatcherMessageReceiver @Inject()(
         fromJson[HybridRecord](notificationMessage.Message))
       workEntry <- s3TypeStore.get(
         ObjectLocation(storageS3Config.bucketName, hybridRecord.s3key))
-      identifiersList <- linkedWorkMatcher.matchWork(workEntry.work)
+      identifiersList <- workMatcher.matchWork(workEntry.work)
       _ <- snsWriter.writeMessage(
         message = toJson(identifiersList).get,
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"

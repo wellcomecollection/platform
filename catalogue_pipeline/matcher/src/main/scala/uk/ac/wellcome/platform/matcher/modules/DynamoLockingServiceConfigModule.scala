@@ -10,11 +10,15 @@ object DynamoLockingServiceConfigModule extends TwitterModule{
     "aws.dynamo.locking.service.lockTableName",
     "",
     "Dynamo table name to use for locking")
+  private val lockTableIndexName = flag[String](
+    "aws.dynamo.locking.service.lockTableIndexName",
+    "",
+    "Dynamo table index to use for context locking")
 
   @Provides
   def provideDynamoLockingServiceConfig(injector: Injector) = {
         DynamoLockingServiceConfig(
-          lockTableName()
+          lockTableName(), lockTableIndexName()
         )
   }
 }

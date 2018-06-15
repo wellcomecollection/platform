@@ -6,12 +6,12 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.DynamoLockingService
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 class WorkGraphStoreTest
     extends FunSpec
     with Matchers
@@ -23,7 +23,7 @@ class WorkGraphStoreTest
     it("returns nothing if there are no matching graphs") {
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             whenReady(
               workGraphStore.findAffectedWorks(
                 WorkUpdate("Not-there", 0, Set.empty))) { workGraph =>
@@ -38,7 +38,7 @@ class WorkGraphStoreTest
       "returns a WorkNode if it has no links and it's the only node in the setId") {
       withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             val work =
               WorkNode(id = "A", version = 0, linkedIds = Nil, componentId = "A")
             Scanamo.put(dynamoDbClient)(thingTable.name)(work)
@@ -55,7 +55,7 @@ class WorkGraphStoreTest
     it("returns a WorkNode and the links in the workUpdate") {
       withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             val workA =
               WorkNode(id = "A", version = 0, linkedIds = Nil, componentId = "A")
             val workB =
@@ -76,7 +76,7 @@ class WorkGraphStoreTest
     it("returns a WorkNode and the links in the database") {
       withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             val workA =
               WorkNode(
                 id = "A",
@@ -106,7 +106,7 @@ class WorkGraphStoreTest
       "returns a WorkNode and the links in the database more than one level down") {
       withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             val workA =
               WorkNode(
                 id = "A",
@@ -143,7 +143,7 @@ class WorkGraphStoreTest
       "returns a WorkNode and the links in the database where an update joins two sets of works") {
       withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+          withWorkGraphStore(thingTable) { workGraphStore =>
             val workA =
               WorkNode(
                 id = "A",
@@ -175,22 +175,18 @@ class WorkGraphStoreTest
 
   describe("Put graph of linked works") {
     it("puts a simple graph") {
-      withSpecifiedLocalDynamoDbTable(createLockTable _) { lockTable =>
-        withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
-          withWorkGraphStore(thingTable, lockTable) { workGraphStore =>
+        withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { graphTable =>
+          withWorkGraphStore(graphTable) { workGraphStore =>
             val workNodeA = WorkNode("A", version = 0, List("B"), "A+B")
             val workNodeB = WorkNode("B", version = 0, Nil, "A+B")
 
-            workGraphStore.put(
-              WorkGraph(Set()),
-              WorkGraph(Set(workNodeA, workNodeB)))
-
-            val savedWorkNodes = Scanamo
-              .scan[WorkNode](dynamoDbClient)(thingTable.name)
+          whenReady(workGraphStore.put(WorkGraph(Set(workNodeA, workNodeB)))) { _ =>
+              val savedWorks = Scanamo
+                .scan[WorkNode](dynamoDbClient)(graphTable.name)
               .map(_.right.get)
-            savedWorkNodes should contain theSameElementsAs List(
-              workNodeA,
-              workNodeB)
+              savedWorks should contain theSameElementsAs List(
+                workNodeA,
+                workNodeB)
           }
         }
       }
@@ -199,15 +195,13 @@ class WorkGraphStoreTest
 
   it("throws a GracefulFailureException if workGraphStore fails to put") {
     val mockWorkNodeDao = mock[WorkNodeDao]
-    val mockLockingService = mock[DynamoLockingService]
     val expectedException = new RuntimeException("FAILED")
     when(mockWorkNodeDao.put(any[WorkNode]))
-      .thenThrow(expectedException)
+          .thenReturn(Future.failed(expectedException))
+    val workGraphStore = new WorkGraphStore(mockWorkNodeDao)
 
-    val workGraphStore = new WorkGraphStore(mockWorkNodeDao, mockLockingService)
-
-    assertThrows[GracefulFailureException] {
-      workGraphStore.put(WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B"))), WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B"))))
+    whenReady(workGraphStore.put(WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B")))).failed) { failedException =>
+      failedException shouldBe expectedException
     }
   }
 }
