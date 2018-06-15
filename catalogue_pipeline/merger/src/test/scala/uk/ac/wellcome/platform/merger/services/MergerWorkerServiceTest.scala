@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
+import org.mockito.Mockito
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
@@ -24,7 +25,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Akka with ExtendedPatience with MetricsSenderFixture with LocalVersionedHybridStore with SNS{
+class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Akka with ExtendedPatience with MetricsSenderFixture with LocalVersionedHybridStore with SNS {
   case class TestObject(something: String)
 
   it("reads matcher result messages, retrieves the works from vhs and sends them to sns") {
@@ -66,6 +67,67 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
               }
             }
           }
+        }
+
+  it("fails if the work is not in vhs") {
+
+          withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq), topic, metricsSender) =>
+            val unidentifiedWork = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
+            val recorderWorkEntry = RecorderWorkEntry(unidentifiedWork)
+
+            val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1)))))
+
+            val notificationMessage = NotificationMessage(
+              MessageId = "MessageId",
+              TopicArn = "topic-arn",
+              Subject = "subject",
+              Message = toJson(matcherResult).get
+            )
+              sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+               listMessagesReceivedFromSNS(topic) shouldBe empty
+                Mockito.verify(metricsSender, Mockito.times(3)).incrementCount(org.mockito.Matchers.endsWith("_failure"))
+              }
+          }
+        }
+
+  it("eats the message if one of the versions is older compared to the work in vhs") {
+
+    withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
+      val work = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
+      val olderVersionWork = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
+      val newerVersionWork = olderVersionWork.copy(version =2)
+
+      val recorderWorkEntry = RecorderWorkEntry(work)
+      val olderVersionRecorderWorkEntry = RecorderWorkEntry(olderVersionWork)
+      val newerVersionRecorderWorkEntry = RecorderWorkEntry(newerVersionWork)
+
+      val entries = List(recorderWorkEntry, newerVersionRecorderWorkEntry)
+      val result = Future.sequence(entries.map( recorderWorkEntry =>
+        vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
+      ))
+
+      val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1), WorkIdentifier(identifier = olderVersionRecorderWorkEntry.id, version = 1)))))
+
+      val notificationMessage = NotificationMessage(
+        MessageId = "MessageId",
+        TopicArn = "topic-arn",
+        Subject = "subject",
+        Message = toJson(matcherResult).get
+      )
+      whenReady(result) { _ =>
+        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueEmpty(dlq)
+          listMessagesReceivedFromSNS(topic) shouldBe empty
+        }
+      }
+    }
         }
 
   it("fails if the message sent is not a matcher result") {
