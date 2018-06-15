@@ -36,7 +36,7 @@ class MessageStreamTest
 
   it("reads messages off a queue, processes them and deletes them") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (_, bucket, messageStream, QueuePair(queue, dlq), _) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), _) =>
         val exampleObject1 = ExampleObject("some value 1")
         sendMessage(bucket, queue, exampleObject1)
         val exampleObject2 = ExampleObject("some value 2")
@@ -62,7 +62,7 @@ class MessageStreamTest
 
   it("increments *_ProcessMessage metric when successful") {
     withMessageStreamFixtures[ExampleObject, Future[Unit]] {
-      case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         val exampleObject = ExampleObject("some value")
 
         sendMessage(bucket, queue, exampleObject)
@@ -81,7 +81,7 @@ class MessageStreamTest
 
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         sqsClient.sendMessage(
           queue.url,
           "not valid json"
@@ -107,7 +107,7 @@ class MessageStreamTest
 
   it("does not fail gracefully when the s3 object cannot be retrieved") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (_, bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
         val streamName = "test-stream"
 
         val key = "key.json"
@@ -152,7 +152,7 @@ class MessageStreamTest
 
   it("continues reading if processing of some messages fails ") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
-      case (_, bucket, messageStream, QueuePair(queue, dlq), _) =>
+      case (bucket, messageStream, QueuePair(queue, dlq), _) =>
         val exampleObject1 = ExampleObject("some value 1")
         val exampleObject2 = ExampleObject("some value 2")
 
@@ -189,12 +189,7 @@ class MessageStreamTest
   describe("runStream") {
     it("processes messages off a queue") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (
-            _,
-            bucket,
-            messageStream,
-            QueuePair(queue, dlq),
-            metricsSender) =>
+        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
           val exampleObject1 = ExampleObject("some value 1")
           sendMessage(bucket, queue, exampleObject1)
           val exampleObject2 = ExampleObject("some value 2")
@@ -226,12 +221,7 @@ class MessageStreamTest
 
     it("does not delete failed messages and sends a failure metric") {
       withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
-        case (
-            _,
-            bucket,
-            messageStream,
-            QueuePair(queue, dlq),
-            metricsSender) =>
+        case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
           val exampleObject = ExampleObject("some value")
           sendMessage(bucket, queue, exampleObject)
 
@@ -253,7 +243,7 @@ class MessageStreamTest
 
     it("continues reading if processing of some messages fails") {
       withMessageStreamFixtures[ExampleObject, Assertion] {
-        case (_, bucket, messageStream, QueuePair(queue, dlq), _) =>
+        case (bucket, messageStream, QueuePair(queue, dlq), _) =>
           val exampleObject1 = ExampleObject("some value 1")
           val exampleObject2 = ExampleObject("some value 2")
 

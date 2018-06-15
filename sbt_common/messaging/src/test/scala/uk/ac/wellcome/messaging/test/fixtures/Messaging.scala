@@ -113,7 +113,7 @@ trait Messaging
   }
 
   def withMessageStreamFixtures[T,R](
-    testWith: TestWith[(ActorSystem, Bucket,
+    testWith: TestWith[(Bucket,
     MessageStream[T],
     QueuePair,
     MetricsSender),
@@ -130,7 +130,7 @@ trait Messaging
                 bucket,
                 queue,
                 metricsSender) { stream =>
-                testWith((actorSystem, bucket, stream, queuePair, metricsSender))
+                testWith((bucket, stream, queuePair, metricsSender))
               }
 
             }
