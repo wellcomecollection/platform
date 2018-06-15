@@ -8,8 +8,8 @@ module "merger" {
   release_id         = "${var.release_ids["merger"]}"
 
   env_vars = {
-    merger_queue_id     = "${module.merger_queue.id}"
-    metrics_namespace   = "merger"
+    merger_queue_id   = "${module.merger_queue.id}"
+    metrics_namespace = "merger"
   }
 
   env_vars_length = 2
