@@ -2,14 +2,32 @@ package uk.ac.wellcome.platform.matcher
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
+import com.twitter.finatra.http.filters.{
+  CommonFilters,
+  LoggingMDCFilter,
+  TraceIdMDCFilter
+}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{SNSClientModule, SNSConfigModule, SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.finatra.messaging.{
+  SNSClientModule,
+  SNSConfigModule,
+  SQSClientModule,
+  SQSConfigModule
+}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule, S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.matcher.modules.{DynamoLockingServiceConfigModule, MatcherModule, RecorderWorkEntryModule}
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  DynamoConfigModule,
+  S3ClientModule,
+  S3ConfigModule
+}
+import uk.ac.wellcome.platform.matcher.modules.{
+  DynamoLockingServiceConfigModule,
+  MatcherModule,
+  RecorderWorkEntryModule
+}
 
 object ServerMain extends Server
 

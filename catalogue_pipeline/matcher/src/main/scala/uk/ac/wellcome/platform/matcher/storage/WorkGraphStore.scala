@@ -8,9 +8,9 @@ import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WorkGraphStore @Inject()(
-  workNodeDao: WorkNodeDao)(
-  implicit context: ExecutionContext) extends Logging {
+class WorkGraphStore @Inject()(workNodeDao: WorkNodeDao)(
+  implicit context: ExecutionContext)
+    extends Logging {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {
     val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.workId

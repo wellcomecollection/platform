@@ -13,14 +13,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig)(
-  implicit context: ExecutionContext) extends Logging {
+  dynamoConfig: DynamoConfig)(implicit context: ExecutionContext)
+    extends Logging {
 
   private val index = dynamoConfig.index
 
-  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] = Future {
-    Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
-  }
+  def put(work: WorkNode): Future[Option[Either[DynamoReadError, WorkNode]]] =
+    Future {
+      Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
+    }
 
   def get(ids: Set[String]): Future[Set[WorkNode]] = Future {
     Scanamo
@@ -41,21 +42,21 @@ class WorkNodeDao @Inject()(
     Future.sequence(setIds.map(getByComponentId)).map(_.flatten)
 
   private def getByComponentId(componentId: String) = Future {
-      Scanamo
-        .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
-          'componentId -> componentId)
-        .map {
-          case Right(record) => {
-            record
-          }
-          case Left(scanamoError) => {
-            val exception = new RuntimeException(scanamoError.toString)
-            error(
-              s"An error occurred while retrieving byComponentId=$componentId from DynamoDB",
-              exception
-            )
-            throw exception
-          }
+    Scanamo
+      .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
+        'componentId -> componentId)
+      .map {
+        case Right(record) => {
+          record
         }
+        case Left(scanamoError) => {
+          val exception = new RuntimeException(scanamoError.toString)
+          error(
+            s"An error occurred while retrieving byComponentId=$componentId from DynamoDB",
+            exception
+          )
+          throw exception
+        }
+      }
   }
 }

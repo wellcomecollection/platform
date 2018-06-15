@@ -92,8 +92,9 @@ class WorkNodeDaoTest
     it("returns empty set if componentIds are not in dynamo") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          whenReady(workNodeDao.getByComponentIds(Set("Not-there"))) { workNodeSet =>
-            workNodeSet shouldBe Set()
+          whenReady(workNodeDao.getByComponentIds(Set("Not-there"))) {
+            workNodeSet =>
+              workNodeSet shouldBe Set()
           }
         }
       }
@@ -108,8 +109,9 @@ class WorkNodeDaoTest
           Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeA)
           Scanamo.put(dynamoDbClient)(table.name)(existingWorkNodeB)
 
-          whenReady(matcherGraphDao.getByComponentIds(Set("A+B"))) { linkedWorks =>
-            linkedWorks shouldBe Set(existingWorkNodeA, existingWorkNodeB)
+          whenReady(matcherGraphDao.getByComponentIds(Set("A+B"))) {
+            linkedWorks =>
+              linkedWorks shouldBe Set(existingWorkNodeA, existingWorkNodeB)
           }
         }
       }
@@ -155,7 +157,8 @@ class WorkNodeDaoTest
         withWorkNodeDao(table) { workNodeDao =>
           val work = WorkNode("A", 1, List("B"), "A+B")
           whenReady(workNodeDao.put(work)) { _ =>
-            val savedLinkedWork = Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
+            val savedLinkedWork =
+              Scanamo.get[WorkNode](dynamoDbClient)(table.name)('id -> "A")
             savedLinkedWork shouldBe Some(Right(work))
           }
         }
@@ -173,8 +176,9 @@ class WorkNodeDaoTest
           DynamoConfig(table = table.name, index = table.index)
         )
 
-        whenReady(workNodeDao.put(WorkNode("A", 1, List("B"), "A+B")).failed) { failedException =>
-          failedException shouldBe expectedException
+        whenReady(workNodeDao.put(WorkNode("A", 1, List("B"), "A+B")).failed) {
+          failedException =>
+            failedException shouldBe expectedException
         }
       }
     }

@@ -13,7 +13,10 @@ import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFutures {
+class DynamoLockingServiceTest
+    extends FunSpec
+    with MatcherFixtures
+    with ScalaFutures {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
@@ -26,9 +29,10 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withLockingService(lockTable) { lockingService =>
         val id = "id"
-        val lockedDuringCallback = lockingService.withLocks(Set(id))(f = Future {
-          assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-        })
+        val lockedDuringCallback =
+          lockingService.withLocks(Set(id))(f = Future {
+            assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+          })
 
         whenReady(lockedDuringCallback) { _ =>
           assertNoRowLocks(lockTable)
@@ -37,16 +41,18 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
     }
   }
 
-  it("throws a FailedLockException and releases locks when writing a row lock fails") {
+  it(
+    "throws a FailedLockException and releases locks when writing a row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withLockingService(lockTable) { lockingService =>
         val idA = "id"
         val lockedId = "lockedId"
         givenLocks(Set(lockedId), "existingContext", lockTable)
 
-        val eventuallyLockFails = lockingService.withLocks(Set(idA, lockedId))(f = Future {
-          fail("Lock did not fail")
-        })
+        val eventuallyLockFails =
+          lockingService.withLocks(Set(idA, lockedId))(f = Future {
+            fail("Lock did not fail")
+          })
 
         whenReady(eventuallyLockFails.failed) { failure =>
           failure shouldBe a[FailedLockException]
@@ -83,10 +89,11 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
         case class ExpectedException() extends Exception()
 
         val id = "id"
-        val eventuallyLockFails = lockingService.withLocks(Set(id))(f = Future {
-          assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-          throw new ExpectedException
-        })
+        val eventuallyLockFails =
+          lockingService.withLocks(Set(id))(f = Future {
+            assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+            throw new ExpectedException
+          })
 
         whenReady(eventuallyLockFails.failed) { failure =>
           failure shouldBe a[ExpectedException]
@@ -96,18 +103,24 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
     }
   }
 
-  private def givenLocks(ids: Set[String], contextId: String, lockTable: LocalDynamoDb.Table) = {
-    ids.foreach( id =>
-      Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(aRowLock(id, contextId))
-    )
+  private def givenLocks(ids: Set[String],
+                         contextId: String,
+                         lockTable: LocalDynamoDb.Table) = {
+    ids.foreach(
+      id =>
+        Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
+          aRowLock(id, contextId)))
   }
 
   private def aRowLock(id: String, contextId: String) = {
     RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(100))
   }
 
-  private def assertOnlyHaveRowLockRecordIds(expectedIds: Set[String], lockTable: LocalDynamoDb.Table): Any = {
-    val locks: immutable.Seq[Either[DynamoReadError, RowLock]] = Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name)
+  private def assertOnlyHaveRowLockRecordIds(
+    expectedIds: Set[String],
+    lockTable: LocalDynamoDb.Table): Any = {
+    val locks: immutable.Seq[Either[DynamoReadError, RowLock]] =
+      Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name)
     val actualIds = locks.map(lock => lock.right.get.id).toSet
     actualIds shouldBe expectedIds
   }
@@ -116,8 +129,3 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
     Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name) shouldBe empty
   }
 }
-
-
-
-
-

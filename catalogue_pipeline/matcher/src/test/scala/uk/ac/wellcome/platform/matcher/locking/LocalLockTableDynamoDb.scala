@@ -32,20 +32,20 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L)
-        ).withGlobalSecondaryIndexes(
-        new GlobalSecondaryIndex()
-          .withIndexName(table.index)
-          .withProjection(
-            new Projection().withProjectionType(ProjectionType.ALL))
-          .withKeySchema(
-            new KeySchemaElement()
-              .withAttributeName("contextId")
-              .withKeyType(KeyType.HASH)
-          )
-          .withProvisionedThroughput(new ProvisionedThroughput()
-            .withReadCapacityUnits(1L)
-            .withWriteCapacityUnits(1L))))
+          .withWriteCapacityUnits(1L))
+        .withGlobalSecondaryIndexes(
+          new GlobalSecondaryIndex()
+            .withIndexName(table.index)
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(
+              new KeySchemaElement()
+                .withAttributeName("contextId")
+                .withKeyType(KeyType.HASH)
+            )
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))))
     eventually {
       waitUntilActive(dynamoDbClient, table.name)
     }
@@ -60,9 +60,10 @@ trait LocalLockTableDynamoDb extends LocalDynamoDb {
     dynamoDbClient.createTable(
       new CreateTableRequest()
         .withTableName(table.name)
-        .withKeySchema(new KeySchemaElement()
-          .withAttributeName("id")
-          .withKeyType(KeyType.HASH))
+        .withKeySchema(
+          new KeySchemaElement()
+            .withAttributeName("id")
+            .withKeyType(KeyType.HASH))
         .withAttributeDefinitions(
           new AttributeDefinition()
             .withAttributeName("id")

@@ -37,40 +37,46 @@ class MatcherFeatureTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-              withMatcherServer(queue, storageBucket, topic, graphTable, lockTable) { _ =>
-                val work = UnidentifiedWork(
-                  sourceIdentifier = sourceIdentifierA,
-                  identifiers = List(sourceIdentifierA),
-                  title = Some("Work"),
-                  version = 1
-                )
-                val workSqsMessage: NotificationMessage =
-                  hybridRecordNotificationMessage(
-                    message = toJson(RecorderWorkEntry(work = work)).get,
-                    version = 1,
-                    s3Client = s3Client,
-                    bucket = storageBucket
+            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
+              graphTable =>
+                withMatcherServer(
+                  queue,
+                  storageBucket,
+                  topic,
+                  graphTable,
+                  lockTable) { _ =>
+                  val work = UnidentifiedWork(
+                    sourceIdentifier = sourceIdentifierA,
+                    identifiers = List(sourceIdentifierA),
+                    title = Some("Work"),
+                    version = 1
                   )
-                sqsClient.sendMessage(
-                  queue.url,
-                  toJson(workSqsMessage).get
-                )
+                  val workSqsMessage: NotificationMessage =
+                    hybridRecordNotificationMessage(
+                      message = toJson(RecorderWorkEntry(work = work)).get,
+                      version = 1,
+                      s3Client = s3Client,
+                      bucket = storageBucket
+                    )
+                  sqsClient.sendMessage(
+                    queue.url,
+                    toJson(workSqsMessage).get
+                  )
 
-                eventually {
-                  val snsMessages = listMessagesReceivedFromSNS(topic)
-                  snsMessages.size should be >= 1
+                  eventually {
+                    val snsMessages = listMessagesReceivedFromSNS(topic)
+                    snsMessages.size should be >= 1
 
-                  snsMessages.map { snsMessage =>
-                    val identifiersList =
-                      fromJson[MatcherResult](snsMessage.message).get
+                    snsMessages.map { snsMessage =>
+                      val identifiersList =
+                        fromJson[MatcherResult](snsMessage.message).get
 
-                    identifiersList shouldBe
-                      MatcherResult(Set(MatchedIdentifiers(
-                        Set(WorkIdentifier("sierra-system-number/A", 1)))))
+                      identifiersList shouldBe
+                        MatcherResult(Set(MatchedIdentifiers(
+                          Set(WorkIdentifier("sierra-system-number/A", 1)))))
+                    }
                   }
                 }
-              }
             }
           }
         }
@@ -84,9 +90,14 @@ class MatcherFeatureTest
       withLocalSqsQueueAndDlq { queuePair =>
         withLocalS3Bucket { storageBucket =>
           withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-              withMatcherServer(queuePair.queue, storageBucket, topic, graphTable, lockTable) {
-                _ =>
+            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
+              graphTable =>
+                withMatcherServer(
+                  queuePair.queue,
+                  storageBucket,
+                  topic,
+                  graphTable,
+                  lockTable) { _ =>
                   val existingWorkVersion = 2
                   val updatedWorkVersion = 1
 
@@ -121,7 +132,7 @@ class MatcherFeatureTest
                     noMessagesAreWaitingIn(queuePair.dlq)
                     listMessagesReceivedFromSNS(topic).size shouldBe 0
                   }
-              }
+                }
             }
           }
         }

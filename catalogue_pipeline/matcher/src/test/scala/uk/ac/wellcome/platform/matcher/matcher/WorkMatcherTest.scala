@@ -8,9 +8,19 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao, Identifier}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  DynamoLockingServiceConfig,
+  DynamoRowLockDao,
+  Identifier
+}
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
@@ -25,12 +35,12 @@ class WorkMatcherTest
     with ScalaFutures
     with MockitoSugar {
 
-  it("matches a work with no linked identifiers to itself only A and saves the updated graph A") {
+  it(
+    "matches a work with no linked identifiers to itself only A and saves the updated graph A") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
         withWorkGraphStore(graphTable) { workGraphStore =>
           withWorkMatcher(workGraphStore, lockTable) { workMatcher =>
-
             whenReady(workMatcher.matchWork(anUnidentifiedSierraWork)) {
               matcherResult =>
                 val workId = "sierra-system-number/id"
@@ -40,7 +50,8 @@ class WorkMatcherTest
                     Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
 
                 val savedLinkedWork = Scanamo
-                  .get[WorkNode](dynamoDbClient)(graphTable.name)('id -> workId)
+                  .get[WorkNode](dynamoDbClient)(graphTable.name)(
+                    'id -> workId)
                   .map(_.right.get)
 
                 savedLinkedWork shouldBe Some(WorkNode(workId, 1, Nil, workId))
@@ -65,10 +76,9 @@ class WorkMatcherTest
             whenReady(workMatcher.matchWork(work)) { identifiersList =>
               identifiersList shouldBe
                 MatcherResult(
-                  Set(
-                    MatchedIdentifiers(Set(
-                      WorkIdentifier("sierra-system-number/A", 1),
-                      WorkIdentifier("sierra-system-number/B", 0)))))
+                  Set(MatchedIdentifiers(Set(
+                    WorkIdentifier("sierra-system-number/A", 1),
+                    WorkIdentifier("sierra-system-number/B", 0)))))
 
               val savedWorkNodes = Scanamo
                 .scan[WorkNode](dynamoDbClient)(graphTable.name)
@@ -93,7 +103,8 @@ class WorkMatcherTest
     }
   }
 
-  it("matches a previously stored work A->B with an update B->C and saves the graph A->B->C") {
+  it(
+    "matches a previously stored work A->B with an update B->C and saves the graph A->B->C") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
         withWorkGraphStore(graphTable) { workGraphStore =>
@@ -167,13 +178,18 @@ class WorkMatcherTest
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
         withWorkGraphStore(graphTable) { workGraphStore =>
           withWorkMatcher(workGraphStore, lockTable) { workMatcher =>
-            val rowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(lockTable.name, lockTable.index))
+            val rowLockDao = new DynamoRowLockDao(
+              dynamoDbClient,
+              DynamoLockingServiceConfig(lockTable.name, lockTable.index))
             val dynamoLockingService =
               new DynamoLockingService(rowLockDao)
-            withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
-
+            withWorkMatcherAndLockingService(
+              workGraphStore,
+              dynamoLockingService) { workMatcher =>
               val failedLock = for {
-                _ <- rowLockDao.lockRow(Identifier("sierra-system-number/id"), "processId")
+                _ <- rowLockDao.lockRow(
+                  Identifier("sierra-system-number/id"),
+                  "processId")
                 result <- workMatcher.matchWork(anUnidentifiedSierraWork)
               } yield (result)
 

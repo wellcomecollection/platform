@@ -24,9 +24,8 @@ class WorkGraphStoreTest
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { thingTable =>
           withWorkGraphStore(thingTable) { workGraphStore =>
-            whenReady(
-              workGraphStore.findAffectedWorks(
-                WorkUpdate("Not-there", 0, Set.empty))) { workGraph =>
+            whenReady(workGraphStore.findAffectedWorks(
+              WorkUpdate("Not-there", 0, Set.empty))) { workGraph =>
               workGraph shouldBe WorkGraph(Set.empty)
             }
           }
@@ -40,12 +39,16 @@ class WorkGraphStoreTest
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
           withWorkGraphStore(thingTable) { workGraphStore =>
             val work =
-              WorkNode(id = "A", version = 0, linkedIds = Nil, componentId = "A")
+              WorkNode(
+                id = "A",
+                version = 0,
+                linkedIds = Nil,
+                componentId = "A")
             Scanamo.put(dynamoDbClient)(thingTable.name)(work)
 
-            whenReady(
-              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) { workGraph =>
-                workGraph shouldBe WorkGraph(Set(work))
+            whenReady(workGraphStore.findAffectedWorks(
+              WorkUpdate("A", 0, Set.empty))) { workGraph =>
+              workGraph shouldBe WorkGraph(Set(work))
             }
           }
         }
@@ -57,9 +60,17 @@ class WorkGraphStoreTest
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { thingTable =>
           withWorkGraphStore(thingTable) { workGraphStore =>
             val workA =
-              WorkNode(id = "A", version = 0, linkedIds = Nil, componentId = "A")
+              WorkNode(
+                id = "A",
+                version = 0,
+                linkedIds = Nil,
+                componentId = "A")
             val workB =
-              WorkNode(id = "B", version = 0, linkedIds = Nil, componentId = "B")
+              WorkNode(
+                id = "B",
+                version = 0,
+                linkedIds = Nil,
+                componentId = "B")
             Scanamo.put(dynamoDbClient)(thingTable.name)(workA)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
 
@@ -92,10 +103,9 @@ class WorkGraphStoreTest
             Scanamo.put(dynamoDbClient)(thingTable.name)(workA)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
 
-            whenReady(
-              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
-              workGraph =>
-                workGraph.nodes shouldBe Set(workA, workB)
+            whenReady(workGraphStore.findAffectedWorks(
+              WorkUpdate("A", 0, Set.empty))) { workGraph =>
+              workGraph.nodes shouldBe Set(workA, workB)
             }
           }
         }
@@ -129,10 +139,9 @@ class WorkGraphStoreTest
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workC)
 
-            whenReady(
-              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
-              workGraph =>
-                workGraph.nodes shouldBe Set(workA, workB, workC)
+            whenReady(workGraphStore.findAffectedWorks(
+              WorkUpdate("A", 0, Set.empty))) { workGraph =>
+              workGraph.nodes shouldBe Set(workA, workB, workC)
             }
           }
         }
@@ -156,7 +165,11 @@ class WorkGraphStoreTest
               linkedIds = Nil,
               componentId = "AB")
             val workC =
-              WorkNode(id = "C", version = 0, linkedIds = Nil, componentId = "C")
+              WorkNode(
+                id = "C",
+                version = 0,
+                linkedIds = Nil,
+                componentId = "C")
 
             Scanamo.put(dynamoDbClient)(thingTable.name)(workA)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
@@ -175,15 +188,16 @@ class WorkGraphStoreTest
 
   describe("Put graph of linked works") {
     it("puts a simple graph") {
-        withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { graphTable =>
-          withWorkGraphStore(graphTable) { workGraphStore =>
-            val workNodeA = WorkNode("A", version = 0, List("B"), "A+B")
-            val workNodeB = WorkNode("B", version = 0, Nil, "A+B")
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable _) { graphTable =>
+        withWorkGraphStore(graphTable) { workGraphStore =>
+          val workNodeA = WorkNode("A", version = 0, List("B"), "A+B")
+          val workNodeB = WorkNode("B", version = 0, Nil, "A+B")
 
-          whenReady(workGraphStore.put(WorkGraph(Set(workNodeA, workNodeB)))) { _ =>
+          whenReady(workGraphStore.put(WorkGraph(Set(workNodeA, workNodeB)))) {
+            _ =>
               val savedWorks = Scanamo
                 .scan[WorkNode](dynamoDbClient)(graphTable.name)
-              .map(_.right.get)
+                .map(_.right.get)
               savedWorks should contain theSameElementsAs List(
                 workNodeA,
                 workNodeB)
@@ -197,10 +211,13 @@ class WorkGraphStoreTest
     val mockWorkNodeDao = mock[WorkNodeDao]
     val expectedException = new RuntimeException("FAILED")
     when(mockWorkNodeDao.put(any[WorkNode]))
-          .thenReturn(Future.failed(expectedException))
+      .thenReturn(Future.failed(expectedException))
     val workGraphStore = new WorkGraphStore(mockWorkNodeDao)
 
-    whenReady(workGraphStore.put(WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B")))).failed) { failedException =>
+    whenReady(
+      workGraphStore
+        .put(WorkGraph(Set(WorkNode("A", version = 0, Nil, "A+B"))))
+        .failed) { failedException =>
       failedException shouldBe expectedException
     }
   }

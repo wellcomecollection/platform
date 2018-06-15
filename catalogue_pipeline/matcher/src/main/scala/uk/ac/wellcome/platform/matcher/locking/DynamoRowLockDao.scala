@@ -11,9 +11,10 @@ import javax.inject.Inject
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DynamoRowLockDao @Inject()(dynamoDBClient: AmazonDynamoDB,
-                                 config: DynamoLockingServiceConfig)(
-                                 implicit context: ExecutionContext) extends Logging {
+class DynamoRowLockDao @Inject()(
+  dynamoDBClient: AmazonDynamoDB,
+  config: DynamoLockingServiceConfig)(implicit context: ExecutionContext)
+    extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
@@ -40,7 +41,9 @@ class DynamoRowLockDao @Inject()(dynamoDBClient: AmazonDynamoDB,
     debug(s"Trying to create RowLock: $rowLock")
 
     val scanamoOps = table
-      .given(not(attributeExists('id)) or Condition('expires < rowLock.created.getEpochSecond))
+      .given(
+        not(attributeExists('id)) or Condition(
+          'expires < rowLock.created.getEpochSecond))
       .put(rowLock)
 
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
@@ -49,14 +52,17 @@ class DynamoRowLockDao @Inject()(dynamoDBClient: AmazonDynamoDB,
 
     result match {
       case Right(_) => rowLock
-      case Left(error) => throw new FailedLockException(s"Failed to lock $id", error)
+      case Left(error) =>
+        throw new FailedLockException(s"Failed to lock $id", error)
     }
   }
 
   def unlockRow(contextId: String) = Future {
     debug(s"Trying to unlock context: $contextId")
 
-    val maybeRowLocks = Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)('contextId -> contextId)
+    val maybeRowLocks =
+      Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
+        'contextId -> contextId)
     val rowLockIds = maybeRowLocks.collect {
       case Right(rowLock) => rowLock.id
     }.toSet
@@ -78,13 +84,15 @@ class DynamoRowLockDao @Inject()(dynamoDBClient: AmazonDynamoDB,
 case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
 case class FailedLockException(private val message: String = "",
-                               private val cause: Throwable = None.orNull) extends Throwable
+                               private val cause: Throwable = None.orNull)
+    extends Throwable
 
 case class FailedUnlockException(private val message: String = "",
-                                 private val cause: Throwable = None.orNull) extends Throwable
+                                 private val cause: Throwable = None.orNull)
+    extends Throwable
 
 case class Identifier(id: String)
-case class RowLock( id: String,
-                    contextId: String,
-                    created: Instant,
-                    expires: Instant)
+case class RowLock(id: String,
+                   contextId: String,
+                   created: Instant,
+                   expires: Instant)

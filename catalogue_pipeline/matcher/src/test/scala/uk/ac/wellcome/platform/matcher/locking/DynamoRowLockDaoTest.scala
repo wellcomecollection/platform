@@ -16,7 +16,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
 class DynamoRowLockDaoTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with LocalLockTableDynamoDb {
@@ -33,77 +33,96 @@ class DynamoRowLockDaoTest
   case class ThingToStore(id: String, value: String)
 
   it("locks a Thing") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { table: LocalDynamoDb.Table =>
-      val dynamoRowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(table.name, table.index))
+    withSpecifiedLocalDynamoDbTable(createLockTable) {
+      table: LocalDynamoDb.Table =>
+        val dynamoRowLockDao = new DynamoRowLockDao(
+          dynamoDbClient,
+          DynamoLockingServiceConfig(table.name, table.index))
 
-      val id = Random.nextString(32)
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { lock =>
-        lock.id shouldBe id
+        val id = Random.nextString(32)
+        whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) {
+          lock =>
+            lock.id shouldBe id
 
-        val actualStored = Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
-        val storedRowLock = actualStored.get.right.get
-        storedRowLock.id shouldBe id
-      }
+            val actualStored =
+              Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
+            val storedRowLock = actualStored.get.right.get
+            storedRowLock.id shouldBe id
+        }
     }
   }
 
   it("cannot lock a locked Thing") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      val dynamoRowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(lockTable.name, lockTable.index))
+      val dynamoRowLockDao = new DynamoRowLockDao(
+        dynamoDbClient,
+        DynamoLockingServiceConfig(lockTable.name, lockTable.index))
 
       val id = Random.nextString(32)
       Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
-          RowLock(id, "contextId", Instant.now, Instant.now.plusSeconds(100)))
+        RowLock(id, "contextId", Instant.now, Instant.now.plusSeconds(100)))
 
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId").failed) { secondLockFailure =>
-        secondLockFailure shouldBe a[FailedLockException]
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId").failed) {
+        secondLockFailure =>
+          secondLockFailure shouldBe a[FailedLockException]
       }
     }
   }
 
   it("can lock a locked Thing that has expired") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { table =>
-      val dynamoRowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(table.name, table.index))
+      val dynamoRowLockDao = new DynamoRowLockDao(
+        dynamoDbClient,
+        DynamoLockingServiceConfig(table.name, table.index))
 
       val id = Random.nextString(32)
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { firstLock =>
-        firstLock.id shouldBe id
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) {
+        firstLock =>
+          firstLock.id shouldBe id
       }
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId").failed) { secondLockFailure =>
-        secondLockFailure shouldBe a[FailedLockException]
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId").failed) {
+        secondLockFailure =>
+          secondLockFailure shouldBe a[FailedLockException]
 
-        // Get the stored RowLock
-        val actualStored = Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
-        val rowLock = actualStored.get.right.get
+          // Get the stored RowLock
+          val actualStored =
+            Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
+          val rowLock = actualStored.get.right.get
 
-        // Update the RowLock to be expired
-        val expiryTimeInThePast = Instant.now().minus(Duration.ofSeconds(1))
-        val updatedRowLock = rowLock.copy(expires = expiryTimeInThePast)
-        Scanamo.put[RowLock](dynamoDbClient)(table.name)(updatedRowLock)
+          // Update the RowLock to be expired
+          val expiryTimeInThePast = Instant.now().minus(Duration.ofSeconds(1))
+          val updatedRowLock = rowLock.copy(expires = expiryTimeInThePast)
+          Scanamo.put[RowLock](dynamoDbClient)(table.name)(updatedRowLock)
       }
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { thirdLock =>
-        // Retry locking expecting a success
-        thirdLock.id shouldBe id
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) {
+        thirdLock =>
+          // Retry locking expecting a success
+          thirdLock.id shouldBe id
       }
     }
   }
 
   it("unlocks a locked Thing and can lock it again") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { table =>
-      val dynamoRowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(table.name, table.index))
+      val dynamoRowLockDao = new DynamoRowLockDao(
+        dynamoDbClient,
+        DynamoLockingServiceConfig(table.name, table.index))
 
       val id = Random.nextString(32)
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { firstLock =>
-        firstLock.id shouldBe id
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) {
+        firstLock =>
+          firstLock.id shouldBe id
       }
 
       whenReady(dynamoRowLockDao.unlockRow("contextId")) { secondLock =>
-        val actualStored = Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
+        val actualStored =
+          Scanamo.get[RowLock](dynamoDbClient)(table.name)('id -> id)
         actualStored shouldBe None
       }
 
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { thirdLock =>
-        thirdLock.id shouldBe id
+      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) {
+        thirdLock =>
+          thirdLock.id shouldBe id
       }
     }
   }
