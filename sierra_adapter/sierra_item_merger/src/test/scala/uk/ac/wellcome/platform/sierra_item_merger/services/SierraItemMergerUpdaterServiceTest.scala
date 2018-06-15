@@ -560,7 +560,7 @@ class SierraItemMergerUpdaterServiceTest
                            table: Table,
                            record: SierraTransformable) =
     assertJsonStringsAreEqual(
-      getJsonFor[SierraTransformable](bucket, table, id = record.id),
+      getJsonFor(bucket, table, id = record.id),
       toJson(record).get
     )
 }

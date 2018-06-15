@@ -64,7 +64,7 @@ class RecorderFeatureTest
               eventually {
                 val record = RecorderWorkEntry(work)
                 assertJsonStringsAreEqual(
-                  getJsonFor[RecorderWorkEntry](
+                  getJsonFor(
                     bucket,
                     table,
                     id = record.id),
