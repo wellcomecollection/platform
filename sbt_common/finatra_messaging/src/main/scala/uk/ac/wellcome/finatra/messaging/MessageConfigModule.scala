@@ -1,6 +1,6 @@
 package uk.ac.wellcome.finatra.messaging
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.messaging.message.{
   MessageReaderConfig,
