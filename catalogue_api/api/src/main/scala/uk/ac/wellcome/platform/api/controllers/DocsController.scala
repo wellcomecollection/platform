@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.api.controllers
 
+import com.google.inject.Inject
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 import io.swagger.util.Json
 import io.swagger.models.{Info, Scheme, Swagger}
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.platform.api.models.ApiConfig

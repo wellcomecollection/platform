@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.api.finatra.exceptions
 
+import com.google.inject.Inject
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.finatra.json.internal.caseclass.exceptions.CaseClassMappingException
 import com.twitter.inject.Logging
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, Error}

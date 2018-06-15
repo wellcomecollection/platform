@@ -1,7 +1,8 @@
 package uk.ac.wellcome.finatra.controllers
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 
+import com.google.inject.Inject
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
 

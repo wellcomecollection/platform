@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.google.inject.Inject
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
-import javax.inject.Inject
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender

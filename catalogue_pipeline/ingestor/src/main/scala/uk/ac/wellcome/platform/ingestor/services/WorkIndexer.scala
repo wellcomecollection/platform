@@ -1,11 +1,12 @@
 package uk.ac.wellcome.platform.ingestor.services
 
+import com.google.inject.Inject
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.bulk.BulkResponse
 import com.twitter.inject.Logging
-import javax.inject.{Inject, Singleton}
+import javax.inject.Singleton
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.models.work.internal.IdentifiedWork

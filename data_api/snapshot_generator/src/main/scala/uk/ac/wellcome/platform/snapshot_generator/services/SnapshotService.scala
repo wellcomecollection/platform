@@ -7,9 +7,9 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.ByteString
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.inject.Inject
 import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
-import javax.inject.Inject
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
