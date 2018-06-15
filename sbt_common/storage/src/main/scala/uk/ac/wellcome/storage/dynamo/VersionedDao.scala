@@ -58,28 +58,31 @@ class VersionedDao @Inject()(
     idGetter: IdGetter[T],
     versionGetter: VersionGetter[T],
     updateExpressionGenerator: UpdateExpressionGenerator[T]
-  ): Future[Unit] = Future {
-    val id = idGetter.id(record)
-    debug(s"Attempting to update Dynamo record: $id")
+  ): Future[Unit] =
+    Future {
+      val id = idGetter.id(record)
+      debug(s"Attempting to update Dynamo record: $id")
 
-    updateBuilder(record) match {
-      case Some(ops) => Scanamo.exec(dynamoDbClient)(ops) match {
-        case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
-          throw DynamoNonFatalException(e)
-        case Left(scanamoError) => {
-          val exception = new RuntimeException(scanamoError.toString)
-          warn(s"Failed to update Dynamo record: $id", exception)
-          throw exception
-        }
-        case Right(_) => {
-          debug(s"Successfully updated Dynamo record: $id")
-        }
+      updateBuilder(record) match {
+        case Some(ops) =>
+          Scanamo.exec(dynamoDbClient)(ops) match {
+            case Left(ConditionNotMet(e: ConditionalCheckFailedException)) =>
+              throw DynamoNonFatalException(e)
+            case Left(scanamoError) => {
+              val exception = new RuntimeException(scanamoError.toString)
+              warn(s"Failed to update Dynamo record: $id", exception)
+              throw exception
+            }
+            case Right(_) => {
+              debug(s"Successfully updated Dynamo record: $id")
+            }
+          }
+        case None => ()
       }
-      case None => ()
+    }.recover {
+      case t: ProvisionedThroughputExceededException =>
+        throw DynamoNonFatalException(t)
     }
-  }.recover {
-    case t: ProvisionedThroughputExceededException => throw DynamoNonFatalException(t)
-  }
 
   def getRecord[T](id: String)(
     implicit evidence: DynamoFormat[T]): Future[Option[T]] = Future {

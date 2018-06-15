@@ -12,4 +12,4 @@ package uk.ac.wellcome.storage.dynamo
 // e.g. authentication errors.
 //
 case class DynamoNonFatalException(e: Throwable)
-  extends Exception(e.getMessage)
+    extends Exception(e.getMessage)

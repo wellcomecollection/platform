@@ -286,8 +286,7 @@ class VersionedDaoTest
         )
       }
 
-      it(
-        "returns a DynamoNonFatalException if we fail the conditional update") {
+      it("returns a DynamoNonFatalException if we fail the conditional update") {
         val exceptionThrownByUpdateItem = new ConditionalCheckFailedException(
           "true is not equal to false!"
         )
