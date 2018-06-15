@@ -47,16 +47,14 @@ class SierraItemsToDynamoWorkerServiceTest
           withLocalSqsQueueAndDlq {
             case queuePair @ QueuePair(queue, dlq) =>
               withMockMetricSender { metricsSender =>
-                withSQSStream[NotificationMessage, R](
+                withSQSStream[SierraRecord, R](
                   actorSystem,
                   queue,
                   metricsSender) { sqsStream =>
                   val sierraItemsToDynamoWorkerService =
                     new SierraItemsToDynamoWorkerService(
                       system = actorSystem,
-                      new SQSToDynamoStream[SierraRecord](
-                        actorSystem,
-                        sqsStream),
+                      sqsStream = sqsStream,
                       dynamoInserter = dynamoInserter
                     )
 
