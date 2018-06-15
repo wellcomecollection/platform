@@ -2,7 +2,9 @@ package uk.ac.wellcome.storage.dynamo
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.amazonaws.services.dynamodbv2.model.{
+  ConditionalCheckFailedException,
   GetItemRequest,
+  ProvisionedThroughputExceededException,
   UpdateItemRequest
 }
 import com.gu.scanamo.Scanamo
@@ -187,8 +189,8 @@ class VersionedDaoTest
           Scanamo.put(dynamoDbClient)(table.name)(newerTestVersioned)
 
           whenReady(versionedDao.updateRecord(testVersioned).failed) { ex =>
-            ex shouldBe a[RuntimeException]
-            ex.getMessage should include("ConditionalCheckFailedException")
+            ex shouldBe a[DynamoNonFatalException]
+            ex.getMessage should include("The conditional request failed")
 
             Scanamo
               .get[TestVersioned](dynamoDbClient)(table.name)(
@@ -269,29 +271,70 @@ class VersionedDaoTest
       }
     }
 
-    it("returns a failed future if the request to dynamo fails") {
-      withLocalDynamoDbTable { table =>
-        val dynamoDbClient = mock[AmazonDynamoDB]
-        val expectedException = new RuntimeException("AAAAAARGH!")
+    describe("DynamoDB failures") {
+      it("returns a DynamoNonFatalException if we exceed throughput limits") {
+        val exceptionThrownByUpdateItem =
+          new ProvisionedThroughputExceededException(
+            "You tried to write to DynamoDB too quickly!"
+          )
+        val expectedException =
+          DynamoNonFatalException(exceptionThrownByUpdateItem)
 
-        when(dynamoDbClient.updateItem(any[UpdateItemRequest]))
-          .thenThrow(expectedException)
+        assertRequestFailsWithCorrectException(
+          exceptionThrownByUpdateItem = exceptionThrownByUpdateItem,
+          expectedException = expectedException
+        )
+      }
 
-        val failingDao =
-          new VersionedDao(
-            dynamoDbClient,
-            dynamoConfig =
-              DynamoConfig(table = table.name, index = table.index)
+      it(
+        "returns a DynamoNonFatalException if we fail the conditional update") {
+        val exceptionThrownByUpdateItem = new ConditionalCheckFailedException(
+          "true is not equal to false!"
+        )
+        val expectedException =
+          DynamoNonFatalException(exceptionThrownByUpdateItem)
+
+        assertRequestFailsWithCorrectException(
+          exceptionThrownByUpdateItem = exceptionThrownByUpdateItem,
+          expectedException = expectedException
+        )
+      }
+
+      it("returns the raw exception if there's an unexpected error") {
+        val exception = new RuntimeException("AAAAAARGH!")
+
+        assertRequestFailsWithCorrectException(
+          exceptionThrownByUpdateItem = exception,
+          expectedException = exception
+        )
+      }
+
+      def assertRequestFailsWithCorrectException(
+        exceptionThrownByUpdateItem: Throwable,
+        expectedException: Throwable) = {
+        withLocalDynamoDbTable { table =>
+          val mockDynamoDbClient = mock[AmazonDynamoDB]
+
+          when(mockDynamoDbClient.updateItem(any[UpdateItemRequest]))
+            .thenThrow(exceptionThrownByUpdateItem)
+
+          val failingDao = new VersionedDao(
+            dynamoDbClient = mockDynamoDbClient,
+            dynamoConfig = DynamoConfig(
+              table = table.name,
+              index = table.index
+            )
           )
 
-        val testVersioned = TestVersioned(
-          id = "testSource/b1111",
-          data = "whatever",
-          version = 1
-        )
+          val testVersioned = TestVersioned(
+            id = "testSource/b1111",
+            data = "whatever",
+            version = 1
+          )
 
-        whenReady(failingDao.updateRecord(testVersioned).failed) { ex =>
-          ex shouldBe expectedException
+          whenReady(failingDao.updateRecord(testVersioned).failed) { ex =>
+            ex shouldBe expectedException
+          }
         }
       }
     }
