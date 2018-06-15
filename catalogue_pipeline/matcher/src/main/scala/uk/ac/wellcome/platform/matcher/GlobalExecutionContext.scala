@@ -1,4 +1,4 @@
-package uk.ac.wellcome.storage
+package uk.ac.wellcome.platform.matcher
 
 import scala.concurrent.ExecutionContext
 

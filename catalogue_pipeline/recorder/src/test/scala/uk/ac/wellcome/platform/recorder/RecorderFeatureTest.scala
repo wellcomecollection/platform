@@ -9,9 +9,9 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -20,6 +20,7 @@ class RecorderFeatureTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
+    with JsonTestUtil
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging {
@@ -61,10 +62,11 @@ class RecorderFeatureTest
               sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
-                assertStored[RecorderWorkEntry](
-                  bucket,
-                  table,
-                  RecorderWorkEntry(work))
+                val record = RecorderWorkEntry(work)
+                assertJsonStringsAreEqual(
+                  getJsonFor(bucket, table, id = record.id),
+                  toJson(record).get
+                )
               }
             }
           }

@@ -50,7 +50,6 @@ cache:
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
     - sbt_common/monitoring/target
-    - sbt_common/storage/target
 
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
@@ -61,8 +60,8 @@ cache:
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
 before_cache:
-  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
-  - find $HOME/.sbt        -name "*.lock"               -print -delete
+  - sudo find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete
+  - sudo find $HOME/.sbt        -name "*.lock"               -print -delete
 
 script:
   - ./run_travis_task.py
@@ -91,7 +90,6 @@ jobs:
       env: TASK=common-test
     - env: TASK=elasticsearch-test
     - env: TASK=messaging-test
-    - env: TASK=storage-test
     - env: TASK=monitoring-test
     - env: TASK=internal_model-test
     - env: TASK=display-test
