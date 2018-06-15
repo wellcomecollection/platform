@@ -22,7 +22,8 @@ module "reindexer_queue" {
   # TODO: Reduce these limits when we fix the reindexer.
   #
   visibility_timeout_seconds = 120
-  max_receive_count          = 50
+
+  max_receive_count = 50
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
