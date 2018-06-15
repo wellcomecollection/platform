@@ -1,0 +1,2 @@
+-aws.metrics.namespace=${metrics_namespace}
+-aws.sqs.queue.url=${merger_queue_id}

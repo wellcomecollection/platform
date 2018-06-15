@@ -29,6 +29,7 @@ cache:
     - catalogue_pipeline/id_minter/target
     - catalogue_pipeline/ingestor/target
     - catalogue_pipeline/matcher/target
+    - catalogue_pipeline/merger/target
     - catalogue_pipeline/recorder/target
     - catalogue_pipeline/transformer/target
 
@@ -138,6 +139,7 @@ jobs:
     - env: TASK=ingestor-test
     - env: TASK=recorder-test
     - env: TASK=matcher-test
+    - env: TASK=merger-test
     - env: TASK=id_minter-test
 
     # Data API stack

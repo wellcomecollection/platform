@@ -23,6 +23,11 @@ module "ecr_repository_matcher" {
   name   = "matcher"
 }
 
+module "ecr_repository_merger" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
+  name   = "merger"
+}
+
 module "ecr_repository_ingestor" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "ingestor"
