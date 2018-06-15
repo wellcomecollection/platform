@@ -25,7 +25,7 @@ object S3 {
 
 }
 
-trait S3 extends Logging with Eventually with Matchers{
+trait S3 extends Logging with Eventually with Matchers {
 
   import S3._
 
