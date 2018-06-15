@@ -52,9 +52,8 @@ class DynamoRowLockDaoTest
       val dynamoRowLockDao = new DynamoRowLockDao(dynamoDbClient, DynamoLockingServiceConfig(lockTable.name, lockTable.index))
 
       val id = Random.nextString(32)
-      whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId")) { firstLock =>
-        firstLock.id shouldBe id
-      }
+      Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
+          RowLock(id, "contextId", Instant.now, Instant.now.plusSeconds(100)))
 
       whenReady(dynamoRowLockDao.lockRow(Identifier(id), "contextId").failed) { secondLockFailure =>
         secondLockFailure shouldBe a[FailedLockException]

@@ -37,8 +37,6 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
     }
   }
 
-//  it("throws a FailedLockException and releases locks when writing a row lock fails") {
-
   it("throws a FailedLockException and releases locks when writing a row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withLockingService(lockTable) { lockingService =>
@@ -52,7 +50,7 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
 
         whenReady(eventuallyLockFails.failed) { failure =>
           failure shouldBe a[FailedLockException]
-          // still expect locks to exist
+          // still expect original locks to exist
           assertOnlyHaveRowLockRecordIds(Set(lockedId), lockTable)
         }
       }
@@ -105,7 +103,7 @@ class DynamoLockingServiceTest extends FunSpec with MatcherFixtures with ScalaFu
   }
 
   private def aRowLock(id: String, contextId: String) = {
-    RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(7200))
+    RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(100))
   }
 
   private def assertOnlyHaveRowLockRecordIds(expectedIds: Set[String], lockTable: LocalDynamoDb.Table): Any = {

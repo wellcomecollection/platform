@@ -40,7 +40,7 @@ class DynamoRowLockDao @Inject()(dynamoDBClient: AmazonDynamoDB,
     debug(s"Trying to create RowLock: $rowLock")
 
     val scanamoOps = table
-      .given(not(attributeExists('id)) or Condition('expires < rowLock.expires.getEpochSecond))
+      .given(not(attributeExists('id)) or Condition('expires < rowLock.created.getEpochSecond))
       .put(rowLock)
 
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
