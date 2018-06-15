@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator.services
 import java.io.File
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.Uri
 import akka.stream.alpakka.s3.S3Exception
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import com.amazonaws.services.s3.model.GetObjectRequest
@@ -22,6 +23,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier
 }
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,
@@ -34,7 +36,6 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.util.Random
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SnapshotServiceTest
@@ -334,6 +335,51 @@ class SnapshotServiceTest
               result shouldBe a[ResponseException]
             }
           }
+        }
+      }
+    }
+  }
+
+  describe("buildLocation") {
+    it("creates the correct object location in tests") {
+      withFixtures {
+        case (snapshotService: SnapshotService, _, _, _) =>
+          snapshotService.buildLocation(
+            bucketName = "bukkit",
+            objectKey = "snapshot.json.gz"
+          ) shouldBe Uri("http://localhost:33333/bukkit/snapshot.json.gz")
+      }
+    }
+
+    it("creates the correct object location with the default S3 endpoint") {
+      withActorSystem { actorSystem =>
+        withMaterializer(actorSystem) { materializer =>
+          val s3Client = AkkaS3ClientModule.buildAkkaS3Client(
+            region = "eu-west-1",
+            actorSystem = actorSystem,
+            endpoint = "",
+            accessKey = accessKey,
+            secretKey = secretKey
+          )
+
+          val elasticConfig = ElasticConfig(
+            documentType = itemType,
+            indexV1name = "indexv1",
+            indexV2name = "indexv2"
+          )
+
+          val snapshotService = new SnapshotService(
+            actorSystem = actorSystem,
+            elasticClient = elasticClient,
+            elasticConfig = elasticConfig,
+            akkaS3Client = s3Client,
+            objectMapper = mapper
+          )
+
+          snapshotService.buildLocation(
+            bucketName = "bukkit",
+            objectKey = "snapshot.json.gz"
+          ) shouldBe Uri("s3://bukkit/snapshot.json.gz")
         }
       }
     }
