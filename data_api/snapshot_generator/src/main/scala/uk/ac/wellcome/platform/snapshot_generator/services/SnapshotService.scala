@@ -43,6 +43,9 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     throw new ConfigurationException("No S3 endpoint specified?")
   )
 
+  def buildLocation(bucketName: String, objectKey: String): Uri =
+    Uri(s"$s3Endpoint/$bucketName/$objectKey")
+
   def generateSnapshot(
     snapshotJob: SnapshotJob): Future[CompletedSnapshotJob] = {
     info(s"ConvertorService running $snapshotJob")
