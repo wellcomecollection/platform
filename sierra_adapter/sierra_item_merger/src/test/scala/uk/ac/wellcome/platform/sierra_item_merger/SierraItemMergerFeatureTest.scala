@@ -8,11 +8,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -22,7 +20,6 @@ class SierraItemMergerFeatureTest
     with Matchers
     with Eventually
     with ExtendedPatience
-    with JsonTestUtil
     with fixtures.Server
     with SQS
     with S3
@@ -55,7 +52,10 @@ class SierraItemMergerFeatureTest
               )
 
               eventually {
-                assertStored(bucket, table, expectedSierraTransformable)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable)
               }
             }
           }
@@ -107,8 +107,14 @@ class SierraItemMergerFeatureTest
                   itemData = Map(id2 -> record2)
                 )
 
-                assertStored(bucket, table, expectedSierraTransformable1)
-                assertStored(bucket, table, expectedSierraTransformable2)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable1)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable2)
               }
             }
           }
@@ -116,14 +122,6 @@ class SierraItemMergerFeatureTest
       }
     }
   }
-
-  private def assertStored(bucket: Bucket,
-                           table: Table,
-                           record: SierraTransformable) =
-    assertJsonStringsAreEqual(
-      getJsonFor(bucket, table, id = record.id),
-      toJson(record).get
-    )
 
   private def sendItemRecordToSQS(itemRecord: SierraItemRecord, queue: Queue) = {
     val message = NotificationMessage(

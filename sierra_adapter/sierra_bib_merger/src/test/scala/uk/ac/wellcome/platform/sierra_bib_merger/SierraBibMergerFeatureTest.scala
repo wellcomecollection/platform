@@ -10,11 +10,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -25,7 +23,6 @@ class SierraBibMergerFeatureTest
     with Eventually
     with MockitoSugar
     with ExtendedPatience
-    with JsonTestUtil
     with ScalaFutures
     with SQS
     with fixtures.Server
@@ -92,7 +89,10 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(bucket, table, expectedSierraTransformable)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable)
               }
             }
           }
@@ -143,8 +143,14 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record2)
 
               eventually {
-                assertStored(bucket, table, expectedSierraTransformable1)
-                assertStored(bucket, table, expectedSierraTransformable2)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable1)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable2)
               }
             }
           }
@@ -199,7 +205,10 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(bucket, table, expectedSierraTransformable)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable)
               }
             }
           }
@@ -256,7 +265,10 @@ class SierraBibMergerFeatureTest
               // enough time for this update to have gone through (if it was going to).
               Thread.sleep(5000)
 
-              assertStored(bucket, table, expectedSierraTransformable)
+              assertStored[SierraTransformable](
+                bucket,
+                table,
+                expectedSierraTransformable)
             }
           }
         }
@@ -301,7 +313,10 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record)
 
               eventually {
-                assertStored(bucket, table, expectedSierraTransformable)
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
+                  expectedSierraTransformable)
               }
             }
           }
@@ -309,14 +324,6 @@ class SierraBibMergerFeatureTest
       }
     }
   }
-
-  private def assertStored(bucket: Bucket,
-                           table: Table,
-                           record: SierraTransformable) =
-    assertJsonStringsAreEqual(
-      getJsonFor(bucket, table, id = record.id),
-      toJson(record).get
-    )
 
   private def sendMessageToSQS(body: String, queue: Queue) = {
     val message = NotificationMessage(

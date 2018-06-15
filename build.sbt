@@ -50,7 +50,13 @@ lazy val monitoring = doSharedLibrarySetup(project, "sbt_common/monitoring")
 // Messaging depends on the S3ObjectStore for message pointers.
 lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
   .dependsOn(monitoring % "compile->compile;test->test")
+  .dependsOn(storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
+
+// Storage depends on some models in the common lib.
+lazy val storage = doSharedLibrarySetup(project, "sbt_common/storage")
+  .dependsOn(common % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.commonStorageDependencies)
 
 lazy val finatra_akka = doSharedLibrarySetup(project, "sbt_common/finatra_akka")
   .settings(libraryDependencies ++= Dependencies.finatraAkkaDependencies)
@@ -69,7 +75,8 @@ lazy val finatra_messaging = doSharedLibrarySetup(project, "sbt_common/finatra_m
   .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_storage = doSharedLibrarySetup(project, "sbt_common/finatra_storage")
-  .settings(libraryDependencies ++= Dependencies.finatraStorageDependencies)
+  .dependsOn(storage % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.finatraDependencies)
 
 lazy val finatra_monitoring = doSharedLibrarySetup(project, "sbt_common/finatra_monitoring")
   .dependsOn(monitoring % "compile->compile;test->test")
@@ -182,6 +189,7 @@ lazy val root = (project in file("."))
     elasticsearch,
     messaging,
     monitoring,
+    storage,
 
     finatra_akka,
     finatra_controllers,

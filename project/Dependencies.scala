@@ -5,7 +5,7 @@ object Dependencies {
   lazy val versions = new {
     val akka = "2.5.9"
     val akkaStreamAlpakkaS3 = "0.17"
-    val aws = "1.11.225"
+    val aws = "1.11.95"
     val apacheLogging = "2.8.2"
     val finatra = "18.4.0"
     val guice = "4.2.0"
@@ -22,10 +22,6 @@ object Dependencies {
     val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
-  }
-
-  lazy val platformVersions = new {
-    val storage = "1.2.0"
   }
 
   // External Library dependency groups
@@ -123,18 +119,16 @@ object Dependencies {
   val commonMessagingDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
+    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
-    "io.circe" %% "circe-yaml" % "0.8.0",
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage,
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage % "test" classifier "tests"
+    "io.circe" %% "circe-yaml" % "0.8.0"
   ) ++ akkaDependencies ++ dynamoDependencies ++ guiceDependencies ++ testDependencies
 
-  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+  val commonStorageDependencies = Seq(
+    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
+  ) ++ dynamoDependencies ++ guiceDependencies
 
-  val finatraStorageDependencies = Seq(
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage,
-    "uk.ac.wellcome" %% "storage" % platformVersions.storage % "test" classifier "tests"
-  ) ++ finatraDependencies ++ guiceDependencies
+  val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws

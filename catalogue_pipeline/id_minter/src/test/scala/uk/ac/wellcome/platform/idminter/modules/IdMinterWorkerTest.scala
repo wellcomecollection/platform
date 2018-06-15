@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao
 }
 import uk.ac.wellcome.platform.idminter.fixtures
-import uk.ac.wellcome.storage.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest
