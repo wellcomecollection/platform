@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
-import uk.ac.wellcome.platform.matcher.GlobalExecutionContext._
+import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
 

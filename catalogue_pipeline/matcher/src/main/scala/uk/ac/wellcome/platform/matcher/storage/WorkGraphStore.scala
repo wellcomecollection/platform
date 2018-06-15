@@ -5,7 +5,7 @@ import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
-import uk.ac.wellcome.platform.matcher.GlobalExecutionContext._
+import uk.ac.wellcome.storage.GlobalExecutionContext._
 
 import scala.concurrent.Future
 
