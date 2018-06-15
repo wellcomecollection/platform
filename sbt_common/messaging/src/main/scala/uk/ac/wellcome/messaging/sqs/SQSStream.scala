@@ -14,6 +14,7 @@ import grizzled.slf4j.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.storage.dynamo.DynamoNonFatalException
 import uk.ac.wellcome.utils.JsonUtil.fromJson
 
 import scala.concurrent.Future
@@ -79,6 +80,9 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       case exception: GracefulFailureException =>
         logger.warn(
           s"Graceful failure processing message: ${exception.getMessage}")
+      case exception: DynamoNonFatalException =>
+        logger.warn(
+          s"Non-fatal DynamoDB error processing message: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
           s"Unrecognised failure while processing message: ${exception.getMessage}",
