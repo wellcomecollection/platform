@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal.{LocationType, PhysicalLocation}
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLocation}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraItemData,
+  SierraItemLocation
+}
 
 trait SierraLocation {
   def getLocation(itemData: SierraItemData): Option[PhysicalLocation] =
@@ -13,12 +16,13 @@ trait SierraLocation {
       // those cases.
       case Some(SierraItemLocation("", "")) => None
 
-      case Some(loc: SierraItemLocation) => Some(
-        PhysicalLocation(
-          locationType = LocationType(loc.code),
-          label = loc.name
+      case Some(loc: SierraItemLocation) =>
+        Some(
+          PhysicalLocation(
+            locationType = LocationType(loc.code),
+            label = loc.name
+          )
         )
-      )
       case None => None
     }
 }
