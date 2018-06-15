@@ -1,9 +1,8 @@
 package uk.ac.wellcome.finatra.messaging
 
 import com.amazonaws.services.sns.AmazonSNS
-import com.google.inject.Provides
+import com.google.inject.{Inject, Singleton}
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 import uk.ac.wellcome.messaging.sns.SNSClientFactory
 
 object SNSClientModule extends TwitterModule {

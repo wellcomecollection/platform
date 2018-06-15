@@ -1,8 +1,6 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import javax.inject.Singleton
-
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.elasticsearch.ElasticConfig

@@ -1,9 +1,8 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
-import javax.inject.Singleton
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.platform.api.models.ApiConfig
 

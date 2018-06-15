@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.matcher.modules
 
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
-import javax.inject.Singleton
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend

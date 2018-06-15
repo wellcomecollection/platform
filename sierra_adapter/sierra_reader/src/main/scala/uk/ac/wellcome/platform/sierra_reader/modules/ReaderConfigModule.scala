@@ -1,8 +1,6 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
-import javax.inject.Singleton
-
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.platform.sierra_reader.models.ReaderConfig
 

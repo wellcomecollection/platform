@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.transformer.modules
 
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
-import javax.inject.Singleton
 import uk.ac.wellcome.models.transformable.{
   CalmTransformable,
   MiroTransformable,

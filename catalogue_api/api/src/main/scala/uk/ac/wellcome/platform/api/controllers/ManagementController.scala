@@ -1,8 +1,6 @@
 package uk.ac.wellcome.platform.api.controllers
 
-import javax.inject.Singleton
-
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.twitter.finagle.http.Request

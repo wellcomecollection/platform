@@ -1,9 +1,8 @@
 package uk.ac.wellcome.platform.idminter.modules
 
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import io.circe.Json
-import javax.inject.Singleton
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 
