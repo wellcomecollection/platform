@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.matcher.matcher
 
 import com.google.inject.Inject
+import grizzled.slf4j.Logging
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -8,27 +10,53 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  FailedLockException
+}
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
-import uk.ac.wellcome.storage.GlobalExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
-  def matchWork(work: UnidentifiedWork) =
-    matchLinkedWorks(work).map(MatcherResult)
+class WorkMatcher @Inject()(
+  workGraphStore: WorkGraphStore,
+  lockingService: DynamoLockingService)(implicit context: ExecutionContext)
+    extends Logging {
+
+  def matchWork(work: UnidentifiedWork): Future[MatcherResult] =
+    doMatch(work).map(MatcherResult)
 
   type FutureMatched = Future[Set[MatchedIdentifiers]]
 
-  private def matchLinkedWorks(work: UnidentifiedWork): FutureMatched = {
+  private def doMatch(work: UnidentifiedWork): FutureMatched = {
     val update = WorkUpdate(work)
 
-    for {
-      graph <- workGraphStore.findAffectedWorks(update)
-      updatedGraph = WorkGraphUpdater.update(update, graph)
-      _ <- workGraphStore.put(updatedGraph)
+    val updateAffectedIdentifiers = update.referencedWorkIds + update.workId
+    lockingService
+      .withLocks(updateAffectedIdentifiers)(
+        processUpdate(update, updateAffectedIdentifiers)
+      )
+      .recover {
+        case e: FailedLockException =>
+          info(
+            s"Failed to obtain a lock matching work ${work.sourceIdentifier}")
+          throw GracefulFailureException(e)
+      }
+  }
 
+  private def processUpdate(update: WorkUpdate,
+                            updateAffectedIdentifiers: Set[String]) = {
+    for {
+      graphBeforeUpdate: WorkGraph <- workGraphStore.findAffectedWorks(update)
+      updatedGraph: WorkGraph = WorkGraphUpdater.update(
+        update,
+        graphBeforeUpdate)
+      _ <- lockingService.withLocks(
+        graphBeforeUpdate.nodes.map(_.id) -- updateAffectedIdentifiers)(
+        workGraphStore.put(updatedGraph)
+      )
     } yield {
       convertToIdentifiersList(updatedGraph)
     }
@@ -43,5 +71,4 @@ class WorkMatcher @Inject()(workGraphStore: WorkGraphStore) {
 
   private def groupBySetId(updatedGraph: WorkGraph) =
     updatedGraph.nodes.groupBy(_.componentId)
-
 }

@@ -14,6 +14,11 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  DynamoLockingServiceConfig,
+  DynamoRowLockDao
+}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -26,12 +31,13 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 trait MatcherFixtures
     extends Akka
     with SQS
     with SNS
-    with LocalLinkedWorkDynamoDb
+    with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
     with S3 {
 
@@ -39,7 +45,8 @@ trait MatcherFixtures
     queue: Queue,
     bucket: Bucket,
     topic: Topic,
-    table: Table
+    table: Table,
+    lockTable: Table
   )(testWith: TestWith[EmbeddedHttpServer, R]) = {
 
     val server: EmbeddedHttpServer =
@@ -50,7 +57,8 @@ trait MatcherFixtures
             s3LocalFlags(bucket) ++
             sqsLocalFlags(queue) ++
             snsLocalFlags(topic) ++
-            dynamoDbLocalEndpointFlags(table)
+            dynamoDbLocalEndpointFlags(table) ++
+            dynamoLockingServiceLocalFlags(lockTable)
       )
 
     server.start()
@@ -62,34 +70,41 @@ trait MatcherFixtures
     }
   }
 
+  def dynamoLockingServiceLocalFlags(table: Table): Map[String, String] =
+    Map(
+      "aws.dynamo.locking.service.lockTableName" -> table.name,
+      "aws.dynamo.locking.service.lockTableIndexName" -> table.index)
+
   def withMatcherMessageReceiver[R](
     queue: SQS.Queue,
     storageBucket: Bucket,
     topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R])(
-    implicit objectStore: ObjectStore[RecorderWorkEntry]) = {
+    implicit objectStore: ObjectStore[RecorderWorkEntry]): R = {
     val storageS3Config = S3Config(storageBucket.name)
     val snsWriter =
       new SNSWriter(snsClient, SNSConfig(topic.arn))
 
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalDynamoDbTable { table =>
-          withWorkGraphStore(table) { workGraphStore =>
-            withLinkedWorkMatcher(table, workGraphStore) { linkedWorkMatcher =>
-              val sqsStream = new SQSStream[NotificationMessage](
-                actorSystem = actorSystem,
-                sqsClient = asyncSqsClient,
-                sqsConfig = SQSConfig(queue.url, 1 second, 1),
-                metricsSender = metricsSender
-              )
-              val matcherMessageReceiver = new MatcherMessageReceiver(
-                sqsStream,
-                snsWriter,
-                objectStore,
-                storageS3Config,
-                actorSystem,
-                linkedWorkMatcher)
-              testWith(matcherMessageReceiver)
+        withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+          withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
+            withWorkGraphStore(graphTable) { workGraphStore =>
+              withWorkMatcher(workGraphStore, lockTable) { workMatcher =>
+                val sqsStream = new SQSStream[NotificationMessage](
+                  actorSystem = actorSystem,
+                  sqsClient = asyncSqsClient,
+                  sqsConfig = SQSConfig(queue.url, 1 second, 1),
+                  metricsSender = metricsSender
+                )
+                val matcherMessageReceiver = new MatcherMessageReceiver(
+                  sqsStream,
+                  snsWriter,
+                  objectStore,
+                  storageS3Config,
+                  actorSystem,
+                  workMatcher)
+                testWith(matcherMessageReceiver)
+              }
             }
           }
         }
@@ -97,15 +112,37 @@ trait MatcherFixtures
     }
   }
 
-  def withLinkedWorkMatcher[R](table: Table, workGraphStore: WorkGraphStore)(
+  def withWorkMatcher[R](workGraphStore: WorkGraphStore, lockTable: Table)(
     testWith: TestWith[WorkMatcher, R]): R = {
-    val linkedWorkMatcher = new WorkMatcher(workGraphStore)
-    testWith(linkedWorkMatcher)
+    val dynamoRowLockDao: DynamoRowLockDao = new DynamoRowLockDao(
+      dynamoDbClient,
+      DynamoLockingServiceConfig(lockTable.name, lockTable.index))
+    val lockingService: DynamoLockingService = new DynamoLockingService(
+      dynamoRowLockDao)
+    val workMatcher = new WorkMatcher(workGraphStore, lockingService)
+    testWith(workMatcher)
   }
 
-  def withWorkGraphStore[R](table: Table)(
+  def withLockingService[R](lockTable: Table)(
+    testWith: TestWith[DynamoLockingService, R]): R = {
+    val dynamoRowLockDao = new DynamoRowLockDao(
+      dynamoDbClient,
+      DynamoLockingServiceConfig(lockTable.name, lockTable.index))
+    val lockingService = new DynamoLockingService(dynamoRowLockDao)
+    testWith(lockingService)
+  }
+
+  def withWorkMatcherAndLockingService[R](
+    workGraphStore: WorkGraphStore,
+    lockingService: DynamoLockingService)(
+    testWith: TestWith[WorkMatcher, R]): R = {
+    val workMatcher = new WorkMatcher(workGraphStore, lockingService)
+    testWith(workMatcher)
+  }
+
+  def withWorkGraphStore[R](graphTable: Table)(
     testWith: TestWith[WorkGraphStore, R]): R = {
-    withWorkNodeDao(table) { workNodeDao =>
+    withWorkNodeDao(graphTable) { workNodeDao =>
       val workGraphStore = new WorkGraphStore(workNodeDao)
       testWith(workGraphStore)
     }

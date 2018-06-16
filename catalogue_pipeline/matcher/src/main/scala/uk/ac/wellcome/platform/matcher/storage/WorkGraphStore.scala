@@ -5,13 +5,12 @@ import com.gu.scanamo.error.DynamoReadError
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
-import uk.ac.wellcome.storage.GlobalExecutionContext._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class WorkGraphStore @Inject()(
-  workNodeDao: WorkNodeDao
-) extends Logging {
+class WorkGraphStore @Inject()(workNodeDao: WorkNodeDao)(
+  implicit context: ExecutionContext)
+    extends Logging {
 
   def findAffectedWorks(workUpdate: WorkUpdate): Future[WorkGraph] = {
     val directlyAffectedWorkIds = workUpdate.referencedWorkIds + workUpdate.workId

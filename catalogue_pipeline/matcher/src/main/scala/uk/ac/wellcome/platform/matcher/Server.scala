@@ -24,6 +24,7 @@ import uk.ac.wellcome.finatra.storage.{
   S3ConfigModule
 }
 import uk.ac.wellcome.platform.matcher.modules.{
+  DynamoLockingServiceConfigModule,
   MatcherModule,
   RecorderWorkEntryModule
 }
@@ -46,7 +47,8 @@ class Server extends HttpServer {
     MatcherModule,
     RecorderWorkEntryModule,
     AkkaModule,
-    ExecutionContextModule
+    ExecutionContextModule,
+    DynamoLockingServiceConfigModule
   )
 
   override def configureHttp(router: HttpRouter) {

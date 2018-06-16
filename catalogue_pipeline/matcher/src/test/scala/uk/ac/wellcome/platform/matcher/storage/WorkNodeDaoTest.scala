@@ -18,7 +18,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-
+import scala.concurrent.ExecutionContext.Implicits.global
 class WorkNodeDaoTest
     extends FunSpec
     with Matchers
@@ -28,7 +28,7 @@ class WorkNodeDaoTest
 
   describe("Get from dynamo") {
     it("returns nothing if ids are not in dynamo") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
           whenReady(workNodeDao.get(Set("Not-there"))) { workNodeSet =>
             workNodeSet shouldBe Set.empty
@@ -38,24 +38,24 @@ class WorkNodeDaoTest
     }
 
     it("returns WorkNodes which are stored in DynamoDB") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
-          val existingLinkedWorkA: WorkNode =
+          val existingWorkA: WorkNode =
             WorkNode("A", 1, List("B"), "A+B")
-          val existingLinkedWorkB: WorkNode = WorkNode("B", 0, Nil, "A+B")
+          val existingWorkB: WorkNode = WorkNode("B", 0, Nil, "A+B")
 
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkA)
-          Scanamo.put(dynamoDbClient)(table.name)(existingLinkedWorkB)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkA)
+          Scanamo.put(dynamoDbClient)(table.name)(existingWorkB)
 
           whenReady(workNodeDao.get(Set("A", "B"))) { work =>
-            work shouldBe Set(existingLinkedWorkA, existingLinkedWorkB)
+            work shouldBe Set(existingWorkA, existingWorkB)
           }
         }
       }
     }
 
     it("returns an error if fetching from dynamo fails") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED!")
 
@@ -74,7 +74,7 @@ class WorkNodeDaoTest
     }
 
     it("returns an error if Scanamo fails") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
           case class BadRecord(id: String)
           val badRecord: BadRecord = BadRecord(id = "A")
@@ -90,7 +90,7 @@ class WorkNodeDaoTest
 
   describe("Get by SetIds") {
     it("returns empty set if componentIds are not in dynamo") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
           whenReady(workNodeDao.getByComponentIds(Set("Not-there"))) {
             workNodeSet =>
@@ -101,7 +101,7 @@ class WorkNodeDaoTest
     }
 
     it("returns WorkNodes which are stored in DynamoDB") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { matcherGraphDao =>
           val existingWorkNodeA: WorkNode = WorkNode("A", 1, List("B"), "A+B")
           val existingWorkNodeB: WorkNode = WorkNode("B", 0, Nil, "A+B")
@@ -118,7 +118,7 @@ class WorkNodeDaoTest
     }
 
     it("returns an error if fetching from dynamo fails") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED")
         when(dynamoDbClient.query(any[QueryRequest]))
@@ -136,7 +136,7 @@ class WorkNodeDaoTest
     }
 
     it("returns an error if Scanamo fails") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
           case class BadRecord(id: String, componentId: String)
           val badRecord: BadRecord = BadRecord(id = "A", componentId = "A+B")
@@ -153,7 +153,7 @@ class WorkNodeDaoTest
 
   describe("Insert into dynamo") {
     it("puts a WorkNode") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { workNodeDao =>
           val work = WorkNode("A", 1, List("B"), "A+B")
           whenReady(workNodeDao.put(work)) { _ =>
@@ -166,7 +166,7 @@ class WorkNodeDaoTest
     }
 
     it("returns an error if putting to dynamo fails") {
-      withLocalDynamoDbTable { table =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED")
         when(dynamoDbClient.putItem(any[PutItemRequest]))
@@ -182,15 +182,14 @@ class WorkNodeDaoTest
         }
       }
     }
-  }
 
-  it("cannot be instantiated if dynamoConfig.maybeIndex is None") {
-    intercept[ConfigurationException] {
-      new WorkNodeDao(
-        dynamoDbClient = dynamoDbClient,
-        dynamoConfig = DynamoConfig(table = "something", maybeIndex = None)
-      )
+    it("cannot be instantiated if dynamoConfig.maybeIndex is None") {
+      intercept[ConfigurationException] {
+        new WorkNodeDao(
+          dynamoDbClient = dynamoDbClient,
+          dynamoConfig = DynamoConfig(table = "something", maybeIndex = None)
+        )
+      }
     }
   }
-
 }

@@ -43,6 +43,15 @@ trait LocalDynamoDb extends Eventually with ExtendedPatience {
     secretKey = secretKey
   )
 
+  def withSpecifiedLocalDynamoDbTable[R](
+    createTable: (AmazonDynamoDB) => Table): Fixture[Table, R] =
+    fixture[Table, R](
+      create = createTable(dynamoDbClient),
+      destroy = { _ =>
+        deleteAllTables()
+      }
+    )
+
   def withLocalDynamoDbTable[R]: Fixture[Table, R] = fixture[Table, R](
     create = {
       val tableName = Random.alphanumeric.take(10).mkString

@@ -4,3 +4,4 @@
 -aws.sns.topic.arn=${topic_arn}
 -aws.dynamo.tableName=${dynamo_table}
 -aws.dynamo.tableIndex=${dynamo_index}
+-aws.dynamo.locking.service.lockTableName=${dynamo_lock_table}
