@@ -92,3 +92,10 @@ resource "aws_iam_role_policy" "matcher_read_write_dynamo" {
   role   = "${module.matcher.task_role_name}"
   policy = "${data.aws_iam_policy_document.graph_table_read_write_policy.json}"
 }
+
+# Role policies for the Merger
+
+resource "aws_iam_role_policy" "merger_cloudwatch" {
+  role   = "${module.merger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
