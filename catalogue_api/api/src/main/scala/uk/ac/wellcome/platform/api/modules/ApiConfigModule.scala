@@ -1,8 +1,6 @@
 package uk.ac.wellcome.platform.api.modules
 
-import javax.inject.Singleton
-
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.platform.api.models.ApiConfig
 

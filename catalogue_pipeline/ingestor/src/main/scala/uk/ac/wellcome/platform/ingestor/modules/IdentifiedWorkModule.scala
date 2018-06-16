@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.ingestor.modules
 
-import javax.inject.Singleton
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
 import uk.ac.wellcome.storage.ObjectStore

@@ -2,9 +2,8 @@ package uk.ac.wellcome.platform.idminter.database
 
 import java.sql.SQLIntegrityConstraintViolationException
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import com.twitter.inject.Logging
-import javax.inject.Singleton
 import scalikejdbc._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.SourceIdentifier

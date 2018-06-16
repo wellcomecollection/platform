@@ -11,9 +11,8 @@ import com.amazonaws.auth.{
   DefaultAWSCredentialsProviderChain
 }
 import com.amazonaws.regions.AwsRegionProvider
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 
 object AkkaS3ClientModule extends TwitterModule {
   private val endpoint = flag[String](

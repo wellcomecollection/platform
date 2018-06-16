@@ -1,9 +1,8 @@
 package uk.ac.wellcome.finatra.storage
 
 import com.amazonaws.services.s3.AmazonS3
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 import uk.ac.wellcome.storage.s3.S3ClientFactory
 
 object S3ClientModule extends TwitterModule {

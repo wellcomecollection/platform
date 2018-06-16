@@ -1,8 +1,7 @@
 package uk.ac.wellcome.finatra.storage
 
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
-import javax.inject.Singleton
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 object DynamoConfigModule extends TwitterModule {

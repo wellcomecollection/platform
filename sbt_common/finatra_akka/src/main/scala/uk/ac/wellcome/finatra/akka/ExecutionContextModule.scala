@@ -1,8 +1,7 @@
 package uk.ac.wellcome.finatra.akka
 
-import javax.inject.Singleton
 import akka.actor.ActorSystem
-import com.google.inject.Provides
+import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.TwitterModule
 
 import scala.concurrent.ExecutionContext

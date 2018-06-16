@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.api.finatra.exceptions
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.inject.{Inject, Singleton}
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.exceptions.ExceptionMapper
 import com.twitter.finatra.http.response.ResponseBuilder
 import com.twitter.inject.Logging
-import javax.inject.{Inject, Singleton}
 
 import org.elasticsearch.client.ResponseException
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
