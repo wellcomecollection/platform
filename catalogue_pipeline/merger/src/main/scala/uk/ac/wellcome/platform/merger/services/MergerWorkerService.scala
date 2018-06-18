@@ -12,6 +12,7 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
+import cats.implicits._
 
 import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +37,7 @@ class MergerWorkerService @Inject()(
     } yield ()
 
 
-  private def getFromVHS(matcherResult: MatcherResult): Future[Option[Seq[RecorderWorkEntry]]] = {
+  private def getFromVHS(matcherResult: MatcherResult): Future[Option[List[RecorderWorkEntry]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
 
     // If we get an identifier with version 0 from the matcher, it means
@@ -49,16 +50,9 @@ class MergerWorkerService @Inject()(
 
     missingWorks.toSeq match {
       case Nil =>
-        val maybeWorksFromVHS: Future[Set[Option[RecorderWorkEntry]]] = Future.sequence(worksIdentifiers.map { workId => getRecorderEntryForIdentifier(workId) })
-        val res: Future[Option[Seq[RecorderWorkEntry]]] = maybeWorksFromVHS.map { workEntriesFromVHS: Set[Option[RecorderWorkEntry]] =>
-          workEntriesFromVHS.toSeq.partition( _.isEmpty) match {
-            case (Nil, maybeWorkEntries: Seq[Option[RecorderWorkEntry]]) => Some(maybeWorkEntries.flatten)
-            case _ =>
-              debug("At least one recorder work entry had the wrong version, so discarding")
-              None
-          }
-        }
-        res
+        for {
+          maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId => getRecorderEntryForIdentifier(workId) })
+        } yield maybeWorkEntries.toList.sequence
 
       case _ => Future.successful(None)
     }
@@ -79,10 +73,12 @@ class MergerWorkerService @Inject()(
   private def getRecorderEntryForIdentifier(workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
     vhs.getRecord(id = workIdentifier.identifier).map {
       case None => throw new RuntimeException(s"Work ${workIdentifier.identifier} is not in vhs!")
-      case Some(record: RecorderWorkEntry) =>
-        if (record.work.version == workIdentifier.version) { Some(record) } else {
-          debug(s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
-          None
+      case Some(record) =>
+        record.work.version match {
+          case workIdentifier.version => Some(record)
+          case _ =>
+            debug(s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
+            None
         }
     }
   }
