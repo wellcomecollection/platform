@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
-import org.mockito.Mockito
+import org.mockito.Mockito.{times, verify}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
@@ -89,7 +89,7 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
                listMessagesReceivedFromSNS(topic) shouldBe empty
-                Mockito.verify(metricsSender, Mockito.times(3)).incrementCount(org.mockito.Matchers.endsWith("_failure"))
+                verify(metricsSender, times(3)).incrementCount(org.mockito.Matchers.endsWith("_failure"))
               }
           }
         }
@@ -110,7 +110,7 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
         vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
       ))
 
-      val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1), WorkIdentifier(identifier = olderVersionRecorderWorkEntry.id, version = 1)))))
+      val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1), WorkIdentifier(identifier = olderVersionRecorderWorkEntry.id, version = olderVersionWork.version)))))
 
       val notificationMessage = NotificationMessage(
         MessageId = "MessageId",
@@ -130,8 +130,45 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
     }
         }
 
+  it("eats messages where some works have version 0") {
+    withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
+      val unidentifiedWork1 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 0)
+      val unidentifiedWork2 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
+      val unidentifiedWork3 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b678910"), version = 1)
+
+      val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
+      val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
+      val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
+
+      val entriesToStore = List(recorderWorkEntry2, recorderWorkEntry3)
+      val result = Future.sequence(entriesToStore.map { recorderWorkEntry =>
+        vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
+      })
+
+      val matchedIdentifiers1 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry1.id, version = 0), WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
+      val matchedIdentifiers2 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
+      val matcherResult = MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
+
+      val notificationMessage = NotificationMessage(
+        MessageId = "MessageId",
+        TopicArn = "topic-arn",
+        Subject = "subject",
+        Message = toJson(matcherResult).get
+      )
+      whenReady(result) { _ =>
+        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueEmpty(dlq)
+          listMessagesReceivedFromSNS(topic) shouldBe empty
+        }
+      }
+    }
+  }
+
   it("fails if the message sent is not a matcher result") {
-    withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq),_, _) =>
+    withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq),_, metricsSender) =>
           val testObject = TestObject("lallabalula")
       val notificationMessage = NotificationMessage(
         MessageId = "MessageId",
@@ -144,6 +181,7 @@ class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Ak
           eventually {
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, 1)
+            verify(metricsSender, times(3)).incrementCount(org.mockito.Matchers.endsWith("_gracefulFailure"))
           }
         }
   }
