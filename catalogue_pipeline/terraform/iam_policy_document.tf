@@ -65,6 +65,7 @@ data "aws_iam_policy_document" "lock_table_read_write_policy" {
       "dynamodb:UpdateItem",
       "dynamodb:PutItem",
       "dynamodb:GetItem",
+      "dynamodb:BatchWriteItem"
     ]
 
     resources = [
