@@ -70,7 +70,7 @@ from travistooling.decisions import (
     ('sierra_adapter/common/main.scala', 's3_demultiplexer-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 'sierra_window_generator-test', ScalaChangeAndNotScalaApp, False),
     ('sierra_adapter/common/main.scala', 'travistooling-test', ScalaChangeAndNotScalaApp, False),
-    ('sbt_common/elasticsearch/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
+    ('sbt_common/elasticsearch/model.scala', 'loris-test', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'loris-publish', ScalaChangeAndNotScalaApp, False),
     ('sbt_common/display/model.scala', 'travis-lambda-test', ScalaChangeAndNotScalaApp, False),
 
@@ -79,6 +79,12 @@ from travistooling.decisions import (
     ('sbt_common/display/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
+
+    # Changes to the elasticsearch lib don't affect all of the stacks
+    ('sbt_common/elasticsearch/model.scala', 'id_minter-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/elasticsearch/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/elasticsearch/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/elasticsearch/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
 
     # Changes to Scala test files trigger a -test Scala task, but not
     # a -publish task.
