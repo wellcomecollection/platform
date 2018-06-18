@@ -12,12 +12,17 @@ import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait Server extends CloudWatch with SQS with SNS with LocalVersionedHybridStore { this: Suite =>
+trait Server
+    extends CloudWatch
+    with SQS
+    with SNS
+    with LocalVersionedHybridStore { this: Suite =>
   def withServer[R](queue: Queue, topic: Topic, bucket: Bucket, table: Table)(
     testWith: TestWith[EmbeddedHttpServer, R]): R = {
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
-      flags = sqsLocalFlags(queue) ++ cloudWatchLocalFlags ++ snsLocalFlags(topic) ++ vhsLocalFlags(bucket, table)
+      flags = sqsLocalFlags(queue) ++ cloudWatchLocalFlags ++ snsLocalFlags(
+        topic) ++ vhsLocalFlags(bucket, table)
     )
 
     server.start()

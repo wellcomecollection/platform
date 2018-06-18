@@ -9,9 +9,17 @@ import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectStore
@@ -25,192 +33,315 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MergerWorkerServiceTest extends FunSpec with ScalaFutures with SQS with Akka with ExtendedPatience with MetricsSenderFixture with LocalVersionedHybridStore with SNS {
+class MergerWorkerServiceTest
+    extends FunSpec
+    with ScalaFutures
+    with SQS
+    with Akka
+    with ExtendedPatience
+    with MetricsSenderFixture
+    with LocalVersionedHybridStore
+    with SNS {
   case class TestObject(something: String)
 
-  it("reads matcher result messages, retrieves the works from vhs and sends them to sns") {
+  it(
+    "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
 
-          withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
-            val unidentifiedWork1 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
-            val unidentifiedWork2 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
-            val unidentifiedWork3 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b678910"), version = 1)
+    withMergerWorkerServiceFixtures {
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        val unidentifiedWork1 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b123456"),
+          version = 1)
+        val unidentifiedWork2 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b987654"),
+          version = 1)
+        val unidentifiedWork3 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b678910"),
+          version = 1)
 
-            val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
-            val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
-            val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
+        val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
+        val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
+        val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
 
-            val entries = List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3)
-            val result = Future.sequence(entries.map { recorderWorkEntry=>
-              vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
-            })
+        val entries =
+          List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3)
+        val result = Future.sequence(entries.map { recorderWorkEntry =>
+          vhs.updateRecord(recorderWorkEntry.id)(
+            ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+            throw new RuntimeException("Not possible, VHS is empty!"))
+        })
 
-            val matchedIdentifiers1 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry1.id, version = 1), WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
-            val matchedIdentifiers2 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
-            val matcherResult = MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
+        val matchedIdentifiers1 = MatchedIdentifiers(
+          Set(
+            WorkIdentifier(identifier = recorderWorkEntry1.id, version = 1),
+            WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
+        val matchedIdentifiers2 = MatchedIdentifiers(
+          Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
+        val matcherResult =
+          MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
 
-            val notificationMessage = NotificationMessage(
-              MessageId = "MessageId",
-              TopicArn = "topic-arn",
-              Subject = "subject",
-              Message = toJson(matcherResult).get
-            )
-            whenReady(result) { _ =>
-              sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+        val notificationMessage = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "topic-arn",
+          Subject = "subject",
+          Message = toJson(matcherResult).get
+        )
+        whenReady(result) { _ =>
+          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueEmpty(dlq)
-                val messagesSent = listMessagesReceivedFromSNS(topic)
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+            val messagesSent = listMessagesReceivedFromSNS(topic)
 
-                val worksSent = messagesSent.map {message => fromJson[UnidentifiedWork](message.message).get}
-                worksSent should contain theSameElementsAs List(unidentifiedWork1, unidentifiedWork2, unidentifiedWork3)
-              }
+            val worksSent = messagesSent.map { message =>
+              fromJson[UnidentifiedWork](message.message).get
             }
+            worksSent should contain theSameElementsAs List(
+              unidentifiedWork1,
+              unidentifiedWork2,
+              unidentifiedWork3)
           }
         }
+    }
+  }
 
   it("fails if the work is not in vhs") {
 
-          withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq), topic, metricsSender) =>
-            val unidentifiedWork = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
-            val recorderWorkEntry = RecorderWorkEntry(unidentifiedWork)
+    withMergerWorkerServiceFixtures {
+      case (_, QueuePair(queue, dlq), topic, metricsSender) =>
+        val unidentifiedWork = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b123456"),
+          version = 1)
+        val recorderWorkEntry = RecorderWorkEntry(unidentifiedWork)
 
-            val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1)))))
+        val matcherResult = MatcherResult(
+          Set(MatchedIdentifiers(Set(
+            WorkIdentifier(identifier = recorderWorkEntry.id, version = 1)))))
 
-            val notificationMessage = NotificationMessage(
-              MessageId = "MessageId",
-              TopicArn = "topic-arn",
-              Subject = "subject",
-              Message = toJson(matcherResult).get
-            )
-              sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+        val notificationMessage = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "topic-arn",
+          Subject = "subject",
+          Message = toJson(matcherResult).get
+        )
+        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-               listMessagesReceivedFromSNS(topic) shouldBe empty
-                verify(metricsSender, times(3)).incrementCount(org.mockito.Matchers.endsWith("_failure"))
-              }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+          listMessagesReceivedFromSNS(topic) shouldBe empty
+          verify(metricsSender, times(3))
+            .incrementCount(org.mockito.Matchers.endsWith("_failure"))
+        }
+    }
+  }
+
+  it(
+    "eats the message if one of the versions is older compared to the work in vhs") {
+
+    withMergerWorkerServiceFixtures {
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        val work = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b123456"),
+          version = 1)
+        val olderVersionWork = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b987654"),
+          version = 1)
+        val newerVersionWork = olderVersionWork.copy(version = 2)
+
+        val recorderWorkEntry = RecorderWorkEntry(work)
+        val olderVersionRecorderWorkEntry = RecorderWorkEntry(olderVersionWork)
+        val newerVersionRecorderWorkEntry = RecorderWorkEntry(newerVersionWork)
+
+        val entries = List(recorderWorkEntry, newerVersionRecorderWorkEntry)
+        val result = Future.sequence(
+          entries.map(recorderWorkEntry =>
+            vhs.updateRecord(recorderWorkEntry.id)(
+              ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+              throw new RuntimeException("Not possible, VHS is empty!"))))
+
+        val matcherResult = MatcherResult(
+          Set(MatchedIdentifiers(Set(
+            WorkIdentifier(identifier = recorderWorkEntry.id, version = 1),
+            WorkIdentifier(
+              identifier = olderVersionRecorderWorkEntry.id,
+              version = olderVersionWork.version)
+          ))))
+
+        val notificationMessage = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "topic-arn",
+          Subject = "subject",
+          Message = toJson(matcherResult).get
+        )
+        whenReady(result) { _ =>
+          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+            listMessagesReceivedFromSNS(topic) shouldBe empty
           }
         }
-
-  it("eats the message if one of the versions is older compared to the work in vhs") {
-
-    withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
-      val work = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 1)
-      val olderVersionWork = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
-      val newerVersionWork = olderVersionWork.copy(version =2)
-
-      val recorderWorkEntry = RecorderWorkEntry(work)
-      val olderVersionRecorderWorkEntry = RecorderWorkEntry(olderVersionWork)
-      val newerVersionRecorderWorkEntry = RecorderWorkEntry(newerVersionWork)
-
-      val entries = List(recorderWorkEntry, newerVersionRecorderWorkEntry)
-      val result = Future.sequence(entries.map( recorderWorkEntry =>
-        vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
-      ))
-
-      val matcherResult = MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry.id, version = 1), WorkIdentifier(identifier = olderVersionRecorderWorkEntry.id, version = olderVersionWork.version)))))
-
-      val notificationMessage = NotificationMessage(
-        MessageId = "MessageId",
-        TopicArn = "topic-arn",
-        Subject = "subject",
-        Message = toJson(matcherResult).get
-      )
-      whenReady(result) { _ =>
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
-
-        eventually {
-          assertQueueEmpty(queue)
-          assertQueueEmpty(dlq)
-          listMessagesReceivedFromSNS(topic) shouldBe empty
-        }
-      }
     }
-        }
+  }
 
   it("eats messages where some works have version 0") {
-    withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, _) =>
-      val unidentifiedWork1 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b123456"), version = 0)
-      val unidentifiedWork2 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b987654"), version = 1)
-      val unidentifiedWork3 = UnidentifiedWork(title = Some("dfmsng"), SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b678910"), version = 1)
+    withMergerWorkerServiceFixtures {
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        val unidentifiedWork1 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b123456"),
+          version = 0)
+        val unidentifiedWork2 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b987654"),
+          version = 1)
+        val unidentifiedWork3 = UnidentifiedWork(
+          title = Some("dfmsng"),
+          SourceIdentifier(
+            IdentifierType("sierra-system-number"),
+            "Work",
+            "b678910"),
+          version = 1)
 
-      val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
-      val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
-      val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
+        val recorderWorkEntry1 = RecorderWorkEntry(unidentifiedWork1)
+        val recorderWorkEntry2 = RecorderWorkEntry(unidentifiedWork2)
+        val recorderWorkEntry3 = RecorderWorkEntry(unidentifiedWork3)
 
-      val entriesToStore = List(recorderWorkEntry2, recorderWorkEntry3)
-      val result = Future.sequence(entriesToStore.map { recorderWorkEntry =>
-        vhs.updateRecord(recorderWorkEntry.id)(ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) => throw new RuntimeException("Not possible, VHS is empty!"))
-      })
+        val entriesToStore = List(recorderWorkEntry2, recorderWorkEntry3)
+        val result = Future.sequence(entriesToStore.map { recorderWorkEntry =>
+          vhs.updateRecord(recorderWorkEntry.id)(
+            ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+            throw new RuntimeException("Not possible, VHS is empty!"))
+        })
 
-      val matchedIdentifiers1 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry1.id, version = 0), WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
-      val matchedIdentifiers2 = MatchedIdentifiers(Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
-      val matcherResult = MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
+        val matchedIdentifiers1 = MatchedIdentifiers(
+          Set(
+            WorkIdentifier(identifier = recorderWorkEntry1.id, version = 0),
+            WorkIdentifier(identifier = recorderWorkEntry2.id, version = 1)))
+        val matchedIdentifiers2 = MatchedIdentifiers(
+          Set(WorkIdentifier(identifier = recorderWorkEntry3.id, version = 1)))
+        val matcherResult =
+          MatcherResult(Set(matchedIdentifiers1, matchedIdentifiers2))
 
-      val notificationMessage = NotificationMessage(
-        MessageId = "MessageId",
-        TopicArn = "topic-arn",
-        Subject = "subject",
-        Message = toJson(matcherResult).get
-      )
-      whenReady(result) { _ =>
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+        val notificationMessage = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "topic-arn",
+          Subject = "subject",
+          Message = toJson(matcherResult).get
+        )
+        whenReady(result) { _ =>
+          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
-        eventually {
-          assertQueueEmpty(queue)
-          assertQueueEmpty(dlq)
-          listMessagesReceivedFromSNS(topic) shouldBe empty
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+            listMessagesReceivedFromSNS(topic) shouldBe empty
+          }
         }
-      }
     }
   }
 
   it("fails if the message sent is not a matcher result") {
-    withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq),_, metricsSender) =>
-          val testObject = TestObject("lallabalula")
-      val notificationMessage = NotificationMessage(
-        MessageId = "MessageId",
-        TopicArn = "topic-arn",
-        Subject = "subject",
-        Message = toJson(testObject).get
-      )
-      sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+    withMergerWorkerServiceFixtures {
+      case (_, QueuePair(queue, dlq), _, metricsSender) =>
+        val testObject = TestObject("lallabalula")
+        val notificationMessage = NotificationMessage(
+          MessageId = "MessageId",
+          TopicArn = "topic-arn",
+          Subject = "subject",
+          Message = toJson(testObject).get
+        )
+        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-            verify(metricsSender, times(3)).incrementCount(org.mockito.Matchers.endsWith("_gracefulFailure"))
-          }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+          verify(metricsSender, times(3))
+            .incrementCount(org.mockito.Matchers.endsWith("_gracefulFailure"))
         }
+    }
   }
 
-  def withMergerWorkerServiceFixtures[R](testWith: TestWith[(VersionedHybridStore[RecorderWorkEntry, EmptyMetadata, ObjectStore[RecorderWorkEntry]], QueuePair, Topic, MetricsSender), R]): R = {
+  def withMergerWorkerServiceFixtures[R](
+    testWith: TestWith[(VersionedHybridStore[RecorderWorkEntry,
+                                             EmptyMetadata,
+                                             ObjectStore[RecorderWorkEntry]],
+                        QueuePair,
+                        Topic,
+                        MetricsSender),
+                       R]): R = {
     withLocalS3Bucket { bucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](bucket, table) { vhs =>
-          withActorSystem { actorSystem =>
-            withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
-              withLocalSnsTopic { topic =>
-                withMockMetricSender { metricsSender =>
-                  withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-                    withSNSWriter(topic) { snsWriter =>
-                      withMergerWorkerService(actorSystem, sqsStream, vhs, snsWriter) { _ =>
-                        testWith((vhs, queuePair, topic, metricsSender))
+        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](bucket, table) {
+          vhs =>
+            withActorSystem { actorSystem =>
+              withLocalSqsQueueAndDlq {
+                case queuePair @ QueuePair(queue, dlq) =>
+                  withLocalSnsTopic { topic =>
+                    withMockMetricSender { metricsSender =>
+                      withSQSStream[NotificationMessage, R](
+                        actorSystem,
+                        queue,
+                        metricsSender) { sqsStream =>
+                        withSNSWriter(topic) { snsWriter =>
+                          withMergerWorkerService(
+                            actorSystem,
+                            sqsStream,
+                            vhs,
+                            snsWriter) { _ =>
+                            testWith((vhs, queuePair, topic, metricsSender))
+                          }
+                        }
                       }
                     }
                   }
-                }
               }
             }
-          }
         }
       }
     }
   }
 
-  def withMergerWorkerService[R](actorSystem:ActorSystem, sqsStream: SQSStream[NotificationMessage], vhs: VersionedHybridStore[RecorderWorkEntry, EmptyMetadata, ObjectStore[RecorderWorkEntry]], snsWriter: SNSWriter)(testWith: TestWith[MergerWorkerService, R]) = {
+  def withMergerWorkerService[R](
+    actorSystem: ActorSystem,
+    sqsStream: SQSStream[NotificationMessage],
+    vhs: VersionedHybridStore[RecorderWorkEntry,
+                              EmptyMetadata,
+                              ObjectStore[RecorderWorkEntry]],
+    snsWriter: SNSWriter)(testWith: TestWith[MergerWorkerService, R]) = {
     testWith(new MergerWorkerService(actorSystem, sqsStream, vhs, snsWriter))
   }
 }

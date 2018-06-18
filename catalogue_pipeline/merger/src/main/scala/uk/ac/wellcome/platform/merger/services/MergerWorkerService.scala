@@ -18,17 +18,20 @@ import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
 
 class MergerWorkerService @Inject()(
-                                     system: ActorSystem,
-                                     sqsStream: SQSStream[NotificationMessage],
-                                     vhs: VersionedHybridStore[RecorderWorkEntry, EmptyMetadata, ObjectStore[RecorderWorkEntry]],
-                                     SNSWriter: SNSWriter
-)(implicit context: ExecutionContext) extends Logging{
+  system: ActorSystem,
+  sqsStream: SQSStream[NotificationMessage],
+  vhs: VersionedHybridStore[RecorderWorkEntry,
+                            EmptyMetadata,
+                            ObjectStore[RecorderWorkEntry]],
+  SNSWriter: SNSWriter
+)(implicit context: ExecutionContext)
+    extends Logging {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      matcherResult <-Future.fromTry(fromJson[MatcherResult] (message.Message))
+      matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
       maybeWorkEntries <- getFromVHS(matcherResult)
       maybeWorks = maybeWorkEntries.map { workEntries =>
         workEntries.map { _.work }
@@ -36,8 +39,8 @@ class MergerWorkerService @Inject()(
       _ <- sendWorks(maybeWorks)
     } yield ()
 
-
-  private def getFromVHS(matcherResult: MatcherResult): Future[Option[List[RecorderWorkEntry]]] = {
+  private def getFromVHS(
+    matcherResult: MatcherResult): Future[Option[List[RecorderWorkEntry]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
 
     // If we get an identifier with version 0 from the matcher, it means
@@ -51,14 +54,17 @@ class MergerWorkerService @Inject()(
     missingWorks.toSeq match {
       case Nil =>
         for {
-          maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId => getRecorderEntryForIdentifier(workId) })
+          maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId =>
+            getRecorderEntryForIdentifier(workId)
+          })
         } yield maybeWorkEntries.toList.sequence
 
       case _ => Future.successful(None)
     }
   }
 
-  private def getWorksIdentifiers(matcherResult: MatcherResult): Set[WorkIdentifier] = {
+  private def getWorksIdentifiers(
+    matcherResult: MatcherResult): Set[WorkIdentifier] = {
     for {
       matchedIdentifiers <- matcherResult.works
       workIdentifier <- matchedIdentifiers.identifiers
@@ -70,14 +76,18 @@ class MergerWorkerService @Inject()(
   //    - returns Some[RecorderWorkEntry] if the entry is in VHS and the correct version
   //    - returns None if the entry is in VHS and the wrong version
   //
-  private def getRecorderEntryForIdentifier(workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
+  private def getRecorderEntryForIdentifier(
+    workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
     vhs.getRecord(id = workIdentifier.identifier).map {
-      case None => throw new RuntimeException(s"Work ${workIdentifier.identifier} is not in vhs!")
+      case None =>
+        throw new RuntimeException(
+          s"Work ${workIdentifier.identifier} is not in vhs!")
       case Some(record) =>
         record.work.version match {
           case workIdentifier.version => Some(record)
           case _ =>
-            debug(s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
+            debug(
+              s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
             None
         }
     }
@@ -86,7 +96,10 @@ class MergerWorkerService @Inject()(
   private def sendWorks(maybeWorks: Option[Seq[UnidentifiedWork]]) = {
     maybeWorks match {
       case Some(works) =>
-        Future.sequence(works.map(work => SNSWriter.writeMessage(toJson(work).get, "merged-work"))).map (_ => ())
+        Future
+          .sequence(works.map(work =>
+            SNSWriter.writeMessage(toJson(work).get, "merged-work")))
+          .map(_ => ())
       case None => Future.successful(())
     }
 
