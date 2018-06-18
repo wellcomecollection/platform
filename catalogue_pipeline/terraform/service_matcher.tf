@@ -12,12 +12,14 @@ module "matcher" {
     vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
     topic_arn         = "${module.linked_works_topic.arn}"
     dynamo_table      = "${aws_dynamodb_table.matcher_graph_table.id}"
-    dynamo_index      = "${var.matcher_table_index}"
+    dynamo_index      = "${var.matcher_graph_table_index}"
+    dynamo_lock_table = "${aws_dynamodb_table.matcher_lock_table.id}"
+    dynamo_lock_table_index ="${var.matcher_lock_table_index}"
     metrics_namespace = "matcher"
     log_level         = "DEBUG"
   }
 
-  env_vars_length = 7
+  env_vars_length = 9
 
   memory = 2048
   cpu    = 512

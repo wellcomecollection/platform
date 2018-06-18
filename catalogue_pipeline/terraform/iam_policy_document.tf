@@ -58,3 +58,27 @@ data "aws_iam_policy_document" "graph_table_read_write_policy" {
     ]
   }
 }
+
+data "aws_iam_policy_document" "lock_table_read_write_policy" {
+  statement {
+    actions = [
+      "dynamodb:UpdateItem",
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_lock_table.arn}",
+    ]
+  }
+
+  statement {
+    actions = [
+      "dynamodb:Query",
+    ]
+
+    resources = [
+      "${aws_dynamodb_table.matcher_lock_table.arn}/index/*",
+    ]
+  }
+}

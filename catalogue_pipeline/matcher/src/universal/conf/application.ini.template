@@ -5,3 +5,4 @@
 -aws.dynamo.tableName=${dynamo_table}
 -aws.dynamo.tableIndex=${dynamo_index}
 -aws.dynamo.locking.service.lockTableName=${dynamo_lock_table}
+-aws.dynamo.locking.service.lockTableIndexName=${dynamo_lock_table_index}

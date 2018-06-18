@@ -88,9 +88,14 @@ resource "aws_iam_role_policy" "matcher_task_sns" {
   policy = "${module.linked_works_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "matcher_read_write_dynamo" {
+resource "aws_iam_role_policy" "matcher_read_write_graph_dynamo" {
   role   = "${module.matcher.task_role_name}"
   policy = "${data.aws_iam_policy_document.graph_table_read_write_policy.json}"
+}
+
+resource "aws_iam_role_policy" "matcher_read_write_lock_dynamo" {
+  role   = "${module.matcher.task_role_name}"
+  policy = "${data.aws_iam_policy_document.lock_table_read_write_policy.json}"
 }
 
 # Role policies for the Merger
