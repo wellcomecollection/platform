@@ -28,9 +28,8 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <-Future.fromTry(fromJson[MatcherResult] (message.Message))
-      workIdentifiers = getWorksIdentifiers(matcherResult)
-      maybeRecorderWorkEntries <- getFromVHS(workIdentifiers)
-      works = worksToSend(workIdentifiers, maybeRecorderWorkEntries)
+      maybeRecorderWorkEntries <- getFromVHS(matcherResult)
+      works = worksToSend(matcherResult, maybeRecorderWorkEntries)
       _ <- sendWorks(works)
     } yield ()
 
@@ -41,11 +40,13 @@ class MergerWorkerService @Inject()(
     } yield workIdentifier
   }
 
-  private def getFromVHS(workIdentifiers: Set[WorkIdentifier]): Future[Set[(WorkIdentifier, Option[RecorderWorkEntry])]] = {
-    Future.sequence(workIdentifiers.map(workIdentifier => vhs.getRecord(workIdentifier.identifier).map((workIdentifier, _))))
+  private def getFromVHS(matcherResult: MatcherResult): Future[Set[(WorkIdentifier, Option[RecorderWorkEntry])]] = {
+    val worksIdentifiers = getWorksIdentifiers(matcherResult)
+    Future.sequence(worksIdentifiers.map(workIdentifier => vhs.getRecord(workIdentifier.identifier).map((workIdentifier, _))))
   }
 
-  private def worksToSend(worksIdentifiers: Set[WorkIdentifier], maybeRecorderWorkEntries: Set[(WorkIdentifier, Option[RecorderWorkEntry])]): Option[Set[UnidentifiedWork]] = {
+  private def worksToSend(matcherResult: MatcherResult, maybeRecorderWorkEntries: Set[(WorkIdentifier, Option[RecorderWorkEntry])]): Option[Set[UnidentifiedWork]] = {
+    val worksIdentifiers = getWorksIdentifiers(matcherResult)
     val receivedIdVersionSet = worksIdentifiers.map{ workIdentifier => (workIdentifier.identifier, workIdentifier.version)}
 
     val receivedWorksWithZeroId = worksIdentifiers.filter { _.version == 0 }
