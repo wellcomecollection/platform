@@ -28,54 +28,73 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <-Future.fromTry(fromJson[MatcherResult] (message.Message))
-      maybeRecorderWorkEntries <- getFromVHS(matcherResult)
-      works = worksToSend(matcherResult, maybeRecorderWorkEntries)
-      _ <- sendWorks(works)
+      maybeWorkEntries <- getFromVHS(matcherResult)
+      maybeWorks = maybeWorkEntries.map { workEntries =>
+        workEntries.map { _.work }
+      }
+      _ <- sendWorks(maybeWorks)
     } yield ()
 
-  private def getWorksIdentifiers(matcherResult: MatcherResult) = {
+
+  private def getFromVHS(matcherResult: MatcherResult): Future[Option[Seq[RecorderWorkEntry]]] = {
+    val worksIdentifiers = getWorksIdentifiers(matcherResult)
+
+    // If we get an identifier with version 0 from the matcher, it means
+    // we know the work exists but it hasn't been seen in the pipeline yet.
+    //
+    // In that case, we have to discard the message because we don't have
+    // enough to do a complete merge -- we'll do it when the work appears.
+    //
+    val missingWorks = worksIdentifiers.filter { _.version == 0 }
+
+    missingWorks.toSeq match {
+      case Nil =>
+        val maybeWorksFromVHS: Future[Set[Option[RecorderWorkEntry]]] = Future.sequence(worksIdentifiers.map { workId => getRecorderEntryForIdentifier(workId) })
+        val res: Future[Option[Seq[RecorderWorkEntry]]] = maybeWorksFromVHS.map { workEntriesFromVHS: Set[Option[RecorderWorkEntry]] =>
+          workEntriesFromVHS.toSeq.partition( _.isEmpty) match {
+            case (Nil, maybeWorkEntries: Seq[Option[RecorderWorkEntry]]) => Some(maybeWorkEntries.flatten)
+            case _ =>
+              debug("At least one recorder work entry had the wrong version, so discarding")
+              None
+          }
+        }
+        res
+
+      case _ => Future.successful(None)
+    }
+  }
+
+  private def getWorksIdentifiers(matcherResult: MatcherResult): Set[WorkIdentifier] = {
     for {
       matchedIdentifiers <- matcherResult.works
       workIdentifier <- matchedIdentifiers.identifiers
     } yield workIdentifier
   }
 
-  private def getFromVHS(matcherResult: MatcherResult): Future[Set[(WorkIdentifier, Option[RecorderWorkEntry])]] = {
-    val worksIdentifiers = getWorksIdentifiers(matcherResult)
-    Future.sequence(worksIdentifiers.map(workIdentifier => vhs.getRecord(workIdentifier.identifier).map((workIdentifier, _))))
-  }
-
-  private def worksToSend(matcherResult: MatcherResult, maybeRecorderWorkEntries: Set[(WorkIdentifier, Option[RecorderWorkEntry])]): Option[Set[UnidentifiedWork]] = {
-    val worksIdentifiers = getWorksIdentifiers(matcherResult)
-    val receivedIdVersionSet = worksIdentifiers.map{ workIdentifier => (workIdentifier.identifier, workIdentifier.version)}
-
-    val receivedWorksWithZeroId = worksIdentifiers.filter { _.version == 0 }
-
-    receivedWorksWithZeroId.toSeq match {
-      case Nil => {
-        val vhsIdToWorkSet = maybeRecorderWorkEntries.map { case (identifier, maybeRecorderWorkEntry) =>
-          (identifier.identifier, maybeRecorderWorkEntry.getOrElse(throw new RuntimeException(s"Work $identifier is not in vhs!")).work)
+  // This function wraps fetching a record from VHS.  It:
+  //
+  //    - returns Some[RecorderWorkEntry] if the entry is in VHS and the correct version
+  //    - returns None if the entry is in VHS and the wrong version
+  //
+  private def getRecorderEntryForIdentifier(workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
+    vhs.getRecord(id = workIdentifier.identifier).map {
+      case None => throw new RuntimeException(s"Work ${workIdentifier.identifier} is not in vhs!")
+      case Some(record: RecorderWorkEntry) =>
+        if (record.work.version == workIdentifier.version) { Some(record) } else {
+          debug(s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
+          None
         }
-        val vhsIdToVersionSet = vhsIdToWorkSet.map{case (id, work) => (id, work.version)}
-        (receivedIdVersionSet diff vhsIdToVersionSet).toSeq match {
-          case Nil => Some(vhsIdToWorkSet.map{case (_, work) => work})
-          case _ =>
-            debug(" Different versions in vhs: discarding message")
-            None
-        }
-      }
-      case _ => None
     }
   }
 
-  private def sendWorks(maybeWorks: Option[Set[UnidentifiedWork]]) = {
+  private def sendWorks(maybeWorks: Option[Seq[UnidentifiedWork]]) = {
     maybeWorks match {
-      case Some(works) => Future.sequence(works.map(work => SNSWriter.writeMessage(toJson(work).get, "merged-work"))).map (_ => ())
+      case Some(works) =>
+        Future.sequence(works.map(work => SNSWriter.writeMessage(toJson(work).get, "merged-work"))).map (_ => ())
       case None => Future.successful(())
     }
 
   }
-
 
   def stop() = system.terminate()
 }
