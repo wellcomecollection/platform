@@ -63,6 +63,17 @@ class MergerWorkerService @Inject()(
     }
   }
 
+  private def sendWorks(maybeWorks: Option[Seq[UnidentifiedWork]]) = {
+    maybeWorks match {
+      case Some(works) =>
+        Future
+          .sequence(works.map(work =>
+            SNSWriter.writeMessage(toJson(work).get, "merged-work")))
+          .map(_ => ())
+      case None => Future.successful(())
+    }
+  }
+
   private def getWorksIdentifiers(
     matcherResult: MatcherResult): Set[WorkIdentifier] = {
     for {
@@ -82,28 +93,13 @@ class MergerWorkerService @Inject()(
       case None =>
         throw new RuntimeException(
           s"Work ${workIdentifier.identifier} is not in vhs!")
+      case Some(record) if record.work.version == workIdentifier.version => Some(record)
       case Some(record) =>
-        record.work.version match {
-          case workIdentifier.version => Some(record)
-          case _ =>
             debug(
               s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
             None
         }
     }
-  }
-
-  private def sendWorks(maybeWorks: Option[Seq[UnidentifiedWork]]) = {
-    maybeWorks match {
-      case Some(works) =>
-        Future
-          .sequence(works.map(work =>
-            SNSWriter.writeMessage(toJson(work).get, "merged-work")))
-          .map(_ => ())
-      case None => Future.successful(())
-    }
-
-  }
 
   def stop() = system.terminate()
 }
