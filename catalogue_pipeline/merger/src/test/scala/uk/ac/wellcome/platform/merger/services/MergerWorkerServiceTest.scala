@@ -31,7 +31,8 @@ class MergerWorkerServiceTest
     with ExtendedPatience
     with MetricsSenderFixture
     with LocalVersionedHybridStore
-    with SNS with MergerTestUtils{
+    with SNS
+    with MergerTestUtils {
   case class TestObject(something: String)
 
   it(
@@ -39,30 +40,39 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry1 = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+        val recorderWorkEntry1 =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
 
-        val recorderWorkEntry2 = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+        val recorderWorkEntry2 =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
 
-        val recorderWorkEntry3 = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b678910", 1)
+        val recorderWorkEntry3 =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b678910", 1)
 
-        val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry3), Set(recorderWorkEntry1, recorderWorkEntry2)))
+        val matcherResult = matcherResultWith(
+          Set(
+            Set(recorderWorkEntry3),
+            Set(recorderWorkEntry1, recorderWorkEntry2)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) { _ =>
-          sendSQSMessage(queue, matcherResult)
+        whenReady(storeInVHS(
+          vhs,
+          List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) {
+          _ =>
+            sendSQSMessage(queue, matcherResult)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
-            val messagesSent = listMessagesReceivedFromSNS(topic)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
+              val messagesSent = listMessagesReceivedFromSNS(topic)
 
-            val worksSent = messagesSent.map { message =>
-              fromJson[UnidentifiedWork](message.message).get
+              val worksSent = messagesSent.map { message =>
+                fromJson[UnidentifiedWork](message.message).get
+              }
+              worksSent should contain theSameElementsAs List(
+                recorderWorkEntry1.work,
+                recorderWorkEntry2.work,
+                recorderWorkEntry3.work)
             }
-            worksSent should contain theSameElementsAs List(
-              recorderWorkEntry1.work,
-              recorderWorkEntry2.work,
-              recorderWorkEntry3.work)
-          }
         }
     }
   }
@@ -71,7 +81,8 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), topic, metricsSender) =>
-        val recorderWorkEntry: RecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+        val recorderWorkEntry: RecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
@@ -92,13 +103,20 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry: RecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
-        val olderVersionRecorderWorkEntry: RecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
-        val newerVersionRecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 2)
+        val recorderWorkEntry: RecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+        val olderVersionRecorderWorkEntry: RecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+        val newerVersionRecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 2)
 
-        val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
+        val matcherResult = matcherResultWith(
+          Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry, newerVersionRecorderWorkEntry))) { _ =>
+        whenReady(
+          storeInVHS(
+            vhs,
+            List(recorderWorkEntry, newerVersionRecorderWorkEntry))) { _ =>
           sendSQSMessage(queue, matcherResult)
 
           eventually {
@@ -113,10 +131,13 @@ class MergerWorkerServiceTest
   it("eats messages where some works have version 0") {
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val versionZeroWork: RecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 0)
-        val recorderWorkEntry: RecorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+        val versionZeroWork: RecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 0)
+        val recorderWorkEntry: RecorderWorkEntry =
+          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
 
-        val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
+        val matcherResult =
+          matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
 
         whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
           sendSQSMessage(queue, matcherResult)

@@ -19,7 +19,8 @@ class MergerFeatureTest
     with fixtures.Server
     with ExtendedPatience
     with LocalVersionedHybridStore
-    with ScalaFutures with MergerTestUtils {
+    with ScalaFutures
+    with MergerTestUtils {
 
   it("reads matcher result messages off a queue and deletes them") {
     withLocalSnsTopic { topic =>
@@ -31,10 +32,15 @@ class MergerFeatureTest
             withLocalSqsQueueAndDlq {
               case QueuePair(queue, dlq) =>
                 withServer(queue, topic, bucket, table) { _ =>
-                  val recorderWorkEntry = recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456" , 1)
+                  val recorderWorkEntry = recorderWorkEntryWith(
+                    "dfmsng",
+                    "sierra-system-number",
+                    "b123456",
+                    1)
 
                   whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
-                    val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
+                    val matcherResult =
+                      matcherResultWith(Set(Set(recorderWorkEntry)))
 
                     sendSQSMessage(queue, matcherResult)
 

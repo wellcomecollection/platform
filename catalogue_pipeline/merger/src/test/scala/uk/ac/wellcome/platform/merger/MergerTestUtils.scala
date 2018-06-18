@@ -2,9 +2,17 @@ package uk.ac.wellcome.platform.merger
 
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -13,13 +21,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-trait MergerTestUtils {this: SQS =>
+trait MergerTestUtils { this: SQS =>
 
-  def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) = MatcherResult(matchedEntries.map(recorderWorkEntries =>
-    MatchedIdentifiers(recorderWorkEntries.map(workEntry =>
-      WorkIdentifier(identifier = workEntry.id, version = workEntry.work.version)
-    ))
-  ))
+  def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
+    MatcherResult(
+      matchedEntries.map(
+        recorderWorkEntries =>
+          MatchedIdentifiers(
+            recorderWorkEntries.map(workEntry =>
+              WorkIdentifier(
+                identifier = workEntry.id,
+                version = workEntry.work.version)))))
 
   def sendSQSMessage(queue: SQS.Queue, matcherResult: MatcherResult) = {
     val notificationMessage = NotificationMessage(
@@ -31,7 +43,10 @@ trait MergerTestUtils {this: SQS =>
     sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
   }
 
-  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry, EmptyMetadata, ObjectStore[RecorderWorkEntry]], entries: List[RecorderWorkEntry]) = {
+  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
+                                           EmptyMetadata,
+                                           ObjectStore[RecorderWorkEntry]],
+                 entries: List[RecorderWorkEntry]) = {
     Future.sequence(entries.map { recorderWorkEntry =>
       vhs.updateRecord(recorderWorkEntry.id)(
         ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
@@ -39,14 +54,15 @@ trait MergerTestUtils {this: SQS =>
     })
   }
 
-  def recorderWorkEntryWith(title: String, identifierType: String, sourceId: String, version: Int) = {
-    val recorderWorkEntry1 = RecorderWorkEntry(UnidentifiedWork(
-      title = Some(title),
-      SourceIdentifier(
-        IdentifierType(identifierType),
-        "Work",
-        sourceId),
-      version = version))
+  def recorderWorkEntryWith(title: String,
+                            identifierType: String,
+                            sourceId: String,
+                            version: Int) = {
+    val recorderWorkEntry1 = RecorderWorkEntry(
+      UnidentifiedWork(
+        title = Some(title),
+        SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
+        version = version))
     recorderWorkEntry1
   }
 }

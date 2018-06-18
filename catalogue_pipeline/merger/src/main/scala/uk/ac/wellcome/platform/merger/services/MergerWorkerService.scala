@@ -93,13 +93,14 @@ class MergerWorkerService @Inject()(
       case None =>
         throw new RuntimeException(
           s"Work ${workIdentifier.identifier} is not in vhs!")
-      case Some(record) if record.work.version == workIdentifier.version => Some(record)
+      case Some(record) if record.work.version == workIdentifier.version =>
+        Some(record)
       case Some(record) =>
-            debug(
-              s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
-            None
-        }
+        debug(
+          s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
+        None
     }
+  }
 
   def stop() = system.terminate()
 }
