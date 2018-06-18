@@ -1,5 +1,5 @@
 module "id_minter" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
   name   = "id_minter"
 
   source_queue_name  = "${module.id_minter_queue.name}"
@@ -20,8 +20,6 @@ module "id_minter" {
 
   memory = 2048
   cpu    = 512
-
-  env_vars_length = 8
 
   cluster_name = "${module.catalogue_pipeline_cluster.cluster_name}"
   vpc_id       = "${module.vpc_services.vpc_id}"

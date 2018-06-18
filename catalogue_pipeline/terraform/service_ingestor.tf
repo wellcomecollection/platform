@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
   name   = "ingestor"
 
   source_queue_name  = "${module.es_ingest_queue.name}"
@@ -32,8 +32,6 @@ module "ingestor" {
 
   memory = "2048"
   cpu    = "512"
-
-  env_vars_length = 12
 
   alb_priority = 107
 

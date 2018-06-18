@@ -1,5 +1,5 @@
 module "transformer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
   name   = "transformer"
 
   memory = "2560"
@@ -17,8 +17,6 @@ module "transformer" {
     storage_bucket_name  = "${module.vhs_sourcedata.bucket_name}"
     message_bucket_name  = "${aws_s3_bucket.messages.id}"
   }
-
-  env_vars_length = 5
 
   alb_priority = "108"
 
