@@ -10,8 +10,8 @@ RUN pip install flask flask_restful numpy pandas scipy
 
 WORKDIR /app
 
-COPY app.py  /app/app.py 
-COPY utils.py /app/utils.py
+COPY app/app.py  /app/app.py 
+COPY app/utils.py /app/utils.py
 COPY data /app/data
 
 EXPOSE 5000
