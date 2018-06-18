@@ -148,3 +148,31 @@ if __name__ == '__main__':
         count=count,
         table_name=table_name
     )
+
+    # Trigger an immediate capacity increase on the DynamoDB table.
+    #
+    # If we just start the reindexer, the autoscaling will eventually warm up
+    # the table, but only after hitting lots of ProvisionedThroughputExceeded
+    # exceptions.  This should give a smoother start to the reindexer.
+    #
+    # Note: this does not disable the autoscaling rules, and if you run this
+    # without starting the reindexer, it eventually scales back down.
+    #
+    client.update_table(
+        TableName='SourceData',
+        ProvisionedThroughput={
+            'WriteCapacityUnits': 50,
+            'ReadCapacityUnits': 5
+        },
+        GlobalSecondaryIndexUpdates=[
+            {
+                'Update': {
+                    'IndexName': 'reindexTracker',
+                    'ProvisionedThroughput': {
+                        'WriteCapacityUnits': 50,
+                        'ReadCapacityUnits': 5
+                    }
+                }
+            }
+        ]
+    )
