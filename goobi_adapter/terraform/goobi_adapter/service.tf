@@ -3,7 +3,7 @@ locals {
 }
 
 module "goobi_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
   name   = "${local.service_name}"
 
   ecr_repository_url = "${var.ecr_repository_url}"
@@ -18,8 +18,6 @@ module "goobi_reader_service" {
     vhs_goobi_tablename  = "${var.vhs_goobi_tablename}"
     vhs_goobi_bucketname = "${var.vhs_goobi_bucketname}"
   }
-
-  env_vars_length = 4
 
   cpu    = 512
   memory = 2048
