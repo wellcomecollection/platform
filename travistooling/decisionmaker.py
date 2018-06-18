@@ -109,6 +109,7 @@ def does_file_affect_build_task(path, task):
     # following stacks:
     #
     #   - catalogue_pipeline
+    #   - reindexer
     #   - goobi_adapter
     #   - sierra_adapter
     #
@@ -117,10 +118,33 @@ def does_file_affect_build_task(path, task):
             if task.startswith(project.name) and (project.type == 'sbt_app'):
                 if project.exclusive_path.startswith((
                     'catalogue_pipeline/',
+                    'reindexer/',
                     'goobi_adapter/',
                     'sierra_adapter/',
                 )):
                     raise ChangeToUnusedLibrary('display')
+
+    # We have a library for elasticsearch code.
+    #
+    # Not every application uses these display models -- in particular,
+    # quite a bit of the pipeline, and some of the adapters.  So a change
+    # to the elasticsearch code can safely be ignored.
+    #
+    if path.startswith(('sbt_common/elasticsearch', 'sbt_common/finatra_elasticsearch')):
+        for project in PROJECTS:
+            print(project)
+            if task.startswith(project.name) and (project.type == 'sbt_app'):
+                if project.exclusive_path.startswith((
+                    'catalogue_pipeline/id_minter',
+                    'catalogue_pipeline/matcher',
+                    'catalogue_pipeline/merger',
+                    'catalogue_pipeline/recorder',
+                    'catalogue_pipeline/relater',
+                    'reindexer/',
+                    'goobi_adapter/',
+                    'sierra_adapter/',
+                )):
+                    raise ChangeToUnusedLibrary('elasticsearch')
 
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
