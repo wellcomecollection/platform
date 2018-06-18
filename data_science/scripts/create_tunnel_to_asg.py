@@ -35,7 +35,7 @@ def _wait(message, wait=5):
     time.sleep(wait)
 
 
-if __name__ == '__main__':
+def main():
     args = docopt.docopt(__doc__)
 
     key_path = args['--key'] or _default_ssh_key_path()
@@ -112,3 +112,10 @@ if __name__ == '__main__':
         ])
     except subprocess.CalledProcessError as err:
         sys.exit(err.returncode)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(1)
