@@ -17,7 +17,7 @@ data "template_file" "es_cluster_host" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.1"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=deprecate-var-config-var-length"
 
   name = "api_${var.name}_v1"
 
@@ -50,8 +50,6 @@ module "service" {
     es_doc_type = "${var.es_config["doc_type"]}"
   }
 
-  env_vars_length = 11
-
   listener_https_arn = "${var.alb_listener_https_arn}"
   listener_http_arn  = "${var.alb_listener_http_arn}"
   healthcheck_path   = "/management/healthcheck"
@@ -60,4 +58,6 @@ module "service" {
   loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
   server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
+
+  log_retention_in_days = 90
 }
