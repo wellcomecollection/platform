@@ -1,5 +1,5 @@
 module "reindexer_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v1.1.0"
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v10.2.3"
   queue_name  = "reindexer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
