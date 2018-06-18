@@ -44,7 +44,19 @@ if __name__ == '__main__':
 
     elif args['--status']:
         actual_size = asg['DesiredCapacity']
-        print('The current size of ASG group %r is %r' % (asg_name, actual_size))
+        instance_count = len(asg['Instances'])
+
+        if instance_count == 1:
+            instance_str = '1 instance'
+        elif instance_count == 0:
+            instance_str = 'no instances'
+        else:
+            instance_str = '%d instances' % instance_count
+
+        print(
+            'The desired size of ASG group %r is %r, with %s running' %
+            (asg_name, actual_size, instance_str)
+        )
 
     else:
         print(
