@@ -16,6 +16,7 @@ Actions:
 import os
 import subprocess
 import sys
+import time
 
 from os.path import expanduser
 
@@ -27,6 +28,11 @@ from asg_utils import discover_asg
 
 def _default_ssh_key_path():
     return '%s/.ssh/wellcomedigitalplatform' % expanduser("~")
+
+
+def _wait(message, wait=5):
+    print('%s; waiting for %d seconds...' % (message, wait))
+    time.sleep(wait)
 
 
 if __name__ == '__main__':
@@ -44,25 +50,32 @@ if __name__ == '__main__':
     tag_name = 'jupyter-%s' % instance_type
 
     asg_client = boto3.client('autoscaling')
-    asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
 
-    if len(asg_data['Instances']) == 0:
-        sys.exit(
-            'No instances running in ASG group %r; is it started?' %
-            asg_data['AutoScalingGroupName']
-        )
+    while True:
+        asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
 
-    in_service_instances = [
-        inst
-        for inst in asg_data['Instances']
-        if inst['LifecycleState'] == 'InService'
-    ]
+        if not asg_data['Instances']:
+            _wait(
+                'No instances in ASG group %r' %
+                asg_data['AutoScalingGroupName']
+            )
+            continue
 
-    if len(in_service_instances) == 0:
-        sys.exit(
-            'No instances in ASG group %r are "InService"; wait a few seconds and try again.' %
-            asg_data['AutoScalingGroupName']
-        )
+        in_service_instances = [
+            inst
+            for inst in asg_data['Instances']
+            if inst['LifecycleState'] == 'InService'
+        ]
+
+        if not in_service_instances:
+            _wait(
+                'No instances in ASG group %r are "InService"' %
+                asg_data['AutoScalingGroupName']
+            )
+            continue
+
+        assert len(in_service_instances) > 0
+        break
 
     instance_data = in_service_instances[0]
     instance_id = instance_data['InstanceId']
