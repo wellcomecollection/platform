@@ -109,6 +109,7 @@ def does_file_affect_build_task(path, task):
     # following stacks:
     #
     #   - catalogue_pipeline
+    #   - reindexer
     #   - goobi_adapter
     #   - sierra_adapter
     #
@@ -117,6 +118,7 @@ def does_file_affect_build_task(path, task):
             if task.startswith(project.name) and (project.type == 'sbt_app'):
                 if project.exclusive_path.startswith((
                     'catalogue_pipeline/',
+                    'reindexer/',
                     'goobi_adapter/',
                     'sierra_adapter/',
                 )):

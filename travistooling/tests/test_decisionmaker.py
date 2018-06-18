@@ -76,6 +76,7 @@ from travistooling.decisions import (
 
     # Changes to the display models don't affect all of the stacks
     ('sbt_common/display/model.scala', 'id_minter-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/display/model.scala', 'reindex_worker-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
