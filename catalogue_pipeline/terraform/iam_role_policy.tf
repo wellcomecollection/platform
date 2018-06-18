@@ -85,7 +85,7 @@ resource "aws_iam_role_policy" "matcher_task_vhs" {
 
 resource "aws_iam_role_policy" "matcher_task_sns" {
   role   = "${module.matcher.task_role_name}"
-  policy = "${module.linked_works_topic.publish_policy}"
+  policy = "${module.matched_works_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "matcher_read_write_graph_dynamo" {
@@ -103,4 +103,14 @@ resource "aws_iam_role_policy" "matcher_read_write_lock_dynamo" {
 resource "aws_iam_role_policy" "merger_cloudwatch" {
   role   = "${module.merger.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
+resource "aws_iam_role_policy" "merger_task_sns" {
+  role   = "${module.merger.task_role_name}"
+  policy = "${module.merged_works_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "merger_task_read_recorder_vhs" {
+  role   = "${module.merger.task_role_name}"
+  policy = "${module.vhs_recorder.read_policy}"
 }

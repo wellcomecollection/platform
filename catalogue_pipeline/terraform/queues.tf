@@ -68,7 +68,20 @@ module "merger_queue" {
   queue_name  = "merger_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.linked_works_topic.name}"]
+  topic_names = ["${module.matched_works_topic.name}"]
+
+  visibility_timeout_seconds = 60
+  max_receive_count          = 8
+
+  alarm_topic_arn = "${local.dlq_alarm_arn}"
+}
+
+module "test_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v9.1.0"
+  queue_name  = "test_queue"
+  aws_region  = "${var.aws_region}"
+  account_id  = "${data.aws_caller_identity.current.account_id}"
+  topic_names = ["${module.merged_works_topic.name}"]
 
   visibility_timeout_seconds = 60
   max_receive_count          = 8
