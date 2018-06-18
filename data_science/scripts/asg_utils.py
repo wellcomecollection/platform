@@ -32,15 +32,6 @@ def discover_asg(asg_client, tag_name):
     sys.exit("Can't find an ASG with name %r!" % tag_name)
 
 
-def discover_asg_name(asg_client, tag_name):
-    """
-    Returns the name of the first autoscaling group whose tags exactly match
-    the supplied input.
-    """
-    asg_data = discover_asg(asg_client=asg_client, tag_name=tag_name)
-    return asg_data['AutoScalingGroupName']
-
-
 def set_asg_size(asg_client, asg_name, desired_size):
     """
     Set the size of an ASG to ``desired_size``.
