@@ -16,7 +16,7 @@ module "matcher" {
     dynamo_lock_table = "${aws_dynamodb_table.matcher_lock_table.id}"
     dynamo_lock_table_index ="${var.matcher_lock_table_index}"
     metrics_namespace = "matcher"
-    log_level         = "INFO"
+    log_level         = "DEBUG"
   }
 
   env_vars_length = 9
