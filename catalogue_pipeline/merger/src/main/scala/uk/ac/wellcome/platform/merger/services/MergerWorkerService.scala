@@ -70,25 +70,30 @@ class MergerWorkerService @Inject()(
   private def getRecorderEntryForIdentifier(
     workIdentifier: WorkIdentifier): Future[Either[VersionMismatchError,Option[RecorderWorkEntry]]] = {
     workIdentifier.version match {
-      case 0 => Future.successful(Right(None))
+      case 0 =>
+        // If a work is at version zero, it means it's not in VHS yet.
+        // Return a Right to avoid the message being discarded.
+        // Don't try to retrieve it from VHS and set the wrapped value to None.
+        Future.successful(Right(None))
       case _ =>
-        vhs.getRecord(id = workIdentifier.identifier).map {
+        vhs.getRecord(id = workIdentifier.identifier).map{
           case None =>
-            throw new RuntimeException(
-              s"Work ${
-                workIdentifier.identifier
-              } is not in vhs!")
-          case Some(record) if record.work.version == workIdentifier.version =>
-            Right(Some(record))
-          case Some(record) =>
-            debug(
-              s"VHS version = ${
-                record.work.version
-              }, identifier version = ${
-                workIdentifier.version
-              }, so discarding message")
-            Left(VersionMismatchError(workIdentifier.identifier, workIdentifier.version, record.work.version))
-        }
+          throw new RuntimeException(
+            s"Work ${
+              workIdentifier.identifier
+            } is not in vhs!")
+        case Some(record) if record.work.version == workIdentifier.version =>
+          Right(Some(record))
+        case Some(record) =>
+          debug(
+            s"VHS version = ${
+              record.work.version
+            }, identifier version = ${
+              workIdentifier.version
+            }, so discarding message")
+          // If some versions don't match return a left to indicate
+          // that this message can be safely discarded
+          Left(VersionMismatchError(workIdentifier.identifier, workIdentifier.version, record.work.version))}
     }
   }
 
