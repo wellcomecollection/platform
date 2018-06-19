@@ -44,7 +44,12 @@ variable "es_config_ingestor" {
   }
 }
 
-variable "matcher_table_index" {
-  description = "Name of the GSI in the matcher table"
+variable "matcher_graph_table_index" {
+  description = "Name of the GSI in the matcher graph table"
   default     = "work-sets-index"
+}
+
+variable "matcher_lock_table_index" {
+  description = "Name of the GSI in the matcher lock table"
+  default     = "context-ids-index"
 }

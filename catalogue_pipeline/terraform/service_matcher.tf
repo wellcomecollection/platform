@@ -8,16 +8,18 @@ module "matcher" {
   release_id         = "${var.release_ids["matcher"]}"
 
   env_vars = {
-    queue_url         = "${module.matcher_queue.id}"
-    vhs_bucket_name   = "${module.vhs_recorder.bucket_name}"
-    topic_arn         = "${module.linked_works_topic.arn}"
-    dynamo_table      = "${aws_dynamodb_table.matcher_graph_table.id}"
-    dynamo_index      = "${var.matcher_table_index}"
-    metrics_namespace = "matcher"
-    log_level         = "DEBUG"
+    queue_url               = "${module.matcher_queue.id}"
+    vhs_bucket_name         = "${module.vhs_recorder.bucket_name}"
+    topic_arn               = "${module.linked_works_topic.arn}"
+    dynamo_table            = "${aws_dynamodb_table.matcher_graph_table.id}"
+    dynamo_index            = "${var.matcher_graph_table_index}"
+    dynamo_lock_table       = "${aws_dynamodb_table.matcher_lock_table.id}"
+    dynamo_lock_table_index = "${var.matcher_lock_table_index}"
+    metrics_namespace       = "matcher"
+    log_level               = "INFO"
   }
 
-  env_vars_length = 7
+  env_vars_length = 9
 
   memory = 2048
   cpu    = 512

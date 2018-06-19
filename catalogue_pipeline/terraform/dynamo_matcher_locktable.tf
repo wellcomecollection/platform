@@ -1,5 +1,5 @@
-resource "aws_dynamodb_table" "matcher_graph_table" {
-  name           = "works-graph"
+resource "aws_dynamodb_table" "matcher_lock_table" {
+  name           = "matcher-lock-table"
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "id"
@@ -10,13 +10,13 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   }
 
   attribute {
-    name = "componentId"
+    name = "contextId"
     type = "S"
   }
 
   global_secondary_index {
-    name            = "${var.matcher_table_index}"
-    hash_key        = "componentId"
+    name            = "${var.matcher_lock_table_index}"
+    hash_key        = "contextId"
     write_capacity  = 1
     read_capacity   = 1
     projection_type = "ALL"
@@ -33,10 +33,10 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   }
 }
 
-module "matcher_dynamo_autoscaling" {
+module "matcher_lock_table_dynamo_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v10.2.0"
 
-  table_name = "${aws_dynamodb_table.matcher_graph_table.name}"
+  table_name = "${aws_dynamodb_table.matcher_lock_table.name}"
 
   enable_read_scaling     = true
   read_target_utilization = 30
