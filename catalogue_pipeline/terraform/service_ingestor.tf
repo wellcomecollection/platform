@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_ingestor" {
 }
 
 module "ingestor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "ingestor"
 
   source_queue_name  = "${module.es_ingest_queue.name}"

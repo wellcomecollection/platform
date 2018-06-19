@@ -7,7 +7,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "sierra_${local.resource_type_singular}_merger"
 
   source_queue_name  = "${module.updates_queue.name}"

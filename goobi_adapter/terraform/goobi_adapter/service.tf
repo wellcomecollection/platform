@@ -3,7 +3,7 @@ locals {
 }
 
 module "goobi_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "${local.service_name}"
 
   ecr_repository_url = "${var.ecr_repository_url}"

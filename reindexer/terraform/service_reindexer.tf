@@ -1,5 +1,5 @@
 module "reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=deprecate-var-config-var-length"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "reindexer"
 
   source_queue_name = "${module.reindexer_queue.name}"

@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=deprecate-var-config-var-length"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v10.3.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   vpc_id             = "${module.vpc_loris.vpc_id}"
