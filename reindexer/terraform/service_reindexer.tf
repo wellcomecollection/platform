@@ -1,5 +1,5 @@
 module "reindexer" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "reindexer"
 
   source_queue_name = "${module.reindexer_queue.name}"
@@ -17,8 +17,6 @@ module "reindexer" {
     reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
     metrics_namespace          = "reindexer"
   }
-
-  env_vars_length = 4
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"
   vpc_id                     = "${local.vpc_services_id}"

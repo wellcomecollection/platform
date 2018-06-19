@@ -1,5 +1,5 @@
 module "recorder" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "recorder"
 
   source_queue_name  = "${module.recorder_queue.name}"
@@ -14,8 +14,6 @@ module "recorder" {
     vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
     metrics_namespace              = "recorder"
   }
-
-  env_vars_length = 5
 
   memory = 2048
   cpu    = 512

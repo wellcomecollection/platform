@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_snapshot" {
 }
 
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "snapshot_generator"
 
   source_queue_name = "${module.snapshot_generator_queue.name}"
@@ -30,8 +30,6 @@ module "snapshot_generator" {
     es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
     metrics_namespace = "snapshot_generator"
   }
-
-  env_vars_length = 11
 
   memory = 3072
   cpu    = 2048

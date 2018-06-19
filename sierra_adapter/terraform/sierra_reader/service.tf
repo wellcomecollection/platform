@@ -3,7 +3,7 @@ locals {
 }
 
 module "sierra_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "${local.service_name}"
 
   source_queue_name  = "${module.windows_queue.name}"
@@ -26,8 +26,6 @@ module "sierra_reader_service" {
 
     batch_size = 50
   }
-
-  env_vars_length = 9
 
   cpu    = 512
   memory = 2048

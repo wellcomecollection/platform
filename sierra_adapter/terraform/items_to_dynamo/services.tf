@@ -3,7 +3,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_to_dynamo_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "sierra_items_to_dynamo"
 
   source_queue_name  = "${module.demultiplexer_queue.name}"
@@ -17,8 +17,6 @@ module "sierra_to_dynamo_service" {
 
     dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
   }
-
-  env_vars_length = 3
 
   cpu    = 256
   memory = 1024

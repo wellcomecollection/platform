@@ -1,5 +1,5 @@
 module "merger" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
   name   = "merger"
 
   source_queue_name  = "${module.merger_queue.name}"
@@ -11,8 +11,6 @@ module "merger" {
     merger_queue_id   = "${module.merger_queue.id}"
     metrics_namespace = "merger"
   }
-
-  env_vars_length = 2
 
   memory = 2048
   cpu    = 512

@@ -1,5 +1,5 @@
 module "loris" {
-  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v6.1.1"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/service?ref=v10.3.0"
   name               = "loris"
   cluster_id         = "${aws_ecs_cluster.loris.id}"
   vpc_id             = "${module.vpc_loris.vpc_id}"
@@ -16,8 +16,6 @@ module "loris" {
 
   desired_count = 4
 
-  env_vars_length = 0
-
   deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
 
@@ -28,4 +26,6 @@ module "loris" {
   loadbalancer_cloudwatch_id   = "${module.loris_alb.cloudwatch_id}"
   server_error_alarm_topic_arn = "${local.alb_server_error_alarm_arn}"
   client_error_alarm_topic_arn = "${local.alb_client_error_alarm_arn}"
+
+  log_retention_in_days = 90
 }
