@@ -10,7 +10,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -63,11 +62,8 @@ class MergerWorkerServiceTest
             eventually {
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
-              val messagesSent = listMessagesReceivedFromSNS(topic)
 
-              val worksSent = messagesSent.map { message =>
-                fromJson[UnidentifiedWork](message.message).get
-              }
+              val worksSent = getWorksSent(topic)
               worksSent should contain only (
                 recorderWorkEntry1.work,
                 recorderWorkEntry2.work,
@@ -122,15 +118,11 @@ class MergerWorkerServiceTest
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            val messagesSent = listMessagesReceivedFromSNS(topic)
-            val worksSent = messagesSent.map { message =>
-              fromJson[UnidentifiedWork](message.message).get
-            }
+            val worksSent = getWorksSent(topic)
             worksSent should contain only recorderWorkEntry.work
           }
           }
         }
-
   }
 
   it("discards works with version 0 and sends along the others") {
@@ -150,11 +142,8 @@ class MergerWorkerServiceTest
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            val messagesSent = listMessagesReceivedFromSNS(topic)
 
-            val worksSent = messagesSent.map { message =>
-              fromJson[UnidentifiedWork](message.message).get
-            }
+            val worksSent = getWorksSent(topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
