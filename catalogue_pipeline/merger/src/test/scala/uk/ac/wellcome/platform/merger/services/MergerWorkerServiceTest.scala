@@ -68,7 +68,7 @@ class MergerWorkerServiceTest
               val worksSent = messagesSent.map { message =>
                 fromJson[UnidentifiedWork](message.message).get
               }
-              worksSent should contain theSameElementsAs List(
+              worksSent should contain only (
                 recorderWorkEntry1.work,
                 recorderWorkEntry2.work,
                 recorderWorkEntry3.work)
@@ -128,7 +128,7 @@ class MergerWorkerServiceTest
     }
   }
 
-  it("eats messages where some works have version 0") {
+  it("discards works with version 0 and sends along the others") {
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val versionZeroWork: RecorderWorkEntry =
@@ -145,7 +145,12 @@ class MergerWorkerServiceTest
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            listMessagesReceivedFromSNS(topic) shouldBe empty
+            val messagesSent = listMessagesReceivedFromSNS(topic)
+
+            val worksSent = messagesSent.map { message =>
+              fromJson[UnidentifiedWork](message.message).get
+            }
+            worksSent should contain only (recorderWorkEntry.work)
           }
         }
     }

@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
+import cats.implicits._
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
@@ -9,10 +10,9 @@ import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.storage.dynamo._
-import cats.implicits._
 
 import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,45 +32,30 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
-      maybeWorkEntries <- getFromVHS(matcherResult)
-      maybeWorks = maybeWorkEntries.map { workEntries =>
-        workEntries.map { _.work }
+      eitherMaybeWorkEntries <- getFromVHS(matcherResult)
+      eitherWorkEntries = eitherMaybeWorkEntries.map { workEntries =>
+        workEntries.collect{case Some(work) => work.work}
       }
-      _ <- sendWorks(maybeWorks)
+      _ <- sendWorks(eitherWorkEntries)
     } yield ()
 
-  private def getFromVHS(
-    matcherResult: MatcherResult): Future[Option[List[RecorderWorkEntry]]] = {
+  private def getFromVHS(matcherResult: MatcherResult): Future[Either[VersionMismatchError, List[Option[RecorderWorkEntry]]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
-
-    // If we get an identifier with version 0 from the matcher, it means
-    // we know the work exists but it hasn't been seen in the pipeline yet.
-    //
-    // In that case, we have to discard the message because we don't have
-    // enough to do a complete merge -- we'll do it when the work appears.
-    //
-    val missingWorks = worksIdentifiers.filter { _.version == 0 }
-
-    missingWorks.toSeq match {
-      case Nil =>
-        for {
-          maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId =>
-            getRecorderEntryForIdentifier(workId)
-          })
-        } yield maybeWorkEntries.toList.sequence
-
-      case _ => Future.successful(None)
-    }
+    for {
+      maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId =>
+        getRecorderEntryForIdentifier(workId)
+      })
+    } yield maybeWorkEntries.toList.sequence
   }
 
-  private def sendWorks(maybeWorks: Option[Seq[UnidentifiedWork]]) = {
-    maybeWorks match {
-      case Some(works) =>
+  private def sendWorks(eitherWorkEntries: Either[VersionMismatchError,Seq[UnidentifiedWork]]) = {
+    eitherWorkEntries match {
+      case Right(works) =>
         Future
           .sequence(works.map(work =>
             SNSWriter.writeMessage(toJson(work).get, "merged-work")))
           .map(_ => ())
-      case None => Future.successful(())
+      case Left(_) => Future.successful(())
     }
   }
 
@@ -82,25 +67,32 @@ class MergerWorkerService @Inject()(
     } yield workIdentifier
   }
 
-  // This function wraps fetching a record from VHS.  It:
-  //
-  //    - returns Some[RecorderWorkEntry] if the entry is in VHS and the correct version
-  //    - returns None if the entry is in VHS and the wrong version
-  //
   private def getRecorderEntryForIdentifier(
-    workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
-    vhs.getRecord(id = workIdentifier.identifier).map {
-      case None =>
-        throw new RuntimeException(
-          s"Work ${workIdentifier.identifier} is not in vhs!")
-      case Some(record) if record.work.version == workIdentifier.version =>
-        Some(record)
-      case Some(record) =>
-        debug(
-          s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding message")
-        None
+    workIdentifier: WorkIdentifier): Future[Either[VersionMismatchError,Option[RecorderWorkEntry]]] = {
+    workIdentifier.version match {
+      case 0 => Future.successful(Right(None))
+      case _ =>
+        vhs.getRecord(id = workIdentifier.identifier).map {
+          case None =>
+            throw new RuntimeException(
+              s"Work ${
+                workIdentifier.identifier
+              } is not in vhs!")
+          case Some(record) if record.work.version == workIdentifier.version =>
+            Right(Some(record))
+          case Some(record) =>
+            debug(
+              s"VHS version = ${
+                record.work.version
+              }, identifier version = ${
+                workIdentifier.version
+              }, so discarding message")
+            Left(VersionMismatchError(workIdentifier.identifier, workIdentifier.version, record.work.version))
+        }
     }
   }
 
   def stop() = system.terminate()
 }
+
+case class VersionMismatchError(id: String, receivedVersion: Int, vhsVersion:Int)
