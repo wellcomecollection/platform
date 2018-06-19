@@ -13,6 +13,7 @@ module "merger" {
     vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
     vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
     metrics_namespace        = "merger"
+    log_level         = "INFO"
   }
 
   memory = 2048
