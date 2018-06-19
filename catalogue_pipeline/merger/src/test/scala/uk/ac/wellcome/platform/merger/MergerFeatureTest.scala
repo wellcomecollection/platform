@@ -51,8 +51,7 @@ class MergerFeatureTest
                       val worksSent = messagesSent.map { message =>
                         fromJson[UnidentifiedWork](message.message).get
                       }
-                      worksSent should contain theSameElementsAs List(
-                        recorderWorkEntry.work)
+                      worksSent should contain only recorderWorkEntry.work
                     }
                   }
                 }
