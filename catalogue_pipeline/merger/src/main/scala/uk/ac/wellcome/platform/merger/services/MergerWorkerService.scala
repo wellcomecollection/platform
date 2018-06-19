@@ -32,26 +32,29 @@ class MergerWorkerService @Inject()(
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
       maybeWorkEntries <- getFromVHS(matcherResult)
-      maybeWorks = maybeWorkEntries.map{ maybeWorkEntry =>
+      maybeWorks = maybeWorkEntries.map { maybeWorkEntry =>
         maybeWorkEntry.map(_.work)
       }
       _ <- sendWorks(maybeWorks)
     } yield ()
 
-  private def getFromVHS(matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
+  private def getFromVHS(
+    matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
     for {
-      maybeWorkEntries <- Future.sequence(worksIdentifiers.toList.map { workId =>
-        getRecorderEntryForIdentifier(workId)
+      maybeWorkEntries <- Future.sequence(worksIdentifiers.toList.map {
+        workId =>
+          getRecorderEntryForIdentifier(workId)
       })
     } yield maybeWorkEntries
   }
 
   private def sendWorks(maybeWorks: Seq[Option[UnidentifiedWork]]) = {
     Future
-      .sequence(maybeWorks.collect{ case Some(work) =>
-            SNSWriter.writeMessage(toJson(work).get, "merged-work").map(_ => ())
-    })
+      .sequence(maybeWorks.collect {
+        case Some(work) =>
+          SNSWriter.writeMessage(toJson(work).get, "merged-work").map(_ => ())
+      })
   }
 
   private def getWorksIdentifiers(
@@ -68,24 +71,19 @@ class MergerWorkerService @Inject()(
       case 0 =>
         Future.successful(None)
       case _ =>
-        vhs.getRecord(id = workIdentifier.identifier).map{
+        vhs.getRecord(id = workIdentifier.identifier).map {
           case None =>
-          throw new RuntimeException(
-            s"Work ${
-              workIdentifier.identifier
-            } is not in vhs!")
-        case Some(record) if record.work.version == workIdentifier.version =>
-          Some(record)
-        case Some(record) =>
-          debug(
-            s"VHS version = ${
-              record.work.version
-            }, identifier version = ${
-              workIdentifier.version
-            }, so discarding work")
-          None
+            throw new RuntimeException(
+              s"Work ${workIdentifier.identifier} is not in vhs!")
+          case Some(record) if record.work.version == workIdentifier.version =>
+            Some(record)
+          case Some(record) =>
+            debug(
+              s"VHS version = ${record.work.version}, identifier version = ${workIdentifier.version}, so discarding work")
+            None
+        }
     }
-  }}
+  }
 
   def stop() = system.terminate()
 }

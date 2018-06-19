@@ -64,10 +64,9 @@ class MergerWorkerServiceTest
               assertQueueEmpty(dlq)
 
               val worksSent = getWorksSent(topic)
-              worksSent should contain only (
-                recorderWorkEntry1.work,
-                recorderWorkEntry2.work,
-                recorderWorkEntry3.work)
+              worksSent should contain only (recorderWorkEntry1.work,
+              recorderWorkEntry2.work,
+              recorderWorkEntry3.work)
             }
         }
     }
@@ -94,8 +93,7 @@ class MergerWorkerServiceTest
     }
   }
 
-  it(
-    "discards works with newer versions in vhs, sends along the others") {
+  it("discards works with newer versions in vhs, sends along the others") {
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
@@ -121,8 +119,8 @@ class MergerWorkerServiceTest
             val worksSent = getWorksSent(topic)
             worksSent should contain only recorderWorkEntry.work
           }
-          }
         }
+    }
   }
 
   it("discards works with version 0 and sends along the others") {
