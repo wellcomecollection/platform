@@ -27,15 +27,17 @@ class DynamoLockingServiceTest
 
   it("locks around a callback") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withLockingService(lockTable) { lockingService =>
-        val id = "id"
-        val lockedDuringCallback =
-          lockingService.withLocks(Set(id))(f = Future {
-            assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-          })
+      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+        withLockingService(dynamoRowLockDao) { lockingService =>
+          val id = "id"
+          val lockedDuringCallback =
+            lockingService.withLocks(Set(id))(f = Future {
+              assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+            })
 
-        whenReady(lockedDuringCallback) { _ =>
-          assertNoRowLocks(lockTable)
+          whenReady(lockedDuringCallback) { _ =>
+            assertNoRowLocks(lockTable)
+          }
         }
       }
     }
@@ -44,32 +46,33 @@ class DynamoLockingServiceTest
   it(
     "throws a FailedLockException and releases locks when writing a row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withLockingService(lockTable) { lockingService =>
-        val idA = "id"
-        val lockedId = "lockedId"
-        givenLocks(Set(lockedId), "existingContext", lockTable)
+      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+        withLockingService(dynamoRowLockDao) { lockingService =>
+          val idA = "id"
+          val lockedId = "lockedId"
+          givenLocks(Set(lockedId), "existingContext", lockTable)
 
-        val eventuallyLockFails =
-          lockingService.withLocks(Set(idA, lockedId))(f = Future {
-            fail("Lock did not fail")
-          })
+          val eventuallyLockFails =
+            lockingService.withLocks(Set(idA, lockedId))(f = Future {
+              fail("Lock did not fail")
+            })
 
-        whenReady(eventuallyLockFails.failed) { failure =>
-          failure shouldBe a[FailedLockException]
-          // still expect original locks to exist
-          assertOnlyHaveRowLockRecordIds(Set(lockedId), lockTable)
+          whenReady(eventuallyLockFails.failed) { failure =>
+            failure shouldBe a[FailedLockException]
+            // still expect original locks to exist
+            assertOnlyHaveRowLockRecordIds(Set(lockedId), lockTable)
+          }
         }
       }
     }
   }
 
-//  REPLACE needs MOCK?
-//  it("throws a FailedUnlockException when unlocking a lock fails") {
+//  it("throws a FailedUnlockException when unlocking the context fails") {
 //    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
 //      withLockingService(lockTable) { lockingService =>
 //        val idA = "id"
 //        val lockedId = "lockedId"
-//        givenLocks(Set(lockedId), lockTable)
+//        givenLocks(Set(lockedId), "contextId", lockTable)
 //
 //        val eventuallyLockFails = lockingService.withLocks(Set(idA, lockedId))(f = Future {
 //          fail("Lock did not fail")
@@ -85,19 +88,21 @@ class DynamoLockingServiceTest
 
   it("releases locks when the callback fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withLockingService(lockTable) { lockingService =>
-        case class ExpectedException() extends Exception()
+      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+        withLockingService(dynamoRowLockDao) { lockingService =>
+          case class ExpectedException() extends Exception()
 
-        val id = "id"
-        val eventuallyLockFails =
-          lockingService.withLocks(Set(id))(f = Future {
-            assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-            throw new ExpectedException
-          })
+          val id = "id"
+          val eventuallyLockFails =
+            lockingService.withLocks(Set(id))(f = Future {
+              assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+              throw new ExpectedException
+            })
 
-        whenReady(eventuallyLockFails.failed) { failure =>
-          failure shouldBe a[ExpectedException]
-          assertNoRowLocks(lockTable)
+          whenReady(eventuallyLockFails.failed) { failure =>
+            failure shouldBe a[ExpectedException]
+            assertNoRowLocks(lockTable)
+          }
         }
       }
     }

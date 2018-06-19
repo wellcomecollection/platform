@@ -3,12 +3,14 @@ package uk.ac.wellcome.platform.matcher.lockable
 import java.time.{Duration, Instant}
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query.Condition
 import com.gu.scanamo.syntax.{attributeExists, not, _}
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
 import javax.inject.Inject
 
+import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoRowLockDao @Inject()(
@@ -57,12 +59,13 @@ class DynamoRowLockDao @Inject()(
     }
   }
 
-  def unlockRow(contextId: String) = Future {
+  def unlockRows(contextId: String) = Future {
     debug(s"Trying to unlock context: $contextId")
 
-    val maybeRowLocks =
+    val maybeRowLocks: immutable.Seq[Either[DynamoReadError, RowLock]] =
       Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
         'contextId -> contextId)
+
     val rowLockIds = maybeRowLocks.collect {
       case Right(rowLock) => rowLock.id
     }.toSet

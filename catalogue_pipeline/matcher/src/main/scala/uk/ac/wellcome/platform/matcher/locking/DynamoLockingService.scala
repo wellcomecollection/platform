@@ -22,7 +22,7 @@ class DynamoLockingService @Inject()(dynamoRowLockDao: DynamoRowLockDao)(
     }
     eventuallyExecutedWithLock.transformWith { triedResult =>
       dynamoRowLockDao
-        .unlockRow(contextGuid)
+        .unlockRows(contextGuid)
         .flatMap(_ => Future.fromTry(triedResult))
     }
   }
