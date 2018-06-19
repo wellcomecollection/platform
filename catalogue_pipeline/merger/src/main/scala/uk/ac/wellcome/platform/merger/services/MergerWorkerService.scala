@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
-import cats.implicits._
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
@@ -32,31 +31,27 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
-      eitherMaybeWorkEntries <- getFromVHS(matcherResult)
-      eitherWorkEntries = eitherMaybeWorkEntries.map { workEntries =>
-        workEntries.collect{case Some(work) => work.work}
+      maybeWorkEntries <- getFromVHS(matcherResult)
+      maybeWorks = maybeWorkEntries.map{ maybeWorkEntry =>
+        maybeWorkEntry.map(_.work)
       }
-      _ <- sendWorks(eitherWorkEntries)
+      _ <- sendWorks(maybeWorks)
     } yield ()
 
-  private def getFromVHS(matcherResult: MatcherResult): Future[Either[VersionMismatchError, List[Option[RecorderWorkEntry]]]] = {
+  private def getFromVHS(matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
     for {
-      maybeWorkEntries <- Future.sequence(worksIdentifiers.map { workId =>
+      maybeWorkEntries <- Future.sequence(worksIdentifiers.toList.map { workId =>
         getRecorderEntryForIdentifier(workId)
       })
-    } yield maybeWorkEntries.toList.sequence
+    } yield maybeWorkEntries
   }
 
-  private def sendWorks(eitherWorkEntries: Either[VersionMismatchError,Seq[UnidentifiedWork]]) = {
-    eitherWorkEntries match {
-      case Right(works) =>
-        Future
-          .sequence(works.map(work =>
-            SNSWriter.writeMessage(toJson(work).get, "merged-work")))
-          .map(_ => ())
-      case Left(_) => Future.successful(())
-    }
+  private def sendWorks(maybeWorks: Seq[Option[UnidentifiedWork]]) = {
+    Future
+      .sequence(maybeWorks.collect{ case Some(work) =>
+            SNSWriter.writeMessage(toJson(work).get, "merged-work").map(_ => ())
+    })
   }
 
   private def getWorksIdentifiers(
@@ -68,13 +63,10 @@ class MergerWorkerService @Inject()(
   }
 
   private def getRecorderEntryForIdentifier(
-    workIdentifier: WorkIdentifier): Future[Either[VersionMismatchError,Option[RecorderWorkEntry]]] = {
+    workIdentifier: WorkIdentifier): Future[Option[RecorderWorkEntry]] = {
     workIdentifier.version match {
       case 0 =>
-        // If a work is at version zero, it means it's not in VHS yet.
-        // Return a Right to avoid the message being discarded.
-        // Don't try to retrieve it from VHS and set the wrapped value to None.
-        Future.successful(Right(None))
+        Future.successful(None)
       case _ =>
         vhs.getRecord(id = workIdentifier.identifier).map{
           case None =>
@@ -83,21 +75,17 @@ class MergerWorkerService @Inject()(
               workIdentifier.identifier
             } is not in vhs!")
         case Some(record) if record.work.version == workIdentifier.version =>
-          Right(Some(record))
+          Some(record)
         case Some(record) =>
           debug(
             s"VHS version = ${
               record.work.version
             }, identifier version = ${
               workIdentifier.version
-            }, so discarding message")
-          // If some versions don't match return a left to indicate
-          // that this message can be safely discarded
-          Left(VersionMismatchError(workIdentifier.identifier, workIdentifier.version, record.work.version))}
+            }, so discarding work")
+          None
     }
-  }
+  }}
 
   def stop() = system.terminate()
 }
-
-case class VersionMismatchError(id: String, receivedVersion: Int, vhsVersion:Int)

@@ -99,7 +99,7 @@ class MergerWorkerServiceTest
   }
 
   it(
-    "eats the message if one of the versions is older compared to the work in vhs") {
+    "discards works with newer versions vhs, sends along the others") {
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
@@ -122,10 +122,15 @@ class MergerWorkerServiceTest
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            listMessagesReceivedFromSNS(topic) shouldBe empty
+            val messagesSent = listMessagesReceivedFromSNS(topic)
+            val worksSent = messagesSent.map { message =>
+              fromJson[UnidentifiedWork](message.message).get
+            }
+            worksSent should contain only recorderWorkEntry.work
+          }
           }
         }
-    }
+
   }
 
   it("discards works with version 0 and sends along the others") {

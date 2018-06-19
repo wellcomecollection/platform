@@ -15,8 +15,7 @@ object Common {
       "-Xverify",
       "-Xfatal-warnings",
       "-feature",
-      "-language:postfixOps",
-      "-Ypartial-unification"
+      "-language:postfixOps"
     ),
     parallelExecution in Test := false,
     libraryDependencies ++= Dependencies.sharedDependencies
