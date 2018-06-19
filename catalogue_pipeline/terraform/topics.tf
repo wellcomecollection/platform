@@ -28,7 +28,12 @@ module "recorded_works_topic" {
   name   = "recorded_works"
 }
 
-module "linked_works_topic" {
+module "merged_works_topic" {
   source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
-  name   = "linked_works"
+  name   = "merged_works"
+}
+
+module "matched_works_topic" {
+  source = "git::https://github.com/wellcometrust/terraform.git//sns?ref=v1.0.0"
+  name   = "matched_works"
 }

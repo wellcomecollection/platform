@@ -10,9 +10,22 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
+import uk.ac.wellcome.finatra.messaging.{
+  SNSClientModule,
+  SNSConfigModule,
+  SQSClientModule,
+  SQSConfigModule
+}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.platform.merger.modules.MergerWorkerModule
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  S3ClientModule,
+  VHSConfigModule
+}
+import uk.ac.wellcome.platform.merger.modules.{
+  MergerWorkerModule,
+  RecorderWorkEntryModule
+}
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.merger Merger"
@@ -22,7 +35,13 @@ class Server extends HttpServer {
     SQSClientModule,
     SQSConfigModule,
     ExecutionContextModule,
-    MergerWorkerModule
+    MergerWorkerModule,
+    VHSConfigModule,
+    DynamoClientModule,
+    S3ClientModule,
+    SNSClientModule,
+    SNSConfigModule,
+    RecorderWorkEntryModule
   )
   override def configureHttp(router: HttpRouter) {
     router

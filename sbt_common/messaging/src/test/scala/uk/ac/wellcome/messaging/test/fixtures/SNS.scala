@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sns._
 import io.circe._
 import io.circe.yaml
-import uk.ac.wellcome.messaging.sns.SNSClientFactory
+import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -80,6 +80,11 @@ trait SNS {
       localStackSnsClient.deleteTopic(topic.arn)
     }
   )
+
+  def withSNSWriter[R](topic: Topic)(testWith: TestWith[SNSWriter, R]): R = {
+    val sNSWriter = new SNSWriter(snsClient, SNSConfig(topic.arn))
+    testWith(sNSWriter)
+  }
 
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.

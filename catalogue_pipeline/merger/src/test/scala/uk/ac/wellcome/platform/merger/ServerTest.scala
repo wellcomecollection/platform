@@ -14,12 +14,18 @@ class ServerTest
     with Messaging {
 
   it("shows the healthcheck message") {
-    withLocalSqsQueue { queue =>
-      withServer(queue) { server =>
-        server.httpGet(
-          path = "/management/healthcheck",
-          andExpect = Ok,
-          withJsonBody = """{"message": "ok"}""")
+    withLocalSnsTopic { topic =>
+      withLocalS3Bucket { bucket =>
+        withLocalDynamoDbTable { table =>
+          withLocalSqsQueue { queue =>
+            withServer(queue, topic, bucket, table) { server =>
+              server.httpGet(
+                path = "/management/healthcheck",
+                andExpect = Ok,
+                withJsonBody = """{"message": "ok"}""")
+            }
+          }
+        }
       }
     }
   }

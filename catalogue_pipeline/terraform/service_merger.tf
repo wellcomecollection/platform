@@ -8,8 +8,12 @@ module "merger" {
   release_id         = "${var.release_ids["merger"]}"
 
   env_vars = {
-    merger_queue_id   = "${module.merger_queue.id}"
-    metrics_namespace = "merger"
+    merger_queue_id          = "${module.merger_queue.id}"
+    merger_topic_arn         = "${module.merged_works_topic.arn}"
+    vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
+    vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
+    metrics_namespace        = "merger"
+    log_level                = "INFO"
   }
 
   memory = 2048

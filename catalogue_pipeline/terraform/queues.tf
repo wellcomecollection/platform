@@ -29,7 +29,7 @@ module "id_minter_queue" {
   queue_name  = "id_minter_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.transformed_works_topic.name}"]
+  topic_names = ["${module.merged_works_topic.name}"]
 
   visibility_timeout_seconds = 60
   max_receive_count          = 8
@@ -68,7 +68,7 @@ module "merger_queue" {
   queue_name  = "merger_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.linked_works_topic.name}"]
+  topic_names = ["${module.matched_works_topic.name}"]
 
   visibility_timeout_seconds = 60
   max_receive_count          = 8
