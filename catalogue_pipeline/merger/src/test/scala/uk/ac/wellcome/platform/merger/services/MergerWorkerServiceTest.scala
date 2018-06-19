@@ -99,7 +99,7 @@ class MergerWorkerServiceTest
   }
 
   it(
-    "discards works with newer versions vhs, sends along the others") {
+    "discards works with newer versions in vhs, sends along the others") {
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
@@ -155,7 +155,7 @@ class MergerWorkerServiceTest
             val worksSent = messagesSent.map { message =>
               fromJson[UnidentifiedWork](message.message).get
             }
-            worksSent should contain only (recorderWorkEntry.work)
+            worksSent should contain only recorderWorkEntry.work
           }
         }
     }
