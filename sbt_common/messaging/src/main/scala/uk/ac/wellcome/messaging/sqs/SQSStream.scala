@@ -56,7 +56,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
             case (message, t) =>
               debug(s"Processing message ${message.getMessageId}")
               readAndProcess(streamName, t, process).map(_ => message)
-          }
+        }
     )
 
   // Defines a "supervision strategy" -- this tells Akka how to react
@@ -82,8 +82,8 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName)))
 
-    val src: Source[Message, NotUsed] = modifySource(source.map {
-      message => (message, fromJson[T](message.getBody).get)
+    val src: Source[Message, NotUsed] = modifySource(source.map { message =>
+      (message, fromJson[T](message.getBody).get)
     })
 
     val srcWithLogging: Source[(Message, Delete.type), NotUsed] = src

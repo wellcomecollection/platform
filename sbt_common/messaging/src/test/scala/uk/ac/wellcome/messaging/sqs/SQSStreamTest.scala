@@ -43,7 +43,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          received should contain theSameElementsAs createExampleObjects(count = 3)
+          received should contain theSameElementsAs createExampleObjects(
+            count = 3)
 
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
@@ -130,7 +131,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          received should contain theSameElementsAs createExampleObjects(count = 2)
+          received should contain theSameElementsAs createExampleObjects(
+            count = 2)
 
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 2)
@@ -156,7 +158,8 @@ class SQSStreamTest
               }))
 
           eventually {
-            received should contain theSameElementsAs createExampleObjects(count = 2)
+            received should contain theSameElementsAs createExampleObjects(
+              count = 2)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
@@ -208,7 +211,8 @@ class SQSStreamTest
               }))
 
           eventually {
-            received should contain theSameElementsAs createExampleObjects(count = 2)
+            received should contain theSameElementsAs createExampleObjects(
+              count = 2)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 2)
@@ -217,12 +221,15 @@ class SQSStreamTest
     }
   }
 
-  private def createExampleObjects(start: Int = 1, count: Int): List[ExampleObject] =
+  private def createExampleObjects(start: Int = 1,
+                                   count: Int): List[ExampleObject] =
     (start to (start + count)).map { i =>
       ExampleObject(s"Example value $i")
     }.toList
 
-  private def sendExampleObjects(queue: Queue, start: Int = 1, count: Int = 1) =
+  private def sendExampleObjects(queue: Queue,
+                                 start: Int = 1,
+                                 count: Int = 1) =
     createExampleObjects(start = start, count = count).map { exampleObject =>
       sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
     }
