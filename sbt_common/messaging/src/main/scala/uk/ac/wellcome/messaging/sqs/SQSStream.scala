@@ -40,19 +40,36 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
                              metricsSender: MetricsSender)
     extends Logging {
 
-  def decider(metricName: String): Supervision.Decider = {
-    case e: Exception =>
-      metricsSender.count(metricName, Future.failed(e))
-      Supervision.Resume
-    case _ => Supervision.Stop
-  }
-
   implicit val system = actorSystem
 
   implicit val dispatcher = system.dispatcher
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
+
+  def foreach(streamName: String, process: T => Future[Unit])(
+    implicit decoderT: Decoder[T]): Future[Done] =
+    runStream(
+      s"$streamName",
+      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
+        case (message, t) =>
+          debug(s"Processing message ${message.getMessageId}")
+          readAndProcess(streamName, t, process).map(_ => message)
+      }
+    )
+
+  // Defines a "supervision strategy" -- this tells Akka how to react
+  // if one of the elements fails.  We want to log the failing message,
+  // then drop it and carry on processing the next message.
+  //
+  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
+  //
+  private def decider(metricName: String): Supervision.Decider = {
+    case e: Exception =>
+      metricsSender.count(metricName, Future.failed(e))
+      Supervision.Resume
+    case _ => Supervision.Stop
+  }
 
   def runStream[M](
     streamName: String,
@@ -73,17 +90,6 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       .toMat(sink)(Keep.right)
       .run()
   }
-
-  def foreach(streamName: String, process: T => Future[Unit])(
-    implicit decoderT: Decoder[T]): Future[Done] =
-    runStream(
-      s"$streamName",
-      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
-        case (message, t) =>
-          debug(s"Processing message ${message.getMessageId}")
-          readAndProcess(streamName, t, process).map(_ => message)
-      }
-    )
 
   private def readAndProcess(streamName: String,
                              message: T,
