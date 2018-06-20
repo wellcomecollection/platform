@@ -70,9 +70,9 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     case _ => Supervision.Stop
   }
 
-  def runStream[M](
+  def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, M])(
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])(
     implicit decoder: Decoder[T]): Future[Done] = {
     val metricName = s"${streamName}_ProcessMessage"
 
@@ -80,11 +80,11 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName)))
 
-    val src: Source[Message, M] = modifySource(source.map {
+    val src: Source[Message, NotUsed] = modifySource(source.map {
       message => (message, fromJson[T](message.getBody).get)
     })
 
-    val srcWithLogging: Source[(Message, Delete.type), M] = src
+    val srcWithLogging: Source[(Message, Delete.type), NotUsed] = src
       .map { m =>
         metricsSender.count(metricName, Future.successful(()))
         debug(s"Deleting message ${m.getMessageId}")

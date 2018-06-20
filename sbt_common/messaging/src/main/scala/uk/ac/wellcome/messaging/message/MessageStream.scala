@@ -30,9 +30,9 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](
+  def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, M])
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])
     : Future[Done] =
     sqsStream.runStream(
       streamName,
