@@ -32,7 +32,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
   }
 
   def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
-    info(s"Attempting to transform ${sierraItemData.id}")
+    debug(s"Attempting to transform ${sierraItemData.id}")
     internal.UnidentifiedItem(
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),

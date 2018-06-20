@@ -38,7 +38,7 @@ class SierraTransformableTransformer
     version: Int): Try[Option[UnidentifiedWork]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
-        info(s"Attempting to transform ${bibData.id}")
+        debug(s"Attempting to transform ${bibData.id}")
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
           Some(
@@ -74,7 +74,7 @@ class SierraTransformableTransformer
       // the item data so far, we don't have enough to build a Work, so we
       // return None.
       .getOrElse {
-        info("No bib data on the record, so skipping")
+        debug("No bib data on the record, so skipping")
         Success(None)
       }
   }
