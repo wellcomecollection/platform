@@ -36,5 +36,5 @@ def hex_to_rgb(hex):
 
 
 def ids_to_urls(image_ids):
-    url = 'https://iiif.wellcomecollection.org/image/{}/full/760,/0/default.jpg'
+    url = 'https://iiif.wellcomecollection.org/image/{}/full/300,/0/default.jpg'
     return [url.format(image_id) for image_id in image_ids]

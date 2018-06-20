@@ -1,0 +1,28 @@
+@font-face {
+    font-family: 'Wellcome Bold';
+    src: url('Wellcome-Bold.otf') format("opentype");;
+}
+
+.roboto {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+body {
+    font-family: 'Roboto';
+}
+
+h1 {
+    font-family: 'Wellcome Bold';
+    font-size: 48px;
+}
+
+.divider--dashed {
+    height: 10px;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzIDEwIj48cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxMCIvPjwvc3ZnPg==');
+    background-repeat: repeat;
+  }
+
+.divider--black {
+    background-color: color('black');
+  }
