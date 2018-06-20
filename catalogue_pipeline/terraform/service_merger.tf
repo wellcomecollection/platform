@@ -11,7 +11,7 @@ module "merger" {
     merger_queue_id          = "${module.merger_queue.id}"
     merger_topic_arn         = "${module.merged_works_topic.arn}"
     vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
-    messages_bucket_name = "${aws_s3_bucket.messages.id}"
+    messages_bucket_name     = "${aws_s3_bucket.messages.id}"
     vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
     metrics_namespace        = "merger"
     log_level                = "INFO"

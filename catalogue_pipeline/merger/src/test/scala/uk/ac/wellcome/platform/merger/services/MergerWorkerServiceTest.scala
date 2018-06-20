@@ -181,10 +181,11 @@ class MergerWorkerServiceTest
                         MetricsSender),
                        R]): R = {
     withLocalS3Bucket { storageBucket =>
-    withLocalS3Bucket { messageBucket =>
-      withLocalDynamoDbTable { table =>
-        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](storageBucket, table) {
-          vhs =>
+      withLocalS3Bucket { messageBucket =>
+        withLocalDynamoDbTable { table =>
+          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
+            storageBucket,
+            table) { vhs =>
             withActorSystem { actorSystem =>
               withLocalSqsQueueAndDlq {
                 case queuePair @ QueuePair(queue, dlq) =>
@@ -194,7 +195,9 @@ class MergerWorkerServiceTest
                         actorSystem,
                         queue,
                         metricsSender) { sqsStream =>
-                        withMessageWriter[UnidentifiedWork, R](messageBucket, topic) { snsWriter =>
+                        withMessageWriter[UnidentifiedWork, R](
+                          messageBucket,
+                          topic) { snsWriter =>
                           withMergerWorkerService(
                             actorSystem,
                             sqsStream,
@@ -208,19 +211,21 @@ class MergerWorkerServiceTest
                   }
               }
             }
-            }
+          }
         }
       }
     }
   }
 
   def withMergerWorkerService[R](
-                                  actorSystem: ActorSystem,
-                                  sqsStream: SQSStream[NotificationMessage],
-                                  vhs: VersionedHybridStore[RecorderWorkEntry,
+    actorSystem: ActorSystem,
+    sqsStream: SQSStream[NotificationMessage],
+    vhs: VersionedHybridStore[RecorderWorkEntry,
                               EmptyMetadata,
                               ObjectStore[RecorderWorkEntry]],
-                                  messageWriter: MessageWriter[UnidentifiedWork])(testWith: TestWith[MergerWorkerService, R]) = {
-    testWith(new MergerWorkerService(actorSystem, sqsStream, vhs, messageWriter))
+    messageWriter: MessageWriter[UnidentifiedWork])(
+    testWith: TestWith[MergerWorkerService, R]) = {
+    testWith(
+      new MergerWorkerService(actorSystem, sqsStream, vhs, messageWriter))
   }
 }

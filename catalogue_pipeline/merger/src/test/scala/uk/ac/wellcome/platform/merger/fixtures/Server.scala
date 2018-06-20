@@ -17,11 +17,16 @@ trait Server
     with SQS
     with Messaging
     with LocalVersionedHybridStore { this: Suite =>
-  def withServer[R](queue: Queue, topic: Topic, storageBucket: Bucket,messageBucket: Bucket, table: Table)(
-    testWith: TestWith[EmbeddedHttpServer, R]): R = {
+  def withServer[R](
+    queue: Queue,
+    topic: Topic,
+    storageBucket: Bucket,
+    messageBucket: Bucket,
+    table: Table)(testWith: TestWith[EmbeddedHttpServer, R]): R = {
     val server: EmbeddedHttpServer = new EmbeddedHttpServer(
       new AppServer(),
-      flags = sqsLocalFlags(queue) ++ cloudWatchLocalFlags ++ messageWriterLocalFlags(messageBucket,
+      flags = sqsLocalFlags(queue) ++ cloudWatchLocalFlags ++ messageWriterLocalFlags(
+        messageBucket,
         topic) ++ vhsLocalFlags(storageBucket, table)
     )
 

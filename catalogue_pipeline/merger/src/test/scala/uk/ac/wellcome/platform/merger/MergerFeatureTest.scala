@@ -31,7 +31,12 @@ class MergerFeatureTest
               table) { vhs =>
               withLocalSqsQueueAndDlq {
                 case QueuePair(queue, dlq) =>
-                  withServer(queue = queue, topic = topic, storageBucket = storageBucket, messageBucket = messagesBucket, table = table) { _ =>
+                  withServer(
+                    queue = queue,
+                    topic = topic,
+                    storageBucket = storageBucket,
+                    messageBucket = messagesBucket,
+                    table = table) { _ =>
                     val recorderWorkEntry = recorderWorkEntryWith(
                       "dfmsng",
                       "sierra-system-number",

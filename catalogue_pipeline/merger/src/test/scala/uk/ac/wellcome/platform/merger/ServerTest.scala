@@ -19,11 +19,12 @@ class ServerTest
         withLocalS3Bucket { messagesBucket =>
           withLocalDynamoDbTable { table =>
             withLocalSqsQueue { queue =>
-              withServer(queue, topic, storageBucket, messagesBucket, table) { server =>
-                server.httpGet(
-                  path = "/management/healthcheck",
-                  andExpect = Ok,
-                  withJsonBody = """{"message": "ok"}""")
+              withServer(queue, topic, storageBucket, messagesBucket, table) {
+                server =>
+                  server.httpGet(
+                    path = "/management/healthcheck",
+                    andExpect = Ok,
+                    withJsonBody = """{"message": "ok"}""")
               }
             }
           }
