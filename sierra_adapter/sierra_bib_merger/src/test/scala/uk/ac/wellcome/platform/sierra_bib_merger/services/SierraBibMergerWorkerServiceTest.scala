@@ -5,13 +5,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -70,15 +68,12 @@ class SierraBibMergerWorkerServiceTest
                     withTypeVHS[SierraTransformable, SourceMetadata, R](
                       storageBucket,
                       table) { vhs =>
-                      val sqsToDynamoStream =
-                        new SQSToDynamoStream[SierraRecord](system, sqsStream)
-
                       val mergerUpdaterService =
                         new SierraBibMergerUpdaterService(vhs, metricsSender)
 
                       val worker = new SierraBibMergerWorkerService(
                         system,
-                        sqsToDynamoStream,
+                        sqsStream = sqsStream,
                         mergerUpdaterService)
                       testWith((metricsSender, queuePair, worker))
                     }

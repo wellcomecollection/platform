@@ -8,7 +8,6 @@ import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.SQSToDynamoStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
@@ -54,9 +53,7 @@ class SierraItemsToDynamoWorkerServiceTest
                   val sierraItemsToDynamoWorkerService =
                     new SierraItemsToDynamoWorkerService(
                       system = actorSystem,
-                      new SQSToDynamoStream[SierraRecord](
-                        actorSystem,
-                        sqsStream),
+                      sqsStream = sqsStream,
                       dynamoInserter = dynamoInserter
                     )
 

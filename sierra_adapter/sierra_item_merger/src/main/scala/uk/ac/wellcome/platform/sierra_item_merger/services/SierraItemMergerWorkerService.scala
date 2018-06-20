@@ -2,22 +2,29 @@ package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
-import uk.ac.wellcome.messaging.sqs.SQSToDynamoStream
+import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.storage.GlobalExecutionContext
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SierraItemMergerWorkerService @Inject()(
   system: ActorSystem,
-  sqsStream: SQSToDynamoStream[SierraItemRecord],
+  sqsStream: SQSStream[NotificationMessage],
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
 ) {
 
-  sqsStream.foreach(this.getClass.getSimpleName, store)
+  implicit val ec: ExecutionContext = GlobalExecutionContext.context
 
-  private def store(record: SierraItemRecord): Future[Unit] =
-    sierraItemMergerUpdaterService.update(record)
+  sqsStream.foreach(this.getClass.getSimpleName, process)
+
+  private def process(message: NotificationMessage): Future[Unit] =
+    for {
+      record <- Future.fromTry(fromJson[SierraItemRecord](message.Message))
+      _ <- sierraItemMergerUpdaterService.update(record)
+    } yield ()
 
   def stop() = system.terminate()
 }
