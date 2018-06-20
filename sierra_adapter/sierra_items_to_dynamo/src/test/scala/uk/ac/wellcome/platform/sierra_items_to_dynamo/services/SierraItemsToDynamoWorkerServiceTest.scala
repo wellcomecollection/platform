@@ -46,7 +46,7 @@ class SierraItemsToDynamoWorkerServiceTest
           withLocalSqsQueueAndDlq {
             case queuePair @ QueuePair(queue, dlq) =>
               withMockMetricSender { metricsSender =>
-                withSQSStream[SierraRecord, R](
+                withSQSStream[NotificationMessage, R](
                   actorSystem,
                   queue,
                   metricsSender) { sqsStream =>
