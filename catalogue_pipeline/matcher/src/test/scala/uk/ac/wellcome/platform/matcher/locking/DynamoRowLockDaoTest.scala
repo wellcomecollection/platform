@@ -1,9 +1,11 @@
 package uk.ac.wellcome.platform.matcher.locking
 
 import java.time.{Duration, Instant}
+import java.util
+import java.util.concurrent.{CountDownLatch, TimeUnit}
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
-import com.amazonaws.services.dynamodbv2.model.QueryRequest
+import com.amazonaws.services.dynamodbv2.model._
 import com.gu.scanamo._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -35,7 +37,7 @@ class DynamoRowLockDaoTest
 
   private val contextId = "contextId"
 
-  it("locks a Thing") {
+  it("locks a thing") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         val id = Random.nextString(32)
@@ -52,7 +54,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("cannot lock a locked Thing") {
+  it("cannot lock a locked thing") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         val id = Random.nextString(32)
@@ -67,7 +69,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("can lock a locked Thing that has expired") {
+  it("can lock a locked thing that has expired") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         val id = Random.nextString(32)
@@ -98,7 +100,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("unlocks a locked Thing and can lock it again") {
+  it("unlocks a locked thing and can lock it again") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         val id = Random.nextString(32)
@@ -121,13 +123,13 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("throws FailedLock exception...") {
+  it("throws FailedUnlockException if there is a problem reading the context index") {
+    val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      val mockClient = mock[AmazonDynamoDB]
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
 
         when(mockClient.query(any[QueryRequest]))
-          .thenThrow(new RuntimeException("FAILED"))
+          .thenThrow(new InternalServerErrorException("FAILED"))
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
           unlockFailed shouldBe a[FailedUnlockException]
@@ -137,7 +139,41 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("only one process can lock a locked Thing") {
+  it("throws FailedUnlockException if there are unprocessed batch items") {
+    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+      val mockClient = mock[AmazonDynamoDB]
+      withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
+
+        when(mockClient.query(any[QueryRequest])).thenReturn(aRowLockQueryResult)
+
+        when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
+          .thenReturn(new BatchWriteItemResult().withUnprocessedItems(someUnprocessedItems))
+
+        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
+          unlockFailed shouldBe a[FailedUnlockException]
+        }
+      }
+    }
+  }
+
+  it("throws FailedUnlockException if the batch update fails") {
+    val mockClient = mock[AmazonDynamoDB]
+    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+      withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
+
+        when(mockClient.query(any[QueryRequest])).thenReturn(aRowLockQueryResult)
+
+        when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
+          .thenThrow(new InternalServerErrorException("FAILED"))
+
+        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
+          unlockFailed shouldBe a[FailedUnlockException]
+        }
+      }
+    }
+  }
+
+  it("only one process can lock a locked thing") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
 
@@ -149,12 +185,17 @@ class DynamoRowLockDaoTest
 
         (1 to lockUnlockCycles).foreach(_ => {
 
-          val thingsToLock = (1 to parallelism).map(_ => Identifier("same"))
+          val thingsToLock = (1 to parallelism).map(_ => Identifier("sameId"))
 
-          val eventualLocks = thingsToLock.map { thingToLock => dynamoRowLockDao.lockRow(Identifier(thingToLock.id), contextId) }
-            .map(_.recover {
-              case e: FailedLockException => e
-            })
+          val countDownLatch = new CountDownLatch(parallelism)
+          val eventualLocks = thingsToLock.map { thingToLock => Future {
+              countDownLatch.countDown()
+              countDownLatch.await(10, TimeUnit.SECONDS)
+            }.flatMap(_ =>
+              dynamoRowLockDao.lockRow(Identifier(thingToLock.id), contextId)
+          )}.map(_.recover {
+            case e: FailedLockException => e
+          })
 
           whenReady(Future.sequence(eventualLocks)) { locksAttempts =>
             locksAttempts.collect { case a: RowLock => a }.size shouldBe 1
@@ -164,6 +205,30 @@ class DynamoRowLockDaoTest
           whenReady(dynamoRowLockDao.unlockRows(contextId)) { _ => }
         })
       }
+    }
+  }
+
+  private def aRowLockQueryResult = {
+    val rowLockAsMap: util.Map[String, AttributeValue] = new util.HashMap[String, AttributeValue]() {
+      put("id", new AttributeValue("id"))
+      put("contextId", new AttributeValue("contextId"))
+      val aDate = new AttributeValue()
+      aDate.setN("1")
+      put("created", aDate)
+      put("expires", aDate)
+    }
+    val results = new util.ArrayList[util.Map[String, AttributeValue]]();
+    results.add(rowLockAsMap)
+    val queryResult = new QueryResult()
+    queryResult.setItems(results)
+    queryResult
+  }
+
+  private def someUnprocessedItems = {
+    new util.HashMap[String, util.List[WriteRequest]] {
+      val items: util.List[WriteRequest] = new util.ArrayList[WriteRequest]()
+      items.add(new WriteRequest())
+      put("key", items)
     }
   }
 }
