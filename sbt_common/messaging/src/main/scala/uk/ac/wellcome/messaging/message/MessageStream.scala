@@ -38,17 +38,11 @@ class MessageStream[T] @Inject()(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] = {
-    runStream(
-      streamName,
-      source =>
-        source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
-          case (message, t) =>
-            for {
-              _ <- process(t)
-            } yield message
-      })
-  }
+  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] =
+    sqsStream.foreach(
+      streamName = streamName,
+      process = (notification: NotificationMessage) => process(readFromS3(notification.Message))
+    )
 
   private def messageFromS3Source(
     source: Source[(Message, NotificationMessage), NotUsed]) = {
