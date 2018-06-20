@@ -54,7 +54,7 @@ class MessageStream[T] @Inject()(
     }
   }
 
-  private def readFromS3(messageString: String) =
+  private def readFromS3(messageString: String): Future[T] =
     for {
       messagePointer <- Future.fromTry(fromJson[MessagePointer](messageString))
       deserialisedObject <- objectStore.get(messagePointer.src)
