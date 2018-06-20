@@ -99,6 +99,9 @@ class SQSStreamTest
     "sends a failure metric if it doesn't fail gracefully when processing a message") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), metricsSender) =>
+        val exampleObject = ExampleObject("some value 1")
+
+        sendMessage(queue, exampleObject)
         def processFailing(o: ExampleObject) = {
           Future.failed(new RuntimeException("BOOOOM!"))
         }
@@ -223,7 +226,7 @@ class SQSStreamTest
 
   private def createExampleObjects(start: Int = 1,
                                    count: Int): List[ExampleObject] =
-    (start to (start + count)).map { i =>
+    (start to (start + count - 1)).map { i =>
       ExampleObject(s"Example value $i")
     }.toList
 
@@ -233,6 +236,9 @@ class SQSStreamTest
     createExampleObjects(start = start, count = count).map { exampleObject =>
       sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
     }
+
+  private def sendMessage(queue: Queue, obj: ExampleObject) =
+    sqsClient.sendMessage(queue.url, toJson(obj).get)
 
   def withSQSStreamFixtures[R](
     testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender),
