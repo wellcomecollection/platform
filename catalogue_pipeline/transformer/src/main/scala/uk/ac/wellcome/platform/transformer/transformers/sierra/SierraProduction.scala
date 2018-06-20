@@ -108,36 +108,47 @@ trait SierraProduction {
   //  - 2 = Distribution
   //  - 3 = Manufacture
   //
+  // The MARC spec specifies another value for the production function:
+  //
+  //  - 4 = Copyright notice date
+  //
+  // We'll be putting copyright information in a separate part of the domain
+  // model, so we drop any fields with indicator 4 for production events.
+  //
   // Note that a, b and c are repeatable fields.
   //
   // https://www.loc.gov/marc/bibliographic/bd264.html
   //
   private def getProductionFrom264Fields(varFields: List[VarField]) =
-    varFields.map { vf =>
-      val places = placesFromSubfields(vf, subfieldTag = "a")
-      val agents = agentsFromSubfields(vf, subfieldTag = "b")
-      val dates = datesFromSubfields(vf, subfieldTag = "c")
-
-      val productionFunctionLabel = vf.indicator2 match {
-        case Some("0") => "Production"
-        case Some("1") => "Publication"
-        case Some("2") => "Distribution"
-        case Some("3") => "Manufacture"
-        case other =>
-          throw GracefulFailureException(new RuntimeException(
-            s"Unrecognised second indicator for production function: [$other]"
-          ))
+    varFields
+      .filterNot { vf =>
+        vf.indicator2 == Some("4")
       }
+      .map { vf =>
+        val places = placesFromSubfields(vf, subfieldTag = "a")
+        val agents = agentsFromSubfields(vf, subfieldTag = "b")
+        val dates = datesFromSubfields(vf, subfieldTag = "c")
 
-      val productionFunction = Some(Concept(label = productionFunctionLabel))
+        val productionFunctionLabel = vf.indicator2 match {
+          case Some("0") => "Production"
+          case Some("1") => "Publication"
+          case Some("2") => "Distribution"
+          case Some("3") => "Manufacture"
+          case other =>
+            throw GracefulFailureException(new RuntimeException(
+              s"Unrecognised second indicator for production function: [$other]"
+            ))
+        }
 
-      ProductionEvent(
-        places = places,
-        agents = agents,
-        dates = dates,
-        function = productionFunction
-      )
-    }
+        val productionFunction = Some(Concept(label = productionFunctionLabel))
+
+        ProductionEvent(
+          places = places,
+          agents = agents,
+          dates = dates,
+          function = productionFunction
+        )
+      }
 
   private def placesFromSubfields(vf: VarField,
                                   subfieldTag: String): List[Place] =
