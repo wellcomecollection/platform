@@ -23,34 +23,36 @@ class MergerFeatureTest
 
   it("reads matcher result messages off a queue and deletes them") {
     withLocalSnsTopic { topic =>
-      withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](
-            bucket,
-            table) { vhs =>
-            withLocalSqsQueueAndDlq {
-              case QueuePair(queue, dlq) =>
-                withServer(queue, topic, bucket, table) { _ =>
-                  val recorderWorkEntry = recorderWorkEntryWith(
-                    "dfmsng",
-                    "sierra-system-number",
-                    "b123456",
-                    1)
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalDynamoDbTable { table =>
+            withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](
+              storageBucket,
+              table) { vhs =>
+              withLocalSqsQueueAndDlq {
+                case QueuePair(queue, dlq) =>
+                  withServer(queue = queue, topic = topic, storageBucket = storageBucket, messageBucket = messagesBucket, table = table) { _ =>
+                    val recorderWorkEntry = recorderWorkEntryWith(
+                      "dfmsng",
+                      "sierra-system-number",
+                      "b123456",
+                      1)
 
-                  whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
-                    val matcherResult =
-                      matcherResultWith(Set(Set(recorderWorkEntry)))
+                    whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+                      val matcherResult =
+                        matcherResultWith(Set(Set(recorderWorkEntry)))
 
-                    sendSQSMessage(queue, matcherResult)
+                      sendSQSMessage(queue, matcherResult)
 
-                    eventually {
-                      assertQueueEmpty(queue)
-                      assertQueueEmpty(dlq)
-                      val worksSent = getWorksSent(topic)
-                      worksSent should contain only recorderWorkEntry.work
+                      eventually {
+                        assertQueueEmpty(queue)
+                        assertQueueEmpty(dlq)
+                        val worksSent = getWorksSent(topic)
+                        worksSent should contain only recorderWorkEntry.work
+                      }
                     }
                   }
-                }
+              }
             }
           }
         }

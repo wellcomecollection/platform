@@ -4,12 +4,14 @@ import akka.actor.ActorSystem
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
+import uk.ac.wellcome.messaging.message.MessageWriter
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -178,9 +180,10 @@ class MergerWorkerServiceTest
                         Topic,
                         MetricsSender),
                        R]): R = {
-    withLocalS3Bucket { bucket =>
+    withLocalS3Bucket { storageBucket =>
+    withLocalS3Bucket { messageBucket =>
       withLocalDynamoDbTable { table =>
-        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](bucket, table) {
+        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](storageBucket, table) {
           vhs =>
             withActorSystem { actorSystem =>
               withLocalSqsQueueAndDlq {
@@ -191,7 +194,7 @@ class MergerWorkerServiceTest
                         actorSystem,
                         queue,
                         metricsSender) { sqsStream =>
-                        withSNSWriter(topic) { snsWriter =>
+                        withMessageWriter[UnidentifiedWork, R](messageBucket, topic) { snsWriter =>
                           withMergerWorkerService(
                             actorSystem,
                             sqsStream,
@@ -205,18 +208,19 @@ class MergerWorkerServiceTest
                   }
               }
             }
+            }
         }
       }
     }
   }
 
   def withMergerWorkerService[R](
-    actorSystem: ActorSystem,
-    sqsStream: SQSStream[NotificationMessage],
-    vhs: VersionedHybridStore[RecorderWorkEntry,
+                                  actorSystem: ActorSystem,
+                                  sqsStream: SQSStream[NotificationMessage],
+                                  vhs: VersionedHybridStore[RecorderWorkEntry,
                               EmptyMetadata,
                               ObjectStore[RecorderWorkEntry]],
-    snsWriter: SNSWriter)(testWith: TestWith[MergerWorkerService, R]) = {
-    testWith(new MergerWorkerService(actorSystem, sqsStream, vhs, snsWriter))
+                                  messageWriter: MessageWriter[UnidentifiedWork])(testWith: TestWith[MergerWorkerService, R]) = {
+    testWith(new MergerWorkerService(actorSystem, sqsStream, vhs, messageWriter))
   }
 }

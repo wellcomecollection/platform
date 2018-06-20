@@ -2,30 +2,14 @@ package uk.ac.wellcome.platform.merger
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{
-  SNSClientModule,
-  SNSConfigModule,
-  SQSClientModule,
-  SQSConfigModule
-}
+import uk.ac.wellcome.finatra.messaging._
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{
-  DynamoClientModule,
-  S3ClientModule,
-  VHSConfigModule
-}
-import uk.ac.wellcome.platform.merger.modules.{
-  MergerWorkerModule,
-  RecorderWorkEntryModule
-}
+import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, VHSConfigModule}
+import uk.ac.wellcome.platform.merger.modules.{MergerWorkerModule, RecorderWorkEntryModule, UnidentifiedWorkModule}
 
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.merger Merger"
@@ -40,8 +24,9 @@ class Server extends HttpServer {
     DynamoClientModule,
     S3ClientModule,
     SNSClientModule,
-    SNSConfigModule,
-    RecorderWorkEntryModule
+    MessageConfigModule,
+    RecorderWorkEntryModule,
+    UnidentifiedWorkModule
   )
   override def configureHttp(router: HttpRouter) {
     router

@@ -3,7 +3,8 @@ package uk.ac.wellcome.platform.merger.services
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
+import uk.ac.wellcome.messaging.message.MessageWriter
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
@@ -22,7 +23,7 @@ class MergerWorkerService @Inject()(
   vhs: VersionedHybridStore[RecorderWorkEntry,
                             EmptyMetadata,
                             ObjectStore[RecorderWorkEntry]],
-  SNSWriter: SNSWriter
+  messageWriter: MessageWriter[UnidentifiedWork]
 )(implicit context: ExecutionContext)
     extends Logging {
 
@@ -53,7 +54,7 @@ class MergerWorkerService @Inject()(
     Future
       .sequence(maybeWorks.collect {
         case Some(work) =>
-          SNSWriter.writeMessage(toJson(work).get, "merged-work").map(_ => ())
+          messageWriter.write(work, "merged-work").map(_ => ())
       })
   }
 
