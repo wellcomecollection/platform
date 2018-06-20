@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import cdist
 from scipy.optimize import linear_sum_assignment
+from skimage.color import rgb2lab, lab2rgb
 
 
 def colour_distance(colour_1, colour_2):
@@ -33,6 +34,10 @@ def vectorised_palette_distance(query_palette, rearranged):
 
 def hex_to_rgb(hex):
      return [int(hex[i : i + 2], 16) for i in range(0, 6, 2)]
+
+
+def rgb_to_lab(rgb_palette):
+    return rgb2lab(rgb_palette.reshape(-1, 1, 3) / 255).squeeze()
 
 
 def ids_to_urls(image_ids):
