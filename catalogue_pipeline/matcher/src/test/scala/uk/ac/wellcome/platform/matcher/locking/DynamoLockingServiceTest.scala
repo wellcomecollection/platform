@@ -67,7 +67,7 @@ class DynamoLockingServiceTest
     }
   }
 
-//  it("throws a FailedUnlockException when unlocking the context fails") {
+//  it("throws a FailedLockException when unlocking the context fails") {
 //    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
 //      withLockingService(lockTable) { lockingService =>
 //        val idA = "id"

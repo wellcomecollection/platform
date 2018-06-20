@@ -123,7 +123,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("throws FailedUnlockException if there is a problem reading the context index") {
+  it("throws FailedLockException if there is a problem reading the context index") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -132,14 +132,14 @@ class DynamoRowLockDaoTest
           .thenThrow(new InternalServerErrorException("FAILED"))
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedUnlockException]
+          unlockFailed shouldBe a[FailedLockException]
         }
 
       }
     }
   }
 
-  it("throws FailedUnlockException if there are unprocessed batch items") {
+  it("throws FailedLockException if there are unprocessed batch items") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       val mockClient = mock[AmazonDynamoDB]
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -150,13 +150,13 @@ class DynamoRowLockDaoTest
           .thenReturn(new BatchWriteItemResult().withUnprocessedItems(someUnprocessedItems))
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedUnlockException]
+          unlockFailed shouldBe a[FailedLockException]
         }
       }
     }
   }
 
-  it("throws FailedUnlockException if the batch update fails") {
+  it("throws FailedLockException if the batch update fails") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -167,7 +167,7 @@ class DynamoRowLockDaoTest
           .thenThrow(new InternalServerErrorException("FAILED"))
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedUnlockException]
+          unlockFailed shouldBe a[FailedLockException]
         }
       }
     }

@@ -41,7 +41,7 @@ class WorkMatcher @Inject()(
       .recover {
         case e: FailedLockException =>
           info(
-            s"Failed to obtain a lock matching work ${work.sourceIdentifier}")
+            s"Failed to obtain a lock while matching work ${work.sourceIdentifier} ${e.getClass.getSimpleName} ${e.getMessage}")
           throw GracefulFailureException(e)
       }
   }
@@ -49,10 +49,8 @@ class WorkMatcher @Inject()(
   private def processUpdate(update: WorkUpdate,
                             updateAffectedIdentifiers: Set[String]) = {
     for {
-      graphBeforeUpdate: WorkGraph <- workGraphStore.findAffectedWorks(update)
-      updatedGraph: WorkGraph = WorkGraphUpdater.update(
-        update,
-        graphBeforeUpdate)
+      graphBeforeUpdate <- workGraphStore.findAffectedWorks(update)
+      updatedGraph = WorkGraphUpdater.update(update, graphBeforeUpdate)
       _ <- lockingService.withLocks(
         graphBeforeUpdate.nodes.map(_.id) -- updateAffectedIdentifiers)(
         workGraphStore.put(updatedGraph)

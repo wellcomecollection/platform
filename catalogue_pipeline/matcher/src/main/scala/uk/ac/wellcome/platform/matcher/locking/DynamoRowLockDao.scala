@@ -40,23 +40,22 @@ class DynamoRowLockDao @Inject()(
   def lockRow(id: Identifier, contextId: String) = Future {
     val (created, expires) = getExpiry
     val rowLock = RowLock(id.id, contextId, created, expires)
-
-    debug(s"Trying to create RowLock: $rowLock")
+    debug(s"Locking $rowLock")
 
     val scanamoOps = table
       .given(
         not(attributeExists('id)) or Condition(
           'expires < rowLock.created.getEpochSecond))
       .put(rowLock)
-
     val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
-
-    debug(s"Got $result when creating $rowLock")
+    debug(s"Got $result for $rowLock")
 
     result match {
       case Right(_) => rowLock
-      case Left(error) =>
-        throw new FailedLockException(s"Failed to lock $id", error)
+      case Left(error) => {
+        debug(s"Failed to lock $rowLock $error")
+        throw FailedLockException(s"Failed to lock $id", error)
+      }
     }
   }
 
@@ -71,7 +70,7 @@ class DynamoRowLockDao @Inject()(
         case Right(rowLock) => rowLock.id
         case Left(error) =>
           info(s"Error $error when unlocking $contextId")
-          throw FailedUnlockException(s"Failed to unlock [$contextId] $error")
+          throw FailedLockException(s"Failed to unlock [$contextId] $error")
       }.toSet
 
       debug(s"Unlocking rows: $rowLockIds")
@@ -82,14 +81,14 @@ class DynamoRowLockDao @Inject()(
           if (result.getUnprocessedItems.size() > 0) {
             val error = s"Batch delete failed to delete ${result.getUnprocessedItems}"
             info(error)
-            throw FailedUnlockException(error)
+            throw FailedLockException(error)
           }
       }
     } catch {
       case e: Exception =>
         val error = s"Problem unlocking rows in context [$contextId], ${e.getClass.getSimpleName} ${e.getMessage}"
         info(error)
-        throw FailedUnlockException(error)
+        throw FailedLockException(error)
     }
 
     ()
@@ -100,10 +99,6 @@ case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
 case class FailedLockException(private val message: String = "",
                                private val cause: Throwable = None.orNull)
-    extends Throwable
-
-case class FailedUnlockException(private val message: String = "",
-                                 private val cause: Throwable = None.orNull)
     extends Throwable
 
 case class Identifier(id: String)

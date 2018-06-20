@@ -11,13 +11,13 @@ class DynamoLockingService @Inject()(dynamoRowLockDao: DynamoRowLockDao)(
   def withLocks[T](ids: Set[String])(f: => Future[T]): Future[T] = {
     val contextGuid = randomUUID.toString
     val identifiers: Set[Identifier] = ids.map(Identifier)
-    debug(s"Locking identifiers $identifiers")
+    debug(s"Locking identifiers $identifiers in context $contextGuid")
     val eventuallyExecutedWithLock = for {
       _ <- Future.sequence(
         identifiers.map(dynamoRowLockDao.lockRow(_, contextGuid)))
       result <- f
     } yield {
-      debug(s"Released locked identifiers $identifiers")
+      debug(s"Released locked identifiers $identifiers in $contextGuid")
       result
     }
     eventuallyExecutedWithLock.transformWith { triedResult =>

@@ -8,24 +8,13 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier,
-  WorkNode
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{
-  DynamoLockingService,
-  DynamoLockingServiceConfig,
-  DynamoRowLockDao,
-  Identifier
-}
+import uk.ac.wellcome.platform.matcher.lockable.Identifier
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 class WorkMatcherTest
@@ -174,30 +163,66 @@ class WorkMatcherTest
     }
   }
 
-  it("Throws GracefulFailureException if it fails to lock") {
+  it("throws GracefulFailureException if it fails to lock primary works") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
         withWorkGraphStore(graphTable) { workGraphStore =>
-          withWorkMatcher(workGraphStore, lockTable) { workMatcher =>
-            val rowLockDao = new DynamoRowLockDao(
-              dynamoDbClient,
-              DynamoLockingServiceConfig(lockTable.name, lockTable.index))
-            val dynamoLockingService =
-              new DynamoLockingService(rowLockDao)
-            withWorkMatcherAndLockingService(
-              workGraphStore,
-              dynamoLockingService) { workMatcher =>
-              val failedLock = for {
-                _ <- rowLockDao.lockRow(
-                  Identifier("sierra-system-number/id"),
-                  "processId")
-                result <- workMatcher.matchWork(anUnidentifiedSierraWork)
-              } yield (result)
+          withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
+            withLockingService(rowLockDao) { dynamoLockingService =>
+              withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
 
-              whenReady(failedLock.failed) { failedMatch =>
-                failedMatch shouldBe a[GracefulFailureException]
+                val failedLock = for {
+                  _ <- rowLockDao.lockRow(
+                    Identifier("sierra-system-number/id"),
+                    "processId")
+                  result <- workMatcher.matchWork(anUnidentifiedSierraWork.copy())
+                } yield result
+
+                whenReady(failedLock.failed) { failedMatch =>
+                  failedMatch shouldBe a[GracefulFailureException]
+                }
+
               }
+            }
+          }
+        }
+      }
+    }
+  }
 
+  it("throws GracefulFailureException if it fails to lock secondary works") {
+    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+      withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
+        withWorkGraphStore(graphTable) { workGraphStore =>
+          withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
+            withLockingService(rowLockDao) { dynamoLockingService =>
+              withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
+
+                val identifierA = aSierraSourceIdentifier("A")
+                val identifierB = aSierraSourceIdentifier("B")
+
+                // A->B->C
+                workGraphStore.put(WorkGraph(Set(
+                  WorkNode("sierra-system-number/A", 0, List("sierra-system-number/B"), "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                  WorkNode("sierra-system-number/B", 0, List("sierra-system-number/C"), "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                  WorkNode("sierra-system-number/C", 0, Nil,                            "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
+                )))
+
+                val work = anUnidentifiedSierraWork.copy(
+                  sourceIdentifier = identifierA,
+                  identifiers = List(identifierA, identifierB)
+                )
+                val failedLock = for {
+                  _ <- rowLockDao.lockRow(
+                    Identifier("sierra-system-number/C"),
+                    "processId")
+                  result <- workMatcher.matchWork(work)
+                } yield result
+
+                whenReady(failedLock.failed) { failedMatch =>
+                  failedMatch shouldBe a[GracefulFailureException]
+                }
+              }
             }
           }
         }
