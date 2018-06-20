@@ -83,7 +83,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
         .withSupervisionStrategy(decider(metricName)))
 
     val src: Source[Message, M] = modifySource(source.map {
-      message => (message, read(message).get)
+      message => (message, fromJson[T](message.getBody).get)
     })
 
     val srcWithLogging: Source[(Message, Delete.type), M] = src
@@ -114,8 +114,4 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     }
     processMessageFuture
   }
-
-  private def read(message: sqs.model.Message)(
-    implicit decoderT: Decoder[T]): Try[T] =
-    fromJson[T](message.getBody)
 }
