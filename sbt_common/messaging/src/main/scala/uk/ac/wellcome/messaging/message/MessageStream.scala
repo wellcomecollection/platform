@@ -41,7 +41,10 @@ class MessageStream[T] @Inject()(
   def foreach(streamName: String, process: T => Future[Unit]): Future[Done] =
     sqsStream.foreach(
       streamName = streamName,
-      process = (notification: NotificationMessage) => process(readFromS3(notification.Message))
+      process = (notification: NotificationMessage) => for {
+        obj <- readFromS3(notification.Message)
+        result <- process(obj)
+      } yield result
     )
 
   private def messageFromS3Source(
