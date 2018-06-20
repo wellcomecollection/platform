@@ -7,7 +7,6 @@ import akka.stream.alpakka.sqs.MessageAction.Delete
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
-import com.amazonaws.services.sqs
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
@@ -18,7 +17,6 @@ import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.utils.JsonUtil.fromJson
 
 import scala.concurrent.Future
-import scala.util.Try
 
 // Provides a stream for processing SQS messages.
 //
