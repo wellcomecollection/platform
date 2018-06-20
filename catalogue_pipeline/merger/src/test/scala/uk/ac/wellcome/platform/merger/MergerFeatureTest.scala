@@ -5,7 +5,6 @@ import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -47,10 +46,7 @@ class MergerFeatureTest
                     eventually {
                       assertQueueEmpty(queue)
                       assertQueueEmpty(dlq)
-                      val messagesSent = listMessagesReceivedFromSNS(topic)
-                      val worksSent = messagesSent.map { message =>
-                        fromJson[UnidentifiedWork](message.message).get
-                      }
+                      val worksSent = getWorksSent(topic)
                       worksSent should contain only recorderWorkEntry.work
                     }
                   }
