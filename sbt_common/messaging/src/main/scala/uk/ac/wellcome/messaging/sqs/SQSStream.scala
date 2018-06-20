@@ -50,11 +50,13 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     implicit decoderT: Decoder[T]): Future[Done] =
     runStream(
       streamName = streamName,
-      _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
-        case (message, t) =>
-          debug(s"Processing message ${message.getMessageId}")
-          readAndProcess(streamName, t, process).map(_ => message)
-      }
+      source =>
+        source
+          .mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
+            case (message, t) =>
+              debug(s"Processing message ${message.getMessageId}")
+              readAndProcess(streamName, t, process).map(_ => message)
+          }
     )
 
   // Defines a "supervision strategy" -- this tells Akka how to react
