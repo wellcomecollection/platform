@@ -46,7 +46,7 @@ class MessagingIntegrationTest
       case (queue, bucket, messageStream) =>
         withLocalStackSnsTopic { topic =>
           withLocalStackSubscription(queue, topic) { _ =>
-            withMessageWriter(bucket, topic, localStackSnsClient) {
+            withExampleObjectMessageWriter(bucket, topic, localStackSnsClient) {
               messageWriter =>
                 testWith((messageStream, messageWriter))
             }

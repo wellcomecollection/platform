@@ -67,10 +67,17 @@ trait Messaging
       "aws.message.writer.s3.bucketName" -> bucket.name
     ) ++ s3ClientLocalFlags ++ snsLocalClientFlags
 
-  def withMessageWriter[R](bucket: Bucket,
-                           topic: Topic,
-                           writerSnsClient: AmazonSNS = snsClient)(
+  def withExampleObjectMessageWriter[R](bucket: Bucket,
+                                        topic: Topic,
+                                        writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[ExampleObject], R]) = {
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient)(testWith)
+  }
+
+  def withMessageWriter[T, R](bucket: Bucket,
+                                        topic: Topic,
+                                        writerSnsClient: AmazonSNS = snsClient)(
+    testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
     val messageConfig = MessageWriterConfig(
@@ -78,7 +85,7 @@ trait Messaging
       snsConfig = snsConfig
     )
 
-    val messageWriter = new MessageWriter[ExampleObject](
+    val messageWriter = new MessageWriter[T](
       messageConfig = messageConfig,
       snsClient = writerSnsClient,
       s3Client = s3Client

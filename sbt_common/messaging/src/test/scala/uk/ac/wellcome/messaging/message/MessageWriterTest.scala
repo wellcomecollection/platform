@@ -24,7 +24,7 @@ class MessageWriterTest
   it("sends messages") {
     withLocalSnsTopic { topic =>
       withLocalS3Bucket { bucket =>
-        withMessageWriter(bucket, topic) { messageWriter =>
+        withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
           val eventualAttempt = messageWriter.write(message, subject)
 
           whenReady(eventualAttempt) { pointer =>
@@ -53,7 +53,7 @@ class MessageWriterTest
   it("returns a failed future if it fails to publish to SNS") {
     withLocalS3Bucket { bucket =>
       val topic = Topic(arn = "invalid-topic-arn")
-      withMessageWriter(bucket, topic) { messageWriter =>
+      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
         val eventualAttempt = messageWriter.write(message, subject)
 
         whenReady(eventualAttempt.failed) { ex =>
@@ -66,7 +66,7 @@ class MessageWriterTest
   it("returns a failed future if it fails to store message") {
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
-      withMessageWriter(bucket, topic) { messageWriter =>
+      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
         val eventualAttempt = messageWriter.write(message, subject)
 
         whenReady(eventualAttempt.failed) { ex =>
@@ -79,7 +79,7 @@ class MessageWriterTest
   it("does not publish message pointer if it fails to store message") {
     withLocalSnsTopic { topic =>
       val bucket = Bucket(name = "invalid-bucket")
-      withMessageWriter(bucket, topic) { messageWriter =>
+      withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
         val eventualAttempt = messageWriter.write(message, subject)
 
         whenReady(eventualAttempt.failed) { _ =>
