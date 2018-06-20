@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.sqs
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import akka.stream.alpakka.sqs.MessageAction
+import akka.stream.alpakka.sqs.MessageAction.Delete
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Keep, Source}
 import akka.{Done, NotUsed}
@@ -78,15 +79,21 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     val metricName = s"${streamName}_ProcessMessage"
 
     implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system).withSupervisionStrategy(
-        decider(metricName)))
+      ActorMaterializerSettings(system)
+        .withSupervisionStrategy(decider(metricName)))
 
-    modifySource(source.map(message => (message, read(message).get)))
+    val src: Source[Message, M] = modifySource(source.map {
+      message => (message, read(message).get)
+    })
+
+    val srcWithLogging: Source[(Message, Delete.type), M] = src
       .map { m =>
         metricsSender.count(metricName, Future.successful(()))
         debug(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
+
+    srcWithLogging
       .toMat(sink)(Keep.right)
       .run()
   }
