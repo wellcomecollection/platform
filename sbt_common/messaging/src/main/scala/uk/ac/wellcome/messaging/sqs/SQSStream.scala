@@ -49,7 +49,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   def foreach(streamName: String, process: T => Future[Unit])(
     implicit decoderT: Decoder[T]): Future[Done] =
     runStream(
-      s"$streamName",
+      streamName = streamName,
       _.mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
         case (message, t) =>
           debug(s"Processing message ${message.getMessageId}")
