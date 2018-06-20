@@ -19,6 +19,21 @@ import uk.ac.wellcome.utils.JsonUtil.fromJson
 import scala.concurrent.Future
 import scala.util.Try
 
+// Provides a stream for processing SQS messages.
+//
+// The main entry point is `foreach` -- callers should create an instance of
+// this class, then pass the name of the stream and a processing function
+// to foreach.  For example:
+//
+//      val sqsStream = SQSStream[NotificationMessage]
+//
+//      def processMessage(message: NotificationMessage): Future[Unit]
+//
+//      sqsStream.foreach(
+//        streamName = "ExampleStream",
+//        process = processMessage
+//      )
+//
 class SQSStream[T] @Inject()(actorSystem: ActorSystem,
                              sqsClient: AmazonSQSAsync,
                              sqsConfig: SQSConfig,
