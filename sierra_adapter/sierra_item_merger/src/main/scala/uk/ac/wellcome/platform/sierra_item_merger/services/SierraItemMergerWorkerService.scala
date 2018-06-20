@@ -20,10 +20,11 @@ class SierraItemMergerWorkerService @Inject()(
 
   sqsStream.foreach(this.getClass.getSimpleName, process)
 
-  private def process(message: NotificationMessage): Future[Unit] = for {
-    record <- Future.fromTry(fromJson[SierraItemRecord](message.Message))
-    _ <- sierraItemMergerUpdaterService.update(record)
-  } yield ()
+  private def process(message: NotificationMessage): Future[Unit] =
+    for {
+      record <- Future.fromTry(fromJson[SierraItemRecord](message.Message))
+      _ <- sierraItemMergerUpdaterService.update(record)
+    } yield ()
 
   def stop() = system.terminate()
 }

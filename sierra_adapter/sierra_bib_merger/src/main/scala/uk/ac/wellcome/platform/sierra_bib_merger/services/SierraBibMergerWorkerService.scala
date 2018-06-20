@@ -20,10 +20,11 @@ class SierraBibMergerWorkerService @Inject()(
 
   sqsStream.foreach(this.getClass.getSimpleName, process)
 
-  private def process(message: NotificationMessage): Future[Unit] = for {
-    record <- Future.fromTry(fromJson[SierraRecord](message.Message))
-    _ <- sierraBibMergerUpdaterService.update(record.toBibRecord)
-  } yield ()
+  private def process(message: NotificationMessage): Future[Unit] =
+    for {
+      record <- Future.fromTry(fromJson[SierraRecord](message.Message))
+      _ <- sierraBibMergerUpdaterService.update(record.toBibRecord)
+    } yield ()
 
   def stop() = system.terminate()
 }

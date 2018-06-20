@@ -20,10 +20,11 @@ class SierraItemsToDynamoWorkerService @Inject()(
 
   implicit val ec: ExecutionContext = GlobalExecutionContext.context
 
-  private def process(message: NotificationMessage): Future[Unit] = for {
-    record <- Future.fromTry(fromJson[SierraRecord](message.Message))
-    _ <- dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
-  } yield ()
+  private def process(message: NotificationMessage): Future[Unit] =
+    for {
+      record <- Future.fromTry(fromJson[SierraRecord](message.Message))
+      _ <- dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
+    } yield ()
 
   def stop() = system.terminate()
 }
