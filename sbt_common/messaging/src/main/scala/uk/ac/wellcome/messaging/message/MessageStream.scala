@@ -50,7 +50,7 @@ class MessageStream[T] @Inject()(
       })
   }
 
-  private def messageFromS3Source[M](
+  private def messageFromS3Source(
     source: Source[(Message, NotificationMessage), NotUsed]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
