@@ -573,12 +573,13 @@ class SierraTransformableTransformerTest
       maybeBibData = Some(bibRecord)
     )
 
-    val transformedSierraRecord = transformer.transform(
+    val triedMaybeWork = transformer.transform(
       transformable = sierraTransformable,
       version = 1
     )
 
-    transformedSierraRecord.isSuccess shouldBe true
-    transformedSierraRecord.get.get
+    if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
+    triedMaybeWork.isSuccess shouldBe true
+    triedMaybeWork.get.get
   }
 }
