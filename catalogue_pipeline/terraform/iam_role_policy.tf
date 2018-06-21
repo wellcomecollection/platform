@@ -114,3 +114,8 @@ resource "aws_iam_role_policy" "merger_task_read_recorder_vhs" {
   role   = "${module.merger.task_role_name}"
   policy = "${module.vhs_recorder.read_policy}"
 }
+
+resource "aws_iam_role_policy" "merger_s3_messages" {
+  role   = "${module.merger.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
+}

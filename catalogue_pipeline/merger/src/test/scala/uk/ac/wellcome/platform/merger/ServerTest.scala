@@ -15,14 +15,17 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSnsTopic { topic =>
-      withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { table =>
-          withLocalSqsQueue { queue =>
-            withServer(queue, topic, bucket, table) { server =>
-              server.httpGet(
-                path = "/management/healthcheck",
-                andExpect = Ok,
-                withJsonBody = """{"message": "ok"}""")
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalDynamoDbTable { table =>
+            withLocalSqsQueue { queue =>
+              withServer(queue, topic, storageBucket, messagesBucket, table) {
+                server =>
+                  server.httpGet(
+                    path = "/management/healthcheck",
+                    andExpect = Ok,
+                    withJsonBody = """{"message": "ok"}""")
+              }
             }
           }
         }

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.merger
 
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -22,7 +22,7 @@ import uk.ac.wellcome.storage.dynamo._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait MergerTestUtils { this: SQS with SNS =>
+trait MergerTestUtils { this: SQS with SNS with Messaging =>
 
   def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
     MatcherResult(
@@ -70,7 +70,7 @@ trait MergerTestUtils { this: SQS with SNS =>
   def getWorksSent(topic: Topic) = {
     val messagesSent = listMessagesReceivedFromSNS(topic)
     val worksSent = messagesSent.map { message =>
-      fromJson[UnidentifiedWork](message.message).get
+      get[UnidentifiedWork](message)
     }
     worksSent
   }
