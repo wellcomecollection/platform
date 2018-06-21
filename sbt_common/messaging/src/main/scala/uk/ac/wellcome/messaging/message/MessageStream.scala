@@ -30,27 +30,25 @@ class MessageStream[T] @Inject()(
     metricsSender = metricsSender
   )
 
-  def runStream[M](
+  def runStream(
     streamName: String,
-    modifySource: Source[(Message, T), NotUsed] => Source[Message, M])
+    modifySource: Source[(Message, T), NotUsed] => Source[Message, NotUsed])
     : Future[Done] =
     sqsStream.runStream(
       streamName,
       source => modifySource(messageFromS3Source(source)))
 
-  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] = {
-    runStream(
-      streamName,
-      source =>
-        source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
-          case (message, t) =>
-            for {
-              _ <- process(t)
-            } yield message
-      })
-  }
+  def foreach(streamName: String, process: T => Future[Unit]): Future[Done] =
+    sqsStream.foreach(
+      streamName = streamName,
+      process = (notification: NotificationMessage) =>
+        for {
+          obj <- readFromS3(notification.Message)
+          result <- process(obj)
+        } yield result
+    )
 
-  private def messageFromS3Source[M](
+  private def messageFromS3Source(
     source: Source[(Message, NotificationMessage), NotUsed]) = {
     source.mapAsyncUnordered(messageReaderConfig.sqsConfig.parallelism) {
       case (message, notification) =>
@@ -60,7 +58,7 @@ class MessageStream[T] @Inject()(
     }
   }
 
-  private def readFromS3(messageString: String) =
+  private def readFromS3(messageString: String): Future[T] =
     for {
       messagePointer <- Future.fromTry(fromJson[MessagePointer](messageString))
       deserialisedObject <- objectStore.get(messagePointer.src)

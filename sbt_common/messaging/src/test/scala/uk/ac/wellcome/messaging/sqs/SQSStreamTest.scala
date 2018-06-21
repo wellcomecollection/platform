@@ -34,11 +34,7 @@ class SQSStreamTest
   it("reads messages off a queue, processes them and deletes them") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
-        val exampleObject1 = ExampleObject("Example value 1")
-        sendMessage(queue, exampleObject1)
-
-        val exampleObject2 = ExampleObject("Example value 2")
-        sendMessage(queue, exampleObject2)
+        sendExampleObjects(queue = queue, count = 3)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -47,9 +43,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          received should contain theSameElementsAs List(
-            exampleObject1,
-            exampleObject2)
+          received should contain theSameElementsAs createExampleObjects(
+            count = 3)
 
           assertQueueEmpty(queue)
           assertQueueEmpty(dlq)
@@ -61,8 +56,7 @@ class SQSStreamTest
   it("increments *_ProcessMessage metric when successful") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, _), metricsSender) =>
-        val exampleObject = ExampleObject("An example value")
-        sendMessage(queue, exampleObject)
+        sendExampleObjects(queue = queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -128,22 +122,11 @@ class SQSStreamTest
   it("continues reading if processing of some messages fails") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
-        val exampleObject1 = ExampleObject("some value 1")
-        val exampleObject2 = ExampleObject("some value 2")
+        sendExampleObjects(queue = queue, start = 1)
+        sqsClient.sendMessage(queue.url, "not valid json")
 
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
-
-        sendMessage(queue, exampleObject1)
-
-        sqsClient.sendMessage(
-          queue.url,
-          "another not valid json"
-        )
-
-        sendMessage(queue, exampleObject2)
+        sendExampleObjects(queue = queue, start = 2)
+        sqsClient.sendMessage(queue.url, "another not valid json")
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -151,9 +134,8 @@ class SQSStreamTest
           process = process(received))
 
         eventually {
-          received should contain theSameElementsAs List(
-            exampleObject1,
-            exampleObject2)
+          received should contain theSameElementsAs createExampleObjects(
+            count = 2)
 
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 2)
@@ -165,11 +147,7 @@ class SQSStreamTest
     it("processes messages off a queue ") {
       withSQSStreamFixtures {
         case (messageStream, QueuePair(queue, dlq), metricsSender) =>
-          val exampleObject1 = ExampleObject("Example value 1")
-          sendMessage(queue, exampleObject1)
-
-          val exampleObject2 = ExampleObject("Example value 2")
-          sendMessage(queue, exampleObject2)
+          sendExampleObjects(queue = queue, start = 1, count = 2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -183,9 +161,8 @@ class SQSStreamTest
               }))
 
           eventually {
-            received should contain theSameElementsAs List(
-              exampleObject1,
-              exampleObject2)
+            received should contain theSameElementsAs createExampleObjects(
+              count = 2)
 
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
@@ -199,8 +176,7 @@ class SQSStreamTest
     it("does not delete failed messages and sends a failure metric") {
       withSQSStreamFixtures {
         case (messageStream, QueuePair(queue, dlq), metricsSender) =>
-          val exampleObject = ExampleObject("Example value 1")
-          sendMessage(queue, exampleObject)
+          sendExampleObjects(queue = queue)
 
           messageStream.runStream(
             "test-stream",
@@ -221,22 +197,11 @@ class SQSStreamTest
     it("continues reading if processing of some messages fails") {
       withSQSStreamFixtures {
         case (messageStream, QueuePair(queue, dlq), _) =>
-          val exampleObject1 = ExampleObject("some value 1")
-          val exampleObject2 = ExampleObject("some value 2")
+          sendExampleObjects(queue = queue, start = 1)
+          sqsClient.sendMessage(queue.url, "not valid json")
 
-          sqsClient.sendMessage(
-            queue.url,
-            "not valid json"
-          )
-
-          sendMessage(queue, exampleObject1)
-
-          sqsClient.sendMessage(
-            queue.url,
-            "another not valid json"
-          )
-
-          sendMessage(queue, exampleObject2)
+          sendExampleObjects(queue = queue, start = 2)
+          sqsClient.sendMessage(queue.url, "another not valid json")
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
           messageStream.runStream(
@@ -249,9 +214,8 @@ class SQSStreamTest
               }))
 
           eventually {
-            received should contain theSameElementsAs List(
-              exampleObject1,
-              exampleObject2)
+            received should contain theSameElementsAs createExampleObjects(
+              count = 2)
 
             assertQueueEmpty(queue)
             assertQueueHasSize(dlq, size = 2)
@@ -259,6 +223,19 @@ class SQSStreamTest
       }
     }
   }
+
+  private def createExampleObjects(start: Int = 1,
+                                   count: Int): List[ExampleObject] =
+    (start to (start + count - 1)).map { i =>
+      ExampleObject(s"Example value $i")
+    }.toList
+
+  private def sendExampleObjects(queue: Queue,
+                                 start: Int = 1,
+                                 count: Int = 1) =
+    createExampleObjects(start = start, count = count).map { exampleObject =>
+      sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
+    }
 
   private def sendMessage(queue: Queue, obj: ExampleObject) =
     sqsClient.sendMessage(queue.url, toJson(obj).get)
