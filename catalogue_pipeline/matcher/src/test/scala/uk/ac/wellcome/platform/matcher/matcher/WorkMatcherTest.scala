@@ -72,7 +72,8 @@ class WorkMatcherTest
             val identifierB = aSierraSourceIdentifier("B")
             val work = anUnidentifiedSierraWork.copy(
               sourceIdentifier = identifierA,
-              identifiers = List(identifierA, identifierB))
+              otherIdentifiers = List(identifierB)
+            )
             whenReady(workMatcher.matchWork(work)) { identifiersList =>
               identifiersList shouldBe
                 MatcherResult(
@@ -133,7 +134,8 @@ class WorkMatcherTest
             val work = anUnidentifiedSierraWork.copy(
               sourceIdentifier = bIdentifier,
               version = 2,
-              identifiers = List(bIdentifier, cIdentifier))
+              otherIdentifiers = List(cIdentifier)
+            )
 
             whenReady(workMatcher.matchWork(work)) { identifiersList =>
               identifiersList shouldBe
