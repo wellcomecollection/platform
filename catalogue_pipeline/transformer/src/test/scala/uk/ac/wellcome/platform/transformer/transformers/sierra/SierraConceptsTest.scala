@@ -37,8 +37,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     maybeIdentifiedConcept shouldBe Identifiable(
       concept,
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier)
+      sourceIdentifier = sourceIdentifier
     )
   }
 
@@ -78,8 +77,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     maybeIdentifiedConcept shouldBe Identifiable(
       concept,
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier)
+      sourceIdentifier = sourceIdentifier
     )
   }
 

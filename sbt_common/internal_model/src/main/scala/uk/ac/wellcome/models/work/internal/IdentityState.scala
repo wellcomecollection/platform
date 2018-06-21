@@ -13,9 +13,10 @@ case class Identified[T](agent: T,
 
 case class Identifiable[T](agent: T,
                            sourceIdentifier: SourceIdentifier,
-                           identifiers: List[SourceIdentifier])
+                           otherIdentifiers: List[SourceIdentifier] = List())
     extends IdentityState[T]
     with MaybeDisplayable[T]
+    with MultipleSourceIdentifiers
 
 case class Unidentifiable[T](agent: T)
     extends IdentityState[T]

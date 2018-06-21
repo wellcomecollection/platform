@@ -177,8 +177,7 @@ trait SierraContributors extends MarcUtils {
         )
         Identifiable(
           agent = agent,
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
+          sourceIdentifier = sourceIdentifier
         )
       }
       case _ =>
