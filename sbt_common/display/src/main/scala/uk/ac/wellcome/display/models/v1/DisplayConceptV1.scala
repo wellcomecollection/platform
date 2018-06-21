@@ -24,7 +24,7 @@ case class DisplayConceptV1(
 case object DisplayConceptV1 {
   def apply(concept: Displayable[AbstractConcept]): DisplayConceptV1 = {
     val label = concept match {
-      case Identified(c: AbstractConcept, _, _) => c.label
+      case Identified(c: AbstractConcept, _, _, _) => c.label
       case Unidentifiable(c: AbstractConcept) => c.label
     }
     DisplayConceptV1(label = label)

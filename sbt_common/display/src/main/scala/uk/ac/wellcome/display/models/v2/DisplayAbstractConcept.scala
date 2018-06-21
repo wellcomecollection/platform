@@ -23,14 +23,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = concept.label
         )
-      case Identified(concept: Concept, id, identifiers) =>
+      case identifiedConcept: Identified[Concept] =>
         DisplayConcept(
-          id = Some(id),
+          id = Some(identifiedConcept.canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(identifiedConcept.identifiers.map(DisplayIdentifierV2(_)))
             else None,
-          label = concept.label
+          label = identifiedConcept.agent.label
         )
       case Unidentifiable(period: Period) =>
         DisplayPeriod(
@@ -38,14 +38,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = period.label
         )
-      case Identified(period: Period, id, identifiers) =>
+      case identifiedPeriod: Identified[Period] =>
         DisplayPeriod(
-          id = Some(id),
+          id = Some(identifiedPeriod.canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(identifiedPeriod.identifiers.map(DisplayIdentifierV2(_)))
             else None,
-          label = period.label
+          label = identifiedPeriod.agent.label
         )
       case Unidentifiable(place: Place) =>
         DisplayPlace(
@@ -53,14 +53,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = place.label
         )
-      case Identified(place: Place, id, identifiers) =>
+      case identifiedPlace: Identified[Place] =>
         DisplayPlace(
-          id = Some(id),
+          id = Some(identifiedPlace.canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(identifiedPlace.identifiers.map(DisplayIdentifierV2(_)))
             else None,
-          label = place.label
+          label = identifiedPlace.agent.label
         )
     }
 }

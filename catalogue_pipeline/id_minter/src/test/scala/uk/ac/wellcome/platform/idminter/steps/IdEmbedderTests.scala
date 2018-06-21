@@ -142,7 +142,7 @@ class IdEmbedderTests
               agent = Identified(
                 agent = person,
                 canonicalId = newCreatorCanonicalId,
-                identifiers = List(creatorIdentifier)))
+                sourceIdentifier = creatorIdentifier))
           ),
           version = originalWork.version
         )

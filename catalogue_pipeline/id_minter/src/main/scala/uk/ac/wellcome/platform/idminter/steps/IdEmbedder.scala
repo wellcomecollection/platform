@@ -45,14 +45,7 @@ class IdEmbedder @Inject()(identifierGenerator: IdentifierGenerator)(
         )
         .get
 
-      if (obj.contains("type")) {
-        (("type", Json.fromString("Identified")) +:
-          ("canonicalId", Json.fromString(canonicalId)) +: obj)
-          .remove("sourceIdentifier")
-      } else {
-        ("canonicalId", Json.fromString(canonicalId)) +: obj
-      }
-
+      ("canonicalId", Json.fromString(canonicalId)) +: obj
     } else obj
   }
 
