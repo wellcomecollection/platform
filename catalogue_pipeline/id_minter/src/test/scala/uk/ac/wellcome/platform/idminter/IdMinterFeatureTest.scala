@@ -53,8 +53,8 @@ class IdMinterFeatureTest
               val work = UnidentifiedWork(
                 title = Some(title),
                 sourceIdentifier = identifier,
-                version = 1,
-                identifiers = List(identifier))
+                version = 1
+              )
 
               val messageCount = 5
 
@@ -113,8 +113,8 @@ class IdMinterFeatureTest
               val work = UnidentifiedWork(
                 title = Some("A query about a queue of quails"),
                 sourceIdentifier = identifier,
-                version = 1,
-                identifiers = List(identifier))
+                version = 1
+              )
 
               val messageBody = put[UnidentifiedWork](
                 obj = work,

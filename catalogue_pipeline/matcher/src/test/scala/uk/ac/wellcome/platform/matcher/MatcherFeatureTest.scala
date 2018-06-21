@@ -47,7 +47,6 @@ class MatcherFeatureTest
                   lockTable) { _ =>
                   val work = UnidentifiedWork(
                     sourceIdentifier = sourceIdentifierA,
-                    identifiers = List(sourceIdentifierA),
                     title = Some("Work"),
                     version = 1
                   )
@@ -111,7 +110,6 @@ class MatcherFeatureTest
 
                   val workAv1 = UnidentifiedWork(
                     sourceIdentifier = sourceIdentifierA,
-                    identifiers = List(sourceIdentifierA),
                     title = Some("Work"),
                     version = updatedWorkVersion
                   )

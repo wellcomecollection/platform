@@ -239,7 +239,7 @@ class SierraTransformableTransformerTest
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier, sierraIdentifier),
+      otherIdentifiers = List(sierraIdentifier),
       description = Some("A delightful description of a dead daisy."),
       production = List(
         ProductionEvent(

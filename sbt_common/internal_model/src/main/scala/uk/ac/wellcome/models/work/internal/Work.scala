@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.internal
 /** A representation of a work in our ontology */
 trait Work {
   val sourceIdentifier: SourceIdentifier
-  val identifiers: List[SourceIdentifier]
+  val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
 
   val title: Option[String]
@@ -27,13 +27,17 @@ trait Work {
   val visible: Boolean
 
   val ontologyType: String
+
+  def identifiers: List[SourceIdentifier] =
+    List(sourceIdentifier) ++ otherIdentifiers
 }
 
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
-  identifiers: List[SourceIdentifier] = List(),
+  otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   title: Option[String],
+
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
