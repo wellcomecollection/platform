@@ -239,7 +239,8 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "contributors": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(otherIdentifier)} ],
+                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                            otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]

@@ -58,7 +58,8 @@ class DisplayItemV1Test extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItemV1.identifiers shouldBe Some(List(DisplayIdentifierV1(identifier)))
+    displayItemV1.identifiers shouldBe Some(
+      List(DisplayIdentifierV1(identifier)))
   }
 
   it("correctly parses an Item without any locations") {

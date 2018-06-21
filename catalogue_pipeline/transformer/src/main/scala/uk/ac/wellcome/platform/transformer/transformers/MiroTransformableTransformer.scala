@@ -59,7 +59,8 @@ class MiroTransformableTransformer
               ontologyType = "Work",
               value = miroTransformable.sourceId),
             version = version,
-            otherIdentifiers = getOtherIdentifiers(miroData, miroTransformable.sourceId),
+            otherIdentifiers =
+              getOtherIdentifiers(miroData, miroTransformable.sourceId),
             description = description,
             lettering = miroData.suppLettering,
             createdDate =

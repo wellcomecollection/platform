@@ -60,7 +60,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       work = work,
       includes = WorksIncludes(identifiers = true)
     )
-    displayWork.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
+    displayWork.identifiers shouldBe Some(
+      List(DisplayIdentifierV2(sourceIdentifier)))
   }
 
   it("gets the physicalDescription from a Work") {

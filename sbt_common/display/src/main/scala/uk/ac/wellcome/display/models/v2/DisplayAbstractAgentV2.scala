@@ -35,21 +35,33 @@ case object DisplayAbstractAgentV2 {
           identifiers = None,
           label = a.label
         )
-      case Identified(agent: Agent, canonicalId, sourceIdentifier, otherIdentifiers) =>
+      case Identified(
+          agent: Agent,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayAgentV2(
           id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
           label = agent.label
         )
-      case Identified(person: Person, canonicalId, sourceIdentifier, otherIdentifiers) =>
+      case Identified(
+          person: Person,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayPersonV2(
           id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
           label = person.label,
           prefix = person.prefix,
@@ -62,14 +74,21 @@ case object DisplayAbstractAgentV2 {
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
-      case Identified(org: Organisation, canonicalId, sourceIdentifier, otherIdentifiers) =>
+      case Identified(
+          org: Organisation,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayOrganisationV2(
           id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
-          label = org.label)
+          label = org.label
+        )
       case Unidentifiable(o: Organisation) =>
         DisplayOrganisationV2(id = None, identifiers = None, label = o.label)
     }

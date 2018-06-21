@@ -61,7 +61,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       work = work,
       includes = WorksIncludes(identifiers = true)
     )
-    displayWork.identifiers shouldBe Some(List(DisplayIdentifierV1(sourceIdentifier)))
+    displayWork.identifiers shouldBe Some(
+      List(DisplayIdentifierV1(sourceIdentifier)))
   }
 
   it("extracts creators from a Work with Unidentifiable Contributors") {

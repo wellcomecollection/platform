@@ -72,10 +72,10 @@ trait WorksUtil {
       visible = visible)
 
   def workWith(
-                canonicalId: String,
-                title: String,
-                otherIdentifiers: List[SourceIdentifier] = List(),
-                items: List[IdentifiedItem] = List()
+    canonicalId: String,
+    title: String,
+    otherIdentifiers: List[SourceIdentifier] = List(),
+    items: List[IdentifiedItem] = List()
   ): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),

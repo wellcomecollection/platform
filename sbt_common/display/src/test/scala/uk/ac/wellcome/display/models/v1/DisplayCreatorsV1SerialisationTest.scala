@@ -46,7 +46,8 @@ class DisplayCreatorsV1SerialisationTest
                             work.contributors(2).agent,
                             abstractAgent)}
                             |  ],
-                            |  "identifiers": [ ${identifier(work.sourceIdentifier)} ],
+                            |  "identifiers": [ ${identifier(
+                            work.sourceIdentifier)} ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
