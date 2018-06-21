@@ -96,7 +96,8 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       textField("type"),
       objectField("agent").fields(fields),
       keywordField("canonicalId"),
-      objectField("identifiers").fields(sourceIdentifierFields)
+      objectField("sourceIdentifier").fields(sourceIdentifierFields),
+      objectField("otherIdentifiers").fields(sourceIdentifierFields)
     )
 
   val agent = Seq(
