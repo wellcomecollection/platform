@@ -77,80 +77,18 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       canonicalId = "j7tw9jv3",
       contributors = List(
         Contributor(
-          agent = Unidentifiable(
-            Person(label = "Esmerelda Weatherwax", prefix = Some("Witch"))
-          )
+          agent = Unidentifiable(Agent(label = "Esmerelda Weatherwax"))
         ),
         Contributor(
-          agent = Unidentifiable(
-            Organisation("Juniper Journals")
-          )
+          agent = Unidentifiable(Agent("Juniper Journals"))
         )
       )
     )
 
     val displayWork = DisplayWorkV1(work)
     displayWork.creators shouldBe List(
-      DisplayPersonV1(
-        id = None,
-        identifiers = None,
-        label = "Esmerelda Weatherwax",
-        prefix = Some("Witch")),
-      DisplayOrganisationV1(
-        id = None,
-        identifiers = None,
-        label = "Juniper Journals")
-    )
-  }
-
-  it(
-    "extracts creators from a Work with a mixture of identified/Unidentifiable Contributors") {
-    val canonicalId = "abcdefgh"
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      "Organisation",
-      "EW")
-    val work = IdentifiedWork(
-      title = Some("Jumping over jackals in Japan"),
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      identifiers = Nil,
-      canonicalId = "j7tw9jv3",
-      contributors = List(
-        Contributor(
-          agent = Unidentifiable(
-            Person(
-              label = "Esmerelda Weatherwax",
-              prefix = Some("Witch")
-            ))
-        ),
-        Contributor(
-          agent = Identified(
-            Organisation(label = "Juniper Journals"),
-            identifiers = List(sourceIdentifier),
-            canonicalId = canonicalId
-          )
-        )
-      )
-    )
-
-    val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
-    displayWork.creators shouldBe List(
-      DisplayPersonV1(
-        id = None,
-        identifiers = None,
-        label = "Esmerelda Weatherwax",
-        prefix = Some("Witch")),
-      DisplayOrganisationV1(
-        id = Some(canonicalId),
-        identifiers = Some(
-          List(
-            DisplayIdentifierV1(
-              identifierScheme = IdentifierType("lc-names").id,
-              sourceIdentifier.value))),
-        label = "Juniper Journals"
-      )
+      DisplayAgentV1(label = "Esmerelda Weatherwax"),
+      DisplayAgentV1(label = "Juniper Journals")
     )
   }
 
@@ -421,13 +359,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         displayWork.identifiers shouldBe None
       }
 
-      it("creators") {
-        displayWork.creators.map { _.identifiers } shouldBe List(
-          None,
-          None,
-          None)
-      }
-
       it("items") {
         val displayWork =
           DisplayWorkV1(work, includes = WorksIncludes(items = true))
@@ -443,28 +374,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
           List(DisplayIdentifierV1(sourceIdentifier)))
-      }
-
-      it("creators") {
-        // This is moderately verbose, but the Scala compiler got confused when
-        // I tried to combine the three map() calls into one.
-        val expectedIdentifiers = List(
-          creatorAgentSourceIdentifier,
-          creatorOrganisationSourceIdentifier,
-          creatorPersonSourceIdentifier
-        ).map { DisplayIdentifierV1(_) }
-          .map { List(_) }
-          .map { Some(_) }
-        displayWork.creators.map { _.identifiers } shouldBe expectedIdentifiers
-      }
-
-      it("items") {
-        val displayWork = DisplayWorkV1(
-          work,
-          includes = WorksIncludes(identifiers = true, items = true))
-        val item: DisplayItemV1 = displayWork.items.get.head
-        item.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(itemSourceIdentifier)))
       }
     }
   }
