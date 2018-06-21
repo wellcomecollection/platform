@@ -4,6 +4,7 @@ package uk.ac.wellcome.models.work.internal
 trait Work {
   val sourceIdentifier: SourceIdentifier
   val identifiers: List[SourceIdentifier]
+  val mergeCandidates: List[MergeCandidate]
 
   val workType: Option[WorkType]
   val title: Option[String]
@@ -29,6 +30,7 @@ trait Work {
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
   identifiers: List[SourceIdentifier] = List(),
+  mergeCandidates: List[MergeCandidate] = List(),
 
   title: Option[String],
   workType: Option[WorkType] = None,
@@ -55,6 +57,7 @@ case class IdentifiedWork(
   canonicalId: String,
   title: Option[String],
   sourceIdentifier: SourceIdentifier,
+  mergeCandidates: List[MergeCandidate] = List(),
 
   identifiers: List[SourceIdentifier] = List(),
   workType: Option[WorkType] = None,
