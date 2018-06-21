@@ -36,7 +36,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
   val sourceIdentifier = objectField("sourceIdentifier")
     .fields(sourceIdentifierFields)
 
-  val identifiers = objectField("identifiers")
+  val otherIdentifiers = objectField("otherIdentifiers")
     .fields(sourceIdentifierFields)
 
   val workType = objectField("workType")
@@ -96,7 +96,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       textField("type"),
       objectField("agent").fields(fields),
       keywordField("canonicalId"),
-      identifiers
+      otherIdentifiers
     )
 
   val agent = Seq(
@@ -110,7 +110,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
   val items = objectField("items").fields(
     keywordField("canonicalId"),
     sourceIdentifier,
-    identifiers,
+    otherIdentifiers,
     location(),
     booleanField("visible"),
     keywordField("ontologyType")
@@ -150,7 +150,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       keywordField("ontologyType"),
       intField("version"),
       sourceIdentifier,
-      identifiers,
+      otherIdentifiers,
       mergeCandidates,
       workType,
       textField("title").fields(
