@@ -4,7 +4,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.utils.JsonUtil._
 
-class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2SerialisationTestBase {
+class DisplayItemV2Test extends FunSpec with Matchers {
 
   val location: Location = {
     val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
@@ -17,7 +17,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2Serialisatio
     )
   }
 
-  val itemIdentifier = SourceIdentifier(
+  val identifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
@@ -26,7 +26,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2Serialisatio
   it("should read an Item as a DisplayItemV2 correctly") {
     val item = IdentifiedItem(
       canonicalId = "foo",
-      sourceIdentifier = itemIdentifier,
+      sourceIdentifier = identifier,
       locations = List(location)
     )
 
@@ -38,7 +38,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2Serialisatio
     displayItemV2.id shouldBe item.canonicalId
     displayItemV2.locations shouldBe List(DisplayLocationV2(location))
     displayItemV2.identifiers shouldBe Some(
-      List(DisplayIdentifierV2(itemIdentifier)))
+      List(DisplayIdentifierV2(identifier)))
     displayItemV2.ontologyType shouldBe "Item"
   }
 
@@ -47,7 +47,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2Serialisatio
       fromJson[IdentifiedItem](s"""
         {
           "canonicalId": "b71876a",
-          "sourceIdentifier": ${toJson(itemIdentifier).get},
+          "sourceIdentifier": ${toJson(identifier).get},
           "locations": [],
           "type": "item"
         }
@@ -58,7 +58,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with DisplayV2Serialisatio
       includesIdentifiers = true
     )
 
-    displayItemV2.identifiers shouldBe Some(List(DisplayIdentifierV2(itemIdentifier)))
+    displayItemV2.identifiers shouldBe Some(List(DisplayIdentifierV2(identifier)))
   }
 
   it("correctly parses an Item without any locations") {
