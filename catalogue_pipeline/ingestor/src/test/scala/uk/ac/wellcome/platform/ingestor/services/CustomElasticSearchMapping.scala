@@ -40,7 +40,7 @@ trait CustomElasticSearchMapping {
           textField("english").analyzer(EnglishLanguageAnalyzer)),
         booleanField("visible"),
         objectField("mergeCandidates"),
-        objectField("identifiers"),
+        objectField("otherIdentifiers"),
         objectField("subjects"),
         keywordField("workType"),
         keywordField("description"),
