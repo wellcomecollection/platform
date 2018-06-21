@@ -149,11 +149,9 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       booleanField("visible"),
       keywordField("ontologyType"),
       intField("version"),
-
       sourceIdentifier,
       identifiers,
       mergeCandidates,
-
       workType,
       textField("title").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),

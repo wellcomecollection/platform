@@ -31,7 +31,6 @@ case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
   identifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-
   title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
@@ -47,18 +46,16 @@ case class UnidentifiedWork(
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
-
   version: Int,
   visible: Boolean = true,
-
-  ontologyType: String = "Work") extends Work
+  ontologyType: String = "Work")
+    extends Work
 
 case class IdentifiedWork(
   canonicalId: String,
   title: Option[String],
   sourceIdentifier: SourceIdentifier,
   mergeCandidates: List[MergeCandidate] = List(),
-
   identifiers: List[SourceIdentifier] = List(),
   workType: Option[WorkType] = None,
   description: Option[String] = None,
@@ -74,8 +71,7 @@ case class IdentifiedWork(
   production: List[ProductionEvent[Displayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
-
   version: Int,
   visible: Boolean = true,
-
-  ontologyType: String = "Work") extends Work
+  ontologyType: String = "Work")
+    extends Work
