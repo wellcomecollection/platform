@@ -466,7 +466,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "id": "${work.canonicalId}",
                | "title": "${work.title.get}",
                | "contributors": [ ],
-               | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(srcIdentifier)} ],
+               | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                srcIdentifier)} ],
                | "subjects": [ ],
                | "genres": [ ],
                | "production": [ ]
