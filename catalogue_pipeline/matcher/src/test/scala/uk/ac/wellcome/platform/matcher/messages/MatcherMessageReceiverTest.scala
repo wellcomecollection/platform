@@ -95,8 +95,8 @@ class MatcherMessageReceiverTest
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
-            val workAv1 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = aIdentifier)
+            val workAv1 =
+              anUnidentifiedSierraWork.copy(sourceIdentifier = aIdentifier)
 
             val expectedMatchedWorks = MatcherResult(
               Set(
@@ -112,8 +112,8 @@ class MatcherMessageReceiverTest
               topic)
 
             // Work Bv1
-            val workBv1 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = bIdentifier)
+            val workBv1 =
+              anUnidentifiedSierraWork.copy(sourceIdentifier = bIdentifier)
 
             processAndAssertMatchedWorkIs(
               workBv1,
@@ -142,8 +142,8 @@ class MatcherMessageReceiverTest
             )
 
             // Work Cv1
-            val workCv1 = anUnidentifiedSierraWork.copy(
-              sourceIdentifier = cIdentifier)
+            val workCv1 =
+              anUnidentifiedSierraWork.copy(sourceIdentifier = cIdentifier)
 
             processAndAssertMatchedWorkIs(
               workCv1,
