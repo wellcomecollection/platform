@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class WorkMatcherTest
+class WorkMatcherConcurrencyTest
     extends FunSpec
     with Matchers
     with MatcherFixtures

@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.matcher.locking
 import java.time.Instant
 
+import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -17,13 +17,6 @@ class DynamoLockingServiceTest
     extends FunSpec
     with MatcherFixtures
     with ScalaFutures {
-
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-      Instant.ofEpochSecond
-    )(
-      _.getEpochSecond
-    )
 
   it("locks around a callback") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
@@ -44,7 +37,7 @@ class DynamoLockingServiceTest
   }
 
   it(
-    "throws a FailedLockException and releases locks when writing a row lock fails") {
+    "throws a FailedLockException and releases locks when a row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         withLockingService(dynamoRowLockDao) { lockingService =>
@@ -67,24 +60,30 @@ class DynamoLockingServiceTest
     }
   }
 
-//  it("throws a FailedLockException when unlocking the context fails") {
-//    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-//      withLockingService(lockTable) { lockingService =>
-//        val idA = "id"
-//        val lockedId = "lockedId"
-//        givenLocks(Set(lockedId), "contextId", lockTable)
-//
-//        val eventuallyLockFails = lockingService.withLocks(Set(idA, lockedId))(f = Future {
-//          fail("Lock did not fail")
-//        })
-//
-//        whenReady(eventuallyLockFails.failed) { failure =>
-//          failure shouldBe a[FailedLockException]
-//          assertNoRowLocks(lockTable)
-//        }
-//      }
-//    }
-//  }
+  it("throws a FailedLockException and releases locks when a nested row lock fails") {
+    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+        withLockingService(dynamoRowLockDao) { lockingService =>
+          val idA = "idA"
+          val idB = "idB"
+          givenLocks(Set(idB), "existingContext", lockTable)
+
+          val eventuallyLockFails =
+            lockingService.withLocks(Set(idA))({
+              lockingService.withLocks(Set(idB))(Future {
+                fail("Lock did not fail")
+              })
+            })
+
+          whenReady(eventuallyLockFails.failed) { failure =>
+            failure shouldBe a[FailedLockException]
+            // still expect original locks to exist
+            assertOnlyHaveRowLockRecordIds(Set(idB), lockTable)
+          }
+        }
+      }
+    }
+  }
 
   it("releases locks when the callback fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
@@ -128,9 +127,5 @@ class DynamoLockingServiceTest
       Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name)
     val actualIds = locks.map(lock => lock.right.get.id).toSet
     actualIds shouldBe expectedIds
-  }
-
-  private def assertNoRowLocks(lockTable: LocalDynamoDb.Table) = {
-    Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name) shouldBe empty
   }
 }

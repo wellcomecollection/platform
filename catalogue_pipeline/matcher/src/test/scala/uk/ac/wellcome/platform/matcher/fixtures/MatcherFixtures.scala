@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.matcher.fixtures
 
+import java.time.Instant
+
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
@@ -11,7 +14,7 @@ import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao}
+import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao, RowLock}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -19,7 +22,7 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -62,6 +65,13 @@ trait MatcherFixtures
       server.close()
     }
   }
+
+  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 
   def dynamoLockingServiceLocalFlags(table: Table): Map[String, String] =
     Map(
@@ -176,4 +186,9 @@ trait MatcherFixtures
       version = 1
     )
   }
+
+  def assertNoRowLocks(lockTable: LocalDynamoDb.Table) = {
+    Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name) shouldBe empty
+  }
+
 }

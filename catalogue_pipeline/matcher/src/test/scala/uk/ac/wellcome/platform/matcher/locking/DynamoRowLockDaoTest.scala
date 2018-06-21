@@ -26,13 +26,6 @@ class DynamoRowLockDaoTest
 
   import com.gu.scanamo.syntax._
 
-  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
-    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
-      Instant.ofEpochSecond
-    )(
-      _.getEpochSecond
-    )
-
   case class ThingToStore(id: String, value: String)
 
   private val contextId = "contextId"

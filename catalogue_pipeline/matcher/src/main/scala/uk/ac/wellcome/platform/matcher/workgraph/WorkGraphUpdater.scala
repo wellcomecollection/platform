@@ -22,7 +22,7 @@ object WorkGraphUpdater {
     if (existingVersion >= workUpdate.version) {
       val versionConflictMessage =
         s"Not matching work ${workUpdate.workId} v${workUpdate.version} because older than existing work v$existingVersion"
-      throw new VersionConflictException(versionConflictMessage)
+      throw VersionConflictException(versionConflictMessage)
     } else {
       doUpdate(workUpdate, existingGraph)
     }
