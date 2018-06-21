@@ -1,7 +1,7 @@
 package uk.ac.wellcome.models.work.internal
 
 /** A representation of a work in our ontology */
-trait Work extends WithSourceIdentifiers {
+trait Work extends MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]

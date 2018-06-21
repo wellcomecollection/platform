@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models.work.internal
 
-sealed trait Item extends WithSourceIdentifiers {
+sealed trait Item extends MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val locations: List[Location]

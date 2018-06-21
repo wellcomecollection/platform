@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models.work.internal
 
-trait WithSourceIdentifiers {
+trait MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
 
