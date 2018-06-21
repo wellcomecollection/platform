@@ -1,7 +1,7 @@
 package uk.ac.wellcome.models.work.internal
 
 /** A representation of a work in our ontology */
-trait Work {
+trait Work extends MultiplyIdentified {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
@@ -27,9 +27,6 @@ trait Work {
   val visible: Boolean
 
   val ontologyType: String
-
-  def identifiers: List[SourceIdentifier] =
-    List(sourceIdentifier) ++ otherIdentifiers
 }
 
 case class UnidentifiedWork(
