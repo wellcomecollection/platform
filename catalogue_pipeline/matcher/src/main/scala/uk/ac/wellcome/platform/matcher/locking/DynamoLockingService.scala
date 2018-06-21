@@ -17,13 +17,14 @@ class DynamoLockingService @Inject()(dynamoRowLockDao: DynamoRowLockDao)(
         identifiers.map(dynamoRowLockDao.lockRow(_, contextGuid)))
       result <- f
     } yield {
-      debug(s"Released locked identifiers $identifiers in $contextGuid")
       result
     }
     eventuallyExecutedWithLock.transformWith { triedResult =>
       dynamoRowLockDao
         .unlockRows(contextGuid)
-        .flatMap(_ => Future.fromTry(triedResult))
+        .flatMap(_ => {
+          debug(s"Released locked identifiers $identifiers in $contextGuid")
+          Future.fromTry(triedResult)})
     }
   }
 }

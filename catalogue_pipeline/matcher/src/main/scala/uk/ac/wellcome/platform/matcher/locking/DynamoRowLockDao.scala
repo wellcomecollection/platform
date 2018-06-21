@@ -75,16 +75,14 @@ class DynamoRowLockDao @Inject()(
       }.toSet
 
       debug(s"Unlocking rows: $rowLockIds")
-      Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
-      val deleteAllResults =
-        Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
-      deleteAllResults.foreach { result: BatchWriteItemResult =>
-        if (result.getUnprocessedItems.size() > 0) {
-          val error =
-            s"Batch delete failed to delete ${result.getUnprocessedItems}"
-          info(error)
-          throw FailedLockException(error)
-        }
+      val deleteAllResults = Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds )
+      deleteAllResults.foreach {
+        result: BatchWriteItemResult =>
+          if (result.getUnprocessedItems.size() > 0) {
+            val error = s"Batch delete failed to delete ${result.getUnprocessedItems}"
+            info(error)
+            throw FailedLockException(error)
+          }
       }
     } catch {
       case e: Exception =>
