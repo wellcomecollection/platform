@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -12,7 +11,7 @@ class DisplayCreatorsV1SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises creators with a mixture of agents/organisations/persons") {
+  it("serialises creators") {
     val work = IdentifiedWork(
       canonicalId = "v9w6cz66",
       sourceIdentifier = sourceIdentifier,
@@ -20,14 +19,12 @@ class DisplayCreatorsV1SerialisationTest
       title = Some("Vultures vying for victory"),
       contributors = List(
         Contributor(agent = Unidentifiable(Agent("Vivian Violet"))),
-        Contributor(agent = Unidentifiable(Organisation("Verily Volumes"))),
+        Contributor(agent = Unidentifiable(Agent("Verily Volumes"))),
         Contributor(
           agent = Unidentifiable(
-            Person(
-              label = "Havelock Vetinari",
-              prefix = Some("Lord Patrician"),
-              numeration = Some("I")
-            )))
+            Agent(label = "Havelock Vetinari")
+          )
+        )
       )
     )
     val displayWork = DisplayWorkV1(work)
@@ -57,87 +54,4 @@ class DisplayCreatorsV1SerialisationTest
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
-
-  it("serialises identified creators") {
-    val work = IdentifiedWork(
-      canonicalId = "v9w6cz66",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      title = Some("Vultures vying for victory"),
-      contributors = List(
-        Contributor(
-          agent = Identified(
-            Person(
-              label = "Havelock Vetinari",
-              prefix = Some("Lord Patrician"),
-              numeration = Some("I")
-            ),
-            canonicalId = "hgfedcba",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("lc-names"),
-                ontologyType = "Organisation",
-                value = "hv"
-              )
-            )
-          )
-        ),
-        Contributor(
-          agent = Identified(
-            Organisation(label = "Unseen University"),
-            canonicalId = "abcdefgh",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("lc-names"),
-                ontologyType = "Organisation",
-                value = "uu"
-              )
-            )
-          )
-        ),
-        Contributor(
-          agent = Identified(
-            Agent(label = "The Librarian"),
-            canonicalId = "blahbluh",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("lc-names"),
-                ontologyType = "Organisation",
-                value = "uu"
-              )
-            )
-          )
-        )
-      )
-    )
-    val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
-
-    val actualJson = objectMapper.writeValueAsString(displayWork)
-    val expectedJson = s"""
-                            |{
-                            |  "type": "Work",
-                            |  "id": "${work.canonicalId}",
-                            |  "identifiers": [],
-                            |  "title": "${work.title.get}",
-                            |  "creators": [
-                            |    ${identifiedOrUnidentifiable(
-                            work.contributors(0).agent,
-                            abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(
-                            work.contributors(1).agent,
-                            abstractAgent)},
-                            |    ${identifiedOrUnidentifiable(
-                            work.contributors(2).agent,
-                            abstractAgent)}
-                            |  ],
-                            |  "subjects": [ ],
-                            |  "genres": [ ],
-                            |  "publishers": [],
-                            |  "placesOfPublication": [ ]
-                            |}""".stripMargin
-
-    assertJsonStringsAreEqual(actualJson, expectedJson)
-  }
-
 }
