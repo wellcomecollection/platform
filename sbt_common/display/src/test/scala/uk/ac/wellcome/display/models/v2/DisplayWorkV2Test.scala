@@ -162,12 +162,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           agent = Identified(
             Person(label = "Vlad the Vanquished"),
             canonicalId = "vs7jd5dx",
-            identifiers = List(
-              SourceIdentifier(
-                identifierType = IdentifierType("lc-names"),
-                ontologyType = "Person",
-                value = "v1"
-              )
+            sourceIdentifier = SourceIdentifier(
+              identifierType = IdentifierType("lc-names"),
+              ontologyType = "Person",
+              value = "v1"
             )
           )
         ),
@@ -288,7 +286,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           agent = Identified(
             Agent(label = "Bond"),
             canonicalId = "bcwth7yg",
-            identifiers = List(contributorAgentSourceIdentifier)
+            sourceIdentifier = contributorAgentSourceIdentifier
           ),
           roles = List()
         ),
@@ -296,7 +294,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           agent = Identified(
             Organisation(label = "Big Business"),
             canonicalId = "bsf3kfwm",
-            identifiers = List(contributorOrganisationSourceIdentifier)
+            sourceIdentifier = contributorOrganisationSourceIdentifier
           ),
           roles = List()
         ),
@@ -304,7 +302,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           agent = Identified(
             Person(label = "Blue Blaise"),
             canonicalId = "b5szcu3c",
-            identifiers = List(contributorPersonSourceIdentifier)
+            sourceIdentifier = contributorPersonSourceIdentifier
           ),
           roles = List()
         )
@@ -322,17 +320,17 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             Identified(
               Concept("Bonding"),
               canonicalId = "b5qsqkyh",
-              identifiers = List(conceptSourceIdentifier)
+              sourceIdentifier = conceptSourceIdentifier
             ),
             Identified(
               Period("Before"),
               canonicalId = "bwn894hk",
-              identifiers = List(periodSourceIdentifier)
+              sourceIdentifier = periodSourceIdentifier
             ),
             Identified(
               Place("Bulgaria"),
               canonicalId = "bf42vqst",
-              identifiers = List(placeSourceIdentifier)
+              sourceIdentifier = placeSourceIdentifier
             )
           )
         )
@@ -344,7 +342,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
             Identified(
               Concept("Colours"),
               canonicalId = "chzwu4ea",
-              identifiers = List(conceptSourceIdentifier)
+              sourceIdentifier = conceptSourceIdentifier
             )
           )
         )

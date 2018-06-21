@@ -14,12 +14,11 @@ class DisplayGenreV2SerialisationTest
     val concept1 = Unidentifiable(Place("placeLabel"))
     val concept2 = Identified(
       canonicalId = "sqwyavpj",
-      identifiers = List(
-        SourceIdentifier(
-          identifierType = IdentifierType("lc-names"),
-          value = "lcsh/sqw",
-          ontologyType = "Period"
-        )),
+      sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("lc-names"),
+        value = "lcsh/sqw",
+        ontologyType = "Period"
+      ),
       agent = Period("periodLabel")
     )
 

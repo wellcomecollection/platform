@@ -23,14 +23,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = concept.label
         )
-      case identifiedConcept: Identified[Concept] =>
+      case Identified(concept: Concept, canonicalId, sourceIdentifier, otherIdentifiers) =>
         DisplayConcept(
-          id = Some(identifiedConcept.canonicalId),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiedConcept.identifiers.map(DisplayIdentifierV2(_)))
+              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
             else None,
-          label = identifiedConcept.agent.label
+          label = concept.label
         )
       case Unidentifiable(period: Period) =>
         DisplayPeriod(
@@ -38,14 +38,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = period.label
         )
-      case identifiedPeriod: Identified[Period] =>
+      case Identified(period: Period, canonicalId, sourceIdentifier, otherIdentifiers) =>
         DisplayPeriod(
-          id = Some(identifiedPeriod.canonicalId),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiedPeriod.identifiers.map(DisplayIdentifierV2(_)))
+              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
             else None,
-          label = identifiedPeriod.agent.label
+          label = period.label
         )
       case Unidentifiable(place: Place) =>
         DisplayPlace(
@@ -53,14 +53,14 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = place.label
         )
-      case identifiedPlace: Identified[Place] =>
+      case Identified(place: Place, canonicalId, sourceIdentifier, otherIdentifiers) =>
         DisplayPlace(
-          id = Some(identifiedPlace.canonicalId),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiedPlace.identifiers.map(DisplayIdentifierV2(_)))
+              Some((sourceIdentifier +: otherIdentifiers).map(DisplayIdentifierV2(_)))
             else None,
-          label = identifiedPlace.agent.label
+          label = place.label
         )
     }
 }
