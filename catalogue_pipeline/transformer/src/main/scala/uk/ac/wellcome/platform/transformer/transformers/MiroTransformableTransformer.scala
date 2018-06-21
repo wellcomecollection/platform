@@ -206,12 +206,6 @@ class MiroTransformableTransformer
           identifierType = IdentifierType("miro-image-number"),
           "Item",
           miroId),
-        identifiers = List(
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            "Item",
-            miroId)
-        ),
         locations = List(
           DigitalLocation(
             locationType = LocationType("iiif-image"),
