@@ -225,7 +225,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes a list of identifiers on DisplayWorkV1") {
-    val srcIdentifier = SourceIdentifier(
+    val otherIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "Test1234"
@@ -233,7 +233,7 @@ class DisplayWorkV1SerialisationTest
     val work = workWith(
       canonicalId = "1234",
       title = "An insect huddled in an igloo",
-      identifiers = List(srcIdentifier)
+      otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV1(work, WorksIncludes(identifiers = true)))
@@ -243,7 +243,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(srcIdentifier)} ],
+                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
@@ -258,7 +258,7 @@ class DisplayWorkV1SerialisationTest
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
-      identifiers = List()
+      otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV1(work, WorksIncludes(identifiers = true)))

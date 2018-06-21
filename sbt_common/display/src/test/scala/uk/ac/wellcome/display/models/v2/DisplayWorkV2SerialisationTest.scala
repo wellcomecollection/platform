@@ -221,15 +221,15 @@ class DisplayWorkV2SerialisationTest
   }
 
   it("includes a list of identifiers on DisplayWorkV2") {
-    val srcIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
+    val otherIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
       ontologyType = "Work",
       value = "Test1234"
     )
     val work = workWith(
       canonicalId = "1234",
       title = "An insect huddled in an igloo",
-      identifiers = List(srcIdentifier)
+      otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(work, WorksIncludes(identifiers = true)))
@@ -239,7 +239,7 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "contributors": [ ],
-                          | "identifiers": [ ${identifier(srcIdentifier)} ],
+                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]
@@ -248,12 +248,11 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it(
-    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+  it("always includes 'identifiers' with the identifiers include") {
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
-      identifiers = List()
+      otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(work, WorksIncludes(identifiers = true)))
@@ -263,7 +262,7 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "contributors": [ ],
-                          | "identifiers": [ ],
+                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]

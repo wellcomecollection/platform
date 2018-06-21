@@ -2,9 +2,10 @@ package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class DisplayItemV2Test extends FunSpec with Matchers {
+class DisplayItemV2Test extends FunSpec with Matchers with WorksUtil {
 
   val location: Location = {
     val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
@@ -42,20 +43,12 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     displayItemV2.ontologyType shouldBe "Item"
   }
 
-  it("correctly parses an Item without any identifiers") {
+  it("correctly parses an Item without any extra identifiers") {
     val item =
-      fromJson[IdentifiedItem]("""
+      fromJson[IdentifiedItem](s"""
         {
           "canonicalId": "b71876a",
-          "sourceIdentifier": {
-            "identifierType": {
-              "id": "miro-image-number",
-              "label": "Miro image number",
-              "ontologyType": "IdentifierType"
-            },
-            "ontologyType": "Item",
-            "value": "B718760"
-          },
+          "sourceIdentifier": ${identifier(sourceIdentifier)},
           "locations": [],
           "type": "item"
         }
@@ -66,7 +59,7 @@ class DisplayItemV2Test extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItemV2.identifiers shouldBe Some(List())
+    displayItemV2.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
   }
 
   it("correctly parses an Item without any locations") {

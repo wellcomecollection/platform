@@ -386,7 +386,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work1 = workWith(
           canonicalId = "1234",
           title = "An image of an iguana",
-          identifiers = List(identifier1)
+          otherIdentifiers = List(identifier1)
         )
 
         val identifier2 = SourceIdentifier(
@@ -397,7 +397,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work2 = workWith(
           canonicalId = "5678",
           title = "An impression of an igloo",
-          identifiers = List(identifier2)
+          otherIdentifiers = List(identifier2)
         )
 
         insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
@@ -450,7 +450,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work = workWith(
           canonicalId = "1234",
           title = "An insect huddled in an igloo",
-          identifiers = List(srcIdentifier)
+          otherIdentifiers = List(srcIdentifier)
         )
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
