@@ -179,7 +179,6 @@ trait WorksUtil {
   ): IdentifiedItem = IdentifiedItem(
     canonicalId = canonicalId,
     sourceIdentifier = identifier,
-    identifiers = List(identifier),
     locations = List(location)
   )
 

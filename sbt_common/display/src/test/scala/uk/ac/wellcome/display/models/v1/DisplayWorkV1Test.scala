@@ -26,7 +26,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val item = IdentifiedItem(
       canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
       locations = List()
     )
     val work = IdentifiedWork(
@@ -296,8 +295,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       items = List(
         IdentifiedItem(
           canonicalId = "pwaazubr",
-          sourceIdentifier = itemSourceIdentifier,
-          identifiers = List(itemSourceIdentifier)
+          sourceIdentifier = itemSourceIdentifier
         )
       ),
       version = 1

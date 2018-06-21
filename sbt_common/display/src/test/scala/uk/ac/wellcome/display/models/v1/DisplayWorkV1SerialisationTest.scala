@@ -118,7 +118,6 @@ class DisplayWorkV1SerialisationTest
     val item = IdentifiedItem(
       canonicalId = "chu27a8",
       sourceIdentifier = sourceIdentifier,
-      identifiers = List(),
       locations = List(location)
     )
     val workWithCopyright = IdentifiedWork(

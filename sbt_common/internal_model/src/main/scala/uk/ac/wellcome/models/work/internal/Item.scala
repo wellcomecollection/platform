@@ -17,7 +17,7 @@ case class UnidentifiedItem(
 case class IdentifiedItem(
   canonicalId: String,
   sourceIdentifier: SourceIdentifier,
-  identifiers: List[SourceIdentifier] = Nil,
+  otherIdentifiers: List[SourceIdentifier] = Nil,
   locations: List[Location] = List(),
   ontologyType: String = "Item"
 ) extends Item

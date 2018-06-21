@@ -27,7 +27,6 @@ class DisplayItemV1Test extends FunSpec with Matchers {
     val item = IdentifiedItem(
       canonicalId = "foo",
       sourceIdentifier = identifier,
-      identifiers = List(identifier),
       locations = List(location)
     )
 
