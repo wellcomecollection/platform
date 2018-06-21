@@ -9,7 +9,7 @@
   </appender>
 
   <logger name="com.amazonaws.services.s3" level="ERROR"/>
-  <root level="info">
+  <root level="${log_level:-INFO}">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>
