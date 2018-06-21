@@ -60,8 +60,9 @@ case class UnidentifiedWork(
 case class IdentifiedWork(
   canonicalId: String,
   sourceIdentifier: SourceIdentifier,
-  identifiers: List[SourceIdentifier] = List(),
+  otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
+
   title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,

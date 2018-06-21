@@ -168,7 +168,6 @@ class DisplayWorkV1SerialisationTest
       title = Some("A seal selling seaweed sandwiches in Scotland"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(),
       canonicalId = "test_subject1",
       subjects = List(
         Subject("label", List(concept0)),
@@ -201,7 +200,6 @@ class DisplayWorkV1SerialisationTest
       title = Some("A guppy in a greenhouse"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(),
       canonicalId = "test_subject1",
       genres = List(
         Genre("label", List(concept0)),

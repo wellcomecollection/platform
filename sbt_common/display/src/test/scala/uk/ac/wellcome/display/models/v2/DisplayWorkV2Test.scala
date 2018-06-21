@@ -11,7 +11,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       title = Some("An irritating imp is immune from items"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "abcdef12"
     )
 
@@ -33,7 +32,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "b4heraz7",
       items = List(item)
     )
@@ -52,19 +50,18 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     value = "b1234567"
   )
 
-  it("correctly parses a work without any identifiers") {
+  it("correctly parses a work without any extra identifiers") {
     val work = IdentifiedWork(
       title = Some("An irascible iguana invites impudence"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = Nil,
       canonicalId = "xtsx8hwk")
 
     val displayWork = DisplayWorkV2(
       work = work,
       includes = WorksIncludes(identifiers = true)
     )
-    displayWork.identifiers shouldBe Some(List())
+    displayWork.identifiers shouldBe Some(List(DisplayIdentifierV2(sourceIdentifier)))
   }
 
   it("gets the physicalDescription from a Work") {
@@ -287,7 +284,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       canonicalId = "bmzwdx3t",
       title = Some("Bizarre bees bounce below a basketball"),
       sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
       contributors = List(
         Contributor(
           agent = Identified(

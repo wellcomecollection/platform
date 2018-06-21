@@ -59,7 +59,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId)
 
   def workWith(canonicalId: String,
@@ -69,7 +68,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       visible = visible)
 
@@ -83,7 +81,7 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = identifiers,
+      otherIdentifiers = identifiers,
       canonicalId = canonicalId,
       items = items)
 
@@ -96,12 +94,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(
-        SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Work",
-          "5678")
-      ),
       canonicalId = canonicalId,
       thumbnail = Some(thumbnail)
     )
@@ -118,7 +110,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       workType = Some(workType),
       description = Some(description),
@@ -146,7 +137,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       workType = Some(workType),
       description = Some(description),
