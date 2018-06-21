@@ -42,7 +42,7 @@ class DisplayItemV1Test extends FunSpec with Matchers {
     displayItemV1.ontologyType shouldBe "Item"
   }
 
-  it("correctly parses an Item without any identifiers") {
+  it("correctly parses an Item without any extra identifiers") {
     val item =
       fromJson[IdentifiedItem]("""
         {
@@ -66,7 +66,7 @@ class DisplayItemV1Test extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItemV1.identifiers shouldBe Some(List())
+    displayItemV1.otherIdentifiers shouldBe Some(List())
   }
 
   it("correctly parses an Item without any locations") {

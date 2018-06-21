@@ -254,7 +254,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it(
-    "always includes 'identifiers' with the identifiers include, even if there are no identifiers") {
+    "always includes 'identifiers' with the identifiers include, even if there are no extra identifiers") {
     val work = workWith(
       canonicalId = "a87na87",
       title = "Idling inkwells of indigo images",
@@ -268,7 +268,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title.get}",
                           | "creators": [ ],
-                          | "identifiers": [ ],
+                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
