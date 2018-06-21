@@ -63,7 +63,8 @@ class DynamoRowLockDao @Inject()(
     debug(s"Trying to unlock context: $contextId")
     try {
       val maybeRowLocks: immutable.Seq[Either[DynamoReadError, RowLock]] =
-        Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)('contextId -> contextId)
+        Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
+          'contextId -> contextId)
 
       debug("maybeRowLocks: " + maybeRowLocks)
       val rowLockIds = maybeRowLocks.collect {
@@ -74,19 +75,21 @@ class DynamoRowLockDao @Inject()(
       }.toSet
 
       debug(s"Unlocking rows: $rowLockIds")
-      Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds )
-      val deleteAllResults = Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds )
-      deleteAllResults.foreach {
-        result: BatchWriteItemResult =>
-          if (result.getUnprocessedItems.size() > 0) {
-            val error = s"Batch delete failed to delete ${result.getUnprocessedItems}"
-            info(error)
-            throw FailedLockException(error)
-          }
+      Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
+      val deleteAllResults =
+        Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
+      deleteAllResults.foreach { result: BatchWriteItemResult =>
+        if (result.getUnprocessedItems.size() > 0) {
+          val error =
+            s"Batch delete failed to delete ${result.getUnprocessedItems}"
+          info(error)
+          throw FailedLockException(error)
+        }
       }
     } catch {
       case e: Exception =>
-        val error = s"Problem unlocking rows in context [$contextId], ${e.getClass.getSimpleName} ${e.getMessage}"
+        val error =
+          s"Problem unlocking rows in context [$contextId], ${e.getClass.getSimpleName} ${e.getMessage}"
         info(error)
         throw FailedLockException(error)
     }

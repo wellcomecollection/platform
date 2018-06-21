@@ -80,9 +80,11 @@ class DynamoRowLockDaoTest
             val rowLock = actualStored.get.right.get
 
             // Update the RowLock to be expired
-            val expiryTimeInThePast = Instant.now().minus(Duration.ofSeconds(1))
+            val expiryTimeInThePast =
+              Instant.now().minus(Duration.ofSeconds(1))
             val updatedRowLock = rowLock.copy(expires = expiryTimeInThePast)
-            Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(updatedRowLock)
+            Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
+              updatedRowLock)
         }
         whenReady(dynamoRowLockDao.lockRow(Identifier(id), contextId)) {
           thirdLock =>
@@ -116,16 +118,17 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("throws FailedLockException if there is a problem reading the context index") {
+  it(
+    "throws FailedLockException if there is a problem reading the context index") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
-
         when(mockClient.query(any[QueryRequest]))
           .thenThrow(new InternalServerErrorException("FAILED"))
 
-        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedLockException]
+        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
+          unlockFailed =>
+            unlockFailed shouldBe a[FailedLockException]
         }
 
       }
@@ -136,14 +139,16 @@ class DynamoRowLockDaoTest
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       val mockClient = mock[AmazonDynamoDB]
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
-
-        when(mockClient.query(any[QueryRequest])).thenReturn(aRowLockQueryResult)
+        when(mockClient.query(any[QueryRequest]))
+          .thenReturn(aRowLockQueryResult)
 
         when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
-          .thenReturn(new BatchWriteItemResult().withUnprocessedItems(someUnprocessedItems))
+          .thenReturn(new BatchWriteItemResult()
+            .withUnprocessedItems(someUnprocessedItems))
 
-        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedLockException]
+        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
+          unlockFailed =>
+            unlockFailed shouldBe a[FailedLockException]
         }
       }
     }
@@ -153,14 +158,15 @@ class DynamoRowLockDaoTest
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
-
-        when(mockClient.query(any[QueryRequest])).thenReturn(aRowLockQueryResult)
+        when(mockClient.query(any[QueryRequest]))
+          .thenReturn(aRowLockQueryResult)
 
         when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
           .thenThrow(new InternalServerErrorException("FAILED"))
 
-        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) { unlockFailed =>
-          unlockFailed shouldBe a[FailedLockException]
+        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
+          unlockFailed =>
+            unlockFailed shouldBe a[FailedLockException]
         }
       }
     }
@@ -169,7 +175,6 @@ class DynamoRowLockDaoTest
   it("only one process can lock a locked thing") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
-
         val lockUnlockCycles = 5
         val parallelism = 8
 
@@ -181,35 +186,41 @@ class DynamoRowLockDaoTest
           val thingsToLock = (1 to parallelism).map(_ => Identifier("sameId"))
 
           val countDownLatch = new CountDownLatch(parallelism)
-          val eventualLocks = thingsToLock.map { thingToLock => Future {
-              countDownLatch.countDown()
-              countDownLatch.await(10, TimeUnit.SECONDS)
-            }.flatMap(_ =>
-              dynamoRowLockDao.lockRow(Identifier(thingToLock.id), contextId)
-          )}.map(_.recover {
-            case e: FailedLockException => e
-          })
+          val eventualLocks = thingsToLock
+            .map { thingToLock =>
+              Future {
+                countDownLatch.countDown()
+                countDownLatch.await(10, TimeUnit.SECONDS)
+              }.flatMap(_ =>
+                dynamoRowLockDao
+                  .lockRow(Identifier(thingToLock.id), contextId))
+            }
+            .map(_.recover {
+              case e: FailedLockException => e
+            })
 
           whenReady(Future.sequence(eventualLocks)) { locksAttempts =>
             locksAttempts.collect { case a: RowLock => a }.size shouldBe 1
             locksAttempts.collect { case a: FailedLockException => a }.size shouldBe expectedFailedLockCount
           }
 
-          whenReady(dynamoRowLockDao.unlockRows(contextId)) { _ => }
+          whenReady(dynamoRowLockDao.unlockRows(contextId)) { _ =>
+            }
         })
       }
     }
   }
 
   private def aRowLockQueryResult = {
-    val rowLockAsMap: util.Map[String, AttributeValue] = new util.HashMap[String, AttributeValue]() {
-      put("id", new AttributeValue("id"))
-      put("contextId", new AttributeValue("contextId"))
-      val aDate = new AttributeValue()
-      aDate.setN("1")
-      put("created", aDate)
-      put("expires", aDate)
-    }
+    val rowLockAsMap: util.Map[String, AttributeValue] =
+      new util.HashMap[String, AttributeValue]() {
+        put("id", new AttributeValue("id"))
+        put("contextId", new AttributeValue("contextId"))
+        val aDate = new AttributeValue()
+        aDate.setN("1")
+        put("created", aDate)
+        put("expires", aDate)
+      }
     val results = new util.ArrayList[util.Map[String, AttributeValue]]();
     results.add(rowLockAsMap)
     val queryResult = new QueryResult()

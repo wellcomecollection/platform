@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class WorkMatcherTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with MatcherFixtures
     with ScalaFutures
@@ -23,8 +23,9 @@ class WorkMatcherTest
         withWorkGraphStore(graphTable) { workGraphStore =>
           withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
             withLockingService(rowLockDao) { dynamoLockingService =>
-              withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
-
+              withWorkMatcherAndLockingService(
+                workGraphStore,
+                dynamoLockingService) { workMatcher =>
                 val identifierA = aSierraSourceIdentifier("A")
                 val identifierB = aSierraSourceIdentifier("B")
 
@@ -42,14 +43,22 @@ class WorkMatcherTest
                 val eventualResultB = workMatcher.matchWork(workB)
 
                 val eventualResults = for {
-                  resultA <- eventualResultA recoverWith {case e: GracefulFailureException => Future.successful(e)}
-                  resultB <- eventualResultB recoverWith {case e: GracefulFailureException => Future.successful(e)}
+                  resultA <- eventualResultA recoverWith {
+                    case e: GracefulFailureException => Future.successful(e)
+                  }
+                  resultB <- eventualResultB recoverWith {
+                    case e: GracefulFailureException => Future.successful(e)
+                  }
                 } yield (resultA, resultB)
 
                 whenReady(eventualResults) { results =>
                   val resultsList = results.productIterator.toList
-                  val failure = resultsList.collect({ case e: GracefulFailureException => e })
-                  val result = resultsList.collect({ case r: MatcherResult => r })
+                  val failure = resultsList.collect({
+                    case e: GracefulFailureException => e
+                  })
+                  val result = resultsList.collect({
+                    case r: MatcherResult => r
+                  })
 
                   failure.size shouldBe 1
                   result.size shouldBe 1

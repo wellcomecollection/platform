@@ -36,8 +36,7 @@ class DynamoLockingServiceTest
     }
   }
 
-  it(
-    "throws a FailedLockException and releases locks when a row lock fails") {
+  it("throws a FailedLockException and releases locks when a row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         withLockingService(dynamoRowLockDao) { lockingService =>
@@ -60,7 +59,8 @@ class DynamoLockingServiceTest
     }
   }
 
-  it("throws a FailedLockException and releases locks when a nested row lock fails") {
+  it(
+    "throws a FailedLockException and releases locks when a nested row lock fails") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         withLockingService(dynamoRowLockDao) { lockingService =>

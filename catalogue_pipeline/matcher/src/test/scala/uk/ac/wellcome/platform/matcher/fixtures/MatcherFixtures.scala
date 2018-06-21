@@ -11,10 +11,19 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao, RowLock}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  DynamoLockingServiceConfig,
+  DynamoRowLockDao,
+  RowLock
+}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -126,8 +135,9 @@ trait MatcherFixtures
     testWith(workMatcher)
   }
 
-  def withDynamoRowLockDao[R](dynamoDbClient: AmazonDynamoDB , lockTable: Table)(
-    testWith: TestWith[DynamoRowLockDao, R]): R = {
+  def withDynamoRowLockDao[R](
+    dynamoDbClient: AmazonDynamoDB,
+    lockTable: Table)(testWith: TestWith[DynamoRowLockDao, R]): R = {
     val dynamoRowLockDao = new DynamoRowLockDao(
       dynamoDbClient,
       DynamoLockingServiceConfig(lockTable.name, lockTable.index))

@@ -8,7 +8,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.lockable.Identifier
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
@@ -169,13 +174,15 @@ class WorkMatcherConcurrencyTest
         withWorkGraphStore(graphTable) { workGraphStore =>
           withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
             withLockingService(rowLockDao) { dynamoLockingService =>
-              withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
-
+              withWorkMatcherAndLockingService(
+                workGraphStore,
+                dynamoLockingService) { workMatcher =>
                 val failedLock = for {
                   _ <- rowLockDao.lockRow(
                     Identifier("sierra-system-number/id"),
                     "processId")
-                  result <- workMatcher.matchWork(anUnidentifiedSierraWork.copy())
+                  result <- workMatcher.matchWork(
+                    anUnidentifiedSierraWork.copy())
                 } yield result
 
                 whenReady(failedLock.failed) { failedMatch =>
@@ -196,16 +203,25 @@ class WorkMatcherConcurrencyTest
         withWorkGraphStore(graphTable) { workGraphStore =>
           withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
             withLockingService(rowLockDao) { dynamoLockingService =>
-              withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
-
+              withWorkMatcherAndLockingService(
+                workGraphStore,
+                dynamoLockingService) { workMatcher =>
                 val identifierA = aSierraSourceIdentifier("A")
                 val identifierB = aSierraSourceIdentifier("B")
 
                 // A->B->C
                 workGraphStore.put(WorkGraph(Set(
-                  WorkNode("sierra-system-number/A", 0, List("sierra-system-number/B"), "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-                  WorkNode("sierra-system-number/B", 0, List("sierra-system-number/C"), "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
-                  WorkNode("sierra-system-number/C", 0, Nil,                            "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
+                  WorkNode(
+                    "sierra-system-number/A",
+                    0,
+                    List("sierra-system-number/B"),
+                    "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                  WorkNode(
+                    "sierra-system-number/B",
+                    0,
+                    List("sierra-system-number/C"),
+                    "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                  WorkNode("sierra-system-number/C", 0, Nil, "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
                 )))
 
                 val work = anUnidentifiedSierraWork.copy(
