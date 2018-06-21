@@ -24,7 +24,8 @@ class DynamoLockingService @Inject()(dynamoRowLockDao: DynamoRowLockDao)(
         .unlockRows(contextGuid)
         .flatMap(_ => {
           debug(s"Released locked identifiers $identifiers in $contextGuid")
-          Future.fromTry(triedResult)})
+          Future.fromTry(triedResult)
+        })
     }
   }
 }
