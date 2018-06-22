@@ -11,11 +11,20 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, DynamoLockingServiceConfig, DynamoRowLockDao, RowLock}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  DynamoLockingServiceConfig,
+  DynamoRowLockDao,
+  RowLock
+}
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
 import uk.ac.wellcome.platform.matcher.storage.{WorkGraphStore, WorkNodeDao}
@@ -93,21 +102,22 @@ trait MatcherFixtures
         withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
           withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
             withWorkGraphStore(graphTable) { workGraphStore =>
-              withWorkMatcher(workGraphStore, lockTable, metricsSender) { workMatcher =>
-                val sqsStream = new SQSStream[NotificationMessage](
-                  actorSystem = actorSystem,
-                  sqsClient = asyncSqsClient,
-                  sqsConfig = SQSConfig(queue.url, 1 second, 1),
-                  metricsSender = metricsSender
-                )
-                val matcherMessageReceiver = new MatcherMessageReceiver(
-                  sqsStream,
-                  snsWriter,
-                  objectStore,
-                  storageS3Config,
-                  actorSystem,
-                  workMatcher)
-                testWith(matcherMessageReceiver)
+              withWorkMatcher(workGraphStore, lockTable, metricsSender) {
+                workMatcher =>
+                  val sqsStream = new SQSStream[NotificationMessage](
+                    actorSystem = actorSystem,
+                    sqsClient = asyncSqsClient,
+                    sqsConfig = SQSConfig(queue.url, 1 second, 1),
+                    metricsSender = metricsSender
+                  )
+                  val matcherMessageReceiver = new MatcherMessageReceiver(
+                    sqsStream,
+                    snsWriter,
+                    objectStore,
+                    storageS3Config,
+                    actorSystem,
+                    workMatcher)
+                  testWith(matcherMessageReceiver)
               }
             }
           }
@@ -116,13 +126,15 @@ trait MatcherFixtures
     }
   }
 
-  def withWorkMatcher[R](workGraphStore: WorkGraphStore, lockTable: Table, metricsSender: MetricsSender)(
-    testWith: TestWith[WorkMatcher, R]): R = {
+  def withWorkMatcher[R](
+    workGraphStore: WorkGraphStore,
+    lockTable: Table,
+    metricsSender: MetricsSender)(testWith: TestWith[WorkMatcher, R]): R = {
     val dynamoRowLockDao: DynamoRowLockDao = new DynamoRowLockDao(
       dynamoDbClient,
       DynamoLockingServiceConfig(lockTable.name, lockTable.index))
-    val lockingService: DynamoLockingService = new DynamoLockingService(
-      dynamoRowLockDao, metricsSender)
+    val lockingService: DynamoLockingService =
+      new DynamoLockingService(dynamoRowLockDao, metricsSender)
     val workMatcher = new WorkMatcher(workGraphStore, lockingService)
     testWith(workMatcher)
   }
@@ -144,9 +156,11 @@ trait MatcherFixtures
     testWith(dynamoRowLockDao)
   }
 
-  def withLockingService[R](dynamoRowLockDao: DynamoRowLockDao, metricsSender: MetricsSender)(
+  def withLockingService[R](dynamoRowLockDao: DynamoRowLockDao,
+                            metricsSender: MetricsSender)(
     testWith: TestWith[DynamoLockingService, R]): R = {
-    val lockingService = new DynamoLockingService(dynamoRowLockDao, metricsSender)
+    val lockingService =
+      new DynamoLockingService(dynamoRowLockDao, metricsSender)
     testWith(lockingService)
   }
 
