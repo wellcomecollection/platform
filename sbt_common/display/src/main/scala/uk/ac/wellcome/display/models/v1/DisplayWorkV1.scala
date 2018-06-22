@@ -75,7 +75,6 @@ case class DisplayWorkV1(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV1]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayAbstractAgentV1]",
     value = "Relates a published work to its publisher."
   ) publishers: List[DisplayAgentV1] = List(),
   @ApiModelProperty(
