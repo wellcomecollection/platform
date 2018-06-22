@@ -458,7 +458,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "id": "${work.canonicalId}",
                  | "title": "${work.title.get}",
                  | "creators": [ ],
-                 | "identifiers": [ ${identifier(srcIdentifier)} ],
+                 | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(srcIdentifier)} ],
                  | "subjects": [ ],
                  | "genres": [ ],
                  | "publishers": [ ],
