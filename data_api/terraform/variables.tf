@@ -27,8 +27,8 @@ variable "es_config_snapshot" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-20180530-new-identifier-schemes"
-    index_v2 = "v2-20180530-new-identifier-schemes"
+    index_v1 = "v1-2018-06-05-new-location-types"
+    index_v2 = "v2-2018-06-05-new-location-types"
     doc_type = "work"
   }
 }
