@@ -15,6 +15,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SNSClientModule,
   SQSClientModule
 }
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ClientModule
 import uk.ac.wellcome.platform.idminter.modules._
@@ -24,6 +25,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.id_minter IdMinter"
   override val modules = Seq(
+    AccessLoggingFilterModule,
     MysqlModule,
     IdentifiersTableConfigModule,
     AkkaModule,

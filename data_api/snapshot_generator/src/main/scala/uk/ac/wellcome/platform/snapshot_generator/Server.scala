@@ -21,6 +21,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule,
   SQSConfigModule
 }
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.S3ConfigModule
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{
@@ -36,6 +37,7 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.snapshot_generator SnapshotGenerator"
 
   override val modules = Seq(
+    AccessLoggingFilterModule,
     MetricsSenderModule,
     SQSClientModule,
     SQSConfigModule,

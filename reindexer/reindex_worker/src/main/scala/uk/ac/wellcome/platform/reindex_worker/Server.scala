@@ -16,6 +16,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule,
   SQSConfigModule
 }
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
@@ -30,6 +31,7 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.reindexer Reindexer"
 
   override val modules = Seq(
+    AccessLoggingFilterModule,
     MetricsSenderModule,
     DynamoClientModule,
     DynamoConfigModule,
