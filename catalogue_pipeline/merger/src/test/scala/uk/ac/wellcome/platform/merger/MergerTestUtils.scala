@@ -62,7 +62,7 @@ trait MergerTestUtils { this: SQS with SNS with Messaging =>
     val recorderWorkEntry1 = RecorderWorkEntry(
       UnidentifiedWork(
         title = Some(title),
-        SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
+        sourceIdentifier = SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
         version = version))
     recorderWorkEntry1
   }
