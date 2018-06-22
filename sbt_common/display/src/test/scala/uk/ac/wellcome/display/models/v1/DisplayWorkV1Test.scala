@@ -287,24 +287,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   describe("correctly uses the WorksIncludes.identifiers include") {
-    val creatorAgentSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/pp",
-      ontologyType = "Agent"
-    )
-
-    val creatorPersonSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/pri",
-      ontologyType = "Agent"
-    )
-
-    val creatorOrganisationSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/pri",
-      ontologyType = "Agent"
-    )
-
     val itemSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       value = "miro/p0001",
@@ -316,32 +298,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       title = Some("Pouncing pugs play in pipes"),
       sourceIdentifier = sourceIdentifier,
       identifiers = List(sourceIdentifier),
-      contributors = List(
-        Contributor(
-          agent = Identified(
-            Agent(label = "Purple Penelope"),
-            canonicalId = "p72ujfbe",
-            identifiers = List(creatorAgentSourceIdentifier)
-          ),
-          roles = List()
-        ),
-        Contributor(
-          agent = Identified(
-            Organisation(label = "Pretty Prints"),
-            canonicalId = "pqcmakdp",
-            identifiers = List(creatorOrganisationSourceIdentifier)
-          ),
-          roles = List()
-        ),
-        Contributor(
-          agent = Identified(
-            Person(label = "Private Paul"),
-            canonicalId = "pcynevb6",
-            identifiers = List(creatorPersonSourceIdentifier)
-          ),
-          roles = List()
-        )
-      ),
       items = List(
         IdentifiedItem(
           canonicalId = "pwaazubr",
