@@ -3,7 +3,7 @@ module "p2_compute" {
   name   = "jupyter-p2"
 
   key_name    = "${var.key_name}"
-  bucket_name = "${aws_s3_bucket.jupyter.id}"
+  bucket_name = "${var.s3_bucket_name}"
 
   instance_type = "p2.xlarge"
   spot_price    = "0.5"

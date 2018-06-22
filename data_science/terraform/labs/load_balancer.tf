@@ -12,7 +12,7 @@ resource "aws_alb_listener" "http_80" {
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${module.service.target_group_arn}"
+    target_group_arn = "${module.palette_service.target_group_arn}"
     type             = "forward"
   }
 }
