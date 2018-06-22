@@ -224,3 +224,17 @@ if __name__ == '__main__':
         print('You can build new windows for the gaps:')
         print('')
         print(f'$ python {sys.argv[0].replace("report_adapter_progress.py", "build_missing_windows.py")}')\
+
+    # If the run completed successfully, we can purge the associated DLQs.
+    #
+    # Because each timestamp is fetched (at least) twice, we can have
+    # windows land on the DLQ and still get a complete history from Sierra --
+    # every record in that window was picked up as part of a different window.
+    #
+    sqs = boto3.client('sqs')
+    for resource_type in ('bibs', 'items'):
+        if len(final_reports[resource_type]) == 1:
+            queue_url = sqs.get_queue_url(
+                QueueName=f'sierra_{resource_type}_windows'
+            )['QueueUrl']
+            sqs.purge_queue(QueueUrl=queue_url)
