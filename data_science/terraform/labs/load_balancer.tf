@@ -1,13 +1,13 @@
-resource "aws_alb" "public_services" {
+resource "aws_alb" "services" {
   # This name can only contain alphanumerics and hyphens
-  name = "${replace("${local.namespace}", "_", "-")}"
+  name = "${replace("${var.namespace}", "_", "-")}"
 
-  subnets         = ["${module.network.public_subnets}"]
+  subnets         = ["${var.subnets}"]
   security_groups = ["${aws_security_group.service_lb_security_group.id}", "${aws_security_group.external_lb_security_group.id}"]
 }
 
 resource "aws_alb_listener" "http_80" {
-  load_balancer_arn = "${aws_alb.public_services.id}"
+  load_balancer_arn = "${aws_alb.services.id}"
   port              = "80"
   protocol          = "HTTP"
 

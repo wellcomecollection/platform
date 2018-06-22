@@ -1,7 +1,7 @@
 resource "aws_security_group" "service_lb_security_group" {
   name        = "service_lb_security_group"
   description = "Allow traffic between services and load balancer"
-  vpc_id      = "${module.network.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     protocol  = "tcp"
@@ -18,14 +18,14 @@ resource "aws_security_group" "service_lb_security_group" {
   }
 
   tags {
-    Name = "${local.namespace}"
+    Name = "${var.namespace}"
   }
 }
 
 resource "aws_security_group" "external_lb_security_group" {
   name        = "external_lb_security_group"
   description = "Allow traffic between load balancer and internet"
-  vpc_id      = "${module.network.vpc_id}"
+  vpc_id      = "${var.vpc_id}"
 
   ingress {
     protocol  = "tcp"
@@ -43,6 +43,6 @@ resource "aws_security_group" "external_lb_security_group" {
   }
 
   tags {
-    Name = "${local.namespace}"
+    Name = "${var.namespace}"
   }
 }

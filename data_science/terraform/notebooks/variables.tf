@@ -1,9 +1,9 @@
-variable "aws_region" {
-  default = "eu-west-1"
-}
+variable "namespace" {}
 
 variable "key_name" {}
+
 variable "s3_bucket_name" {}
+variable "s3_bucket_arn" {}
 
 variable "hashed_password" {
   # The default password is 'password'
@@ -15,4 +15,10 @@ variable "hashed_password" {
   default = "sha1:5310f21e370d:a4d66e725c179218638c21c03d83933aa066db2d"
 }
 
-
+variable "aws_region" {}
+variable "vpc_cidr_block" {}
+variable "vpc_id" {}
+variable "subnets" {
+  type    = "list"
+  default = []
+}

@@ -13,7 +13,7 @@ resource "aws_alb_listener_rule" "path_rule" {
 }
 
 module "task" {
-  source = "../../../../../terraform-modules/ecs/modules/task/prebuilt/default"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/default?ref=ecs_v2"
 
   aws_region = "${var.aws_region}"
   task_name  = "${var.namespace}"
@@ -23,7 +23,7 @@ module "task" {
 }
 
 module "service" {
-  source = "../../../../../terraform-modules/ecs/modules/service/prebuilt/load_balanced"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=ecs_v2"
 
   service_name       = "${var.namespace}"
   task_desired_count = "1"
