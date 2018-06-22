@@ -16,6 +16,7 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSClientModule,
   SQSConfigModule
 }
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
 import uk.ac.wellcome.platform.transformer.modules.{TransformerWorkerModule, _}
@@ -25,6 +26,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
   override val modules = Seq(
+    AccessLoggingFilterModule,
     MetricsSenderModule,
     AkkaModule,
     SQSClientModule,

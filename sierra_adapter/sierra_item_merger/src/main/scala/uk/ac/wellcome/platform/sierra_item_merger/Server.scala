@@ -12,6 +12,7 @@ import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
   S3ClientModule,
@@ -26,6 +27,7 @@ class Server extends HttpServer {
   override val name =
     "uk.ac.wellcome.platform.sierra_item_merger SierraItemMerger"
   override val modules = Seq(
+    AccessLoggingFilterModule,
     DynamoClientModule,
     VHSConfigModule,
     ExecutionContextModule,

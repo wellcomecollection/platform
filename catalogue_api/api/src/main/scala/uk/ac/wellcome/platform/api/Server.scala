@@ -13,6 +13,7 @@ import uk.ac.wellcome.finatra.elasticsearch.{
   ElasticClientModule,
   ElasticConfigModule
 }
+import uk.ac.wellcome.finatra.modules.AccessLoggingFilterModule
 import uk.ac.wellcome.platform.api.controllers._
 import uk.ac.wellcome.platform.api.finatra.exceptions.{
   CaseClassMappingExceptionWrapper,
@@ -26,6 +27,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.api Platformapi"
   override val modules = Seq(
+    AccessLoggingFilterModule,
     ApiConfigModule,
     ElasticClientModule,
     ElasticConfigModule
