@@ -138,6 +138,11 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     keywordField("ontologyType")
   )
 
+  val mergeCandidates = objectField("mergeCandidates").fields(
+    objectField("identifier").fields(sourceIdentifierFields),
+    keywordField("reason")
+  )
+
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
     Seq(
       keywordField("canonicalId"),
@@ -146,6 +151,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       intField("version"),
       sourceIdentifier,
       identifiers,
+      mergeCandidates,
       workType,
       textField("title").fields(
         textField("english").analyzer(EnglishLanguageAnalyzer)),

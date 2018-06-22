@@ -2,10 +2,11 @@ package uk.ac.wellcome.models.work.internal
 
 /** A representation of a work in our ontology */
 trait Work {
-  val title: Option[String]
   val sourceIdentifier: SourceIdentifier
-  val version: Int
   val identifiers: List[SourceIdentifier]
+  val mergeCandidates: List[MergeCandidate]
+
+  val title: Option[String]
   val workType: Option[WorkType]
   val description: Option[String]
   val physicalDescription: Option[String]
@@ -13,21 +14,26 @@ trait Work {
   val lettering: Option[String]
   val createdDate: Option[Period]
   val subjects: List[Subject[IdentityState[AbstractConcept]]]
-  val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val genres: List[Genre[IdentityState[AbstractConcept]]]
+  val contributors: List[Contributor[IdentityState[AbstractAgent]]]
   val thumbnail: Option[Location]
   val production: List[ProductionEvent[IdentityState[AbstractAgent]]]
   val language: Option[Language]
   val dimensions: Option[String]
+
+  val items: List[Item]
+
+  val version: Int
   val visible: Boolean
+
   val ontologyType: String
 }
 
 case class UnidentifiedWork(
-  title: Option[String],
   sourceIdentifier: SourceIdentifier,
-  version: Int,
   identifiers: List[SourceIdentifier] = List(),
+  mergeCandidates: List[MergeCandidate] = List(),
+  title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -35,23 +41,24 @@ case class UnidentifiedWork(
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
   subjects: List[Subject[MaybeDisplayable[AbstractConcept]]] = Nil,
-  contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = Nil,
   genres: List[Genre[MaybeDisplayable[AbstractConcept]]] = Nil,
+  contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = Nil,
   thumbnail: Option[Location] = None,
-  items: List[UnidentifiedItem] = Nil,
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
+  items: List[UnidentifiedItem] = Nil,
+  version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
 
 case class IdentifiedWork(
   canonicalId: String,
-  title: Option[String],
   sourceIdentifier: SourceIdentifier,
-  version: Int,
   identifiers: List[SourceIdentifier] = List(),
+  mergeCandidates: List[MergeCandidate] = List(),
+  title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -59,13 +66,14 @@ case class IdentifiedWork(
   lettering: Option[String] = None,
   createdDate: Option[Period] = None,
   subjects: List[Subject[Displayable[AbstractConcept]]] = Nil,
-  contributors: List[Contributor[Displayable[AbstractAgent]]] = Nil,
   genres: List[Genre[Displayable[AbstractConcept]]] = Nil,
+  contributors: List[Contributor[Displayable[AbstractAgent]]] = Nil,
   thumbnail: Option[Location] = None,
-  items: List[IdentifiedItem] = Nil,
   production: List[ProductionEvent[Displayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
+  items: List[IdentifiedItem] = Nil,
+  version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
