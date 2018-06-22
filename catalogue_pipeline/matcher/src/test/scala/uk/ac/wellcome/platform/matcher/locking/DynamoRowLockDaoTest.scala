@@ -40,8 +40,10 @@ class DynamoRowLockDaoTest
 
             val actualStored =
               Scanamo.get[RowLock](dynamoDbClient)(lockTable.name)('id -> id)
-            val storedRowLock = actualStored.get.right.get
-            storedRowLock.id shouldBe id
+            actualStored.get match {
+              case Right(storedRowLock) => storedRowLock.id shouldBe id
+              case Left(failed) => fail(s"failed to get rowLocks $failed")
+            }
         }
       }
     }
