@@ -125,7 +125,9 @@ class DynamoRowLockDaoTest
         when(mockClient.putItem(any[PutItemRequest]))
           .thenThrow(new InternalServerErrorException("FAILED"))
 
-        whenReady(dynamoRowLockDao.lockRow(Identifier("id"), "contextId").failed) { lockFailed =>
+        whenReady(
+          dynamoRowLockDao.lockRow(Identifier("id"), "contextId").failed) {
+          lockFailed =>
             lockFailed shouldBe a[FailedLockException]
         }
 
