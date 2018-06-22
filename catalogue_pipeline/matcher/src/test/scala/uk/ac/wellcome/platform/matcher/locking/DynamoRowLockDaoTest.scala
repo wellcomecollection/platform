@@ -118,6 +118,21 @@ class DynamoRowLockDaoTest
     }
   }
 
+  it("throws FailedLockException if there is a problem writing the lock") {
+    val mockClient = mock[AmazonDynamoDB]
+    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+      withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
+        when(mockClient.putItem(any[PutItemRequest]))
+          .thenThrow(new InternalServerErrorException("FAILED"))
+
+        whenReady(dynamoRowLockDao.lockRow(Identifier("id"), "contextId").failed) { lockFailed =>
+            lockFailed shouldBe a[FailedLockException]
+        }
+
+      }
+    }
+  }
+
   it(
     "throws FailedLockException if there is a problem reading the context index") {
     val mockClient = mock[AmazonDynamoDB]
