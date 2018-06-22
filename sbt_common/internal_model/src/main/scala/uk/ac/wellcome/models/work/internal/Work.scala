@@ -34,7 +34,6 @@ case class UnidentifiedWork(
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   title: Option[String],
-
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -59,7 +58,6 @@ case class IdentifiedWork(
   sourceIdentifier: SourceIdentifier,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-
   title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
