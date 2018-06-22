@@ -23,7 +23,8 @@ object AccessLoggingFilterModule extends TwitterModule {
 
   @Singleton
   @Provides
-  def providesAccessLoggingFilter(injector: Injector): AccessLoggingFilter[Request] = {
+  def providesAccessLoggingFilter(
+    injector: Injector): AccessLoggingFilter[Request] = {
     val logFormatter = injector.instance[LogFormatter[Request, Response]]
     new PlatformLoggingFilter(logFormatter = logFormatter)
   }

@@ -24,12 +24,11 @@ class PlatformLoggingFilter @Inject()(
   logFormatter: LogFormatter[Request, Response]
 ) extends AccessLoggingFilter[Request](logFormatter = logFormatter) {
 
-  override def apply(request: Request, service: Service[Request, Response]): Future[Response] = {
-    if (
-      request.userAgent.contains("ELB-HealthChecker/2.0") &&
-      request.path == "/management/healthcheck" &&
-      !isDebugEnabled
-    ) {
+  override def apply(request: Request,
+                     service: Service[Request, Response]): Future[Response] = {
+    if (request.userAgent.contains("ELB-HealthChecker/2.0") &&
+        request.path == "/management/healthcheck" &&
+        !isDebugEnabled) {
       service(request)
     } else {
       super.apply(request = request, service = service)
