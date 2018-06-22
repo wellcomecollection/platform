@@ -235,6 +235,6 @@ if __name__ == '__main__':
     for resource_type in ('bibs', 'items'):
         if len(final_reports[resource_type]) == 1:
             queue_url = sqs.get_queue_url(
-                QueueName=f'sierra_{resource_type}_windows'
+                QueueName=f'sierra_{resource_type}_windows_dlq'
             )['QueueUrl']
             sqs.purge_queue(QueueUrl=queue_url)
