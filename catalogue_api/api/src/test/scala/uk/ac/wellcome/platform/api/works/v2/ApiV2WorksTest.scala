@@ -415,7 +415,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title.get}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(identifier1)} ],
+               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                identifier1)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -425,7 +426,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work2.canonicalId}",
                |     "title": "${work2.title.get}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(identifier2)} ],
+               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                identifier2)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
