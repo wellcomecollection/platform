@@ -10,7 +10,12 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoRowLockDao, FailedLockException, FailedUnlockException, RowLock}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoRowLockDao,
+  FailedLockException,
+  FailedUnlockException,
+  RowLock
+}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.collection.immutable
@@ -105,19 +110,20 @@ class DynamoLockingServiceTest
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         val mockDynamoRowLockDao = mock[DynamoRowLockDao]
-        withLockingService(mockDynamoRowLockDao, mockMetricsSender) { lockingService =>
+        withLockingService(mockDynamoRowLockDao, mockMetricsSender) {
+          lockingService =>
+            when(mockDynamoRowLockDao.unlockRows(any())).thenReturn(Future
+              .failed(FailedUnlockException("Failed", new RuntimeException)))
 
-          when(mockDynamoRowLockDao.unlockRows(any())).thenReturn(Future.failed(FailedUnlockException("Failed", new RuntimeException)))
+            val eventuallyLockFails =
+              lockingService.withLocks(Set("id"))(Future {})
 
-          val eventuallyLockFails =
-            lockingService.withLocks(Set("id"))(Future {})
-
-          whenReady(eventuallyLockFails.failed) { failure =>
-            failure shouldBe a[FailedUnlockException]
-            // still expect original locks to exist
-            assertNoRowLocks(lockTable)
-            assertIncrementsFailedUnlockCount(1, mockMetricsSender)
-          }
+            whenReady(eventuallyLockFails.failed) { failure =>
+              failure shouldBe a[FailedUnlockException]
+              // still expect original locks to exist
+              assertNoRowLocks(lockTable)
+              assertIncrementsFailedUnlockCount(1, mockMetricsSender)
+            }
         }
       }
     }
@@ -175,13 +181,16 @@ class DynamoLockingServiceTest
     verify(mockMetricsSender, Mockito.never()).incrementCount(any())
   }
 
-  private def assertIncrementsFailedLockCount(i: Int, mockMetricsSender: MetricsSender): Future[Any] = {
+  private def assertIncrementsFailedLockCount(
+    i: Int,
+    mockMetricsSender: MetricsSender): Future[Any] = {
     verify(mockMetricsSender, Mockito.times(i))
       .incrementCount("WorkMatcher_FailedLock")
   }
 
-  private def assertIncrementsFailedUnlockCount(i: Int,
-                                               mockMetricsSender: MetricsSender): Future[Any] = {
+  private def assertIncrementsFailedUnlockCount(
+    i: Int,
+    mockMetricsSender: MetricsSender): Future[Any] = {
     verify(mockMetricsSender, Mockito.times(i))
       .incrementCount("WorkMatcher_FailedUnlock")
   }

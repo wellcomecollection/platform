@@ -154,7 +154,8 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("throws FailedUnlockException if there is a problem unlocking - there are unprocessed batch items") {
+  it(
+    "throws FailedUnlockException if there is a problem unlocking - there are unprocessed batch items") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       val mockClient = mock[AmazonDynamoDB]
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -173,7 +174,8 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it("throws FailedUnlockException if there is a problem unlocking - the batch update fails") {
+  it(
+    "throws FailedUnlockException if there is a problem unlocking - the batch update fails") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
