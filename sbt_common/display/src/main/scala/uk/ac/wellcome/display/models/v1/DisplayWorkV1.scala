@@ -52,7 +52,7 @@ case class DisplayWorkV1(
   @ApiModelProperty(
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) creators: List[DisplayAbstractAgentV1] = List(),
+  ) creators: List[DisplayAgentV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v1.DisplayIdentifierV1]",
     value =
@@ -75,9 +75,8 @@ case class DisplayWorkV1(
     value = "List of items related to this work."
   ) items: Option[List[DisplayItemV1]] = None,
   @ApiModelProperty(
-    dataType = "List[uk.ac.wellcome.display.models.v1.DisplayAbstractAgentV1]",
     value = "Relates a published work to its publisher."
-  ) publishers: List[DisplayAbstractAgentV1] = List(),
+  ) publishers: List[DisplayAgentV1] = List(),
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v1.DisplayPlaceV1]",
     value = "Show a list of places of publication."
@@ -136,9 +135,7 @@ case object DisplayWorkV1 {
       createdDate = work.createdDate.map { DisplayPeriodV1(_) },
       creators = work.contributors.map {
         contributor: Contributor[Displayable[AbstractAgent]] =>
-          DisplayAbstractAgentV1(
-            contributor.agent,
-            includesIdentifiers = includes.identifiers)
+          DisplayAgentV1(contributor.agent)
       },
       subjects = work.subjects.flatMap { subject =>
         subject.concepts.map { DisplayConceptV1(_) }
