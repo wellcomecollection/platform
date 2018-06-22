@@ -5,7 +5,7 @@ import java.time.{Duration, Instant}
 import com.gu.scanamo._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.matcher.lockable._
+import uk.ac.wellcome.platform.matcher.locking._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 //import java.util.concurrent.ForkJoinPool

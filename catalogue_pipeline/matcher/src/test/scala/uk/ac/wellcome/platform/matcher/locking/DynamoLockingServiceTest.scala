@@ -6,7 +6,7 @@ import com.gu.scanamo.{DynamoFormat, Scanamo}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{FailedLockException, RowLock}
+import uk.ac.wellcome.platform.matcher.locking.{FailedLockException, RowLock}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.collection.immutable

@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.matcher.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.matcher.lockable.DynamoLockingServiceConfig
+import uk.ac.wellcome.platform.matcher.locking.DynamoLockingServiceConfig
 
 object DynamoLockingServiceConfigModule extends TwitterModule {
 

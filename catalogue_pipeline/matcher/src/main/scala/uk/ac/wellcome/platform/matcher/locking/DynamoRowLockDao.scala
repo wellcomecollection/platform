@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.matcher.lockable
+package uk.ac.wellcome.platform.matcher.locking
 
 import java.time.{Duration, Instant}
 
@@ -92,7 +92,9 @@ case class FailedUnlockException(private val message: String = "",
     extends Throwable
 
 case class Identifier(id: String)
-case class RowLock(id: String,
-                   contextId: String,
-                   created: Instant,
-                   expires: Instant)
+case class RowLock(
+  id: String,
+  contextId: String,
+  created: Instant,
+  expires: Instant
+)
