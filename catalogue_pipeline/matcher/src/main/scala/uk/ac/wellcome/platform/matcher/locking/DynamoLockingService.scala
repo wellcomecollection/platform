@@ -12,7 +12,8 @@ class DynamoLockingService @Inject()(
   metricsSender: MetricsSender)(implicit context: ExecutionContext)
     extends Logging {
 
-  val failedLockMetricName: String = "WorkMatcher_FailedLock"
+  private val failedLockMetricName: String = "WorkMatcher_FailedLock"
+  private val failedUnlockMetricName: String = "WorkMatcher_FailedUnlock"
 
   def withLocks[T](ids: Set[String])(f: => Future[T]): Future[T] = {
     val contextGuid = randomUUID.toString
@@ -36,10 +37,17 @@ class DynamoLockingService @Inject()(
       }
       .recover {
         case failedLockException: FailedLockException =>
-          info(
-            s"Failed to obtain a lock ${failedLockException.getClass.getSimpleName} ${failedLockException.getMessage}")
+          info(failedLockErrorMessage("lock", failedLockException))
           metricsSender.incrementCount(failedLockMetricName)
           throw failedLockException
+        case failedUnlockException: FailedUnlockException =>
+          info(failedLockErrorMessage("unlock", failedUnlockException))
+          metricsSender.incrementCount(failedUnlockMetricName)
+          throw failedUnlockException
       }
+  }
+
+  private def failedLockErrorMessage[T](failure: String, exception: Exception) = {
+    s"Failed to $failure ${exception.getClass.getSimpleName} ${exception.getMessage}"
   }
 }

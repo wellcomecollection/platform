@@ -37,76 +37,77 @@ class DynamoRowLockDao @Inject()(
     (created, expires)
   }
 
-  def lockRow(id: Identifier, contextId: String) =
-    Future {
-      val (created, expires) = getExpiry
-      val rowLock = RowLock(id.id, contextId, created, expires)
-      debug(s"Locking $rowLock")
+  def lockRow(id: Identifier, contextId: String) = Future {
+    val (created, expires) = getExpiry
+    val rowLock = RowLock(id.id, contextId, created, expires)
+    debug(s"Locking $rowLock")
 
-      val scanamoOps = table
-        .given(not(attributeExists('id)) or Condition(
+    val scanamoOps = table
+      .given(
+        not(attributeExists('id)) or Condition(
           'expires < rowLock.created.getEpochSecond))
-        .put(rowLock)
-      val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
-      debug(s"Got $result for $rowLock")
+      .put(rowLock)
+    val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
+    debug(s"Got $result for $rowLock")
 
-      result match {
-        case Right(_) => rowLock
-        case Left(error) => {
-          debug(s"Failed to lock $rowLock $error")
-          throw FailedLockException(s"Failed to lock $id", error)
-        }
+    result match {
+      case Right(_) => rowLock
+      case Left(error) => {
+        debug(s"Failed to lock $rowLock $error")
+        throw FailedLockException(s"Failed to lock $id", error)
       }
-    }.recover {
-      case e: Exception =>
-        val error =
-          s"Problem locking row ${id} in context [$contextId], ${e.getClass.getSimpleName} ${e.getMessage}"
-        debug(error)
-        throw FailedLockException(error)
     }
+  }.recover {
+    case exception: Exception =>
+      val errorMsg = s"Problem locking row ${id} in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+      debug(errorMsg)
+      throw FailedLockException(errorMsg, exception)
+  }
 
-  def unlockRows(contextId: String): Future[Unit] =
-    Future {
-      debug(s"Trying to unlock context: $contextId")
-      val maybeRowLocks: immutable.Seq[Either[DynamoReadError, RowLock]] =
-        Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
-          'contextId -> contextId)
+  def unlockRows(contextId: String): Future[Unit] = Future {
+    debug(s"Trying to unlock context: $contextId")
+    val maybeRowLocks: immutable.Seq[Either[DynamoReadError, RowLock]] =
+      Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
+        'contextId -> contextId)
 
-      debug("maybeRowLocks: " + maybeRowLocks)
-      val rowLockIds = maybeRowLocks.collect {
-        case Right(rowLock) => rowLock.id
-        case Left(error) =>
-          info(s"Error $error when unlocking $contextId")
-          throw FailedLockException(s"Failed to unlock [$contextId] $error")
-      }.toSet
+    debug("maybeRowLocks: " + maybeRowLocks)
+    val rowLockIds = maybeRowLocks.collect {
+      case Right(rowLock) => rowLock.id
+      case Left(error) =>
+        info(s"Error $error when unlocking $contextId")
+        throw FailedUnlockException(s"Failed to unlock [$contextId] $error", new RuntimeException)
+    }.toSet
 
-      debug(s"Unlocking rows: $rowLockIds")
-      val deleteAllResults =
-        Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
-      deleteAllResults.foreach { result: BatchWriteItemResult =>
-        if (result.getUnprocessedItems.size() > 0) {
-          val error =
-            s"Batch delete failed to delete ${result.getUnprocessedItems}"
-          debug(error)
-          throw new RuntimeException(error)
-        }
+    debug(s"Unlocking rows: $rowLockIds")
+    val deleteAllResults =
+      Scanamo.deleteAll(dynamoDBClient)(table.name)('id -> rowLockIds)
+    deleteAllResults.foreach { result: BatchWriteItemResult =>
+      if (result.getUnprocessedItems.size() > 0) {
+        val errorMsg =
+          s"Batch delete failed to delete ${result.getUnprocessedItems}"
+        debug(errorMsg)
+        throw new RuntimeException(errorMsg)
       }
-      ()
-    }.recover {
-      case e: Exception =>
-        val error =
-          s"Problem unlocking rows in context [$contextId], ${e.getClass.getSimpleName} ${e.getMessage}"
-        debug(error)
-        throw FailedLockException(error)
     }
+    ()
+  }.recover {
+    case exception: Exception =>
+      val errorMsg = s"Problem unlocking rows in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+      debug(errorMsg)
+      throw FailedUnlockException(errorMsg, exception)
+  }
 
 }
 
 case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
-case class FailedLockException(private val message: String = "",
-                               private val cause: Throwable = None.orNull)
-    extends Throwable
+case class FailedLockException(message: String,
+                               cause: Throwable)
+    extends Exception(message, cause)
+
+case class FailedUnlockException(message: String,
+                                 cause: Throwable)
+  extends Exception(message, cause)
 
 case class Identifier(id: String)
 case class RowLock(id: String,

@@ -138,7 +138,7 @@ class DynamoRowLockDaoTest
   }
 
   it(
-    "throws FailedLockException if there is a problem reading the context index") {
+    "throws FailedUnlockException if there is a problem unlocking - fails to read the context locks") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -147,14 +147,14 @@ class DynamoRowLockDaoTest
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
           unlockFailed =>
-            unlockFailed shouldBe a[FailedLockException]
+            unlockFailed shouldBe a[FailedUnlockException]
         }
 
       }
     }
   }
 
-  it("throws FailedLockException if there are unprocessed batch items") {
+  it("throws FailedUnlockException if there is a problem unlocking - there are unprocessed batch items") {
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       val mockClient = mock[AmazonDynamoDB]
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -167,13 +167,13 @@ class DynamoRowLockDaoTest
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
           unlockFailed =>
-            unlockFailed shouldBe a[FailedLockException]
+            unlockFailed shouldBe a[FailedUnlockException]
         }
       }
     }
   }
 
-  it("throws FailedLockException if the batch update fails") {
+  it("throws FailedUnlockException if there is a problem unlocking - the batch update fails") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -185,7 +185,7 @@ class DynamoRowLockDaoTest
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
           unlockFailed =>
-            unlockFailed shouldBe a[FailedLockException]
+            unlockFailed shouldBe a[FailedUnlockException]
         }
       }
     }
