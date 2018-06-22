@@ -20,13 +20,16 @@ module "task" {
 
   container_image = "${var.container_image}"
   container_port  = "${var.container_port}"
+
+  memory = "2048"
+  cpu    = "1024"
 }
 
 module "service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=ecs_v2"
 
   service_name       = "${var.namespace}"
-  task_desired_count = "1"
+  task_desired_count = "3"
 
   task_definition_arn = "${module.task.task_definition_arn}"
 
@@ -41,7 +44,7 @@ module "service" {
   subnets = "${var.subnets}"
 
   namespace_id     = "${var.service_discovery_namespace}"
-  healthcheck_path = "/static/index.html"
+  healthcheck_path = "/${var.namespace}/index.html"
 
   launch_type = "FARGATE"
 }

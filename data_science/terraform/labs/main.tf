@@ -16,7 +16,7 @@ module "palette_service" {
   container_image = "harrisonpim/palette:v1"
   ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
   vpc_cidr_block  = "${var.vpc_cidr_block}"
-  subnets         = "${var.subnets}"
+  subnets         = "${var.private_subnets}"
 
   service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
