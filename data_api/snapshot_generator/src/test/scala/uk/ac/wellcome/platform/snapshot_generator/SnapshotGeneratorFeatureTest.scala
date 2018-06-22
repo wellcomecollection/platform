@@ -7,7 +7,7 @@ import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.display.models.v2.DisplayV2SerialisationTestBase
+import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -46,7 +46,7 @@ class SnapshotGeneratorFeatureTest
     with JsonTestUtil
     with ExtendedPatience
     with ElasticsearchFixtures
-    with DisplayV2SerialisationTestBase {
+    with DisplayV1SerialisationTestBase {
 
   val itemType = "work"
 
