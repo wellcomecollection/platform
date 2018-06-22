@@ -163,6 +163,9 @@ def chunks(iterable, chunk_size):
 
 
 if __name__ == '__main__':
+
+    final_reports = {}
+
     for resource_type in ('bibs', 'items'):
         print('')
         print('=' * 79)
@@ -206,9 +209,18 @@ if __name__ == '__main__':
 
         print('')
 
-    print('')
-    print('-' * 79)
-    print('')
-    print('If there are gaps in the report, you can build new windows for the readers:')
-    print('')
-    print(f'$ python {sys.argv[0].replace("report_adapter_progress.py", "build_missing_windows.py")}')
+        # Now we've consolidated the markers in S3, produce a second copy
+        # of the report that "summarises" the output.
+        report = build_report(bucket=BUCKET, resource_type=resource_type)
+        final_reports[resource_type] = [iv for (iv, _) in report]
+
+    # We only need to give instructions for building missing windows if
+    # there are gaps in the run.
+    #
+    if len(final_reports['bibs']) > 1 or len(final_reports['items']) > 1:
+        print('')
+        print('-' * 79)
+        print('')
+        print('You can build new windows for the gaps:')
+        print('')
+        print(f'$ python {sys.argv[0].replace("report_adapter_progress.py", "build_missing_windows.py")}')\
