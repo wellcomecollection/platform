@@ -3,8 +3,12 @@ import java.time.Instant
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
+import org.mockito.Matchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.verify
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.lockable.{FailedLockException, RowLock}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
@@ -19,17 +23,20 @@ class DynamoLockingServiceTest
     with ScalaFutures {
 
   it("locks around a callback") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
-        withLockingService(dynamoRowLockDao) { lockingService =>
-          val id = "id"
-          val lockedDuringCallback =
-            lockingService.withLocks(Set(id))(f = Future {
-              assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-            })
+    withMockMetricSender { mockMetricsSender =>
+      withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+        withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+          withLockingService(dynamoRowLockDao, mockMetricsSender) { lockingService =>
+            val id = "id"
+            val lockedDuringCallback =
+              lockingService.withLocks(Set(id))(f = Future {
+                assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+              })
 
-          whenReady(lockedDuringCallback) { _ =>
-            assertNoRowLocks(lockTable)
+            whenReady(lockedDuringCallback) { _ =>
+              assertNoRowLocks(lockTable)
+              assertDoesNotIncrementFailedLockCount(mockMetricsSender)
+            }
           }
         }
       }
@@ -37,22 +44,25 @@ class DynamoLockingServiceTest
   }
 
   it("throws a FailedLockException and releases locks when a row lock fails") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
-        withLockingService(dynamoRowLockDao) { lockingService =>
-          val idA = "id"
-          val lockedId = "lockedId"
-          givenLocks(Set(lockedId), "existingContext", lockTable)
+    withMockMetricSender { mockMetricsSender =>
+      withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+        withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+          withLockingService(dynamoRowLockDao, mockMetricsSender) { lockingService =>
+            val idA = "id"
+            val lockedId = "lockedId"
+            givenLocks(Set(lockedId), "existingContext", lockTable)
 
-          val eventuallyLockFails =
-            lockingService.withLocks(Set(idA, lockedId))(f = Future {
-              fail("Lock did not fail")
-            })
+            val eventuallyLockFails =
+              lockingService.withLocks(Set(idA, lockedId))(f = Future {
+                fail("Lock did not fail")
+              })
 
-          whenReady(eventuallyLockFails.failed) { failure =>
-            failure shouldBe a[FailedLockException]
-            // still expect original locks to exist
-            assertOnlyHaveRowLockRecordIds(Set(lockedId), lockTable)
+            whenReady(eventuallyLockFails.failed) { failure =>
+              failure shouldBe a[FailedLockException]
+              // still expect original locks to exist
+              assertOnlyHaveRowLockRecordIds(Set(lockedId), lockTable)
+              assertIncrementsFailedLockCount(1, mockMetricsSender)
+            }
           }
         }
       }
@@ -61,24 +71,27 @@ class DynamoLockingServiceTest
 
   it(
     "throws a FailedLockException and releases locks when a nested row lock fails") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
-        withLockingService(dynamoRowLockDao) { lockingService =>
-          val idA = "idA"
-          val idB = "idB"
-          givenLocks(Set(idB), "existingContext", lockTable)
+    withMockMetricSender { mockMetricsSender =>
+      withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+        withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+          withLockingService(dynamoRowLockDao, mockMetricsSender) { lockingService =>
+            val idA = "idA"
+            val idB = "idB"
+            givenLocks(Set(idB), "existingContext", lockTable)
 
-          val eventuallyLockFails =
-            lockingService.withLocks(Set(idA))({
-              lockingService.withLocks(Set(idB))(Future {
-                fail("Lock did not fail")
+            val eventuallyLockFails =
+              lockingService.withLocks(Set(idA))({
+                lockingService.withLocks(Set(idB))(Future {
+                  fail("Lock did not fail")
+                })
               })
-            })
 
-          whenReady(eventuallyLockFails.failed) { failure =>
-            failure shouldBe a[FailedLockException]
-            // still expect original locks to exist
-            assertOnlyHaveRowLockRecordIds(Set(idB), lockTable)
+            whenReady(eventuallyLockFails.failed) { failure =>
+              failure shouldBe a[FailedLockException]
+              // still expect original locks to exist
+              assertOnlyHaveRowLockRecordIds(Set(idB), lockTable)
+              assertIncrementsFailedLockCount(2, mockMetricsSender)
+            }
           }
         }
       }
@@ -86,21 +99,23 @@ class DynamoLockingServiceTest
   }
 
   it("releases locks when the callback fails") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
-        withLockingService(dynamoRowLockDao) { lockingService =>
-          case class ExpectedException() extends Exception()
+    withMockMetricSender { mockMetricsSender =>
+      withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+        withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
+          withLockingService(dynamoRowLockDao, mockMetricsSender) { lockingService =>
+            case class ExpectedException() extends Exception()
 
-          val id = "id"
-          val eventuallyLockFails =
-            lockingService.withLocks(Set(id))(f = Future {
-              assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
-              throw new ExpectedException
-            })
+            val id = "id"
+            val eventuallyLockFails =
+              lockingService.withLocks(Set(id))(f = Future {
+                assertOnlyHaveRowLockRecordIds(Set(id), lockTable)
+                throw new ExpectedException
+              })
 
-          whenReady(eventuallyLockFails.failed) { failure =>
-            failure shouldBe a[ExpectedException]
-            assertNoRowLocks(lockTable)
+            whenReady(eventuallyLockFails.failed) { failure =>
+              failure shouldBe a[ExpectedException]
+              assertNoRowLocks(lockTable)
+            }
           }
         }
       }
@@ -128,4 +143,13 @@ class DynamoLockingServiceTest
     val actualIds = locks.map(lock => lock.right.get.id).toSet
     actualIds shouldBe expectedIds
   }
+
+  private def assertDoesNotIncrementFailedLockCount(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, Mockito.never()).incrementCount(any())
+  }
+
+  private def assertIncrementsFailedLockCount(i: Int, mockMetricsSender: MetricsSender): Future[Any] = {
+    verify(mockMetricsSender, Mockito.times(i)).incrementCount("WorkMatcher_FailedLock")
+  }
+
 }
