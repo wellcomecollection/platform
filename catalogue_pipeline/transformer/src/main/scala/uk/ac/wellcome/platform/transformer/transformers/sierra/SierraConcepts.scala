@@ -94,13 +94,12 @@ trait SierraConcepts extends MarcUtils {
   // These are never identified.  We preserve the order from MARC.
   protected def getSubdivisions(subdivisionSubfields: List[MarcSubfield])
     : List[Unidentifiable[AbstractConcept]] = {
-    val concepts: List[AbstractConcept] = subdivisionSubfields.map {
-      subfield =>
-        subfield.tag match {
-          case "v" | "x" => Concept(label = subfield.content)
-          case "y" => Period(label = subfield.content)
-          case "z" => Place(label = subfield.content)
-        }
+    val concepts: List[AbstractConcept] = subdivisionSubfields.map { subfield =>
+      subfield.tag match {
+        case "v" | "x" => Concept(label = subfield.content)
+        case "y"       => Period(label = subfield.content)
+        case "z"       => Place(label = subfield.content)
+      }
     }
 
     concepts.map { Unidentifiable(_) }
