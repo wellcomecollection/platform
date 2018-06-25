@@ -3,4 +3,6 @@ module "vhs_sourcedata" {
 
   name              = "SourceData"
   table_name_prefix = ""
+
+  table_write_max_capacity = 750
 }
