@@ -203,6 +203,10 @@ trait MatcherFixtures
     )
   }
 
+  def aRowLock(id: String, contextId: String) = {
+    RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(100))
+  }
+
   def assertNoRowLocks(lockTable: LocalDynamoDb.Table) = {
     Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name) shouldBe empty
   }

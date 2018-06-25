@@ -1,6 +1,4 @@
 package uk.ac.wellcome.platform.matcher.locking
-import java.time.Instant
-
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import org.mockito.Matchers.any
@@ -176,10 +174,6 @@ class DynamoLockingServiceTest
       id =>
         Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
           aRowLock(id, contextId)))
-  }
-
-  private def aRowLock(id: String, contextId: String) = {
-    RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(100))
   }
 
   private def assertOnlyHaveRowLockRecordIds(
