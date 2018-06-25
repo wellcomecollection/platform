@@ -18,8 +18,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig,
-                               metricsSender: MetricsSender)
+                               dynamoConfig: DynamoConfig)
     extends Logging {
 
   val versionedDao = new VersionedDao(

@@ -44,7 +44,7 @@ class ReindexWorkerServiceTest
                 actorSystem,
                 queue,
                 metricsSender) { sqsStream =>
-                withReindexService(metricsSender, table) { reindexService =>
+                withReindexService(table) { reindexService =>
                   val workerService = new ReindexWorkerService(
                     targetService = reindexService,
                     sqsStream = sqsStream,
@@ -69,12 +69,11 @@ class ReindexWorkerServiceTest
     }
   }
 
-  def withReindexService[R](metricsSender: MetricsSender, table: Table)(
+  def withReindexService[R](table: Table)(
     testWith: TestWith[ReindexService, R]) = {
     val reindexService = new ReindexService(
       dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(table = table.name, index = table.index),
-      metricsSender = metricsSender
+      dynamoConfig = DynamoConfig(table = table.name, index = table.index)
     )
     testWith(reindexService)
   }
