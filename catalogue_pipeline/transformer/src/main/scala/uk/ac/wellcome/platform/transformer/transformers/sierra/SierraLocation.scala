@@ -10,11 +10,11 @@ trait SierraLocation {
   def getLocation(itemData: SierraItemData): Option[PhysicalLocation] =
     itemData.location match {
       // We've seen records where the "location" field is populated in
-      // the JSON, but the code and name are both empty strings.  We can't
-      // do anything useful with this, so don't return a location.
-      // TODO: Find out if we can populate location from other fields in
-      // those cases.
+      // the JSON, but the code and name are both empty strings or "none".
+      // We can't do anything useful with this, so don't return a location.
+      // TODO: Find out if we can populate location from other fields.
       case Some(SierraItemLocation("", "")) => None
+      case Some(SierraItemLocation("none", "none")) => None
 
       case Some(loc: SierraItemLocation) =>
         Some(
