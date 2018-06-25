@@ -34,6 +34,15 @@ class SierraLocationTest extends FunSpec with Matchers {
     transformer.getLocation(itemData = itemData) shouldBe None
   }
 
+  it("returns None if the location field only contains the string 'none'") {
+    val itemData = SierraItemData(
+      id = "i1234567",
+      location = Some(SierraItemLocation("none", "none"))
+    )
+
+    transformer.getLocation(itemData = itemData) shouldBe None
+  }
+
   it("returns None if there is no location in the item data") {
     val itemData = SierraItemData(
       id = "i1234567"
