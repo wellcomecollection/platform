@@ -22,7 +22,7 @@ module "labs" {
 
   vpc_cidr_block = "${var.vpc_cidr_block}"
 
-  vpc_id  = "${module.network.vpc_id}"
+  vpc_id = "${module.network.vpc_id}"
 
   private_subnets = "${module.network.private_subnets}"
   public_subnets  = "${module.network.public_subnets}"
