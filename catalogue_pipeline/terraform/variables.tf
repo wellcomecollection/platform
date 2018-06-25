@@ -33,17 +33,6 @@ variable "es_cluster_credentials" {
   type        = "map"
 }
 
-variable "es_config_ingestor" {
-  description = "ElasticCloud config for the ingestor"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-06-07-production-field"
-    index_v2 = "v2-2018-06-07-production-field"
-    doc_type = "work"
-  }
-}
-
 variable "matcher_graph_table_index" {
   description = "Name of the GSI in the matcher graph table"
   default     = "work-sets-index"
