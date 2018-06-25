@@ -36,7 +36,7 @@ class WorkMatcher @Inject()(
     val updateAffectedIdentifiers = update.referencedWorkIds + update.workId
     lockingService
       .withLocks(updateAffectedIdentifiers)(
-        processUpdate(update, updateAffectedIdentifiers)
+        withUpdateLocked(update, updateAffectedIdentifiers)
       )
       .recover {
         case e: FailedLockException =>
@@ -46,13 +46,14 @@ class WorkMatcher @Inject()(
       }
   }
 
-  private def processUpdate(update: WorkUpdate,
-                            updateAffectedIdentifiers: Set[String]) = {
+  private def withUpdateLocked(update: WorkUpdate,
+                               updateAffectedIdentifiers: Set[String]) = {
     for {
       graphBeforeUpdate <- workGraphStore.findAffectedWorks(update)
       updatedGraph = WorkGraphUpdater.update(update, graphBeforeUpdate)
       _ <- lockingService.withLocks(
         graphBeforeUpdate.nodes.map(_.id) -- updateAffectedIdentifiers)(
+
         workGraphStore.put(updatedGraph)
       )
     } yield {
