@@ -44,11 +44,11 @@ class DynamoLockingService @Inject()(
       }
       .recover {
         case failedLockException: FailedLockException =>
-          info(failedLockErrorMessage("lock", failedLockException))
+          debug(failedLockErrorMessage("lock", failedLockException))
           metricsSender.incrementCount(failedLockMetricName)
           throw failedLockException
         case failedUnlockException: FailedUnlockException =>
-          info(failedLockErrorMessage("unlock", failedUnlockException))
+          debug(failedLockErrorMessage("unlock", failedUnlockException))
           metricsSender.incrementCount(failedUnlockMetricName)
           throw failedUnlockException
       }

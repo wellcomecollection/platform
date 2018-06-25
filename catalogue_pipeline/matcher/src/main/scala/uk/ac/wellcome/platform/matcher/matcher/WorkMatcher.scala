@@ -40,7 +40,7 @@ class WorkMatcher @Inject()(
       )
       .recover {
         case e: FailedLockException =>
-          info(
+          debug(
             s"Failed to obtain a lock while matching work ${work.sourceIdentifier} ${e.getClass.getSimpleName} ${e.getMessage}")
           throw GracefulFailureException(e)
       }
