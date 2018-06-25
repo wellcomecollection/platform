@@ -10,6 +10,9 @@ Our transformer messages contain pointers to S3, not the records themselves.
 This snippet gets messages from the frozen SQS output, extracts the
 S3 pointers, and yields the contents of the resulting objects.
 
+I kept rewriting this snippet from scratch, so I figured checking it in
+would save me a bit of time later.
+
 Copy + paste this into a Jupyter notebook/script to use.
 
 Usage:
