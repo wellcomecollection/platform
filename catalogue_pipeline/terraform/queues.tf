@@ -57,8 +57,8 @@ module "matcher_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.recorded_works_topic.name}"]
 
-  visibility_timeout_seconds = 60
-  max_receive_count          = 8
+  visibility_timeout_seconds = 210
+  max_receive_count          = 5
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
