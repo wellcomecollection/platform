@@ -34,7 +34,8 @@ class WorkMatcher @Inject()(
     val update = WorkUpdate(work)
 
     val updateAffectedIdentifiers = update.referencedWorkIds + update.workId
-    lockingService.withLocks(updateAffectedIdentifiers)(
+    lockingService
+      .withLocks(updateAffectedIdentifiers)(
         withUpdateLocked(update, updateAffectedIdentifiers)
       )
       .recover {
