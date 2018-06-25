@@ -1,7 +1,7 @@
 function display_most_similar_images(query_id) {
     document.getElementById('images').innerHTML = '';
     image_div = document.getElementById('images');
-    const query_url = 'http://127.0.0.1:5000/api/most_similar/'.concat(query_id).concat('.jpg');
+    const query_url = '/api/most_similar/'.concat(query_id).concat('.jpg');
     fetch(query_url)
         .then((resp) => resp.json())
         .then(function (data) {
@@ -37,8 +37,7 @@ function display_palette_search_images(the_form) {
     const c_4 = document.getElementById('form').c_4.value;
     const c_5 = document.getElementById('form').c_5.value;
     const params = c_1.concat(c_2).concat(c_3).concat(c_4).concat(c_5)
-    const query_url = 'http://127.0.0.1:5000/api/palette_search/'.concat(params);
-    console.log(query_url)
+    const query_url = '/api/palette_search/'.concat(params);
     
     image_div = document.getElementById('images');
     fetch(query_url)
