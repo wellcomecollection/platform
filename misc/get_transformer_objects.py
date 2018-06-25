@@ -14,45 +14,55 @@ Copy + paste this into a Jupyter notebook/script to use.
 
 Usage:
 
-    >>> for obj in get_transformer_objects():
+    >>> gto = GetTransformerObjects()
+    >>> for obj in gto
     ...    print(obj)
-    {"sourceId": "123", "sourceName": "sierra", ...}
-    {"sourceId": "456", "sourceName": "sierra", ...}
-    {"sourceId": "789", "sourceName": "sierra", ...}
+    '{"sourceId": "123", "sourceName": "sierra", ...}'
+    '{"sourceId": "456", "sourceName": "sierra", ...}'
+    '{"sourceId": "789", "sourceName": "sierra", ...}'
 
 [1]: https://github.com/wellcometrust/dockerfiles/tree/master/sqs_freezeray
 
 """
 
 
-def get_transformer_objects(key=None):
+class GetTransformerObjects(object):
+
     import json
     import boto3
 
     s3 = boto3.client('s3')
-
-    if key is None:
-        resp = s3.list_objects_v2(
-            Bucket='wellcomecollection-platform-infra',
-            Prefix='sqs'
-        )
-        possible_keys = [r['Key'] for r in resp['Contents']]
-        key = max(possible_keys)
-
-    if not key.startswith('sqs/'):
-        key = f'sqs/{key}'
-
-    data = s3.get_object(
-        Bucket='wellcomecollection-platform-infra',
-        Key=key
-    )['Body'].read()
-
     jl = json.loads
 
-    for line in data.splitlines():
-        s3key = jl(jl(jl(line)['Body'])['Message'])['s3key']
-        s3obj = s3.get_object(
-            Bucket='wellcomecollection-vhs-sourcedata',
-            Key=s3key
-        )
-        yield s3obj['Body'].read()
+    def __init__(self, key=None):
+        if key is None:
+            resp = s3.list_objects_v2(
+                Bucket='wellcomecollection-platform-infra',
+                Prefix='sqs'
+            )
+            possible_keys = [r['Key'] for r in resp['Contents']]
+            key = max(possible_keys)
+
+        if not key.startswith('sqs/'):
+            key = f'sqs/{key}'
+
+        self.data = s3.get_object(
+            Bucket='wellcomecollection-platform-infra',
+            Key=key
+        )['Body'].read()
+
+        self.cached_s3_records = {}
+
+    def __iter__(self):
+        for line in data.splitlines():
+            s3key = jl(jl(jl(line)['Body'])['Message'])['s3key']
+
+            try:
+                self.cached_s3_records[s3key]
+            except KeyError:
+                self.cached_s3_records[s3key] = s3.get_object(
+                    Bucket='wellcomecollection-vhs-sourcedata',
+                    Key=s3key
+                )['Body'].read()
+
+            yield self.cached_s3_records[s3key]
