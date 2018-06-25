@@ -52,8 +52,7 @@ class ReindexWorkerServiceTest
                       snsClient = snsClient,
                       snsConfig = SNSConfig(topicArn = topic.arn)
                     ),
-                    system = actorSystem,
-                    metrics = metricsSender
+                    system = actorSystem
                   )
 
                   try {
@@ -168,7 +167,6 @@ class ReindexWorkerServiceTest
 
                 new ReindexWorkerService(
                   targetService = failingReindexService,
-                  metrics = metricsSender,
                   system = actorSystem,
                   snsWriter = new SNSWriter(
                     snsClient = snsClient,
