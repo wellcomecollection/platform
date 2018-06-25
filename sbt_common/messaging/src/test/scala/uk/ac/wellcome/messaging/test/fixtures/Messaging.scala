@@ -2,7 +2,11 @@ package uk.ac.wellcome.messaging.test.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sns.AmazonSNS
-import com.amazonaws.services.sns.model.{SubscribeRequest, SubscribeResult, UnsubscribeRequest}
+import com.amazonaws.services.sns.model.{
+  SubscribeRequest,
+  SubscribeResult,
+  UnsubscribeRequest
+}
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
@@ -26,11 +30,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 trait Messaging
     extends Akka
-      with MetricsSenderFixture
-      with SQS
-      with SNS
-      with S3
-      with Matchers {
+    with MetricsSenderFixture
+    with SQS
+    with SNS
+    with S3
+    with Matchers {
 
   case class ExampleObject(name: String)
 
@@ -71,12 +75,13 @@ trait Messaging
                                         topic: Topic,
                                         writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[ExampleObject], R]) = {
-    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient)(testWith)
+    withMessageWriter[ExampleObject, R](bucket, topic, writerSnsClient)(
+      testWith)
   }
 
   def withMessageWriter[T, R](bucket: Bucket,
-                                        topic: Topic,
-                                        writerSnsClient: AmazonSNS = snsClient)(
+                              topic: Topic,
+                              writerSnsClient: AmazonSNS = snsClient)(
     testWith: TestWith[MessageWriter[T], R])(implicit store: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
     val snsConfig = SNSConfig(topicArn = topic.arn)
@@ -98,12 +103,11 @@ trait Messaging
     actorSystem: ActorSystem,
     bucket: Bucket,
     queue: SQS.Queue,
-    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(implicit objectStore: ObjectStore[T]) = {
+    metricsSender: MetricsSender)(testWith: TestWith[MessageStream[T], R])(
+    implicit objectStore: ObjectStore[T]) = {
     val s3Config = S3Config(bucketName = bucket.name)
-    val sqsConfig = SQSConfig(
-      queueUrl = queue.url,
-      waitTime = 1 millisecond,
-      maxMessages = 1)
+    val sqsConfig =
+      SQSConfig(queueUrl = queue.url, waitTime = 1 millisecond, maxMessages = 1)
 
     val messageConfig = MessageReaderConfig(
       sqsConfig = sqsConfig,
@@ -119,12 +123,8 @@ trait Messaging
     testWith(stream)
   }
 
-  def withMessageStreamFixtures[T,R](
-    testWith: TestWith[(Bucket,
-    MessageStream[T],
-    QueuePair,
-    MetricsSender),
-    R]
+  def withMessageStreamFixtures[T, R](
+    testWith: TestWith[(Bucket, MessageStream[T], QueuePair, MetricsSender), R]
   )(implicit objectStore: ObjectStore[T]) = {
 
     withActorSystem { actorSystem =>
@@ -132,12 +132,9 @@ trait Messaging
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, _) =>
             withMockMetricSender { metricsSender =>
-              withMessageStream[T, R](
-                actorSystem,
-                bucket,
-                queue,
-                metricsSender) { stream =>
-                testWith((bucket, stream, queuePair, metricsSender))
+              withMessageStream[T, R](actorSystem, bucket, queue, metricsSender) {
+                stream =>
+                  testWith((bucket, stream, queuePair, metricsSender))
               }
 
             }
@@ -146,9 +143,7 @@ trait Messaging
     }
   }
 
-
-  def put[T](obj: T, location: ObjectLocation)(
-    implicit encoder: Encoder[T]) = {
+  def put[T](obj: T, location: ObjectLocation)(implicit encoder: Encoder[T]) = {
     val serialisedExampleObject = toJson[T](obj).get
 
     s3Client.putObject(

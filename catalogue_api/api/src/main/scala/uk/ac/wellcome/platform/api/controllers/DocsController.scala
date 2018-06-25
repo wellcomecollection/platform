@@ -33,7 +33,7 @@ class DocsController @Inject()(apiConfig: ApiConfig) extends Controller {
                            apiVersion: ApiVersions.Value): Swagger = {
     val scheme = apiConfig.scheme match {
       case "https" => Scheme.HTTPS
-      case _ => Scheme.HTTP
+      case _       => Scheme.HTTP
     }
 
     swagger.info(

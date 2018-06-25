@@ -32,7 +32,7 @@ trait SierraCheckDigits {
 
     // Then pick the record type prefix.
     val prefix = recordType match {
-      case SierraRecordTypes.bibs => "b"
+      case SierraRecordTypes.bibs  => "b"
       case SierraRecordTypes.items => "i"
       case _ =>
         throw new RuntimeException(

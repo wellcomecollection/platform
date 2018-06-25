@@ -25,7 +25,7 @@ object SierraConfigModule extends TwitterModule {
   @Provides
   def providesSierraConfig(): SierraConfig = {
     val resourceType = resourceTypeFlag() match {
-      case s: String if s == bibs.toString => bibs
+      case s: String if s == bibs.toString  => bibs
       case s: String if s == items.toString => items
       case s: String =>
         throw new IllegalArgumentException(

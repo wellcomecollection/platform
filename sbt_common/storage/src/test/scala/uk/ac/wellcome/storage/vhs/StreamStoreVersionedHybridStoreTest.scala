@@ -49,14 +49,12 @@ class StreamStoreVersionedHybridStoreTest
       globalS3Prefix = globalS3Prefix
     )
 
-    val store = new VersionedHybridStore[
-      InputStream,
-      Metadata,
-      ObjectStore[InputStream]](
-      vhsConfig = vhsConfig,
-      objectStore = objectStore,
-      dynamoDbClient = dynamoDbClient
-    )
+    val store =
+      new VersionedHybridStore[InputStream, Metadata, ObjectStore[InputStream]](
+        vhsConfig = vhsConfig,
+        objectStore = objectStore,
+        dynamoDbClient = dynamoDbClient
+      )
 
     testWith(store)
   }

@@ -23,7 +23,7 @@ class IdentifierGenerator @Inject()(identifiersDao: IdentifiersDao)
         )
         .flatMap {
           case Some(id) => Try(id.CanonicalId)
-          case None => generateAndSaveCanonicalId(identifier)
+          case None     => generateAndSaveCanonicalId(identifier)
         }
     }.flatten
   }

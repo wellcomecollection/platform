@@ -11,9 +11,8 @@ import uk.ac.wellcome.models.work.internal.{
 @ApiModel(
   value = "Location",
   description = "A location that provides access to an item",
-  subTypes = Array(
-    classOf[DisplayDigitalLocationV1],
-    classOf[DisplayPhysicalLocationV1])
+  subTypes =
+    Array(classOf[DisplayDigitalLocationV1], classOf[DisplayPhysicalLocationV1])
 )
 sealed trait DisplayLocationV1
 

@@ -17,8 +17,7 @@ trait TransformableTransformer[T <: Transformable] {
       transformable match {
         case t: T => transformForType(t, version)
         case _ =>
-          throw new RuntimeException(
-            s"$transformable is not of the right type")
+          throw new RuntimeException(s"$transformable is not of the right type")
       }
     }.flatten
 }

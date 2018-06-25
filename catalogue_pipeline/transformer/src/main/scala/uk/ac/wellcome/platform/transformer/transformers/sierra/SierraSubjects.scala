@@ -63,8 +63,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts
-        : List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(
         primarySubfields,
         varField = varField) ++ getSubdivisions(subdivisionSubfields)
 

@@ -46,9 +46,10 @@ class WorkGraphStoreTest
                 componentId = "A")
             Scanamo.put(dynamoDbClient)(thingTable.name)(work)
 
-            whenReady(workGraphStore.findAffectedWorks(
-              WorkUpdate("A", 0, Set.empty))) { workGraph =>
-              workGraph shouldBe WorkGraph(Set(work))
+            whenReady(
+              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
+              workGraph =>
+                workGraph shouldBe WorkGraph(Set(work))
             }
           }
         }
@@ -103,9 +104,10 @@ class WorkGraphStoreTest
             Scanamo.put(dynamoDbClient)(thingTable.name)(workA)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
 
-            whenReady(workGraphStore.findAffectedWorks(
-              WorkUpdate("A", 0, Set.empty))) { workGraph =>
-              workGraph.nodes shouldBe Set(workA, workB)
+            whenReady(
+              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
+              workGraph =>
+                workGraph.nodes shouldBe Set(workA, workB)
             }
           }
         }
@@ -139,9 +141,10 @@ class WorkGraphStoreTest
             Scanamo.put(dynamoDbClient)(thingTable.name)(workB)
             Scanamo.put(dynamoDbClient)(thingTable.name)(workC)
 
-            whenReady(workGraphStore.findAffectedWorks(
-              WorkUpdate("A", 0, Set.empty))) { workGraph =>
-              workGraph.nodes shouldBe Set(workA, workB, workC)
+            whenReady(
+              workGraphStore.findAffectedWorks(WorkUpdate("A", 0, Set.empty))) {
+              workGraph =>
+                workGraph.nodes shouldBe Set(workA, workB, workC)
             }
           }
         }

@@ -41,8 +41,8 @@ trait SierraDescription {
 
         (subfields.get("a"), subfields.get("b")) match {
           case (Some(a), Some(b)) => acc :+ s"${a.content} ${b.content}"
-          case (Some(a), None) => acc :+ a.content
-          case (None, None) => acc
+          case (Some(a), None)    => acc :+ a.content
+          case (None, None)       => acc
 
           // We never expect to see this in practice.  If we do, we should
           // refuse to process it, and if/when we see it we can decide how
@@ -53,7 +53,7 @@ trait SierraDescription {
             )
         }
       }) match {
-      case Nil => None
+      case Nil  => None
       case list => Some(list.mkString(" "))
     }
   }

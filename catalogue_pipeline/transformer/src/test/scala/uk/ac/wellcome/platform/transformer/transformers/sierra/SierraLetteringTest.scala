@@ -44,8 +44,7 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
     )
   }
 
-  it(
-    "ignores records with the MARC field and 2nd indicator but wrong subfield") {
+  it("ignores records with the MARC field and 2nd indicator but wrong subfield") {
     assertFindsCorrectLettering(
       varFields = List(
         VarField(

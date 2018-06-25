@@ -23,16 +23,15 @@ trait MiroLicenses {
 
       // These images need more data.
       case None =>
-        throw new ShouldNotTransformException(
-          "No usage restriction specified!")
+        throw new ShouldNotTransformException("No usage restriction specified!")
 
       case Some(useRestrictions) =>
         useRestrictions match {
 
           // Certain strings map directly onto license types
-          case "CC-0" => License_CC0
-          case "CC-BY" => License_CCBY
-          case "CC-BY-NC" => License_CCBYNC
+          case "CC-0"        => License_CC0
+          case "CC-BY"       => License_CCBY
+          case "CC-BY-NC"    => License_CCBYNC
           case "CC-BY-NC-ND" => License_CCBYNCND
 
           // These mappings are defined in Christy's document

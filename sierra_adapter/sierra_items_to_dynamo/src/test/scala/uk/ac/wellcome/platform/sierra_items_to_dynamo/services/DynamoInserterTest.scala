@@ -275,14 +275,8 @@ class DynamoInserterTest
     when(
       mockedDao.getRecord[SierraItemRecord](any[String])(
         any[DynamoFormat[SierraItemRecord]]))
-      .thenReturn(
-        Future.successful(
-          Some(
-            SierraItemRecord(
-              id = "500005",
-              "{}",
-              "2001-01-01T00:00:00Z",
-              List()))))
+      .thenReturn(Future.successful(Some(
+        SierraItemRecord(id = "500005", "{}", "2001-01-01T00:00:00Z", List()))))
 
     when(
       mockedDao.updateRecord(any[SierraItemRecord])(

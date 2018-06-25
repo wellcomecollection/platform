@@ -49,7 +49,7 @@ object DisplayItemV2 {
       locations = // Same as with identifiers
         Option[List[Location]](item.locations) match {
           case Some(locations) => locations.map(DisplayLocationV2(_))
-          case None => List()
+          case None            => List()
         }
     )
   }

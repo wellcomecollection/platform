@@ -137,14 +137,13 @@ class VersionedDaoTest
           Scanamo.put(dynamoDbClient)(table.name)(testVersioned)
 
           whenReady(
-            versionedDao.updateRecord[TestVersioned](newerTestVersioned)) {
-            _ =>
-              Scanamo
-                .get[TestVersioned](dynamoDbClient)(table.name)(
-                  'id -> testVersioned.id)
-                .get shouldBe Right(
-                newerTestVersioned.copy(version = 3)
-              )
+            versionedDao.updateRecord[TestVersioned](newerTestVersioned)) { _ =>
+            Scanamo
+              .get[TestVersioned](dynamoDbClient)(table.name)(
+                'id -> testVersioned.id)
+              .get shouldBe Right(
+              newerTestVersioned.copy(version = 3)
+            )
           }
       }
     }

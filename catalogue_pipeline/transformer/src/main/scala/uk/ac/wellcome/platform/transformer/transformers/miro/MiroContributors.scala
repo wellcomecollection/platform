@@ -33,7 +33,7 @@ trait MiroContributors extends MiroContributorCodes {
       case Some(code) =>
         lookupContributorCode(miroId = miroId, code = code) match {
           case Some("Wellcome Collection") => None
-          case Some(s) => Some(s)
+          case Some(s)                     => Some(s)
           case None =>
             throw GracefulFailureException(new RuntimeException(
               s"Unable to look up contributor credit line for ${miroData.sourceCode} on ${miroId}"
@@ -44,7 +44,7 @@ trait MiroContributors extends MiroContributorCodes {
 
     val contributorCreators = maybeContributorCreator match {
       case Some(contributor) => List(Unidentifiable(Agent(contributor)))
-      case None => List()
+      case None              => List()
     }
 
     val creators = primaryCreators ++ secondaryCreators ++ contributorCreators

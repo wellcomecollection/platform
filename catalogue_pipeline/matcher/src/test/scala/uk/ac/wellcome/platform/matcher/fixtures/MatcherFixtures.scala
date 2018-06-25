@@ -132,9 +132,8 @@ trait MatcherFixtures
     testWith(lockingService)
   }
 
-  def withWorkMatcherAndLockingService[R](
-    workGraphStore: WorkGraphStore,
-    lockingService: DynamoLockingService)(
+  def withWorkMatcherAndLockingService[R](workGraphStore: WorkGraphStore,
+                                          lockingService: DynamoLockingService)(
     testWith: TestWith[WorkMatcher, R]): R = {
     val workMatcher = new WorkMatcher(workGraphStore, lockingService)
     testWith(workMatcher)
@@ -148,7 +147,8 @@ trait MatcherFixtures
     }
   }
 
-  def withWorkNodeDao[R](table: Table)(testWith: TestWith[WorkNodeDao, R]): R = {
+  def withWorkNodeDao[R](table: Table)(
+    testWith: TestWith[WorkNodeDao, R]): R = {
     val workNodeDao = new WorkNodeDao(
       dynamoDbClient,
       DynamoConfig(table = table.name, index = table.index)

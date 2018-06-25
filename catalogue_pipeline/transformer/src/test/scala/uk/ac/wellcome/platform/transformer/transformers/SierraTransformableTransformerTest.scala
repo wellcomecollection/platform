@@ -563,7 +563,8 @@ class SierraTransformableTransformerTest
     )
   }
 
-  private def transformDataToWork(id: String, data: String): UnidentifiedWork = {
+  private def transformDataToWork(id: String,
+                                  data: String): UnidentifiedWork = {
     val bibRecord = SierraBibRecord(
       id = id,
       data = data,

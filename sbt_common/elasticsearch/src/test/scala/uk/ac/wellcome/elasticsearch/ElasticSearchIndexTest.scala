@@ -69,43 +69,41 @@ class ElasticSearchIndexTest
 
   it("creates an index into which doc of the expected type can be put") {
     val indexName = "working-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) {
-      indexName =>
-        val testObject = TestObject("id", "description", true)
-        val testObjectJson = JsonUtil.toJson(testObject).get
+    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+      val testObject = TestObject("id", "description", true)
+      val testObjectJson = JsonUtil.toJson(testObject).get
 
-        eventually {
-          for {
-            _ <- elasticClient.execute(
-              indexInto(indexName / testType).doc(testObjectJson))
-            hits <- elasticClient
-              .execute(search(s"$indexName/$testType").matchAllQuery())
-              .map { _.hits.hits }
-          } yield {
-            hits should have size 1
+      eventually {
+        for {
+          _ <- elasticClient.execute(
+            indexInto(indexName / testType).doc(testObjectJson))
+          hits <- elasticClient
+            .execute(search(s"$indexName/$testType").matchAllQuery())
+            .map { _.hits.hits }
+        } yield {
+          hits should have size 1
 
-            assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
-          }
+          assertJsonStringsAreEqual(hits.head.sourceAsString, testObjectJson)
         }
+      }
     }
   }
 
   it("create an index where inserting a doc of an unexpected type fails") {
     val indexName = "unexpected-type-index"
-    withLocalElasticsearchIndex(TestIndex, indexName = indexName) {
-      indexName =>
-        val badTestObject = BadTestObject("id", 5)
-        val badTestObjectJson = JsonUtil.toJson(badTestObject).get
+    withLocalElasticsearchIndex(TestIndex, indexName = indexName) { indexName =>
+      val badTestObject = BadTestObject("id", 5)
+      val badTestObjectJson = JsonUtil.toJson(badTestObject).get
 
-        val eventuallyResponse =
-          for {
-            response <- elasticClient.execute(
-              indexInto(indexName / testType).doc(badTestObjectJson))
-          } yield response
+      val eventuallyResponse =
+        for {
+          response <- elasticClient.execute(
+            indexInto(indexName / testType).doc(badTestObjectJson))
+        } yield response
 
-        whenReady(eventuallyResponse.failed) { exception =>
-          exception shouldBe a[ResponseException]
-        }
+      whenReady(eventuallyResponse.failed) { exception =>
+        exception shouldBe a[ResponseException]
+      }
     }
   }
 

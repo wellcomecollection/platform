@@ -71,9 +71,8 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
       },
       destroy = { bucket: Bucket =>
         safeCleanup(s3Client) {
-          _.listObjects(bucket.name).getObjectSummaries.asScala.foreach {
-            obj =>
-              safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
+          _.listObjects(bucket.name).getObjectSummaries.asScala.foreach { obj =>
+            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
           }
         }
 

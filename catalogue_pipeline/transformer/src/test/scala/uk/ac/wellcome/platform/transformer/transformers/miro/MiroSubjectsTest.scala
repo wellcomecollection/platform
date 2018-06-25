@@ -42,8 +42,7 @@ class MiroSubjectsTest
     )
   }
 
-  it(
-    "uses the image_keywords and image_keywords_unauth fields if both present") {
+  it("uses the image_keywords and image_keywords_unauth fields if both present") {
     transformRecordAndCheckSubjects(
       data = s"""
         "image_title": "A squid, a sponge and a stingray walk into a bar",

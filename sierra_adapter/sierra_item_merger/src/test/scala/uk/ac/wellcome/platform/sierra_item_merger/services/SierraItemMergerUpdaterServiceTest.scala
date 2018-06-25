@@ -565,22 +565,21 @@ class SierraItemMergerUpdaterServiceTest
   it("returns a failed future if putting an item fails") {
     withLocalS3Bucket { bucket =>
       val table = Table(name = "doesnotexist", index = "missing")
-      withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-        bucket,
-        table) { brokenStore =>
-        withSierraUpdaterService(brokenStore) { brokenService =>
-          val bibId = "b242"
+      withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
+        brokenStore =>
+          withSierraUpdaterService(brokenStore) { brokenService =>
+            val bibId = "b242"
 
-          val itemRecord = sierraItemRecord(
-            "i000",
-            "2007-07-07T07:07:07Z",
-            List(bibId)
-          )
+            val itemRecord = sierraItemRecord(
+              "i000",
+              "2007-07-07T07:07:07Z",
+              List(bibId)
+            )
 
-          whenReady(brokenService.update(itemRecord).failed) { ex =>
-            ex shouldBe a[RuntimeException]
+            whenReady(brokenService.update(itemRecord).failed) { ex =>
+              ex shouldBe a[RuntimeException]
+            }
           }
-        }
       }
     }
   }

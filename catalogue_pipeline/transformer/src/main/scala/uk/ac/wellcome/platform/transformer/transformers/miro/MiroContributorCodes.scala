@@ -36,8 +36,7 @@ trait MiroContributorCodes {
   private val perRecordStream: InputStream = getClass
     .getResourceAsStream("/miro_individual_record_contributor_map.json")
   private val perRecordContributorMap: Map[String, Map[String, String]] =
-    toMap[Map[String, String]](
-      Source.fromInputStream(perRecordStream).mkString).get
+    toMap[Map[String, String]](Source.fromInputStream(perRecordStream).mkString).get
 
   // Returns our best guess for the credit line of an image, given its
   // Miro ID and contributor code.
@@ -56,7 +55,7 @@ trait MiroContributorCodes {
       case None => {
         perRecordContributorMap.get(miroId) match {
           case Some(perRecordMap) => perRecordMap.get(creditCode)
-          case None => None
+          case None               => None
         }
       }
     }

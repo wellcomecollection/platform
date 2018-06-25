@@ -127,8 +127,7 @@ class SierraItemsToDynamoWorkerServiceTest
           Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
           val scanamoResult =
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> id)
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> id)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(

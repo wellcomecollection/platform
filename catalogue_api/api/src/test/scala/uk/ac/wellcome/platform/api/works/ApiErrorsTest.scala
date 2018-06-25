@@ -9,8 +9,7 @@ class ApiErrorsTest
     extends ApiWorksTestBase
     with DisplayV1SerialisationTestBase {
 
-  it(
-    "returns a BadRequest error when malformed query parameters are presented") {
+  it("returns a BadRequest error when malformed query parameters are presented") {
     ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>

@@ -2,10 +2,7 @@ package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
 import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.databind.{
-  DeserializationContext,
-  JsonDeserializer
-}
+import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
 
 case class WorksIncludes(
   identifiers: Boolean = false,
@@ -47,7 +44,7 @@ case object WorksIncludes {
   def apply(queryParam: Option[String]): WorksIncludes =
     queryParam match {
       case Some(s) => WorksIncludes(s)
-      case None => WorksIncludes()
+      case None    => WorksIncludes()
     }
 }
 
