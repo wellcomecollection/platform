@@ -37,8 +37,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NotificationMessageReceiverTest
     extends FunSpec
     with Matchers
-    with Akka
-    with MetricsSenderFixture
     with SQS
     with SNS
     with S3
@@ -80,18 +78,13 @@ class NotificationMessageReceiverTest
         s3Client = s3Client
       )
 
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val recordReceiver = new NotificationMessageReceiver(
-          messageWriter = messageWriter,
-          s3Client = s3Client,
-          s3Config = S3Config(bucket.name),
-          metricsSender = metricsSender
-        )
+    val recordReceiver = new NotificationMessageReceiver(
+      messageWriter = messageWriter,
+      s3Client = s3Client,
+      s3Config = S3Config(bucket.name)
+    )
 
-        testWith(recordReceiver)
-      }
-    }
+    testWith(recordReceiver)
   }
 
   it("receives a message and sends it to SNS client") {
