@@ -8,10 +8,6 @@
     </encoder>
   </appender>
 
-  <logger name="org.apache.http" level="ERROR"/>
-  <logger name="io.netty" level="ERROR"/>
-  <logger name="com.twitter" level="WARN"/>
-  <logger name="com.amazonaws" level="WARN"/>
   <!--
     Hide logs from the ALB healthchecks.
 
@@ -21,6 +17,7 @@
   -->
   <logger name="com.twitter.finatra.http.filters.AccessLoggingFilter" level="WARN"/>
 
+  <!-- reduce external logging -->
   <logger name="org.apache.http" level="ERROR"/>
   <logger name="io.netty" level="ERROR"/>
   <logger name="com.twitter" level="WARN"/>
