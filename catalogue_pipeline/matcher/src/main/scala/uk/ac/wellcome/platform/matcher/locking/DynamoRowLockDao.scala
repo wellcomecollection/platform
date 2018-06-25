@@ -40,14 +40,14 @@ class DynamoRowLockDao @Inject()(
     Future {
       val (created, expires) = getExpiry
       val rowLock = RowLock(id.id, contextId, created, expires)
-      debug(s"Locking $rowLock")
+      trace(s"Locking $rowLock")
 
       val scanamoOps = table
         .given(not(attributeExists('id)) or Condition(
           'expires < rowLock.created.getEpochSecond))
         .put(rowLock)
       val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
-      debug(s"Got $result for $rowLock")
+      trace(s"Got $result for $rowLock")
 
       result match {
         case Right(_) => rowLock
