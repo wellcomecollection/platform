@@ -2,6 +2,16 @@
 # -*- encoding: utf-8
 """
 Report the progress of the Sierra adapter.
+
+Usage:
+    report_adapter_progress.py [--purge_dlqs]
+    report_adapter_progress.py -h | --help
+
+Options:
+    --purge_dlqs    Purge the associated DLQs *if* the report shows that
+                    the windows don't have any gaps.
+    -h --help       Show this message.
+
 """
 
 import datetime as dt
@@ -10,6 +20,7 @@ import sys
 
 import attr
 import boto3
+import docopt
 
 
 BUCKET = 'wellcomecollection-platform-adapters-sierra'
@@ -163,6 +174,7 @@ def chunks(iterable, chunk_size):
 
 
 if __name__ == '__main__':
+    args = docopt.docopt(__doc__)
 
     final_reports = {}
 
@@ -231,10 +243,12 @@ if __name__ == '__main__':
     # windows land on the DLQ and still get a complete history from Sierra --
     # every record in that window was picked up as part of a different window.
     #
-    sqs = boto3.client('sqs')
-    for resource_type in ('bibs', 'items'):
-        if len(final_reports[resource_type]) == 1:
-            queue_url = sqs.get_queue_url(
-                QueueName=f'sierra_{resource_type}_windows_dlq'
-            )['QueueUrl']
-            sqs.purge_queue(QueueUrl=queue_url)
+    if args['--purge_dlqs']:
+        print('Purging DLQs...')
+        for resource_type in ('bibs', 'items'):
+            if len(final_reports[resource_type]) == 1:
+                sqs = boto3.client('sqs')
+                queue_url = sqs.get_queue_url(
+                    QueueName=f'sierra_{resource_type}_windows_dlq'
+                )['QueueUrl']
+                sqs.purge_queue(QueueUrl=queue_url)
