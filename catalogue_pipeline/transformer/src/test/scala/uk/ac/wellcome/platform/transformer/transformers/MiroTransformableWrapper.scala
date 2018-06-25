@@ -11,7 +11,9 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableWrapper extends Matchers with TransformableTestBase[MiroTransformable] { this: Suite =>
+trait MiroTransformableWrapper
+    extends Matchers
+    with TransformableTestBase[MiroTransformable] { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String =

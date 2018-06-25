@@ -22,14 +22,16 @@ trait TransformableTestBase[T <: Transformable] extends Matchers {
 
   val transformer: TransformableTransformer[T]
 
-  def transformToWork(transformable: T)(implicit c: ClassTag[T]): UnidentifiedWork = {
+  def transformToWork(transformable: T)(
+    implicit c: ClassTag[T]): UnidentifiedWork = {
     val triedMaybeWork = transformer.transform(transformable, version = 1)
     if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
     triedMaybeWork.isSuccess shouldBe true
     triedMaybeWork.get.get
   }
 
-  def assertTransformToWorkFails(transformable: T)(implicit c: ClassTag[T]): Unit = {
+  def assertTransformToWorkFails(transformable: T)(
+    implicit c: ClassTag[T]): Unit = {
     transformer
       .transform(transformable, version = 1)
       .isSuccess shouldBe false
