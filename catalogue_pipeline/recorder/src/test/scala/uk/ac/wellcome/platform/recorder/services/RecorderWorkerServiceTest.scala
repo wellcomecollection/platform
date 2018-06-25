@@ -47,7 +47,6 @@ class RecorderWorkerServiceTest
   val work = UnidentifiedWork(
     title = Some(title),
     sourceIdentifier = sourceIdentifier,
-    identifiers = List(sourceIdentifier),
     version = 2
   )
 

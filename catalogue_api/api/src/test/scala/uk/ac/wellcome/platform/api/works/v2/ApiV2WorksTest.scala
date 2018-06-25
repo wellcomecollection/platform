@@ -386,7 +386,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work1 = workWith(
           canonicalId = "1234",
           title = "An image of an iguana",
-          identifiers = List(identifier1)
+          otherIdentifiers = List(identifier1)
         )
 
         val identifier2 = SourceIdentifier(
@@ -397,7 +397,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work2 = workWith(
           canonicalId = "5678",
           title = "An impression of an igloo",
-          identifiers = List(identifier2)
+          otherIdentifiers = List(identifier2)
         )
 
         insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
@@ -415,7 +415,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title.get}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(identifier1)} ],
+               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                identifier1)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -425,7 +426,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work2.canonicalId}",
                |     "title": "${work2.title.get}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(identifier2)} ],
+               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                identifier2)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -449,8 +451,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         )
         val work = workWith(
           canonicalId = "1234",
-          title = "An insect huddled in an igloo",
-          identifiers = List(srcIdentifier)
+          title = "Idle imps ignite indigo incense",
+          otherIdentifiers = List(srcIdentifier)
         )
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -466,7 +468,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "id": "${work.canonicalId}",
                | "title": "${work.title.get}",
                | "contributors": [ ],
-               | "identifiers": [ ${identifier(srcIdentifier)} ],
+               | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                                srcIdentifier)} ],
                | "subjects": [ ],
                | "genres": [ ],
                | "production": [ ]

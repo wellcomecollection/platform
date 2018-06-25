@@ -356,8 +356,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(
           agent = Identifiable(
             Person(label = name),
-            sourceIdentifier = sourceIdentifier,
-            identifiers = List(sourceIdentifier)
+            sourceIdentifier = sourceIdentifier
           ))
       )
 
@@ -403,8 +402,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(
           agent = Identifiable(
             Person(label = name),
-            sourceIdentifier = sourceIdentifier,
-            identifiers = List(sourceIdentifier)
+            sourceIdentifier = sourceIdentifier
           ))
       )
 
@@ -580,8 +578,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(
           agent = Identifiable(
             Organisation(label = name),
-            sourceIdentifier = sourceIdentifier,
-            identifiers = List(sourceIdentifier)
+            sourceIdentifier = sourceIdentifier
           ))
       )
 
@@ -622,8 +619,7 @@ class SierraContributorsTest extends FunSpec with Matchers {
         Contributor(
           agent = Identifiable(
             Organisation(label = name),
-            sourceIdentifier = sourceIdentifier,
-            identifiers = List(sourceIdentifier)
+            sourceIdentifier = sourceIdentifier
           ))
       )
 

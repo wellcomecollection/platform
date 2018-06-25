@@ -85,8 +85,7 @@ trait SierraConcepts extends MarcUtils {
       case Some(sourceIdentifier) =>
         Identifiable(
           agent = concept,
-          sourceIdentifier = sourceIdentifier,
-          identifiers = List(sourceIdentifier)
+          sourceIdentifier = sourceIdentifier
         )
     }
   }

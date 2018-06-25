@@ -66,13 +66,13 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def identifiedOrUnidentifiable[T](displayable: Displayable[T],
                                     serialise: T => String) =
     displayable match {
-      case Unidentifiable(ag) => serialise(ag)
-      case Identified(ag, id, identifiers) =>
-        val agent = parse(serialise(ag)).right.get.asObject.get
-        val identifiersJson = identifiers.map { sourceIdentifier =>
+      case ag: Unidentifiable[T] => serialise(ag.agent)
+      case disp: Identified[T] =>
+        val agent = parse(serialise(disp.agent)).right.get.asObject.get
+        val identifiersJson = disp.identifiers.map { sourceIdentifier =>
           parse(identifier(sourceIdentifier)).right.get
         }
-        val newJson = ("id", Json.fromString(id)) +: (
+        val newJson = ("id", Json.fromString(disp.canonicalId)) +: (
           "identifiers",
           Json.arr(identifiersJson: _*)) +: agent
         Json.fromJsonObject(newJson).spaces2

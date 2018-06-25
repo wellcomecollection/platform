@@ -23,12 +23,18 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = concept.label
         )
-      case Identified(concept: Concept, id, identifiers) =>
+      case Identified(
+          concept: Concept,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayConcept(
-          id = Some(id),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
           label = concept.label
         )
@@ -38,12 +44,18 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = period.label
         )
-      case Identified(period: Period, id, identifiers) =>
+      case Identified(
+          period: Period,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayPeriod(
-          id = Some(id),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
           label = period.label
         )
@@ -53,12 +65,18 @@ case object DisplayAbstractConcept {
           identifiers = None,
           label = place.label
         )
-      case Identified(place: Place, id, identifiers) =>
+      case Identified(
+          place: Place,
+          canonicalId,
+          sourceIdentifier,
+          otherIdentifiers) =>
         DisplayPlace(
-          id = Some(id),
+          id = Some(canonicalId),
           identifiers =
             if (includesIdentifiers)
-              Some(identifiers.map(DisplayIdentifierV2(_)))
+              Some(
+                (sourceIdentifier +: otherIdentifiers).map(
+                  DisplayIdentifierV2(_)))
             else None,
           label = place.label
         )

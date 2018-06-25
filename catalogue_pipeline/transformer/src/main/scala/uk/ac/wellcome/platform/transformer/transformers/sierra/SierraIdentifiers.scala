@@ -15,16 +15,8 @@ trait SierraIdentifiers extends SierraCheckDigits {
   //
   //    Adding other identifiers is out-of-scope for now.
   //
-  def getIdentifiers(bibData: SierraBibData): List[SourceIdentifier] =
+  def getOtherIdentifiers(bibData: SierraBibData): List[SourceIdentifier] =
     List(
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Work",
-        value = addCheckDigit(
-          bibData.id,
-          recordType = SierraRecordTypes.bibs
-        )
-      ),
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",

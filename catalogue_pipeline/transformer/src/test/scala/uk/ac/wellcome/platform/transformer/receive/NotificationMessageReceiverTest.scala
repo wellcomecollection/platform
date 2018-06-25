@@ -58,8 +58,7 @@ class NotificationMessageReceiverTest
   val work = UnidentifiedWork(
     title = Some("placeholder title"),
     sourceIdentifier = sourceIdentifier,
-    version = 1,
-    identifiers = List(sourceIdentifier)
+    version = 1
   )
 
   def withNotificationMessageReceiver[R](

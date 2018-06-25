@@ -12,7 +12,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       title = Some("An irritating imp is immune from items"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "abcdef12"
     )
 
@@ -27,14 +26,12 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val item = IdentifiedItem(
       canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
       locations = List()
     )
     val work = IdentifiedWork(
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "b4heraz7",
       items = List(item)
     )
@@ -53,19 +50,19 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     value = "b1234567"
   )
 
-  it("correctly parses a work without any identifiers") {
+  it("correctly parses a work without any extra identifiers") {
     val work = IdentifiedWork(
       title = Some("An irascible iguana invites impudence"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = Nil,
       canonicalId = "xtsx8hwk")
 
     val displayWork = DisplayWorkV1(
       work = work,
       includes = WorksIncludes(identifiers = true)
     )
-    displayWork.identifiers shouldBe Some(List())
+    displayWork.identifiers shouldBe Some(
+      List(DisplayIdentifierV1(sourceIdentifier)))
   }
 
   it("extracts creators from a Work with Unidentifiable Contributors") {
@@ -73,7 +70,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       title = Some("Jumping over jackals in Japan"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = Nil,
       canonicalId = "j7tw9jv3",
       contributors = List(
         Contributor(
@@ -297,12 +293,10 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       canonicalId = "pt5vupg4",
       title = Some("Pouncing pugs play in pipes"),
       sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
       items = List(
         IdentifiedItem(
           canonicalId = "pwaazubr",
-          sourceIdentifier = itemSourceIdentifier,
-          identifiers = List(itemSourceIdentifier)
+          sourceIdentifier = itemSourceIdentifier
         )
       ),
       version = 1

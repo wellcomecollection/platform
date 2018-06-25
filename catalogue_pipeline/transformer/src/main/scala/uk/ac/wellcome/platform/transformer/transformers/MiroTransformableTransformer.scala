@@ -59,7 +59,8 @@ class MiroTransformableTransformer
               ontologyType = "Work",
               value = miroTransformable.sourceId),
             version = version,
-            identifiers = getIdentifiers(miroData, miroTransformable.sourceId),
+            otherIdentifiers =
+              getOtherIdentifiers(miroData, miroTransformable.sourceId),
             description = description,
             lettering = miroData.suppLettering,
             createdDate =
@@ -206,12 +207,6 @@ class MiroTransformableTransformer
           identifierType = IdentifierType("miro-image-number"),
           "Item",
           miroId),
-        identifiers = List(
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            "Item",
-            miroId)
-        ),
         locations = List(
           DigitalLocation(
             locationType = LocationType("iiif-image"),

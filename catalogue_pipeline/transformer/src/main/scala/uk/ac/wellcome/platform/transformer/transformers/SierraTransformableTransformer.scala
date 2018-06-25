@@ -53,7 +53,7 @@ class SierraTransformableTransformer
                 )
               ),
               version = version,
-              identifiers = getIdentifiers(sierraBibData),
+              otherIdentifiers = getOtherIdentifiers(sierraBibData),
               workType = getWorkType(sierraBibData),
               description = getDescription(sierraBibData),
               physicalDescription = getPhysicalDescription(sierraBibData),

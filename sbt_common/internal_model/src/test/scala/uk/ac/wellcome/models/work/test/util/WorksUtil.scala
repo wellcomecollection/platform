@@ -59,7 +59,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId)
 
   def workWith(canonicalId: String,
@@ -69,21 +68,20 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       visible = visible)
 
   def workWith(
     canonicalId: String,
     title: String,
-    identifiers: List[SourceIdentifier] = List(),
+    otherIdentifiers: List[SourceIdentifier] = List(),
     items: List[IdentifiedItem] = List()
   ): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = identifiers,
+      otherIdentifiers = otherIdentifiers,
       canonicalId = canonicalId,
       items = items)
 
@@ -96,12 +94,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(
-        SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Work",
-          "5678")
-      ),
       canonicalId = canonicalId,
       thumbnail = Some(thumbnail)
     )
@@ -118,7 +110,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       workType = Some(workType),
       description = Some(description),
@@ -146,7 +137,6 @@ trait WorksUtil {
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = canonicalId,
       workType = Some(workType),
       description = Some(description),
@@ -189,7 +179,6 @@ trait WorksUtil {
   ): IdentifiedItem = IdentifiedItem(
     canonicalId = canonicalId,
     sourceIdentifier = identifier,
-    identifiers = List(identifier),
     locations = List(location)
   )
 

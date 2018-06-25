@@ -167,8 +167,7 @@ trait MatcherFixtures
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
       title = Some("WorkTitle"),
-      version = 1,
-      identifiers = List(sourceIdentifier)
+      version = 1
     )
   }
 }

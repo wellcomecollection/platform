@@ -1,9 +1,9 @@
 package uk.ac.wellcome.models.work.internal
 
 /** A representation of a work in our ontology */
-trait Work {
+trait Work extends MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
-  val identifiers: List[SourceIdentifier]
+  val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
 
   val title: Option[String]
@@ -31,7 +31,7 @@ trait Work {
 
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
-  identifiers: List[SourceIdentifier] = List(),
+  otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   title: Option[String],
   workType: Option[WorkType] = None,
@@ -56,7 +56,7 @@ case class UnidentifiedWork(
 case class IdentifiedWork(
   canonicalId: String,
   sourceIdentifier: SourceIdentifier,
-  identifiers: List[SourceIdentifier] = List(),
+  otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   title: Option[String],
   workType: Option[WorkType] = None,

@@ -11,15 +11,10 @@ class MiroIdentifiersTest extends FunSpec with Matchers {
       innopacID = Some("L 35411 \n\n15551040")
     )
 
-    val identifiers =
-      transformer.getIdentifiers(miroData = miroData, miroId = "L0035411")
+    val otherIdentifiers =
+      transformer.getOtherIdentifiers(miroData = miroData, miroId = "L0035411")
 
-    identifiers shouldBe List(
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        value = "L0035411",
-        ontologyType = "Work"
-      ),
+    otherIdentifiers shouldBe List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         value = "b15551040",

@@ -112,12 +112,14 @@ class SierraTransformableTransformerTest
     triedMaybeWork.get.isDefined shouldBe true
     val work = triedMaybeWork.get.get
     work.items should have size 1
-    val expectedSourceIdentifiers = List(
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        value = "i63636360"
-      ),
+
+    val expectedSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      ontologyType = "Item",
+      value = "i63636360"
+    )
+
+    val expectedOtherIdentifiers = List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
@@ -126,8 +128,8 @@ class SierraTransformableTransformerTest
     )
 
     work.items.head shouldBe UnidentifiedItem(
-      sourceIdentifier = expectedSourceIdentifiers.head,
-      identifiers = expectedSourceIdentifiers,
+      sourceIdentifier = expectedSourceIdentifier,
+      otherIdentifiers = expectedOtherIdentifiers,
       locations = List(PhysicalLocation(locationType, locationLabel)))
   }
 
@@ -239,7 +241,7 @@ class SierraTransformableTransformerTest
       title = Some(title),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier, sierraIdentifier),
+      otherIdentifiers = List(sierraIdentifier),
       description = Some("A delightful description of a dead daisy."),
       production = List(
         ProductionEvent(
@@ -573,12 +575,13 @@ class SierraTransformableTransformerTest
       maybeBibData = Some(bibRecord)
     )
 
-    val transformedSierraRecord = transformer.transform(
+    val triedMaybeWork = transformer.transform(
       transformable = sierraTransformable,
       version = 1
     )
 
-    transformedSierraRecord.isSuccess shouldBe true
-    transformedSierraRecord.get.get
+    if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
+    triedMaybeWork.isSuccess shouldBe true
+    triedMaybeWork.get.get
   }
 }

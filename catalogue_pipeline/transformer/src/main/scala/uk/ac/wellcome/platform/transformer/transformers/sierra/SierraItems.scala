@@ -42,15 +42,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
           recordType = SierraRecordTypes.items
         )
       ),
-      identifiers = List(
-        SourceIdentifier(
-          identifierType = IdentifierType("sierra-system-number"),
-          ontologyType = "Item",
-          value = addCheckDigit(
-            sierraItemData.id,
-            recordType = SierraRecordTypes.items
-          )
-        ),
+      otherIdentifiers = List(
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",

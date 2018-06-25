@@ -42,7 +42,6 @@ class IngestorFeatureTest
       title = Some("A type of a tame turtle"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "1234")
 
     withLocalSqsQueue { queue =>
@@ -79,7 +78,6 @@ class IngestorFeatureTest
       title = Some("A type of a tame turtle"),
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      identifiers = List(sourceIdentifier),
       canonicalId = "1234")
 
     withLocalSqsQueue { queue =>

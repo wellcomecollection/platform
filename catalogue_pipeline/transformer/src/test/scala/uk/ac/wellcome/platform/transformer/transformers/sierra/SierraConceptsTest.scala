@@ -37,8 +37,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     maybeIdentifiedConcept shouldBe Identifiable(
       concept,
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier)
+      sourceIdentifier = sourceIdentifier
     )
   }
 
@@ -78,12 +77,11 @@ class SierraConceptsTest extends FunSpec with Matchers {
 
     maybeIdentifiedConcept shouldBe Identifiable(
       concept,
-      sourceIdentifier = sourceIdentifier,
-      identifiers = List(sourceIdentifier)
+      sourceIdentifier = sourceIdentifier
     )
   }
 
-  it("throws an error if it sees too many distinct subfield 0 instances") {
+  it("puts extra instances of subfield 0 into the otherIdentifiers field") {
     val caught = intercept[RuntimeException] {
       transformer.identifyPrimaryConcept[Concept](
         concept = Concept(label = "Hitchhiking horses hurry home"),

@@ -28,12 +28,6 @@ class CalmTransformableTransformer
                 ontologyType = "Work",
                 value = "value"
               ),
-              version = version,
-              identifiers = List(
-                SourceIdentifier(
-                  identifierType = IdentifierType("calm-altref-no"),
-                  ontologyType = "Work",
-                  value = "value"
-                ))
+              version = version
             )))
 }

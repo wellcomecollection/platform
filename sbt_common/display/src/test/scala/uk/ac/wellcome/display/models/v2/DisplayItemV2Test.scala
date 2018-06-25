@@ -17,7 +17,7 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     )
   }
 
-  val identifier: SourceIdentifier = SourceIdentifier(
+  val identifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
     ontologyType = "Item",
     value = "value"
@@ -27,7 +27,6 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     val item = IdentifiedItem(
       canonicalId = "foo",
       sourceIdentifier = identifier,
-      identifiers = List(identifier),
       locations = List(location)
     )
 
@@ -43,20 +42,12 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     displayItemV2.ontologyType shouldBe "Item"
   }
 
-  it("correctly parses an Item without any identifiers") {
+  it("correctly parses an Item without any extra identifiers") {
     val item =
-      fromJson[IdentifiedItem]("""
+      fromJson[IdentifiedItem](s"""
         {
           "canonicalId": "b71876a",
-          "sourceIdentifier": {
-            "identifierType": {
-              "id": "miro-image-number",
-              "label": "Miro image number",
-              "ontologyType": "IdentifierType"
-            },
-            "ontologyType": "Item",
-            "value": "B718760"
-          },
+          "sourceIdentifier": ${toJson(identifier).get},
           "locations": [],
           "type": "item"
         }
@@ -67,7 +58,8 @@ class DisplayItemV2Test extends FunSpec with Matchers {
       includesIdentifiers = true
     )
 
-    displayItemV2.identifiers shouldBe Some(List())
+    displayItemV2.identifiers shouldBe Some(
+      List(DisplayIdentifierV2(identifier)))
   }
 
   it("correctly parses an Item without any locations") {

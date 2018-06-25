@@ -12,11 +12,6 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
       bibDataId = "1782863",
       expectedIdentifiers = List(
         SourceIdentifier(
-          identifierType = IdentifierType("sierra-system-number"),
-          ontologyType = "Work",
-          value = "b17828636"
-        ),
-        SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Work",
           value = "1782863"
@@ -39,6 +34,6 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
       suppressed = false
     )
 
-    transformer.getIdentifiers(bibData = bibData) shouldBe expectedIdentifiers
+    transformer.getOtherIdentifiers(bibData = bibData) shouldBe expectedIdentifiers
   }
 }

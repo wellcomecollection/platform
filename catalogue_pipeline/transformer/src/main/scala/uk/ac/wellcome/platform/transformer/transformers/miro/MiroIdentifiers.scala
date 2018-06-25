@@ -4,14 +4,8 @@ import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
 trait MiroIdentifiers extends MiroTransformableUtils {
-  def getIdentifiers(miroData: MiroTransformableData,
-                     miroId: String): List[SourceIdentifier] = {
-    val miroIDList = List(
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = "Work",
-        value = miroId)
-    )
+  def getOtherIdentifiers(miroData: MiroTransformableData,
+                          miroId: String): List[SourceIdentifier] = {
 
     // Add the Sierra system number from the INNOPAC ID, if it's present.
     //
@@ -84,6 +78,6 @@ trait MiroIdentifiers extends MiroTransformableUtils {
             )
         }
 
-    miroIDList ++ sierraList ++ libraryRefsList
+    sierraList ++ libraryRefsList
   }
 }
