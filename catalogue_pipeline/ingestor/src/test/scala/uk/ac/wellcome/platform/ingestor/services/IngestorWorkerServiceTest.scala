@@ -492,22 +492,21 @@ class IngestorWorkerServiceTest
         withLocalSqsQueueAndDlqAndTimeout(10) {
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
-              withWorkIndexer[R](elasticClient = elasticClient) {
-                workIndexer =>
-                  withMessageStream[IdentifiedWork, R](
+              withWorkIndexer[R](elasticClient = elasticClient) { workIndexer =>
+                withMessageStream[IdentifiedWork, R](
+                  actorSystem,
+                  bucket,
+                  queue,
+                  metricsSender) { messageStream =>
+                  withIngestorWorkerService[R](
+                    esIndexV1,
+                    esIndexV2,
                     actorSystem,
-                    bucket,
-                    queue,
-                    metricsSender) { messageStream =>
-                    withIngestorWorkerService[R](
-                      esIndexV1,
-                      esIndexV2,
-                      actorSystem,
-                      workIndexer,
-                      messageStream) { _ =>
-                      testWith((queuePair, bucket))
-                    }
+                    workIndexer,
+                    messageStream) { _ =>
+                    testWith((queuePair, bucket))
                   }
+                }
               }
             }
         }

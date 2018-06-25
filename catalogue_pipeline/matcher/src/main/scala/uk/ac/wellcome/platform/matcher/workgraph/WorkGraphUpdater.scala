@@ -17,7 +17,7 @@ object WorkGraphUpdater {
     val existingVersion =
       existingGraph.nodes.find(_.id == workUpdate.workId) match {
         case Some(lw) => lw.version
-        case None => 0
+        case None     => 0
       }
     if (existingVersion >= workUpdate.version) {
       val versionConflictMessage =

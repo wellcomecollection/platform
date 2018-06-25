@@ -116,13 +116,10 @@ class SierraReaderWorkerServiceTest
           MessageId = "message-id"
         )
 
-      sqsClient.sendMessage(
-        fixtures.queue.url,
-        toJson(notificationMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
-      val pageNames = List("0000.json", "0001.json", "0002.json").map {
-        label =>
-          s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
+      val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
+        s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
       } ++ List(
         "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
@@ -162,9 +159,7 @@ class SierraReaderWorkerServiceTest
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(
-        fixtures.queue.url,
-        toJson(notificationMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -227,9 +222,7 @@ class SierraReaderWorkerServiceTest
           TopicArn = "topic",
           MessageId = "message-id"
         )
-      sqsClient.sendMessage(
-        fixtures.queue.url,
-        toJson(notificationMessage).get)
+      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -287,29 +280,28 @@ class SierraReaderWorkerServiceTest
 
   it(
     "does not return a GracefulFailureException if it cannot reach the Sierra API") {
-    withSierraReaderWorkerService(
-      fields = "",
-      apiUrl = "http://localhost:5050") { fixtures =>
-      val message =
-        """
+    withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
+      fixtures =>
+        val message =
+          """
           |{
           | "start": "2013-12-10T17:16:35Z",
           | "end": "2013-12-13T21:34:35Z"
           |}
         """.stripMargin
 
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
+        val notificationMessage =
+          NotificationMessage(
+            Subject = "subject",
+            Message = message,
+            TopicArn = "topic",
+            MessageId = "message-id"
+          )
 
-      whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
-        ex =>
-          ex shouldNot be(a[GracefulFailureException])
-      }
+        whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
+          ex =>
+            ex shouldNot be(a[GracefulFailureException])
+        }
     }
   }
 

@@ -54,9 +54,8 @@ class SierraBibMergerWorkerServiceTest
   }
 
   def withWorkerServiceFixtures[R](
-    testWith: TestWith[
-      (MetricsSender, QueuePair, SierraBibMergerWorkerService),
-      R]) =
+    testWith: TestWith[(MetricsSender, QueuePair, SierraBibMergerWorkerService),
+                       R]) =
     withActorSystem { system =>
       withMockMetricSender { metricsSender =>
         withLocalSqsQueueAndDlq {

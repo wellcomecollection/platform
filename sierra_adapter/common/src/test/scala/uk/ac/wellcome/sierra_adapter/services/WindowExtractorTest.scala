@@ -92,8 +92,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
       .get shouldBe a[GracefulFailureException]
   }
 
-  it(
-    "should return a GracefulFailureException if there is not an end datetime") {
+  it("should return a GracefulFailureException if there is not an end datetime") {
     val jsonString =
       s"""
          |{

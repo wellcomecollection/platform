@@ -3,8 +3,7 @@ package uk.ac.wellcome.platform.idminter.models
 import com.google.inject.Inject
 import scalikejdbc._
 
-class IdentifiersTable @Inject()(
-  identifiersTableConfig: IdentifiersTableConfig)
+class IdentifiersTable @Inject()(identifiersTableConfig: IdentifiersTableConfig)
     extends SQLSyntaxSupport[Identifier] {
   override val schemaName = Some(identifiersTableConfig.database)
   override val tableName = identifiersTableConfig.tableName

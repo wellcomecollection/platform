@@ -30,7 +30,7 @@ trait SierraProduction {
     }
 
     (maybeMarc260fields, maybeMarc264fields) match {
-      case (Nil, Nil) => List()
+      case (Nil, Nil)           => List()
       case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
       case (Nil, marc264fields) => getProductionFrom264Fields(marc264fields)
       case (_, _) =>

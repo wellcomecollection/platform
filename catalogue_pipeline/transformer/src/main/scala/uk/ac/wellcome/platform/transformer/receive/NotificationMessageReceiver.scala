@@ -72,8 +72,8 @@ class NotificationMessageReceiver @Inject()(
     )
 
     sourceMetadata.sourceName match {
-      case "miro" => miroTransformableStore.get(s3ObjectLocation)
-      case "calm" => calmTransformableStore.get(s3ObjectLocation)
+      case "miro"   => miroTransformableStore.get(s3ObjectLocation)
+      case "calm"   => calmTransformableStore.get(s3ObjectLocation)
       case "sierra" => sierraTransformableStore.get(s3ObjectLocation)
     }
   }
@@ -96,8 +96,8 @@ class NotificationMessageReceiver @Inject()(
 
   private def chooseTransformer(transformable: Transformable) = {
     transformable match {
-      case _: CalmTransformable => new CalmTransformableTransformer
-      case _: MiroTransformable => new MiroTransformableTransformer
+      case _: CalmTransformable   => new CalmTransformableTransformer
+      case _: MiroTransformable   => new MiroTransformableTransformer
       case _: SierraTransformable => new SierraTransformableTransformer
     }
   }

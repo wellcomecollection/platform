@@ -62,8 +62,7 @@ class MiroTransformableTransformerTest
 
     it("two references") {
       transformRecordAndCheckMiroLibraryReferences(
-        data =
-          """
+        data = """
           "image_library_ref_department": ["External Reference", "ICV No"],
           "image_library_ref_id": ["Sanskrit ID 1924", "1234"]
         """,
@@ -228,8 +227,8 @@ class MiroTransformableTransformerTest
   it(
     "returns None for Miro records with usage restrictions that mean we suppress the image") {
     assertTransformReturnsNone(
-      data = buildJSONForWork(
-        """
+      data =
+        buildJSONForWork("""
         "image_title": "Private pictures of perilous penguins",
         "image_use_restrictions": "Do not use"
       """)

@@ -19,7 +19,7 @@ class SierraCheckDigitsTest extends FunSpec with Matchers {
     forAll(testCases) {
       (sierraId: String, recordType: String, expectedId: String) =>
         val sierraRecordType = recordType match {
-          case "bibs" => SierraRecordTypes.bibs
+          case "bibs"  => SierraRecordTypes.bibs
           case "items" => SierraRecordTypes.items
         }
 
@@ -45,9 +45,7 @@ class SierraCheckDigitsTest extends FunSpec with Matchers {
 
   it("throws an error if passed a Sierra ID which is too long") {
     val caught = intercept[RuntimeException] {
-      transformer.addCheckDigit(
-        "12345678",
-        recordType = SierraRecordTypes.bibs)
+      transformer.addCheckDigit("12345678", recordType = SierraRecordTypes.bibs)
     }
 
     caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"

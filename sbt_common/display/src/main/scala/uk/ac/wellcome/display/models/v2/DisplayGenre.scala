@@ -2,11 +2,7 @@ package uk.ac.wellcome.display.models.v2
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{
-  AbstractConcept,
-  Displayable,
-  Genre
-}
+import uk.ac.wellcome.models.work.internal.{AbstractConcept, Displayable, Genre}
 
 @ApiModel(
   value = "Genre",

@@ -8,10 +8,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{
-  ReaderConfig,
-  SierraConfig
-}
+import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
@@ -64,7 +61,7 @@ class SierraReaderWorkerService @Inject()(
       Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
     val params = windowStatus.id match {
       case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
-      case None => baseParams
+      case None     => baseParams
     }
 
     val s3sink = SequentialS3Sink(

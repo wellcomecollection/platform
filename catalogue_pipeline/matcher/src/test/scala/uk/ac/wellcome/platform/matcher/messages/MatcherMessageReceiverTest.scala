@@ -290,12 +290,11 @@ class MatcherMessageReceiverTest
     }
   }
 
-  private def processAndAssertMatchedWorkIs(
-    workToMatch: UnidentifiedWork,
-    expectedMatchedWorks: MatcherResult,
-    queue: SQS.Queue,
-    storageBucket: Bucket,
-    topic: Topic): Any = {
+  private def processAndAssertMatchedWorkIs(workToMatch: UnidentifiedWork,
+                                            expectedMatchedWorks: MatcherResult,
+                                            queue: SQS.Queue,
+                                            storageBucket: Bucket,
+                                            topic: Topic): Any = {
     sendSQS(queue, storageBucket, workToMatch)
     eventually {
       assertLastMatchedResultIs(

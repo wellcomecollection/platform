@@ -182,8 +182,7 @@ trait SierraContributors extends MarcUtils {
       }
       case _ =>
         throw GracefulFailureException(
-          new RuntimeException(
-            s"Multiple identifiers in subfield $$0: $codes"))
+          new RuntimeException(s"Multiple identifiers in subfield $$0: $codes"))
     }
   }
 }

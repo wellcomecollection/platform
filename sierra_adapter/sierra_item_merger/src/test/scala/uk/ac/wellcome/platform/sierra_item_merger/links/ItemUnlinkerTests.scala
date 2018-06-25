@@ -62,9 +62,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
 
     val expectedSierraTransformable = sierraTransformable
 
-    ItemUnlinker.unlinkItemRecord(
-      sierraTransformable,
-      previouslyUnlinkedRecord) shouldBe expectedSierraTransformable
+    ItemUnlinker.unlinkItemRecord(sierraTransformable, previouslyUnlinkedRecord) shouldBe expectedSierraTransformable
   }
 
   it(

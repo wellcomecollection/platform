@@ -123,7 +123,8 @@ class SierraItemMergerFeatureTest
     }
   }
 
-  private def sendItemRecordToSQS(itemRecord: SierraItemRecord, queue: Queue) = {
+  private def sendItemRecordToSQS(itemRecord: SierraItemRecord,
+                                  queue: Queue) = {
     val message = NotificationMessage(
       MessageId = "message-id",
       TopicArn = "topic",

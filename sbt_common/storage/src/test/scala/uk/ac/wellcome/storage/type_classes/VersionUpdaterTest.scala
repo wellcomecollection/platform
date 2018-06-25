@@ -5,9 +5,7 @@ import shapeless.LabelledGeneric
 
 class VersionUpdaterTest extends FunSpec with Matchers {
 
-  case class TestVersion(something: String,
-                         version: Int,
-                         somethingElse: String)
+  case class TestVersion(something: String, version: Int, somethingElse: String)
 
   it("creates a VersionUpdater instance for an hlist") {
     val gen = LabelledGeneric[TestVersion]

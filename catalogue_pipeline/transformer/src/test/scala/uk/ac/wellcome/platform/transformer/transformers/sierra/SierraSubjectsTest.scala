@@ -281,7 +281,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
       .map { _.concepts.head }
       .map {
         case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
-        case other => assert(false, other)
+        case other                                         => assert(false, other)
       }
 
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers

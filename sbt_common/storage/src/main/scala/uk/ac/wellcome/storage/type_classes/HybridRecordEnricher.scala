@@ -38,10 +38,10 @@ object HybridRecordEnricher {
   def create[M, O](f: (String, M, Int, String) => O) =
     new HybridRecordEnricher[M] {
       type Out = O
-      override def enrichedHybridRecordHList(
-        id: String,
-        metadata: M,
-        version: Int)(s3key: String): Out = f(id, metadata, version, s3key)
+      override def enrichedHybridRecordHList(id: String,
+                                             metadata: M,
+                                             version: Int)(s3key: String): Out =
+        f(id, metadata, version, s3key)
     }
 
   // This method takes three type parameters:

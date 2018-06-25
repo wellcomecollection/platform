@@ -29,7 +29,7 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .mkString(",")
 
   def location(loc: Location) = loc match {
-    case l: DigitalLocation => digitalLocation(l)
+    case l: DigitalLocation  => digitalLocation(l)
     case l: PhysicalLocation => physicalLocation(l)
   }
 
@@ -80,9 +80,9 @@ trait DisplaySerialisationTestBase { this: Suite =>
 
   def abstractAgent(ag: AbstractAgent) =
     ag match {
-      case a: Agent => agent(a)
+      case a: Agent        => agent(a)
       case o: Organisation => organisation(o)
-      case p: Person => person(p)
+      case p: Person       => person(p)
     }
 
   def person(p: Person) = {

@@ -62,7 +62,7 @@ case object MiroTransformableData {
     val miroTransformableData: MiroTransformableData =
       tryMiroTransformableData match {
         case Success(miroData) => miroData
-        case Failure(e) => throw e
+        case Failure(e)        => throw e
       }
 
     miroTransformableData

@@ -8,9 +8,7 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 
 import scala.util.Random
 
-trait LocalWorkGraphDynamoDb
-  extends LocalDynamoDb
-{
+trait LocalWorkGraphDynamoDb extends LocalDynamoDb {
   def createTable(table: LocalDynamoDb.Table): Table = Table("table", "index")
 
   def createLockTable(dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
@@ -34,27 +32,28 @@ trait LocalWorkGraphDynamoDb
         )
         .withProvisionedThroughput(new ProvisionedThroughput()
           .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L)
-    ).withGlobalSecondaryIndexes(
-      new GlobalSecondaryIndex()
-        .withIndexName(table.index)
-        .withProjection(
-          new Projection().withProjectionType(ProjectionType.ALL))
-        .withKeySchema(
-          new KeySchemaElement()
-            .withAttributeName("contextId")
-            .withKeyType(KeyType.HASH)
-        )
-        .withProvisionedThroughput(new ProvisionedThroughput()
-          .withReadCapacityUnits(1L)
-          .withWriteCapacityUnits(1L))))
+          .withWriteCapacityUnits(1L))
+        .withGlobalSecondaryIndexes(
+          new GlobalSecondaryIndex()
+            .withIndexName(table.index)
+            .withProjection(
+              new Projection().withProjectionType(ProjectionType.ALL))
+            .withKeySchema(
+              new KeySchemaElement()
+                .withAttributeName("contextId")
+                .withKeyType(KeyType.HASH)
+            )
+            .withProvisionedThroughput(new ProvisionedThroughput()
+              .withReadCapacityUnits(1L)
+              .withWriteCapacityUnits(1L))))
     eventually {
       waitUntilActive(dynamoDbClient, table.name)
     }
     table
   }
 
-  def createWorkGraphTable(dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
+  def createWorkGraphTable(
+    dynamoDbClient: AmazonDynamoDB): LocalDynamoDb.Table = {
     val tableName = Random.alphanumeric.take(10).mkString
     val indexName = Random.alphanumeric.take(10).mkString
     val table = Table(tableName, indexName)

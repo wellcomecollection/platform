@@ -49,16 +49,9 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) {
-              _ =>
-                assertElasticsearchEventuallyHasWork(
-                  indexNameV1,
-                  itemType,
-                  work)
-                assertElasticsearchEventuallyHasWork(
-                  indexNameV2,
-                  itemType,
-                  work)
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
+              assertElasticsearchEventuallyHasWork(indexNameV1, itemType, work)
+              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
             }
           }
         }
@@ -85,13 +78,9 @@ class IngestorFeatureTest
         sendToSqs(work, queue, bucket)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) {
-              _ =>
-                assertElasticsearchEventuallyHasWork(
-                  indexNameV2,
-                  itemType,
-                  work)
-                assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
+              assertElasticsearchEventuallyHasWork(indexNameV2, itemType, work)
+              assertElasticsearchNeverHasWork(indexNameV1, itemType, work)
             }
           }
         }
@@ -104,39 +93,38 @@ class IngestorFeatureTest
       withLocalS3Bucket { bucket =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) {
-              _ =>
-                val invalidMessage = toJson(
-                  NotificationMessage(
-                    Subject = "identified-item",
-                    Message = "not a json string - this will fail parsing",
-                    TopicArn = "ingester",
-                    MessageId = "messageId"
-                  )
-                ).get
-
-                sqsClient.sendMessage(
-                  queue.url,
-                  invalidMessage
+            withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
+              val invalidMessage = toJson(
+                NotificationMessage(
+                  Subject = "identified-item",
+                  Message = "not a json string - this will fail parsing",
+                  TopicArn = "ingester",
+                  MessageId = "messageId"
                 )
-                // After a message is read, it stays invisible for 1 second and then it gets sent again.
-                // So we wait for longer than the visibility timeout and then we assert that it has become
-                // invisible again, which means that the ingestor picked it up again,
-                // and so it wasn't deleted as part of the first run.
-                // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
-                Thread.sleep(2000)
+              ).get
 
-                eventually {
-                  sqsClient
-                    .getQueueAttributes(
-                      queue.url,
-                      List("ApproximateNumberOfMessagesNotVisible").asJava
-                    )
-                    .getAttributes
-                    .get(
-                      "ApproximateNumberOfMessagesNotVisible"
-                    ) shouldBe "1"
-                }
+              sqsClient.sendMessage(
+                queue.url,
+                invalidMessage
+              )
+              // After a message is read, it stays invisible for 1 second and then it gets sent again.
+              // So we wait for longer than the visibility timeout and then we assert that it has become
+              // invisible again, which means that the ingestor picked it up again,
+              // and so it wasn't deleted as part of the first run.
+              // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+              Thread.sleep(2000)
+
+              eventually {
+                sqsClient
+                  .getQueueAttributes(
+                    queue.url,
+                    List("ApproximateNumberOfMessagesNotVisible").asJava
+                  )
+                  .getAttributes
+                  .get(
+                    "ApproximateNumberOfMessagesNotVisible"
+                  ) shouldBe "1"
+              }
             }
           }
         }

@@ -15,14 +15,14 @@ trait MiroSubjects {
    *  e.g. where keywords were pulled directly from Sierra -- but we don't
    *  have enough information in Miro to determine which ones those are.
    */
-  def getSubjects(miroData: MiroTransformableData)
-    : List[Subject[Unidentifiable[Concept]]] = {
+  def getSubjects(
+    miroData: MiroTransformableData): List[Subject[Unidentifiable[Concept]]] = {
     val keywords: List[String] = miroData.keywords.getOrElse(List())
 
     val keywordsUnauth: List[String] =
       miroData.keywordsUnauth match {
         case Some(maybeKeywords) => maybeKeywords.flatten
-        case None => List()
+        case None                => List()
       }
 
     (keywords ++ keywordsUnauth).map { keyword =>

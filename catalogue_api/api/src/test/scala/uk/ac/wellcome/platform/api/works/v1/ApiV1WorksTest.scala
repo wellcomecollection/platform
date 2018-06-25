@@ -448,8 +448,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
 
         eventually {
           server.httpGet(
-            path =
-              s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
+            path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
             andExpect = Status.Ok,
             withJsonBody = s"""
                  |{

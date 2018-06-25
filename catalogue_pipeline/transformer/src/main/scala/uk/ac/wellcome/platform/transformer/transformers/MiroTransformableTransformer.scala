@@ -71,8 +71,7 @@ class MiroTransformableTransformer
               miroData = miroData
             ),
             genres = getGenres(miroData),
-            thumbnail =
-              Some(getThumbnail(miroData, miroTransformable.sourceId)),
+            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
             items = getItems(miroData, miroTransformable.sourceId)
           ))
       } catch {
@@ -126,7 +125,7 @@ class MiroTransformableTransformer
     val candidateTitle = candidateDescription.split("\n").head
     val titleIsTruncatedDescription = miroData.title match {
       case Some(title) => candidateTitle.startsWith(title)
-      case None => true
+      case None        => true
     }
 
     val useDescriptionAsTitle =
@@ -167,7 +166,7 @@ class MiroTransformableTransformer
 
     val wiaAwardsString = wiaAwardsData match {
       // Most images have no award, or only a single award string.
-      case Nil => ""
+      case Nil                 => ""
       case List((label, year)) => s" $label $year."
 
       // A handful of images have an award key pair for "WIA Overall Winner"

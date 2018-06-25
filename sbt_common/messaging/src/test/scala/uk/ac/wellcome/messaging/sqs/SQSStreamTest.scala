@@ -230,9 +230,7 @@ class SQSStreamTest
       ExampleObject(s"Example value $i")
     }.toList
 
-  private def sendExampleObjects(queue: Queue,
-                                 start: Int = 1,
-                                 count: Int = 1) =
+  private def sendExampleObjects(queue: Queue, start: Int = 1, count: Int = 1) =
     createExampleObjects(start = start, count = count).map { exampleObject =>
       sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
     }

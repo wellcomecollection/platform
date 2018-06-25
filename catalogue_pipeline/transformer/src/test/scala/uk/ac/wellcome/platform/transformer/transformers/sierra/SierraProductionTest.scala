@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.source.{
+  MarcSubfield,
+  SierraBibData,
+  VarField
+}
 
 class SierraProductionTest extends FunSpec with Matchers {
 
@@ -25,10 +29,11 @@ class SierraProductionTest extends FunSpec with Matchers {
 
   describe("MARC field 260") {
     it("populates places from subfield a") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "a", content = "Paris"),
-        MarcSubfield(tag = "a", content = "London")
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Paris"),
+          MarcSubfield(tag = "a", content = "London")
+        ))
 
       production.places shouldBe List(
         Place(label = "Paris"),
@@ -37,10 +42,11 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates agents from subfield b") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "b", content = "Gauthier-Villars ;"),
-        MarcSubfield(tag = "b", content = "Vogue")
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "b", content = "Gauthier-Villars ;"),
+          MarcSubfield(tag = "b", content = "Vogue")
+        ))
 
       production.agents shouldBe List(
         Unidentifiable(Agent(label = "Gauthier-Villars ;")),
@@ -49,11 +55,12 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates dates from subfield c") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "c", content = "1955."),
-        MarcSubfield(tag = "c", content = "1984."),
-        MarcSubfield(tag = "c", content = "1999.")
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "c", content = "1955."),
+          MarcSubfield(tag = "c", content = "1984."),
+          MarcSubfield(tag = "c", content = "1999.")
+        ))
 
       production.dates shouldBe List(
         Period(label = "1955."),
@@ -63,21 +70,23 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("sets the function as None if it only has subfields a/b/c") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "a", content = "New York"),
-        MarcSubfield(tag = "b", content = "Xerox Films"),
-        MarcSubfield(tag = "c", content = "1973")
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "New York"),
+          MarcSubfield(tag = "b", content = "Xerox Films"),
+          MarcSubfield(tag = "c", content = "1973")
+        ))
 
       production.function shouldBe None
     }
 
     it("populates places from a and e, and sets the function as Manufacture") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "a", content = "New York, N.Y."),
-        MarcSubfield(tag = "e", content = "Reston, Va."),
-        MarcSubfield(tag = "e", content = "[Philadelphia]"),
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "New York, N.Y."),
+          MarcSubfield(tag = "e", content = "Reston, Va."),
+          MarcSubfield(tag = "e", content = "[Philadelphia]"),
+        ))
 
       production.places shouldBe List(
         Place(label = "New York, N.Y."),
@@ -89,11 +98,12 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates agents from b and f, and sets the function as Manufacture") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "b", content = "Macmillan"),
-        MarcSubfield(tag = "f", content = "Sussex Tapes"),
-        MarcSubfield(tag = "f", content = "US Dept of Energy"),
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "b", content = "Macmillan"),
+          MarcSubfield(tag = "f", content = "Sussex Tapes"),
+          MarcSubfield(tag = "f", content = "US Dept of Energy"),
+        ))
 
       production.agents shouldBe List(
         Unidentifiable(Agent(label = "Macmillan")),
@@ -105,11 +115,12 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates dates from c and g, and sets the function as Manufacture") {
-      val production = transform260ToProduction(subfields = List(
-        MarcSubfield(tag = "c", content = "1981"),
-        MarcSubfield(tag = "g", content = "April 15, 1977"),
-        MarcSubfield(tag = "g", content = "1973 printing"),
-      ))
+      val production = transform260ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "c", content = "1981"),
+          MarcSubfield(tag = "g", content = "April 15, 1977"),
+          MarcSubfield(tag = "g", content = "1973 printing"),
+        ))
 
       production.dates shouldBe List(
         Period(label = "1981"),
@@ -139,9 +150,14 @@ class SierraProductionTest extends FunSpec with Matchers {
           fieldTag = "a",
           subfields = List(
             MarcSubfield(tag = "a", content = "Bethesda, Md"),
-            MarcSubfield(tag = "b", content = "Toxicology Information Program, National Library of Medicine"),
+            MarcSubfield(
+              tag = "b",
+              content =
+                "Toxicology Information Program, National Library of Medicine"),
             MarcSubfield(tag = "a", content = "Springfield, Va"),
-            MarcSubfield(tag = "b", content = "National Technical Information Service"),
+            MarcSubfield(
+              tag = "b",
+              content = "National Technical Information Service"),
             MarcSubfield(tag = "c", content = "1974-")
           )
         )
@@ -160,7 +176,8 @@ class SierraProductionTest extends FunSpec with Matchers {
         ProductionEvent(
           places = List(Place("Bethesda, Md"), Place("Springfield, Va")),
           agents = List(
-            Unidentifiable(Agent("Toxicology Information Program, National Library of Medicine")),
+            Unidentifiable(Agent(
+              "Toxicology Information Program, National Library of Medicine")),
             Unidentifiable(Agent("National Technical Information Service"))
           ),
           dates = List(Period("1974-")),
@@ -177,10 +194,11 @@ class SierraProductionTest extends FunSpec with Matchers {
 
   describe("MARC field 264") {
     it("populates places from subfield a") {
-      val production = transform264ToProduction(subfields = List(
-        MarcSubfield(tag = "a", content = "Boston"),
-        MarcSubfield(tag = "a", content = "Cambridge")
-      ))
+      val production = transform264ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "a", content = "Boston"),
+          MarcSubfield(tag = "a", content = "Cambridge")
+        ))
 
       production.places shouldBe List(
         Place(label = "Boston"),
@@ -189,10 +207,11 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates agents from subfield b") {
-      val production = transform264ToProduction(subfields = List(
-        MarcSubfield(tag = "b", content = "ABC Publishers"),
-        MarcSubfield(tag = "b", content = "Iverson Company")
-      ))
+      val production = transform264ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "b", content = "ABC Publishers"),
+          MarcSubfield(tag = "b", content = "Iverson Company")
+        ))
 
       production.agents shouldBe List(
         Unidentifiable(Agent(label = "ABC Publishers")),
@@ -201,11 +220,12 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
 
     it("populates dates from subfield c") {
-      val production = transform264ToProduction(subfields = List(
-        MarcSubfield(tag = "c", content = "2002"),
-        MarcSubfield(tag = "c", content = "1983"),
-        MarcSubfield(tag = "c", content = "copyright 2005")
-      ))
+      val production = transform264ToProduction(
+        subfields = List(
+          MarcSubfield(tag = "c", content = "2002"),
+          MarcSubfield(tag = "c", content = "1983"),
+          MarcSubfield(tag = "c", content = "copyright 2005")
+        ))
 
       production.dates shouldBe List(
         Period(label = "2002"),
@@ -216,19 +236,27 @@ class SierraProductionTest extends FunSpec with Matchers {
 
     describe("production function") {
       it("sets Production from 2nd indicator == 0") {
-        checkProductionFunctionFor264(indicator2 = "0", expectedFunction = "Production")
+        checkProductionFunctionFor264(
+          indicator2 = "0",
+          expectedFunction = "Production")
       }
 
       it("sets Publication from 2nd indicator == 1") {
-        checkProductionFunctionFor264(indicator2 = "1", expectedFunction = "Publication")
+        checkProductionFunctionFor264(
+          indicator2 = "1",
+          expectedFunction = "Publication")
       }
 
       it("sets Distribution from 2nd indicator == 2") {
-        checkProductionFunctionFor264(indicator2 = "2", expectedFunction = "Distribution")
+        checkProductionFunctionFor264(
+          indicator2 = "2",
+          expectedFunction = "Distribution")
       }
 
       it("sets Manufacture from 2nd indicator == 3") {
-        checkProductionFunctionFor264(indicator2 = "3", expectedFunction = "Manufacture")
+        checkProductionFunctionFor264(
+          indicator2 = "3",
+          expectedFunction = "Manufacture")
       }
 
       it("throws an error if the 2nd indicator is unrecognised") {
@@ -248,7 +276,8 @@ class SierraProductionTest extends FunSpec with Matchers {
       }
     }
 
-    it("ignores instances of the 264 field related to copyright (2nd indicator 4)") {
+    it(
+      "ignores instances of the 264 field related to copyright (2nd indicator 4)") {
       val varFields = List(
         VarField(
           marcTag = Some("264"),
@@ -351,7 +380,8 @@ class SierraProductionTest extends FunSpec with Matchers {
     transformToProduction(varFields = varFields).head
   }
 
-  private def checkProductionFunctionFor264(indicator2: String, expectedFunction: String) = {
+  private def checkProductionFunctionFor264(indicator2: String,
+                                            expectedFunction: String) = {
     val varFields = List(
       VarField(
         marcTag = Some("264"),
@@ -376,7 +406,8 @@ class SierraProductionTest extends FunSpec with Matchers {
     }
   }
 
-  private def transformToProduction(varFields: List[VarField]): List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
+  private def transformToProduction(varFields: List[VarField])
+    : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
     val bibData = SierraBibData(
       id = "p1000001",
       title = Some("Practical production of poisonous panthers"),

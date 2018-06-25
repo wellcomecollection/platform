@@ -33,9 +33,8 @@ class SierraTransformableTransformer
     with SierraGenres
     with Logging {
 
-  override def transformForType(
-    sierraTransformable: SierraTransformable,
-    version: Int): Try[Option[UnidentifiedWork]] = {
+  override def transformForType(sierraTransformable: SierraTransformable,
+                                version: Int): Try[Option[UnidentifiedWork]] = {
     sierraTransformable.maybeBibData
       .map { bibData =>
         debug(s"Attempting to transform ${bibData.id}")
