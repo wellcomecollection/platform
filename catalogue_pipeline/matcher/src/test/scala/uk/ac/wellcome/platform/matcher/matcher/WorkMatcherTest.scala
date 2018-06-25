@@ -30,8 +30,7 @@ class WorkMatcherTest
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
           withWorkGraphStore(graphTable) { workGraphStore =>
-            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
-              workMatcher =>
+            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) { workMatcher =>
                 whenReady(workMatcher.matchWork(anUnidentifiedSierraWork)) {
                   matcherResult =>
                     val workId = "sierra-system-number/id"
@@ -61,8 +60,7 @@ class WorkMatcherTest
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
           withWorkGraphStore(graphTable) { workGraphStore =>
-            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
-              workMatcher =>
+            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) { workMatcher =>
                 val identifierA = aSierraSourceIdentifier("A")
                 val identifierB = aSierraSourceIdentifier("B")
                 val work = anUnidentifiedSierraWork.copy(
@@ -105,8 +103,7 @@ class WorkMatcherTest
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
           withWorkGraphStore(graphTable) { workGraphStore =>
-            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
-              workMatcher =>
+            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) { workMatcher =>
                 val existingWorkA = WorkNode(
                   "sierra-system-number/A",
                   1,
@@ -204,11 +201,8 @@ class WorkMatcherTest
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
           withWorkGraphStore(graphTable) { workGraphStore =>
             withDynamoRowLockDao(dynamoDbClient, lockTable) { rowLockDao =>
-              withLockingService(rowLockDao, mockMetricsSender) {
-                dynamoLockingService =>
-                  withWorkMatcherAndLockingService(
-                    workGraphStore,
-                    dynamoLockingService) { workMatcher =>
+              withLockingService(rowLockDao, mockMetricsSender) { dynamoLockingService =>
+                  withWorkMatcherAndLockingService(workGraphStore, dynamoLockingService) { workMatcher =>
                     val identifierA = aSierraSourceIdentifier("A")
                     val identifierB = aSierraSourceIdentifier("B")
 
