@@ -5,6 +5,7 @@ import grizzled.slf4j.Logging
 import javax.inject.Inject
 import uk.ac.wellcome.monitoring.MetricsSender
 
+import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoLockingService @Inject()(
@@ -15,10 +16,16 @@ class DynamoLockingService @Inject()(
   private val failedLockMetricName: String = "WorkMatcher_FailedLock"
   private val failedUnlockMetricName: String = "WorkMatcher_FailedUnlock"
 
-  def withLocks[T](ids: Set[String])(f: => Future[T]): Future[T] = {
-    val contextGuid = randomUUID.toString
-    val identifiers: Set[Identifier] = ids.map(Identifier)
-    debug(s"Locking identifiers $identifiers in context $contextGuid")
+  def withLocks[T](ids: Set[String])(callback: => Future[T]): Future[T] = {
+    if (ids.isEmpty) {
+      callback
+    } else {
+      executeWithLocks(ids, callback, randomUUID.toString, ids.map(Identifier))
+    }
+  }
+
+  private def executeWithLocks[T](ids: Set[String], f: => Future[T], contextGuid: String, identifiers: Set[Identifier]) = {
+    debug(s"Locking ids $ids in context $contextGuid")
     val eventuallyExecutedWithLock = for {
       _ <- Future.sequence(
         identifiers.map(dynamoRowLockDao.lockRow(_, contextGuid)))

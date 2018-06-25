@@ -155,34 +155,14 @@ class DynamoRowLockDaoTest
   }
 
   it(
-    "throws FailedUnlockException if there is a problem unlocking - there are unprocessed batch items") {
-    withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-      val mockClient = mock[AmazonDynamoDB]
-      withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
-        when(mockClient.query(any[QueryRequest]))
-          .thenReturn(aRowLockQueryResult)
-
-        when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
-          .thenReturn(new BatchWriteItemResult()
-            .withUnprocessedItems(someUnprocessedItems))
-
-        whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
-          unlockFailed =>
-            unlockFailed shouldBe a[FailedUnlockException]
-        }
-      }
-    }
-  }
-
-  it(
-    "throws FailedUnlockException if there is a problem unlocking - the batch update fails") {
+    "throws FailedUnlockException if there is a problem deleting the lock") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
         when(mockClient.query(any[QueryRequest]))
           .thenReturn(aRowLockQueryResult)
 
-        when(mockClient.batchWriteItem(any[BatchWriteItemRequest]))
+        when(mockClient.deleteItem(any[DeleteItemRequest]))
           .thenThrow(new InternalServerErrorException("FAILED"))
 
         whenReady(dynamoRowLockDao.unlockRows("contextId").failed) {
@@ -249,11 +229,4 @@ class DynamoRowLockDaoTest
     queryResult
   }
 
-  private def someUnprocessedItems = {
-    new util.HashMap[String, util.List[WriteRequest]] {
-      val items: util.List[WriteRequest] = new util.ArrayList[WriteRequest]()
-      items.add(new WriteRequest())
-      put("key", items)
-    }
-  }
 }

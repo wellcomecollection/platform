@@ -40,7 +40,7 @@ class MatcherMessageReceiver @Inject()(
         subject = s"source: ${this.getClass.getSimpleName}.processMessage"
       )
     } yield ()).recover {
-      case e: VersionConflictException => info(e.getMessage)
+      case e: VersionConflictException => debug(s"Not matching work due to version: ${e.getMessage}")
     }
   }
 
