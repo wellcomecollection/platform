@@ -28,14 +28,16 @@ Usage:
 
 """
 
+import json
+
+import boto3
+
+
+s3 = boto3.client('s3')
+jl = json.loads
+
 
 class GetTransformerObjects(object):
-
-    import json
-    import boto3
-
-    s3 = boto3.client('s3')
-    jl = json.loads
 
     def __init__(self, key=None):
         if key is None:
@@ -57,7 +59,7 @@ class GetTransformerObjects(object):
         self.cached_s3_records = {}
 
     def __iter__(self):
-        for line in data.splitlines():
+        for line in self.data.splitlines():
             s3key = jl(jl(jl(line)['Body'])['Message'])['s3key']
 
             try:
