@@ -57,6 +57,9 @@ module "matcher_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.recorded_works_topic.name}"]
 
+  // The records in the locktable expire after 3 minutes
+  // The matcher is abkle to override locks that have expired
+  // Wait slightly longer to make sure locks are axpired
   visibility_timeout_seconds = 210
   max_receive_count          = 5
 
