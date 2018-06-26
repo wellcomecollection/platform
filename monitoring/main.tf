@@ -1,28 +1,3 @@
-module "grafana" {
-  source = "grafana"
-
-  ecs_monitoring_iam_instance_role_name = "${module.ecs_monitoring_iam.instance_role_name}"
-
-  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-
-  listener_https_arn = "${module.monitoring_alb.listener_https_arn}"
-  listener_http_arn  = "${module.monitoring_alb.listener_http_arn}"
-
-  vpc_id              = "${module.vpc_monitoring.vpc_id}"
-  cluster_id          = "${aws_ecs_cluster.monitoring.id}"
-  efs_mount_directory = "${module.monitoring_userdata.efs_mount_directory}"
-
-  cloudwatch_id = "${module.monitoring_alb.cloudwatch_id}"
-
-  release_ids = "${var.release_ids}"
-
-  grafana_admin_user        = "${var.grafana_admin_user}"
-  grafana_anonymous_role    = "${var.grafana_anonymous_role}"
-  grafana_admin_password    = "${var.grafana_admin_password}"
-  grafana_anonymous_enabled = "${var.grafana_anonymous_enabled}"
-}
-
 module "deployment_tracking" {
   source = "deployment_tracking"
 
