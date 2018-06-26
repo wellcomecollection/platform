@@ -5,6 +5,8 @@ import uk.ac.wellcome.platform.transformer.source.SierraBibData
 
 trait SierraMergeCandidates extends MarcUtils{
 
+  // Populate mergeCandidates from tag 776 subfield w if starting with (UkLW), ignore otherwise.
+  // Strip the (UkLW) prefix and return the rest as a bibNumber of a merge candidate
   def getMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = for {
     subFields <- getMatchingSubfields(sierraBibData, "776", "w")
     subField <- subFields
