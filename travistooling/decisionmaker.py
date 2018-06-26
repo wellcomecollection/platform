@@ -132,7 +132,6 @@ def does_file_affect_build_task(path, task):
     #
     if path.startswith(('sbt_common/elasticsearch', 'sbt_common/finatra_elasticsearch')):
         for project in PROJECTS:
-            print(project)
             if task.startswith(project.name) and (project.type == 'sbt_app'):
                 if project.exclusive_path.startswith((
                     'catalogue_pipeline/id_minter',
