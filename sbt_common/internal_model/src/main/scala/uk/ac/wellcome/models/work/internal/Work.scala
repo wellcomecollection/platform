@@ -1,12 +1,9 @@
 package uk.ac.wellcome.models.work.internal
 
-object Work {
-  type Redirect = IdentityState[Nothing]
-  type IdentifiedRedirect = Identified[Nothing]
-  type IdentifiableRedirect = Identifiable[Nothing]
-}
+sealed trait Redirect
+case class IdentifiableRedirect(sourceIdentifier: SourceIdentifier) extends Redirect
+case class IdentifiedRedirect(canonicalId: String) extends Redirect
 
-import Work._
 /** A representation of a work in our ontology */
 trait Work extends MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
