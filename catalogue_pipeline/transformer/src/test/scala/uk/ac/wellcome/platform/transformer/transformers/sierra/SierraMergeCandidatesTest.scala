@@ -29,6 +29,27 @@ class SierraMergeCandidatesTest extends FunSpec with Matchers with SierraData {
     transformer.getMergeCandidates(sierraData) shouldBe List(MergeCandidate(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", mergeCandidateBibNumber)))
   }
 
+  it("strips spaces in tag 776$$w and adds it as a mergeCandidate") {
+    val mergeCandidateBibNumber = "b21414440"
+    val sierraData = SierraBibData(
+      id = "b1234567",
+      title = Some("A pack of published puffins in Paris"),
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "776",
+          indicator1 = "",
+          indicator2 = "",
+          subfields = List(
+            MarcSubfield(tag = "w", content = s"(UkLW)  $mergeCandidateBibNumber")
+          )
+        )
+      )
+    )
+
+    transformer.getMergeCandidates(sierraData) shouldBe List(MergeCandidate(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", mergeCandidateBibNumber)))
+  }
+
   it("returns an empty list if there is no marc tag 776") {
     val sierraData = SierraBibData(
       id = "b1234567",
@@ -81,14 +102,21 @@ class SierraMergeCandidatesTest extends FunSpec with Matchers with SierraData {
 }
 
 trait SierraMergeCandidates extends MarcUtils{
-  val prefixRegex = """\(UkLW\)"""
+
   def getMergeCandidates(sierraBibData: SierraBibData): List[MergeCandidate] = for {
     subFields <- getMatchingSubfields(sierraBibData, "776", "w")
     subField <- subFields
-  } yield {
-    val prefixedBibNumber = subField.content
-    val cleanedBibNumber = prefixedBibNumber.replaceFirst(prefixRegex, "")
-    MergeCandidate(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", cleanedBibNumber))
-  }
+    mergeCandidate <- extractMergeCandidate(subField.content).toList
+  } yield mergeCandidate
 
+  private def extractMergeCandidate(content: String): Option[MergeCandidate] = {
+    // This regex matches any string starting with (UkLW), followed by any number of spaces
+    // and groups everything after that, which is the sierra bib number we're interested in
+    val prefixRegex = """\(UkLW\)[\s]*(.+)""".r.anchored
+
+    content match {
+      case prefixRegex(bibNumber) => Some(MergeCandidate(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", bibNumber)))
+      case _ => None
+    }
+  }
 }
