@@ -1,4 +1,5 @@
-package uk.ac.wellcome.platform.matcher.lockable
+package uk.ac.wellcome.platform.matcher.locking
+
 import java.util.UUID.randomUUID
 
 import grizzled.slf4j.Logging

@@ -8,12 +8,6 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{
-  DynamoRowLockDao,
-  FailedLockException,
-  FailedUnlockException,
-  RowLock
-}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.collection.immutable

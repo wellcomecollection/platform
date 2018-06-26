@@ -16,7 +16,7 @@ import uk.ac.wellcome.models.matcher.{
 }
 import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{
+import uk.ac.wellcome.platform.matcher.locking.{
   DynamoRowLockDao,
   FailedUnlockException,
   Identifier
