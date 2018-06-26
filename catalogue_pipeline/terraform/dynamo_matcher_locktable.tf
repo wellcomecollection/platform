@@ -22,6 +22,11 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
     projection_type = "ALL"
   }
 
+  ttl {
+    attribute_name = "expires"
+    enabled        = true
+  }
+
   lifecycle {
     prevent_destroy = true
 

@@ -12,7 +12,8 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
 import uk.ac.wellcome.platform.matcher.lockable.{
   DynamoLockingService,
-  FailedLockException
+  FailedLockException,
+  FailedUnlockException
 }
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -36,23 +37,21 @@ class WorkMatcher @Inject()(
     val updateAffectedIdentifiers = update.referencedWorkIds + update.workId
     lockingService
       .withLocks(updateAffectedIdentifiers)(
-        processUpdate(update, updateAffectedIdentifiers)
+        withUpdateLocked(update, updateAffectedIdentifiers)
       )
       .recover {
-        case e: FailedLockException =>
-          info(
-            s"Failed to obtain a lock matching work ${work.sourceIdentifier}")
+        case e @ (_: FailedLockException | _: FailedUnlockException) =>
+          debug(
+            s"Locking failed while matching work ${work.sourceIdentifier} ${e.getClass.getSimpleName} ${e.getMessage}")
           throw GracefulFailureException(e)
       }
   }
 
-  private def processUpdate(update: WorkUpdate,
-                            updateAffectedIdentifiers: Set[String]) = {
+  private def withUpdateLocked(update: WorkUpdate,
+                               updateAffectedIdentifiers: Set[String]) = {
     for {
-      graphBeforeUpdate: WorkGraph <- workGraphStore.findAffectedWorks(update)
-      updatedGraph: WorkGraph = WorkGraphUpdater.update(
-        update,
-        graphBeforeUpdate)
+      graphBeforeUpdate <- workGraphStore.findAffectedWorks(update)
+      updatedGraph = WorkGraphUpdater.update(update, graphBeforeUpdate)
       _ <- lockingService.withLocks(
         graphBeforeUpdate.nodes.map(_.id) -- updateAffectedIdentifiers)(
         workGraphStore.put(updatedGraph)

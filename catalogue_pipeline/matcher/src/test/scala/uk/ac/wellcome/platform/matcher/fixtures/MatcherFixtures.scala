@@ -1,5 +1,9 @@
 package uk.ac.wellcome.platform.matcher.fixtures
 
+import java.time.Instant
+
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
@@ -12,12 +16,14 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.lockable.{
   DynamoLockingService,
   DynamoLockingServiceConfig,
-  DynamoRowLockDao
+  DynamoRowLockDao,
+  RowLock
 }
 import uk.ac.wellcome.platform.matcher.matcher.WorkMatcher
 import uk.ac.wellcome.platform.matcher.messages.MatcherMessageReceiver
@@ -26,7 +32,7 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.S3
+import uk.ac.wellcome.storage.test.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
@@ -40,6 +46,13 @@ trait MatcherFixtures
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
     with S3 {
+
+  implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
+    DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
+      Instant.ofEpochSecond
+    )(
+      _.getEpochSecond
+    )
 
   def withMatcherServer[R](
     queue: Queue,
@@ -85,25 +98,26 @@ trait MatcherFixtures
       new SNSWriter(snsClient, SNSConfig(topic.arn))
 
     withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
+      withMockMetricSender { metricsSender =>
         withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
           withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
             withWorkGraphStore(graphTable) { workGraphStore =>
-              withWorkMatcher(workGraphStore, lockTable) { workMatcher =>
-                val sqsStream = new SQSStream[NotificationMessage](
-                  actorSystem = actorSystem,
-                  sqsClient = asyncSqsClient,
-                  sqsConfig = SQSConfig(queue.url, 1 second, 1),
-                  metricsSender = metricsSender
-                )
-                val matcherMessageReceiver = new MatcherMessageReceiver(
-                  sqsStream,
-                  snsWriter,
-                  objectStore,
-                  storageS3Config,
-                  actorSystem,
-                  workMatcher)
-                testWith(matcherMessageReceiver)
+              withWorkMatcher(workGraphStore, lockTable, metricsSender) {
+                workMatcher =>
+                  val sqsStream = new SQSStream[NotificationMessage](
+                    actorSystem = actorSystem,
+                    sqsClient = asyncSqsClient,
+                    sqsConfig = SQSConfig(queue.url, 1 second, 1),
+                    metricsSender = metricsSender
+                  )
+                  val matcherMessageReceiver = new MatcherMessageReceiver(
+                    sqsStream,
+                    snsWriter,
+                    objectStore,
+                    storageS3Config,
+                    actorSystem,
+                    workMatcher)
+                  testWith(matcherMessageReceiver)
               }
             }
           }
@@ -112,23 +126,40 @@ trait MatcherFixtures
     }
   }
 
-  def withWorkMatcher[R](workGraphStore: WorkGraphStore, lockTable: Table)(
-    testWith: TestWith[WorkMatcher, R]): R = {
+  def withWorkMatcher[R](
+    workGraphStore: WorkGraphStore,
+    lockTable: Table,
+    metricsSender: MetricsSender)(testWith: TestWith[WorkMatcher, R]): R = {
     val dynamoRowLockDao: DynamoRowLockDao = new DynamoRowLockDao(
       dynamoDbClient,
       DynamoLockingServiceConfig(lockTable.name, lockTable.index))
-    val lockingService: DynamoLockingService = new DynamoLockingService(
-      dynamoRowLockDao)
+    val lockingService: DynamoLockingService =
+      new DynamoLockingService(dynamoRowLockDao, metricsSender)
     val workMatcher = new WorkMatcher(workGraphStore, lockingService)
     testWith(workMatcher)
   }
 
-  def withLockingService[R](lockTable: Table)(
-    testWith: TestWith[DynamoLockingService, R]): R = {
+  def withDynamoRowLockDao[R](dynamoDbClient: AmazonDynamoDB, lockTable: Table)(
+    testWith: TestWith[DynamoRowLockDao, R]): R = {
     val dynamoRowLockDao = new DynamoRowLockDao(
       dynamoDbClient,
       DynamoLockingServiceConfig(lockTable.name, lockTable.index))
-    val lockingService = new DynamoLockingService(dynamoRowLockDao)
+    testWith(dynamoRowLockDao)
+  }
+
+  def withDynamoRowLockDao[R](lockTable: Table)(
+    testWith: TestWith[DynamoRowLockDao, R]): R = {
+    val dynamoRowLockDao = new DynamoRowLockDao(
+      dynamoDbClient,
+      DynamoLockingServiceConfig(lockTable.name, lockTable.index))
+    testWith(dynamoRowLockDao)
+  }
+
+  def withLockingService[R](dynamoRowLockDao: DynamoRowLockDao,
+                            metricsSender: MetricsSender)(
+    testWith: TestWith[DynamoLockingService, R]): R = {
+    val lockingService =
+      new DynamoLockingService(dynamoRowLockDao, metricsSender)
     testWith(lockingService)
   }
 
@@ -170,4 +201,13 @@ trait MatcherFixtures
       version = 1
     )
   }
+
+  def aRowLock(id: String, contextId: String) = {
+    RowLock(id, contextId, Instant.now, Instant.now.plusSeconds(100))
+  }
+
+  def assertNoRowLocks(lockTable: LocalDynamoDb.Table) = {
+    Scanamo.scan[RowLock](dynamoDbClient)(lockTable.name) shouldBe empty
+  }
+
 }

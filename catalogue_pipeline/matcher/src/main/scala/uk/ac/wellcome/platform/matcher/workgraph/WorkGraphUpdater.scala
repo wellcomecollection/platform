@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
+import grizzled.slf4j.Logging
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
@@ -11,7 +12,7 @@ import uk.ac.wellcome.platform.matcher.models.{
 
 import scala.collection.immutable.Iterable
 
-object WorkGraphUpdater {
+object WorkGraphUpdater extends Logging {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
     val existingVersion =
@@ -21,8 +22,9 @@ object WorkGraphUpdater {
       }
     if (existingVersion >= workUpdate.version) {
       val versionConflictMessage =
-        s"Not matching work ${workUpdate.workId} v${workUpdate.version} because older than existing work v$existingVersion"
-      throw new VersionConflictException(versionConflictMessage)
+        s"${workUpdate.workId} v${workUpdate.version} is not newer than existing work v$existingVersion"
+      debug(versionConflictMessage)
+      throw VersionConflictException(versionConflictMessage)
     } else {
       doUpdate(workUpdate, existingGraph)
     }

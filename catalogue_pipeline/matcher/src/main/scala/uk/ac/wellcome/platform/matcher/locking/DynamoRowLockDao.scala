@@ -3,12 +3,14 @@ package uk.ac.wellcome.platform.matcher.lockable
 import java.time.{Duration, Instant}
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query.Condition
-import com.gu.scanamo.syntax.{attributeExists, not, _}
+import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import grizzled.slf4j.Logging
 import javax.inject.Inject
 
+import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoRowLockDao @Inject()(
@@ -23,7 +25,7 @@ class DynamoRowLockDao @Inject()(
       _.getEpochSecond
     )
 
-  private val defaultDuration = Duration.ofSeconds(3600)
+  private val defaultDuration = Duration.ofSeconds(180)
   private val table = Table[RowLock](config.tableName)
   private val index = config.indexName
 
@@ -34,62 +36,84 @@ class DynamoRowLockDao @Inject()(
     (created, expires)
   }
 
-  def lockRow(id: Identifier, contextId: String) = Future {
-    val (created, expires) = getExpiry
-    val rowLock = RowLock(id.id, contextId, created, expires)
+  def lockRow(id: Identifier, contextId: String) =
+    Future {
+      val (created, expires) = getExpiry
+      val rowLock = RowLock(id.id, contextId, created, expires)
+      trace(s"Locking $rowLock")
 
-    debug(s"Trying to create RowLock: $rowLock")
-
-    val scanamoOps = table
-      .given(
-        not(attributeExists('id)) or Condition(
+      val scanamoOps = table
+        .given(not(attributeExists('id)) or Condition(
           'expires < rowLock.created.getEpochSecond))
-      .put(rowLock)
+        .put(rowLock)
+      val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
+      trace(s"Got $result for $rowLock")
 
-    val result = Scanamo.exec(dynamoDBClient)(scanamoOps)
+      result match {
+        case Right(_) => rowLock
+        case Left(error) => {
+          debug(s"Failed to lock $rowLock $error")
+          throw FailedLockException(s"Failed to lock $id", error)
+        }
+      }
+    }.recover {
+      case exception: Exception =>
+        val errorMsg =
+          s"Problem locking row ${id} in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+        debug(errorMsg)
+        throw FailedLockException(errorMsg, exception)
+    }
 
-    debug(s"Got $result when creating $rowLock")
-
-    result match {
-      case Right(_) => rowLock
-      case Left(error) =>
-        throw new FailedLockException(s"Failed to lock $id", error)
+  def unlockRows(contextId: String): Future[Unit] = {
+    val eventallyDeleted = for {
+      rowLockIds <- queryContextForLockIds(contextId)
+      _ <- deleteRowLocks(rowLockIds.toList)
+    } yield ()
+    eventallyDeleted.recover {
+      case exception: Exception =>
+        val errorMsg =
+          s"Problem unlocking rows in context [$contextId], ${exception.getClass.getSimpleName} ${exception.getMessage}"
+        debug(errorMsg)
+        throw FailedUnlockException(errorMsg, exception)
     }
   }
 
-  def unlockRow(contextId: String) = Future {
-    debug(s"Trying to unlock context: $contextId")
+  private def deleteRowLocks(rowLockIds: List[String]) = {
+    debug(s"Unlocking rows: $rowLockIds")
+    Future.sequence(rowLockIds.map { rowLockId =>
+      Future {
+        Scanamo.delete(dynamoDBClient)(table.name)('id -> rowLockId)
+      }
+    })
+  }
 
-    val maybeRowLocks =
-      Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
-        'contextId -> contextId)
-    val rowLockIds = maybeRowLocks.collect {
-      case Right(rowLock) => rowLock.id
-    }.toSet
+  private def queryContextForLockIds(contextId: String): Future[Seq[String]] = {
+    Future {
+      debug(s"Trying to unlock context: $contextId")
+      val maybeRowLocks: immutable.Seq[Either[DynamoReadError, RowLock]] =
+        Scanamo.queryIndex[RowLock](dynamoDBClient)(table.name, index)(
+          'contextId -> contextId)
 
-    maybeRowLocks.collect {
-      case Left(error) => {
-        info(s"Error $error when unlocking $contextId")
-        throw FailedUnlockException(s"Failed to unlock [$contextId] $error")
+      debug("maybeRowLocks: " + maybeRowLocks)
+      maybeRowLocks.collect {
+        case Right(rowLock) => rowLock.id
+        case Left(error) =>
+          info(s"Error $error when unlocking $contextId")
+          throw FailedUnlockException(
+            s"Failed to unlock [$contextId] $error",
+            new RuntimeException)
       }
     }
-
-    debug(s"Trying to unlock rows: $rowLockIds")
-    val scanamoOps = table.deleteAll('id -> rowLockIds)
-    Scanamo.exec(dynamoDBClient)(scanamoOps)
-    ()
   }
 }
 
 case class DynamoLockingServiceConfig(tableName: String, indexName: String)
 
-case class FailedLockException(private val message: String = "",
-                               private val cause: Throwable = None.orNull)
-    extends Throwable
+case class FailedLockException(message: String, cause: Throwable)
+    extends Exception(message, cause)
 
-case class FailedUnlockException(private val message: String = "",
-                                 private val cause: Throwable = None.orNull)
-    extends Throwable
+case class FailedUnlockException(message: String, cause: Throwable)
+    extends Exception(message, cause)
 
 case class Identifier(id: String)
 case class RowLock(id: String,
