@@ -9,7 +9,6 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
