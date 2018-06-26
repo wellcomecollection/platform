@@ -563,7 +563,7 @@ class SierraTransformableTransformerTest
       )
     )
   }
-  
+
   it("extracts merge candidates from 776 subfield $$w") {
     val id = "9876789"
     val mergeCandidateBibNumber = "b21414440"
@@ -590,7 +590,12 @@ class SierraTransformableTransformerTest
       """.stripMargin
 
     val work = transformDataToWork(id = id, data = data)
-    work.mergeCandidates shouldBe List(MergeCandidate(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", mergeCandidateBibNumber)))
+    work.mergeCandidates shouldBe List(
+      MergeCandidate(
+        SourceIdentifier(
+          IdentifierType("sierra-system-number"),
+          "Work",
+          mergeCandidateBibNumber)))
   }
 
   private def transformDataToWork(id: String,
