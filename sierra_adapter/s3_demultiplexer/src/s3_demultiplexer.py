@@ -25,9 +25,13 @@ import json
 import os
 
 import boto3
+import daiquiri
 
 from wellcome_aws_utils import s3_utils, sns_utils
 from wellcome_aws_utils.lambda_utils import log_on_error
+
+
+daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 @log_on_error
