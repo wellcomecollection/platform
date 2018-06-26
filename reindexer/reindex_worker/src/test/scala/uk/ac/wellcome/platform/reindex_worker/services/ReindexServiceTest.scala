@@ -7,22 +7,19 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ReindexServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
-    with Akka
     with LocalDynamoDbVersioned
-    with MetricsSenderFixture
     with ExtendedPatience {
 
   val shardName = "shard"
@@ -44,21 +41,15 @@ class ReindexServiceTest
 
   private def withReindexService(table: Table)(
     testWith: TestWith[ReindexService, Assertion]) = {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val reindexService =
-          new ReindexService(
-            dynamoDbClient = dynamoDbClient,
-            dynamoConfig = DynamoConfig(
-              table = table.name,
-              index = table.index
-            ),
-            metricsSender = metricsSender
-          )
+    val reindexService = new ReindexService(
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(
+        table = table.name,
+        index = table.index
+      )
+    )
 
-        testWith(reindexService)
-      }
-    }
+    testWith(reindexService)
   }
 
   it("only updates records with a lower than desired reindexVersion") {
@@ -199,22 +190,17 @@ class ReindexServiceTest
   }
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val service = new ReindexService(
-          dynamoDbClient = dynamoDbClient,
-          dynamoConfig = DynamoConfig(
-            table = "mytable",
-            maybeIndex = None
-          ),
-          metricsSender = metricsSender
-        )
+    val service = new ReindexService(
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(
+        table = "mytable",
+        maybeIndex = None
+      )
+    )
 
-        val future = service.runReindex(exampleReindexJob)
-        whenReady(future.failed) {
-          _ shouldBe a[ConfigurationException]
-        }
-      }
+    val future = service.runReindex(exampleReindexJob)
+    whenReady(future.failed) {
+      _ shouldBe a[ConfigurationException]
     }
   }
 

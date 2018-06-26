@@ -4,7 +4,6 @@ import java.io.{ByteArrayInputStream, InputStream}
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-import akka.actor.ActorSystem
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
@@ -13,7 +12,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -24,12 +23,11 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
-import uk.ac.wellcome.test.fixtures.{fixture, Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
 
 class GoobiReaderWorkerServiceTest
     extends FunSpec
@@ -38,7 +36,8 @@ class GoobiReaderWorkerServiceTest
     with ScalaFutures
     with ExtendedPatience
     with MockitoSugar
-    with GoobiReaderFixtures {
+    with GoobiReaderFixtures
+    with SQS {
 
   private val id = "mets-0001"
   private val goobiS3Prefix = "goobi"
@@ -311,22 +310,6 @@ class GoobiReaderWorkerServiceTest
       }
     }
 
-  private def withSqsStream[R](actorSystem: ActorSystem,
-                               queue: Queue,
-                               metricsSender: MetricsSender) =
-    fixture[SQSStream[NotificationMessage], R](
-      new SQSStream(
-        actorSystem = actorSystem,
-        sqsClient = asyncSqsClient,
-        sqsConfig = SQSConfig(
-          queueUrl = queue.url,
-          waitTime = 1.second,
-          maxMessages = 1
-        ),
-        metricsSender = metricsSender
-      )
-    )
-
   private def withGoobiReaderWorkerService[R](s3Client: AmazonS3)(
     testWith: TestWith[(Bucket,
                         QueuePair,
@@ -340,7 +323,10 @@ class GoobiReaderWorkerServiceTest
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
           withMockMetricSender { mockMetricsSender =>
-            withSqsStream(actorSystem, queue, mockMetricsSender) { sqsStream =>
+            withSQSStream[NotificationMessage, R](
+              actorSystem,
+              queue,
+              mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
                 case (bucket, table, vhs) =>
                   new GoobiReaderWorkerService(

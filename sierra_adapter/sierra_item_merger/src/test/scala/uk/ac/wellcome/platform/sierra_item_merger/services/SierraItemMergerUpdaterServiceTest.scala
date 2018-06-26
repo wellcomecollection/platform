@@ -1,11 +1,9 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -22,7 +20,6 @@ import scala.concurrent.Future
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
     with ExtendedPatience
-    with MockitoSugar
     with ScalaFutures
     with LocalVersionedHybridStore
     with SQS
@@ -34,8 +31,7 @@ class SierraItemMergerUpdaterServiceTest
                                       ObjectStore[SierraTransformable]])(
     testWith: TestWith[SierraItemMergerUpdaterService, Assertion]) = {
     val sierraUpdaterService = new SierraItemMergerUpdaterService(
-      versionedHybridStore = hybridStore,
-      mock[MetricsSender]
+      versionedHybridStore = hybridStore
     )
     testWith(sierraUpdaterService)
   }

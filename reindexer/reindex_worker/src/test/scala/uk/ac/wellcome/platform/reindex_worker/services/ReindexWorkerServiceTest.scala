@@ -9,7 +9,6 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
@@ -44,7 +43,7 @@ class ReindexWorkerServiceTest
                 actorSystem,
                 queue,
                 metricsSender) { sqsStream =>
-                withReindexService(metricsSender, table) { reindexService =>
+                withReindexService(table) { reindexService =>
                   val workerService = new ReindexWorkerService(
                     targetService = reindexService,
                     sqsStream = sqsStream,
@@ -52,8 +51,7 @@ class ReindexWorkerServiceTest
                       snsClient = snsClient,
                       snsConfig = SNSConfig(topicArn = topic.arn)
                     ),
-                    system = actorSystem,
-                    metrics = metricsSender
+                    system = actorSystem
                   )
 
                   try {
@@ -69,12 +67,11 @@ class ReindexWorkerServiceTest
     }
   }
 
-  def withReindexService[R](metricsSender: MetricsSender, table: Table)(
+  def withReindexService[R](table: Table)(
     testWith: TestWith[ReindexService, R]) = {
     val reindexService = new ReindexService(
       dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(table = table.name, index = table.index),
-      metricsSender = metricsSender
+      dynamoConfig = DynamoConfig(table = table.name, index = table.index)
     )
     testWith(reindexService)
   }
@@ -169,7 +166,6 @@ class ReindexWorkerServiceTest
 
                 new ReindexWorkerService(
                   targetService = failingReindexService,
-                  metrics = metricsSender,
                   system = actorSystem,
                   snsWriter = new SNSWriter(
                     snsClient = snsClient,

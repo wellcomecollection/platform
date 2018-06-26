@@ -68,7 +68,7 @@ class SierraBibMergerWorkerServiceTest
                       storageBucket,
                       table) { vhs =>
                       val mergerUpdaterService =
-                        new SierraBibMergerUpdaterService(vhs, metricsSender)
+                        new SierraBibMergerUpdaterService(vhs)
 
                       val worker = new SierraBibMergerWorkerService(
                         system,

@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSWriter}
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
@@ -18,8 +17,7 @@ class ReindexWorkerService @Inject()(
   targetService: ReindexService,
   snsWriter: SNSWriter,
   system: ActorSystem,
-  sqsStream: SQSStream[NotificationMessage],
-  metrics: MetricsSender
+  sqsStream: SQSStream[NotificationMessage]
 ) {
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 

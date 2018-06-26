@@ -10,7 +10,6 @@ import uk.ac.wellcome.platform.sierra_item_merger.links.ItemUnlinker
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.ObjectStore
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,8 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SierraItemMergerUpdaterService @Inject()(
   versionedHybridStore: VersionedHybridStore[SierraTransformable,
                                              SourceMetadata,
-                                             ObjectStore[SierraTransformable]],
-  metrics: MetricsSender
+                                             ObjectStore[SierraTransformable]]
 )(implicit ec: ExecutionContext)
     extends Logging {
 

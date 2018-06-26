@@ -21,13 +21,11 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
+import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -37,8 +35,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NotificationMessageReceiverTest
     extends FunSpec
     with Matchers
-    with Akka
-    with MetricsSenderFixture
     with SQS
     with SNS
     with S3
@@ -80,18 +76,13 @@ class NotificationMessageReceiverTest
         s3Client = s3Client
       )
 
-    withActorSystem { actorSystem =>
-      withMetricsSender(actorSystem) { metricsSender =>
-        val recordReceiver = new NotificationMessageReceiver(
-          messageWriter = messageWriter,
-          s3Client = s3Client,
-          s3Config = S3Config(bucket.name),
-          metricsSender = metricsSender
-        )
+    val recordReceiver = new NotificationMessageReceiver(
+      messageWriter = messageWriter,
+      s3Client = s3Client,
+      s3Config = S3Config(bucket.name)
+    )
 
-        testWith(recordReceiver)
-      }
-    }
+    testWith(recordReceiver)
   }
 
   it("receives a message and sends it to SNS client") {

@@ -15,7 +15,6 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.transformer.transformers.{
   CalmTransformableTransformer,
   MiroTransformableTransformer,
@@ -31,8 +30,7 @@ import scala.util.Try
 class NotificationMessageReceiver @Inject()(
   messageWriter: MessageWriter[UnidentifiedWork],
   s3Client: AmazonS3,
-  s3Config: S3Config,
-  metricsSender: MetricsSender)(
+  s3Config: S3Config)(
   implicit miroTransformableStore: ObjectStore[MiroTransformable],
   calmTransformableStore: ObjectStore[CalmTransformable],
   sierraTransformableStore: ObjectStore[SierraTransformable],
