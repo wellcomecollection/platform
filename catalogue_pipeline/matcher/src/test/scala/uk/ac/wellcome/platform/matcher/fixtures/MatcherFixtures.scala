@@ -19,7 +19,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
-import uk.ac.wellcome.platform.matcher.lockable.{
+import uk.ac.wellcome.platform.matcher.locking.{
   DynamoLockingService,
   DynamoLockingServiceConfig,
   DynamoRowLockDao,

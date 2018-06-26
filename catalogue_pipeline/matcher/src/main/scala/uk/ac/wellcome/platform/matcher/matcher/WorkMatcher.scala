@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.matcher.lockable.{
+import uk.ac.wellcome.platform.matcher.locking.{
   DynamoLockingService,
   FailedLockException,
   FailedUnlockException

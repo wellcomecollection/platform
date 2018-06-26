@@ -12,7 +12,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
