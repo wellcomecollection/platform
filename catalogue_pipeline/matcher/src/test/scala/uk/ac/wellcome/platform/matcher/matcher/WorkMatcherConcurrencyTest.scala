@@ -33,12 +33,11 @@ class WorkMatcherConcurrencyTest
 
                     val workA = anUnidentifiedSierraWork.copy(
                       sourceIdentifier = identifierA,
-                      identifiers = List(identifierA, identifierB)
+                      otherIdentifiers = List(identifierB)
                     )
 
                     val workB = anUnidentifiedSierraWork.copy(
-                      sourceIdentifier = identifierB,
-                      identifiers = List(identifierB)
+                      sourceIdentifier = identifierB
                     )
 
                     val eventualResultA = workMatcher.matchWork(workA)

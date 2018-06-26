@@ -19,7 +19,7 @@ module "es_ingest_queue" {
   topic_names = ["${module.es_ingest_topic.name}"]
 
   visibility_timeout_seconds = 30
-  max_receive_count          = 3
+  max_receive_count          = 5
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
