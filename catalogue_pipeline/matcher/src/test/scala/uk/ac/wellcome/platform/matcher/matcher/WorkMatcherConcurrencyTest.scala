@@ -5,6 +5,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.MatcherResult
+import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,7 +34,7 @@ class WorkMatcherConcurrencyTest
 
                     val workA = anUnidentifiedSierraWork.copy(
                       sourceIdentifier = identifierA,
-                      otherIdentifiers = List(identifierB)
+                      mergeCandidates = List(MergeCandidate(identifierB))
                     )
 
                     val workB = anUnidentifiedSierraWork.copy(

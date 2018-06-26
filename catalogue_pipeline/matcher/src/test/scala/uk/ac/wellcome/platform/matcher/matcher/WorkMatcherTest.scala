@@ -14,6 +14,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier,
   WorkNode
 }
+import uk.ac.wellcome.models.work.internal.MergeCandidate
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.lockable.{
   DynamoRowLockDao,
@@ -76,7 +77,7 @@ class WorkMatcherTest
                 val identifierB = aSierraSourceIdentifier("B")
                 val work = anUnidentifiedSierraWork.copy(
                   sourceIdentifier = identifierA,
-                  otherIdentifiers = List(identifierB))
+                  mergeCandidates = List(MergeCandidate(identifierB)))
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
                     MatcherResult(
@@ -140,7 +141,7 @@ class WorkMatcherTest
                 val work = anUnidentifiedSierraWork.copy(
                   sourceIdentifier = bIdentifier,
                   version = 2,
-                  otherIdentifiers = List(cIdentifier))
+                  mergeCandidates = List(MergeCandidate(cIdentifier)))
 
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
@@ -243,7 +244,7 @@ class WorkMatcherTest
 
                     val work = anUnidentifiedSierraWork.copy(
                       sourceIdentifier = identifierA,
-                      otherIdentifiers = List(identifierB)
+                      mergeCandidates = List(MergeCandidate(identifierB))
                     )
                     val failedLock = for {
                       _ <- rowLockDao.lockRow(

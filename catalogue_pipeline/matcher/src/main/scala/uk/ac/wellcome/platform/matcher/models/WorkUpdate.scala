@@ -9,8 +9,10 @@ case class WorkUpdate(workId: String,
 case object WorkUpdate {
   def apply(work: UnidentifiedWork): WorkUpdate = {
     val id = identifierToString(work.sourceIdentifier)
-    val referencedWorkIds = work.identifiers
-      .map { identifierToString(_) }
+    val referencedWorkIds = work.mergeCandidates
+      .map { mergeCandidate =>
+        identifierToString(mergeCandidate.identifier)
+      }
       .filterNot { _ == id }
       .toSet
 

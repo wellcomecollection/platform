@@ -12,7 +12,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.{MergeCandidate, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -66,7 +66,7 @@ class MatcherMessageReceiverTest
             val workAv1 =
               anUnidentifiedSierraWork.copy(
                 sourceIdentifier = aIdentifier,
-                otherIdentifiers = List(bIdentifier))
+                mergeCandidates = List(MergeCandidate(bIdentifier)))
             // Work Av1 matched to B (before B exists hence version 0)
             // need to match to works that do not exist to support
             // bi-directionally matched works without deadlocking (A->B, B->A)
@@ -127,7 +127,7 @@ class MatcherMessageReceiverTest
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
-              otherIdentifiers = List(bIdentifier))
+              mergeCandidates = List(MergeCandidate(bIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workAv2,
@@ -157,7 +157,7 @@ class MatcherMessageReceiverTest
             val workBv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = bIdentifier,
               version = 2,
-              otherIdentifiers = List(cIdentifier))
+              mergeCandidates = List(MergeCandidate(cIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workBv2,
@@ -213,7 +213,7 @@ class MatcherMessageReceiverTest
             val workAv2MatchedToB = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
-              otherIdentifiers = List(bIdentifier))
+              mergeCandidates = List(MergeCandidate(bIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workAv2MatchedToB,
