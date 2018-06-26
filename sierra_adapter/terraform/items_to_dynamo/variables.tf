@@ -4,12 +4,6 @@ variable "demultiplexer_topic_name" {}
 variable "cluster_name" {}
 variable "vpc_id" {}
 
-variable "alb_listener_http_arn" {}
-variable "alb_listener_https_arn" {}
-variable "alb_server_error_alarm_arn" {}
-variable "alb_client_error_alarm_arn" {}
-variable "alb_cloudwatch_id" {}
-
 variable "dlq_alarm_arn" {}
 variable "lambda_error_alarm_arn" {}
 
@@ -20,3 +14,10 @@ variable "aws_region" {
 variable "account_id" {}
 
 variable "infra_bucket" {}
+
+variable "subnets" {
+  type = "list"
+}
+variable "namespace_id" {}
+variable "interservice_security_group_id" {}
+variable "service_egress_security_group_id" {}
