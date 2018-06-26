@@ -58,8 +58,8 @@ module "matcher_queue" {
   topic_names = ["${module.recorded_works_topic.name}"]
 
   // The records in the locktable expire after 3 minutes
-  // The matcher is abkle to override locks that have expired
-  // Wait slightly longer to make sure locks are axpired
+  // The matcher is able to override locks that have expired
+  // Wait slightly longer to make sure locks are expired
   visibility_timeout_seconds = 210
   max_receive_count          = 5
 
