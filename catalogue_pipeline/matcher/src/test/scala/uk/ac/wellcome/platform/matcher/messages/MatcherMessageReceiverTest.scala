@@ -123,7 +123,7 @@ class MatcherMessageReceiverTest
             val workAv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
-              otherIdentifiers = List(bIdentifier))
+              mergeCandidates = List(MergeCandidate(bIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workAv2,
@@ -153,7 +153,7 @@ class MatcherMessageReceiverTest
             val workBv2 = anUnidentifiedSierraWork.copy(
               sourceIdentifier = bIdentifier,
               version = 2,
-              otherIdentifiers = List(cIdentifier))
+              mergeCandidates = List(MergeCandidate(cIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workBv2,
@@ -209,7 +209,7 @@ class MatcherMessageReceiverTest
             val workAv2MatchedToB = anUnidentifiedSierraWork.copy(
               sourceIdentifier = aIdentifier,
               version = 2,
-              otherIdentifiers = List(bIdentifier))
+              mergeCandidates = List(MergeCandidate(bIdentifier)))
 
             processAndAssertMatchedWorkIs(
               workAv2MatchedToB,
