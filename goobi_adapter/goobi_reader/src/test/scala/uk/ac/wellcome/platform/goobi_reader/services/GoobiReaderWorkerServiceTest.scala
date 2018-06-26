@@ -323,7 +323,10 @@ class GoobiReaderWorkerServiceTest
       withLocalSqsQueueAndDlq {
         case queuePair @ QueuePair(queue, dlq) =>
           withMockMetricSender { mockMetricsSender =>
-            withSQSStream[NotificationMessage, R](actorSystem, queue, mockMetricsSender) { sqsStream =>
+            withSQSStream[NotificationMessage, R](
+              actorSystem,
+              queue,
+              mockMetricsSender) { sqsStream =>
               withS3StreamStoreFixtures {
                 case (bucket, table, vhs) =>
                   new GoobiReaderWorkerService(
