@@ -13,7 +13,7 @@ module "palette_service" {
 
   lb_listener_arn = "${aws_alb_listener.http_80.arn}"
   vpc_id          = "${var.vpc_id}"
-  container_image = "harrisonpim/palette:v1"
+  container_image = "harrisonpim/palette:v2"
   ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
   vpc_cidr_block  = "${var.vpc_cidr_block}"
   subnets         = "${var.private_subnets}"
