@@ -38,6 +38,7 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.hashing.MurmurHash3
 
 trait MatcherFixtures
     extends Akka
@@ -200,6 +201,12 @@ trait MatcherFixtures
       title = Some("WorkTitle"),
       version = 1
     )
+  }
+
+  def ciHash(str: String): String = {
+    MurmurHash3
+      .stringHash(str, MurmurHash3.stringSeed)
+      .toHexString
   }
 
   def aRowLock(id: String, contextId: String) = {
