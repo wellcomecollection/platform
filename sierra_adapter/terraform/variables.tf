@@ -19,3 +19,10 @@ variable "sierra_bibs_fields" {}
 variable "sierra_items_fields" {}
 
 variable "infra_bucket" {}
+variable "namespace" {
+  default = "sierra-adapter"
+}
+
+variable "vps_cidr_block" {
+  default = "20.60.0.0/16"
+}
