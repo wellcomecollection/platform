@@ -61,7 +61,8 @@ module "matcher_queue" {
   // The matcher is able to override locks that have expired
   // Wait slightly longer to make sure locks are expired
   visibility_timeout_seconds = 210
-  max_receive_count          = 5
+
+  max_receive_count = 5
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }

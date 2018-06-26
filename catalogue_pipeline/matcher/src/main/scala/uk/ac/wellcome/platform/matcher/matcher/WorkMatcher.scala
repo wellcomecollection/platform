@@ -3,9 +3,18 @@ package uk.ac.wellcome.platform.matcher.matcher
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier,
+  WorkNode
+}
 import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoLockingService, FailedLockException, FailedUnlockException}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoLockingService,
+  FailedLockException,
+  FailedUnlockException
+}
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 import uk.ac.wellcome.platform.matcher.workgraph.WorkGraphUpdater
@@ -45,7 +54,6 @@ class WorkMatcher @Inject()(
       updatedGraph = WorkGraphUpdater.update(update, graphBeforeUpdate)
       _ <- lockingService.withLocks(
         graphBeforeUpdate.nodes.map(_.id) -- updateAffectedIdentifiers)(
-
         workGraphStore.put(updatedGraph)
       )
     } yield {

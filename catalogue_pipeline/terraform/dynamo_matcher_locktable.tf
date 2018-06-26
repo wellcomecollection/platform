@@ -24,7 +24,7 @@ resource "aws_dynamodb_table" "matcher_lock_table" {
 
   ttl {
     attribute_name = "expires"
-    enabled = true
+    enabled        = true
   }
 
   lifecycle {

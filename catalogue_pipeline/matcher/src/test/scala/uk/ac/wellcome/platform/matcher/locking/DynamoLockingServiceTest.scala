@@ -8,7 +8,12 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.lockable.{DynamoRowLockDao, FailedLockException, FailedUnlockException, RowLock}
+import uk.ac.wellcome.platform.matcher.lockable.{
+  DynamoRowLockDao,
+  FailedLockException,
+  FailedUnlockException,
+  RowLock
+}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
 
 import scala.collection.immutable
@@ -46,17 +51,19 @@ class DynamoLockingServiceTest
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         val mockDynamoRowLockDao = mock[DynamoRowLockDao]
-        withLockingService(mockDynamoRowLockDao, mockMetricsSender) { lockingService =>
-          var callbackCalled = false
-          val lockedDuringCallback = lockingService.withLocks(Set.empty)(Future {
-            callbackCalled = true
-          })
-          whenReady(lockedDuringCallback) { _ =>
-            callbackCalled shouldBe true
-            verifyZeroInteractions(mockDynamoRowLockDao)
-            assertNoRowLocks(lockTable)
-            assertDoesNotIncrementFailedLockCount(mockMetricsSender)
-          }
+        withLockingService(mockDynamoRowLockDao, mockMetricsSender) {
+          lockingService =>
+            var callbackCalled = false
+            val lockedDuringCallback =
+              lockingService.withLocks(Set.empty)(Future {
+                callbackCalled = true
+              })
+            whenReady(lockedDuringCallback) { _ =>
+              callbackCalled shouldBe true
+              verifyZeroInteractions(mockDynamoRowLockDao)
+              assertNoRowLocks(lockTable)
+              assertDoesNotIncrementFailedLockCount(mockMetricsSender)
+            }
         }
       }
     }

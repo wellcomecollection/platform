@@ -24,7 +24,10 @@ class DynamoLockingService @Inject()(
     }
   }
 
-  private def executeWithLocks[T](ids: Set[String], f: => Future[T], contextGuid: String, identifiers: Set[Identifier]) = {
+  private def executeWithLocks[T](ids: Set[String],
+                                  f: => Future[T],
+                                  contextGuid: String,
+                                  identifiers: Set[Identifier]) = {
     debug(s"Locking ids $ids in context $contextGuid")
     val eventuallyExecutedWithLock = for {
       _ <- Future.sequence(

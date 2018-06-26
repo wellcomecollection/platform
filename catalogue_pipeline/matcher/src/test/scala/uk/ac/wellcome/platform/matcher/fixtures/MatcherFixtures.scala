@@ -139,9 +139,8 @@ trait MatcherFixtures
     testWith(workMatcher)
   }
 
-  def withDynamoRowLockDao[R](
-    dynamoDbClient: AmazonDynamoDB,
-    lockTable: Table)(testWith: TestWith[DynamoRowLockDao, R]): R = {
+  def withDynamoRowLockDao[R](dynamoDbClient: AmazonDynamoDB, lockTable: Table)(
+    testWith: TestWith[DynamoRowLockDao, R]): R = {
     val dynamoRowLockDao = new DynamoRowLockDao(
       dynamoDbClient,
       DynamoLockingServiceConfig(lockTable.name, lockTable.index))

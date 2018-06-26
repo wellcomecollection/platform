@@ -34,16 +34,15 @@ class DynamoRowLockDaoTest
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(lockTable) { dynamoRowLockDao =>
         val id = Random.nextString(32)
-        whenReady(dynamoRowLockDao.lockRow(Identifier(id), contextId)) {
-          lock =>
-            lock.id shouldBe id
+        whenReady(dynamoRowLockDao.lockRow(Identifier(id), contextId)) { lock =>
+          lock.id shouldBe id
 
-            val actualStored =
-              Scanamo.get[RowLock](dynamoDbClient)(lockTable.name)('id -> id)
-            actualStored.get match {
-              case Right(storedRowLock) => storedRowLock.id shouldBe id
-              case Left(failed) => fail(s"failed to get rowLocks $failed")
-            }
+          val actualStored =
+            Scanamo.get[RowLock](dynamoDbClient)(lockTable.name)('id -> id)
+          actualStored.get match {
+            case Right(storedRowLock) => storedRowLock.id shouldBe id
+            case Left(failed)         => fail(s"failed to get rowLocks $failed")
+          }
         }
       }
     }
@@ -85,8 +84,7 @@ class DynamoRowLockDaoTest
             val expiryTimeInThePast =
               Instant.now().minus(Duration.ofSeconds(1))
             val updatedRowLock = rowLock.copy(expires = expiryTimeInThePast)
-            Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(
-              updatedRowLock)
+            Scanamo.put[RowLock](dynamoDbClient)(lockTable.name)(updatedRowLock)
         }
         whenReady(dynamoRowLockDao.lockRow(Identifier(id), contextId)) {
           thirdLock =>
@@ -154,8 +152,7 @@ class DynamoRowLockDaoTest
     }
   }
 
-  it(
-    "throws FailedUnlockException if there is a problem deleting the lock") {
+  it("throws FailedUnlockException if there is a problem deleting the lock") {
     val mockClient = mock[AmazonDynamoDB]
     withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
       withDynamoRowLockDao(mockClient, lockTable) { dynamoRowLockDao =>
@@ -201,7 +198,7 @@ class DynamoRowLockDaoTest
             })
 
           whenReady(Future.sequence(eventualLocks)) { locksAttempts =>
-            locksAttempts.collect { case a: RowLock => a }.size shouldBe 1
+            locksAttempts.collect { case a: RowLock             => a }.size shouldBe 1
             locksAttempts.collect { case a: FailedLockException => a }.size shouldBe expectedFailedLockCount
           }
 
