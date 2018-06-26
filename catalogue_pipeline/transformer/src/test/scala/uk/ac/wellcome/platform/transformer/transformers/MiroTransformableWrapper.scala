@@ -11,7 +11,9 @@ import uk.ac.wellcome.models.work.internal.UnidentifiedWork
   *  fields before transformation, allowing tests to focus on only the fields
   *  that are interesting for that test.
   */
-trait MiroTransformableWrapper extends Matchers { this: Suite =>
+trait MiroTransformableWrapper
+    extends Matchers
+    with TransformableTestBase[MiroTransformable] { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String =
@@ -34,10 +36,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       data = buildJSONForWork(data)
     )
 
-    val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
-    if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
-    triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get.get
+    transformToWork(miroTransformable)
   }
 
   def assertTransformWorkFails(
@@ -50,8 +49,7 @@ trait MiroTransformableWrapper extends Matchers { this: Suite =>
       MiroCollection = MiroCollection,
       data = buildJSONForWork(data)
     )
-    transformer
-      .transform(miroTransformable, version = 1)
-      .isSuccess shouldBe false
+
+    assertTransformToWorkFails(miroTransformable)
   }
 }

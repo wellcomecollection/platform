@@ -17,7 +17,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
-    with SierraData {
+    with SierraData
+    with TransformableTestBase[SierraTransformable] {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
@@ -576,13 +577,6 @@ class SierraTransformableTransformerTest
       maybeBibData = Some(bibRecord)
     )
 
-    val triedMaybeWork = transformer.transform(
-      transformable = sierraTransformable,
-      version = 1
-    )
-
-    if (triedMaybeWork.isFailure) triedMaybeWork.failed.get.printStackTrace()
-    triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get.get
+    transformToWork(sierraTransformable)
   }
 }
