@@ -27,13 +27,15 @@ trait Work extends MultipleSourceIdentifiers {
   val visible: Boolean
 
   val ontologyType: String
+  val redirect: Option[IdentityState[None.type]]
 }
 
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
+  version: Int,
+  title: Option[String],
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-  title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -48,9 +50,9 @@ case class UnidentifiedWork(
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   items: List[UnidentifiedItem] = Nil,
-  version: Int,
   visible: Boolean = true,
-  ontologyType: String = "Work")
+  ontologyType: String = "Work",
+  redirect: Option[Identifiable[None.type]] = None)
     extends Work
 
 case class IdentifiedWork(
@@ -75,5 +77,6 @@ case class IdentifiedWork(
   items: List[IdentifiedItem] = Nil,
   version: Int,
   visible: Boolean = true,
-  ontologyType: String = "Work")
+  ontologyType: String = "Work",
+  redirect: Option[Identified[None.type]] = None)
     extends Work
