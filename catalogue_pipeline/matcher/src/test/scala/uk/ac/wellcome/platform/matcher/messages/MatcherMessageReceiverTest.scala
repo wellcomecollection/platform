@@ -6,13 +6,9 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.{MergeCandidate, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -66,7 +62,7 @@ class MatcherMessageReceiverTest
             val workAv1 =
               anUnidentifiedSierraWork.copy(
                 sourceIdentifier = aIdentifier,
-                otherIdentifiers = List(bIdentifier))
+                mergeCandidates = List(MergeCandidate(bIdentifier)))
             // Work Av1 matched to B (before B exists hence version 0)
             // need to match to works that do not exist to support
             // bi-directionally matched works without deadlocking (A->B, B->A)
