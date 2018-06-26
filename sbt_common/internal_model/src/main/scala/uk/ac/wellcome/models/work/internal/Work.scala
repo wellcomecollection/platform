@@ -1,5 +1,12 @@
 package uk.ac.wellcome.models.work.internal
 
+object Work {
+  type Redirect = IdentityState[Nothing]
+  type IdentifiedRedirect = Identified[Nothing]
+  type IdentifiableRedirect = Identifiable[Nothing]
+}
+
+import Work._
 /** A representation of a work in our ontology */
 trait Work extends MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
@@ -27,7 +34,7 @@ trait Work extends MultipleSourceIdentifiers {
   val visible: Boolean
 
   val ontologyType: String
-  val redirect: Option[IdentityState[Nothing]]
+  val redirect: Option[Redirect]
 }
 
 case class UnidentifiedWork(
@@ -52,7 +59,7 @@ case class UnidentifiedWork(
   items: List[UnidentifiedItem] = Nil,
   visible: Boolean = true,
   ontologyType: String = "Work",
-  redirect: Option[Identifiable[Nothing]] = None)
+  redirect: Option[IdentifiableRedirect] = None)
     extends Work
 
 case class IdentifiedWork(
@@ -78,5 +85,5 @@ case class IdentifiedWork(
   version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work",
-  redirect: Option[Identified[Nothing]] = None)
+  redirect: Option[IdentifiedRedirect] = None)
     extends Work
