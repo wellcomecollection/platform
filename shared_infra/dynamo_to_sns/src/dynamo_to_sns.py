@@ -3,6 +3,7 @@
 Receives DynamoDB events and publishes the event to an SNS topic.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import os
 
 import boto3
@@ -47,13 +48,17 @@ def main(event, _ctxt=None, sns_client=None):
 
     sns_client = sns_client or boto3.client('sns')
 
-    for message in get_sns_messages(
-        trigger_event=event,
-        stream_view_type=stream_view_type
-    ):
+    def send(message):
         publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
             message=message,
             subject=f'source: dynamo_to_sns ({topic_name})'
         )
+
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        for message in get_sns_messages(
+            trigger_event=event,
+            stream_view_type=stream_view_type
+        ):
+            executor.submit(send, message)
