@@ -30,8 +30,8 @@ Here are some guidelines that we follow internally when submitting PRs:
 
 - Open PRs as early as possible to provide visibility of work
 - PRs not ready for final review should be prefixed "[WIP]"
-- Developers should assign themselves to PRs they are working on
-- PRs should only be approved by someone who has not contributed to the changes
+- Developers should assign themselves to PRs they have contributed code changes to
+- PRs should only be approved by someone who has not contributed code changes
 - PRs should be merged by the assignees of a PR
 - RFC PRs should be approved by all non-contributing developers in the digital platform team in order to be merged
 - Developers assigned to a PR are responsible for deploying their changes after a merge
