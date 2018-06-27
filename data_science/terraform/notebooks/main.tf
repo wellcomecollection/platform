@@ -12,6 +12,8 @@ module "p2_compute" {
 
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"
+
+  controlled_access_cidr_ingress = ["${var.controlled_access_cidr_ingress}"]
 }
 
 module "t2_compute" {
@@ -27,4 +29,6 @@ module "t2_compute" {
 
   vpc_id      = "${var.vpc_id}"
   subnet_list = "${var.subnets}"
+
+  controlled_access_cidr_ingress = ["${var.controlled_access_cidr_ingress}"]
 }

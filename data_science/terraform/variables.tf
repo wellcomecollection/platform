@@ -11,3 +11,7 @@ variable "vpc_cidr_block" {
 variable "namespace" {
   default = "datascience"
 }
+
+variable "admin_cidr_ingress" {
+  type = "list"
+}

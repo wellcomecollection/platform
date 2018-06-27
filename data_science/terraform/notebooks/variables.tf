@@ -23,3 +23,7 @@ variable "subnets" {
   type    = "list"
   default = []
 }
+
+variable "controlled_access_cidr_ingress" {
+  type    = "list"
+}

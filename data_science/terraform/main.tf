@@ -13,6 +13,8 @@ module "harrison_pim_notebook" {
   vpc_cidr_block = "${var.vpc_cidr_block}"
   subnets        = "${module.network.public_subnets}"
   vpc_id         = "${module.network.vpc_id}"
+
+  controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
 }
 
 module "labs" {
