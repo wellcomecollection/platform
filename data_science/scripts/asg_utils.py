@@ -26,7 +26,7 @@ def discover_asg(asg_client, tag_name):
     for asg_data in resp['AutoScalingGroups']:
         actual_tags = {t['Key']: t['Value'] for t in asg_data['Tags']}
 
-        if actual_tags.get('name') == tag_name:
+        if actual_tags.get('Name') == tag_name:
             return asg_data
 
     sys.exit("Can't find an ASG with name %r!" % tag_name)
