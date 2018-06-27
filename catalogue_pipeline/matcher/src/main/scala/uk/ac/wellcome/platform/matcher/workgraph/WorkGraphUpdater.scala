@@ -4,7 +4,11 @@ import grizzled.slf4j.Logging
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{VersionConflictException, WorkGraph, WorkUpdate}
+import uk.ac.wellcome.platform.matcher.models.{
+  VersionConflictException,
+  WorkGraph,
+  WorkUpdate
+}
 
 import scala.collection.immutable.Iterable
 import scala.util.hashing.MurmurHash3

@@ -13,11 +13,11 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
   // works comprised of linked works are identified by compound id together with their linked works.
   // A+B:(A->B, B) means compound work with id "A+B" is made of work A linked to B and work B.
 
-  private val hashed_A    = "217b21f3" // ciHash("A")
-  private val hashed_B    = "4d7e95ff" // ciHash("B")
-  private val hashed_C    = "8171cb29" // ciHash("C")
-  private val hashed_AB   = "2f2f1575" // ciHash("A+B")
-  private val hashed_ABC  = "45e72cb2" // ciHash("A+B+C")
+  private val hashed_A = "217b21f3" // ciHash("A")
+  private val hashed_B = "4d7e95ff" // ciHash("B")
+  private val hashed_C = "8171cb29" // ciHash("C")
+  private val hashed_AB = "2f2f1575" // ciHash("A+B")
+  private val hashed_ABC = "45e72cb2" // ciHash("A+B+C")
   private val hashed_ABCD = "73200083" // ciHash("A+B+C+D")
 
   describe("Adding links without existing works") {
@@ -77,9 +77,9 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
               WorkNode("B", 1, Nil, "A+B")))
         )
         .nodes shouldBe Set(
-          WorkNode("A", 2, List("B"), hashed_AB),
-          WorkNode("B", 1, List(), hashed_AB)
-        )
+        WorkNode("A", 2, List("B"), hashed_AB),
+        WorkNode("B", 1, List(), hashed_AB)
+      )
     }
 
     it("updating A->B, B, C with B->C gives A+B+C:(A->B, B->C, C)") {
@@ -134,7 +134,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
         .nodes shouldBe
         Set(
           WorkNode("A", 2, List("B"), hashed_ABCD),
-          WorkNode("B", 2, List("C", "D"),hashed_ABCD),
+          WorkNode("B", 2, List("C", "D"), hashed_ABCD),
           WorkNode("C", 1, List(), hashed_ABCD),
           WorkNode("D", 1, List(), hashed_ABCD)
         )
@@ -200,7 +200,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
               WorkNode("C", 1, Nil, "A+B+C")))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, List("B"),hashed_AB),
+        WorkNode("A", 2, List("B"), hashed_AB),
         WorkNode("B", 3, Nil, hashed_AB),
         WorkNode("C", 1, Nil, hashed_C)
       )
@@ -217,7 +217,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
               WorkNode("C", 1, Nil, "A+B+C")))
         )
         .nodes shouldBe Set(
-        WorkNode("A", 2, List("B"),hashed_ABC),
+        WorkNode("A", 2, List("B"), hashed_ABC),
         WorkNode("B", 3, List("C"), hashed_ABC),
         WorkNode("C", 1, Nil, hashed_ABC)
       )

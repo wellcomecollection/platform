@@ -51,10 +51,11 @@ class WorkMatcherTest
 
                     val savedLinkedWork = Scanamo
                       .get[WorkNode](dynamoDbClient)(graphTable.name)(
-                      'id -> workId)
+                        'id -> workId)
                       .map(_.right.get)
 
-                    savedLinkedWork shouldBe Some(WorkNode(workId, 1, Nil, ciHash(workId)))
+                    savedLinkedWork shouldBe Some(
+                      WorkNode(workId, 1, Nil, ciHash(workId)))
                 }
             }
           }
@@ -159,17 +160,20 @@ class WorkMatcherTest
                       "sierra-system-number/A",
                       1,
                       List("sierra-system-number/B"),
-                      ciHash("sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
                     WorkNode(
                       "sierra-system-number/B",
                       2,
                       List("sierra-system-number/C"),
-                      ciHash("sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
                     WorkNode(
                       "sierra-system-number/C",
                       1,
                       Nil,
-                      ciHash("sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"))
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"))
                   )
                 }
             }
