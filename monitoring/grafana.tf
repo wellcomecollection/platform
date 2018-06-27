@@ -102,10 +102,10 @@ module "grafana_task" {
   aws_region = "${var.aws_region}"
   task_name  = "${local.namespace}_ec2_private_efs"
 
-  container_image = "grafana/grafana:4.4.3"
+  container_image = "grafana/grafana:5.2.0"
   container_port  = "3000"
 
-  efs_host_path      = "${module.ec2_efs_host.efs_host_path}"
+  efs_host_path      = "${module.ec2_efs_host.efs_host_path}/grafana"
   efs_container_path = "/var/lib/grafana"
 
   cpu    = 256
@@ -129,6 +129,9 @@ module "grafana_service" {
     "${aws_security_group.service_lb_security_group.id}",
     "${aws_security_group.service_egress_security_group.id}"
   ]
+
+  deployment_minimum_healthy_percent = "0"
+  deployment_maximum_percent         = "200"
 
   ecs_cluster_id = "${aws_ecs_cluster.monitoring.id}"
 
@@ -159,10 +162,12 @@ resource "aws_alb" "public_services" {
   security_groups = ["${aws_security_group.service_lb_security_group.id}", "${aws_security_group.external_lb_security_group.id}"]
 }
 
-resource "aws_alb_listener" "http_80" {
+resource "aws_alb_listener" "https" {
   load_balancer_arn = "${aws_alb.public_services.id}"
-  port              = "80"
-  protocol          = "HTTP"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2015-05"
+  certificate_arn   = "${data.aws_acm_certificate.certificate.arn}"
 
   default_action {
     target_group_arn = "${module.grafana_service.target_group_arn}"
@@ -170,18 +175,9 @@ resource "aws_alb_listener" "http_80" {
   }
 }
 
-resource "aws_alb_listener_rule" "path_rule_80" {
-  listener_arn = "${aws_alb_listener.http_80.arn}"
-
-  action {
-    type             = "forward"
-    target_group_arn = "${module.grafana_service.target_group_arn}"
-  }
-
-  condition {
-    field  = "path-pattern"
-    values = ["/"]
-  }
+data "aws_acm_certificate" "certificate" {
+  domain   = "monitoring.wellcomecollection.org"
+  statuses = ["ISSUED"]
 }
 
 # Security groups
@@ -234,8 +230,8 @@ resource "aws_security_group" "external_lb_security_group" {
 
   ingress {
     protocol  = "tcp"
-    from_port = 80
-    to_port   = 80
+    from_port = 443
+    to_port   = 443
 
     cidr_blocks = ["${var.admin_cidr_ingress}"]
   }
