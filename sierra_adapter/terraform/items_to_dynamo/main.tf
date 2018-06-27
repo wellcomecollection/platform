@@ -25,7 +25,7 @@ module "sierra_to_dynamo_service" {
   memory = 1024
 
   env_vars = {
-    tedemultiplexer_queue_url = "${module.demultiplexer_queue.id}"
+    demultiplexer_queue_url = "${module.demultiplexer_queue.id}"
     metrics_namespace       = "sierra_items_to_dynamo"
 
     dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
