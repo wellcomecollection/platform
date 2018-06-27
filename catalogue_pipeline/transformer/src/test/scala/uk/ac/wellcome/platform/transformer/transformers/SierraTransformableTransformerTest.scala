@@ -564,6 +564,40 @@ class SierraTransformableTransformerTest
     )
   }
 
+  it("extracts merge candidates from 776 subfield $$w") {
+    val id = "9876789"
+    val mergeCandidateBibNumber = "b21414440"
+    val data =
+      s"""
+         | {
+         |   "id": "$id",
+         |   "title": "Loosely lamenting the lemons of London",
+         |   "varFields": [
+         |     {
+         |       "fieldTag": "",
+         |       "marcTag": "776",
+         |       "ind1": " ",
+         |       "ind2": " ",
+         |       "subfields": [
+         |         {
+         |           "tag": "w",
+         |           "content": "(UkLW)$mergeCandidateBibNumber"
+         |         }
+         |       ]
+         |     }
+         |   ]
+         | }
+      """.stripMargin
+
+    val work = transformDataToWork(id = id, data = data)
+    work.mergeCandidates shouldBe List(
+      MergeCandidate(
+        SourceIdentifier(
+          IdentifierType("sierra-system-number"),
+          "Work",
+          mergeCandidateBibNumber)))
+  }
+
   private def transformDataToWork(id: String,
                                   data: String): UnidentifiedWork = {
     val bibRecord = SierraBibRecord(

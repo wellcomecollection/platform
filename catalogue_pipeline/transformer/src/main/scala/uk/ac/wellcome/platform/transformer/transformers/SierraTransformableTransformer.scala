@@ -31,6 +31,7 @@ class SierraTransformableTransformer
     with SierraDimensions
     with SierraSubjects
     with SierraGenres
+    with SierraMergeCandidates
     with Logging {
 
   override def transformForType(sierraTransformable: SierraTransformable,
@@ -65,7 +66,8 @@ class SierraTransformableTransformer
               contributors = getContributors(sierraBibData),
               dimensions = getDimensions(sierraBibData),
               subjects = getSubjects(sierraBibData),
-              genres = getGenres(sierraBibData)
+              genres = getGenres(sierraBibData),
+              mergeCandidates = getMergeCandidates(sierraBibData)
             ))
         }
       }
