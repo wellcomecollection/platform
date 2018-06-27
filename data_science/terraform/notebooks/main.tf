@@ -1,5 +1,5 @@
 module "p2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=ecs_v2"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.0.0"
   name   = "jupyter-p2"
 
   key_name    = "${var.key_name}"
@@ -17,7 +17,7 @@ module "p2_compute" {
 }
 
 module "t2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=ecs_v2"
+  source = "git::https://github.com/wellcometrust/terraform.git//ec2/prebuilt/dlami?ref=v11.0.0"
   name   = "jupyter-t2"
 
   key_name    = "${var.key_name}"
