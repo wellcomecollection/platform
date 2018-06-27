@@ -24,7 +24,7 @@ module "bibs_reader" {
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
 
-  release_id         = "${var.release_ids["sierra_reader"]}"
+  release_id = "${var.release_ids["sierra_reader"]}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${module.network.vpc_id}"
@@ -37,10 +37,10 @@ module "bibs_reader" {
   infra_bucket = "${var.infra_bucket}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets = ["${module.network.private_subnets}"]
+  subnets      = ["${module.network.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }
 
 module "bibs_merger" {
@@ -66,8 +66,8 @@ module "bibs_merger" {
   bucket_name = "${local.vhs_bucket_name}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets = ["${module.network.private_subnets}"]
+  subnets      = ["${module.network.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }

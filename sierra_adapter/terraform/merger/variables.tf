@@ -18,6 +18,7 @@ variable "bucket_name" {}
 variable "subnets" {
   type = "list"
 }
+
 variable "namespace_id" {}
 variable "interservice_security_group_id" {}
 variable "service_egress_security_group_id" {}
