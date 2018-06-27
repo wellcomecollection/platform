@@ -19,6 +19,7 @@ variable "sierra_bibs_fields" {}
 variable "sierra_items_fields" {}
 
 variable "infra_bucket" {}
+
 variable "namespace" {
   default = "sierra-adapter"
 }

@@ -24,7 +24,7 @@ module "items_reader" {
   sierra_oauth_key    = "${var.sierra_oauth_key}"
   sierra_oauth_secret = "${var.sierra_oauth_secret}"
 
-  release_id         = "${var.release_ids["sierra_reader"]}"
+  release_id = "${var.release_ids["sierra_reader"]}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${module.network.vpc_id}"
@@ -37,10 +37,10 @@ module "items_reader" {
   infra_bucket = "${var.infra_bucket}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets = ["${module.network.private_subnets}"]
+  subnets      = ["${module.network.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }
 
 module "items_to_dynamo" {
@@ -60,17 +60,17 @@ module "items_to_dynamo" {
   infra_bucket = "${var.infra_bucket}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets = ["${module.network.private_subnets}"]
+  subnets      = ["${module.network.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }
 
 module "items_merger" {
   source = "merger"
 
   resource_type = "items"
-  release_id = "${var.release_ids["sierra_item_merger"]}"
+  release_id    = "${var.release_ids["sierra_item_merger"]}"
 
   merged_dynamo_table_name = "${local.vhs_table_name}"
 
@@ -88,8 +88,8 @@ module "items_merger" {
   bucket_name = "${local.vhs_bucket_name}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets = ["${module.network.private_subnets}"]
+  subnets      = ["${module.network.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id = "${aws_security_group.interservice_security_group.id}"
+  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }

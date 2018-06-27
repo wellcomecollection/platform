@@ -1,5 +1,5 @@
 module "network" {
-  source     = "git::https://github.com/wellcometrust/terraform.git//network?ref=ecs_v2"
+  source     = "git::https://github.com/wellcometrust/terraform.git//network?ref=v11.0.0"
   name       = "sierra_adapter"
   cidr_block = "${var.vps_cidr_block}"
   az_count   = "3"
