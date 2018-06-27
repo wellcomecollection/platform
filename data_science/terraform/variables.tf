@@ -12,6 +12,4 @@ variable "namespace" {
   default = "datascience"
 }
 
-variable "admin_cidr_ingress" {
-  type = "list"
-}
+variable "admin_cidr_ingress" {}
