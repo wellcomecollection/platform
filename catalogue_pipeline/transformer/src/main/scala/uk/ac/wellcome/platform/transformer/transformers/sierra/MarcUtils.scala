@@ -22,7 +22,7 @@ trait MarcUtils {
   def getMatchingVarFields(bibData: SierraBibData,
                            marcTag: String): List[VarField] =
     bibData.varFields
-      .filter { _.marcTag == Some(marcTag) }
+      .filter { _.marcTag.contains(marcTag) }
 
   def getMatchingSubfields(bibData: SierraBibData,
                            marcTag: String,
