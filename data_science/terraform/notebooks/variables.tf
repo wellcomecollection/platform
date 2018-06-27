@@ -25,5 +25,5 @@ variable "subnets" {
 }
 
 variable "controlled_access_cidr_ingress" {
-  type    = "list"
+  type = "list"
 }
