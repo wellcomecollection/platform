@@ -1,15 +1,15 @@
+variable "key_name" {}
+
 variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "hashed_password" {
-  # The default password is 'password'
-  # To generate a new password run the following Python code:
-  #
-  # from notebook.auth import passwd
-  #   passwd()
-  #
-  default = "sha1:5310f21e370d:a4d66e725c179218638c21c03d83933aa066db2d"
+variable "vpc_cidr_block" {
+  default = "18.0.0.0/16"
 }
 
-variable "key_name" {}
+variable "namespace" {
+  default = "datascience"
+}
+
+variable "admin_cidr_ingress" {}

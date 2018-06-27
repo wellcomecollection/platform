@@ -1,30 +1,31 @@
-module "p2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//dlami_asg?ref=fix-dlami"
-  name   = "jupyter-p2"
+module "harrison_pim_notebook" {
+  source = "notebooks"
 
-  key_name    = "${var.key_name}"
-  bucket_name = "${aws_s3_bucket.jupyter.id}"
+  namespace = "noteboook"
 
-  instance_type = "p2.xlarge"
-  spot_price    = "0.5"
+  s3_bucket_name = "${aws_s3_bucket.jupyter.id}"
+  s3_bucket_arn  = "${aws_s3_bucket.jupyter.arn}"
 
-  vpc_id      = "${module.vpc.vpc_id}"
-  vpc_subnets = "${module.vpc.subnets}"
+  key_name = "${var.key_name}"
 
-  default_environment = "tensorflow_p36"
+  aws_region = "${var.aws_region}"
+
+  vpc_cidr_block = "${var.vpc_cidr_block}"
+  subnets        = "${module.network.public_subnets}"
+  vpc_id         = "${module.network.vpc_id}"
+
+  controlled_access_cidr_ingress = ["${var.admin_cidr_ingress}"]
 }
 
-module "t2_compute" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//dlami_asg?ref=fix-dlami"
-  name   = "jupyter-t2"
+module "labs" {
+  source = "labs"
 
-  key_name    = "${var.key_name}"
-  bucket_name = "${aws_s3_bucket.jupyter.id}"
+  namespace = "datalabs"
 
-  spot_price = "0.4"
+  vpc_cidr_block = "${var.vpc_cidr_block}"
 
-  vpc_id      = "${module.vpc.vpc_id}"
-  vpc_subnets = "${module.vpc.subnets}"
+  vpc_id = "${module.network.vpc_id}"
 
-  default_environment = "tensorflow_p36"
+  private_subnets = "${module.network.private_subnets}"
+  public_subnets  = "${module.network.public_subnets}"
 }
