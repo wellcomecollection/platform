@@ -11,6 +11,7 @@ import uk.ac.wellcome.platform.matcher.models.{
 }
 
 import scala.collection.immutable.Iterable
+import scala.util.hashing.MurmurHash3
 
 object WorkGraphUpdater extends Logging {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
@@ -56,17 +57,23 @@ object WorkGraphUpdater extends Logging {
       g.componentTraverser()
         .flatMap(component => {
           val nodeIds = component.nodes.map(_.value).toList
-          val componentIdentifier = nodeIds.sorted.mkString("+")
           component.nodes.map(node => {
             WorkNode(
               node.value,
               nodeVersions.getOrElse(node.value, 0),
               adjacentNodeIds(node),
-              componentIdentifier)
+              componentIdentifierHash(nodeIds))
           })
         })
         .toSet
     )
+  }
+
+  def componentIdentifierHash(nodeIds: List[String]) = {
+    val componentIdentifier = nodeIds.sorted.mkString("+")
+    MurmurHash3
+      .stringHash(componentIdentifier, MurmurHash3.stringSeed)
+      .toHexString
   }
 
   private def allNodes(linkedWork: WorkNode) = {

@@ -56,7 +56,7 @@ class WorkMatcherTest
                       .map(_.right.get)
 
                     savedLinkedWork shouldBe Some(
-                      WorkNode(workId, 1, Nil, workId))
+                      WorkNode(workId, 1, Nil, ciHash(workId)))
                 }
             }
           }
@@ -94,12 +94,12 @@ class WorkMatcherTest
                       "sierra-system-number/A",
                       1,
                       List("sierra-system-number/B"),
-                      "sierra-system-number/A+sierra-system-number/B"),
+                      ciHash("sierra-system-number/A+sierra-system-number/B")),
                     WorkNode(
                       "sierra-system-number/B",
                       0,
                       Nil,
-                      "sierra-system-number/A+sierra-system-number/B")
+                      ciHash("sierra-system-number/A+sierra-system-number/B"))
                   )
                 }
             }
@@ -161,17 +161,20 @@ class WorkMatcherTest
                       "sierra-system-number/A",
                       1,
                       List("sierra-system-number/B"),
-                      "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
                     WorkNode(
                       "sierra-system-number/B",
                       2,
                       List("sierra-system-number/C"),
-                      "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"),
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")),
                     WorkNode(
                       "sierra-system-number/C",
                       1,
                       Nil,
-                      "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
+                      ciHash(
+                        "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C"))
                   )
                 }
             }
