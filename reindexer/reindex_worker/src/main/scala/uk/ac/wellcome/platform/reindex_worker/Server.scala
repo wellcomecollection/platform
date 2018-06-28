@@ -11,8 +11,6 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
-  SNSClientModule,
-  SNSConfigModule,
   SQSClientModule,
   SQSConfigModule
 }
@@ -35,8 +33,6 @@ class Server extends HttpServer {
     DynamoConfigModule,
     SQSClientModule,
     SQSConfigModule,
-    SNSClientModule,
-    SNSConfigModule,
     S3ClientModule,
     ReindexerWorkerModule,
     AkkaModule

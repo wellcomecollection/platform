@@ -5,7 +5,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.platform.reindex_worker.models.{
   CompletedReindexJob,
@@ -33,7 +33,6 @@ class ReindexerFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDbVersioned
-    with SNS
     with SQS
     with ScalaFutures {
 
@@ -87,24 +86,20 @@ class ReindexerFeatureTest
 
   it("increases the reindexVersion on every record that needs a reindex") {
     withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalDynamoDbTable { table =>
-          val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table) ++ sqsLocalFlags(queue)
+      withLocalDynamoDbTable { table =>
+        val flags = dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(queue)
 
-          withServer(flags) { _ =>
-            val expectedRecords =
-              createReindexableData(queue, table)
+        withServer(flags) { _ =>
+          val expectedRecords =
+            createReindexableData(queue, table)
 
-            eventually {
-              val actualRecords =
-                Scanamo
-                  .scan[ReindexRecord](dynamoDbClient)(table.name)
-                  .map(_.right.get)
+          eventually {
+            val actualRecords =
+              Scanamo
+                .scan[ReindexRecord](dynamoDbClient)(table.name)
+                .map(_.right.get)
 
-              actualRecords should contain theSameElementsAs expectedRecords
-            }
+            actualRecords should contain theSameElementsAs expectedRecords
           }
         }
       }
