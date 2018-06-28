@@ -55,7 +55,6 @@ case class UnidentifiedWork(
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   items: List[Identifiable[Item]] = Nil,
-  visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
 
@@ -80,7 +79,6 @@ case class IdentifiedWork(
   dimensions: Option[String] = None,
   items: List[Identified[Item]] = Nil,
   version: Int,
-  visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
     with IdentifiedBaseWork

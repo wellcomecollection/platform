@@ -145,7 +145,6 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
   val rootIndexFields: Seq[FieldDefinition with Product with Serializable] =
     Seq(
       keywordField("canonicalId"),
-      booleanField("visible"),
       keywordField("ontologyType"),
       intField("version"),
       sourceIdentifier,

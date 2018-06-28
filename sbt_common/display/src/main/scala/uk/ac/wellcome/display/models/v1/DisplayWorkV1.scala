@@ -105,13 +105,6 @@ case class DisplayWorkV1(
 case object DisplayWorkV1 {
   def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV1 = {
 
-    if (!work.visible) {
-      throw GracefulFailureException(
-        new RuntimeException(
-          s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
-        ))
-    }
-
     // The "production" field on work contains information that should go
     // into the publisher-specific fields.
     //

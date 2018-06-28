@@ -244,22 +244,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     displayWork.subjects shouldBe expectedSubjects
   }
 
-  it("gives a helpful error if you try to convert a work with visible=False") {
-    val work = IdentifiedWork(
-      canonicalId = "xpudrscx",
-      title = "Invisible igloos improve iguanas",
-      sourceIdentifier = sourceIdentifier,
-      visible = false,
-      version = 1
-    )
-
-    val caught = intercept[GracefulFailureException] {
-      DisplayWorkV1(work)
-    }
-
-    caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
-  }
-
   it("errors if you try to convert a work with non-empty production field") {
     val work = IdentifiedWork(
       canonicalId = "pejk5skd",
