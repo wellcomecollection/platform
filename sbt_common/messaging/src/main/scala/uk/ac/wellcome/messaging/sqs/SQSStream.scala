@@ -107,13 +107,13 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     processMessageFuture.failed.foreach {
       case exception: GracefulFailureException =>
         logger.warn(
-          s"Graceful failure processing message: ${exception.getMessage}")
+          s"Graceful failure processing $message: ${exception.getMessage}")
       case exception: DynamoNonFatalException =>
         logger.warn(
-          s"Non-fatal DynamoDB error processing message: ${exception.getMessage}")
+          s"Non-fatal DynamoDB error processing $message: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
-          s"Unrecognised failure while processing message: ${exception.getMessage}",
+          s"Unrecognised failure while processing $message: ${exception.getMessage}",
           exception)
     }
     processMessageFuture
