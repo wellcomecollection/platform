@@ -128,10 +128,11 @@ class SierraTransformableTransformerTest
       )
     )
 
-    work.items.head shouldBe UnidentifiedItem(
+    work.items.head shouldBe Identifiable(
       sourceIdentifier = expectedSourceIdentifier,
       otherIdentifiers = expectedOtherIdentifiers,
-      locations = List(PhysicalLocation(locationType, locationLabel)))
+      agent = Item(
+      locations = List(PhysicalLocation(locationType, locationLabel))))
   }
 
   it("should not perform a transformation without bibData") {

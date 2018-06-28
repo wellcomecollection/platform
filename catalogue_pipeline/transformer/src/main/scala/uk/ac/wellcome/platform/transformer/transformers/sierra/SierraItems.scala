@@ -2,12 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.work.internal
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedItem
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -31,17 +26,16 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
       .flatten
   }
 
-  def transformItemData(sierraItemData: SierraItemData): UnidentifiedItem = {
+  def transformItemData(sierraItemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform ${sierraItemData.id}")
-    internal.UnidentifiedItem(
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        value = addCheckDigit(
-          sierraItemData.id,
-          recordType = SierraRecordTypes.items
-        )
-      ),
+    Identifiable(sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      ontologyType = "Item",
+      value = addCheckDigit(
+        sierraItemData.id,
+        recordType = SierraRecordTypes.items
+      )
+    ),
       otherIdentifiers = List(
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
@@ -49,12 +43,13 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
           value = sierraItemData.id
         )
       ),
+      agent = Item(
       locations = getLocation(sierraItemData).toList
-    )
+    ))
   }
 
   def getItems(
-    sierraTransformable: SierraTransformable): List[UnidentifiedItem] = {
+    sierraTransformable: SierraTransformable): List[Identifiable[Item]] = {
     extractItemData(sierraTransformable)
       .filterNot { _.deleted }
       .map(transformItemData)

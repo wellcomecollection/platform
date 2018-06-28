@@ -120,11 +120,12 @@ class DisplayWorkV2SerialisationTest
       credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
-    val item = IdentifiedItem(
+    val item = Identified(
       canonicalId = "chu27a8",
       sourceIdentifier = sourceIdentifier,
+      agent = Item(
       locations = List(location)
-    )
+    ))
     val workWithCopyright = IdentifiedWork(
       title = Some("A scarf on a squirrel"),
       sourceIdentifier = sourceIdentifier,
@@ -145,7 +146,7 @@ class DisplayWorkV2SerialisationTest
                           |     "items": [
                           |       {
                           |         "id": "${item.canonicalId}",
-                          |         "type": "${item.ontologyType}",
+                          |         "type": "${item.agent.ontologyType}",
                           |         "locations": [
                           |           {
                           |             "type": "${location.ontologyType}",
