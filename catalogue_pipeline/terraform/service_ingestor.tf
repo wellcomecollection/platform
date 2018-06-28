@@ -38,8 +38,8 @@ module "ingestor" {
     metrics_namespace   = "ingestor"
   }
 
-  memory = "2048"
-  cpu    = "512"
+  memory = 2048
+  cpu    = 1024
 
   alb_priority = 107
 
