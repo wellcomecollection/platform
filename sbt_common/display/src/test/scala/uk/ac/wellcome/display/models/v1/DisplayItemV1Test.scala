@@ -28,8 +28,8 @@ class DisplayItemV1Test extends FunSpec with Matchers {
       canonicalId = "foo",
       sourceIdentifier = identifier,
       agent = Item(
-      locations = List(location)
-    ))
+        locations = List(location)
+      ))
 
     val displayItemV1 = DisplayItemV1(
       item = item,

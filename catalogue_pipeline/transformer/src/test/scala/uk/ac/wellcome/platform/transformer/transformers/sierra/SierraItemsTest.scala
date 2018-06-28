@@ -6,7 +6,12 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
-import uk.ac.wellcome.models.work.internal.{Identifiable, IdentifierType, Item, SourceIdentifier}
+import uk.ac.wellcome.models.work.internal.{
+  Identifiable,
+  IdentifierType,
+  Item,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.transformer.source.{SierraItemData, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -100,7 +105,10 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
       val transformedItem = transformer.transformItemData(item)
-      transformedItem shouldBe Identifiable(sourceIdentifier = sourceIdentifier1, otherIdentifiers = List(sourceIdentifier2), agent = Item())
+      transformedItem shouldBe Identifiable(
+        sourceIdentifier = sourceIdentifier1,
+        otherIdentifiers = List(sourceIdentifier2),
+        agent = Item())
       transformedItem.identifiers shouldBe expectedIdentifiers
     }
 

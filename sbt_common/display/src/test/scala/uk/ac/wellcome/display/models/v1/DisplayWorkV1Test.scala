@@ -27,8 +27,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
       canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
       agent = Item(
-      locations = List()
-    ))
+        locations = List()
+      ))
     val work = IdentifiedWork(
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,

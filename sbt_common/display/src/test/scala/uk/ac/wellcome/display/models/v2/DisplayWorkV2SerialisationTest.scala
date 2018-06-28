@@ -124,8 +124,8 @@ class DisplayWorkV2SerialisationTest
       canonicalId = "chu27a8",
       sourceIdentifier = sourceIdentifier,
       agent = Item(
-      locations = List(location)
-    ))
+        locations = List(location)
+      ))
     val workWithCopyright = IdentifiedWork(
       title = Some("A scarf on a squirrel"),
       sourceIdentifier = sourceIdentifier,

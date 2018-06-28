@@ -207,15 +207,16 @@ class MiroTransformableTransformer
           "Item",
           miroId),
         agent = Item(
-        locations = List(
-          DigitalLocation(
-            locationType = LocationType("iiif-image"),
-            url = buildImageApiURL(miroId, "info"),
-            credit = getCredit(miroId = miroId, miroData = miroData),
-            license = chooseLicense(miroData.useRestrictions)
+          locations = List(
+            DigitalLocation(
+              locationType = LocationType("iiif-image"),
+              url = buildImageApiURL(miroId, "info"),
+              credit = getCredit(miroId = miroId, miroData = miroData),
+              license = chooseLicense(miroData.useRestrictions)
+            )
           )
         )
-      )))
+      ))
   }
 
   private def getCreatedDate(miroData: MiroTransformableData,
