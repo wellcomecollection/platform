@@ -140,6 +140,29 @@ def test_end_to_end_feature_test(
     assert messages[0][':message'] == expected_message
 
 
+def test_sending_lots_of_messages(sns_client, topic_arn):
+    input_event = _dynamo_event(event_name='MODIFY', new_image=NEW_IMAGE)
+
+    event = {
+        'Records': [input_event] * 50
+    }
+    for i, rec in enumerate(event['Records']):
+        rec['eventID'] = str(i)
+
+    dynamo_to_sns.main(event=event, sns_client=sns_client)
+
+    expected_message = {
+        'event_type': 'MODIFY',
+        'old_image': None,
+        'new_image': NEW_IMAGE_DATA
+    }
+
+    messages = sns_client.list_messages()
+    assert len(messages) == 50
+    assert [m[':message'] for m in messages] == [expected_message] * 50
+
+
+
 def test_invalid_stream_view_type_is_error(topic_arn):
     input_event = _dynamo_event(event_name='REMOVE', old_image=OLD_IMAGE)
     os.environ.update({'STREAM_VIEW_TYPE': 'NOTAREALSTREAMVIEWTYPE'})

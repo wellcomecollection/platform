@@ -3,6 +3,7 @@
 Receives DynamoDB events and publishes the event to an SNS topic.
 """
 
+import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 import os
 
@@ -57,8 +58,14 @@ def main(event, _ctxt=None, sns_client=None):
         )
 
     with ThreadPoolExecutor(max_workers=5) as executor:
+        futures = []
         for message in get_sns_messages(
             trigger_event=event,
             stream_view_type=stream_view_type
         ):
-            executor.submit(send, message)
+            futures.append(executor.submit(send, message))
+
+        # The send() method doesn't return anything.  If an exception is
+        # raised, this will re-raise the exception.
+        for f in concurrent.futures.as_completed(futures):
+            assert f.result() is None
