@@ -5,7 +5,7 @@ data "aws_ecs_cluster" "cluster" {
 module "sierra_merger_service" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.0.0"
 
-  service_name       = "sierra_${local.resource_type_singular}_merger_v2"
+  service_name       = "sierra_${local.resource_type_singular}_merger"
   task_desired_count = "0"
 
   container_image = "${local.container_image}"

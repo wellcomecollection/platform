@@ -3,7 +3,7 @@ resource "aws_iam_role_policy" "vhs_full_access_policy" {
   policy = "${var.vhs_full_access_policy}"
 }
 
-resource "aws_iam_role_policy" "allow_read_from_windows_q" {
+resource "aws_iam_role_policy" "allow_read_from_updates_q" {
   role   = "${module.sierra_merger_service.task_role_name}"
   policy = "${module.updates_queue.read_policy}"
 }
