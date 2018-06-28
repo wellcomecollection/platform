@@ -15,7 +15,7 @@ module "bibs_reader" {
 
   resource_type = "bibs"
 
-  bucket_name        = "${aws_s3_bucket.sierra_adapter.id}"
+  bucket_name        = "wellcomecollection-platform-adapters-sierra"//${aws_s3_bucket.sierra_adapter.id}
   windows_topic_name = "${module.bibs_window_generator.topic_name}"
 
   sierra_fields = "${var.sierra_bibs_fields}"
@@ -27,7 +27,7 @@ module "bibs_reader" {
   release_id = "${var.release_ids["sierra_reader"]}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  vpc_id       = "${module.network.vpc_id}"
+  vpc_id       = "${local.vpc_id}"
 
   dlq_alarm_arn          = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
@@ -37,7 +37,7 @@ module "bibs_reader" {
   infra_bucket = "${var.infra_bucket}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets      = ["${module.network.private_subnets}"]
+  subnets      = ["${local.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
@@ -55,7 +55,7 @@ module "bibs_merger" {
   updates_topic_name = "${module.bibs_reader.topic_name}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
-  vpc_id       = "${module.network.vpc_id}"
+  vpc_id       = "${local.vpc_id}"
 
   dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
@@ -66,7 +66,7 @@ module "bibs_merger" {
   bucket_name = "${local.vhs_bucket_name}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
-  subnets      = ["${module.network.private_subnets}"]
+  subnets      = ["${local.private_subnets}"]
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"

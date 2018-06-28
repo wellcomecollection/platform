@@ -15,7 +15,7 @@ module "items_reader" {
 
   resource_type = "items"
 
-  bucket_name        = "${aws_s3_bucket.sierra_adapter.id}"
+  bucket_name        = "wellcomecollection-platform-adapters-sierra"//${aws_s3_bucket.sierra_adapter.id}
   windows_topic_name = "${module.items_window_generator.topic_name}"
 
   sierra_fields = "${var.sierra_items_fields}"
@@ -74,7 +74,7 @@ module "items_merger" {
 
   merged_dynamo_table_name = "${local.vhs_table_name}"
 
-  updates_topic_name = "${module.bibs_reader.topic_name}"
+  updates_topic_name = "${module.items_to_dynamo.topic_name}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${module.network.vpc_id}"
