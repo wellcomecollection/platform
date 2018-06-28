@@ -60,7 +60,7 @@ def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
     ('transformer-alb-not-enough-healthy-hosts', False),
     ('grafana-alb-target-500-errors', False),
     ('IngestorWorkerService_TerminalFailure', False),
-    ('sierra_items_windows_dlq_not_empty', False),
+    ('sierra_items_windows_dlq_not_empty', True),
     ('lambda-post_to_slack-errors', False),
     ('unknown-alarm-type', False),
 ])
