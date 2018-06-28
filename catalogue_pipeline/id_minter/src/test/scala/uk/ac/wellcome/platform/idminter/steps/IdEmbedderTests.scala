@@ -193,20 +193,21 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalItem1 = Identifiable(sourceIdentifier = identifier,
+    val originalItem1 = Identifiable(
+      sourceIdentifier = identifier,
       agent = Item(
-      locations = List()
-    ))
+        locations = List()
+      ))
 
-    val originalItem2 = Identifiable(sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Item",
-      value = "1235"
-    ),
+    val originalItem2 = Identifiable(
+      sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("miro-image-number"),
+        ontologyType = "Item",
+        value = "1235"
+      ),
       agent = Item(
-      locations = List()
-    )
-    )
+        locations = List()
+      ))
 
     val originalWork = UnidentifiedWork(
       title = Some("crap"),
@@ -246,10 +247,11 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedItem1 = Identified(sourceIdentifier = originalItem1.sourceIdentifier,
+        val expectedItem1 = Identified(
+          sourceIdentifier = originalItem1.sourceIdentifier,
           canonicalId = newItemCanonicalId1,
-           agent = Item(
-          ))
+          agent = Item(
+            ))
 
         val expectedItem2 = Identified(
           sourceIdentifier = originalItem2.sourceIdentifier,

@@ -22,11 +22,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   it("correctly parses items on a work") {
-    val item = Identified(canonicalId = "c3a599u5",
+    val item = Identified(
+      canonicalId = "c3a599u5",
       sourceIdentifier = sourceIdentifier,
       agent = Item(
-      locations = List()
-    ))
+        locations = List()
+      ))
     val work = IdentifiedWork(
       title = Some("Inside an irate igloo"),
       sourceIdentifier = sourceIdentifier,
@@ -312,7 +313,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         Identified(
           canonicalId = "bksy8rkc",
           sourceIdentifier = itemSourceIdentifier,
-            agent = Item()
+          agent = Item()
         )
       ),
       subjects = List(

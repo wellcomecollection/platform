@@ -174,12 +174,13 @@ trait WorksUtil {
     canonicalId: String,
     identifier: SourceIdentifier,
     location: Location
-  ): Identified[Item] = Identified(
-    canonicalId = canonicalId,
-    sourceIdentifier = identifier,
-    agent = Item(
-    locations = List(location)
-  ))
+  ): Identified[Item] =
+    Identified(
+      canonicalId = canonicalId,
+      sourceIdentifier = identifier,
+      agent = Item(
+        locations = List(location)
+      ))
 
   def digitalLocationWith(url: String, license: License): DigitalLocation = {
     DigitalLocation(

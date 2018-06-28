@@ -28,9 +28,9 @@ class DisplayLocationsV1SerialisationTest
           canonicalId = "mhberjwy7",
           sourceIdentifier = sourceIdentifier,
           agent = Item(
-          locations = List(physicalLocation)
-        )
-      ))
+            locations = List(physicalLocation)
+          )
+        ))
     )
     val displayWork =
       DisplayWorkV1(work, includes = WorksIncludes(items = true))

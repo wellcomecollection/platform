@@ -28,14 +28,15 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
 
   def transformItemData(sierraItemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform ${sierraItemData.id}")
-    Identifiable(sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Item",
-      value = addCheckDigit(
-        sierraItemData.id,
-        recordType = SierraRecordTypes.items
-      )
-    ),
+    Identifiable(
+      sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = addCheckDigit(
+          sierraItemData.id,
+          recordType = SierraRecordTypes.items
+        )
+      ),
       otherIdentifiers = List(
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
@@ -44,8 +45,9 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
         )
       ),
       agent = Item(
-      locations = getLocation(sierraItemData).toList
-    ))
+        locations = getLocation(sierraItemData).toList
+      )
+    )
   }
 
   def getItems(

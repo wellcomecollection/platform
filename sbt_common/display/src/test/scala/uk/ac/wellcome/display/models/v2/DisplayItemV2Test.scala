@@ -24,11 +24,12 @@ class DisplayItemV2Test extends FunSpec with Matchers {
   )
 
   it("should read an Item as a DisplayItemV2 correctly") {
-    val item = Identified(canonicalId = "foo",
+    val item = Identified(
+      canonicalId = "foo",
       sourceIdentifier = identifier,
       agent = Item(
-      locations = List(location)
-    ))
+        locations = List(location)
+      ))
 
     val displayItemV2 = DisplayItemV2(
       item = item,
