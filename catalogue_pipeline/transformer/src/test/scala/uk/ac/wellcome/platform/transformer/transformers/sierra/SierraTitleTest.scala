@@ -41,6 +41,6 @@ class SierraTitleTest extends FunSpec with Matchers with SierraData {
       suppressed = false
     )
 
-    transformer.getTitle(bibData = bibData) shouldBe Some(expectedTitle)
+    transformer.getTitle(bibData = bibData) shouldBe expectedTitle
   }
 }

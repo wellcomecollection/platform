@@ -83,7 +83,7 @@ class SierraTransformerFeatureTest
                   val actualWork = get[UnidentifiedWork](snsMessage)
 
                   actualWork.sourceIdentifier shouldBe sourceIdentifier
-                  actualWork.title shouldBe Some(title)
+                  actualWork.title shouldBe title
                   actualWork.identifiers shouldBe List(
                     sourceIdentifier,
                     sierraIdentifier)

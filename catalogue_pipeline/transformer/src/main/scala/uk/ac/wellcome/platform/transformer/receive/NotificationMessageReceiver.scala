@@ -6,29 +6,20 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
-import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
-import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.models.transformable.{CalmTransformable, MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.platform.transformer.transformers.{CalmTransformableTransformer, MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
+import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 class NotificationMessageReceiver @Inject()(
-  messageWriter: MessageWriter[UnidentifiedWork],
+  messageWriter: MessageWriter[TransformedBaseWork],
   s3Client: AmazonS3,
   s3Config: S3Config)(
   implicit miroTransformableStore: ObjectStore[MiroTransformable],
@@ -79,7 +70,7 @@ class NotificationMessageReceiver @Inject()(
   private def transformTransformable(
     transformable: Transformable,
     version: Int
-  ): Try[Option[UnidentifiedWork]] = {
+  ): Try[Option[TransformedBaseWork]] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -101,7 +92,7 @@ class NotificationMessageReceiver @Inject()(
   }
 
   private def publishMessage(
-    maybeWork: Option[UnidentifiedWork]): Future[Unit] =
+    maybeWork: Option[TransformedBaseWork]): Future[Unit] =
     maybeWork.fold(Future.successful(())) { work =>
       messageWriter.write(
         work,

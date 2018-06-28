@@ -16,11 +16,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -70,7 +66,7 @@ class NotificationMessageReceiverTest
     implicit val storageBackend = new S3StorageBackend(s3Client)
 
     val messageWriter =
-      new MessageWriter[UnidentifiedWork](
+      new MessageWriter[TransformedBaseWork](
         messageConfig = messageConfig,
         snsClient = maybeSnsClient.getOrElse(snsClient),
         s3Client = s3Client
@@ -161,7 +157,7 @@ class NotificationMessageReceiverTest
               snsMessages.map { snsMessage =>
                 val actualWork = get[UnidentifiedWork](snsMessage)
 
-                actualWork.title shouldBe Some(title)
+                actualWork.title shouldBe title
                 actualWork.sourceIdentifier shouldBe sourceIdentifier
                 actualWork.version shouldBe version
                 actualWork.identifiers shouldBe List(
@@ -266,7 +262,7 @@ class NotificationMessageReceiverTest
           .toJson(
             SierraBibRecord(
               id = id,
-              data = s"""{"id": "$id"}""",
+              data = s"""{"id": "$id", "title": "A title"}""",
               modifiedDate = Instant.now))
           .get)
 

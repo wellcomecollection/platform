@@ -6,6 +6,7 @@ sealed trait BaseWork {
 }
 
 sealed trait IdentifiedBaseWork extends BaseWork
+sealed trait TransformedBaseWork extends BaseWork
 
 /** A representation of a work in our ontology */
 trait Work extends BaseWork with MultipleSourceIdentifiers {
@@ -56,7 +57,7 @@ case class UnidentifiedWork(
   dimensions: Option[String] = None,
   items: List[Identifiable[Item]] = Nil,
   ontologyType: String = "Work")
-    extends Work
+    extends Work with TransformedBaseWork
 
 case class IdentifiedWork(
   canonicalId: String,
@@ -86,7 +87,7 @@ case class IdentifiedWork(
 trait InvisibleWork extends BaseWork
 
 case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
-                                     version: Int) extends InvisibleWork
+                                     version: Int) extends InvisibleWork with TransformedBaseWork
 
 case class IdentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
                                      version: Int,

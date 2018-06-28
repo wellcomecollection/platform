@@ -65,7 +65,7 @@ class MiroTransformerFeatureTest
                   val actualWork = get[UnidentifiedWork](snsMessage)
 
                   actualWork.identifiers.head.value shouldBe miroID
-                  actualWork.title shouldBe Some(title)
+                  actualWork.title shouldBe title
                 }
               }
             }

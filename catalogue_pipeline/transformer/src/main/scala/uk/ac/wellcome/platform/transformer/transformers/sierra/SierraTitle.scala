@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
+import uk.ac.wellcome.platform.transformer.transformers.miro.ShouldNotTransformException
 
 trait SierraTitle {
 
@@ -11,5 +12,5 @@ trait SierraTitle {
   // Note: Sierra populates this field from MARC field 245 subfields $a and $b.
   // http://www.loc.gov/marc/bibliographic/bd245.html
   def getTitle(bibData: SierraBibData): String =
-    bibData.title.get
+    bibData.title.getOrElse(throw new ShouldNotTransformException("Sierra record with no title!"))
 }

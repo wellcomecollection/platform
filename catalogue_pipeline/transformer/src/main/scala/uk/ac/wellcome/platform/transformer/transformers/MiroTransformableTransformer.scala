@@ -20,8 +20,7 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-  override def transformForType(miroTransformable: MiroTransformable,
-                                version: Int): Try[Option[UnidentifiedWork]] =
+  override def transformForType = { case (miroTransformable: MiroTransformable, version: Int) =>
     Try {
       val miroData = MiroTransformableData.create(miroTransformable.data)
       val (title, description) = getTitleAndDescription(miroData)
@@ -82,6 +81,7 @@ class MiroTransformableTransformer
         }
       }
     }
+  }
 
   /*
    * Populate the title and description.  The rules are as follows:

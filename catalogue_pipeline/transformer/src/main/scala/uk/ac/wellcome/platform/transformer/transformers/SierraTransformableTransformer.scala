@@ -2,17 +2,12 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.work.internal
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.{Success, Try}
+import scala.util.Success
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
@@ -34,41 +29,44 @@ class SierraTransformableTransformer
     with SierraMergeCandidates
     with Logging {
 
-  override def transformForType(sierraTransformable: SierraTransformable,
-                                version: Int): Try[Option[UnidentifiedWork]] = {
+  override def transformForType = { case (sierraTransformable: SierraTransformable, version: Int) =>
     sierraTransformable.maybeBibData
       .map { bibData =>
         debug(s"Attempting to transform ${bibData.id}")
 
         fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-          Some(
-            internal.UnidentifiedWork(
-              title = getTitle(sierraBibData),
-              sourceIdentifier = SourceIdentifier(
-                identifierType = IdentifierType("sierra-system-number"),
-                ontologyType = "Work",
-                value = addCheckDigit(
-                  sierraBibData.id,
-                  recordType = SierraRecordTypes.bibs
-                )
-              ),
-              version = version,
-              otherIdentifiers = getOtherIdentifiers(sierraBibData),
-              workType = getWorkType(sierraBibData),
-              description = getDescription(sierraBibData),
-              physicalDescription = getPhysicalDescription(sierraBibData),
-              extent = getExtent(sierraBibData),
-              lettering = getLettering(sierraBibData),
-              items = getItems(sierraTransformable),
-//              visible = !(sierraBibData.deleted || sierraBibData.suppressed),
-              production = getProduction(sierraBibData),
-              language = getLanguage(sierraBibData),
-              contributors = getContributors(sierraBibData),
-              dimensions = getDimensions(sierraBibData),
-              subjects = getSubjects(sierraBibData),
-              genres = getGenres(sierraBibData),
-              mergeCandidates = getMergeCandidates(sierraBibData)
+          val identifier = SourceIdentifier(
+            identifierType = IdentifierType("sierra-system-number"),
+            ontologyType = "Work",
+            value = addCheckDigit(
+              sierraBibData.id,
+              recordType = SierraRecordTypes.bibs
             ))
+          if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
+            Some(
+              UnidentifiedWork(
+                title = getTitle(sierraBibData),
+                sourceIdentifier = identifier,
+                version = version,
+                otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                workType = getWorkType(sierraBibData),
+                description = getDescription(sierraBibData),
+                physicalDescription = getPhysicalDescription(sierraBibData),
+                extent = getExtent(sierraBibData),
+                lettering = getLettering(sierraBibData),
+                items = getItems(sierraTransformable),
+                //              visible = !,
+                production = getProduction(sierraBibData),
+                language = getLanguage(sierraBibData),
+                contributors = getContributors(sierraBibData),
+                dimensions = getDimensions(sierraBibData),
+                subjects = getSubjects(sierraBibData),
+                genres = getGenres(sierraBibData),
+                mergeCandidates = getMergeCandidates(sierraBibData)
+              ))
+          } else {
+            Some(UnidentifiedInvisibleWork(identifier, version))
+          }
         }
       }
       // A merged record can have both bibs and items.  If we only have
@@ -79,4 +77,5 @@ class SierraTransformableTransformer
         Success(None)
       }
   }
+
 }

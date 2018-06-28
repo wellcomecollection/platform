@@ -75,7 +75,7 @@ class CalmTransformerFeatureTest
                   val actualWork = get[UnidentifiedWork](snsMessage)
 
                   actualWork.sourceIdentifier shouldBe sourceIdentifier
-                  actualWork.title shouldBe Some("placeholder title")
+                  actualWork.title shouldBe "placeholder title"
                   actualWork.identifiers shouldBe List(sourceIdentifier)
                 }
               }
