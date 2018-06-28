@@ -7,19 +7,6 @@ case class ReindexJob(
   desiredVersion: Int
 )
 
-case class CompletedReindexJob(
-  shardId: String,
-  completedReindexVersion: Int
-)
-
-case object CompletedReindexJob {
-  def apply(reindexJob: ReindexJob): CompletedReindexJob =
-    CompletedReindexJob(
-      shardId = reindexJob.shardId,
-      completedReindexVersion = reindexJob.desiredVersion
-    )
-}
-
 case class ReindexRecord(
   id: String,
   version: Int,
