@@ -8,7 +8,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.platform.reindex_worker.models.{
-  CompletedReindexJob,
   ReindexJob,
   ReindexRecord
 }
