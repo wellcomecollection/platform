@@ -13,7 +13,7 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
 
-  val title: Option[String]
+  val title: String
   val workType: Option[WorkType]
   val description: Option[String]
   val physicalDescription: Option[String]
@@ -31,7 +31,6 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
   val items: List[IdentityState[Item]]
 
   val version: Int
-  val visible: Boolean
 
   val ontologyType: String
 }
@@ -39,7 +38,7 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
   version: Int,
-  title: Option[String],
+  title: String,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   workType: Option[WorkType] = None,
@@ -65,7 +64,7 @@ case class IdentifiedWork(
   sourceIdentifier: SourceIdentifier,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-  title: Option[String],
+  title: String,
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -86,9 +85,17 @@ case class IdentifiedWork(
     extends Work
     with IdentifiedBaseWork
 
+trait InvisibleWork extends BaseWork
+
+case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
+                                     version: Int) extends InvisibleWork
+
+case class IdentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
+                                     version: Int,
+                                   canonicalId: String) extends InvisibleWork with IdentifiedBaseWork
+
+
 trait RedirectedWork extends BaseWork {
-  val sourceIdentifier: SourceIdentifier
-  val version: Int
   val redirect: Redirect
 }
 
