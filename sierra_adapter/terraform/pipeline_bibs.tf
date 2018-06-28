@@ -41,6 +41,8 @@ module "bibs_reader" {
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
+
+  sierra_reader_ecr_repository_url = "${module.ecr_repository_sierra_reader.repository_url}"
 }
 
 module "bibs_merger" {

@@ -1,7 +1,7 @@
 resource "aws_security_group" "service_egress_security_group" {
   name        = "service_egress_security_group"
   description = "Allow traffic between services"
-  vpc_id      = "${module.network.vpc_id}"
+  vpc_id      = "${local.vpc_id}"
 
   egress {
     from_port   = 0
@@ -18,7 +18,7 @@ resource "aws_security_group" "service_egress_security_group" {
 resource "aws_security_group" "interservice_security_group" {
   name        = "interservice_security_group"
   description = "Allow traffic between services"
-  vpc_id      = "${module.network.vpc_id}"
+  vpc_id      = "${local.vpc_id}"
 
   ingress {
     from_port = 0
