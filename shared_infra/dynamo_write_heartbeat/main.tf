@@ -8,7 +8,7 @@ module "lambda_dynamo_write_heartbeat" {
   memory_size = 256
 
   environment_variables = {
-    TABLE_NAMES  = "${var.dynamo_table_names}"
+    TABLE_NAMES = "${var.dynamo_table_names}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
@@ -19,8 +19,8 @@ module "lambda_dynamo_write_heartbeat" {
 }
 
 resource "aws_cloudwatch_event_rule" "dynamo_heartbeat_scheduler_rule" {
-  name = "dynamo-heartbeat-scheduler-rule"
-  description = "Heartbeat scheduler for writes to dynamoDb"
+  name                = "dynamo-heartbeat-scheduler-rule"
+  description         = "Heartbeat scheduler for writes to dynamoDb"
   schedule_expression = "rate(10 minutes)"
 }
 
