@@ -3,11 +3,13 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>]
+Usage: trigger_reindex.py --prefix=<PREFIX> --reason=<REASON> [--count=<COUNT>]
        trigger_reindex.py -h | --help
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
+  --reason=<REASON>     An explanation of why you're running this reindex.
+                        This will be printed in the Slack alert.
   --count=<COUNT>       How many shards to create in the table
   -h --help             Print this help message
 
@@ -115,6 +117,7 @@ if __name__ == '__main__':
 
     prefix = args['--prefix']
     count = int(args['--count'] or '0')
+    reason = args['--reason']
     table_name = TABLE_NAME
 
     # We use the current timestamp for the reindex version -- this allows
