@@ -14,6 +14,8 @@ Options:
 
 """
 
+import datetime as dt
+
 import boto3
 import docopt
 import tqdm
@@ -77,19 +79,6 @@ def _count_current_shards(client, prefix, table_name):
     return best_seen
 
 
-def _get_current_max_desired_capacity(client, table_name, prefix):
-    """
-    Given a prefix, find the highest desired capacity of any reindex
-    record within that prefix.
-    """
-    best_seen = 0
-    for shard in _all_records_in_shard(client=client, table_name=table_name):
-        if not shard['shardId']['S'].startswith(prefix):
-            continue
-        best_seen = max(best_seen, int(shard['desiredVersion']['N']))
-    return best_seen
-
-
 def create_shards(client, prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
@@ -126,12 +115,9 @@ if __name__ == '__main__':
     count = int(args['--count'] or '0')
     table_name = args['--table'] or 'ReindexShardTracker'
 
-    current_max_version = _get_current_max_desired_capacity(
-        client=client,
-        table_name=table_name,
-        prefix=prefix
-    )
-    desired_version = current_max_version + 1
+    # We use the current timestamp for the reindex version -- this allows
+    # us to easily trace when a reindex was triggered.
+    desired_version = int(dt.datetime.utcnow().timestamp())
     print(f'Updating all shards in {prefix} to {desired_version}')
 
     if count == 0:
