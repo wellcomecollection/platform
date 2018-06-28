@@ -75,7 +75,7 @@ trait WorksUtil {
     canonicalId: String,
     title: String,
     otherIdentifiers: List[SourceIdentifier] = List(),
-    items: List[IdentifiedItem] = List()
+    items: List[Identified[Item]] = List()
   ): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
@@ -104,7 +104,7 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               items: List[IdentifiedItem],
+               items: List[Identified[Item]],
                visible: Boolean): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
@@ -131,7 +131,7 @@ trait WorksUtil {
                creator: Agent,
                subjects: List[Subject[Displayable[AbstractConcept]]],
                genres: List[Genre[Displayable[AbstractConcept]]],
-               items: List[IdentifiedItem],
+               items: List[Identified[Item]],
                visible: Boolean): IdentifiedWork =
     IdentifiedWork(
       title = Some(title),
@@ -151,13 +151,11 @@ trait WorksUtil {
       visible = visible
     )
 
-  def defaultItem: IdentifiedItem = {
-    itemWith(
-      "item-canonical-id",
-      defaultItemSourceIdentifier,
-      defaultLocation
-    )
-  }
+  def defaultItem: Identified[Item] = itemWith(
+    "item-canonical-id",
+    defaultItemSourceIdentifier,
+    defaultLocation
+  )
 
   def defaultItemSourceIdentifier = {
     SourceIdentifier(
@@ -176,11 +174,12 @@ trait WorksUtil {
     canonicalId: String,
     identifier: SourceIdentifier,
     location: Location
-  ): IdentifiedItem = IdentifiedItem(
+  ): Identified[Item] = Identified(
     canonicalId = canonicalId,
     sourceIdentifier = identifier,
+    agent = Item(
     locations = List(location)
-  )
+  ))
 
   def digitalLocationWith(url: String, license: License): DigitalLocation = {
     DigitalLocation(

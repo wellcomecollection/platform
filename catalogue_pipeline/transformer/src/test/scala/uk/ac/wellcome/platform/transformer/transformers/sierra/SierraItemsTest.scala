@@ -6,11 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedItem
-}
+import uk.ac.wellcome.models.work.internal.{Identifiable, IdentifierType, Item, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.{SierraItemData, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -88,11 +84,6 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
   }
 
   describe("transformItemData") {
-    it("returns UnidentifiedItem if an item is not deleted") {
-      val item = SierraItemData(id = "4000002", deleted = false)
-      transformer.transformItemData(item) shouldBe a[UnidentifiedItem]
-    }
-
     it("creates both forms of the Sierra ID in 'identifiers'") {
       val item = SierraItemData(id = "4000004", deleted = false)
 
@@ -109,6 +100,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
       val transformedItem = transformer.transformItemData(item)
+      transformedItem shouldBe Identifiable(sourceIdentifier = sourceIdentifier1, otherIdentifiers = List(sourceIdentifier2), agent = Item())
       transformedItem.identifiers shouldBe expectedIdentifiers
     }
 
