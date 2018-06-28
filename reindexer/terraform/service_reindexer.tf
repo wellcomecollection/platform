@@ -12,10 +12,9 @@ module "reindexer" {
   memory = 2048
 
   env_vars = {
-    dynamo_table_name          = "${local.vhs_table_name}"
-    reindex_complete_topic_arn = "${module.reindex_jobs_complete_topic.arn}"
-    reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
-    metrics_namespace          = "reindexer"
+    dynamo_table_name     = "${local.vhs_table_name}"
+    reindex_jobs_queue_id = "${module.reindexer_queue.id}"
+    metrics_namespace     = "reindexer"
   }
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"
@@ -29,11 +28,6 @@ module "reindexer" {
   enable_alb_alarm = false
 
   log_retention_in_days = 30
-}
-
-resource "aws_iam_role_policy" "ecs_reindexer_task_sns" {
-  role   = "${module.reindexer.task_role_name}"
-  policy = "${module.reindex_jobs_complete_topic.publish_policy}"
 }
 
 resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
