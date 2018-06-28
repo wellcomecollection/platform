@@ -49,3 +49,15 @@ output "travis_ci_id" {
 output "travis_ci_encrypted_secret" {
   value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
 }
+
+output "catalogue_private_subnets" {
+  value = ["${module.catalogue_vpc.private_subnets}"]
+}
+
+output "catalogue_public_subnets" {
+  value = ["${module.catalogue_vpc.public_subnets}"]
+}
+
+output "catalogue_vpc_id" {
+  value = "${module.catalogue_vpc.vpc_id}"
+}
