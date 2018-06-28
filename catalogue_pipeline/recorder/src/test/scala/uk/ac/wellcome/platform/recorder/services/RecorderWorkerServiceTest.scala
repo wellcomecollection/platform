@@ -1,19 +1,15 @@
 package uk.ac.wellcome.platform.recorder.services
 
-import com.amazonaws.AmazonServiceException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -45,18 +41,39 @@ class RecorderWorkerServiceTest
   )
 
   val work = UnidentifiedWork(
-    title = Some(title),
+    title = title,
     sourceIdentifier = sourceIdentifier,
     version = 2
   )
 
-  it("returns a successful Future if the Work is recorded successfully") {
+  it("successfully records a UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
-      withLocalS3Bucket { bucket =>
+      withLocalS3Bucket { storageBucket =>
+      withLocalS3Bucket { messagesBucket =>
         withLocalSqsQueue { queue =>
-          withRecorderWorkerService(table, bucket, queue) { service =>
-            whenReady(service.processMessage(work = work)) { _ =>
-              assertStoredSingleWork(bucket, table, work)
+          sendMessage(queue, messagesBucket, work)
+          withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { _ =>
+            eventually {
+              assertStoredSingleWork(storageBucket, table, work)
+            }
+          }
+        }
+      }
+    }
+  }
+  }
+
+  it("stores UnidentifiedInvisibleWork successfully") {
+    withLocalDynamoDbTable { table =>
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalSqsQueue { queue =>
+            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
+              val invisibleWork = UnidentifiedInvisibleWork(sourceIdentifier = sourceIdentifier, version = 2)
+              sendMessage(queue, messagesBucket, invisibleWork)
+              eventually {
+                assertStoredSingleWork(storageBucket, table, invisibleWork)
+              }
             }
           }
         }
@@ -66,15 +83,20 @@ class RecorderWorkerServiceTest
 
   it("doesn't overwrite a newer work with an older work") {
     val olderWork = work
-    val newerWork = work.copy(version = 10, title = Some("A nice new thing"))
+    val newerWork = work.copy(version = 10, title = "A nice new thing")
 
     withLocalDynamoDbTable { table =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueue { queue =>
-          withRecorderWorkerService(table, bucket, queue) { service =>
-            whenReady(service.processMessage(work = newerWork)) { _ =>
-              whenReady(service.processMessage(work = olderWork)) { _ =>
-                assertStoredSingleWork(bucket, table, newerWork)
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalSqsQueue { queue =>
+            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
+              sendMessage(queue, messagesBucket, newerWork)
+              eventually {
+                assertStoredSingleWork(storageBucket, table, newerWork)
+                sendMessage(queue, messagesBucket, olderWork)
+                eventually {
+                  assertStoredSingleWork(storageBucket, table, newerWork)
+                }
               }
             }
           }
@@ -85,19 +107,24 @@ class RecorderWorkerServiceTest
 
   it("overwrites an older work with an newer work") {
     val olderWork = work
-    val newerWork = work.copy(version = 10, title = Some("A nice new thing"))
+    val newerWork = work.copy(version = 10, title = "A nice new thing")
 
     withLocalDynamoDbTable { table =>
-      withLocalS3Bucket { bucket =>
-        withLocalSqsQueue { queue =>
-          withRecorderWorkerService(table, bucket, queue) { service =>
-            whenReady(service.processMessage(work = olderWork)) { _ =>
-              whenReady(service.processMessage(work = newerWork)) { _ =>
-                assertStoredSingleWork(
-                  bucket,
-                  table,
-                  newerWork,
-                  expectedVhsVersion = 2)
+      withLocalS3Bucket { storageBucket =>
+        withLocalS3Bucket { messagesBucket =>
+          withLocalSqsQueue { queue =>
+            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
+              sendMessage(queue, messagesBucket, olderWork)
+              eventually {
+                assertStoredSingleWork(storageBucket, table, olderWork)
+                sendMessage(queue, messagesBucket, newerWork)
+                eventually {
+                  assertStoredSingleWork(
+                    storageBucket,
+                    table,
+                    newerWork,
+                    expectedVhsVersion = 2)
+                }
               }
             }
           }
@@ -106,13 +133,17 @@ class RecorderWorkerServiceTest
     }
   }
 
-  it("returns a failed Future if saving to S3 fails") {
+  it("fails if saving to S3 fails") {
     withLocalDynamoDbTable { table =>
       val badBucket = Bucket(name = "bad-bukkit")
-      withLocalSqsQueue { queue =>
-        withRecorderWorkerService(table, badBucket, queue) { service =>
-          whenReady(service.processMessage(work = work).failed) { err =>
-            err shouldBe a[AmazonServiceException]
+      withLocalS3Bucket { messagesBucket =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withRecorderWorkerService(table, badBucket, messagesBucket, queue) { service =>
+            sendMessage(queue, messagesBucket, work)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
           }
         }
       }
@@ -121,20 +152,35 @@ class RecorderWorkerServiceTest
 
   it("returns a failed Future if saving to DynamoDB fails") {
     val badTable = Table(name = "bad-table", index = "bad-index")
-    withLocalS3Bucket { bucket =>
-      withLocalSqsQueue { queue =>
-        withRecorderWorkerService(badTable, bucket, queue) { service =>
-          whenReady(service.processMessage(work = work).failed) { err =>
-            err shouldBe a[AmazonServiceException]
+    withLocalS3Bucket { storageBucket =>
+      withLocalS3Bucket { messagesBucket =>
+        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
+          withRecorderWorkerService(badTable, storageBucket, messagesBucket, queue) { service =>
+            sendMessage(queue, messagesBucket, work)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
           }
         }
       }
     }
   }
 
+  private def sendMessage(queue: Queue, bucket: Bucket, work: TransformedBaseWork) = {
+    val messageToSend = put[TransformedBaseWork](
+      obj = work,
+      location = ObjectLocation(
+        namespace = bucket.name,
+        key = "work_message.json"
+      )
+    )
+    sqsClient.sendMessage(queue.url, messageToSend)
+  }
+
   private def assertStoredSingleWork(bucket: Bucket,
                                      table: Table,
-                                     expectedWork: UnidentifiedWork,
+                                     expectedWork: TransformedBaseWork,
                                      expectedVhsVersion: Int = 1) = {
     val actualRecords: List[HybridRecord] =
       Scanamo
@@ -157,17 +203,17 @@ class RecorderWorkerServiceTest
 
   private def withRecorderWorkerService[R](
     table: Table,
-    bucket: Bucket,
+    storageBucket: Bucket,
+    messagesBucket: Bucket,
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSqsQueue { queue =>
           withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
-            bucket = bucket,
+            bucket = storageBucket,
             table = table) { versionedHybridStore =>
-            withMessageStream[UnidentifiedWork, R](
+            withMessageStream[TransformedBaseWork, R](
               actorSystem,
-              bucket,
+              messagesBucket,
               queue,
               metricsSender) { messageStream =>
               val workerService = new RecorderWorkerService(
@@ -183,7 +229,6 @@ class RecorderWorkerServiceTest
               }
             }
           }
-        }
       }
     }
   }

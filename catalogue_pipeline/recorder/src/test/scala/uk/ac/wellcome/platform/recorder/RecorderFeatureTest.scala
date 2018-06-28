@@ -3,11 +3,7 @@ package uk.ac.wellcome.platform.recorder
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
@@ -34,7 +30,7 @@ class RecorderFeatureTest
     )
 
     val work = UnidentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1
     )
@@ -49,7 +45,7 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              val messageBody = put[UnidentifiedWork](
+              val messageBody = put[TransformedBaseWork](
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
