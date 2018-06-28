@@ -3,13 +3,12 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
+Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>]
        trigger_reindex.py -h | --help
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
   --count=<COUNT>       How many shards to create in the table
-  --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
   -h --help             Print this help message
 
 """
@@ -19,6 +18,9 @@ import datetime as dt
 import boto3
 import docopt
 import tqdm
+
+
+TABLE_NAME = 'ReindexShardTracker'
 
 
 # Implementation note: this code may fail if you hit the write limit on
@@ -113,7 +115,7 @@ if __name__ == '__main__':
 
     prefix = args['--prefix']
     count = int(args['--count'] or '0')
-    table_name = args['--table'] or 'ReindexShardTracker'
+    table_name = TABLE_NAME
 
     # We use the current timestamp for the reindex version -- this allows
     # us to easily trace when a reindex was triggered.
