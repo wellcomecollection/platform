@@ -3,6 +3,8 @@ from flask_restful import Resource, Api
 from utils import *
 from flask_cors import CORS
 import pandas as pd
+import pickle
+import itertools
 
 
 app = Flask(__name__)
@@ -11,8 +13,14 @@ cors = CORS(app)
 
 # Load data
 known_palette_distances = pd.read_pickle('../data/palette_distances.pkl')
+
 with open('../data/palette_dict.pkl', 'rb') as f:
     palette_dict = pickle.load(f)
+
+image_ids = np.sort(list(palette_dict.keys()))
+palettes = [palette_dict[image_id] for image_id in image_ids]
+all_possible_palettes = np.stack([list(itertools.permutations(palette, 5)) 
+                                  for palette in palettes])
 
 
 # Define classes
@@ -39,9 +47,11 @@ class palette_search(Resource):
         rgb_palette = np.array([hex_to_rgb(colour) for colour in query_palette])
         palette = rgb_to_lab(rgb_palette)
 
-        rearranged = assignment_switch(palette, palette_dict)
-        distance_values = vectorised_palette_distance(palette, rearranged)
-        palette_distances = pd.Series(dict(zip(palette_dict.keys(), distance_values)))
+        distances = (np.linalg.norm(all_possible_palettes - palette, axis=3)
+                    .sum(axis=2)
+                    .min(axis=1))
+        
+        palette_distances = pd.Series(dict(zip(image_ids, distances)))
         most_similar_ids = (palette_distances
                             .sort_values()
                             [1:13]
