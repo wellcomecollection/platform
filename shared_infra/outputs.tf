@@ -61,3 +61,7 @@ output "catalogue_public_subnets" {
 output "catalogue_vpc_id" {
   value = "${module.catalogue_vpc.vpc_id}"
 }
+
+output "catalogue_ssh_controlled_ingress_sg" {
+  value = "${module.bastion.ssh_controlled_ingress_sg}"
+}

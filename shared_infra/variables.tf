@@ -11,3 +11,6 @@ variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"
 }
+
+variable "admin_cidr_ingress" {}
+variable "key_name" {}
