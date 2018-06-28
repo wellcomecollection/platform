@@ -16,9 +16,12 @@ Options:
 """
 
 import datetime as dt
+import json
 
 import boto3
 import docopt
+import hcl
+import requests
 import tqdm
 
 
@@ -110,6 +113,45 @@ def create_shards(client, prefix, desired_version, count, table_name):
         _update_shard(client=client, table_name=table_name, shard=shard)
 
 
+def post_to_slack(prefix, reason):
+    """
+    Posts a message about the reindex in Slack, so we can track them.
+    """
+    # Get the name of the current user.
+    iam = boto3.client('iam')
+    username = iam.get_user()['User']['UserName']
+
+    # Get the non-critical Slack token.
+    s3 = boto3.client('s3')
+    tfvars_obj = s3.get_object(
+        Bucket='wellcomecollection-platform-infra',
+        Key='terraform.tfvars'
+    )
+    tfvars_body = tfvars_obj['Body'].read()
+    tfvars = hcl.loads(tfvars_body)
+
+    webhook_url = tfvars['non_critical_slack_webhook']
+
+    slack_data = {
+        'username': 'reindex-tracker',
+        'icon_emoji': ':dynamodb:',
+        'color': '#2E72B8',
+        'title': 'reindexer',
+        'fields': [{
+            'value': '*%s* started a reindex in *%s*\nReason: *%s*' % (
+                username, prefix, reason
+            )
+        }]
+    }
+
+    resp = requests.post(
+        webhook_url,
+        data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )
+    resp.raise_for_status()
+
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
@@ -124,6 +166,8 @@ if __name__ == '__main__':
     # us to easily trace when a reindex was triggered.
     desired_version = int(dt.datetime.utcnow().timestamp())
     print(f'Updating all shards in {prefix} to {desired_version}')
+
+    post_to_slack(prefix=prefix, reason=reason)
 
     if count == 0:
         count = _count_current_shards(
