@@ -193,18 +193,19 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalItem1 = UnidentifiedItem(
-      sourceIdentifier = identifier,
+    val originalItem1 = Identifiable(sourceIdentifier = identifier,
+      agent = Item(
+      locations = List()
+    ))
+
+    val originalItem2 = Identifiable(sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      ontologyType = "Item",
+      value = "1235"
+    ),
+      agent = Item(
       locations = List()
     )
-
-    val originalItem2 = UnidentifiedItem(
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = "Item",
-        value = "1235"
-      ),
-      locations = List()
     )
 
     val originalWork = UnidentifiedWork(
@@ -228,14 +229,14 @@ class IdEmbedderTests
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
           sourceIdentifier = originalItem1.sourceIdentifier,
-          ontologyType = originalItem1.ontologyType,
+          ontologyType = originalItem1.agent.ontologyType,
           newCanonicalId = newItemCanonicalId1
         )
 
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
           sourceIdentifier = originalItem2.sourceIdentifier,
-          ontologyType = originalItem2.ontologyType,
+          ontologyType = originalItem2.agent.ontologyType,
           newCanonicalId = newItemCanonicalId2
         )
 
@@ -245,15 +246,15 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedItem1 = IdentifiedItem(
-          sourceIdentifier = originalItem1.sourceIdentifier,
-          canonicalId = newItemCanonicalId1
-        )
+        val expectedItem1 = Identified(sourceIdentifier = originalItem1.sourceIdentifier,
+          canonicalId = newItemCanonicalId1,
+           agent = Item(
+          ))
 
-        val expectedItem2 = IdentifiedItem(
+        val expectedItem2 = Identified(
           sourceIdentifier = originalItem2.sourceIdentifier,
-          canonicalId = newItemCanonicalId2
-        )
+          canonicalId = newItemCanonicalId2,
+          agent = Item())
 
         whenReady(eventualWork) { json =>
           val work = fromJson[IdentifiedWork](json.toString()).get
