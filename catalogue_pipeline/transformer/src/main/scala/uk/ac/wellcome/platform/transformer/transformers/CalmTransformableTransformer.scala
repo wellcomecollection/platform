@@ -22,7 +22,7 @@ class CalmTransformableTransformer
         _ =>
           Some(
             UnidentifiedWork(
-              title = Some("placeholder title"),
+              title = "placeholder title",
               sourceIdentifier = SourceIdentifier(
                 identifierType = IdentifierType("calm-altref-no"),
                 ontologyType = "Work",

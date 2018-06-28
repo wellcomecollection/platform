@@ -53,7 +53,7 @@ class MiroTransformableTransformer
 
         Some(
           UnidentifiedWork(
-            title = Some(title),
+            title = title,
             sourceIdentifier = SourceIdentifier(
               identifierType = IdentifierType("miro-image-number"),
               ontologyType = "Work",

@@ -52,7 +52,7 @@ class NotificationMessageReceiverTest
       value = "value")
 
   val work = UnidentifiedWork(
-    title = Some("placeholder title"),
+    title = "placeholder title",
     sourceIdentifier = sourceIdentifier,
     version = 1
   )

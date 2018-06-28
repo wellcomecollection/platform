@@ -60,7 +60,7 @@ class SierraTransformableTransformer
               extent = getExtent(sierraBibData),
               lettering = getLettering(sierraBibData),
               items = getItems(sierraTransformable),
-              visible = !(sierraBibData.deleted || sierraBibData.suppressed),
+//              visible = !(sierraBibData.deleted || sierraBibData.suppressed),
               production = getProduction(sierraBibData),
               language = getLanguage(sierraBibData),
               contributors = getContributors(sierraBibData),
