@@ -1,28 +1,34 @@
 # -*- encoding: utf-8 -*-
 
 import pytest
-import boto3
 import os
 import dynamo_write_heartbeat
 
-TABLE_NAMES = 'Test1, Test2'
-ENDPOINT_URL = 'http://localhost:8000'
+
+TABLE_NAMES = ['Test1', 'Test2']
+TABLE_NAME_STR = ','.join(TABLE_NAMES)
 
 
 @pytest.yield_fixture(autouse=True)
-def run_around_tests():
-    dynamodb = boto3.client('dynamodb', endpoint_url=ENDPOINT_URL)
-    table_names = [t.strip(' ') for t in TABLE_NAMES.split(",")]
+def run_around_tests(dynamodb_client):
+    table_names = TABLE_NAMES
+
     for table_name in table_names:
-        create_table(dynamodb, table_name)
+        create_table(dynamodb_client, table_name)
     yield
     for table_name in table_names:
-        dynamodb.delete_table(TableName=table_name)
+        dynamodb_client.delete_table(TableName=table_name)
 
 
-def test_executing_lambda():
-    os.environ.update({'TABLE_NAMES': 'Test1, Test2'})
-    dynamo_write_heartbeat.main(event=None, context=None, endpoint_url=ENDPOINT_URL)
+def test_executing_lambda_no_params(dynamodb_client):
+    with pytest.raises(RuntimeError) as e:
+        dynamo_write_heartbeat.main(event=None, context=None, dynamodb_client=dynamodb_client)
+    e.match('TABLE_NAMES not found')
+
+
+def test_executing_lambda(dynamodb_client):
+    os.environ.update({'TABLE_NAMES': TABLE_NAME_STR})
+    dynamo_write_heartbeat.main(event=None, context=None, dynamodb_client=dynamodb_client)
 
 
 def create_table(dynamodb, table_name):

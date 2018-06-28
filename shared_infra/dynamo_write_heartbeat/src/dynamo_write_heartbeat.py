@@ -12,9 +12,13 @@ import os
 from wellcome_aws_utils.lambda_utils import log_on_error
 
 @log_on_error
-def main(event, context, endpoint_url=None):
-    dynamodb = boto3.resource('dynamodb', endpoint_url=endpoint_url)
-    table_names = os.environ.get('TABLE_NAMES').split(",")
+def main(event, context, dynamodb_client=None):
+    try:
+        table_names = [t.strip(' ') for t in os.environ['TABLE_NAMES'].split(',')]
+    except KeyError:
+        raise RuntimeError('TABLE_NAMES not found')
+
+    dynamodb_client = dynamodb_client or boto3.client('dynamodb')
     for table_name in table_names:
-        table = dynamodb.Table(table_name.strip())
-        table.delete_item(Key={'id' : 'not-there'})
+        dynamodb_client.delete_item(TableName=table_name.strip(),
+                                    Key={'id': {'S': 'not-there'}})
