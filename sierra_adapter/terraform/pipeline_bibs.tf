@@ -15,7 +15,7 @@ module "bibs_reader" {
 
   resource_type = "bibs"
 
-  bucket_name        = "wellcomecollection-platform-adapters-sierra"//${aws_s3_bucket.sierra_adapter.id}
+  bucket_name        = "wellcomecollection-platform-adapters-sierra" //${aws_s3_bucket.sierra_adapter.id}
   windows_topic_name = "${module.bibs_window_generator.topic_name}"
 
   sierra_fields = "${var.sierra_bibs_fields}"

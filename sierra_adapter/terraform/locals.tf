@@ -1,8 +1,8 @@
 locals {
   lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
 
-  vpc_id = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  public_subnets = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
+  vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
+  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 
   vhs_full_access_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_full_access_policy}"
