@@ -77,7 +77,7 @@ class DisplayWorkV2SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
@@ -101,7 +101,7 @@ class DisplayWorkV2SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ],
                           | "subjects": [ ],
@@ -127,7 +127,7 @@ class DisplayWorkV2SerialisationTest
         locations = List(location)
       ))
     val workWithCopyright = IdentifiedWork(
-      title = Some("A scarf on a squirrel"),
+      title = "A scarf on a squirrel",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "yxh928a",
@@ -138,7 +138,7 @@ class DisplayWorkV2SerialisationTest
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
-                          |     "title": "${workWithCopyright.title.get}",
+                          |     "title": "${workWithCopyright.title}",
                           |     "contributors": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
@@ -166,7 +166,7 @@ class DisplayWorkV2SerialisationTest
 
   it("includes subject information in DisplayWorkV2 serialisation") {
     val workWithSubjects = IdentifiedWork(
-      title = Some("A seal selling seaweed sandwiches in Scotland"),
+      title = "A seal selling seaweed sandwiches in Scotland",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "test_subject1",
@@ -179,7 +179,7 @@ class DisplayWorkV2SerialisationTest
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
+                          |     "title": "${workWithSubjects.title}",
                           |     "contributors": [],
                           |     "subjects": [ ${subjects(
                             workWithSubjects.subjects)} ],
@@ -192,7 +192,7 @@ class DisplayWorkV2SerialisationTest
 
   it("includes genre information in DisplayWorkV2 serialisation") {
     val workWithSubjects = IdentifiedWork(
-      title = Some("A guppy in a greenhouse"),
+      title = "A guppy in a greenhouse",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "test_subject1",
@@ -211,7 +211,7 @@ class DisplayWorkV2SerialisationTest
                           |{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
+                          |     "title": "${workWithSubjects.title}",
                           |     "contributors": [],
                           |     "subjects": [ ],
                           |     "genres": [ ${genres(workWithSubjects.genres)} ],
@@ -238,7 +238,7 @@ class DisplayWorkV2SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
@@ -262,7 +262,7 @@ class DisplayWorkV2SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(sourceIdentifier)} ],
                           | "subjects": [ ],
@@ -290,7 +290,7 @@ class DisplayWorkV2SerialisationTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
-                          |     "title": "${work.title.get}",
+                          |     "title": "${work.title}",
                           |     "contributors": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],

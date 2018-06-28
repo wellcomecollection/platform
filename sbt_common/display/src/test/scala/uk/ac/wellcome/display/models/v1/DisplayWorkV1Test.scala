@@ -9,7 +9,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
   it("correctly parses a Work without any items") {
     val work = IdentifiedWork(
-      title = Some("An irritating imp is immune from items"),
+      title = "An irritating imp is immune from items",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "abcdef12"
@@ -30,7 +30,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
         locations = List()
       ))
     val work = IdentifiedWork(
-      title = Some("Inside an irate igloo"),
+      title = "Inside an irate igloo",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "b4heraz7",
@@ -53,7 +53,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
   it("correctly parses a work without any extra identifiers") {
     val work = IdentifiedWork(
-      title = Some("An irascible iguana invites impudence"),
+      title = "An irascible iguana invites impudence",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "xtsx8hwk")
@@ -68,7 +68,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
   it("extracts creators from a Work with Unidentifiable Contributors") {
     val work = IdentifiedWork(
-      title = Some("Jumping over jackals in Japan"),
+      title = "Jumping over jackals in Japan",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "j7tw9jv3",
@@ -93,7 +93,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val physicalDescription = "A magnificent mural of magpies"
 
     val work = IdentifiedWork(
-      title = Some("Moving a mighty mouse to Madagascar"),
+      title = "Moving a mighty mouse to Madagascar",
       canonicalId = "mtc2wvrg",
       sourceIdentifier = sourceIdentifier,
       physicalDescription = Some(physicalDescription),
@@ -116,7 +116,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("Moving a mighty mouse to Madagascar"),
+      title = "Moving a mighty mouse to Madagascar",
       canonicalId = "mtc2wvrg",
       sourceIdentifier = sourceIdentifier,
       workType = Some(workType),
@@ -131,7 +131,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     val extent = "Bound in boxes of bark"
 
     val work = IdentifiedWork(
-      title = Some("Brilliant beeches in Bucharest"),
+      title = "Brilliant beeches in Bucharest",
       canonicalId = "bmnppscn",
       sourceIdentifier = sourceIdentifier,
       extent = Some(extent),
@@ -149,7 +149,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("A largesse of leaping Libyan lions"),
+      title = "A largesse of leaping Libyan lions",
       canonicalId = "lfk6nkje",
       sourceIdentifier = sourceIdentifier,
       language = Some(language),
@@ -188,7 +188,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("A work with genres"),
+      title = "A work with genres",
       canonicalId = "b225839r",
       sourceIdentifier = sourceIdentifier,
       genres = genres,
@@ -229,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("A work with subjects"),
+      title = "A work with subjects",
       canonicalId = "nznaj8p5",
       sourceIdentifier = sourceIdentifier,
       subjects = subjects,
@@ -247,7 +247,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   it("gives a helpful error if you try to convert a work with visible=False") {
     val work = IdentifiedWork(
       canonicalId = "xpudrscx",
-      title = Some("Invisible igloos improve iguanas"),
+      title = "Invisible igloos improve iguanas",
       sourceIdentifier = sourceIdentifier,
       visible = false,
       version = 1
@@ -263,7 +263,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   it("errors if you try to convert a work with non-empty production field") {
     val work = IdentifiedWork(
       canonicalId = "pejk5skd",
-      title = Some("Perhaps production of pasta is perfunctory?"),
+      title = "Perhaps production of pasta is perfunctory?",
       sourceIdentifier = sourceIdentifier,
       production = List(
         ProductionEvent(
@@ -292,7 +292,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
 
     val work = IdentifiedWork(
       canonicalId = "pt5vupg4",
-      title = Some("Pouncing pugs play in pipes"),
+      title = "Pouncing pugs play in pipes",
       sourceIdentifier = sourceIdentifier,
       items = List(
         Identified(

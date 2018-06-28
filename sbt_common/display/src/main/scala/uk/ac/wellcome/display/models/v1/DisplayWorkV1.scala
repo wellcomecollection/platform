@@ -127,7 +127,7 @@ case object DisplayWorkV1 {
 
     DisplayWorkV1(
       id = work.canonicalId,
-      title = work.title.get,
+      title = work.title,
       description = work.description,
       physicalDescription = work.physicalDescription,
       extent = work.extent,
