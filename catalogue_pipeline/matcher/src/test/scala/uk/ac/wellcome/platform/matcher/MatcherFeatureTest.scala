@@ -47,7 +47,7 @@ class MatcherFeatureTest
                   lockTable) { _ =>
                   val work = UnidentifiedWork(
                     sourceIdentifier = sourceIdentifierA,
-                    title = Some("Work"),
+                    title = "Work",
                     version = 1
                   )
                   val workSqsMessage: NotificationMessage =
@@ -110,7 +110,7 @@ class MatcherFeatureTest
 
                   val workAv1 = UnidentifiedWork(
                     sourceIdentifier = sourceIdentifierA,
-                    title = Some("Work"),
+                    title = "Work",
                     version = updatedWorkVersion
                   )
 
