@@ -172,7 +172,10 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       production,
       language,
       location("thumbnail"),
-      textField("dimensions")
+      textField("dimensions"),
+      objectField("redirect")
+        .fields(sourceIdentifier, keywordField("canonicalId")),
+      keywordField("type")
     )
 
   val mappingDefinition: MappingDefinition = mapping(rootIndexType)

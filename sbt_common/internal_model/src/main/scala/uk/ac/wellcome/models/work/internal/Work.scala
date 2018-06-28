@@ -1,7 +1,14 @@
 package uk.ac.wellcome.models.work.internal
 
+sealed trait BaseWork {
+  val version: Int
+  val sourceIdentifier: SourceIdentifier
+}
+
+sealed trait IdentifiedBaseWork extends BaseWork
+
 /** A representation of a work in our ontology */
-trait Work extends MultipleSourceIdentifiers {
+trait Work extends BaseWork with MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
@@ -31,9 +38,10 @@ trait Work extends MultipleSourceIdentifiers {
 
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
+  version: Int,
+  title: Option[String],
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-  title: Option[String],
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -48,7 +56,6 @@ case class UnidentifiedWork(
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   items: List[UnidentifiedItem] = Nil,
-  version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
@@ -77,3 +84,24 @@ case class IdentifiedWork(
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
+    with IdentifiedBaseWork
+
+trait RedirectedWork extends BaseWork {
+  val sourceIdentifier: SourceIdentifier
+  val version: Int
+  val redirect: Redirect
+}
+
+case class UnidentifiedRedirectedWork(
+  sourceIdentifier: SourceIdentifier,
+  version: Int,
+  redirect: IdentifiableRedirect
+) extends RedirectedWork
+
+case class IdentifiedRedirectedWork(
+  canonicalId: String,
+  sourceIdentifier: SourceIdentifier,
+  version: Int,
+  redirect: IdentifiedRedirect
+) extends RedirectedWork
+    with IdentifiedBaseWork

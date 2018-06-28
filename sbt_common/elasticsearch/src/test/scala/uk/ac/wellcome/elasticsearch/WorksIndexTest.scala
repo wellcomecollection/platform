@@ -8,10 +8,10 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 import org.scalacheck.ScalacheckShapeless._
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 class WorksIndexTest
     extends FunSpec
@@ -26,10 +26,10 @@ class WorksIndexTest
 
   // On failure, scalacheck tries to shrink to the smallest input that causes a failure.
   // With IdentifiedWork, that means that it never actually completes.
-  implicit val noShrink = Shrink.shrinkAny[IdentifiedWork]
+  implicit val noShrink = Shrink.shrinkAny[IdentifiedBaseWork]
 
   it("puts a valid work") {
-    forAll { sampleWork: IdentifiedWork =>
+    forAll { sampleWork: IdentifiedBaseWork =>
       withLocalElasticsearchIndex(itemType = "work") { indexName =>
         val sampleWorkJson = toJson(sampleWork).get
 
