@@ -152,7 +152,7 @@ def post_to_slack(prefix, reason):
     resp.raise_for_status()
 
 
-if __name__ == '__main__':
+def main():
     args = docopt.docopt(__doc__)
 
     client = boto3.client('dynamodb')
@@ -183,3 +183,11 @@ if __name__ == '__main__':
         count=count,
         table_name=table_name
     )
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        import sys
+        sys.exit(1)
