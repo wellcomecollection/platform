@@ -57,7 +57,7 @@ case class UnidentifiedWork(
   items: List[UnidentifiedItem] = Nil,
   visible: Boolean = true,
   ontologyType: String = "Work")
-    extends Work with IdentifiedBaseWork
+    extends Work
 
 case class IdentifiedWork(
   canonicalId: String,
@@ -82,7 +82,7 @@ case class IdentifiedWork(
   version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")
-    extends Work
+    extends Work with IdentifiedBaseWork
 
 trait RedirectedWork extends BaseWork {
   val sourceIdentifier: SourceIdentifier
