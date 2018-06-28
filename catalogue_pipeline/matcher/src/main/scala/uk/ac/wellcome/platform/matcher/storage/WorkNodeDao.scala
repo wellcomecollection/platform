@@ -28,46 +28,48 @@ class WorkNodeDao @Inject()(
         throw GracefulFailureException(exception)
     }
 
-  def get(ids: Set[String]): Future[Set[WorkNode]] = Future {
-    Scanamo
-      .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
-      .map {
-        case Right(works) => works
-        case Left(scanamoError) => {
-          val exception = new RuntimeException(scanamoError.toString)
-          error(
-            s"An error occurred while retrieving all workIds=$ids from DynamoDB",
-            exception)
-          throw exception
+  def get(ids: Set[String]): Future[Set[WorkNode]] =
+    Future {
+      Scanamo
+        .getAll[WorkNode](dynamoDbClient)(dynamoConfig.table)('id -> ids)
+        .map {
+          case Right(works) => works
+          case Left(scanamoError) => {
+            val exception = new RuntimeException(scanamoError.toString)
+            error(
+              s"An error occurred while retrieving all workIds=$ids from DynamoDB",
+              exception)
+            throw exception
+          }
         }
-      }
-  }.recover {
-    case exception: ProvisionedThroughputExceededException =>
-      throw GracefulFailureException(exception)
-  }
+    }.recover {
+      case exception: ProvisionedThroughputExceededException =>
+        throw GracefulFailureException(exception)
+    }
 
   def getByComponentIds(setIds: Set[String]): Future[Set[WorkNode]] =
     Future.sequence(setIds.map(getByComponentId)).map(_.flatten)
 
-  private def getByComponentId(componentId: String) = Future {
-    Scanamo
-      .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
-        'componentId -> componentId)
-      .map {
-        case Right(record) => {
-          record
+  private def getByComponentId(componentId: String) =
+    Future {
+      Scanamo
+        .queryIndex[WorkNode](dynamoDbClient)(dynamoConfig.table, index)(
+          'componentId -> componentId)
+        .map {
+          case Right(record) => {
+            record
+          }
+          case Left(scanamoError) => {
+            val exception = new RuntimeException(scanamoError.toString)
+            error(
+              s"An error occurred while retrieving byComponentId=$componentId from DynamoDB",
+              exception
+            )
+            throw exception
+          }
         }
-        case Left(scanamoError) => {
-          val exception = new RuntimeException(scanamoError.toString)
-          error(
-            s"An error occurred while retrieving byComponentId=$componentId from DynamoDB",
-            exception
-          )
-          throw exception
-        }
-      }
-  }.recover {
-    case exception: ProvisionedThroughputExceededException =>
-      throw GracefulFailureException(exception)
-  }
+    }.recover {
+      case exception: ProvisionedThroughputExceededException =>
+        throw GracefulFailureException(exception)
+    }
 }

@@ -70,7 +70,8 @@ class WorkNodeDaoTest
       }
     }
 
-    it("returns a GracefulFailure if ProvisionedThroughputExceededException occurs during get from dynamo") {
+    it(
+      "returns a GracefulFailure if ProvisionedThroughputExceededException occurs during get from dynamo") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         when(dynamoDbClient.batchGetItem(any[BatchGetItemRequest]))
@@ -80,9 +81,8 @@ class WorkNodeDaoTest
           DynamoConfig(table.name, table.index)
         )
 
-        whenReady(workNodeDao.get(Set("A")).failed) {
-          failedException =>
-            failedException shouldBe a[GracefulFailureException]
+        whenReady(workNodeDao.get(Set("A")).failed) { failedException =>
+          failedException shouldBe a[GracefulFailureException]
         }
       }
     }
@@ -100,7 +100,8 @@ class WorkNodeDaoTest
       }
     }
 
-    it("returns WorkNodes which are stored in DynamoDB for a given component id") {
+    it(
+      "returns WorkNodes which are stored in DynamoDB for a given component id") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         withWorkNodeDao(table) { matcherGraphDao =>
           val existingWorkNodeA: WorkNode = WorkNode("A", 1, List("B"), "A+B")
@@ -117,7 +118,8 @@ class WorkNodeDaoTest
       }
     }
 
-    it("returns an error if fetching from dynamo fails during a getByComponentIds") {
+    it(
+      "returns an error if fetching from dynamo fails during a getByComponentIds") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         val expectedException = new RuntimeException("FAILED")
@@ -135,7 +137,8 @@ class WorkNodeDaoTest
       }
     }
 
-    it("returns a GracefulFailure if ProvisionedThroughputExceededException occurs during a getByComponentIds") {
+    it(
+      "returns a GracefulFailure if ProvisionedThroughputExceededException occurs during a getByComponentIds") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         when(dynamoDbClient.query(any[QueryRequest]))
@@ -145,8 +148,9 @@ class WorkNodeDaoTest
           DynamoConfig(table.name, table.index)
         )
 
-        whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) { failedException =>
-          failedException shouldBe a[GracefulFailureException]
+        whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
+          failedException =>
+            failedException shouldBe a[GracefulFailureException]
         }
       }
     }
@@ -213,7 +217,8 @@ class WorkNodeDaoTest
       }
     }
 
-    it("returns a GracefulFailure if ProvisionedThroughputExceededException occurs during put to dynamo") {
+    it(
+      "returns a GracefulFailure if ProvisionedThroughputExceededException occurs during put to dynamo") {
       withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { table =>
         val dynamoDbClient = mock[AmazonDynamoDB]
         when(dynamoDbClient.putItem(any[PutItemRequest]))
