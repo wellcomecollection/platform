@@ -14,7 +14,7 @@ cors = CORS(app)
 # Load data
 known_palette_distances = pd.read_pickle('../data/palette_distances.pkl')
 
-with open('../data/palette_dict.pkl', 'rb') as f:
+with open('../data/palettes.pkl', 'rb') as f:
     palette_dict = pickle.load(f)
 
 image_ids = np.sort(list(palette_dict.keys()))
