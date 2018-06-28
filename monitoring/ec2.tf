@@ -15,7 +15,7 @@ module "ec2_bastion" {
 }
 
 module "ec2_efs_host" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/efs?ref=ecs_v2"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/ec2/prebuilt/efs?ref=v11.0.0"
 
   cluster_name = "${aws_ecs_cluster.monitoring.name}"
   vpc_id       = "${module.network.vpc_id}"

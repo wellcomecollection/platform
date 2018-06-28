@@ -52,6 +52,9 @@ def should_be_sent_to_main_channel(alarm_name):
     if any(p in alarm_name for p in ['api_remus', 'api_romulus', 'loris']):
         return True
 
+    if alarm_name.endswith('_dlq_not_empty'):
+        return True
+
     # Otherwise default to False, because we don't know what this alarm is.
     return False
 
