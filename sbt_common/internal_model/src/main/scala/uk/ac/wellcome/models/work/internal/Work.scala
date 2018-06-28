@@ -6,6 +6,7 @@ sealed trait BaseWork {
 }
 
 sealed trait IdentifiedBaseWork extends BaseWork
+
 /** A representation of a work in our ontology */
 trait Work extends BaseWork with MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
@@ -82,7 +83,8 @@ case class IdentifiedWork(
   version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")
-    extends Work with IdentifiedBaseWork
+    extends Work
+    with IdentifiedBaseWork
 
 trait RedirectedWork extends BaseWork {
   val sourceIdentifier: SourceIdentifier
@@ -91,14 +93,15 @@ trait RedirectedWork extends BaseWork {
 }
 
 case class UnidentifiedRedirectedWork(
-                                     sourceIdentifier: SourceIdentifier,
-                                     version: Int,
-                                     redirect: IdentifiableRedirect
-                                     ) extends RedirectedWork
+  sourceIdentifier: SourceIdentifier,
+  version: Int,
+  redirect: IdentifiableRedirect
+) extends RedirectedWork
 
 case class IdentifiedRedirectedWork(
-                                   canonicalId: String,
-                                     sourceIdentifier: SourceIdentifier,
-                                     version: Int,
-                                     redirect: IdentifiedRedirect
-                                     ) extends RedirectedWork with IdentifiedBaseWork
+  canonicalId: String,
+  sourceIdentifier: SourceIdentifier,
+  version: Int,
+  redirect: IdentifiedRedirect
+) extends RedirectedWork
+    with IdentifiedBaseWork

@@ -173,7 +173,8 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
       language,
       location("thumbnail"),
       textField("dimensions"),
-      objectField("redirect").fields(sourceIdentifier, keywordField("canonicalId")),
+      objectField("redirect")
+        .fields(sourceIdentifier, keywordField("canonicalId")),
       keywordField("type")
     )
 
