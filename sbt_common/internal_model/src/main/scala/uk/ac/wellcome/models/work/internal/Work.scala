@@ -1,11 +1,11 @@
 package uk.ac.wellcome.models.work.internal
 
-sealed trait Redirect
-case class IdentifiableRedirect(sourceIdentifier: SourceIdentifier) extends Redirect
-case class IdentifiedRedirect(canonicalId: String) extends Redirect
-
+sealed trait BaseWork {
+  val version: Int
+  val sourceIdentifier: SourceIdentifier
+}
 /** A representation of a work in our ontology */
-trait Work extends MultipleSourceIdentifiers {
+trait Work extends BaseWork with MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
@@ -31,7 +31,6 @@ trait Work extends MultipleSourceIdentifiers {
   val visible: Boolean
 
   val ontologyType: String
-  val redirect: Option[Redirect]
 }
 
 case class UnidentifiedWork(
@@ -55,8 +54,7 @@ case class UnidentifiedWork(
   dimensions: Option[String] = None,
   items: List[UnidentifiedItem] = Nil,
   visible: Boolean = true,
-  ontologyType: String = "Work",
-  redirect: Option[IdentifiableRedirect] = None)
+  ontologyType: String = "Work")
     extends Work
 
 case class IdentifiedWork(
@@ -81,6 +79,24 @@ case class IdentifiedWork(
   items: List[IdentifiedItem] = Nil,
   version: Int,
   visible: Boolean = true,
-  ontologyType: String = "Work",
-  redirect: Option[IdentifiedRedirect] = None)
+  ontologyType: String = "Work")
     extends Work
+
+trait RedirectedWork extends BaseWork {
+  val sourceIdentifier: SourceIdentifier
+  val version: Int
+  val redirect: Redirect
+}
+
+case class UnidentifiedRedirectedWork(
+                                     sourceIdentifier: SourceIdentifier,
+                                     version: Int,
+                                     redirect: IdentifiableRedirect
+                                     ) extends RedirectedWork
+
+case class IdentifiedRedirectedWork(
+                                   canonicalId: String,
+                                     sourceIdentifier: SourceIdentifier,
+                                     version: Int,
+                                     redirect: IdentifiedRedirect
+                                     ) extends RedirectedWork
