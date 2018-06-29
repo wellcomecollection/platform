@@ -1,4 +1,3 @@
-
 data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
   statement {
     actions = [
@@ -10,6 +9,7 @@ data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
     ]
   }
 }
+
 # restrict the resource permissions to the specified dynamo tables
 # obtained from the dynamo_table_names list:
 #
@@ -18,3 +18,4 @@ data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
 # => resources = [ "arn:aws:dynamodb:*:*:table/table1",
 #                  "arn:aws:dynamodb:*:*:table/table2"
 #                ]
+
