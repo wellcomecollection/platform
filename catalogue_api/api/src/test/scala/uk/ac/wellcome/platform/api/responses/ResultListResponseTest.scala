@@ -1,16 +1,16 @@
 package uk.ac.wellcome.platform.api.responses
 
-import com.twitter.finagle.http.Request
-import org.scalatest.mockito.MockitoSugar
+import com.twitter.finagle.http.{Method, Request}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.platform.api.models.DisplayResultList
 import uk.ac.wellcome.platform.api.requests.MultipleResultsRequest
 
-class ResultListResponseTest extends FunSpec with Matchers with MockitoSugar {
+class ResultListResponseTest extends FunSpec with Matchers {
   val contextUri = "https://example.org/context.json"
 
-  val requestBaseUri = "https://api.example.org/works"
+  val requestBaseUri = "https://api.example.org"
+  val requestUri = "/works"
 
   val displayResultList = DisplayResultList[DisplayWorkV1](
     pageSize = 10,
@@ -28,7 +28,7 @@ class ResultListResponseTest extends FunSpec with Matchers with MockitoSugar {
     id = None,
     query = None,
     _index = None,
-    request = mock[Request]
+    request = Request(method = Method.Get, uri = requestUri)
   )
 
   describe("nextPage") {
@@ -64,7 +64,7 @@ class ResultListResponseTest extends FunSpec with Matchers with MockitoSugar {
         multipleResultsRequest = multipleResultsRequest.copy(page = 5)
       )
 
-      resp.nextPage shouldBe Some(s"$requestBaseUri?page=6")
+      resp.nextPage shouldBe Some(s"$requestBaseUri$requestUri?page=6")
     }
   }
 
