@@ -1,52 +1,20 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.query._
-import com.gu.scanamo.syntax._
-import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest, ReindexableRecord}
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
-import scala.util.Try
 
-class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig,
+class ReindexService @Inject()(readerService: ReindexRecordReaderService,
                                snsWriter: SNSWriter)
     extends Logging {
 
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
-    info(s"ReindexService running $reindexJob")
-    val table = Table[ReindexableRecord](dynamoConfig.table)
-
-    val outdatedRecordsFuture: Future[List[ReindexableRecord]] = for {
-      index: SecondaryIndex[ReindexableRecord] <- Future.fromTry(Try {
-        table.index(indexName = dynamoConfig.index)
-      })
-
-      // We start by querying DynamoDB for every record in the reindex shard
-      // that has an out-of-date reindexVersion.  If a shard was especially
-      // large, this might cause out-of-memory errors -- in practice, we're
-      // hoping that the shards/individual records are small enough for this
-      // not to be a problem.
-      results: List[Either[DynamoReadError, ReindexableRecord]] <- Future {
-        Scanamo.exec(dynamoDbClient)(
-          index.query(
-            'reindexShard -> reindexJob.shardId and
-              KeyIs('reindexVersion, LT, reindexJob.desiredVersion)
-          )
-        )
-      }
-
-      outdatedRecords: List[ReindexableRecord] = results.map(extractRecord)
-    } yield outdatedRecords
+    val outdatedRecordsFuture = readerService.findRecordsForReindexing(reindexJob)
 
     // Then we send an SNS notification for all of the records.  Another
     // application will pick these up and do the writes back to DynamoDB.
@@ -58,18 +26,6 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       }
     }
   }
-
-  private def extractRecord(
-    scanamoResult: Either[DynamoReadError, ReindexableRecord]): ReindexableRecord =
-    scanamoResult match {
-      case Left(err: DynamoReadError) => {
-        warn(s"Failed to read Dynamo records: $err")
-        throw GracefulFailureException(
-          new RuntimeException(s"Error in the DynamoDB query: $err")
-        )
-      }
-      case Right(r: ReindexableRecord) => r
-    }
 
   private def sendIndividualNotification(record: ReindexableRecord,
                                          desiredVersion: Int): Future[Unit] = {
