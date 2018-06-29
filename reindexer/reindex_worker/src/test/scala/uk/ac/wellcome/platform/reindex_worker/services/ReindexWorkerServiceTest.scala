@@ -147,7 +147,7 @@ class ReindexWorkerServiceTest
               metricsSender) { sqsStream =>
               val failingReindexService = mock[ReindexService]
               val targetService = mock[ReindexService]
-              when(targetService.runReindex(any[ReindexJob]))
+              when(targetService.sendReindexRequests(any[ReindexJob]))
                 .thenReturn(Future {
                   throw new RuntimeException(
                     "Flobberworm! Fickle failure frustrates my fortunes!")
