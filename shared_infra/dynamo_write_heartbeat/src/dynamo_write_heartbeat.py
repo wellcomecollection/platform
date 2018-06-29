@@ -11,6 +11,7 @@ import os
 
 from wellcome_aws_utils.lambda_utils import log_on_error
 
+
 @log_on_error
 def main(event, context, dynamodb_client=None):
     try:
