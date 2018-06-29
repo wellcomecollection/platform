@@ -39,7 +39,7 @@ class IngestorFeatureTest
         "5678")
 
     val work = IdentifiedWork(
-      title = Some("A type of a tame turtle"),
+      title = "A type of a tame turtle",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "1234")
@@ -68,7 +68,7 @@ class IngestorFeatureTest
         "5678")
 
     val work = IdentifiedWork(
-      title = Some("A type of a tame turtle"),
+      title = "A type of a tame turtle",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "1234")
