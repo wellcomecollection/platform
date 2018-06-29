@@ -6,9 +6,9 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
@@ -28,7 +28,6 @@ class ReindexWorkerServiceTest
     with Akka
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
-    with SNS
     with SQS
     with ScalaFutures {
 
@@ -38,27 +37,21 @@ class ReindexWorkerServiceTest
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, dlq) =>
-            withLocalSnsTopic { topic =>
-              withSQSStream[NotificationMessage, Assertion](
-                actorSystem,
-                queue,
-                metricsSender) { sqsStream =>
-                withReindexService(table) { reindexService =>
-                  val workerService = new ReindexWorkerService(
-                    targetService = reindexService,
-                    sqsStream = sqsStream,
-                    snsWriter = new SNSWriter(
-                      snsClient = snsClient,
-                      snsConfig = SNSConfig(topicArn = topic.arn)
-                    ),
-                    system = actorSystem
-                  )
+            withSQSStream[NotificationMessage, Assertion](
+              actorSystem,
+              queue,
+              metricsSender) { sqsStream =>
+              withReindexService(table) { reindexService =>
+                val workerService = new ReindexWorkerService(
+                  targetService = reindexService,
+                  sqsStream = sqsStream,
+                  system = actorSystem
+                )
 
-                  try {
-                    testWith((workerService, queuePair))
-                  } finally {
-                    workerService.stop()
-                  }
+                try {
+                  testWith((workerService, queuePair))
+                } finally {
+                  workerService.stop()
                 }
               }
             }
@@ -149,51 +142,45 @@ class ReindexWorkerServiceTest
   it("fails if the reindex job fails") {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withLocalSnsTopic { topic =>
-          withLocalSqsQueueAndDlq {
-            case queuePair @ QueuePair(queue, dlq) =>
-              withSQSStream[NotificationMessage, Assertion](
-                actorSystem,
-                queue,
-                metricsSender) { sqsStream =>
-                val failingReindexService = mock[ReindexService]
-                val targetService = mock[ReindexService]
-                when(targetService.runReindex(any[ReindexJob]))
-                  .thenReturn(Future {
-                    throw new RuntimeException(
-                      "Flobberworm! Fickle failure frustrates my fortunes!")
-                  })
+        withLocalSqsQueueAndDlq {
+          case queuePair @ QueuePair(queue, dlq) =>
+            withSQSStream[NotificationMessage, Assertion](
+              actorSystem,
+              queue,
+              metricsSender) { sqsStream =>
+              val failingReindexService = mock[ReindexService]
+              val targetService = mock[ReindexService]
+              when(targetService.runReindex(any[ReindexJob]))
+                .thenReturn(Future {
+                  throw new RuntimeException(
+                    "Flobberworm! Fickle failure frustrates my fortunes!")
+                })
 
-                new ReindexWorkerService(
-                  targetService = failingReindexService,
-                  system = actorSystem,
-                  snsWriter = new SNSWriter(
-                    snsClient = snsClient,
-                    snsConfig = SNSConfig(topicArn = topic.arn)
-                  ),
-                  sqsStream = sqsStream
-                )
+              new ReindexWorkerService(
+                targetService = failingReindexService,
+                system = actorSystem,
+                sqsStream = sqsStream
+              )
 
-                val reindexJob = ReindexJob(
-                  shardId = "sierra/444",
-                  desiredVersion = 4
-                )
+              val reindexJob = ReindexJob(
+                shardId = "sierra/444",
+                desiredVersion = 4
+              )
 
-                val sqsMessage = NotificationMessage(
-                  Subject = "",
-                  Message = toJson(reindexJob).get,
-                  TopicArn = "topic",
-                  MessageId = "message"
-                )
+              val sqsMessage = NotificationMessage(
+                Subject = "",
+                Message = toJson(reindexJob).get,
+                TopicArn = "topic",
+                MessageId = "message"
+              )
 
-                sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+              sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-                eventually {
-                  assertQueueEmpty(queue)
-                  assertQueueHasSize(dlq, 1)
-                }
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
               }
-          }
+            }
         }
       }
     }

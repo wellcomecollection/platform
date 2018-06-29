@@ -5,17 +5,12 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.platform.reindex_worker.models.{
-  CompletedReindexJob,
-  ReindexJob,
-  ReindexRecord
-}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 case class TestRecord(
@@ -33,7 +28,6 @@ class ReindexerFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDbVersioned
-    with SNS
     with SQS
     with ScalaFutures {
 
@@ -87,80 +81,20 @@ class ReindexerFeatureTest
 
   it("increases the reindexVersion on every record that needs a reindex") {
     withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalDynamoDbTable { table =>
-          val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table) ++ sqsLocalFlags(queue)
+      withLocalDynamoDbTable { table =>
+        val flags = dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(queue)
 
-          withServer(flags) { _ =>
-            val expectedRecords =
-              createReindexableData(queue, table)
-
-            eventually {
-              val actualRecords =
-                Scanamo
-                  .scan[ReindexRecord](dynamoDbClient)(table.name)
-                  .map(_.right.get)
-
-              actualRecords should contain theSameElementsAs expectedRecords
-            }
-          }
-        }
-      }
-    }
-  }
-
-  it("sends an SNS notice for a completed reindex") {
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalDynamoDbTable { table =>
-          val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table) ++ sqsLocalFlags(queue)
-
-          withServer(flags) { _ =>
+        withServer(flags) { _ =>
+          val expectedRecords =
             createReindexableData(queue, table)
 
-            val expectedMessage = CompletedReindexJob(
-              shardId = shardName,
-              completedReindexVersion = desiredVersion
-            )
+          eventually {
+            val actualRecords =
+              Scanamo
+                .scan[ReindexRecord](dynamoDbClient)(table.name)
+                .map(_.right.get)
 
-            eventually {
-              val messages = listMessagesReceivedFromSNS(topic)
-
-              messages.size should be >= 1
-
-              JsonUtil
-                .fromJson[CompletedReindexJob](
-                  messages.head.message
-                )
-                .get shouldBe expectedMessage
-            }
-          }
-        }
-      }
-    }
-  }
-
-  it("does not send a message if it cannot complete a reindex") {
-    withLocalSqsQueue { queue =>
-      withLocalSnsTopic { topic =>
-        withLocalDynamoDbTable { table =>
-          val flags
-            : Map[String, String] = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(
-            table
-              .copy(name = "non_existent_table")) ++ sqsLocalFlags(queue)
-
-          withServer(flags) { _ =>
-            createReindexableData(queue, table)
-
-            // We wait some time to ensure that the message is not processed
-            Thread.sleep(5000)
-
-            val messages = listMessagesReceivedFromSNS(topic)
-            messages should have size 0
+            actualRecords should contain theSameElementsAs expectedRecords
           }
         }
       }
