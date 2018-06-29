@@ -5,14 +5,14 @@ import javax.naming.ConfigurationException
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
+import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
-import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class ReindexServiceTest
@@ -20,7 +20,8 @@ class ReindexServiceTest
     with ScalaFutures
     with Matchers
     with LocalDynamoDbVersioned
-    with ExtendedPatience {
+    with ExtendedPatience
+    with ReindexServiceFixture {
 
   val shardName = "shard"
   val currentVersion = 1
@@ -38,19 +39,6 @@ class ReindexServiceTest
     shardId = "sierra/000",
     desiredVersion = 2
   )
-
-  private def withReindexService(table: Table)(
-    testWith: TestWith[ReindexService, Assertion]) = {
-    val reindexService = new ReindexService(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(
-        table = table.name,
-        index = table.index
-      )
-    )
-
-    testWith(reindexService)
-  }
 
   it("only updates records with a lower than desired reindexVersion") {
     withLocalDynamoDbTable { table =>

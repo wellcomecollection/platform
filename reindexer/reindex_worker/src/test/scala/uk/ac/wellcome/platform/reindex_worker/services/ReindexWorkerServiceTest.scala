@@ -11,8 +11,8 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
+import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
@@ -28,6 +28,7 @@ class ReindexWorkerServiceTest
     with Akka
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
+    with ReindexServiceFixture
     with SQS
     with ScalaFutures {
 
@@ -58,15 +59,6 @@ class ReindexWorkerServiceTest
         }
       }
     }
-  }
-
-  def withReindexService[R](table: Table)(
-    testWith: TestWith[ReindexService, R]) = {
-    val reindexService = new ReindexService(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(table = table.name, index = table.index)
-    )
-    testWith(reindexService)
   }
 
   it("successfully completes a reindex") {
