@@ -1,11 +1,11 @@
-data "aws_iam_policy_document" "dynamodb_delete_item_policy" {
+data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
   statement {
     actions = [
       "dynamodb:DeleteItem",
     ]
 
     resources = [
-      "arn:aws:dynamodb:::",
+      "${join(",",formatlist("arn:aws:dynamodb:*:*:table/%s", split(",", replace(var.dynamo_table_names, ", ", ","))))}",
     ]
   }
 }

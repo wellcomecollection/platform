@@ -21,5 +21,6 @@ def main(event, context, dynamodb_client=None):
 
     dynamodb_client = dynamodb_client or boto3.client('dynamodb')
     for table_name in table_names:
-        dynamodb_client.delete_item(TableName=table_name.strip(),
-                                    Key={'id': {'S': 'not-there'}})
+        response = dynamodb_client.delete_item(TableName=table_name.strip(),
+                                               Key={'id': {'S': 'dummy-id-not-there'}})
+        print("Heartbeat, delete_item on dynamoDb table:{}, returned-status:{}".format(table_name, response['ResponseMetadata']['HTTPStatusCode']))

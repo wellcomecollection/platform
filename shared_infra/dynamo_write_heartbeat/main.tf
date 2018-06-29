@@ -31,3 +31,9 @@ module "trigger_dynamo_heartbeat_scheduler_lambda" {
   cloudwatch_trigger_arn  = "${aws_cloudwatch_event_rule.dynamo_heartbeat_scheduler_rule.arn}"
   cloudwatch_trigger_name = "${aws_cloudwatch_event_rule.dynamo_heartbeat_scheduler_rule.id}"
 }
+
+resource "aws_iam_role_policy" "dynamo_heartbeat_scheduler_lambda" {
+  role   = "${module.lambda_dynamo_write_heartbeat.role_name}"
+  policy = "${data.aws_iam_policy_document.allow_dynamodb_delete_item.json}"
+}
+
