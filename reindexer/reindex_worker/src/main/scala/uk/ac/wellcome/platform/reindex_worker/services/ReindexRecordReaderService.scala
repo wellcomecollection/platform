@@ -8,6 +8,7 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexableRecord}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 

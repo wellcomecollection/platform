@@ -133,49 +133,6 @@ class ReindexServiceTest
     }
   }
 
-  it("returns a failed Future if the reindex is only partially successful") {
-    withLocalDynamoDbTable { table =>
-      withLocalSnsTopic { topic =>
-        withReindexService(table, topic) { reindexService =>
-          val inShardRecords = List(
-            exampleRecord.copy(id = "id1"),
-            exampleRecord.copy(id = "id2")
-          )
-
-          inShardRecords.foreach(record =>
-            Scanamo.put(dynamoDbClient)(table.name)(record))
-
-          // This record doesn't conform to our ReindexRecord type (it doesn't
-          // have a version field), but it is in the same reindex shard as
-          // the other two records -- so it will be picked up for reindexing,
-          // but won't succeed.
-          case class BadRecord(
-                                id: String,
-                                reindexShard: String,
-                                reindexVersion: Int
-                              )
-
-          Scanamo.put(dynamoDbClient)(table.name)(
-            BadRecord(
-              id = "badId1",
-              reindexShard = shardName,
-              reindexVersion = currentVersion
-            ))
-
-          val reindexJob = ReindexJob(
-            shardId = shardName,
-            desiredVersion = desiredVersion
-          )
-
-          val future = reindexService.runReindex(reindexJob)
-          whenReady(future.failed) {
-            _ shouldBe a[GracefulFailureException]
-          }
-        }
-      }
-    }
-  }
-
   it("returns a failed Future if there's a DynamoDB error") {
     withLocalSnsTopic { topic =>
       withReindexService(Table("does-not-exist", "no-such-index"), topic) { service =>
@@ -207,12 +164,16 @@ class ReindexServiceTest
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
     withLocalSnsTopic { topic =>
-      val service = new ReindexService(
+      val readerService = new ReindexRecordReaderService(
         dynamoDbClient = dynamoDbClient,
         dynamoConfig = DynamoConfig(
           table = "mytable",
           maybeIndex = None
-        ),
+        )
+      )
+
+      val service = new ReindexService(
+        readerService = readerService,
         snsWriter = new SNSWriter(
           snsClient = snsClient,
           snsConfig = SNSConfig(topicArn = topic.arn)
