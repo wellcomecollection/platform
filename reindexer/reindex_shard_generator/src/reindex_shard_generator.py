@@ -50,7 +50,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
             # incrementing by 1.
             dynamodb_client.update_item(
                 TableName=table_name,
-                Key={'id': {'S': id}},
+                Key={'id': {'S': source_id}},
                 UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard, reindexVersion=:reindexVersion',
                 ConditionExpression='version < :newVersion',
                 ExpressionAttributeValues={

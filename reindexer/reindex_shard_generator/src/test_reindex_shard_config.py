@@ -6,7 +6,7 @@ from reindex_shard_config import create_reindex_shard
 
 
 @pytest.mark.parametrize(
-    'source_name, id, expected_reindex_shard', [
+    'source_name, source_id, expected_reindex_shard', [
     ('sierra', 'b0000001', 'sierra/2441'),
 ])
 def test_create_reindex_shard(source_name, source_id, expected_reindex_shard):
