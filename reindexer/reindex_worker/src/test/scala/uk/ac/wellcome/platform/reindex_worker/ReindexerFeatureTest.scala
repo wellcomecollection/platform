@@ -5,7 +5,7 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -28,6 +28,7 @@ class ReindexerFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDbVersioned
+    with SNS
     with SQS
     with ScalaFutures {
 
@@ -37,7 +38,7 @@ class ReindexerFeatureTest
   val shardName = "shard"
 
   private def createReindexableData(queue: Queue,
-                                    table: Table): List[ReindexRecord] = {
+                                    table: Table): Seq[ReindexRecord] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -53,15 +54,6 @@ class ReindexerFeatureTest
     //TODO re-factor shared test state here into fixture method
     testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
 
-    val expectedRecords = testRecords.map(
-      (r: TestRecord) =>
-        ReindexRecord(
-          id = r.id,
-          version = r.version + 1,
-          reindexShard = shardName,
-          reindexVersion = desiredVersion
-      ))
-
     val reindexJob = ReindexJob(
       shardId = shardName,
       desiredVersion = desiredVersion
@@ -76,25 +68,34 @@ class ReindexerFeatureTest
 
     sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-    expectedRecords.toList
+    testRecords.map { record =>
+      ReindexRecord(
+        id = record.id,
+        version = record.version,
+        reindexShard = shardName,
+        reindexVersion = desiredVersion
+      )
+    }
   }
 
-  it("increases the reindexVersion on every record that needs a reindex") {
+  it("sends a notification for every record that needs a reindex") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
-        val flags = dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(queue)
+        withLocalSnsTopic { topic =>
+          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(queue)
 
-        withServer(flags) { _ =>
-          val expectedRecords =
-            createReindexableData(queue, table)
+          withServer(flags) { _ =>
+            val expectedRecords =
+              createReindexableData(queue, table)
 
-          eventually {
-            val actualRecords =
-              Scanamo
-                .scan[ReindexRecord](dynamoDbClient)(table.name)
-                .map(_.right.get)
+            eventually {
+              val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+                .map { _.message }
+                .map { fromJson[ReindexRecord](_).get }
+                .distinct
 
-            actualRecords should contain theSameElementsAs expectedRecords
+              actualRecords should contain theSameElementsAs expectedRecords
+            }
           }
         }
       }
