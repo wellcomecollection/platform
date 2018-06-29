@@ -68,25 +68,3 @@ variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
-
-variable "es_config_romulus" {
-  description = "Elasticcloud config for romulus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-06-25-other-identifiers"
-    index_v2 = "v2-2018-06-25-other-identifiers"
-    doc_type = "work"
-  }
-}
-
-variable "es_config_remus" {
-  description = "Elasticcloud config for remus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
-    doc_type = "work"
-  }
-}
