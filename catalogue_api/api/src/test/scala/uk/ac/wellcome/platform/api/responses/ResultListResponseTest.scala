@@ -16,7 +16,6 @@ class ResultListResponseTest extends FunSpec with Matchers {
     pageSize = 10,
     totalPages = 5,
     totalResults = 45,
-
     // Nothing checks that results is populated correctly!
     results = List()
   )
