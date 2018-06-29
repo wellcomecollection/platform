@@ -31,6 +31,7 @@ object ResultListResponse {
 
     val currentPage = multipleResultsRequest.page
     val isLastPage = displayResultList.totalPages == currentPage
+    val isOutOfBounds = displayResultList.totalPages < currentPage
     val isFirstPage = currentPage == 1
 
     val apiLink = createApiLink(requestBaseUri, multipleResultsRequest) _
@@ -40,7 +41,7 @@ object ResultListResponse {
         Some(apiLink(Map("page" -> (currentPage - 1))))
       else None
     val nextLink =
-      if (!isLastPage)
+      if (!isLastPage && !isOutOfBounds)
         Some(apiLink(Map("page" -> (currentPage + 1))))
       else None
 
