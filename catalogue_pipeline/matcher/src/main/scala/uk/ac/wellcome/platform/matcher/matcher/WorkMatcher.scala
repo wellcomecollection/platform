@@ -5,7 +5,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
-import uk.ac.wellcome.models.work.internal.{InvisibleWork, TransformedBaseWork, UnidentifiedInvisibleWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedInvisibleWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, FailedLockException, FailedUnlockException}
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
