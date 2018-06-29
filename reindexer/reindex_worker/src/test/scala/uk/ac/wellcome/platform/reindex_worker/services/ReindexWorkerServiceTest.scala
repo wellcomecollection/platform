@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
@@ -84,11 +84,9 @@ class ReindexWorkerServiceTest
             Scanamo.put(dynamoDbClient)(table.name)(testRecord)
 
             val expectedRecords = Seq(
-              ReindexRecord(
+              ReindexRequest(
                 id = testRecord.id,
-                version = testRecord.version,
-                reindexShard = reindexJob.shardId,
-                reindexVersion = reindexJob.desiredVersion
+                desiredVersion = reindexJob.desiredVersion
               )
             )
             val sqsMessage = NotificationMessage(
@@ -101,9 +99,9 @@ class ReindexWorkerServiceTest
             sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
             eventually {
-              val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+              val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
                 .map { _.message }
-                .map { fromJson[ReindexRecord](_).get }
+                .map { fromJson[ReindexRequest](_).get }
                 .distinct
 
               actualRecords shouldBe expectedRecords

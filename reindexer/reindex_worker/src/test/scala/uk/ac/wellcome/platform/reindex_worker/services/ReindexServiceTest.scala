@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
@@ -65,11 +65,9 @@ class ReindexServiceTest
             Scanamo.put(dynamoDbClient)(table.name)(record))
 
           val expectedRecords = List(
-            ReindexRecord(
+            ReindexRequest(
               id = olderRecord.id,
-              version = olderRecord.version,
-              reindexShard = olderRecord.reindexShard,
-              reindexVersion = desiredVersion
+              desiredVersion = desiredVersion
             )
           )
 
@@ -79,9 +77,9 @@ class ReindexServiceTest
           )
 
           whenReady(reindexService.runReindex(reindexJob)) { _ =>
-            val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+            val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
               .map { _.message }
-              .map { fromJson[ReindexRecord](_).get }
+              .map { fromJson[ReindexRequest](_).get }
               .distinct
 
             actualRecords should contain theSameElementsAs expectedRecords
@@ -116,18 +114,16 @@ class ReindexServiceTest
             Scanamo.put(dynamoDbClient)(table.name)(record))
 
           val expectedRecords = inShardRecords.map { record =>
-            ReindexRecord(
+            ReindexRequest(
               id = record.id,
-              version = record.version,
-              reindexShard = shardName,
-              reindexVersion = desiredVersion
+              desiredVersion = desiredVersion
             )
           }
 
           whenReady(reindexService.runReindex(reindexJob)) { _ =>
-            val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+            val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
               .map { _.message }
-              .map { fromJson[ReindexRecord](_).get }
+              .map { fromJson[ReindexRequest](_).get }
               .distinct
 
             actualRecords should contain theSameElementsAs expectedRecords

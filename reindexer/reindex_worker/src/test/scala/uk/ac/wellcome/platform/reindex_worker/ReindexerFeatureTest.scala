@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -38,7 +38,7 @@ class ReindexerFeatureTest
   val shardName = "shard"
 
   private def createReindexableData(queue: Queue,
-                                    table: Table): Seq[ReindexRecord] = {
+                                    table: Table): Seq[ReindexRequest] = {
     val numberOfRecords = 4
 
     val testRecords = (1 to numberOfRecords).map(i => {
@@ -69,11 +69,9 @@ class ReindexerFeatureTest
     sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
     testRecords.map { record =>
-      ReindexRecord(
+      ReindexRequest(
         id = record.id,
-        version = record.version,
-        reindexShard = shardName,
-        reindexVersion = desiredVersion
+        desiredVersion = desiredVersion
       )
     }
   }
@@ -89,9 +87,9 @@ class ReindexerFeatureTest
               createReindexableData(queue, table)
 
             eventually {
-              val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+              val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
                 .map { _.message }
-                .map { fromJson[ReindexRecord](_).get }
+                .map { fromJson[ReindexRequest](_).get }
                 .distinct
 
               actualRecords should contain theSameElementsAs expectedRecords
