@@ -3,14 +3,13 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --prefix=(miro|sierra) --reason=<REASON> [--count=<COUNT>]
+Usage: trigger_reindex.py --prefix=(miro|sierra) --reason=<REASON>
        trigger_reindex.py -h | --help
 
 Options:
   --prefix=(miro|sierra)    Name of the reindex shard prefix.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
-  --count=<COUNT>           How many shards to create in the table
   -h --help                 Print this help message
 
 """
@@ -158,7 +157,6 @@ def main():
     client = boto3.client('dynamodb')
 
     prefix = args['--prefix']
-    count = int(args['--count'] or '0')
     reason = args['--reason']
     table_name = TABLE_NAME
 
@@ -169,12 +167,11 @@ def main():
 
     post_to_slack(prefix=prefix, reason=reason)
 
-    if count == 0:
-        count = _count_current_shards(
-            client=client,
-            table_name=table_name,
-            prefix=prefix
-        )
+    count = _count_current_shards(
+        client=client,
+        table_name=table_name,
+        prefix=prefix
+    )
 
     create_shards(
         client=client,
