@@ -3,20 +3,29 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --prefix=<PREFIX> [--count=<COUNT>] [--table=<TABLE>]
+Usage: trigger_reindex.py --prefix=<PREFIX> --reason=<REASON> [--count=<COUNT>]
        trigger_reindex.py -h | --help
 
 Options:
   --prefix=<PREFIX>     Name of the reindex shard prefix, e.g. sierra, miro
+  --reason=<REASON>     An explanation of why you're running this reindex.
+                        This will be printed in the Slack alert.
   --count=<COUNT>       How many shards to create in the table
-  --table=<TABLE>       Name of the reindex shard tracker DynamoDB table
   -h --help             Print this help message
 
 """
 
+import datetime as dt
+import json
+
 import boto3
 import docopt
+import hcl
+import requests
 import tqdm
+
+
+TABLE_NAME = 'ReindexShardTracker'
 
 
 # Implementation note: this code may fail if you hit the write limit on
@@ -77,19 +86,6 @@ def _count_current_shards(client, prefix, table_name):
     return best_seen
 
 
-def _get_current_max_desired_capacity(client, table_name, prefix):
-    """
-    Given a prefix, find the highest desired capacity of any reindex
-    record within that prefix.
-    """
-    best_seen = 0
-    for shard in _all_records_in_shard(client=client, table_name=table_name):
-        if not shard['shardId']['S'].startswith(prefix):
-            continue
-        best_seen = max(best_seen, int(shard['desiredVersion']['N']))
-    return best_seen
-
-
 def create_shards(client, prefix, desired_version, count, table_name):
     """Create new shards in the table."""
     new_shards = [
@@ -117,22 +113,61 @@ def create_shards(client, prefix, desired_version, count, table_name):
         _update_shard(client=client, table_name=table_name, shard=shard)
 
 
-if __name__ == '__main__':
+def post_to_slack(prefix, reason):
+    """
+    Posts a message about the reindex in Slack, so we can track them.
+    """
+    # Get the name of the current user.
+    iam = boto3.client('iam')
+    username = iam.get_user()['User']['UserName']
+
+    # Get the non-critical Slack token.
+    s3 = boto3.client('s3')
+    tfvars_obj = s3.get_object(
+        Bucket='wellcomecollection-platform-infra',
+        Key='terraform.tfvars'
+    )
+    tfvars_body = tfvars_obj['Body'].read()
+    tfvars = hcl.loads(tfvars_body)
+
+    webhook_url = tfvars['non_critical_slack_webhook']
+
+    slack_data = {
+        'username': 'reindex-tracker',
+        'icon_emoji': ':dynamodb:',
+        'color': '#2E72B8',
+        'title': 'reindexer',
+        'fields': [{
+            'value': '*%s* started a reindex in *%s*\nReason: *%s*' % (
+                username, prefix, reason
+            )
+        }]
+    }
+
+    resp = requests.post(
+        webhook_url,
+        data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )
+    resp.raise_for_status()
+
+
+def main():
     args = docopt.docopt(__doc__)
 
     client = boto3.client('dynamodb')
 
     prefix = args['--prefix']
     count = int(args['--count'] or '0')
-    table_name = args['--table'] or 'ReindexShardTracker'
+    reason = args['--reason']
+    table_name = TABLE_NAME
 
-    current_max_version = _get_current_max_desired_capacity(
-        client=client,
-        table_name=table_name,
-        prefix=prefix
-    )
-    desired_version = current_max_version + 1
+    # We use the current timestamp for the reindex version -- this allows
+    # us to easily trace when a reindex was triggered.
+    desired_version = int(dt.datetime.utcnow().timestamp())
     print(f'Updating all shards in {prefix} to {desired_version}')
+
+    post_to_slack(prefix=prefix, reason=reason)
 
     if count == 0:
         count = _count_current_shards(
@@ -149,30 +184,10 @@ if __name__ == '__main__':
         table_name=table_name
     )
 
-    # Trigger an immediate capacity increase on the DynamoDB table.
-    #
-    # If we just start the reindexer, the autoscaling will eventually warm up
-    # the table, but only after hitting lots of ProvisionedThroughputExceeded
-    # exceptions.  This should give a smoother start to the reindexer.
-    #
-    # Note: this does not disable the autoscaling rules, and if you run this
-    # without starting the reindexer, it eventually scales back down.
-    #
-    client.update_table(
-        TableName='SourceData',
-        ProvisionedThroughput={
-            'WriteCapacityUnits': 50,
-            'ReadCapacityUnits': 5
-        },
-        GlobalSecondaryIndexUpdates=[
-            {
-                'Update': {
-                    'IndexName': 'reindexTracker',
-                    'ProvisionedThroughput': {
-                        'WriteCapacityUnits': 50,
-                        'ReadCapacityUnits': 5
-                    }
-                }
-            }
-        ]
-    )
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        import sys
+        sys.exit(1)
