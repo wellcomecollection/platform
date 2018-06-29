@@ -24,11 +24,12 @@ class DisplayItemV2Test extends FunSpec with Matchers {
   )
 
   it("should read an Item as a DisplayItemV2 correctly") {
-    val item = IdentifiedItem(
+    val item = Identified(
       canonicalId = "foo",
       sourceIdentifier = identifier,
-      locations = List(location)
-    )
+      agent = Item(
+        locations = List(location)
+      ))
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -44,12 +45,14 @@ class DisplayItemV2Test extends FunSpec with Matchers {
 
   it("correctly parses an Item without any extra identifiers") {
     val item =
-      fromJson[IdentifiedItem](s"""
+      fromJson[Identified[Item]](s"""
         {
           "canonicalId": "b71876a",
           "sourceIdentifier": ${toJson(identifier).get},
-          "locations": [],
-          "type": "item"
+          "agent": {
+            "locations": [],
+            "type": "item"
+          }
         }
       """).get
 
@@ -64,7 +67,7 @@ class DisplayItemV2Test extends FunSpec with Matchers {
 
   it("correctly parses an Item without any locations") {
     val item =
-      fromJson[IdentifiedItem]("""
+      fromJson[Identified[Item]]("""
         {
           "canonicalId": "mr953zsh",
           "sourceIdentifier": {
@@ -77,7 +80,9 @@ class DisplayItemV2Test extends FunSpec with Matchers {
             "value": "M9530000"
           },
           "identifiers": [],
-          "type": "item"
+          "agent": {
+            "type": "item"
+          }
         }
       """).get
 

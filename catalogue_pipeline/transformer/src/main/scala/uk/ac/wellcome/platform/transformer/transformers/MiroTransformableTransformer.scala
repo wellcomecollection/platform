@@ -199,19 +199,21 @@ class MiroTransformableTransformer
   }
 
   private def getItems(miroData: MiroTransformableData,
-                       miroId: String): List[UnidentifiedItem] = {
+                       miroId: String): List[Identifiable[Item]] = {
     List(
-      UnidentifiedItem(
+      Identifiable(
         sourceIdentifier = SourceIdentifier(
           identifierType = IdentifierType("miro-image-number"),
           "Item",
           miroId),
-        locations = List(
-          DigitalLocation(
-            locationType = LocationType("iiif-image"),
-            url = buildImageApiURL(miroId, "info"),
-            credit = getCredit(miroId = miroId, miroData = miroData),
-            license = chooseLicense(miroData.useRestrictions)
+        agent = Item(
+          locations = List(
+            DigitalLocation(
+              locationType = LocationType("iiif-image"),
+              url = buildImageApiURL(miroId, "info"),
+              credit = getCredit(miroId = miroId, miroData = miroData),
+              license = chooseLicense(miroData.useRestrictions)
+            )
           )
         )
       ))

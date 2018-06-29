@@ -28,7 +28,7 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
   val language: Option[Language]
   val dimensions: Option[String]
 
-  val items: List[Item]
+  val items: List[IdentityState[Item]]
 
   val version: Int
   val visible: Boolean
@@ -55,7 +55,7 @@ case class UnidentifiedWork(
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
-  items: List[UnidentifiedItem] = Nil,
+  items: List[Identifiable[Item]] = Nil,
   visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
@@ -79,7 +79,7 @@ case class IdentifiedWork(
   production: List[ProductionEvent[Displayable[AbstractAgent]]] = Nil,
   language: Option[Language] = None,
   dimensions: Option[String] = None,
-  items: List[IdentifiedItem] = Nil,
+  items: List[Identified[Item]] = Nil,
   version: Int,
   visible: Boolean = true,
   ontologyType: String = "Work")

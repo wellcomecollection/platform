@@ -8,14 +8,14 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
-  def items(its: List[IdentifiedItem]) =
+  def items(its: List[Identified[Item]]) =
     its
       .map { it =>
         s"""{
           "id": "${it.canonicalId}",
-          "type": "${it.ontologyType}",
+          "type": "${it.agent.ontologyType}",
           "locations": [
-            ${locations(it.locations)}
+            ${locations(it.agent.locations)}
           ]
         }"""
       }

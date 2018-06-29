@@ -3,12 +3,7 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.models.WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedItem,
-  IdentifiedWork,
-  LocationType,
-  PhysicalLocation
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayLocationsV2SerialisationTest
@@ -29,10 +24,12 @@ class DisplayLocationsV2SerialisationTest
       version = 1,
       title = Some("A zoo of zebras doing zumba"),
       items = List(
-        IdentifiedItem(
+        Identified(
           canonicalId = "mhberjwy7",
           sourceIdentifier = sourceIdentifier,
-          locations = List(physicalLocation)
+          agent = Item(
+            locations = List(physicalLocation)
+          )
         )
       )
     )

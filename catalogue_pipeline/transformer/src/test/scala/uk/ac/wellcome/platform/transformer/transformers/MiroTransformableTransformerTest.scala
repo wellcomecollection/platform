@@ -270,7 +270,7 @@ class MiroTransformableTransformerTest
       credit = Some("Ezra Feilden"),
       locationType = LocationType("iiif-image")
     )
-    work.items.head.locations shouldBe List(expectedDigitalLocation)
+    work.items.head.agent.locations shouldBe List(expectedDigitalLocation)
   }
 
   private def assertTransformReturnsNone(data: String) = {

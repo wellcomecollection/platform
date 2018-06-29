@@ -112,9 +112,7 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
     keywordField("canonicalId"),
     sourceIdentifier,
     otherIdentifiers,
-    location(),
-    booleanField("visible"),
-    keywordField("ontologyType")
+    objectField("agent").fields(location(), keywordField("ontologyType"))
   )
   val language = objectField("language").fields(
     keywordField("id"),
