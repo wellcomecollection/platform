@@ -19,7 +19,22 @@ resource "aws_alb_listener" "https" {
   }
 }
 
+resource "aws_alb_listener_rule" "https" {
+  listener_arn = "${aws_alb_listener.https.arn}"
+
+  action {
+    type             = "forward"
+    target_group_arn = "${module.service.target_group_arn}"
+  }
+
+  condition {
+    field  = "path-pattern"
+    values = ["${var.path_pattern}"]
+  }
+}
+
+
 data "aws_acm_certificate" "certificate" {
-  domain   = "monitoring.wellcomecollection.org"
+  domain   = "${var.certificate_domain}"
   statuses = ["ISSUED"]
 }
