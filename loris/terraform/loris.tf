@@ -1,11 +1,11 @@
 module "loris" {
-  source ="service"
+  source = "service"
 
   namespace = "loris_v2"
 
   certificate_domain = "iiif-origin.wellcomecollection.org"
 
-  cpu = "3960"
+  cpu    = "3960"
   memory = "7350"
 
   aws_region = "${var.aws_region}"
@@ -32,7 +32,7 @@ module "loris" {
   app_container_image = "${module.ecr_loris.repository_url}:${var.release_ids["loris"]}"
   app_container_port  = "8888"
 
-  app_cpu = "3832"
-  app_memory = "7222"
+  app_cpu      = "3832"
+  app_memory   = "7222"
   app_env_vars = {}
 }
