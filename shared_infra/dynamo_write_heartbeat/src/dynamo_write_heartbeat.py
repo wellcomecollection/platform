@@ -15,7 +15,7 @@ from wellcome_aws_utils.lambda_utils import log_on_error
 @log_on_error
 def main(event, context, dynamodb_client=None):
     try:
-        table_names = [t.strip(' ') for t in os.environ['TABLE_NAMES'].split(',')]
+        table_names = [t.strip() for t in os.environ['TABLE_NAMES'].split(',')]
     except KeyError:
         raise RuntimeError('TABLE_NAMES not found')
 
