@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.reindex_worker.services
 
 import javax.naming.ConfigurationException
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
+import com.amazonaws.services.sns.model.AmazonSNSException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -10,11 +11,12 @@ import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
-import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 class ReindexServiceTest
     extends FunSpec
@@ -41,7 +43,7 @@ class ReindexServiceTest
     desiredVersion = 2
   )
 
-  it("only updates records with a lower than desired reindexVersion") {
+  it("only sends notifications for records with a lower than desired reindexVersion") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
         withReindexService(table, topic) { reindexService =>
@@ -59,16 +61,17 @@ class ReindexServiceTest
             olderRecord
           )
 
-          val expectedRecords = List(
-            newerRecord,
-            olderRecord.copy(
-              reindexVersion = desiredVersion,
-              version = 2
-            )
-          )
-
           records.foreach(record =>
             Scanamo.put(dynamoDbClient)(table.name)(record))
+
+          val expectedRecords = List(
+            ReindexRecord(
+              id = olderRecord.id,
+              version = olderRecord.version,
+              reindexShard = olderRecord.reindexShard,
+              reindexVersion = desiredVersion
+            )
+          )
 
           val reindexJob = ReindexJob(
             shardId = shardName,
@@ -76,18 +79,19 @@ class ReindexServiceTest
           )
 
           whenReady(reindexService.runReindex(reindexJob)) { _ =>
-            val records = Scanamo
-              .scan[TestRecord](dynamoDbClient)(table.name)
-              .map(_.right.get)
+            val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+              .map { _.message }
+              .map { fromJson[ReindexRecord](_).get }
+              .distinct
 
-            records should contain theSameElementsAs expectedRecords
+            actualRecords should contain theSameElementsAs expectedRecords
           }
         }
       }
     }
   }
 
-  it("updates records in the specified shard") {
+  it("sends notifications for records in the specified shard") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
         withReindexService(table, topic) { reindexService =>
@@ -111,21 +115,22 @@ class ReindexServiceTest
           recordList.foreach(record =>
             Scanamo.put(dynamoDbClient)(table.name)(record))
 
-          val expectedUpdatedRecords = inShardRecords.map(
-            record =>
-              record
-                .copy(
-                  reindexVersion = desiredVersion,
-                  version = record.version + 1))
+          val expectedRecords = inShardRecords.map { record =>
+            ReindexRecord(
+              id = record.id,
+              version = record.version,
+              reindexShard = shardName,
+              reindexVersion = desiredVersion
+            )
+          }
 
           whenReady(reindexService.runReindex(reindexJob)) { _ =>
-            val testRecords =
-              Scanamo
-                .scan[TestRecord](dynamoDbClient)(table.name)
-                .map(_.right.get)
+            val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+              .map { _.message }
+              .map { fromJson[ReindexRecord](_).get }
+              .distinct
 
-            testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
-            testRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+            actualRecords should contain theSameElementsAs expectedRecords
           }
         }
       }
@@ -189,9 +194,16 @@ class ReindexServiceTest
   it("returns a failed Future if there's an SNS error") {
     withLocalDynamoDbTable { table =>
       withReindexService(table, Topic("no-such-topic")) { service =>
-        val future = service.runReindex(exampleReindexJob)
+        val reindexJob = ReindexJob(
+          shardId = exampleRecord.reindexShard,
+          desiredVersion = exampleRecord.reindexVersion + 1
+        )
+
+        Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
+
+        val future = service.runReindex(reindexJob)
         whenReady(future.failed) {
-          _ shouldBe a[ResourceNotFoundException]
+          _ shouldBe a[AmazonSNSException]
         }
       }
     }
