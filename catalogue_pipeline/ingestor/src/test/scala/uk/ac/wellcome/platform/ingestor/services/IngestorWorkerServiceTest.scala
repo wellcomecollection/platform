@@ -111,7 +111,6 @@ class IngestorWorkerServiceTest
     }
   }
 
-
   it("inserts an Sierra identified invisible Work into the v2 index") {
     val sierraSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
@@ -120,6 +119,42 @@ class IngestorWorkerServiceTest
     )
 
     val work = IdentifiedInvisibleWork(canonicalId = "abcdefg",sourceIdentifier = sierraSourceIdentifier, version = 1)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
+            val messageBody = put[IdentifiedBaseWork](
+              obj = work,
+              location = ObjectLocation(
+                namespace = bucket.name,
+                key = s"work.json"
+              )
+            )
+            sqsClient.sendMessage(queue.url, messageBody)
+
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              work)
+
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              work)
+        }
+      }
+    }
+  }
+
+  it("inserts an Sierra identified redirected Work into the v2 index") {
+    val sierraSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      ontologyType = "Work",
+      value = "b1027467"
+    )
+
+    val work = IdentifiedRedirectedWork(canonicalId = "abcdefg",sourceIdentifier = sierraSourceIdentifier, version = 1, redirect = IdentifiedRedirect(canonicalId = "defghijlk"))
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
