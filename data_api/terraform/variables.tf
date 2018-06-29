@@ -21,14 +21,3 @@ variable "es_cluster_credentials" {
   description = "Credentials for the Elasticsearch cluster"
   type        = "map"
 }
-
-variable "es_config_snapshot" {
-  description = "Elasticcloud config for the snapshot generator"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
-    doc_type = "work"
-  }
-}
