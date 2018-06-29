@@ -16,12 +16,24 @@ Options:
 
 import datetime as dt
 import json
+import os
+import subprocess
+import sys
 
 import boto3
 import docopt
 import hcl
 import requests
 import tqdm
+
+
+# Reindex shards are added by a "reindex_shard_generator" Lambda.
+# Import the utility code that assigns reindex shards.
+ROOT = subprocess.check_call(
+    ['git', 'rev-parse', '--show-toplevel']).decode('utf8')
+sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
+
+from reindex_shard_config import get_number_of_shards
 
 
 TABLE_NAME = 'ReindexShardTracker'
@@ -57,32 +69,6 @@ def _update_shard(client, table_name, shard):
             ':initialCurrentVersion': {'N': '1'},
         }
     )
-
-
-def _all_records_in_shard(client, table_name):
-    """Generates every row in a particular shard."""
-    paginator = client.get_paginator('scan')
-    for page in paginator.paginate(TableName=table_name):
-        for i in page['Items']:
-            yield i
-
-
-def _all_shard_names(client, table_name):
-    """Generates the name of all current shards."""
-    for shard in _all_records_in_shard(client=client, table_name=table_name):
-        yield shard['shardId']['S']
-
-
-def _count_current_shards(client, prefix, table_name):
-    """How many shards are there in the current table?"""
-    best_seen = None
-    for s in _all_shard_names(client=client, table_name=table_name):
-        if s.startswith(prefix):
-            value = int(s.replace(prefix, '').strip('/'))
-            if (best_seen is None) or (value > best_seen):
-                best_seen = value
-
-    return best_seen
 
 
 def create_shards(client, prefix, desired_version, count, table_name):
@@ -167,11 +153,7 @@ def main():
 
     post_to_slack(prefix=prefix, reason=reason)
 
-    count = _count_current_shards(
-        client=client,
-        table_name=table_name,
-        prefix=prefix
-    )
+    count = get_number_of_shards(source_name=prefix)
 
     create_shards(
         client=client,
