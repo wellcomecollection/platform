@@ -112,7 +112,6 @@ jobs:
     - stage: test
       env:
         - TRAVIS_LAMBDAS="snapshot_scheduler \
-          reindex_job_creator \
           reindex_shard_generator \
           sierra_window_generator \
           s3_demultiplexer \
