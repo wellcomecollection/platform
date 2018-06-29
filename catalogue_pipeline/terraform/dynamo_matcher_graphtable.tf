@@ -41,10 +41,10 @@ module "matcher_graph_dynamo_autoscaling" {
   enable_read_scaling     = true
   read_target_utilization = 30
   read_min_capacity       = 1
-  read_max_capacity       = 300
+  read_max_capacity       = 750
 
   enable_write_scaling     = true
   write_target_utilization = 30
   write_min_capacity       = 1
-  write_max_capacity       = 300
+  write_max_capacity       = 750
 }

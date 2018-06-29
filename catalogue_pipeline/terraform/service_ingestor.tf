@@ -1,7 +1,7 @@
 locals {
   es_config_ingestor = {
-    index_v1 = "v1-2018-06-25-other-identifiers"
-    index_v2 = "v2-2018-06-25-other-identifiers"
+    index_v1 = "v1-2018-06-29-identity-state"
+    index_v2 = "v2-2018-06-29-identity-state"
     doc_type = "work"
   }
 }

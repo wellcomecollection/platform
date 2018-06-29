@@ -9,6 +9,7 @@ SBT_APPS    =
 ECS_TASKS   = sqs_freezeray sqs_redrive
 LAMBDAS     = drain_ecs_container_instance \
               dynamo_to_sns \
+              dynamo_write_heartbeat \
               ecs_ec2_instance_tagger \
               run_ecs_task
 
