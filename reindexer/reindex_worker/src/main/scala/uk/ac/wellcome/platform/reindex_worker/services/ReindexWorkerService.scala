@@ -20,9 +20,13 @@ class ReindexWorkerService @Inject()(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexJob: ReindexJob <- Future.fromTry(fromJson[ReindexJob](message.Message))
-      outdatedRecordIds: List[String] <- readerService.findRecordsForReindexing(reindexJob)
-      _ <- notificationService.sendNotifications(outdatedRecordIds, desiredVersion = reindexJob.desiredVersion)
+      reindexJob: ReindexJob <- Future.fromTry(
+        fromJson[ReindexJob](message.Message))
+      outdatedRecordIds: List[String] <- readerService.findRecordsForReindexing(
+        reindexJob)
+      _ <- notificationService.sendNotifications(
+        outdatedRecordIds,
+        desiredVersion = reindexJob.desiredVersion)
     } yield ()
 
   def stop() = system.terminate()

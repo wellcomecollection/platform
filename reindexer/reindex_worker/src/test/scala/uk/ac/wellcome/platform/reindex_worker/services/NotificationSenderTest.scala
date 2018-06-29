@@ -9,7 +9,12 @@ import uk.ac.wellcome.platform.reindex_worker.models.ReindexRequest
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-class NotificationSenderTest extends FunSpec with Matchers with ExtendedPatience with ScalaFutures with SNS {
+class NotificationSenderTest
+    extends FunSpec
+    with Matchers
+    with ExtendedPatience
+    with ScalaFutures
+    with SNS {
   it("sends ReindexRequests for the provided IDs") {
     withLocalSnsTopic { topic =>
       val notificationSender = new NotificationSender(
@@ -51,7 +56,9 @@ class NotificationSenderTest extends FunSpec with Matchers with ExtendedPatience
       )
     )
 
-    val future = notificationSender.sendNotifications(recordIds = List("1", "2", "3"), desiredVersion = 2)
+    val future = notificationSender.sendNotifications(
+      recordIds = List("1", "2", "3"),
+      desiredVersion = 2)
     whenReady(future.failed) {
       _ shouldBe a[AmazonSNSException]
     }

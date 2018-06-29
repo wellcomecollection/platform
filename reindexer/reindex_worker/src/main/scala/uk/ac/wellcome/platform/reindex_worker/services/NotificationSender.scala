@@ -9,7 +9,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class NotificationSender @Inject()(snsWriter: SNSWriter) {
-  def sendNotifications(recordIds: List[String], desiredVersion: Int): Future[List[Unit]] = {
+  def sendNotifications(recordIds: List[String],
+                        desiredVersion: Int): Future[List[Unit]] = {
     Future.sequence {
       recordIds.map {
         sendIndividualNotification(_, desiredVersion = desiredVersion)

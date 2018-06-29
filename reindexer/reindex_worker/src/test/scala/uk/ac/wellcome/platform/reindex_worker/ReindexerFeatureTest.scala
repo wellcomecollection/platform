@@ -7,7 +7,10 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.Id
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  ReindexJob,
+  ReindexRequest
+}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -80,17 +83,19 @@ class ReindexerFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(queue)
+          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
+            queue)
 
           withServer(flags) { _ =>
             val expectedRecords =
               createReindexableData(queue, table)
 
             eventually {
-              val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
-                .map { _.message }
-                .map { fromJson[ReindexRequest](_).get }
-                .distinct
+              val actualRecords: Seq[ReindexRequest] =
+                listMessagesReceivedFromSNS(topic)
+                  .map { _.message }
+                  .map { fromJson[ReindexRequest](_).get }
+                  .distinct
 
               actualRecords should contain theSameElementsAs expectedRecords
             }

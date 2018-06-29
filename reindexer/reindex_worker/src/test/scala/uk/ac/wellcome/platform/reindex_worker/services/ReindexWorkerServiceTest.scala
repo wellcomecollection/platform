@@ -10,7 +10,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
+import uk.ac.wellcome.platform.reindex_worker.models.{
+  ReindexJob,
+  ReindexRequest
+}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
@@ -33,12 +36,11 @@ class ReindexWorkerServiceTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
-          case queuePair@QueuePair(queue, dlq) =>
+          case queuePair @ QueuePair(queue, dlq) =>
             withSQSStream[NotificationMessage, Assertion](
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-
               val readerService = new RecordReader(
                 dynamoDbClient = dynamoDbClient,
                 dynamoConfig = DynamoConfig(
@@ -108,10 +110,11 @@ class ReindexWorkerServiceTest
             sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
             eventually {
-              val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
-                .map { _.message }
-                .map { fromJson[ReindexRequest](_).get }
-                .distinct
+              val actualRecords: Seq[ReindexRequest] =
+                listMessagesReceivedFromSNS(topic)
+                  .map { _.message }
+                  .map { fromJson[ReindexRequest](_).get }
+                  .distinct
 
               actualRecords shouldBe expectedRecords
               assertQueueEmpty(queue)
@@ -154,7 +157,6 @@ class ReindexWorkerServiceTest
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-
               val readerService = new RecordReader(
                 dynamoDbClient = dynamoDbClient,
                 dynamoConfig = DynamoConfig(

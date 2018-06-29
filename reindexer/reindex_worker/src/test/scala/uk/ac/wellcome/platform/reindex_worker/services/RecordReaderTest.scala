@@ -14,7 +14,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class RecordReaderTest
-  extends FunSpec
+    extends FunSpec
     with ScalaFutures
     with Matchers
     with LocalDynamoDbVersioned
@@ -64,8 +64,9 @@ class RecordReaderTest
           desiredVersion = desiredVersion
         )
 
-        whenReady(service.findRecordsForReindexing(reindexJob)) { actualRecordIds =>
-          actualRecordIds should contain theSameElementsAs expectedRecordIds
+        whenReady(service.findRecordsForReindexing(reindexJob)) {
+          actualRecordIds =>
+            actualRecordIds should contain theSameElementsAs expectedRecordIds
         }
       }
 
@@ -99,19 +100,21 @@ class RecordReaderTest
           record.id
         }
 
-        whenReady(service.findRecordsForReindexing(reindexJob)) { actualRecordIds =>
-          actualRecordIds should contain theSameElementsAs expectedRecordIds
+        whenReady(service.findRecordsForReindexing(reindexJob)) {
+          actualRecordIds =>
+            actualRecordIds should contain theSameElementsAs expectedRecordIds
         }
       }
     }
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexRecordReaderService(Table("does-not-exist", "no-such-index")) { service =>
-      val future = service.findRecordsForReindexing(exampleReindexJob)
-      whenReady(future.failed) {
-        _ shouldBe a[ResourceNotFoundException]
-      }
+    withReindexRecordReaderService(Table("does-not-exist", "no-such-index")) {
+      service =>
+        val future = service.findRecordsForReindexing(exampleReindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[ResourceNotFoundException]
+        }
     }
   }
 
@@ -143,4 +146,3 @@ class RecordReaderTest
     testWith(service)
   }
 }
-
