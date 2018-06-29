@@ -26,7 +26,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(0).canonicalId}",
-                 |     "title": "${works(0).title.get}",
+                 |     "title": "${works(0).title}",
                  |     "description": "${works(0).description.get}",
                  |     "workType": {
                  |       "id": "${works(0).workType.get.id}",
@@ -46,7 +46,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(1).canonicalId}",
-                 |     "title": "${works(1).title.get}",
+                 |     "title": "${works(1).title}",
                  |     "description": "${works(1).description.get}",
                  |     "workType": {
                  |       "id": "${works(1).workType.get.id}",
@@ -66,7 +66,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(2).canonicalId}",
-                 |     "title": "${works(2).title.get}",
+                 |     "title": "${works(2).title}",
                  |     "description": "${works(2).description.get}",
                  |     "workType": {
                  |       "id": "${works(2).workType.get.id}",
@@ -101,8 +101,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           lettering = lettering,
           createdDate = period,
           creator = agent,
-          items = List(defaultItem),
-          visible = true)
+          items = List(defaultItem))
 
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
@@ -164,7 +163,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
                  | "id": "${work.canonicalId}",
-                 | "title": "${work.title.get}",
+                 | "title": "${work.title}",
                  | "creators": [ ],
                  | "items": [ ${items(work.items)} ],
                  | "subjects": [ ],
@@ -203,7 +202,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(1).canonicalId}",
-                 |     "title": "${works(1).title.get}",
+                 |     "title": "${works(1).title}",
                  |     "description": "${works(1).description.get}",
                  |     "workType" : {
                  |        "id" : "${works(1).workType.get.id}",
@@ -241,7 +240,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(0).canonicalId}",
-                 |     "title": "${works(0).title.get}",
+                 |     "title": "${works(0).title}",
                  |     "description": "${works(0).description.get}",
                  |     "workType" : {
                  |        "id" : "${works(0).workType.get.id}",
@@ -279,7 +278,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${works(2).canonicalId}",
-                 |     "title": "${works(2).title.get}",
+                 |     "title": "${works(2).title}",
                  |     "description": "${works(2).description.get}",
                  |     "workType" : {
                  |        "id" : "${works(2).workType.get.id}",
@@ -348,7 +347,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
-                 |     "title": "${work1.title.get}",
+                 |     "title": "${work1.title}",
                  |     "creators": [],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -401,7 +400,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
-                 |     "title": "${work1.title.get}",
+                 |     "title": "${work1.title}",
                  |     "creators": [ ],
                  |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
                                 identifier1)} ],
@@ -413,7 +412,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${work2.canonicalId}",
-                 |     "title": "${work2.title.get}",
+                 |     "title": "${work2.title}",
                  |     "creators": [ ],
                  |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
                                 identifier2)} ],
@@ -455,7 +454,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
                  | "id": "${work.canonicalId}",
-                 | "title": "${work.title.get}",
+                 | "title": "${work.title}",
                  | "creators": [ ],
                  | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
                                 srcIdentifier)} ],
@@ -473,60 +472,64 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("searches different indices with the ?_index query parameter") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "1234",
-          title = "A whale on a wave"
-        )
-        insertIntoElasticsearch(indexNameV1, itemType, work)
-
-        val work_alt = workWith(
-          canonicalId = "5678",
-          title = "An impostor in an igloo"
-        )
-        insertIntoElasticsearch(
-          indexName = "alt_records",
-          itemType = itemType,
-          work_alt)
-
-        eventually {
-          server.httpGet(
-            path = s"/$apiPrefix/works/${work.canonicalId}",
-            andExpect = Status.Ok,
-            withJsonBody = s"""
-                 |{
-                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                 | "type": "Work",
-                 | "id": "${work.canonicalId}",
-                 | "title": "${work.title.get}",
-                 | "creators": [ ],
-                 | "subjects": [ ],
-                 | "genres": [ ],
-                 | "publishers": [ ],
-                 | "placesOfPublication": [ ]
-                 |}
-          """.stripMargin
+        withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
+          val work = workWith(
+            canonicalId = "1234",
+            title = "A whale on a wave"
           )
-        }
+          insertIntoElasticsearch(indexNameV1, itemType, work)
 
-        eventually {
-          server.httpGet(
-            path =
-              s"/$apiPrefix/works/${work_alt.canonicalId}?_index=alt_records",
-            andExpect = Status.Ok,
-            withJsonBody = s"""
-                 |{
-                 | "@context": "https://localhost:8888/$apiPrefix/context.json",
-                 | "type": "Work",
-                 | "id": "${work_alt.canonicalId}",
-                 | "title": "${work_alt.title.get}",
-                 | "creators": [ ],
-                 | "subjects": [ ],
-                 | "genres": [ ],
-                 | "publishers": [ ],
-                 | "placesOfPublication": [ ]
-                 |}
-          """.stripMargin
+          val work_alt = workWith(
+            canonicalId = "5678",
+            title = "An impostor in an igloo"
           )
+          insertIntoElasticsearch(
+            indexName = otherIndex,
+            itemType = itemType,
+            work_alt)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works/${work.canonicalId}",
+              andExpect = Status.Ok,
+              withJsonBody =
+                s"""
+                   |{
+                   | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                   | "type": "Work",
+                   | "id": "${work.canonicalId}",
+                   | "title": "${work.title}",
+                   | "creators": [ ],
+                   | "subjects": [ ],
+                   | "genres": [ ],
+                   | "publishers": [ ],
+                   | "placesOfPublication": [ ]
+                   |}
+          """.stripMargin
+            )
+          }
+
+          eventually {
+            server.httpGet(
+              path =
+                s"/$apiPrefix/works/${work_alt.canonicalId}?_index=$otherIndex",
+              andExpect = Status.Ok,
+              withJsonBody =
+                s"""
+                   |{
+                   | "@context": "https://localhost:8888/$apiPrefix/context.json",
+                   | "type": "Work",
+                   | "id": "${work_alt.canonicalId}",
+                   | "title": "${work_alt.title}",
+                   | "creators": [ ],
+                   | "subjects": [ ],
+                   | "genres": [ ],
+                   | "publishers": [ ],
+                   | "placesOfPublication": [ ]
+                   |}
+          """.stripMargin
+            )
+          }
         }
     }
   }
@@ -534,67 +537,71 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("looks up works in different indices with the ?_index query parameter") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "1234",
-          title = "A wombat wallowing under a willow"
-        )
-        insertIntoElasticsearch(indexNameV1, itemType, work)
-
-        val work_alt = workWith(
-          canonicalId = "5678",
-          title = "An impostor in an igloo"
-        )
-        insertIntoElasticsearch(
-          indexName = "alt_records",
-          itemType = itemType,
-          work_alt)
-
-        eventually {
-          server.httpGet(
-            path = s"/$apiPrefix/works?query=wombat",
-            andExpect = Status.Ok,
-            withJsonBody = s"""
-                 |{
-                 |  ${resultList(apiPrefix)},
-                 |  "results": [
-                 |   {
-                 |     "type": "Work",
-                 |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title.get}",
-                 |     "creators": [ ],
-                 |     "subjects": [ ],
-                 |     "genres": [ ],
-                 |     "publishers": [ ],
-                 |     "placesOfPublication": [ ]
-                 |   }
-                 |  ]
-                 |}
-          """.stripMargin
+        withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
+          val work = workWith(
+            canonicalId = "1234",
+            title = "A wombat wallowing under a willow"
           )
-        }
+          insertIntoElasticsearch(indexNameV1, itemType, work)
 
-        eventually {
-          server.httpGet(
-            path = s"/$apiPrefix/works?query=igloo&_index=alt_records",
-            andExpect = Status.Ok,
-            withJsonBody = s"""
-                 |{
-                 |  ${resultList(apiPrefix)},
-                 |  "results": [
-                 |   {
-                 |     "type": "Work",
-                 |     "id": "${work_alt.canonicalId}",
-                 |     "title": "${work_alt.title.get}",
-                 |     "creators": [ ],
-                 |     "subjects": [ ],
-                 |     "genres": [ ],
-                 |     "publishers": [ ],
-                 |     "placesOfPublication": [ ]
-                 |   }
-                 |  ]
-                 |}
-          """.stripMargin
+          val work_alt = workWith(
+            canonicalId = "5678",
+            title = "An impostor in an igloo"
           )
+          insertIntoElasticsearch(
+            indexName = otherIndex,
+            itemType = itemType,
+            work_alt)
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?query=wombat",
+              andExpect = Status.Ok,
+              withJsonBody =
+                s"""
+                   |{
+                   |  ${resultList(apiPrefix)},
+                   |  "results": [
+                   |   {
+                   |     "type": "Work",
+                   |     "id": "${work.canonicalId}",
+                   |     "title": "${work.title}",
+                   |     "creators": [ ],
+                   |     "subjects": [ ],
+                   |     "genres": [ ],
+                   |     "publishers": [ ],
+                   |     "placesOfPublication": [ ]
+                   |   }
+                   |  ]
+                   |}
+          """.stripMargin
+            )
+          }
+
+          eventually {
+            server.httpGet(
+              path = s"/$apiPrefix/works?query=igloo&_index=$otherIndex",
+              andExpect = Status.Ok,
+              withJsonBody =
+                s"""
+                   |{
+                   |  ${resultList(apiPrefix)},
+                   |  "results": [
+                   |   {
+                   |     "type": "Work",
+                   |     "id": "${work_alt.canonicalId}",
+                   |     "title": "${work_alt.title}",
+                   |     "creators": [ ],
+                   |     "subjects": [ ],
+                   |     "genres": [ ],
+                   |     "publishers": [ ],
+                   |     "placesOfPublication": [ ]
+                   |   }
+                   |  ]
+                   |}
+          """.stripMargin
+            )
+          }
         }
     }
   }
@@ -625,7 +632,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title.get}",
+                 |     "title": "${work.title}",
                  |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -675,7 +682,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
-                 |     "title": "${work1.title.get}",
+                 |     "title": "${work1.title}",
                  |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],

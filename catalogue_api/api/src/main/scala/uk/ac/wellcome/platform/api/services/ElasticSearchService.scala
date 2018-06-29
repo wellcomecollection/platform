@@ -14,7 +14,7 @@ import scala.concurrent.Future
 class ElasticSearchService @Inject()(elasticClient: HttpClient,
                                      elasticConfig: ElasticConfig) {
 
-  val documentType = elasticConfig.documentType
+  val documentType: String = elasticConfig.documentType
 
   def findResultById(canonicalId: String,
                      indexName: String): Future[GetResponse] =
@@ -30,7 +30,7 @@ class ElasticSearchService @Inject()(elasticClient: HttpClient,
     elasticClient
       .execute {
         search(s"${indexName}/$documentType")
-          .query(termQuery("visible", true))
+          .query(termQuery("type", "IdentifiedWork"))
           .sortBy(fieldSort(sortByField))
           .limit(limit)
           .from(from)
@@ -46,7 +46,7 @@ class ElasticSearchService @Inject()(elasticClient: HttpClient,
           .query(
             must(
               simpleStringQuery(queryString),
-              termQuery("visible", true)
+              termQuery("type", "IdentifiedWork")
             ))
           .limit(limit)
           .from(from)

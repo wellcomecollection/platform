@@ -52,6 +52,21 @@ trait WorksUtil {
           items = List(defaultItem)
       ))
 
+  def createInvisibleWorks(count: Int,
+                  start: Int = 1): Seq[IdentifiedInvisibleWork] =
+    (start to count).map(
+      (idx: Int) =>
+        invisibleWorkWith(s"$idx-$canonicalId")
+      )
+
+  def invisibleWorkWith(canonicalId: String): IdentifiedInvisibleWork = {
+    IdentifiedInvisibleWork(
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      canonicalId = canonicalId
+    )
+  }
+
   def workWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(
       title = title,

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.works.v2
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 
 class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
@@ -11,10 +11,8 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "g9dtcj2e",
-          title = "This work has been deleted",
-          visible = false
+        val work = invisibleWorkWith(
+          canonicalId = "g9dtcj2e"
         )
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
@@ -33,16 +31,14 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         // Start by indexing a work with visible=false.
-        val deletedWork = workWith(
-          canonicalId = "gze7bc24",
-          title = "This work has been deleted",
-          visible = false
+        val deletedWork = invisibleWorkWith(
+          canonicalId = "gze7bc24"
         )
 
         // Then we index two ordinary works into Elasticsearch.
         val works = createWorks(2)
 
-        val worksToIndex = Seq[IdentifiedWork](deletedWork) ++ works
+        val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
         insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
 
         eventually {
@@ -56,7 +52,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |   {
                |     "type": "Work",
                |     "id": "${works(0).canonicalId}",
-               |     "title": "${works(0).title.get}",
+               |     "title": "${works(0).title}",
                |     "description": "${works(0).description.get}",
                |     "workType": {
                |       "id": "${works(0).workType.get.id}",
@@ -73,7 +69,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |   {
                |     "type": "Work",
                |     "id": "${works(1).canonicalId}",
-               |     "title": "${works(1).title.get}",
+               |     "title": "${works(1).title}",
                |     "description": "${works(1).description.get}",
                |     "workType": {
                |       "id": "${works(1).workType.get.id}",
@@ -102,10 +98,8 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
           canonicalId = "r8dx6std",
           title = "A deleted dodo"
         )
-        val deletedWork = workWith(
-          canonicalId = "e7rxkty8",
-          title = "This work has been deleted",
-          visible = false
+        val deletedWork = invisibleWorkWith(
+          canonicalId = "e7rxkty8"
         )
         insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 
@@ -120,7 +114,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |   {
                |     "type": "Work",
                |     "id": "${work.canonicalId}",
-               |     "title": "${work.title.get}",
+               |     "title": "${work.title}",
                |     "contributors": [],
                |     "subjects": [ ],
                |     "genres": [ ],
