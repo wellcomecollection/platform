@@ -46,25 +46,25 @@ variable "es_cluster_credentials" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "remus"
+  default     = "romulus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = ""
+  default     = "cd3bd08cbf5ece8af17b2baad979e5c0e589b880"
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "58d71745bc3b50ef0bde45be7e27a63e1dee4b1a"
+  default     = ""
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
+  default     = ""
 }
