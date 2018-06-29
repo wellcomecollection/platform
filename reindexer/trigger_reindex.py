@@ -3,11 +3,11 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --prefix=(miro|sierra) --reason=<REASON>
+Usage: trigger_reindex.py --source=(miro|sierra) --reason=<REASON>
        trigger_reindex.py -h | --help
 
 Options:
-  --prefix=(miro|sierra)    Name of the reindex shard prefix.
+  --source=(miro|sierra)    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
   -h --help                 Print this help message
@@ -33,72 +33,47 @@ ROOT = subprocess.check_call(
     ['git', 'rev-parse', '--show-toplevel']).decode('utf8')
 sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
 
-from reindex_shard_config import get_number_of_shards
+from reindex_shard_config import get_number_of_shards  # noqa
 
 
-TABLE_NAME = 'ReindexShardTracker'
+TOPIC_NAME = 'reindex_jobs'
 
 
-# Implementation note: this code may fail if you hit the write limit on
-# DynamoDB, and interrupt midway through updating a prefix.
-#
-#  1. Decorating this function with the tenacity library
-#     (http://tenacity.readthedocs.io/en/latest/) should make it more likely
-#     to succeed, as it will retry in case of error.
-#
-#  2. The whole process is idempotent, so it's enough to bump the capacity
-#     and re-run the prefix.
-#
-# FWIW, I was able to create >5000 shards with WriteCapacity=1 and autoscaling
-# on a test table, so this may be a theoretical concern!
+def all_shard_ids(source_name):
+    """
+    Generates all the shard IDs in a given source name.
 
-def _update_shard(client, table_name, shard):
-    client.update_item(
-        TableName=table_name,
-        Key={'shardId': {'S': shard['shardId']}},
+    e.g. miro/1, miro/2, miro/3, ...
+    """
+    count = get_number_of_shards(source_name=source_name)
 
-        # We want to update the desiredVersion of every row in the table, and
-        # set the currentVersion to 1, but *only* if there isn't already an
-        # existing value of currentVersion in the table.
-        UpdateExpression=(
-            'SET desiredVersion = :desiredVersion, '
-            'currentVersion = if_not_exists(currentVersion, :initialCurrentVersion)'
-        ),
-        ExpressionAttributeValues={
-            ':desiredVersion': {'N': str(shard['desiredVersion'])},
-            ':initialCurrentVersion': {'N': '1'},
+    for shard_index in range(count):
+        yield f'{source_name}/{shard_index}'
+
+
+def all_messages(shard_ids, desired_version):
+    """
+    Generates all the messages to be sent to SNS.
+    """
+    for s_id in shard_ids:
+        yield {
+            'shardId': s_id,
+            'desiredVersion': desired_version
         }
-    )
 
 
-def create_shards(client, prefix, desired_version, count, table_name):
-    """Create new shards in the table."""
-    new_shards = [
-        {'shardId': f'{prefix}/{i}', 'desiredVersion': desired_version}
-        for i in range(count)
-    ]
-
-    # Implementation note: this is potentially quite slow, as we make a new
-    # UPDATE request for every shard we want to write to DynamoDB.  The
-    # reason is that if we just PUT an item, we delete whatever's already
-    # there -- potentially including the currentVersion.
-    #
-    # We could speed this up slightly by:
-    #
-    #   1.  GET the current row (if any)
-    #   2.  Construct the new row, and try to PUT that, using a conditional
-    #       update to check nobody has updated :currentVersion in the meantime
-    #   3.  Repeat 1-2 until we get an update that succeeds
-    #
-    # That would be significantly more complicated to implement, so for now
-    # we choose simplicity over speed.
-    #
-    # If you're finding this script to be too slow, this is where to start.
-    for shard in tqdm.tqdm(new_shards):
-        _update_shard(client=client, table_name=table_name, shard=shard)
+def publish_messages(sns_client, topic_arn, messages):
+    """Publish a sequence of messages to an SNS topic."""
+    for m in tqdm.tqdm(messages):
+        sns_client.publish_message(
+            TopicArn=topic_arn,
+            MessageStructure='json',
+            Message=json.dumps(m),
+            Subject=f'source: {__file__}'
+        )
 
 
-def post_to_slack(prefix, reason):
+def post_to_slack(source_name, reason):
     """
     Posts a message about the reindex in Slack, so we can track them.
     """
@@ -117,16 +92,14 @@ def post_to_slack(prefix, reason):
 
     webhook_url = tfvars['non_critical_slack_webhook']
 
+    message = f'*{username}* started a reindex in *{source_name}*\nReason: *{reason}*'
+
     slack_data = {
         'username': 'reindex-tracker',
         'icon_emoji': ':dynamodb:',
         'color': '#2E72B8',
         'title': 'reindexer',
-        'fields': [{
-            'value': '*%s* started a reindex in *%s*\nReason: *%s*' % (
-                username, prefix, reason
-            )
-        }]
+        'fields': [{'value': message}]
     }
 
     resp = requests.post(
@@ -137,30 +110,41 @@ def post_to_slack(prefix, reason):
     resp.raise_for_status()
 
 
+def build_topic_arn(topic_name):
+    """Given a topic name, return the topic ARN."""
+    # https://stackoverflow.com/a/37723278/1558022
+    sts_client = boto3.client('sts')
+    account_id = sts_client.get_caller_identity().get('Account')
+
+    return f'arn:aws:sns:eu-west-1:{account_id}:{topic_name}'
+
+
 def main():
     args = docopt.docopt(__doc__)
 
-    client = boto3.client('dynamodb')
-
-    prefix = args['--prefix']
+    source_name = args['--prefix']
     reason = args['--reason']
-    table_name = TABLE_NAME
 
     # We use the current timestamp for the reindex version -- this allows
     # us to easily trace when a reindex was triggered.
     desired_version = int(dt.datetime.utcnow().timestamp())
-    print(f'Updating all shards in {prefix} to {desired_version}')
+    print(f'Updating all shards in {source_name} to {desired_version}')
 
-    post_to_slack(prefix=prefix, reason=reason)
+    post_to_slack(source_name=source_name, reason=reason)
 
-    count = get_number_of_shards(source_name=prefix)
+    shard_ids = all_shard_ids(source_name=source_name)
+    messages = all_messages(
+        shard_ids=shard_ids,
+        desired_version=desired_version
+    )
 
-    create_shards(
-        client=client,
-        prefix=prefix,
-        desired_version=desired_version,
-        count=count,
-        table_name=table_name
+    topic_arn = build_topic_arn(topic_name=TOPIC_NAME)
+
+    sns_client = boto3.client('sns')
+    publish_messages(
+        sns_client=sns_client,
+        topic_arn=topic_arn,
+        messages=messages
     )
 
 
