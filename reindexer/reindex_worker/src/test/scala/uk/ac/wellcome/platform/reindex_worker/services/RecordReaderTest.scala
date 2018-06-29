@@ -6,7 +6,6 @@ import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
-import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -19,8 +18,7 @@ class RecordReaderTest
     with ScalaFutures
     with Matchers
     with LocalDynamoDbVersioned
-    with ExtendedPatience
-    with ReindexServiceFixture {
+    with ExtendedPatience {
 
   val shardName = "shard"
   val currentVersion = 1

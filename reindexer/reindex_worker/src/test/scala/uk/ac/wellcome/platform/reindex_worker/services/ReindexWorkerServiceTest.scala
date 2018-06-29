@@ -1,26 +1,22 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
 import com.gu.scanamo.Scanamo
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
-import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
+import uk.ac.wellcome.platform.reindex_worker.fixtures.
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class ReindexWorkerServiceTest
     extends FunSpec
@@ -29,7 +25,6 @@ class ReindexWorkerServiceTest
     with Akka
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
-    with ReindexServiceFixture
     with SNS
     with SQS
     with ScalaFutures {
@@ -39,23 +34,38 @@ class ReindexWorkerServiceTest
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
-          case queuePair @ QueuePair(queue, dlq) =>
+          case queuePair@QueuePair(queue, dlq) =>
             withSQSStream[NotificationMessage, Assertion](
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-              withReindexService(table, topic) { reindexService =>
-                val workerService = new ReindexWorkerService(
-                  targetService = reindexService,
-                  sqsStream = sqsStream,
-                  system = actorSystem
-                )
 
-                try {
-                  testWith((workerService, queuePair))
-                } finally {
-                  workerService.stop()
-                }
+              val readerService = new RecordReader(
+                dynamoDbClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(
+                  table = table.name,
+                  index = table.index
+                )
+              )
+
+              val notificationService = new NotificationSender(
+                snsWriter = new SNSWriter(
+                  snsClient = snsClient,
+                  snsConfig = SNSConfig(topicArn = topic.arn)
+                )
+              )
+
+              val workerService = new ReindexWorkerService(
+                readerService = readerService,
+                notificationService = notificationService,
+                sqsStream = sqsStream,
+                system = actorSystem
+              )
+
+              try {
+                testWith((workerService, queuePair))
+              } finally {
+                workerService.stop()
               }
             }
         }
@@ -145,16 +155,25 @@ class ReindexWorkerServiceTest
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-              val failingReindexService = mock[ReindexService]
-              val targetService = mock[ReindexService]
-              when(targetService.sendReindexRequests(any[ReindexJob]))
-                .thenReturn(Future {
-                  throw new RuntimeException(
-                    "Flobberworm! Fickle failure frustrates my fortunes!")
-                })
+
+              val readerService = new RecordReader(
+                dynamoDbClient = dynamoDbClient,
+                dynamoConfig = DynamoConfig(
+                  table = "doesnotexist",
+                  index = "whatindex?"
+                )
+              )
+
+              val notificationService = new NotificationSender(
+                snsWriter = new SNSWriter(
+                  snsClient = snsClient,
+                  snsConfig = SNSConfig(topicArn = "doesnotexist")
+                )
+              )
 
               new ReindexWorkerService(
-                targetService = failingReindexService,
+                readerService = readerService,
+                notificationService = notificationService,
                 system = actorSystem,
                 sqsStream = sqsStream
               )
