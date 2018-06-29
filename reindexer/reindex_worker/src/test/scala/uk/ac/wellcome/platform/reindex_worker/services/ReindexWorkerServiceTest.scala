@@ -8,11 +8,11 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
-import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
@@ -29,6 +29,7 @@ class ReindexWorkerServiceTest
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
     with ReindexServiceFixture
+    with SNS
     with SQS
     with ScalaFutures {
 
@@ -63,49 +64,52 @@ class ReindexWorkerServiceTest
 
   it("successfully completes a reindex") {
     withLocalDynamoDbTable { table =>
-      withReindexWorkerService(table) {
-        case (service, QueuePair(queue, dlq)) =>
-          val reindexJob = ReindexJob(
-            shardId = "sierra/123",
-            desiredVersion = 6
-          )
-
-          val testRecord = TestRecord(
-            id = "id/111",
-            version = 1,
-            someData = "A dire daliance directly dancing due down.",
-            reindexShard = reindexJob.shardId,
-            reindexVersion = reindexJob.desiredVersion - 1
-          )
-
-          Scanamo.put(dynamoDbClient)(table.name)(testRecord)
-
-          val expectedRecords = List(
-            testRecord.copy(
-              version = testRecord.version + 1,
-              reindexVersion = reindexJob.desiredVersion
+      withLocalSnsTopic { topic =>
+        withReindexWorkerService(table) {
+          case (service, QueuePair(queue, dlq)) =>
+            val reindexJob = ReindexJob(
+              shardId = "sierra/123",
+              desiredVersion = 6
             )
-          )
 
-          val sqsMessage = NotificationMessage(
-            Subject = "",
-            Message = toJson(reindexJob).get,
-            TopicArn = "topic",
-            MessageId = "message"
-          )
+            val testRecord = TestRecord(
+              id = "id/111",
+              version = 1,
+              someData = "A dire daliance directly dancing due down.",
+              reindexShard = reindexJob.shardId,
+              reindexVersion = reindexJob.desiredVersion - 1
+            )
 
-          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+            Scanamo.put(dynamoDbClient)(table.name)(testRecord)
 
-          eventually {
-            val actualRecords: List[TestRecord] =
-              Scanamo
-                .scan[TestRecord](dynamoDbClient)(table.name)
-                .map(_.right.get)
+            val expectedRecords = Seq(
+              ReindexRecord(
+                id = testRecord.id,
+                version = testRecord.version,
+                reindexShard = reindexJob.shardId,
+                reindexVersion = reindexJob.desiredVersion
+              )
+            )
+            val sqsMessage = NotificationMessage(
+              Subject = "",
+              Message = toJson(reindexJob).get,
+              TopicArn = "topic",
+              MessageId = "message"
+            )
 
-            actualRecords shouldBe expectedRecords
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
-          }
+            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+
+            eventually {
+              val actualRecords: Seq[ReindexRecord] = listMessagesReceivedFromSNS(topic)
+                .map { _.message }
+                .map { fromJson[ReindexRecord](_).get }
+                .distinct
+
+              actualRecords shouldBe expectedRecords
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
+            }
+        }
       }
     }
   }
