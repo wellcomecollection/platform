@@ -36,4 +36,3 @@ resource "aws_iam_role_policy" "dynamo_heartbeat_scheduler_lambda" {
   role   = "${module.lambda_dynamo_write_heartbeat.role_name}"
   policy = "${data.aws_iam_policy_document.allow_dynamodb_delete_item.json}"
 }
-
