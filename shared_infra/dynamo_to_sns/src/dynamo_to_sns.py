@@ -6,10 +6,14 @@ Receives DynamoDB events and publishes the event to an SNS topic.
 import os
 
 import boto3
+import daiquiri
 
 from wellcome_aws_utils.dynamo_event import create_dynamo_events
 from wellcome_aws_utils.lambda_utils import log_on_error
 from wellcome_aws_utils.sns_utils import publish_sns_message
+
+
+daiquiri.setup(level=os.environ.get('LOG_LEVEL', 'INFO'))
 
 
 def get_sns_messages(trigger_event, stream_view_type):
