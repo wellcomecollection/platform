@@ -7,23 +7,20 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, _}
 import com.twitter.inject.Logging
-
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRecord}
-import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 import scala.util.Try
 
 class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
-                               dynamoConfig: DynamoConfig)
+                               dynamoConfig: DynamoConfig,
+                               snsWriter: SNSWriter)
     extends Logging {
-
-  val versionedDao = new VersionedDao(
-    dynamoDbClient = dynamoDbClient,
-    dynamoConfig = dynamoConfig
-  )
 
   def runReindex(reindexJob: ReindexJob): Future[List[Unit]] = {
     info(s"ReindexService running $reindexJob")
@@ -51,12 +48,12 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       outdatedRecords: List[ReindexRecord] = results.map(extractRecord)
     } yield outdatedRecords
 
-    // Then we PUT all the records.  It might be more efficient to do a
-    // bulk update, but this will do for now.
+    // Then we send an SNS notification for all of the records.  Another
+    // application will pick these up and do the writes back to DynamoDB.
     outdatedRecordsFuture.flatMap { outdatedRecords: List[ReindexRecord] =>
       Future.sequence {
         outdatedRecords.map {
-          updateIndividualRecord(_, desiredVersion = reindexJob.desiredVersion)
+          sendIndividualNotification(_, desiredVersion = reindexJob.desiredVersion)
         }
       }
     }
@@ -74,9 +71,14 @@ class ReindexService @Inject()(dynamoDbClient: AmazonDynamoDB,
       case Right(r: ReindexRecord) => r
     }
 
-  private def updateIndividualRecord(record: ReindexRecord,
-                                     desiredVersion: Int): Future[Unit] = {
+  private def sendIndividualNotification(record: ReindexRecord,
+                                         desiredVersion: Int): Future[Unit] = {
     val updatedRecord = record.copy(reindexVersion = desiredVersion)
-    versionedDao.updateRecord[ReindexRecord](updatedRecord)
+    for {
+      _ <- snsWriter.writeMessage(
+        message = toJson(updatedRecord).get,
+        subject = this.getClass.getSimpleName
+      )
+    } yield ()
   }
 }

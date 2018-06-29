@@ -7,6 +7,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -33,7 +34,7 @@ class ReindexWorkerServiceTest
     with SQS
     with ScalaFutures {
 
-  def withReindexWorkerService(table: Table)(
+  def withReindexWorkerService(table: Table, topic: Topic)(
     testWith: TestWith[(ReindexWorkerService, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -43,7 +44,7 @@ class ReindexWorkerServiceTest
               actorSystem,
               queue,
               metricsSender) { sqsStream =>
-              withReindexService(table) { reindexService =>
+              withReindexService(table, topic) { reindexService =>
                 val workerService = new ReindexWorkerService(
                   targetService = reindexService,
                   sqsStream = sqsStream,
@@ -65,7 +66,7 @@ class ReindexWorkerServiceTest
   it("successfully completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table) {
+        withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = ReindexJob(
               shardId = "sierra/123",
@@ -116,21 +117,23 @@ class ReindexWorkerServiceTest
 
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
-      withReindexWorkerService(table) {
-        case (_, QueuePair(queue, dlq)) =>
-          val sqsMessage = NotificationMessage(
-            Subject = "",
-            Message = "<xml>What is JSON.</xl?>",
-            TopicArn = "topic",
-            MessageId = "message-id"
-          )
+      withLocalSnsTopic { topic =>
+        withReindexWorkerService(table, topic) {
+          case (_, QueuePair(queue, dlq)) =>
+            val sqsMessage = NotificationMessage(
+              Subject = "",
+              Message = "<xml>What is JSON.</xl?>",
+              TopicArn = "topic",
+              MessageId = "message-id"
+            )
 
-          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-          }
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+            }
+        }
       }
     }
   }

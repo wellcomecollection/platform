@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.reindex_worker.services
 
 import javax.naming.ConfigurationException
-
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
 import uk.ac.wellcome.platform.reindex_worker.fixtures.ReindexServiceFixture
 import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
@@ -42,43 +43,45 @@ class ReindexServiceTest
 
   it("only updates records with a lower than desired reindexVersion") {
     withLocalDynamoDbTable { table =>
-      withReindexService(table) { reindexService =>
-        val newerRecord = exampleRecord.copy(
-          id = "id1",
-          reindexVersion = desiredVersion + 1
-        )
-
-        val olderRecord = exampleRecord.copy(
-          id = "id2"
-        )
-
-        val records = List(
-          newerRecord,
-          olderRecord
-        )
-
-        val expectedRecords = List(
-          newerRecord,
-          olderRecord.copy(
-            reindexVersion = desiredVersion,
-            version = 2
+      withLocalSnsTopic { topic =>
+        withReindexService(table, topic) { reindexService =>
+          val newerRecord = exampleRecord.copy(
+            id = "id1",
+            reindexVersion = desiredVersion + 1
           )
-        )
 
-        records.foreach(record =>
-          Scanamo.put(dynamoDbClient)(table.name)(record))
+          val olderRecord = exampleRecord.copy(
+            id = "id2"
+          )
 
-        val reindexJob = ReindexJob(
-          shardId = shardName,
-          desiredVersion = desiredVersion
-        )
+          val records = List(
+            newerRecord,
+            olderRecord
+          )
 
-        whenReady(reindexService.runReindex(reindexJob)) { _ =>
-          val records = Scanamo
-            .scan[TestRecord](dynamoDbClient)(table.name)
-            .map(_.right.get)
+          val expectedRecords = List(
+            newerRecord,
+            olderRecord.copy(
+              reindexVersion = desiredVersion,
+              version = 2
+            )
+          )
 
-          records should contain theSameElementsAs expectedRecords
+          records.foreach(record =>
+            Scanamo.put(dynamoDbClient)(table.name)(record))
+
+          val reindexJob = ReindexJob(
+            shardId = shardName,
+            desiredVersion = desiredVersion
+          )
+
+          whenReady(reindexService.runReindex(reindexJob)) { _ =>
+            val records = Scanamo
+              .scan[TestRecord](dynamoDbClient)(table.name)
+              .map(_.right.get)
+
+            records should contain theSameElementsAs expectedRecords
+          }
         }
       }
     }
@@ -86,42 +89,44 @@ class ReindexServiceTest
 
   it("updates records in the specified shard") {
     withLocalDynamoDbTable { table =>
-      withReindexService(table) { reindexService =>
-        val inShardRecords = List(
-          exampleRecord.copy(id = "id1"),
-          exampleRecord.copy(id = "id2")
-        )
+      withLocalSnsTopic { topic =>
+        withReindexService(table, topic) { reindexService =>
+          val inShardRecords = List(
+            exampleRecord.copy(id = "id1"),
+            exampleRecord.copy(id = "id2")
+          )
 
-        val notInShardRecords = List(
-          exampleRecord.copy(id = "id3", reindexShard = "not_the_same_shard"),
-          exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
-        )
+          val notInShardRecords = List(
+            exampleRecord.copy(id = "id3", reindexShard = "not_the_same_shard"),
+            exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
+          )
 
-        val reindexJob = ReindexJob(
-          shardId = shardName,
-          desiredVersion = desiredVersion
-        )
+          val reindexJob = ReindexJob(
+            shardId = shardName,
+            desiredVersion = desiredVersion
+          )
 
-        val recordList = inShardRecords ++ notInShardRecords
+          val recordList = inShardRecords ++ notInShardRecords
 
-        recordList.foreach(record =>
-          Scanamo.put(dynamoDbClient)(table.name)(record))
+          recordList.foreach(record =>
+            Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        val expectedUpdatedRecords = inShardRecords.map(
-          record =>
-            record
-              .copy(
-                reindexVersion = desiredVersion,
-                version = record.version + 1))
+          val expectedUpdatedRecords = inShardRecords.map(
+            record =>
+              record
+                .copy(
+                  reindexVersion = desiredVersion,
+                  version = record.version + 1))
 
-        whenReady(reindexService.runReindex(reindexJob)) { _ =>
-          val testRecords =
-            Scanamo
-              .scan[TestRecord](dynamoDbClient)(table.name)
-              .map(_.right.get)
+          whenReady(reindexService.runReindex(reindexJob)) { _ =>
+            val testRecords =
+              Scanamo
+                .scan[TestRecord](dynamoDbClient)(table.name)
+                .map(_.right.get)
 
-          testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
-          testRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+            testRecords.filter(_.reindexShard != shardName) should contain theSameElementsAs notInShardRecords
+            testRecords.filter(_.reindexShard == shardName) should contain theSameElementsAs expectedUpdatedRecords
+          }
         }
       }
     }
@@ -129,66 +134,87 @@ class ReindexServiceTest
 
   it("returns a failed Future if the reindex is only partially successful") {
     withLocalDynamoDbTable { table =>
-      withReindexService(table) { reindexService =>
-        val inShardRecords = List(
-          exampleRecord.copy(id = "id1"),
-          exampleRecord.copy(id = "id2")
-        )
+      withLocalSnsTopic { topic =>
+        withReindexService(table, topic) { reindexService =>
+          val inShardRecords = List(
+            exampleRecord.copy(id = "id1"),
+            exampleRecord.copy(id = "id2")
+          )
 
-        inShardRecords.foreach(record =>
-          Scanamo.put(dynamoDbClient)(table.name)(record))
+          inShardRecords.foreach(record =>
+            Scanamo.put(dynamoDbClient)(table.name)(record))
 
-        // This record doesn't conform to our ReindexRecord type (it doesn't
-        // have a version field), but it is in the same reindex shard as
-        // the other two records -- so it will be picked up for reindexing,
-        // but won't succeed.
-        case class BadRecord(
-          id: String,
-          reindexShard: String,
-          reindexVersion: Int
-        )
+          // This record doesn't conform to our ReindexRecord type (it doesn't
+          // have a version field), but it is in the same reindex shard as
+          // the other two records -- so it will be picked up for reindexing,
+          // but won't succeed.
+          case class BadRecord(
+                                id: String,
+                                reindexShard: String,
+                                reindexVersion: Int
+                              )
 
-        Scanamo.put(dynamoDbClient)(table.name)(
-          BadRecord(
-            id = "badId1",
-            reindexShard = shardName,
-            reindexVersion = currentVersion
-          ))
+          Scanamo.put(dynamoDbClient)(table.name)(
+            BadRecord(
+              id = "badId1",
+              reindexShard = shardName,
+              reindexVersion = currentVersion
+            ))
 
-        val reindexJob = ReindexJob(
-          shardId = shardName,
-          desiredVersion = desiredVersion
-        )
+          val reindexJob = ReindexJob(
+            shardId = shardName,
+            desiredVersion = desiredVersion
+          )
 
-        val future = reindexService.runReindex(reindexJob)
-        whenReady(future.failed) {
-          _ shouldBe a[GracefulFailureException]
+          val future = reindexService.runReindex(reindexJob)
+          whenReady(future.failed) {
+            _ shouldBe a[GracefulFailureException]
+          }
         }
       }
     }
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexService(Table("does-not-exist", "no-such-index")) { service =>
-      val future = service.runReindex(exampleReindexJob)
-      whenReady(future.failed) {
-        _ shouldBe a[ResourceNotFoundException]
+    withLocalSnsTopic { topic =>
+      withReindexService(Table("does-not-exist", "no-such-index"), topic) { service =>
+        val future = service.runReindex(exampleReindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[ResourceNotFoundException]
+        }
+      }
+    }
+  }
+
+  it("returns a failed Future if there's an SNS error") {
+    withLocalDynamoDbTable { table =>
+      withReindexService(table, Topic("no-such-topic")) { service =>
+        val future = service.runReindex(exampleReindexJob)
+        whenReady(future.failed) {
+          _ shouldBe a[ResourceNotFoundException]
+        }
       }
     }
   }
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
-    val service = new ReindexService(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(
-        table = "mytable",
-        maybeIndex = None
+    withLocalSnsTopic { topic =>
+      val service = new ReindexService(
+        dynamoDbClient = dynamoDbClient,
+        dynamoConfig = DynamoConfig(
+          table = "mytable",
+          maybeIndex = None
+        ),
+        snsWriter = new SNSWriter(
+          snsClient = snsClient,
+          snsConfig = SNSConfig(topicArn = topic.arn)
+        )
       )
-    )
 
-    val future = service.runReindex(exampleReindexJob)
-    whenReady(future.failed) {
-      _ shouldBe a[ConfigurationException]
+      val future = service.runReindex(exampleReindexJob)
+      whenReady(future.failed) {
+        _ shouldBe a[ConfigurationException]
+      }
     }
   }
 
