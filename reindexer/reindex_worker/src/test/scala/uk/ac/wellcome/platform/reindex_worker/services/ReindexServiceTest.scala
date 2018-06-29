@@ -163,7 +163,7 @@ class ReindexServiceTest
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
     withLocalSnsTopic { topic =>
-      val readerService = new ReindexRecordReaderService(
+      val readerService = new RecordReader(
         dynamoDbClient = dynamoDbClient,
         dynamoConfig = DynamoConfig(
           table = "mytable",
@@ -171,7 +171,7 @@ class ReindexServiceTest
         )
       )
 
-      val notificationService = new NotificationSenderService(
+      val notificationService = new NotificationSender(
         snsWriter = new SNSWriter(
           snsClient = snsClient,
           snsConfig = SNSConfig(topicArn = topic.arn)

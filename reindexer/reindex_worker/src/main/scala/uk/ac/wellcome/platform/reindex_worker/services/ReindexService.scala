@@ -7,8 +7,8 @@ import uk.ac.wellcome.platform.reindex_worker.models.ReindexJob
 
 import scala.concurrent.Future
 
-class ReindexService @Inject()(readerService: ReindexRecordReaderService,
-                               notificationService: NotificationSenderService)
+class ReindexService @Inject()(readerService: RecordReader,
+                               notificationService: NotificationSender)
     extends Logging {
 
   def sendReindexRequests(reindexJob: ReindexJob): Future[List[Unit]] = {

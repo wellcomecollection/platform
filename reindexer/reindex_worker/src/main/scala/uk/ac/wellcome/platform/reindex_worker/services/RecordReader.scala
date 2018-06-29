@@ -20,7 +20,7 @@ import scala.util.Try
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class ReindexRecordReaderService @Inject()(
+class RecordReader @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
 ) extends Logging {

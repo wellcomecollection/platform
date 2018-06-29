@@ -14,7 +14,7 @@ import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-class ReindexRecordReaderServiceTest
+class RecordReaderTest
   extends FunSpec
     with ScalaFutures
     with Matchers
@@ -118,7 +118,7 @@ class ReindexRecordReaderServiceTest
   }
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
-    val service = new ReindexRecordReaderService(
+    val service = new RecordReader(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(
         table = "mytable",
@@ -133,8 +133,8 @@ class ReindexRecordReaderServiceTest
   }
 
   private def withReindexRecordReaderService(table: Table)(
-    testWith: TestWith[ReindexRecordReaderService, Assertion]) = {
-    val service = new ReindexRecordReaderService(
+    testWith: TestWith[RecordReader, Assertion]) = {
+    val service = new RecordReader(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(
         table = table.name,
