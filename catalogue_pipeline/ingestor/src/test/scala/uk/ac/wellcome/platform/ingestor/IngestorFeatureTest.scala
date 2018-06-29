@@ -6,11 +6,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork, IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -132,8 +128,8 @@ class IngestorFeatureTest
     }
   }
 
-  private def sendToSqs(work: IdentifiedWork, queue: Queue, bucket: Bucket) = {
-    val messageBody = put[IdentifiedWork](
+  private def sendToSqs(work: IdentifiedBaseWork, queue: Queue, bucket: Bucket) = {
+    val messageBody = put[IdentifiedBaseWork](
       obj = work,
       location = ObjectLocation(
         namespace = bucket.name,

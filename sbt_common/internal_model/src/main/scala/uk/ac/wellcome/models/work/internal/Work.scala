@@ -5,7 +5,9 @@ sealed trait BaseWork {
   val sourceIdentifier: SourceIdentifier
 }
 
-sealed trait IdentifiedBaseWork extends BaseWork
+sealed trait IdentifiedBaseWork extends BaseWork {
+  val canonicalId: String
+}
 sealed trait TransformedBaseWork extends BaseWork
 
 /** A representation of a work in our ontology */

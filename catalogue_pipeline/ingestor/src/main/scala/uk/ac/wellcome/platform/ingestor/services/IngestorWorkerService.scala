@@ -5,7 +5,7 @@ import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
-import uk.ac.wellcome.models.work.internal.{IdentifiedWork, IdentifierType}
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType}
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -13,11 +13,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class IngestorWorkerService @Inject()(
   ingestorConfig: IngestorConfig,
   identifiedWorkIndexer: WorkIndexer,
-  messageStream: MessageStream[IdentifiedWork],
+  messageStream: MessageStream[IdentifiedBaseWork],
   system: ActorSystem)(implicit ec: ExecutionContext) {
 
   case class MessageBundle(message: Message,
-                           work: IdentifiedWork,
+                           work: IdentifiedBaseWork,
                            indices: Set[String])
 
   messageStream.runStream(
@@ -70,7 +70,7 @@ class IngestorWorkerService @Inject()(
   // * Miro works are indexed in both v1 and v2 indices.
   // * Sierra works are indexed only in the v2 index.
   // * Works from any other source are not expected so they are discarded.
-  private def decideTargetIndices(work: IdentifiedWork): Set[String] = {
+  private def decideTargetIndices(work: IdentifiedBaseWork): Set[String] = {
     val miroIdentifier = IdentifierType("miro-image-number")
     val sierraIdentifier = IdentifierType("sierra-system-number")
     work.sourceIdentifier.identifierType.id match {
@@ -89,8 +89,8 @@ class IngestorWorkerService @Inject()(
   }
 
   private def sortInTargetIndices(
-    works: List[MessageBundle]): Map[String, List[IdentifiedWork]] =
-    works.foldLeft(Map[String, List[IdentifiedWork]]()) {
+    works: List[MessageBundle]): Map[String, List[IdentifiedBaseWork]] =
+    works.foldLeft(Map[String, List[IdentifiedBaseWork]]()) {
       case (resultMap, MessageBundle(_, work, indices)) =>
         val workUpdateMap = indices.map { index =>
           val existingWorks = resultMap.getOrElse(index, Nil)

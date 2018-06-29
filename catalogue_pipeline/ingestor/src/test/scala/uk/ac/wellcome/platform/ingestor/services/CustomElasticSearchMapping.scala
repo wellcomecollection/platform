@@ -55,7 +55,8 @@ trait CustomElasticSearchMapping {
         objectField("genres"),
         objectField("items"),
         objectField("production"),
-        keywordField("ontologyType")
+        keywordField("ontologyType"),
+        keywordField("type")
       )
 
     override val mappingDefinition: MappingDefinition = mapping(esType)
