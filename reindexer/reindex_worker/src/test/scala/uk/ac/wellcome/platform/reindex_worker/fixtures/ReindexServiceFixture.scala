@@ -4,7 +4,7 @@ import org.scalatest.Assertion
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.platform.reindex_worker.services.{ReindexRecordReaderService, ReindexService}
+import uk.ac.wellcome.platform.reindex_worker.services.{NotificationSenderService, ReindexRecordReaderService, ReindexService}
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
@@ -21,14 +21,16 @@ trait ReindexServiceFixture extends LocalDynamoDbVersioned with SNS {
       )
     )
 
-    val reindexService = new ReindexService(
-      readerService = readerService,
+    val notificationService = new NotificationSenderService(
       snsWriter = new SNSWriter(
         snsClient = snsClient,
-        snsConfig = SNSConfig(
-          topicArn = topic.arn
-        )
+        snsConfig = SNSConfig(topicArn = topic.arn)
       )
+    )
+
+    val reindexService = new ReindexService(
+      readerService = readerService,
+      notificationService = notificationService
     )
 
     testWith(reindexService)

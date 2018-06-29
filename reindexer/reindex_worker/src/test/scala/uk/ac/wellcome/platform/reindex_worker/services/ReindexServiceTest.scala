@@ -171,12 +171,16 @@ class ReindexServiceTest
         )
       )
 
-      val service = new ReindexService(
-        readerService = readerService,
+      val notificationService = new NotificationSenderService(
         snsWriter = new SNSWriter(
           snsClient = snsClient,
           snsConfig = SNSConfig(topicArn = topic.arn)
         )
+      )
+
+      val service = new ReindexService(
+        readerService = readerService,
+        notificationService = notificationService
       )
 
       val future = service.sendReindexRequests(exampleReindexJob)
