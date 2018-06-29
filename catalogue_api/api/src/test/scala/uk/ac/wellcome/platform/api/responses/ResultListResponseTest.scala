@@ -68,6 +68,34 @@ class ResultListResponseTest extends FunSpec with Matchers {
     }
   }
 
+  describe("prevPage") {
+    it("omits the parameter if this is the only page") {
+      val resp = getResponse(
+        displayResultList = displayResultList.copy(totalPages = 1)
+      )
+
+      resp.prevPage shouldBe None
+    }
+
+    it("omits the parameter if this is the first page") {
+      val resp = getResponse(
+        displayResultList = displayResultList.copy(totalPages = 5),
+        multipleResultsRequest = multipleResultsRequest.copy(page = 1)
+      )
+
+      resp.prevPage shouldBe None
+    }
+
+    it("includes the parameter if there's a previous page to view") {
+      val resp = getResponse(
+        displayResultList = displayResultList.copy(totalPages = 10),
+        multipleResultsRequest = multipleResultsRequest.copy(page = 5)
+      )
+
+      resp.prevPage shouldBe Some(s"$requestBaseUri$requestUri?page=4")
+    }
+  }
+
   private def getResponse(
     contextUri: String = contextUri,
     displayResultList: DisplayResultList[DisplayWorkV1],
