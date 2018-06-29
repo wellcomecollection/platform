@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.platform.reindex_worker.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest, ReindexableRecord}
+import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexRequest}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
