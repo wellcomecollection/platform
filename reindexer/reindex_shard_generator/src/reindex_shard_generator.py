@@ -13,6 +13,8 @@ from reindex_shard_config import create_reindex_shard
 @log_on_error
 def main(event, _ctxt=None, dynamodb_client=None):
     dynamodb_client = dynamodb_client or boto3.client('dynamodb')
+
+    # TODO: Isn't the table name passed in the record?
     table_name = os.environ['TABLE_NAME']
 
     for record in event['Records']:
