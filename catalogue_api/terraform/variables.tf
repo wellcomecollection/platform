@@ -74,8 +74,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-20180530-new-identifier-schemes"
-    index_v2 = "v2-20180530-new-identifier-schemes"
+    index_v1 = "v1-2018-06-25-other-identifiers"
+    index_v2 = "v2-2018-06-25-other-identifiers"
     doc_type = "work"
   }
 }
