@@ -6,7 +6,6 @@ import com.amazonaws.services.sns.model.AmazonSNSException
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.platform.reindex_worker.TestRecord
@@ -76,7 +75,7 @@ class ReindexServiceTest
             desiredVersion = desiredVersion
           )
 
-          whenReady(reindexService.runReindex(reindexJob)) { _ =>
+          whenReady(reindexService.sendReindexRequests(reindexJob)) { _ =>
             val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
               .map { _.message }
               .map { fromJson[ReindexRequest](_).get }
@@ -120,7 +119,7 @@ class ReindexServiceTest
             )
           }
 
-          whenReady(reindexService.runReindex(reindexJob)) { _ =>
+          whenReady(reindexService.sendReindexRequests(reindexJob)) { _ =>
             val actualRecords: Seq[ReindexRequest] = listMessagesReceivedFromSNS(topic)
               .map { _.message }
               .map { fromJson[ReindexRequest](_).get }
@@ -136,7 +135,7 @@ class ReindexServiceTest
   it("returns a failed Future if there's a DynamoDB error") {
     withLocalSnsTopic { topic =>
       withReindexService(Table("does-not-exist", "no-such-index"), topic) { service =>
-        val future = service.runReindex(exampleReindexJob)
+        val future = service.sendReindexRequests(exampleReindexJob)
         whenReady(future.failed) {
           _ shouldBe a[ResourceNotFoundException]
         }
@@ -154,7 +153,7 @@ class ReindexServiceTest
 
         Scanamo.put(dynamoDbClient)(table.name)(exampleRecord)
 
-        val future = service.runReindex(reindexJob)
+        val future = service.sendReindexRequests(reindexJob)
         whenReady(future.failed) {
           _ shouldBe a[AmazonSNSException]
         }
@@ -180,7 +179,7 @@ class ReindexServiceTest
         )
       )
 
-      val future = service.runReindex(exampleReindexJob)
+      val future = service.sendReindexRequests(exampleReindexJob)
       whenReady(future.failed) {
         _ shouldBe a[ConfigurationException]
       }

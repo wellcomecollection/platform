@@ -20,7 +20,7 @@ class ReindexWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       reindexJob <- Future.fromTry(fromJson[ReindexJob](message.Message))
-      _ <- targetService.runReindex(reindexJob = reindexJob)
+      _ <- targetService.sendReindexRequests(reindexJob = reindexJob)
     } yield ()
 
   def stop() = system.terminate()
