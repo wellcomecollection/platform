@@ -3,8 +3,9 @@ package uk.ac.wellcome.platform.matcher.matcher
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{InvisibleWork, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.matcher.locking.{DynamoLockingService, FailedLockException, FailedUnlockException}
 import uk.ac.wellcome.platform.matcher.models._
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
@@ -17,8 +18,11 @@ class WorkMatcher @Inject()(
   lockingService: DynamoLockingService)(implicit context: ExecutionContext)
     extends Logging {
 
-  def matchWork(work: TransformedBaseWork): Future[MatcherResult] =
-    doMatch(work.asInstanceOf[UnidentifiedWork]).map(MatcherResult)
+  def matchWork(work: TransformedBaseWork): Future[MatcherResult] = work match {
+    case w: UnidentifiedWork =>
+      doMatch(w).map(MatcherResult)
+    case w: InvisibleWork => Future.successful(MatcherResult(Set(MatchedIdentifiers(Set(WorkIdentifier(Sourced.id(w.sourceIdentifier.identifierType.id, w.sourceIdentifier.value), w.version))))))
+  }
 
   type FutureMatched = Future[Set[MatchedIdentifiers]]
 

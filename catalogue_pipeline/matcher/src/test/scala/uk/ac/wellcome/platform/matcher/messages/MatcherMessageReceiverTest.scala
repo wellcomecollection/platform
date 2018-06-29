@@ -6,13 +6,9 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier
-}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{MergeCandidate, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -50,6 +46,30 @@ class MatcherMessageReceiverTest
               queue,
               storageBucket,
               topic)
+          }
+        }
+      }
+    }
+  }
+
+  it("sends an invisible work as a single matched result with no other matched identifiers") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+            val invisibleWork = UnidentifiedInvisibleWork(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "id"), 1)
+            val expectedMatchedWorks =
+              MatcherResult(
+                Set(MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/id", 1)))))
+
+            sendSQS(queue, storageBucket, invisibleWork)
+            eventually {
+              assertLastMatchedResultIs(
+                topic,
+                expectedMatchedWorks
+              )
+            }
           }
         }
       }
@@ -318,7 +338,7 @@ class MatcherMessageReceiverTest
 
   private def sendSQS(queue: SQS.Queue,
                       storageBucket: Bucket,
-                      work: UnidentifiedWork) = {
+                      work: TransformedBaseWork) = {
     val workSqsMessage: NotificationMessage =
       hybridRecordNotificationMessage(
         message = toJson(RecorderWorkEntry(work = work)).get,

@@ -8,19 +8,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier,
-  WorkNode
-}
-import uk.ac.wellcome.models.work.internal.MergeCandidate
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, MergeCandidate, SourceIdentifier, UnidentifiedInvisibleWork}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.locking.{
-  DynamoRowLockDao,
-  FailedUnlockException,
-  Identifier
-}
+import uk.ac.wellcome.platform.matcher.locking.{DynamoRowLockDao, FailedUnlockException, Identifier}
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
@@ -57,6 +48,34 @@ class WorkMatcherTest
 
                     savedLinkedWork shouldBe Some(
                       WorkNode(workId, 1, Nil, ciHash(workId)))
+                }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it(
+    "doesn't store an invisible work and sends the work id") {
+    withMockMetricSender { mockMetricsSender =>
+      withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+        withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
+          withWorkGraphStore(graphTable) { workGraphStore =>
+            withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
+              workMatcher =>
+                val invisibleWork = UnidentifiedInvisibleWork(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "id"), 1)
+                whenReady(workMatcher.matchWork(invisibleWork)) {
+                  matcherResult =>
+                    val workId = "sierra-system-number/id"
+
+                    matcherResult shouldBe
+                      MatcherResult(
+                        Set(MatchedIdentifiers(Set(WorkIdentifier(workId, 1)))))
+
+                    Scanamo
+                      .get[WorkNode](dynamoDbClient)(graphTable.name)(
+                        'id -> workId) shouldBe None
                 }
             }
           }
