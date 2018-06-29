@@ -5,6 +5,7 @@ import com.google.inject.Inject
 import com.gu.scanamo.{Scanamo, SecondaryIndex, Table}
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
+import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.platform.reindex_worker.models.{ReindexJob, ReindexableRecord}
@@ -13,7 +14,7 @@ import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import scala.concurrent.Future
 import scala.util.Try
 
-/** Find records in the SourceData table that need reindexing.
+/** Find IDs for records in the SourceData table that need reindexing.
   *
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
@@ -23,7 +24,7 @@ class ReindexRecordReaderService @Inject()(
   dynamoConfig: DynamoConfig
 ) extends Logging {
 
-  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[ReindexableRecord]] = {
+  def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
     val table = Table[ReindexableRecord](dynamoConfig.table)
@@ -47,12 +48,12 @@ class ReindexRecordReaderService @Inject()(
         )
       }
 
-      outdatedRecords: List[ReindexableRecord] = results.map(extractRecord)
-    } yield outdatedRecords
+      outdatedRecordIds: List[String] = results.map(extractRecordID)
+    } yield outdatedRecordIds
   }
 
-  private def extractRecord(
-                             scanamoResult: Either[DynamoReadError, ReindexableRecord]): ReindexableRecord =
+  private def extractRecordID(
+    scanamoResult: Either[DynamoReadError, ReindexableRecord]): String =
     scanamoResult match {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
@@ -60,6 +61,6 @@ class ReindexRecordReaderService @Inject()(
           new RuntimeException(s"Error in the DynamoDB query: $err")
         )
       }
-      case Right(r: ReindexableRecord) => r
+      case Right(r: ReindexableRecord) => r.id
     }
 }

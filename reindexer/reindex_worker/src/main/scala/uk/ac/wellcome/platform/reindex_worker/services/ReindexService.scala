@@ -18,19 +18,19 @@ class ReindexService @Inject()(readerService: ReindexRecordReaderService,
 
     // Then we send an SNS notification for all of the records.  Another
     // application will pick these up and do the writes back to DynamoDB.
-    outdatedRecordsFuture.flatMap { outdatedRecords: List[ReindexableRecord] =>
+    outdatedRecordsFuture.flatMap { outdatedRecordIds: List[String] =>
       Future.sequence {
-        outdatedRecords.map {
+        outdatedRecordIds.map {
           sendIndividualNotification(_, desiredVersion = reindexJob.desiredVersion)
         }
       }
     }
   }
 
-  private def sendIndividualNotification(record: ReindexableRecord,
+  private def sendIndividualNotification(recordId: String,
                                          desiredVersion: Int): Future[Unit] = {
     val request = ReindexRequest(
-      id = record.id,
+      id = recordId,
       desiredVersion = desiredVersion
     )
 
