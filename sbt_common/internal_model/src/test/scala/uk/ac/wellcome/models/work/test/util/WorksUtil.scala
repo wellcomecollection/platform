@@ -43,19 +43,11 @@ trait WorksUtil extends ItemsUtil {
         identifiedWorkWith(
           canonicalId = s"${idx}-${canonicalId}",
           title = s"${idx}-${title}",
-<<<<<<< HEAD
-          description = s"${idx}-${description}",
-          lettering = s"${idx}-${lettering}",
-          createdDate = Period(s"${idx}-${period.label}"),
-          creator = Agent(s"${idx}-${agent.label}"),
-          items = createItems(count = 2)
-=======
           description = Some(s"${idx}-${description}"),
           lettering = Some(s"${idx}-${lettering}"),
           createdDate = Some(Period(s"${idx}-${period.label}")),
           contributors = List(Contributor(agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
-          items = List(defaultItem)
->>>>>>> Another method cleaned up
+          items = createItems(count = 2)
       ))
 
   def createInvisibleWorks(count: Int,
