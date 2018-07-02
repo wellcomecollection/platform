@@ -15,12 +15,10 @@ class DisplayWorkV2SerialisationTest
   it("serialises a DisplayWorkV2 correctly") {
 
     val work = createIdentifiedWorkWith(
-      canonicalId = canonicalId,
-      title = title,
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(period),
-      contributors = List(Contributor(agent = Unidentifiable(agent))),
+      description = Some(s"A single work in ${this.getClass.getSimpleName}"),
+      lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
+      createdDate = Some(Period("2 February 2002")),
+      contributors = List(Contributor(agent = Unidentifiable(Agent("An ambiguous acquaintance")))),
       items = createItems(count = 2),
       workType = None
     )
@@ -30,15 +28,11 @@ class DisplayWorkV2SerialisationTest
     val expectedJsonString = s"""
        |{
        | "type": "Work",
-       | "id": "$canonicalId",
-       | "title": "$title",
-       | "description": "$description",
-       | "workType": {
-       |       "id": "${workType.id}",
-       |       "label": "${workType.label}",
-       |       "type": "WorkType"
-       | },
-       | "lettering": "$lettering",
+       | "id": "${work.canonicalId}",
+       | "title": "${work.title}",
+       | "description": "${work.description.get}",
+       | "workType" : ${workType(work.workType.get)},
+       | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "contributors": [
        |   {
@@ -207,7 +201,7 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "contributors": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
@@ -227,7 +221,7 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "contributors": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]

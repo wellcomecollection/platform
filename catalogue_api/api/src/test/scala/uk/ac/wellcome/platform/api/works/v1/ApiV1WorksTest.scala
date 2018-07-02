@@ -28,11 +28,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(0).canonicalId}",
                  |     "title": "${works(0).title}",
                  |     "description": "${works(0).description.get}",
-                 |     "workType": {
-                 |       "id": "${works(0).workType.get.id}",
-                 |       "label": "${works(0).workType.get.label}",
-                 |       "type": "WorkType"
-                 |     },
+                 |     "workType" : ${workType(works(0).workType.get)},
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -48,11 +44,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(1).canonicalId}",
                  |     "title": "${works(1).title}",
                  |     "description": "${works(1).description.get}",
-                 |     "workType": {
-                 |       "id": "${works(1).workType.get.id}",
-                 |       "label": "${works(1).workType.get.label}",
-                 |       "type": "WorkType"
-                 |     },
+                 |     "workType" : ${workType(works(1).workType.get)},
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -68,11 +60,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(2).canonicalId}",
                  |     "title": "${works(2).title}",
                  |     "description": "${works(2).description.get}",
-                 |     "workType": {
-                 |       "id": "${works(2).workType.get.id}",
-                 |       "label": "${works(2).workType.get.label}",
-                 |       "type": "WorkType"
-                 |     },
+                 |     "workType" : ${workType(works(2).workType.get)},
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -95,11 +83,10 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          title = title,
-          description = Some(description),
-          lettering = Some(lettering),
-          createdDate = Some(period),
-          contributors = List(Contributor(agent = Unidentifiable(agent))),
+          description = Some(s"A single work in ${this.getClass.getSimpleName}"),
+          lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
+          createdDate = Some(Period("The future")),
+          contributors = List(Contributor(agent = Unidentifiable(Agent("A tall person")))),
           items = createItems(count = 2)
         )
 
@@ -114,14 +101,10 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
                  | "id": "${work.canonicalId}",
-                 | "title": "$title",
-                 | "description": "$description",
-                 | "workType": {
-                 |       "id": "${workType.id}",
-                 |       "label": "${workType.label}",
-                 |       "type": "WorkType"
-                 | },
-                 | "lettering": "$lettering",
+                 | "title": "${work.title}",
+                 | "description": "${work.description.get}",
+                 | "workType": ${workType(work.workType.get)},
+                 | "lettering": "${work.lettering.get}",
                  | "createdDate": ${period(work.createdDate.get)},
                  | "creators": [ ${identifiedOrUnidentifiable(
                                 work.contributors(0).agent,
@@ -196,11 +179,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(1).canonicalId}",
                  |     "title": "${works(1).title}",
                  |     "description": "${works(1).description.get}",
-                 |     "workType" : {
-                 |        "id" : "${works(1).workType.get.id}",
-                 |        "label" : "${works(1).workType.get.label}",
-                 |        "type" : "WorkType"
-                 |      },
+                 |     "workType" : ${workType(works(1).workType.get)},
                  |     "lettering": "${works(1).lettering.get}",
                  |     "createdDate": ${period(works(1).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -234,11 +213,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(0).canonicalId}",
                  |     "title": "${works(0).title}",
                  |     "description": "${works(0).description.get}",
-                 |     "workType" : {
-                 |        "id" : "${works(0).workType.get.id}",
-                 |        "label" : "${works(0).workType.get.label}",
-                 |        "type" : "WorkType"
-                 |      },
+                 |     "workType" : ${workType(works(0).workType.get)},
                  |     "lettering": "${works(0).lettering.get}",
                  |     "createdDate": ${period(works(0).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -272,11 +247,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${works(2).canonicalId}",
                  |     "title": "${works(2).title}",
                  |     "description": "${works(2).description.get}",
-                 |     "workType" : {
-                 |        "id" : "${works(2).workType.get.id}",
-                 |        "label" : "${works(2).workType.get.label}",
-                 |        "type" : "WorkType"
-                 |      },
+                 |     "workType" : ${workType(works(2).workType.get)},
                  |     "lettering": "${works(2).lettering.get}",
                  |     "createdDate": ${period(works(2).createdDate.get)},
                  |     "creators": [ ${identifiedOrUnidentifiable(
@@ -388,7 +359,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
                  |     "creators": [ ],
-                 |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                 |     "identifiers": [ ${identifier(work1.sourceIdentifier)}, ${identifier(
                                 identifier1)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -400,7 +371,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "id": "${work2.canonicalId}",
                  |     "title": "${work2.title}",
                  |     "creators": [ ],
-                 |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                 |     "identifiers": [ ${identifier(work2.sourceIdentifier)}, ${identifier(
                                 identifier2)} ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
@@ -440,7 +411,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "id": "${work.canonicalId}",
                  | "title": "${work.title}",
                  | "creators": [ ],
-                 | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                 | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                                 srcIdentifier)} ],
                  | "subjects": [ ],
                  | "genres": [ ],

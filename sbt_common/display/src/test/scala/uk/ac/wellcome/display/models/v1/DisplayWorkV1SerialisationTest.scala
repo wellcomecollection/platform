@@ -14,11 +14,10 @@ class DisplayWorkV1SerialisationTest
 
   it("serialises a DisplayWorkV1 correctly") {
     val work = createIdentifiedWorkWith(
-      title = title,
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(period),
-      contributors = List(Contributor(agent = Unidentifiable(agent))),
+      description = Some(s"A single work in ${this.getClass.getSimpleName}"),
+      lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
+      createdDate = Some(Period("1 January 1001")),
+      contributors = List(Contributor(agent = Unidentifiable(Agent("A faceless corporation")))),
       items = createItems(count = 2),
       workType = None
     )
@@ -29,14 +28,10 @@ class DisplayWorkV1SerialisationTest
        |{
        | "type": "Work",
        | "id": "${work.canonicalId}",
-       | "title": "$title",
-       | "description": "$description",
-       | "workType": {
-       |       "id": "${workType.id}",
-       |       "label": "${workType.label}",
-       |       "type": "WorkType"
-       | },
-       | "lettering": "$lettering",
+       | "title": "${work.title}",
+       | "description": "${work.description.get}",
+       | "workType" : ${workType(work.workType.get)},
+       | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
                                   work.contributors(0).agent,
@@ -216,7 +211,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
@@ -240,7 +235,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],

@@ -28,11 +28,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "description": "${works(0).description.get}",
-               |     "workType": {
-               |       "id": "${works(0).workType.get.id}",
-               |       "label": "${works(0).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(0).workType.get)},
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
                |     "contributors": [${contributor(works(0).contributors(0))}],
@@ -45,11 +41,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "description": "${works(1).description.get}",
-               |     "workType": {
-               |       "id": "${works(1).workType.get.id}",
-               |       "label": "${works(1).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(1).workType.get)},
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
                |     "contributors": [${contributor(works(1).contributors(0))}],
@@ -62,11 +54,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "description": "${works(2).description.get}",
-               |     "workType": {
-               |       "id": "${works(2).workType.get.id}",
-               |       "label": "${works(2).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(2).workType.get)},
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
                |     "contributors": [${contributor(works(2).contributors(0))}],
@@ -83,17 +71,37 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("returns a single work when requested with id") {
+    val subjects = List(
+      Subject[Unidentifiable[AbstractConcept]](
+        label = "a subject created by WorksUtil",
+        concepts = List(
+          Unidentifiable(Concept("a subject concept")),
+          Unidentifiable(Place("a subject place")),
+          Unidentifiable(Period("a subject period"))
+        )
+      )
+    )
+
+    val genres = List(
+      Genre[Unidentifiable[AbstractConcept]](
+        label = "an unidentified genre created by WorksUtil",
+        concepts = List(
+          Unidentifiable(Concept("a genre concept")),
+          Unidentifiable(Place("a genre place")),
+          Unidentifiable(Period("a genre period"))
+        )
+      )
+    )
+
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          canonicalId = canonicalId,
-          title = title,
-          description = Some(description),
-          lettering = Some(lettering),
-          createdDate = Some(period),
-          contributors = List(Contributor(agent = Unidentifiable(agent))),
-          subjects = List(subject),
-          genres = List(genre),
+          description = Some(s"A single work in ${this.getClass.getSimpleName}"),
+          lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
+          createdDate = Some(Period("The future")),
+          contributors = List(Contributor(agent = Unidentifiable(Agent("A mysterious organisation")))),
+          subjects = subjects,
+          genres = genres,
           items = createItems(count = 2)
         )
 
@@ -101,56 +109,24 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/$canonicalId",
+            path = s"/$apiPrefix/works/${work.canonicalId}",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
                | "@context": "https://localhost:8888/$apiPrefix/context.json",
                | "type": "Work",
-               | "id": "$canonicalId",
-               | "title": "$title",
-               | "description": "$description",
-               | "workType": {
-               |       "id": "${workType.id}",
-               |       "label": "${workType.label}",
-               |       "type": "WorkType"
-               | },
-               | "lettering": "$lettering",
+               | "id": "${work.canonicalId}",
+               | "title": "${work.title}",
+               | "description": "${work.description.get}",
+               | "workType" : ${workType(work.workType.get)},
+               | "lettering": "${work.lettering.get}",
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
                | "subjects": [
-               |   { "label": "${subject.label}",
-               |     "type": "${subject.ontologyType}",
-               |     "concepts":[
-               |       {
-               |         "label": "${subject.concepts(0).agent.label}",
-               |         "type":  "${subject.concepts(0).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${subject.concepts(1).agent.label}",
-               |         "type":  "${subject.concepts(1).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${subject.concepts(2).agent.label}",
-               |         "type":  "${subject.concepts(2).agent.ontologyType}"
-               |       }]}
+               |   ${subjects(work.subjects)}
                | ],
                | "genres": [
-               |   { "label": "${genre.label}",
-               |     "type": "${genre.ontologyType}",
-               |     "concepts":[
-               |       {
-               |         "label": "${genre.concepts(0).agent.label}",
-               |         "type":  "${genre.concepts(0).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${genre.concepts(1).agent.label}",
-               |         "type":  "${genre.concepts(1).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${genre.concepts(2).agent.label}",
-               |         "type":  "${genre.concepts(2).agent.ontologyType}"
-               |       }]}
+               |   ${genres(work.genres)}
                | ],
                | "production": [ ]
                |}
@@ -216,11 +192,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "description": "${works(1).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(1).workType.get.id}",
-               |        "label" : "${works(1).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(1).workType.get)},
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
                |     "contributors": [${contributor(works(1).contributors(0))}],
@@ -251,11 +223,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "description": "${works(0).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(0).workType.get.id}",
-               |        "label" : "${works(0).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(0).workType.get)},
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
                |     "contributors": [${contributor(works(0).contributors(0))}],
@@ -286,11 +254,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "description": "${works(2).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(2).workType.get.id}",
-               |        "label" : "${works(2).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(2).workType.get)},
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
                |     "contributors": [${contributor(works(2).contributors(0))}],
@@ -394,7 +358,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+               |     "identifiers": [ ${identifier(work1.sourceIdentifier)}, ${identifier(
                                 identifier1)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
@@ -405,7 +369,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work2.canonicalId}",
                |     "title": "${work2.title}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+               |     "identifiers": [ ${identifier(work2.sourceIdentifier)}, ${identifier(
                                 identifier2)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
@@ -444,7 +408,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "id": "${work.canonicalId}",
                | "title": "${work.title}",
                | "contributors": [ ],
-               | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+               | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                                 srcIdentifier)} ],
                | "subjects": [ ],
                | "genres": [ ],
