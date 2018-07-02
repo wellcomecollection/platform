@@ -50,11 +50,17 @@ trait WorksUtil extends ItemsUtil {
           items = createItems(count = 2)
       ))
 
-  def createInvisibleWorks(count: Int,
-                           start: Int = 1): Seq[IdentifiedInvisibleWork] =
-    (start to count).map(
-      (idx: Int) => invisibleWorkWith(s"$idx-$canonicalId")
+  def createIdentifiedInvisibleWork: IdentifiedInvisibleWork = {
+    IdentifiedInvisibleWork(
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      canonicalId = (Random.alphanumeric take 10 mkString) toLowerCase
     )
+  }
+
+  def createIdentifiedInvisibleWorks(count: Int,
+                                     start: Int = 1): Seq[IdentifiedInvisibleWork] =
+    (start to count).map { _ => createIdentifiedInvisibleWork }
 
   def unidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
@@ -127,12 +133,4 @@ trait WorksUtil extends ItemsUtil {
       items = items,
       version = version
     )
-
-  def invisibleWorkWith(canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase): IdentifiedInvisibleWork = {
-    IdentifiedInvisibleWork(
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId
-    )
-  }
 }

@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.api.works.v2
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 
 class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
@@ -11,9 +10,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = invisibleWorkWith(
-          canonicalId = "g9dtcj2e"
-        )
+        val work = createIdentifiedInvisibleWork
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -30,15 +27,10 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("excludes works with visible=false from list results") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        // Start by indexing a work with visible=false.
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "gze7bc24"
-        )
-
-        // Then we index two ordinary works into Elasticsearch.
+        val deletedWork = createIdentifiedInvisibleWorks(count = 1)
         val works = createWorks(2)
 
-        val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
+        val worksToIndex = deletedWork ++ works
         insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
 
         eventually {
@@ -87,7 +79,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith()
-        val deletedWork = invisibleWorkWith()
+        val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 
         eventually {
