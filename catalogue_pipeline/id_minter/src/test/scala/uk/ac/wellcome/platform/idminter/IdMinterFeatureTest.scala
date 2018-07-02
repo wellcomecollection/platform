@@ -111,7 +111,7 @@ class IdMinterFeatureTest
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
-                  key = s"invisible-work.json"
+                  key = "invisible-work.json"
                 )
               )
               sqsClient.sendMessage(queue.url, messageBody)
@@ -123,6 +123,60 @@ class IdMinterFeatureTest
                 val work = get[IdentifiedInvisibleWork](messages.head)
                 work.sourceIdentifier shouldBe identifier
                 work.canonicalId shouldNot be(empty)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("mints an identifier for a UnidentifiedRedirectedWork") {
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withIdentifiersDatabase { identifiersTableConfig =>
+            val flags =
+              identifiersLocalDbFlags(identifiersTableConfig) ++
+                messagingLocalFlags(bucket, topic, queue)
+
+            withServer(flags) { _ =>
+              eventuallyTableExists(identifiersTableConfig)
+
+              val id = "id"
+              val identifier =
+                SourceIdentifier(
+                  identifierType = IdentifierType("sierra-system-number"),
+                  "Work",
+                  id)
+
+              val work = UnidentifiedRedirectedWork(
+                sourceIdentifier = identifier,
+                version = 1,
+                redirect = IdentifiableRedirect(
+                  sourceIdentifier = SourceIdentifier(
+                    IdentifierType("sierra-system-number"),
+                    "Work",
+                    "b1234567"))
+              )
+
+              val messageBody = put[UnidentifiedRedirectedWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = "redirected-work.json"
+                )
+              )
+              sqsClient.sendMessage(queue.url, messageBody)
+
+              eventually {
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages.length shouldBe >=(1)
+
+                val work = get[IdentifiedRedirectedWork](messages.head)
+                work.sourceIdentifier shouldBe identifier
+                work.canonicalId shouldNot be(empty)
+                work.redirect.canonicalId shouldNot be(empty)
               }
             }
           }
