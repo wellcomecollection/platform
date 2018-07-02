@@ -108,7 +108,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       transformedItem shouldBe Identifiable(
         sourceIdentifier = sourceIdentifier1,
         otherIdentifiers = List(sourceIdentifier2),
-        agent = Item())
+        agent = Item(locations = List()))
       transformedItem.identifiers shouldBe expectedIdentifiers
     }
 

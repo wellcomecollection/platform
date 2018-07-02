@@ -21,7 +21,7 @@ class DisplayWorkV2SerialisationTest
       lettering = lettering,
       createdDate = period,
       creator = agent,
-      items = List(defaultItem))
+      items = createItems(count = 2))
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work))
 
@@ -61,13 +61,7 @@ class DisplayWorkV2SerialisationTest
     val work = workWith(
       canonicalId = "b4heraz7",
       title = "Inside an irate igloo",
-      items = List(
-        itemWith(
-          canonicalId = "c3a599u5",
-          identifier = defaultItemSourceIdentifier,
-          location = defaultLocation
-        )
-      )
+      items = createItems(count = 1)
     )
 
     val actualJson = objectMapper.writeValueAsString(
@@ -119,12 +113,7 @@ class DisplayWorkV2SerialisationTest
       credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
-    val item = Identified(
-      canonicalId = "chu27a8",
-      sourceIdentifier = sourceIdentifier,
-      agent = Item(
-        locations = List(location)
-      ))
+    val item = createItem(locations = List(location))
     val workWithCopyright = IdentifiedWork(
       title = "A scarf on a squirrel",
       sourceIdentifier = sourceIdentifier,

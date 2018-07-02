@@ -4,8 +4,9 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
-class DisplayWorkV1Test extends FunSpec with Matchers {
+class DisplayWorkV1Test extends FunSpec with Matchers with ItemsUtil {
 
   it("correctly parses a Work without any items") {
     val work = IdentifiedWork(
@@ -23,12 +24,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   it("correctly parses items on a work") {
-    val item = Identified(
-      canonicalId = "c3a599u5",
-      sourceIdentifier = sourceIdentifier,
-      agent = Item(
-        locations = List()
-      ))
+    val item = createItem(locations = List())
     val work = IdentifiedWork(
       title = "Inside an irate igloo",
       sourceIdentifier = sourceIdentifier,
@@ -268,23 +264,11 @@ class DisplayWorkV1Test extends FunSpec with Matchers {
   }
 
   describe("correctly uses the WorksIncludes.identifiers include") {
-    val itemSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      value = "miro/p0001",
-      ontologyType = "Item"
-    )
-
     val work = IdentifiedWork(
       canonicalId = "pt5vupg4",
       title = "Pouncing pugs play in pipes",
       sourceIdentifier = sourceIdentifier,
-      items = List(
-        Identified(
-          canonicalId = "pwaazubr",
-          sourceIdentifier = itemSourceIdentifier,
-          agent = Item()
-        )
-      ),
+      items = createItems(count = 1),
       version = 1
     )
 

@@ -6,6 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.ItemsUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -21,7 +22,8 @@ class IdEmbedderTests
     with MockitoSugar
     with Akka
     with JsonTestUtil
-    with ExtendedPatience {
+    with ExtendedPatience
+    with ItemsUtil {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
@@ -195,9 +197,8 @@ class IdEmbedderTests
 
     val originalItem1 = Identifiable(
       sourceIdentifier = identifier,
-      agent = Item(
-        locations = List()
-      ))
+      agent = Item(locations = List())
+    )
 
     val originalItem2 = Identifiable(
       sourceIdentifier = SourceIdentifier(
@@ -205,9 +206,8 @@ class IdEmbedderTests
         ontologyType = "Item",
         value = "1235"
       ),
-      agent = Item(
-        locations = List()
-      ))
+      agent = Item(locations = List())
+    )
 
     val originalWork = UnidentifiedWork(
       title = "crap",
@@ -247,16 +247,17 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedItem1 = Identified(
+        val expectedItem1 = createItem(
           sourceIdentifier = originalItem1.sourceIdentifier,
           canonicalId = newItemCanonicalId1,
-          agent = Item(
-            ))
+          locations = originalItem1.agent.locations
+        )
 
-        val expectedItem2 = Identified(
+        val expectedItem2 = createItem(
           sourceIdentifier = originalItem2.sourceIdentifier,
           canonicalId = newItemCanonicalId2,
-          agent = Item())
+          locations = originalItem2.agent.locations
+        )
 
         whenReady(eventualWork) { json =>
           val work = fromJson[IdentifiedWork](json.toString()).get

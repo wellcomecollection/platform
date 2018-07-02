@@ -3,8 +3,9 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
-class DisplayWorkV2Test extends FunSpec with Matchers {
+class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
 
   it("correctly parses a Work without any items") {
     val work = IdentifiedWork(
@@ -22,18 +23,12 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
   }
 
   it("correctly parses items on a work") {
-    val item = Identified(
-      canonicalId = "c3a599u5",
-      sourceIdentifier = sourceIdentifier,
-      agent = Item(
-        locations = List()
-      ))
     val work = IdentifiedWork(
       title = "Inside an irate igloo",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "b4heraz7",
-      items = List(item)
+      items = createItems(count = 1)
     )
 
     val displayWork = DisplayWorkV2(
@@ -41,7 +36,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       includes = WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
-    displayItem.id shouldBe item.canonicalId
+    displayItem.id shouldBe work.items.head.canonicalId
   }
 
   val sourceIdentifier = SourceIdentifier(
@@ -239,12 +234,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
       ontologyType = "Agent"
     )
 
-    val itemSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      value = "miro/b0001",
-      ontologyType = "Item"
-    )
-
     val conceptSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/bonds",
@@ -293,13 +282,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           roles = List()
         )
       ),
-      items = List(
-        Identified(
-          canonicalId = "bksy8rkc",
-          sourceIdentifier = itemSourceIdentifier,
-          agent = Item()
-        )
-      ),
+      items = createItems(count = 1),
       subjects = List(
         Subject(
           label = "Beryllium-Boron Bonding",
@@ -398,7 +381,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
           includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV2(itemSourceIdentifier)))
+          List(DisplayIdentifierV2(work.items.head.sourceIdentifier)))
       }
 
       it("subjects") {

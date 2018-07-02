@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
-trait WorksUtil {
+trait WorksUtil extends ItemsUtil {
   val canonicalId = "1234"
   val title = "this is the first image title"
   val description = "this is a description"
@@ -48,7 +48,7 @@ trait WorksUtil {
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
           creator = Agent(s"${idx}-${agent.label}"),
-          items = List(defaultItem)
+          items = createItems(count = 2)
       ))
 
   def createInvisibleWorks(count: Int,
@@ -147,42 +147,4 @@ trait WorksUtil {
       genres = genres,
       items = items
     )
-
-  def defaultItem: Identified[Item] = itemWith(
-    "item-canonical-id",
-    defaultItemSourceIdentifier,
-    defaultLocation
-  )
-
-  def defaultItemSourceIdentifier = {
-    SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      "Item",
-      "M0000001")
-  }
-
-  def defaultLocation: Location = {
-    digitalLocationWith(
-      "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
-      License_CCBY)
-  }
-
-  def itemWith(
-    canonicalId: String,
-    identifier: SourceIdentifier,
-    location: Location
-  ): Identified[Item] =
-    Identified(
-      canonicalId = canonicalId,
-      sourceIdentifier = identifier,
-      agent = Item(
-        locations = List(location)
-      ))
-
-  def digitalLocationWith(url: String, license: License): DigitalLocation = {
-    DigitalLocation(
-      locationType = LocationType("iiif-image"),
-      url = url,
-      license = license)
-  }
 }
