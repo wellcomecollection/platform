@@ -6,10 +6,6 @@ import scala.util.Random
 
 trait WorksUtil extends ItemsUtil {
   private val defaultTitle = "this is the first image title"
-  val workType = WorkType(
-    id = "1dz4yn34va",
-    label = "An aggregation of angry archipelago aged ankylosaurs."
-  )
   val subject = Subject[Unidentifiable[AbstractConcept]](
     label = "a subject created by WorksUtil",
     concepts = List(
