@@ -3,11 +3,11 @@
 """
 Create/update reindex shards in the reindex shard tracker table.
 
-Usage: trigger_reindex.py --source=(miro|sierra) --reason=<REASON>
+Usage: trigger_reindex.py --source=<SOURCE_NAME> --reason=<REASON>
        trigger_reindex.py -h | --help
 
 Options:
-  --source=(miro|sierra)    Name of the source you want to reindex.
+  --source=<SOURCE_NAME>    Name of the source you want to reindex.
   --reason=<REASON>         An explanation of why you're running this reindex.
                             This will be printed in the Slack alert.
   -h --help                 Print this help message
@@ -25,12 +25,13 @@ import docopt
 import hcl
 import requests
 import tqdm
+from wellcome_aws_utils.sns_utils import publish_sns_message
 
 
 # Reindex shards are added by a "reindex_shard_generator" Lambda.
 # Import the utility code that assigns reindex shards.
-ROOT = subprocess.check_call(
-    ['git', 'rev-parse', '--show-toplevel']).decode('utf8')
+ROOT = subprocess.check_output(
+    ['git', 'rev-parse', '--show-toplevel']).decode('utf8').strip()
 sys.path.append(os.path.join(ROOT, 'reindexer/reindex_shard_generator/src'))
 
 from reindex_shard_config import get_number_of_shards  # noqa
@@ -65,11 +66,11 @@ def all_messages(shard_ids, desired_version):
 def publish_messages(sns_client, topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
     for m in tqdm.tqdm(messages):
-        sns_client.publish_message(
-            TopicArn=topic_arn,
-            MessageStructure='json',
-            Message=json.dumps(m),
-            Subject=f'source: {__file__}'
+        publish_sns_message(
+            sns_client=sns_client,
+            topic_arn=topic_arn,
+            message=json.dumps(m),
+            subject=f'source: {__file__}'
         )
 
 
@@ -122,7 +123,7 @@ def build_topic_arn(topic_name):
 def main():
     args = docopt.docopt(__doc__)
 
-    source_name = args['--prefix']
+    source_name = args['--source']
     reason = args['--reason']
 
     # We use the current timestamp for the reindex version -- this allows
