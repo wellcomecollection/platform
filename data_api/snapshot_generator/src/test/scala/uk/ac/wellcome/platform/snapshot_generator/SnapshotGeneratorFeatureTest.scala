@@ -58,7 +58,7 @@ class SnapshotGeneratorFeatureTest
         val works = (1 to 3).map { version =>
           IdentifiedWork(
             canonicalId = s"rbfhv6b4$version",
-            title = Some("Rumblings from a rambunctious rodent"),
+            title = "Rumblings from a rambunctious rodent",
             sourceIdentifier = SourceIdentifier(
               identifierType = IdentifierType("miro-image-number"),
               ontologyType = "work",
@@ -102,7 +102,7 @@ class SnapshotGeneratorFeatureTest
           val expectedJsonLines = works.map { work =>
             s"""{
                  |  "id": "${work.canonicalId}",
-                 |  "title": "${work.title.get}",
+                 |  "title": "${work.title}",
                  |  "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                  |  "creators": [ ],
                  |  "genres": [ ],
