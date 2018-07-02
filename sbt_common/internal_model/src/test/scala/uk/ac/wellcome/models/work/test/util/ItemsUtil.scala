@@ -19,15 +19,17 @@ trait ItemsUtil {
     license = License_CCBY
   )
 
-  private def createItem: Identified[Item] =
+  def createItem(
+    locations: List[Location] = List(location)
+  ): Identified[Item] =
     Identified(
       canonicalId = (Random.alphanumeric take 10 mkString) toLowerCase,
       sourceIdentifier = sourceIdentifier,
-      agent = Item(locations = List(location))
+      agent = Item(locations = locations)
     )
 
   def createItems(count: Int): List[Identified[Item]] =
     (1 to count)
-      .map { _ => createItem }
+      .map { _ => createItem() }
       .toList
 }
