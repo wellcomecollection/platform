@@ -98,7 +98,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           description = Some(s"A single work in ${this.getClass.getSimpleName}"),
           lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
           createdDate = Some(Period("The future")),
-          contributors = List(Contributor(agent = Unidentifiable(agent))),
+          contributors = List(Contributor(agent = Unidentifiable(Agent("A tall person")))),
           items = createItems(count = 2)
         )
 

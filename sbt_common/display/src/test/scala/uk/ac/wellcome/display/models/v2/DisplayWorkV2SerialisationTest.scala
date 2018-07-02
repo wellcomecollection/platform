@@ -18,7 +18,7 @@ class DisplayWorkV2SerialisationTest
       description = Some(s"A single work in ${this.getClass.getSimpleName}"),
       lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
       createdDate = Some(Period("2 February 2002")),
-      contributors = List(Contributor(agent = Unidentifiable(agent))),
+      contributors = List(Contributor(agent = Unidentifiable(Agent("An ambiguous acquaintance")))),
       items = createItems(count = 2),
       workType = None
     )
