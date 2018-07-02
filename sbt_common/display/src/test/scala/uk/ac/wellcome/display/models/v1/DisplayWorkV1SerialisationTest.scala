@@ -30,11 +30,7 @@ class DisplayWorkV1SerialisationTest
        | "id": "${work.canonicalId}",
        | "title": "${work.title}",
        | "description": "${work.description.get}",
-       | "workType": {
-       |       "id": "${workType.id}",
-       |       "label": "${workType.label}",
-       |       "type": "WorkType"
-       | },
+       | "workType" : ${workType(work.workType.get)},
        | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(

@@ -28,11 +28,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "description": "${works(0).description.get}",
-               |     "workType": {
-               |       "id": "${works(0).workType.get.id}",
-               |       "label": "${works(0).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(0).workType.get)},
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
                |     "contributors": [${contributor(works(0).contributors(0))}],
@@ -45,11 +41,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "description": "${works(1).description.get}",
-               |     "workType": {
-               |       "id": "${works(1).workType.get.id}",
-               |       "label": "${works(1).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(1).workType.get)},
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
                |     "contributors": [${contributor(works(1).contributors(0))}],
@@ -62,11 +54,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "description": "${works(2).description.get}",
-               |     "workType": {
-               |       "id": "${works(2).workType.get.id}",
-               |       "label": "${works(2).workType.get.label}",
-               |       "type": "WorkType"
-               |     },
+               |     "workType" : ${workType(works(2).workType.get)},
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
                |     "contributors": [${contributor(works(2).contributors(0))}],
@@ -108,11 +96,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "id": "${work.canonicalId}",
                | "title": "${work.title}",
                | "description": "${work.description.get}",
-               | "workType": {
-               |       "id": "${workType.id}",
-               |       "label": "${workType.label}",
-               |       "type": "WorkType"
-               | },
+               | "workType" : ${workType(work.workType.get)},
                | "lettering": "${work.lettering.get}",
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
@@ -214,11 +198,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "description": "${works(1).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(1).workType.get.id}",
-               |        "label" : "${works(1).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(1).workType.get)},
                |     "lettering": "${works(1).lettering.get}",
                |     "createdDate": ${period(works(1).createdDate.get)},
                |     "contributors": [${contributor(works(1).contributors(0))}],
@@ -249,11 +229,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "description": "${works(0).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(0).workType.get.id}",
-               |        "label" : "${works(0).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(0).workType.get)},
                |     "lettering": "${works(0).lettering.get}",
                |     "createdDate": ${period(works(0).createdDate.get)},
                |     "contributors": [${contributor(works(0).contributors(0))}],
@@ -284,11 +260,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "description": "${works(2).description.get}",
-               |     "workType" : {
-               |        "id" : "${works(2).workType.get.id}",
-               |        "label" : "${works(2).workType.get.label}",
-               |        "type" : "WorkType"
-               |      },
+               |     "workType" : ${workType(works(2).workType.get)},
                |     "lettering": "${works(2).lettering.get}",
                |     "createdDate": ${period(works(2).createdDate.get)},
                |     "contributors": [${contributor(works(2).contributors(0))}],
