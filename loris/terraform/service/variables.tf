@@ -72,7 +72,7 @@ variable "app_cpu" {
   default = "2948"
 }
 variable "app_memory" {
-  default = "6966"
+  default = "6950"
 }
 
 variable "app_env_vars" {
