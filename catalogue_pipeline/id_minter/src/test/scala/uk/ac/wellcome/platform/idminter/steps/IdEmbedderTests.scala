@@ -250,13 +250,14 @@ class IdEmbedderTests
         val expectedItem1 = Identified(
           sourceIdentifier = originalItem1.sourceIdentifier,
           canonicalId = newItemCanonicalId1,
-          agent = Item(
-            ))
+          agent = Item(locations = List())
+        )
 
         val expectedItem2 = Identified(
           sourceIdentifier = originalItem2.sourceIdentifier,
           canonicalId = newItemCanonicalId2,
-          agent = Item())
+          agent = Item(locations = List())
+        )
 
         whenReady(eventualWork) { json =>
           val work = fromJson[IdentifiedWork](json.toString()).get
