@@ -90,21 +90,27 @@ if __name__ == '__main__':
 
 variable "pinned_romulus_api" {{
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "{new_prod_api_info['api'] if new_prod_api == 'romulus' else ''}"
+  default     = "{new_prod_api_info['api'] if new_prod_api == 'romulus' else staging_api_info['api']}"
 }}
 
 variable "pinned_romulus_api_nginx" {{
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'romulus' else ''}"
+  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'romulus' else staging_api_info['nginx_api']}"
 }}
 
 variable "pinned_remus_api" {{
   description = "Which version of the API image to pin remus to, if any"
-  default     = "{new_prod_api_info['api'] if new_prod_api == 'remus' else ''}"
+  default     = "{new_prod_api_info['api'] if new_prod_api == 'remus' else staging_api_info['api']}"
 }}
 
 variable "pinned_remus_api_nginx" {{
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'remus' else ''}"
+  default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'remus' else staging_api_info['nginx_api']}"
 }}
 '''.strip())
+
+    print('\033[0m')
+    print('---')
+    print('')
+    print("When you've deployed the change above successfully, then remove the")
+    print('pins for {prod_api}.')

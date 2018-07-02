@@ -1,8 +1,7 @@
 locals {
   es_config_ingestor = {
-    index_v1 = "v1-2018-06-25-other-identifiers"
-    index_v2 = "v2-2018-06-25-other-identifiers"
-    doc_type = "work"
+    index_suffix = "2018-06-25-other-identifiers"
+    doc_type     = "work"
   }
 }
 
@@ -30,8 +29,8 @@ module "ingestor" {
     es_username         = "${var.es_cluster_credentials["username"]}"
     es_password         = "${var.es_cluster_credentials["password"]}"
     es_protocol         = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1         = "${local.es_config_ingestor["index_v1"]}"
-    es_index_v2         = "${local.es_config_ingestor["index_v2"]}"
+    es_index_v1         = "v1-${local.es_config_ingestor["index_suffix"]}"
+    es_index_v2         = "v2-${local.es_config_ingestor["index_suffix"]}"
     es_doc_type         = "${local.es_config_ingestor["doc_type"]}"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
     message_bucket_name = "${aws_s3_bucket.messages.id}"

@@ -1,3 +1,15 @@
+locals {
+  es_config_romulus = {
+    index_suffix = "2018-06-25-other-identifiers"
+    doc_type     = "work"
+  }
+
+  es_config_remus = {
+    index_suffix = "2018-06-05-new-location-types"
+    doc_type     = "work"
+  }
+}
+
 module "api_romulus_v1" {
   source = "./api_service"
 
@@ -5,7 +17,7 @@ module "api_romulus_v1" {
   prod_api = "${var.production_api}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_romulus}"
+  es_config              = "${local.es_config_romulus}"
 
   prod_api_release_id       = "${var.production_api == "romulus" ? var.pinned_romulus_api : var.pinned_remus_api}"
   prod_api_nginx_release_id = "${var.production_api == "romulus" ? var.pinned_romulus_api_nginx : var.pinned_remus_api_nginx}"
@@ -34,7 +46,7 @@ module "api_remus_v1" {
   prod_api = "${var.production_api}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
-  es_config              = "${var.es_config_remus}"
+  es_config              = "${local.es_config_remus}"
 
   prod_api_release_id       = "${var.production_api == "romulus" ? var.pinned_romulus_api : var.pinned_remus_api}"
   prod_api_nginx_release_id = "${var.production_api == "romulus" ? var.pinned_romulus_api_nginx : var.pinned_remus_api_nginx}"

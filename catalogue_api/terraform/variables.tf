@@ -51,12 +51,12 @@ variable "production_api" {
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = ""
+  default     = "cd3bd08cbf5ece8af17b2baad979e5c0e589b880"
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "pinned_remus_api" {
@@ -67,26 +67,4 @@ variable "pinned_remus_api" {
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
-}
-
-variable "es_config_romulus" {
-  description = "Elasticcloud config for romulus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-20180530-new-identifier-schemes"
-    index_v2 = "v2-20180530-new-identifier-schemes"
-    doc_type = "work"
-  }
-}
-
-variable "es_config_remus" {
-  description = "Elasticcloud config for remus"
-  type        = "map"
-
-  default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
-    doc_type = "work"
-  }
 }

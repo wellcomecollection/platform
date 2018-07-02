@@ -1,3 +1,10 @@
+locals {
+  es_config_snapshot_generator = {
+    index_suffix = "2018-06-25-other-identifiers"
+    doc_type     = "work"
+  }
+}
+
 data "template_file" "es_cluster_host_snapshot" {
   template = "$${name}.$${region}.aws.found.io"
 
@@ -25,9 +32,9 @@ module "snapshot_generator" {
     es_username       = "${var.es_cluster_credentials["username"]}"
     es_password       = "${var.es_cluster_credentials["password"]}"
     es_protocol       = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1       = "${var.es_config_snapshot["index_v1"]}"
-    es_index_v2       = "${var.es_config_snapshot["index_v2"]}"
-    es_doc_type       = "${var.es_config_snapshot["doc_type"]}"
+    es_index_v1       = "${local.es_config_snapshot_generator["index_suffix"]}"
+    es_index_v2       = "${local.es_config_snapshot_generator["index_suffix"]}"
+    es_doc_type       = "${local.es_config_snapshot_generator["doc_type"]}"
     metrics_namespace = "snapshot_generator"
   }
 

@@ -45,8 +45,8 @@ module "service" {
     es_username = "${var.es_cluster_credentials["username"]}"
     es_password = "${var.es_cluster_credentials["password"]}"
     es_protocol = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1 = "${var.es_config["index_v1"]}"
-    es_index_v2 = "${var.es_config["index_v2"]}"
+    es_index_v1 = "v1-${var.es_config["index_suffix"]}"
+    es_index_v2 = "v2-${var.es_config["index_suffix"]}"
     es_doc_type = "${var.es_config["doc_type"]}"
   }
 
