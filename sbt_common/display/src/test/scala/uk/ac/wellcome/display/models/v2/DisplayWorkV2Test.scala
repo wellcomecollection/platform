@@ -234,12 +234,6 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
       ontologyType = "Agent"
     )
 
-    val itemSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      value = "miro/b0001",
-      ontologyType = "Item"
-    )
-
     val conceptSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-subjects"),
       value = "lcsh/bonds",
@@ -387,7 +381,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
           includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV2(itemSourceIdentifier)))
+          List(DisplayIdentifierV2(work.items.head.sourceIdentifier)))
       }
 
       it("subjects") {
