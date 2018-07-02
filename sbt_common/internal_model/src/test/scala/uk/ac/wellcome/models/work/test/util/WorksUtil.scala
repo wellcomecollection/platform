@@ -48,7 +48,7 @@ trait WorksUtil extends ItemsUtil {
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
           creator = Agent(s"${idx}-${agent.label}"),
-          items = List(defaultItem)
+          items = createItems(count = 2)
       ))
 
   def createInvisibleWorks(count: Int,
@@ -147,6 +147,4 @@ trait WorksUtil extends ItemsUtil {
       genres = genres,
       items = items
     )
-
-  def defaultItem: Identified[Item] = createItem
 }

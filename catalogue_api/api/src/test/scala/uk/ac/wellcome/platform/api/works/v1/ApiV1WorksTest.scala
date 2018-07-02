@@ -101,7 +101,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           lettering = lettering,
           createdDate = period,
           creator = agent,
-          items = List(defaultItem))
+          items = createItems(count = 2))
 
         insertIntoElasticsearch(indexNameV1, itemType, work)
 

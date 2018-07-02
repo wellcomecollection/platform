@@ -19,7 +19,7 @@ trait ItemsUtil {
     license = License_CCBY
   )
 
-  def createItem: Identified[Item] =
+  private def createItem: Identified[Item] =
     Identified(
       canonicalId = (Random.alphanumeric take 10 mkString) toLowerCase,
       sourceIdentifier = sourceIdentifier,

@@ -94,7 +94,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           creator = agent,
           subjects = List(subject),
           genres = List(genre),
-          items = List(defaultItem)
+          items = createItems(count = 2)
         )
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
