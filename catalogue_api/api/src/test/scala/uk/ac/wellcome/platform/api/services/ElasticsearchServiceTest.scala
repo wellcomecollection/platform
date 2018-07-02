@@ -23,18 +23,9 @@ class ElasticsearchServiceTest
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = workWith(
-          canonicalId = "000Z",
-          title = "Amid an Aegean"
-        )
-        val work2 = workWith(
-          canonicalId = "000Y",
-          title = "Before a Bengal"
-        )
-        val work3 = workWith(
-          canonicalId = "000X",
-          title = "Circling a Cheetah"
-        )
+        val work1 = identifiedWorkWith(title = "Amid an Aegean")
+        val work2 = identifiedWorkWith(title = "Before a Bengal")
+        val work3 = identifiedWorkWith(title = "Circling a Cheetah")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
@@ -61,26 +52,20 @@ class ElasticsearchServiceTest
   describe("findResultById") {
     it("finds a result by ID") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val canonicalId = "000Z"
-
-        val expectedWork = workWith(
-          canonicalId = canonicalId,
-          title = "Amid an Aegean"
-        )
-
-        insertIntoElasticsearch(indexName, itemType, expectedWork)
+        val work = identifiedWorkWith(canonicalId = "000Z")
+        insertIntoElasticsearch(indexName, itemType, work)
 
         withElasticSearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             val searchResultFuture: Future[GetResponse] =
               searchService.findResultById(
-                canonicalId = canonicalId,
+                canonicalId = work.canonicalId,
                 indexName = indexName
               )
 
             whenReady(searchResultFuture) { result =>
               val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
-              returnedWork shouldBe expectedWork
+              returnedWork shouldBe work
             }
         }
       }
@@ -90,18 +75,9 @@ class ElasticsearchServiceTest
   describe("listResults") {
     it("sorts results from Elasticsearch in the correct order") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = workWith(
-          canonicalId = "000Z",
-          title = "Amid an Aegean"
-        )
-        val work2 = workWith(
-          canonicalId = "000Y",
-          title = "Before a Bengal"
-        )
-        val work3 = workWith(
-          canonicalId = "000X",
-          title = "Circling a Cheetah"
-        )
+        val work1 = identifiedWorkWith(canonicalId = "000Z")
+        val work2 = identifiedWorkWith(canonicalId = "000Y")
+        val work3 = identifiedWorkWith(canonicalId = "000X")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
@@ -198,7 +174,7 @@ class ElasticsearchServiceTest
   }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
-    val works = createWorks(10)
+    val works = createWorks(count = 10)
 
     insertIntoElasticsearch(indexName, itemType, works: _*)
 

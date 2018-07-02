@@ -14,7 +14,8 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.models.work.internal.{SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.SourceIdentifier
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -25,7 +26,8 @@ class MatcherFeatureTest
     with Matchers
     with ExtendedPatience
     with Eventually
-    with MatcherFixtures {
+    with MatcherFixtures
+    with WorksUtil {
 
   val sourceIdentifierA = SourceIdentifier(
     identifierType = IdentifierType("sierra-system-number"),
@@ -45,10 +47,9 @@ class MatcherFeatureTest
                   topic,
                   graphTable,
                   lockTable) { _ =>
-                  val work = UnidentifiedWork(
+                  val work = unidentifiedWorkWithDefaults(
                     sourceIdentifier = sourceIdentifierA,
-                    title = "Work",
-                    version = 1
+                    title = "Work"
                   )
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
@@ -108,7 +109,7 @@ class MatcherFeatureTest
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                  val workAv1 = UnidentifiedWork(
+                  val workAv1 = unidentifiedWorkWithDefaults(
                     sourceIdentifier = sourceIdentifierA,
                     title = "Work",
                     version = updatedWorkVersion

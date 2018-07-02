@@ -4,7 +4,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
   IdentifierType,
   SourceIdentifier,
   Subject
@@ -28,7 +27,7 @@ class WorkIndexerTest
   val esType = "work"
 
   it("inserts an identified Work into Elasticsearch") {
-    val work = createVersionedWork()
+    val work = identifiedWorkWith()
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -46,7 +45,7 @@ class WorkIndexerTest
   }
 
   it("only adds one record when the same ID is ingested multiple times") {
-    val work = createVersionedWork()
+    val work = identifiedWorkWith()
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -71,7 +70,7 @@ class WorkIndexerTest
   }
 
   it("doesn't add a Work with a lower version") {
-    val work = createVersionedWork(version = 3)
+    val work = identifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
@@ -99,7 +98,7 @@ class WorkIndexerTest
   }
 
   it("replaces a Work with the same version") {
-    val work = createVersionedWork(version = 3)
+    val work = identifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "boring title")
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
@@ -124,9 +123,7 @@ class WorkIndexerTest
   }
 
   it("inserts a list of works into elasticsearch and returns them") {
-    val works = (1 to 5).map { i =>
-      createVersionedWork().copy(canonicalId = s"$i-workid")
-    }
+    val works = createWorks(count = 5)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -148,17 +145,15 @@ class WorkIndexerTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, esType)
     val validWorks = (1 to 5).map { i =>
-      IdentifiedWork(
+      identifiedWorkWith(
         canonicalId = s"s$i",
         sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-        title = "s1 title",
-        version = 1)
+        title = "s1 title")
     }
-    val notMatchingMappingWork = IdentifiedWork(
+    val notMatchingMappingWork = identifiedWorkWith(
       canonicalId = "not-matching",
       sourceIdentifier = createIdentifier("miro-image-number", "not-matching"),
       title = "title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -193,8 +188,4 @@ class WorkIndexerTest
       value = value
     )
   }
-
-  def createVersionedWork(version: Int = 1): IdentifiedWork =
-    createWorks(count = 1).head
-      .copy(version = version)
 }
