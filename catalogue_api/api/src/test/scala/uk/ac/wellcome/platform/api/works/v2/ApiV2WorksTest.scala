@@ -119,38 +119,10 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
                | "subjects": [
-               |   { "label": "${subject.label}",
-               |     "type": "${subject.ontologyType}",
-               |     "concepts":[
-               |       {
-               |         "label": "${subject.concepts(0).agent.label}",
-               |         "type":  "${subject.concepts(0).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${subject.concepts(1).agent.label}",
-               |         "type":  "${subject.concepts(1).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${subject.concepts(2).agent.label}",
-               |         "type":  "${subject.concepts(2).agent.ontologyType}"
-               |       }]}
+               |   ${subjects(work.subjects)}
                | ],
                | "genres": [
-               |   { "label": "${genre.label}",
-               |     "type": "${genre.ontologyType}",
-               |     "concepts":[
-               |       {
-               |         "label": "${genre.concepts(0).agent.label}",
-               |         "type":  "${genre.concepts(0).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${genre.concepts(1).agent.label}",
-               |         "type":  "${genre.concepts(1).agent.ontologyType}"
-               |       },
-               |       {
-               |         "label": "${genre.concepts(2).agent.label}",
-               |         "type":  "${genre.concepts(2).agent.ontologyType}"
-               |       }]}
+               |   ${genres(work.genres)}
                | ],
                | "production": [ ]
                |}
