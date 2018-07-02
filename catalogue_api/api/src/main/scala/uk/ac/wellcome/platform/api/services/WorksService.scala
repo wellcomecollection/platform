@@ -64,7 +64,8 @@ class WorksService @Inject()(apiConfig: ApiConfig,
         )
       }
 
-  private def jsonTo[T <: IdentifiedBaseWork](document: String)(implicit decoder: Decoder[T]): T =
+  private def jsonTo[T <: IdentifiedBaseWork](document: String)(
+    implicit decoder: Decoder[T]): T =
     fromJson[T](document) match {
       case Success(work) => work
       case Failure(e) =>

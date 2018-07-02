@@ -59,7 +59,8 @@ case class UnidentifiedWork(
   dimensions: Option[String] = None,
   items: List[Identifiable[Item]] = Nil,
   ontologyType: String = "Work")
-    extends Work with TransformedBaseWork
+    extends Work
+    with TransformedBaseWork
 
 case class IdentifiedWork(
   canonicalId: String,
@@ -89,12 +90,15 @@ case class IdentifiedWork(
 trait InvisibleWork extends BaseWork
 
 case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
-                                     version: Int) extends InvisibleWork with TransformedBaseWork
+                                     version: Int)
+    extends InvisibleWork
+    with TransformedBaseWork
 
 case class IdentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
-                                     version: Int,
-                                   canonicalId: String) extends InvisibleWork with IdentifiedBaseWork
-
+                                   version: Int,
+                                   canonicalId: String)
+    extends InvisibleWork
+    with IdentifiedBaseWork
 
 trait RedirectedWork extends BaseWork {
   val redirect: Redirect

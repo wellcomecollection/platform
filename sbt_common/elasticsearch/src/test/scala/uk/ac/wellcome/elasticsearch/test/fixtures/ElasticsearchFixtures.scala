@@ -5,7 +5,12 @@ import com.sksamuel.elastic4s.http.HttpClient
 import org.elasticsearch.index.VersionType
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{Matchers, Suite}
-import uk.ac.wellcome.elasticsearch.{ElasticClientBuilder, ElasticConfig, ElasticSearchIndex, WorksIndex}
+import uk.ac.wellcome.elasticsearch.{
+  ElasticClientBuilder,
+  ElasticConfig,
+  ElasticSearchIndex,
+  WorksIndex
+}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}

@@ -501,8 +501,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
             server.httpGet(
               path = s"/$apiPrefix/works/${work.canonicalId}",
               andExpect = Status.Ok,
-              withJsonBody =
-                s"""
+              withJsonBody = s"""
                    |{
                    | "@context": "https://localhost:8888/$apiPrefix/context.json",
                    | "type": "Work",
@@ -522,8 +521,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
               path =
                 s"/$apiPrefix/works/${work_alt.canonicalId}?_index=$otherIndex",
               andExpect = Status.Ok,
-              withJsonBody =
-                s"""
+              withJsonBody = s"""
                    |{
                    | "@context": "https://localhost:8888/$apiPrefix/context.json",
                    | "type": "Work",
@@ -564,8 +562,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
             server.httpGet(
               path = s"/$apiPrefix/works?query=wombat",
               andExpect = Status.Ok,
-              withJsonBody =
-                s"""
+              withJsonBody = s"""
                    |{
                    |  ${resultList(apiPrefix)},
                    |  "results": [
@@ -588,8 +585,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
             server.httpGet(
               path = s"/$apiPrefix/works?query=igloo&_index=$otherIndex",
               andExpect = Status.Ok,
-              withJsonBody =
-                s"""
+              withJsonBody = s"""
                    |{
                    |  ${resultList(apiPrefix)},
                    |  "results": [

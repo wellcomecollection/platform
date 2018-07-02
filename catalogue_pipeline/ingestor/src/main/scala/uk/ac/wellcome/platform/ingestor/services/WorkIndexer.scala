@@ -20,12 +20,15 @@ class WorkIndexer @Inject()(
     extends Logging
     with ElasticsearchExceptionManager {
 
-  implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedBaseWork] {
+  implicit object IdentifiedWorkIndexable
+      extends Indexable[IdentifiedBaseWork] {
     override def json(t: IdentifiedBaseWork): String =
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedBaseWork], esIndex: String, esType: String)
+  def indexWorks(works: Seq[IdentifiedBaseWork],
+                 esIndex: String,
+                 esType: String)
     : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")

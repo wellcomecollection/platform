@@ -8,9 +8,17 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, DisplayResultList, Error}
+import uk.ac.wellcome.platform.api.models.{
+  ApiConfig,
+  DisplayError,
+  DisplayResultList,
+  Error
+}
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 
@@ -114,7 +122,8 @@ abstract class WorksController(apiConfig: ApiConfig,
     request: SingleWorkRequest,
     contextUri: String) =
     maybeWork match {
-      case Some(work: IdentifiedWork) => respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
+      case Some(work: IdentifiedWork) =>
+        respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
       case Some(_) => respondWithGoneError(contextUri: String)
       case None =>
         respondWithNotFoundError(request, contextUri: String)

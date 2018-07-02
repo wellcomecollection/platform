@@ -8,10 +8,24 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier, WorkNode}
-import uk.ac.wellcome.models.work.internal.{IdentifierType, MergeCandidate, SourceIdentifier, UnidentifiedInvisibleWork}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier,
+  WorkNode
+}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  MergeCandidate,
+  SourceIdentifier,
+  UnidentifiedInvisibleWork
+}
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.locking.{DynamoRowLockDao, FailedUnlockException, Identifier}
+import uk.ac.wellcome.platform.matcher.locking.{
+  DynamoRowLockDao,
+  FailedUnlockException,
+  Identifier
+}
 import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
 import uk.ac.wellcome.platform.matcher.storage.WorkGraphStore
 
@@ -56,15 +70,19 @@ class WorkMatcherTest
     }
   }
 
-  it(
-    "doesn't store an invisible work and sends the work id") {
+  it("doesn't store an invisible work and sends the work id") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                val invisibleWork = UnidentifiedInvisibleWork(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "id"), 1)
+                val invisibleWork = UnidentifiedInvisibleWork(
+                  SourceIdentifier(
+                    IdentifierType("sierra-system-number"),
+                    "Work",
+                    "id"),
+                  1)
                 whenReady(workMatcher.matchWork(invisibleWork)) {
                   matcherResult =>
                     val workId = "sierra-system-number/id"

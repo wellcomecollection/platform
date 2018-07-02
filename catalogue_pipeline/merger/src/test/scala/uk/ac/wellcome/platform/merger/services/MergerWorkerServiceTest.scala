@@ -76,32 +76,25 @@ class MergerWorkerServiceTest
     }
   }
 
-  it(
-    "sends InvisibleWorks unmerged") {
+  it("sends InvisibleWorks unmerged") {
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val recorderWorkEntry =
           recorderInvisibleWorkEntryWith("sierra-system-number", "b123456", 1)
 
-        val matcherResult = matcherResultWith(
-          Set(
-            Set(recorderWorkEntry)))
+        val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
-        whenReady(
-          storeInVHS(
-            vhs,
-            List(recorderWorkEntry))) {
-          _ =>
-            sendSQSMessage(queue, matcherResult)
+        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+          sendSQSMessage(queue, matcherResult)
 
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueEmpty(dlq)
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
 
-              val worksSent = getWorksSent(topic)
-              worksSent should contain only recorderWorkEntry.work
-            }
+            val worksSent = getWorksSent(topic)
+            worksSent should contain only recorderWorkEntry.work
+          }
         }
     }
   }

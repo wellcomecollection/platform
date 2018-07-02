@@ -49,18 +49,22 @@ class RecorderWorkerServiceTest
   it("successfully records a UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
-      withLocalS3Bucket { messagesBucket =>
-        withLocalSqsQueue { queue =>
-          sendMessage(queue, messagesBucket, work)
-          withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { _ =>
-            eventually {
-              assertStoredSingleWork(storageBucket, table, work)
+        withLocalS3Bucket { messagesBucket =>
+          withLocalSqsQueue { queue =>
+            sendMessage(queue, messagesBucket, work)
+            withRecorderWorkerService(
+              table,
+              storageBucket,
+              messagesBucket,
+              queue) { _ =>
+              eventually {
+                assertStoredSingleWork(storageBucket, table, work)
+              }
             }
           }
         }
       }
     }
-  }
   }
 
   it("stores UnidentifiedInvisibleWork successfully") {
@@ -68,8 +72,14 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
-              val invisibleWork = UnidentifiedInvisibleWork(sourceIdentifier = sourceIdentifier, version = 2)
+            withRecorderWorkerService(
+              table,
+              storageBucket,
+              messagesBucket,
+              queue) { service =>
+              val invisibleWork = UnidentifiedInvisibleWork(
+                sourceIdentifier = sourceIdentifier,
+                version = 2)
               sendMessage(queue, messagesBucket, invisibleWork)
               eventually {
                 assertStoredSingleWork(storageBucket, table, invisibleWork)
@@ -89,7 +99,11 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
+            withRecorderWorkerService(
+              table,
+              storageBucket,
+              messagesBucket,
+              queue) { service =>
               sendMessage(queue, messagesBucket, newerWork)
               eventually {
                 assertStoredSingleWork(storageBucket, table, newerWork)
@@ -113,7 +127,11 @@ class RecorderWorkerServiceTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
-            withRecorderWorkerService(table, storageBucket, messagesBucket, queue) { service =>
+            withRecorderWorkerService(
+              table,
+              storageBucket,
+              messagesBucket,
+              queue) { service =>
               sendMessage(queue, messagesBucket, olderWork)
               eventually {
                 assertStoredSingleWork(storageBucket, table, olderWork)
@@ -137,14 +155,16 @@ class RecorderWorkerServiceTest
     withLocalDynamoDbTable { table =>
       val badBucket = Bucket(name = "bad-bukkit")
       withLocalS3Bucket { messagesBucket =>
-        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-          withRecorderWorkerService(table, badBucket, messagesBucket, queue) { service =>
-            sendMessage(queue, messagesBucket, work)
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
+        withLocalSqsQueueAndDlq {
+          case QueuePair(queue, dlq) =>
+            withRecorderWorkerService(table, badBucket, messagesBucket, queue) {
+              service =>
+                sendMessage(queue, messagesBucket, work)
+                eventually {
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 1)
+                }
             }
-          }
         }
       }
     }
@@ -154,20 +174,27 @@ class RecorderWorkerServiceTest
     val badTable = Table(name = "bad-table", index = "bad-index")
     withLocalS3Bucket { storageBucket =>
       withLocalS3Bucket { messagesBucket =>
-        withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-          withRecorderWorkerService(badTable, storageBucket, messagesBucket, queue) { service =>
-            sendMessage(queue, messagesBucket, work)
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueHasSize(dlq, 1)
+        withLocalSqsQueueAndDlq {
+          case QueuePair(queue, dlq) =>
+            withRecorderWorkerService(
+              badTable,
+              storageBucket,
+              messagesBucket,
+              queue) { service =>
+              sendMessage(queue, messagesBucket, work)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
             }
-          }
         }
       }
     }
   }
 
-  private def sendMessage(queue: Queue, bucket: Bucket, work: TransformedBaseWork) = {
+  private def sendMessage(queue: Queue,
+                          bucket: Bucket,
+                          work: TransformedBaseWork) = {
     val messageToSend = put[TransformedBaseWork](
       obj = work,
       location = ObjectLocation(
@@ -208,27 +235,27 @@ class RecorderWorkerServiceTest
     queue: Queue)(testWith: TestWith[RecorderWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
-            bucket = storageBucket,
-            table = table) { versionedHybridStore =>
-            withMessageStream[TransformedBaseWork, R](
-              actorSystem,
-              messagesBucket,
-              queue,
-              metricsSender) { messageStream =>
-              val workerService = new RecorderWorkerService(
-                versionedHybridStore = versionedHybridStore,
-                messageStream = messageStream,
-                system = actorSystem
-              )
+        withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](
+          bucket = storageBucket,
+          table = table) { versionedHybridStore =>
+          withMessageStream[TransformedBaseWork, R](
+            actorSystem,
+            messagesBucket,
+            queue,
+            metricsSender) { messageStream =>
+            val workerService = new RecorderWorkerService(
+              versionedHybridStore = versionedHybridStore,
+              messageStream = messageStream,
+              system = actorSystem
+            )
 
-              try {
-                testWith(workerService)
-              } finally {
-                workerService.stop()
-              }
+            try {
+              testWith(workerService)
+            } finally {
+              workerService.stop()
             }
           }
+        }
       }
     }
   }

@@ -622,8 +622,9 @@ class SierraTransformableTransformerTest
     transformToWork(sierraTransformable)
   }
 
-  private def transformDataToUnidentifiedWork(id: String,
-                                  data: String): UnidentifiedWork = {
+  private def transformDataToUnidentifiedWork(
+    id: String,
+    data: String): UnidentifiedWork = {
 
     val work = transformDataToWork(id, data)
     work shouldBe a[UnidentifiedWork]

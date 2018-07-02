@@ -107,14 +107,14 @@ class IdMinterFeatureTest
                 version = 1
               )
 
-               val messageBody = put[UnidentifiedInvisibleWork](
-                  obj = work,
-                  location = ObjectLocation(
-                    namespace = bucket.name,
-                    key = s"invisible-work.json"
-                  )
+              val messageBody = put[UnidentifiedInvisibleWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"invisible-work.json"
                 )
-                sqsClient.sendMessage(queue.url, messageBody)
+              )
+              sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
                 val messages = listMessagesReceivedFromSNS(topic)
@@ -122,7 +122,7 @@ class IdMinterFeatureTest
 
                 val work = get[IdentifiedInvisibleWork](messages.head)
                 work.sourceIdentifier shouldBe identifier
-                work.canonicalId shouldNot be (empty)
+                work.canonicalId shouldNot be(empty)
               }
             }
           }

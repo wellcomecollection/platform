@@ -6,7 +6,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -52,12 +56,18 @@ class MatcherMessageReceiverTest
     }
   }
 
-  it("sends an invisible work as a single matched result with no other matched identifiers") {
+  it(
+    "sends an invisible work as a single matched result with no other matched identifiers") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val invisibleWork = UnidentifiedInvisibleWork(SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "id"), 1)
+            val invisibleWork = UnidentifiedInvisibleWork(
+              SourceIdentifier(
+                IdentifierType("sierra-system-number"),
+                "Work",
+                "id"),
+              1)
             val expectedMatchedWorks =
               MatcherResult(
                 Set(MatchedIdentifiers(

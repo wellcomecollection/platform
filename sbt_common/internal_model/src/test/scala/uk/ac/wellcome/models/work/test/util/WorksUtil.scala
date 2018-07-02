@@ -38,8 +38,7 @@ trait WorksUtil {
   def createWork: IdentifiedWork =
     createWorks(count = 1).head
 
-  def createWorks(count: Int,
-                  start: Int = 1): Seq[IdentifiedWork] =
+  def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
         workWith(
@@ -53,11 +52,10 @@ trait WorksUtil {
       ))
 
   def createInvisibleWorks(count: Int,
-                  start: Int = 1): Seq[IdentifiedInvisibleWork] =
+                           start: Int = 1): Seq[IdentifiedInvisibleWork] =
     (start to count).map(
-      (idx: Int) =>
-        invisibleWorkWith(s"$idx-$canonicalId")
-      )
+      (idx: Int) => invisibleWorkWith(s"$idx-$canonicalId")
+    )
 
   def invisibleWorkWith(canonicalId: String): IdentifiedInvisibleWork = {
     IdentifiedInvisibleWork(

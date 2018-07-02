@@ -118,7 +118,10 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = IdentifiedInvisibleWork(canonicalId = "abcdefg",sourceIdentifier = sierraSourceIdentifier, version = 1)
+    val work = IdentifiedInvisibleWork(
+      canonicalId = "abcdefg",
+      sourceIdentifier = sierraSourceIdentifier,
+      version = 1)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -154,7 +157,11 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = IdentifiedRedirectedWork(canonicalId = "abcdefg",sourceIdentifier = sierraSourceIdentifier, version = 1, redirect = IdentifiedRedirect(canonicalId = "defghijlk"))
+    val work = IdentifiedRedirectedWork(
+      canonicalId = "abcdefg",
+      sourceIdentifier = sierraSourceIdentifier,
+      version = 1,
+      redirect = IdentifiedRedirect(canonicalId = "defghijlk"))
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>

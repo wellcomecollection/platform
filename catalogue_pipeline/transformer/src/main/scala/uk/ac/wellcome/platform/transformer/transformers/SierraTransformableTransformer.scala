@@ -29,53 +29,53 @@ class SierraTransformableTransformer
     with SierraMergeCandidates
     with Logging {
 
-  override def transformForType = { case (sierraTransformable: SierraTransformable, version: Int) =>
-    sierraTransformable.maybeBibData
-      .map { bibData =>
-        debug(s"Attempting to transform ${bibData.id}")
+  override def transformForType = {
+    case (sierraTransformable: SierraTransformable, version: Int) =>
+      sierraTransformable.maybeBibData
+        .map { bibData =>
+          debug(s"Attempting to transform ${bibData.id}")
 
-        fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-          val identifier = SourceIdentifier(
-            identifierType = IdentifierType("sierra-system-number"),
-            ontologyType = "Work",
-            value = addCheckDigit(
-              sierraBibData.id,
-              recordType = SierraRecordTypes.bibs
-            ))
-          if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
-            Some(
-              UnidentifiedWork(
-                title = getTitle(sierraBibData),
-                sourceIdentifier = identifier,
-                version = version,
-                otherIdentifiers = getOtherIdentifiers(sierraBibData),
-                workType = getWorkType(sierraBibData),
-                description = getDescription(sierraBibData),
-                physicalDescription = getPhysicalDescription(sierraBibData),
-                extent = getExtent(sierraBibData),
-                lettering = getLettering(sierraBibData),
-                items = getItems(sierraTransformable),
-                //              visible = !,
-                production = getProduction(sierraBibData),
-                language = getLanguage(sierraBibData),
-                contributors = getContributors(sierraBibData),
-                dimensions = getDimensions(sierraBibData),
-                subjects = getSubjects(sierraBibData),
-                genres = getGenres(sierraBibData),
-                mergeCandidates = getMergeCandidates(sierraBibData)
+          fromJson[SierraBibData](bibData.data).map { sierraBibData =>
+            val identifier = SourceIdentifier(
+              identifierType = IdentifierType("sierra-system-number"),
+              ontologyType = "Work",
+              value = addCheckDigit(
+                sierraBibData.id,
+                recordType = SierraRecordTypes.bibs
               ))
-          } else {
-            Some(UnidentifiedInvisibleWork(identifier, version))
+            if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
+              Some(
+                UnidentifiedWork(
+                  title = getTitle(sierraBibData),
+                  sourceIdentifier = identifier,
+                  version = version,
+                  otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                  workType = getWorkType(sierraBibData),
+                  description = getDescription(sierraBibData),
+                  physicalDescription = getPhysicalDescription(sierraBibData),
+                  extent = getExtent(sierraBibData),
+                  lettering = getLettering(sierraBibData),
+                  items = getItems(sierraTransformable),
+                  production = getProduction(sierraBibData),
+                  language = getLanguage(sierraBibData),
+                  contributors = getContributors(sierraBibData),
+                  dimensions = getDimensions(sierraBibData),
+                  subjects = getSubjects(sierraBibData),
+                  genres = getGenres(sierraBibData),
+                  mergeCandidates = getMergeCandidates(sierraBibData)
+                ))
+            } else {
+              Some(UnidentifiedInvisibleWork(identifier, version))
+            }
           }
         }
-      }
-      // A merged record can have both bibs and items.  If we only have
-      // the item data so far, we don't have enough to build a Work, so we
-      // return None.
-      .getOrElse {
-        debug("No bib data on the record, so skipping")
-        Success(None)
-      }
+        // A merged record can have both bibs and items.  If we only have
+        // the item data so far, we don't have enough to build a Work, so we
+        // return None.
+        .getOrElse {
+          debug("No bib data on the record, so skipping")
+          Success(None)
+        }
   }
 
 }
