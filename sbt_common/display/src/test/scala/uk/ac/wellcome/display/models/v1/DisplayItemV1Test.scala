@@ -33,9 +33,7 @@ class DisplayItemV1Test extends FunSpec with Matchers with ItemsUtil {
   }
 
   it("correctly parses an Item without any locations") {
-    val item = createItem(
-      locations = List()
-    )
+    val item = createItem(locations = List())
 
     val displayItemV1 = DisplayItemV1(
       item = item,
