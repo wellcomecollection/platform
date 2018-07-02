@@ -6,21 +6,6 @@ import scala.util.Random
 
 trait WorksUtil extends ItemsUtil {
   private val defaultTitle = "this is the first image title"
-  val subject = Subject[Unidentifiable[AbstractConcept]](
-    label = "a subject created by WorksUtil",
-    concepts = List(
-      Unidentifiable(Concept("a subject concept")),
-      Unidentifiable(Place("a subject place")),
-      Unidentifiable(Period("a subject period")))
-  )
-
-  val genre = Genre[Unidentifiable[AbstractConcept]](
-    label = "an unidentified genre created by WorksUtil",
-    concepts = List(
-      Unidentifiable(Concept("a genre concept")),
-      Unidentifiable(Place("a genre place")),
-      Unidentifiable(Period("a genre period")))
-  )
 
   val sourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),

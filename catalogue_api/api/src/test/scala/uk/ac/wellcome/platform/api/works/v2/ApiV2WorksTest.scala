@@ -71,6 +71,28 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it("returns a single work when requested with id") {
+    val subjects = List(
+      Subject[Unidentifiable[AbstractConcept]](
+        label = "a subject created by WorksUtil",
+        concepts = List(
+          Unidentifiable(Concept("a subject concept")),
+          Unidentifiable(Place("a subject place")),
+          Unidentifiable(Period("a subject period"))
+        )
+      )
+    )
+
+    val genres = List(
+      Genre[Unidentifiable[AbstractConcept]](
+        label = "an unidentified genre created by WorksUtil",
+        concepts = List(
+          Unidentifiable(Concept("a genre concept")),
+          Unidentifiable(Place("a genre place")),
+          Unidentifiable(Period("a genre period"))
+        )
+      )
+    )
+
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
@@ -78,8 +100,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
           createdDate = Some(Period("The future")),
           contributors = List(Contributor(agent = Unidentifiable(Agent("A mysterious organisation")))),
-          subjects = List(subject),
-          genres = List(genre),
+          subjects = subjects,
+          genres = genres,
           items = createItems(count = 2)
         )
 
