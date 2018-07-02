@@ -23,15 +23,7 @@ class DisplayLocationsV2SerialisationTest
       sourceIdentifier = sourceIdentifier,
       version = 1,
       title = "A zoo of zebras doing zumba",
-      items = List(
-        Identified(
-          canonicalId = "mhberjwy7",
-          sourceIdentifier = sourceIdentifier,
-          agent = Item(
-            locations = List(physicalLocation)
-          )
-        )
-      )
+      items = List(createItem(locations = List(physicalLocation)))
     )
     val displayWork =
       DisplayWorkV2(work, includes = WorksIncludes(items = true))

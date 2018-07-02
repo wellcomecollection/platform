@@ -1,35 +1,12 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
-class DisplayItemV2Test extends FunSpec with Matchers {
-
-  val location: Location = {
-    val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
-    val locationType = LocationType("thumbnail-image")
-
-    DigitalLocation(
-      locationType = locationType,
-      url = thumbnailUrl,
-      license = License_CCBY
-    )
-  }
-
-  val identifier = SourceIdentifier(
-    identifierType = IdentifierType("miro-image-number"),
-    ontologyType = "Item",
-    value = "value"
-  )
+class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
 
   it("should read an Item as a DisplayItemV2 correctly") {
-    val item = Identified(
-      canonicalId = "foo",
-      sourceIdentifier = identifier,
-      agent = Item(
-        locations = List(location)
-      ))
+    val item = createItem()
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -37,24 +14,14 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     )
 
     displayItemV2.id shouldBe item.canonicalId
-    displayItemV2.locations shouldBe List(DisplayLocationV2(location))
+    displayItemV2.locations shouldBe List(DisplayLocationV2(item.agent.locations.head))
     displayItemV2.identifiers shouldBe Some(
-      List(DisplayIdentifierV2(identifier)))
+      List(DisplayIdentifierV2(item.sourceIdentifier)))
     displayItemV2.ontologyType shouldBe "Item"
   }
 
   it("correctly parses an Item without any extra identifiers") {
-    val item =
-      fromJson[Identified[Item]](s"""
-        {
-          "canonicalId": "b71876a",
-          "sourceIdentifier": ${toJson(identifier).get},
-          "agent": {
-            "locations": [],
-            "type": "item"
-          }
-        }
-      """).get
+    val item = createItem()
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -62,29 +29,13 @@ class DisplayItemV2Test extends FunSpec with Matchers {
     )
 
     displayItemV2.identifiers shouldBe Some(
-      List(DisplayIdentifierV2(identifier)))
+      List(DisplayIdentifierV2(item.sourceIdentifier)))
   }
 
   it("correctly parses an Item without any locations") {
-    val item =
-      fromJson[Identified[Item]]("""
-        {
-          "canonicalId": "mr953zsh",
-          "sourceIdentifier": {
-            "identifierType": {
-              "id": "miro-image-number",
-              "label": "Miro image number",
-              "ontologyType": "IdentifierType"
-            },
-            "ontologyType": "Item",
-            "value": "M9530000"
-          },
-          "identifiers": [],
-          "agent": {
-            "type": "item"
-          }
-        }
-      """).get
+    val item = createItem(
+      locations = List()
+    )
 
     val displayItemV2 = DisplayItemV2(
       item = item,
