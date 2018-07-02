@@ -15,7 +15,6 @@ class DisplayWorkV2SerialisationTest
   it("serialises a DisplayWorkV2 correctly") {
 
     val work = createIdentifiedWorkWith(
-      title = title,
       description = Some(description),
       lettering = Some(lettering),
       createdDate = Some(period),
@@ -30,7 +29,7 @@ class DisplayWorkV2SerialisationTest
        |{
        | "type": "Work",
        | "id": "${work.canonicalId}",
-       | "title": "$title",
+       | "title": "${work.title}",
        | "description": "$description",
        | "workType": {
        |       "id": "${workType.id}",

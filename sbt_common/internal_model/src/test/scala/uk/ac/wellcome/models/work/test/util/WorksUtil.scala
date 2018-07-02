@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal._
 import scala.util.Random
 
 trait WorksUtil extends ItemsUtil {
-  val title = "this is the first image title"
+  private val defaultTitle = "this is the first image title"
   val description = "this is a description"
   val lettering = "some lettering"
   val period = Period("the past")
@@ -40,7 +40,6 @@ trait WorksUtil extends ItemsUtil {
     (start to count).map(
       (idx: Int) =>
         createIdentifiedWorkWith(
-          title = s"${idx}-${title}",
           description = Some(s"${idx}-${description}"),
           lettering = Some(s"${idx}-${lettering}"),
           createdDate = Some(Period(s"${idx}-${period.label}")),
@@ -67,7 +66,7 @@ trait WorksUtil extends ItemsUtil {
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
     version: Int = 1,
-    title: String = title,
+    title: String = defaultTitle,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
     items: List[Identifiable[Item]] = List()
   ): UnidentifiedWork =
@@ -98,7 +97,7 @@ trait WorksUtil extends ItemsUtil {
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
     otherIdentifiers: List[SourceIdentifier] = List(),
     version: Int = 1,
-    title: String = title,
+    title: String = defaultTitle,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
     physicalDescription: Option[String] = None,

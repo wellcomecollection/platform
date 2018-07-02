@@ -86,7 +86,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          title = title,
           description = Some(description),
           lettering = Some(lettering),
           createdDate = Some(period),
@@ -107,7 +106,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "@context": "https://localhost:8888/$apiPrefix/context.json",
                | "type": "Work",
                | "id": "${work.canonicalId}",
-               | "title": "$title",
+               | "title": "${work.title}",
                | "description": "$description",
                | "workType": {
                |       "id": "${workType.id}",
