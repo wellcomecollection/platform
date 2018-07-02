@@ -111,7 +111,7 @@ class IdMinterFeatureTest
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
-                  key = s"invisible-work.json"
+                  key = "invisible-work.json"
                 )
               )
               sqsClient.sendMessage(queue.url, messageBody)
@@ -160,7 +160,7 @@ class IdMinterFeatureTest
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
-                  key = s"redirected-work.json"
+                  key = "redirected-work.json"
                 )
               )
               sqsClient.sendMessage(queue.url, messageBody)
