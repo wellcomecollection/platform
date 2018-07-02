@@ -24,11 +24,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with ItemsUtil {
   }
 
   it("correctly parses items on a work") {
-    val item = Identified(
-      canonicalId = "c3a599u5",
-      sourceIdentifier = sourceIdentifier,
-      agent = createItem(locations = List())
-    )
+    val item = createItem(locations = List())
     val work = IdentifiedWork(
       title = "Inside an irate igloo",
       sourceIdentifier = sourceIdentifier,
