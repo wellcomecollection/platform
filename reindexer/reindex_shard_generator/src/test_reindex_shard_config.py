@@ -21,7 +21,7 @@ def test_create_reindex_shard(source_name, source_id, expected_reindex_shard):
 @pytest.mark.parametrize('source_name', ['foo', 13, None])
 def test_unrecognised_source_name_is_ValueError(source_name):
     with pytest.raises(ValueError) as err:
-        reindex_shard = create_reindex_shard(
+        create_reindex_shard(
             source_name=source_name,
             source_id='0001'
         )
