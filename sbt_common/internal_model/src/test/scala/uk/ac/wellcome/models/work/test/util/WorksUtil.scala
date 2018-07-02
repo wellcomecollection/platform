@@ -37,9 +37,6 @@ trait WorksUtil extends ItemsUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWork: IdentifiedWork =
-    createWorks(count = 1).head
-
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
