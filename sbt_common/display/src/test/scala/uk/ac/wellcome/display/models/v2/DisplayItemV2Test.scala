@@ -14,7 +14,8 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
     )
 
     displayItemV2.id shouldBe item.canonicalId
-    displayItemV2.locations shouldBe List(DisplayLocationV2(item.agent.locations.head))
+    displayItemV2.locations shouldBe List(
+      DisplayLocationV2(item.agent.locations.head))
     displayItemV2.identifiers shouldBe Some(
       List(DisplayIdentifierV2(item.sourceIdentifier)))
     displayItemV2.ontologyType shouldBe "Item"

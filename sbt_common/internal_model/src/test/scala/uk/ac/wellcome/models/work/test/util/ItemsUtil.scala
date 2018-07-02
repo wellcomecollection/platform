@@ -31,7 +31,7 @@ trait ItemsUtil {
     )
 
   def createItems(count: Int): List[Identified[Item]] =
-    (1 to count)
-      .map { _ => createItem() }
-      .toList
+    (1 to count).map { _ =>
+      createItem()
+    }.toList
 }
