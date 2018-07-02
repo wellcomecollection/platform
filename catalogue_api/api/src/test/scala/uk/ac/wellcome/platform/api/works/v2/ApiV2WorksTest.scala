@@ -87,7 +87,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
           description = Some(s"A single work in ${this.getClass.getSimpleName}"),
-          lettering = Some(lettering),
+          lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
           createdDate = Some(period),
           contributors = List(Contributor(agent = Unidentifiable(agent))),
           subjects = List(subject),
@@ -113,7 +113,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |       "label": "${workType.label}",
                |       "type": "WorkType"
                | },
-               | "lettering": "$lettering",
+               | "lettering": "${work.lettering.get}",
                | "createdDate": ${period(work.createdDate.get)},
                | "contributors": [${contributor(work.contributors(0))}],
                | "subjects": [

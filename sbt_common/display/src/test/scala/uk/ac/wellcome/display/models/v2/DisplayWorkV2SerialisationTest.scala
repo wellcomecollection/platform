@@ -16,7 +16,7 @@ class DisplayWorkV2SerialisationTest
 
     val work = createIdentifiedWorkWith(
       description = Some(s"A single work in ${this.getClass.getSimpleName}"),
-      lettering = Some(lettering),
+      lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
       createdDate = Some(period),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
       items = createItems(count = 2),
@@ -36,7 +36,7 @@ class DisplayWorkV2SerialisationTest
        |       "label": "${workType.label}",
        |       "type": "WorkType"
        | },
-       | "lettering": "$lettering",
+       | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "contributors": [
        |   {
