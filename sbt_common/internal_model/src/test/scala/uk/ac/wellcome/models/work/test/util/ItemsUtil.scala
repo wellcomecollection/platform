@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal._
 import scala.util.Random
 
 trait ItemsUtil {
-  private def sourceIdentifier = {
+  private def defaultSourceIdentifier = {
     SourceIdentifier(
       identifierType = IdentifierType("miro-image-number"),
       value = (Random.alphanumeric take 10 mkString) toLowerCase,
@@ -13,17 +13,19 @@ trait ItemsUtil {
     )
   }
 
-  private def location = DigitalLocation(
+  private def defaultLocation = DigitalLocation(
     locationType = LocationType("iiif-image"),
     url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
     license = License_CCBY
   )
 
   def createItem(
-    locations: List[Location] = List(location)
+    canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase,
+    sourceIdentifier: SourceIdentifier = defaultSourceIdentifier,
+    locations: List[Location] = List(defaultLocation)
   ): Identified[Item] =
     Identified(
-      canonicalId = (Random.alphanumeric take 10 mkString) toLowerCase,
+      canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
       agent = Item(locations = locations)
     )
