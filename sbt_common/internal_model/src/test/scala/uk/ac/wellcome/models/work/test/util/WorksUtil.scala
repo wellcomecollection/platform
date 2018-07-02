@@ -46,7 +46,8 @@ trait WorksUtil extends ItemsUtil {
           description = Some(s"${idx}-${description}"),
           lettering = Some(s"${idx}-${lettering}"),
           createdDate = Some(Period(s"${idx}-${period.label}")),
-          contributors = List(Contributor(agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
+          contributors = List(Contributor(
+            agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
           items = createItems(count = 2)
       ))
 
@@ -58,9 +59,12 @@ trait WorksUtil extends ItemsUtil {
     )
   }
 
-  def createIdentifiedInvisibleWorks(count: Int,
-                                     start: Int = 1): Seq[IdentifiedInvisibleWork] =
-    (start to count).map { _ => createIdentifiedInvisibleWork }
+  def createIdentifiedInvisibleWorks(
+    count: Int,
+    start: Int = 1): Seq[IdentifiedInvisibleWork] =
+    (start to count).map { _ =>
+      createIdentifiedInvisibleWork
+    }
 
   def unidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = sourceIdentifier,

@@ -158,7 +158,8 @@ class ElasticsearchServiceTest
     it("does not list works that have visible=false") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
         val visibleWorks = createWorks(count = 8)
-        val invisibleWorks = createIdentifiedInvisibleWorks(count = 2, start = 9)
+        val invisibleWorks =
+          createIdentifiedInvisibleWorks(count = 2, start = 9)
 
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
