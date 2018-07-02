@@ -76,10 +76,24 @@ trait WorksUtil extends ItemsUtil {
   ): UnidentifiedWork =
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
-      version = version,
+      otherIdentifiers = List(),
+      mergeCandidates = List(),
       title = title,
+      workType = None,
+      description = None,
+      physicalDescription = None,
+      lettering = None,
+      extent = None,
+      createdDate = None,
+      subjects = List(),
+      genres = List(),
       contributors = contributors,
-      items = items
+      thumbnail = None,
+      production = List(),
+      language = None,
+      dimensions = None,
+      items = items,
+      version = version
     )
 
   def identifiedWorkWith(
@@ -107,7 +121,6 @@ trait WorksUtil extends ItemsUtil {
       sourceIdentifier = sourceIdentifier,
       otherIdentifiers = otherIdentifiers,
       mergeCandidates = List(),
-      version = version,
       title = title,
       workType = workType,
       description = description,
@@ -122,7 +135,8 @@ trait WorksUtil extends ItemsUtil {
       production = production,
       language = language,
       dimensions = None,
-      items = items
+      items = items,
+      version = version
     )
 
   def invisibleWorkWith(canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase): IdentifiedInvisibleWork = {
