@@ -5,6 +5,9 @@ module "loris_service" {
 
   certificate_domain = "api.wellcomecollection.org"
 
+  asg_desired = "4"
+  asg_max     = "4"
+
   cpu    = "3960"
   memory = "7350"
 
