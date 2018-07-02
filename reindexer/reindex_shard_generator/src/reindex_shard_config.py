@@ -35,8 +35,19 @@ def get_number_of_shards(source_name):
 
 def create_reindex_shard(source_name, source_id):
     """What reindex shard should a given source name/ID pair be placed in?"""
-    ascii_id = int(''.join(str(ord(c)) for c in source_id))
+
     number_of_shards = get_number_of_shards(source_name)
+
+    # This line gets the ASCII code point value of each character in
+    # the source ID, and adds them together.  e.g. a => 97, b => 98, c => 99
+    #
+    # The exact algorithm isn't especially important -- our goal is to
+    # pick values that get an even spread.  Since source IDs are sequential,
+    # this approach should ensure that adjacent IDs end up in different
+    # reindex shards (which should spread the load on S3 when we reindex
+    # a VHS-backed table).
+    #
+    ascii_id = int(''.join(str(ord(c)) for c in source_id))
 
     shard_id = ascii_id % number_of_shards
 
