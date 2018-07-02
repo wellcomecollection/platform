@@ -101,7 +101,7 @@ class SnapshotServiceTest
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createWorks(count = 3)
         val notVisibleWorks =
-          createInvisibleWorks(count = 1, start = 4)
+          createIdentifiedInvisibleWorks(count = 1, start = 4)
 
         val works = visibleWorks ++ notVisibleWorks
 
@@ -150,7 +150,7 @@ class SnapshotServiceTest
       case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createWorks(count = 4)
         val notVisibleWorks =
-          createInvisibleWorks(count = 2, start = 5)
+          createIdentifiedInvisibleWorks(count = 2, start = 5)
 
         val works = visibleWorks ++ notVisibleWorks
 

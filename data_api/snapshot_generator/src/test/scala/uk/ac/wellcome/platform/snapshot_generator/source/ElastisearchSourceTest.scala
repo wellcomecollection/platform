@@ -46,7 +46,7 @@ class ElastisearchSourceTest
           implicit val materialiser = actorMaterialiser
           val visibleWorks = createWorks(count = 10)
           val invisibleWorks =
-            createInvisibleWorks(count = 3, start = 11)
+            createIdentifiedInvisibleWorks(count = 3, start = 11)
 
           val works = visibleWorks ++ invisibleWorks
           insertIntoElasticsearch(indexName, itemType, works: _*)
