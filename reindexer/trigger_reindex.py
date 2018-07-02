@@ -69,7 +69,7 @@ def publish_messages(sns_client, topic_arn, messages):
         publish_sns_message(
             sns_client=sns_client,
             topic_arn=topic_arn,
-            message=json.dumps(m),
+            message=m,
             subject=f'source: {__file__}'
         )
 
