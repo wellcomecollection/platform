@@ -21,7 +21,8 @@ class DisplayWorkV2SerialisationTest
       lettering = Some(lettering),
       createdDate = Some(period),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
-      items = createItems(count = 2))
+      items = createItems(count = 2),
+      workType = None)
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work))
 
