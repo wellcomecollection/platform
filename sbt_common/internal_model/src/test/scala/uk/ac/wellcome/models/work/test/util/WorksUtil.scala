@@ -56,7 +56,7 @@ trait WorksUtil extends ItemsUtil {
       (idx: Int) => invisibleWorkWith(s"$idx-$canonicalId")
     )
 
-  def unidentifiedWorkWithDefaults(
+  def unidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
     version: Int = 1,
     title: String = title,
