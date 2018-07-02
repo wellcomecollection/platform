@@ -25,4 +25,9 @@ trait ItemsUtil {
       sourceIdentifier = sourceIdentifier,
       agent = Item(locations = List(location))
     )
+
+  def createItems(count: Int): List[Identified[Item]] =
+    (1 to count)
+      .map { _ => createItem }
+      .toList
 }

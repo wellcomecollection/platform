@@ -166,13 +166,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         val work = workWith(
           canonicalId = "b4heraz7",
           title = "Inside an irate igloo",
-          items = List(
-            itemWith(
-              canonicalId = "c3a599u5",
-              identifier = defaultItemSourceIdentifier,
-              location = defaultLocation
-            )
-          )
+          items = createItems(count = 1)
         )
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
