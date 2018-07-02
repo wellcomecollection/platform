@@ -108,12 +108,7 @@ class DisplayWorkV1SerialisationTest
       credit = Some("Wellcome Collection"),
       license = License_CCBY
     )
-    val item = Identified(
-      canonicalId = "chu27a8",
-      sourceIdentifier = sourceIdentifier,
-      agent = Item(
-        locations = List(location)
-      ))
+    val item = createItem(locations = List(location))
     val workWithCopyright = IdentifiedWork(
       title = "A scarf on a squirrel",
       sourceIdentifier = sourceIdentifier,
