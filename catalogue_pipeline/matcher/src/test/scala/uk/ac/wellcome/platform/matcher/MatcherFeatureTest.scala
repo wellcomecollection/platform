@@ -48,8 +48,7 @@ class MatcherFeatureTest
                   graphTable,
                   lockTable) { _ =>
                   val work = unidentifiedWorkWith(
-                    sourceIdentifier = sourceIdentifierA,
-                    title = "Work"
+                    sourceIdentifier = sourceIdentifierA
                   )
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
@@ -111,7 +110,6 @@ class MatcherFeatureTest
 
                   val workAv1 = unidentifiedWorkWith(
                     sourceIdentifier = sourceIdentifierA,
-                    title = "Work",
                     version = updatedWorkVersion
                   )
 

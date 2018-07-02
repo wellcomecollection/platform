@@ -199,8 +199,7 @@ trait MatcherFixtures
   def anUnidentifiedSierraWork: UnidentifiedWork = {
     val sourceIdentifier = aSierraSourceIdentifier("id")
     unidentifiedWorkWith(
-      sourceIdentifier = sourceIdentifier,
-      title = "WorkTitle"
+      sourceIdentifier = sourceIdentifier
     )
   }
 
