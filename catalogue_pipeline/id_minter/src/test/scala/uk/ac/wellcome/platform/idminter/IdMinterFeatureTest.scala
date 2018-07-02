@@ -153,7 +153,11 @@ class IdMinterFeatureTest
               val work = UnidentifiedRedirectedWork(
                 sourceIdentifier = identifier,
                 version = 1,
-                redirect = IdentifiableRedirect(sourceIdentifier = SourceIdentifier(IdentifierType("sierra-system-number"), "Work", "b1234567"))
+                redirect = IdentifiableRedirect(
+                  sourceIdentifier = SourceIdentifier(
+                    IdentifierType("sierra-system-number"),
+                    "Work",
+                    "b1234567"))
               )
 
               val messageBody = put[UnidentifiedRedirectedWork](
