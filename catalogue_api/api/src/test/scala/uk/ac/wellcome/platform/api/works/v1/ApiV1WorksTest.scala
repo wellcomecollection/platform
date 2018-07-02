@@ -94,26 +94,25 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("returns a single work when requested with id") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = canonicalId,
+        val work = identifiedWorkWith(
           title = title,
-          description = description,
-          lettering = lettering,
-          createdDate = period,
-          creator = agent,
+          description = Some(description),
+          lettering = Some(lettering),
+          createdDate = Some(period),
+          contributors = List(Contributor(agent = Unidentifiable(agent))),
           items = createItems(count = 2))
 
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/$canonicalId",
+            path = s"/$apiPrefix/works/${work.canonicalId}",
             andExpect = Status.Ok,
             withJsonBody = s"""
                  |{
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
-                 | "id": "$canonicalId",
+                 | "id": "${work.canonicalId}",
                  | "title": "$title",
                  | "description": "$description",
                  | "workType": {
@@ -140,9 +139,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("renders the items if the items include is present") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "b4heraz7",
-          title = "Inside an irate igloo",
+        val work = identifiedWorkWith(
           items = createItems(count = 1)
         )
 
@@ -312,12 +309,10 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
   it("returns matching results if doing a full-text search") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work1 = workWith(
-          canonicalId = "1234",
+        val work1 = identifiedWorkWith(
           title = "A drawing of a dodo"
         )
-        val work2 = workWith(
-          canonicalId = "5678",
+        val work2 = identifiedWorkWith(
           title = "A mezzotint of a mouse"
         )
         insertIntoElasticsearch(indexNameV1, itemType, work1, work2)
@@ -364,9 +359,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           ontologyType = "Work",
           value = "Test1234"
         )
-        val work1 = workWith(
-          canonicalId = "1234",
-          title = "An image of an iguana",
+        val work1 = identifiedWorkWith(
           otherIdentifiers = List(identifier1)
         )
 
@@ -375,9 +368,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           ontologyType = "Work",
           value = "DTest5678"
         )
-        val work2 = workWith(
-          canonicalId = "5678",
-          title = "An impression of an igloo",
+        val work2 = identifiedWorkWith(
           otherIdentifiers = List(identifier2)
         )
 
@@ -432,9 +423,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           ontologyType = "Work",
           value = "Test1234"
         )
-        val work = workWith(
-          canonicalId = "1234",
-          title = "An insect huddled in an igloo",
+        val work = identifiedWorkWith(
           otherIdentifiers = List(srcIdentifier)
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)
@@ -467,16 +456,10 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
-          val work = workWith(
-            canonicalId = "1234",
-            title = "A whale on a wave"
-          )
+          val work = identifiedWorkWith(title = "A whale on a wave")
           insertIntoElasticsearch(indexNameV1, itemType, work)
 
-          val work_alt = workWith(
-            canonicalId = "5678",
-            title = "An impostor in an igloo"
-          )
+          val work_alt = identifiedWorkWith(title = "An impostor in an igloo")
           insertIntoElasticsearch(
             indexName = otherIndex,
             itemType = itemType,
@@ -530,14 +513,12 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
-          val work = workWith(
-            canonicalId = "1234",
+          val work = identifiedWorkWith(
             title = "A wombat wallowing under a willow"
           )
           insertIntoElasticsearch(indexNameV1, itemType, work)
 
-          val work_alt = workWith(
-            canonicalId = "5678",
+          val work_alt = identifiedWorkWith(
             title = "An impostor in an igloo"
           )
           insertIntoElasticsearch(
@@ -601,13 +582,11 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(
-          canonicalId = "1234",
-          title = "A thorn in the thumb tells a traumatic tale",
-          thumbnail = DigitalLocation(
+          thumbnail = Some(DigitalLocation(
             locationType = LocationType("thumbnail-image"),
             url = "https://iiif.example.org/1234/default.jpg",
             license = License_CCBY
-          )
+          ))
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
@@ -647,15 +626,13 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           indexNameV2,
           itemType,
           server: EmbeddedHttpServer) =>
-        val work1 = workWith(
-          canonicalId = "1234",
+        val work1 = identifiedWorkWith(
           title = "A wombat wallowing under a willow"
         )
 
         insertIntoElasticsearch(indexNameV1, itemType, work1)
 
-        val work2 = workWith(
-          canonicalId = "5678",
+        val work2 = identifiedWorkWith(
           title = "A wombat wrestling with wet weather"
         )
 

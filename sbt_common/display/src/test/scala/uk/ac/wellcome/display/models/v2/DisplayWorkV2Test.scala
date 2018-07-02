@@ -3,17 +3,12 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.ItemsUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 
-class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
+class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
   it("correctly parses a Work without any items") {
-    val work = IdentifiedWork(
-      title = "An irritating imp is immune from items",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "abcdef12"
-    )
+    val work = identifiedWorkWith(items = List())
 
     val displayWork = DisplayWorkV2(
       work = work,
@@ -23,11 +18,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
   }
 
   it("correctly parses items on a work") {
-    val work = IdentifiedWork(
-      title = "Inside an irate igloo",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "b4heraz7",
+    val work = identifiedWorkWith(
       items = createItems(count = 1)
     )
 
@@ -39,18 +30,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
     displayItem.id shouldBe work.items.head.canonicalId
   }
 
-  val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("sierra-system-number"),
-    ontologyType = "Work",
-    value = "b1234567"
-  )
-
   it("correctly parses a work without any extra identifiers") {
-    val work = IdentifiedWork(
-      title = "An irascible iguana invites impudence",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "xtsx8hwk")
+    val work = identifiedWorkWith(otherIdentifiers = List())
 
     val displayWork = DisplayWorkV2(
       work = work,
@@ -63,12 +44,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
   it("gets the physicalDescription from a Work") {
     val physicalDescription = "A magnificent mural of magpies"
 
-    val work = IdentifiedWork(
-      title = "Moving a mighty mouse to Madagascar",
-      canonicalId = "mtc2wvrg",
-      sourceIdentifier = sourceIdentifier,
-      physicalDescription = Some(physicalDescription),
-      version = 1
+    val work = identifiedWorkWith(
+      physicalDescription = Some(physicalDescription)
     )
 
     val displayWork = DisplayWorkV2(work)
@@ -86,13 +63,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
       label = workType.label
     )
 
-    val work = IdentifiedWork(
-      title = "Moving a mighty mouse to Madagascar",
-      canonicalId = "mtc2wvrg",
-      sourceIdentifier = sourceIdentifier,
-      workType = Some(workType),
-      version = 1
-    )
+    val work = identifiedWorkWith(workType = Some(workType))
 
     val displayWork = DisplayWorkV2(work)
     displayWork.workType shouldBe Some(expectedDisplayWorkV2)
@@ -101,13 +72,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
   it("gets the extent from a Work") {
     val extent = "Bound in boxes of bark"
 
-    val work = IdentifiedWork(
-      title = "Brilliant beeches in Bucharest",
-      canonicalId = "bmnppscn",
-      sourceIdentifier = sourceIdentifier,
-      extent = Some(extent),
-      version = 1
-    )
+    val work = identifiedWorkWith(extent = Some(extent))
 
     val displayWork = DisplayWorkV2(work)
     displayWork.extent shouldBe Some(extent)
@@ -119,13 +84,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
       label = "British Sign Language"
     )
 
-    val work = IdentifiedWork(
-      title = "A largesse of leaping Libyan lions",
-      canonicalId = "lfk6nkje",
-      sourceIdentifier = sourceIdentifier,
-      language = Some(language),
-      version = 1
-    )
+    val work = identifiedWorkWith(language = Some(language))
 
     val displayWork = DisplayWorkV2(work)
     val displayLanguage = displayWork.language.get
@@ -134,10 +93,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
   }
 
   it("extracts contributors from a Work") {
-    val work = IdentifiedWork(
-      canonicalId = "vc6zww4f",
-      title = "Vicarious victory for violet vampires",
-      sourceIdentifier = sourceIdentifier,
+    val work = identifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(
@@ -158,8 +114,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
             ContributionRole(label = "Background location")
           )
         )
-      ),
-      version = 1
+      )
     )
 
     val displayWork =
@@ -202,13 +157,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
       function = Some(Concept("Manufacture"))
     )
 
-    val work = IdentifiedWork(
-      canonicalId = "ecgxstzd",
-      title = "Events entailing the exegesis of empires",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      production = List(productionEvent)
-    )
+    val work = identifiedWorkWith(production = List(productionEvent))
 
     val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
     displayWork.production shouldBe List(
@@ -252,10 +201,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
       ontologyType = "Concept"
     )
 
-    val work = IdentifiedWork(
-      canonicalId = "bmzwdx3t",
-      title = "Bizarre bees bounce below a basketball",
-      sourceIdentifier = sourceIdentifier,
+    val work = identifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(
@@ -316,8 +262,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with ItemsUtil {
             )
           )
         )
-      ),
-      version = 1
+      )
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {

@@ -5,6 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -22,7 +23,8 @@ class IdMinterFeatureTest
     with fixtures.Server
     with ExtendedPatience
     with Eventually
-    with Matchers {
+    with Matchers
+    with WorksUtil {
 
   it("mints the same IDs where source identifiers match") {
     withLocalSqsQueue { queue =>
@@ -45,10 +47,9 @@ class IdMinterFeatureTest
                   "Work",
                   miroID)
 
-              val work = UnidentifiedWork(
+              val work = unidentifiedWorkWithDefaults(
                 title = title,
-                sourceIdentifier = identifier,
-                version = 1
+                sourceIdentifier = identifier
               )
 
               val messageCount = 5
@@ -207,10 +208,9 @@ class IdMinterFeatureTest
                   "Work",
                   miroId)
 
-              val work = UnidentifiedWork(
+              val work = unidentifiedWorkWithDefaults(
                 title = "A query about a queue of quails",
-                sourceIdentifier = identifier,
-                version = 1
+                sourceIdentifier = identifier
               )
 
               val messageBody = put[UnidentifiedWork](

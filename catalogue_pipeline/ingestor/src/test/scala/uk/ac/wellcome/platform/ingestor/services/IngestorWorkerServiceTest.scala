@@ -383,16 +383,14 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val sierraWork = IdentifiedWork(
+    val sierraWork = identifiedWorkWith(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-      title = "s1 title",
-      version = 1)
-    val sierraWorkDoesNotMatchMapping = IdentifiedWork(
+      title = "s1 title")
+    val sierraWorkDoesNotMatchMapping = identifiedWorkWith(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       title = "s2 title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -440,16 +438,14 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val miroWork = IdentifiedWork(
+    val miroWork = identifiedWorkWith(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("miro-image-number", "m1"),
-      title = "s1 title",
-      version = 1)
-    val miroWorkDoesNotMatchV2Mapping = IdentifiedWork(
+      title = "s1 title")
+    val miroWorkDoesNotMatchV2Mapping = identifiedWorkWith(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("miro-image-number", "m2"),
       title = "s2 title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
