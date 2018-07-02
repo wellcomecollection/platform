@@ -1,6 +1,6 @@
 resource "aws_alb" "public_services" {
   # This name can only contain alphanumerics and hyphens
-  name = "${replace("${local.namespace}", "_", "-")}-v2"
+  name = "${replace("${var.namespace}", "_", "-")}"
 
   subnets         = ["${var.public_subnets}"]
   security_groups = ["${aws_security_group.service_lb_security_group.id}", "${aws_security_group.external_lb_security_group.id}"]
