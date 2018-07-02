@@ -46,7 +46,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = unidentifiedWorkWithDefaults(
+    val originalWork = unidentifiedWorkWith(
       title = "crap",
       sourceIdentifier = identifier)
 
@@ -97,7 +97,7 @@ class IdEmbedderTests
     )
 
     val person = Person(label = "The Librarian")
-    val originalWork = unidentifiedWorkWithDefaults(
+    val originalWork = unidentifiedWorkWith(
       title = "crap",
       sourceIdentifier = workIdentifier,
       contributors = List(
@@ -161,7 +161,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = unidentifiedWorkWithDefaults(
+    val originalWork = unidentifiedWorkWith(
       title = "crap",
       sourceIdentifier = identifier)
 
@@ -206,7 +206,7 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalWork = unidentifiedWorkWithDefaults(
+    val originalWork = unidentifiedWorkWith(
       title = "crap",
       sourceIdentifier = identifier,
       items = List(originalItem1, originalItem2))

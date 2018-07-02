@@ -47,7 +47,7 @@ class MatcherFeatureTest
                   topic,
                   graphTable,
                   lockTable) { _ =>
-                  val work = unidentifiedWorkWithDefaults(
+                  val work = unidentifiedWorkWith(
                     sourceIdentifier = sourceIdentifierA,
                     title = "Work"
                   )
@@ -109,7 +109,7 @@ class MatcherFeatureTest
                   )
                   Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
-                  val workAv1 = unidentifiedWorkWithDefaults(
+                  val workAv1 = unidentifiedWorkWith(
                     sourceIdentifier = sourceIdentifierA,
                     title = "Work",
                     version = updatedWorkVersion

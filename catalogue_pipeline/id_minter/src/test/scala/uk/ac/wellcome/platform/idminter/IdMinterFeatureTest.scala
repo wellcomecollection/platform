@@ -47,7 +47,7 @@ class IdMinterFeatureTest
                   "Work",
                   miroID)
 
-              val work = unidentifiedWorkWithDefaults(
+              val work = unidentifiedWorkWith(
                 title = title,
                 sourceIdentifier = identifier
               )
@@ -208,7 +208,7 @@ class IdMinterFeatureTest
                   "Work",
                   miroId)
 
-              val work = unidentifiedWorkWithDefaults(
+              val work = unidentifiedWorkWith(
                 title = "A query about a queue of quails",
                 sourceIdentifier = identifier
               )
