@@ -194,7 +194,8 @@ class DisplayWorkV2SerialisationTest
       ontologyType = "Work",
       value = "Test1234"
     )
-    val work = createIdentifiedWorkWith(otherIdentifiers = List(otherIdentifier))
+    val work =
+      createIdentifiedWorkWith(otherIdentifiers = List(otherIdentifier))
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(work, WorksIncludes(identifiers = true)))
     val expectedJson = s"""

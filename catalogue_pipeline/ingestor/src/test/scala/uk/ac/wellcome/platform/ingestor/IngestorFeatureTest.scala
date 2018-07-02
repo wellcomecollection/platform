@@ -65,7 +65,8 @@ class IngestorFeatureTest
         "Item",
         "5678")
 
-    val work = createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
+    val work =
+      createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>

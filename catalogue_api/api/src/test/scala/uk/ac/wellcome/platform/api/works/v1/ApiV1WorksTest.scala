@@ -432,7 +432,8 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           val work = createIdentifiedWorkWith(title = "A whale on a wave")
           insertIntoElasticsearch(indexNameV1, itemType, work)
 
-          val work_alt = createIdentifiedWorkWith(title = "An impostor in an igloo")
+          val work_alt =
+            createIdentifiedWorkWith(title = "An impostor in an igloo")
           insertIntoElasticsearch(
             indexName = otherIndex,
             itemType = itemType,

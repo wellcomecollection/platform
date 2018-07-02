@@ -82,7 +82,8 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
+    val work =
+      createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -530,7 +531,8 @@ class IngestorWorkerServiceTest
                   )
 
                   val work =
-                    createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
+                    createIdentifiedWorkWith(
+                      sourceIdentifier = miroSourceIdentifier)
 
                   val messageBody = put[IdentifiedBaseWork](
                     obj = work,

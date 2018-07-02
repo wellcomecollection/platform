@@ -47,7 +47,8 @@ class IdMinterFeatureTest
                   "Work",
                   miroID)
 
-              val work = createUnidentifiedWorkWith(sourceIdentifier = identifier)
+              val work =
+                createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
               val messageCount = 5
 
@@ -205,7 +206,8 @@ class IdMinterFeatureTest
                   "Work",
                   miroId)
 
-              val work = createUnidentifiedWorkWith(sourceIdentifier = identifier)
+              val work =
+                createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
               val messageBody = put[UnidentifiedWork](
                 obj = work,
