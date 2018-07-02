@@ -46,7 +46,7 @@ class IngestorWorkerServiceTest
       value = "M000765"
     )
 
-    val work = identifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -82,7 +82,7 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = identifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -191,16 +191,16 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
-    val miroWork1 = identifiedWorkWith(
+    val miroWork1 = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("miro-image-number", "M1"),
       canonicalId = "m1")
-    val miroWork2 = identifiedWorkWith(
+    val miroWork2 = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("miro-image-number", "M2"),
       canonicalId = "m2")
-    val sierraWork1 = identifiedWorkWith(
+    val sierraWork1 = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "S1"),
       canonicalId = "s1")
-    val sierraWork2 = identifiedWorkWith(
+    val sierraWork2 = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
       canonicalId = "s2")
 
@@ -252,7 +252,7 @@ class IngestorWorkerServiceTest
       value = "MS/237"
     )
 
-    val work = identifiedWorkWith(sourceIdentifier = calmSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = calmSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -278,13 +278,13 @@ class IngestorWorkerServiceTest
 
   it(
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
-    val miroWork = identifiedWorkWith(
+    val miroWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("miro-image-number", "M"),
       canonicalId = "m")
-    val sierraWork = identifiedWorkWith(
+    val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
       canonicalId = "s")
-    val invalidWork = identifiedWorkWith(
+    val invalidWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("calm-altref-no", "C1"),
       canonicalId = "c")
 
@@ -332,10 +332,10 @@ class IngestorWorkerServiceTest
 
   it(
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
-    val sierraWork = identifiedWorkWith(
+    val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
       canonicalId = "s1")
-    val newSierraWork = identifiedWorkWith(
+    val newSierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       canonicalId = "s2",
       version = 2)
@@ -383,11 +383,11 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val sierraWork = identifiedWorkWith(
+    val sierraWork = createIdentifiedWorkWith(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
       title = "s1 title")
-    val sierraWorkDoesNotMatchMapping = identifiedWorkWith(
+    val sierraWorkDoesNotMatchMapping = createIdentifiedWorkWith(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       title = "s2 title",
@@ -438,11 +438,11 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val miroWork = identifiedWorkWith(
+    val miroWork = createIdentifiedWorkWith(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("miro-image-number", "m1"),
       title = "s1 title")
-    val miroWorkDoesNotMatchV2Mapping = identifiedWorkWith(
+    val miroWorkDoesNotMatchV2Mapping = createIdentifiedWorkWith(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("miro-image-number", "m2"),
       title = "s2 title",
@@ -530,7 +530,7 @@ class IngestorWorkerServiceTest
                   )
 
                   val work =
-                    identifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
+                    createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
                   val messageBody = put[IdentifiedBaseWork](
                     obj = work,

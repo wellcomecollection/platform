@@ -40,7 +40,7 @@ class IngestorFeatureTest
         "Item",
         "5678")
 
-    val work = identifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
@@ -65,7 +65,7 @@ class IngestorFeatureTest
         "Item",
         "5678")
 
-    val work = identifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>

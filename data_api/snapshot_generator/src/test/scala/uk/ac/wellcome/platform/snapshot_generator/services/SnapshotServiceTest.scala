@@ -199,7 +199,7 @@ class SnapshotServiceTest
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val works = (1 to 11000).map { id =>
-          identifiedWorkWith(
+          createIdentifiedWorkWith(
             canonicalId = id.toString,
             title = Random.alphanumeric.take(1500).mkString)
         }

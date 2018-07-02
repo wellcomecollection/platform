@@ -86,7 +86,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("excludes works with visible=false from search results") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = identifiedWorkWith()
+        val work = createIdentifiedWorkWith()
         val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 

@@ -23,9 +23,9 @@ class ElasticsearchServiceTest
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = identifiedWorkWith(title = "Amid an Aegean")
-        val work2 = identifiedWorkWith(title = "Before a Bengal")
-        val work3 = identifiedWorkWith(title = "Circling a Cheetah")
+        val work1 = createIdentifiedWorkWith(title = "Amid an Aegean")
+        val work2 = createIdentifiedWorkWith(title = "Before a Bengal")
+        val work3 = createIdentifiedWorkWith(title = "Circling a Cheetah")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
@@ -52,7 +52,7 @@ class ElasticsearchServiceTest
   describe("findResultById") {
     it("finds a result by ID") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work = identifiedWorkWith(canonicalId = "000Z")
+        val work = createIdentifiedWorkWith(canonicalId = "000Z")
         insertIntoElasticsearch(indexName, itemType, work)
 
         withElasticSearchService(indexName = indexName, itemType = itemType) {
@@ -75,9 +75,9 @@ class ElasticsearchServiceTest
   describe("listResults") {
     it("sorts results from Elasticsearch in the correct order") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = identifiedWorkWith(canonicalId = "000Z")
-        val work2 = identifiedWorkWith(canonicalId = "000Y")
-        val work3 = identifiedWorkWith(canonicalId = "000X")
+        val work1 = createIdentifiedWorkWith(canonicalId = "000Z")
+        val work2 = createIdentifiedWorkWith(canonicalId = "000Y")
+        val work3 = createIdentifiedWorkWith(canonicalId = "000X")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
