@@ -15,7 +15,6 @@ class DisplayWorkV2SerialisationTest
   it("serialises a DisplayWorkV2 correctly") {
 
     val work = createIdentifiedWorkWith(
-      canonicalId = canonicalId,
       title = title,
       description = Some(description),
       lettering = Some(lettering),
@@ -30,7 +29,7 @@ class DisplayWorkV2SerialisationTest
     val expectedJsonString = s"""
        |{
        | "type": "Work",
-       | "id": "$canonicalId",
+       | "id": "${work.canonicalId}",
        | "title": "$title",
        | "description": "$description",
        | "workType": {

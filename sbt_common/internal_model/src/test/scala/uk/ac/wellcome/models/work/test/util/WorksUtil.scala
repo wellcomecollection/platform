@@ -5,7 +5,6 @@ import uk.ac.wellcome.models.work.internal._
 import scala.util.Random
 
 trait WorksUtil extends ItemsUtil {
-  val canonicalId = "1234"
   val title = "this is the first image title"
   val description = "this is a description"
   val lettering = "some lettering"
@@ -40,8 +39,7 @@ trait WorksUtil extends ItemsUtil {
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
-        identifiedWorkWith(
-          canonicalId = s"${idx}-${canonicalId}",
+        createIdentifiedWorkWith(
           title = s"${idx}-${title}",
           description = Some(s"${idx}-${description}"),
           lettering = Some(s"${idx}-${lettering}"),
