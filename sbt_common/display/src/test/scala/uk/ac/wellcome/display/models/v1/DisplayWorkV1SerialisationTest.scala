@@ -14,7 +14,7 @@ class DisplayWorkV1SerialisationTest
 
   it("serialises a DisplayWorkV1 correctly") {
     val work = createIdentifiedWorkWith(
-      description = Some(description),
+      description = Some(s"A single work in ${this.getClass.getSimpleName}"),
       lettering = Some(lettering),
       createdDate = Some(period),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
@@ -29,7 +29,7 @@ class DisplayWorkV1SerialisationTest
        | "type": "Work",
        | "id": "${work.canonicalId}",
        | "title": "${work.title}",
-       | "description": "$description",
+       | "description": "${work.description.get}",
        | "workType": {
        |       "id": "${workType.id}",
        |       "label": "${workType.label}",

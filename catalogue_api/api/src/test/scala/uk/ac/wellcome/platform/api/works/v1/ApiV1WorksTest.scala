@@ -95,7 +95,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          description = Some(description),
+          description = Some(s"A single work in ${this.getClass.getSimpleName}"),
           lettering = Some(lettering),
           createdDate = Some(period),
           contributors = List(Contributor(agent = Unidentifiable(agent))),
@@ -114,7 +114,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "type": "Work",
                  | "id": "${work.canonicalId}",
                  | "title": "${work.title}",
-                 | "description": "$description",
+                 | "description": "${work.description.get}",
                  | "workType": {
                  |       "id": "${workType.id}",
                  |       "label": "${workType.label}",
