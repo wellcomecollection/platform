@@ -7,7 +7,7 @@ SBT_NO_DOCKER_LIBRARIES =
 
 SBT_APPS 	= reindex_worker
 ECS_TASKS 	=
-LAMBDAS 	= reindex_job_creator reindex_shard_generator resharder
+LAMBDAS 	= reindex_shard_generator
 
 TF_NAME 	= reindexer
 TF_PATH 	= $(STACK_ROOT)/terraform

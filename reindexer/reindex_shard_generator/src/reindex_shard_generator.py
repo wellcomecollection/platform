@@ -7,20 +7,14 @@ import botocore
 from wellcome_aws_utils.dynamo_event import DynamoEvent
 from wellcome_aws_utils.lambda_utils import log_on_error
 
-from shard_manager import create_reindex_shard
-
-
-SOURCE_SIZES = {
-    'sierra': 5e6,
-    'miro': 2.5e5,
-}
-
-SHARD_SIZE = 1500
+from reindex_shard_config import create_reindex_shard
 
 
 @log_on_error
 def main(event, _ctxt=None, dynamodb_client=None):
     dynamodb_client = dynamodb_client or boto3.client('dynamodb')
+
+    # TODO: Isn't the table name passed in the record?
     table_name = os.environ['TABLE_NAME']
 
     for record in event['Records']:
@@ -31,13 +25,11 @@ def main(event, _ctxt=None, dynamodb_client=None):
             print("no NewImage key in dynamo update event, skipping")
             continue
 
-        id = row['id']
         source_name = row['sourceName']
+        source_id = row['id']
         new_reindex_shard = create_reindex_shard(
-            id=id,
-            source_name=row['sourceName'],
-            source_size=SOURCE_SIZES[source_name],
-            shard_size=SHARD_SIZE
+            source_name=source_name,
+            source_id=source_id
         )
 
         # If the reindex shard doesn't match the current schema, we'll
@@ -58,7 +50,7 @@ def main(event, _ctxt=None, dynamodb_client=None):
             # incrementing by 1.
             dynamodb_client.update_item(
                 TableName=table_name,
-                Key={'id': {'S': id}},
+                Key={'id': {'S': source_id}},
                 UpdateExpression='SET version = :newVersion, reindexShard=:reindexShard, reindexVersion=:reindexVersion',
                 ConditionExpression='version < :newVersion',
                 ExpressionAttributeValues={
@@ -68,6 +60,11 @@ def main(event, _ctxt=None, dynamodb_client=None):
                 }
             )
         except botocore.exceptions.ClientError as e:
+
+            # If we get a ConditionalCheckFailedException, it means somebody
+            # else wrote a record with a newer version before we could do it.
+            # That's okay -- the newer record will appear later in the event
+            # stream, so we can add the shard then.
             if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                 raise
             else:
