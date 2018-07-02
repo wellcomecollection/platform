@@ -7,7 +7,7 @@ import scala.util.Random
 trait WorksUtil extends ItemsUtil {
   private val defaultTitle = "this is the first image title"
 
-  val sourceIdentifier = SourceIdentifier(
+  private val defaultSourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
     "Work",
     "sourceIdentifierFromWorksUtil"
@@ -22,7 +22,7 @@ trait WorksUtil extends ItemsUtil {
 
   def createIdentifiedInvisibleWork: IdentifiedInvisibleWork = {
     IdentifiedInvisibleWork(
-      sourceIdentifier = sourceIdentifier,
+      sourceIdentifier = defaultSourceIdentifier,
       version = 1,
       canonicalId = (Random.alphanumeric take 10 mkString) toLowerCase
     )
@@ -36,7 +36,7 @@ trait WorksUtil extends ItemsUtil {
     }
 
   def createUnidentifiedWorkWith(
-    sourceIdentifier: SourceIdentifier = sourceIdentifier,
+    sourceIdentifier: SourceIdentifier = defaultSourceIdentifier,
     version: Int = 1,
     title: String = defaultTitle,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
@@ -66,7 +66,7 @@ trait WorksUtil extends ItemsUtil {
 
   def createIdentifiedWorkWith(
     canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase,
-    sourceIdentifier: SourceIdentifier = sourceIdentifier,
+    sourceIdentifier: SourceIdentifier = defaultSourceIdentifier,
     otherIdentifiers: List[SourceIdentifier] = List(),
     version: Int = 1,
     title: String = defaultTitle,

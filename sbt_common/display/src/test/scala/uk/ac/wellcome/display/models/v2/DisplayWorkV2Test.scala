@@ -38,7 +38,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       includes = WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
-      List(DisplayIdentifierV2(sourceIdentifier)))
+      List(DisplayIdentifierV2(work.sourceIdentifier)))
   }
 
   it("gets the physicalDescription from a Work") {
@@ -301,7 +301,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
-          List(DisplayIdentifierV2(sourceIdentifier)))
+          List(DisplayIdentifierV2(work.sourceIdentifier)))
       }
 
       it("contributors") {

@@ -211,7 +211,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
@@ -235,7 +235,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],

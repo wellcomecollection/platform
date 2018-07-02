@@ -34,7 +34,6 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
   it("correctly parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
-      sourceIdentifier = sourceIdentifier,
       otherIdentifiers = List()
     )
 
@@ -43,7 +42,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
       includes = WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
-      List(DisplayIdentifierV1(sourceIdentifier)))
+      List(DisplayIdentifierV1(work.sourceIdentifier)))
   }
 
   it("extracts creators from a Work with Unidentifiable Contributors") {
@@ -230,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(sourceIdentifier)))
+          List(DisplayIdentifierV1(work.sourceIdentifier)))
       }
     }
   }
