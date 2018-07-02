@@ -17,12 +17,7 @@ import uk.ac.wellcome.finatra.elasticsearch.{
 import uk.ac.wellcome.finatra.messaging.{MessageConfigModule, SQSClientModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.ingestor.modules.{
-  IdentifiedWorkModule,
-  IngestorConfigModule,
-  IngestorWorkerModule,
-  WorksIndexModule
-}
+import uk.ac.wellcome.platform.ingestor.modules._
 
 object ServerMain extends Server
 
@@ -40,7 +35,7 @@ class Server extends HttpServer {
     ElasticConfigModule,
     ExecutionContextModule,
     WorksIndexModule,
-    IdentifiedWorkModule,
+    IdentifiedBaseWorkModule,
     IngestorConfigModule
   )
 

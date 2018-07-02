@@ -100,7 +100,7 @@ class WorkIndexerTest
 
   it("replaces a Work with the same version") {
     val work = createVersionedWork(version = 3)
-    val updatedWork = work.copy(title = Some("boring title"))
+    val updatedWork = work.copy(title = "boring title")
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
@@ -151,13 +151,13 @@ class WorkIndexerTest
       IdentifiedWork(
         canonicalId = s"s$i",
         sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-        title = Some("s1 title"),
+        title = "s1 title",
         version = 1)
     }
     val notMatchingMappingWork = IdentifiedWork(
       canonicalId = "not-matching",
       sourceIdentifier = createIdentifier("miro-image-number", "not-matching"),
-      title = Some("title"),
+      title = "title",
       version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )

@@ -4,12 +4,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -51,7 +46,7 @@ class IdMinterFeatureTest
                   miroID)
 
               val work = UnidentifiedWork(
-                title = Some(title),
+                title = title,
                 sourceIdentifier = identifier,
                 version = 1
               )
@@ -78,8 +73,56 @@ class IdMinterFeatureTest
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { work =>
                   work.identifiers.head.value shouldBe miroID
-                  work.title shouldBe Some(title)
+                  work.title shouldBe title
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  it("mints an identifier for a UnidentifiedInvisibleWork") {
+    withLocalSqsQueue { queue =>
+      withLocalSnsTopic { topic =>
+        withLocalS3Bucket { bucket =>
+          withIdentifiersDatabase { identifiersTableConfig =>
+            val flags =
+              identifiersLocalDbFlags(identifiersTableConfig) ++
+                messagingLocalFlags(bucket, topic, queue)
+
+            withServer(flags) { _ =>
+              eventuallyTableExists(identifiersTableConfig)
+
+              val id = "id"
+              val identifier =
+                SourceIdentifier(
+                  identifierType = IdentifierType("sierra-system-number"),
+                  "Work",
+                  id)
+
+              val work = UnidentifiedInvisibleWork(
+                sourceIdentifier = identifier,
+                version = 1
+              )
+
+              val messageBody = put[UnidentifiedInvisibleWork](
+                obj = work,
+                location = ObjectLocation(
+                  namespace = bucket.name,
+                  key = s"invisible-work.json"
+                )
+              )
+              sqsClient.sendMessage(queue.url, messageBody)
+
+              eventually {
+                val messages = listMessagesReceivedFromSNS(topic)
+                messages.length shouldBe >=(1)
+
+                val work = get[IdentifiedInvisibleWork](messages.head)
+                work.sourceIdentifier shouldBe identifier
+                work.canonicalId shouldNot be(empty)
               }
             }
           }
@@ -111,7 +154,7 @@ class IdMinterFeatureTest
                   miroId)
 
               val work = UnidentifiedWork(
-                title = Some("A query about a queue of quails"),
+                title = "A query about a queue of quails",
                 sourceIdentifier = identifier,
                 version = 1
               )

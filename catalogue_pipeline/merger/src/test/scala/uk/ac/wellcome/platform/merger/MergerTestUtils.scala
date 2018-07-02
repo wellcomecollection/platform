@@ -9,11 +9,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -58,20 +54,27 @@ trait MergerTestUtils { this: SQS with SNS with Messaging =>
   def recorderWorkEntryWith(title: String,
                             identifierType: String,
                             sourceId: String,
-                            version: Int) = {
-    val recorderWorkEntry1 = RecorderWorkEntry(
+                            version: Int) =
+    RecorderWorkEntry(
       UnidentifiedWork(
-        title = Some(title),
+        title = title,
         sourceIdentifier =
           SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
         version = version))
-    recorderWorkEntry1
-  }
+
+  def recorderInvisibleWorkEntryWith(identifierType: String,
+                                     sourceId: String,
+                                     version: Int) =
+    RecorderWorkEntry(
+      UnidentifiedInvisibleWork(
+        sourceIdentifier =
+          SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
+        version = version))
 
   def getWorksSent(topic: Topic) = {
     val messagesSent = listMessagesReceivedFromSNS(topic)
     val worksSent = messagesSent.map { message =>
-      get[UnidentifiedWork](message)
+      get[TransformedBaseWork](message)
     }
     worksSent
   }

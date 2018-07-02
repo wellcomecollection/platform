@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -72,6 +72,29 @@ class MergerWorkerServiceTest
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
             }
+        }
+    }
+  }
+
+  it("sends InvisibleWorks unmerged") {
+
+    withMergerWorkerServiceFixtures {
+      case (vhs, QueuePair(queue, dlq), topic, _) =>
+        val recorderWorkEntry =
+          recorderInvisibleWorkEntryWith("sierra-system-number", "b123456", 1)
+
+        val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
+
+        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+          sendSQSMessage(queue, matcherResult)
+
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueEmpty(dlq)
+
+            val worksSent = getWorksSent(topic)
+            worksSent should contain only recorderWorkEntry.work
+          }
         }
     }
   }
@@ -195,7 +218,7 @@ class MergerWorkerServiceTest
                           actorSystem,
                           queue,
                           metricsSender) { sqsStream =>
-                          withMessageWriter[UnidentifiedWork, R](
+                          withMessageWriter[TransformedBaseWork, R](
                             messageBucket,
                             topic) { snsWriter =>
                             withMergerWorkerService(
@@ -223,7 +246,7 @@ class MergerWorkerServiceTest
     vhs: VersionedHybridStore[RecorderWorkEntry,
                               EmptyMetadata,
                               ObjectStore[RecorderWorkEntry]],
-    messageWriter: MessageWriter[UnidentifiedWork])(
+    messageWriter: MessageWriter[TransformedBaseWork])(
     testWith: TestWith[MergerWorkerService, R]) = {
     testWith(
       new MergerWorkerService(actorSystem, sqsStream, vhs, messageWriter))

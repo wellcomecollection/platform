@@ -5,7 +5,10 @@ sealed trait BaseWork {
   val sourceIdentifier: SourceIdentifier
 }
 
-sealed trait IdentifiedBaseWork extends BaseWork
+sealed trait IdentifiedBaseWork extends BaseWork {
+  val canonicalId: String
+}
+sealed trait TransformedBaseWork extends BaseWork
 
 /** A representation of a work in our ontology */
 trait Work extends BaseWork with MultipleSourceIdentifiers {
@@ -13,7 +16,7 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
 
-  val title: Option[String]
+  val title: String
   val workType: Option[WorkType]
   val description: Option[String]
   val physicalDescription: Option[String]
@@ -31,7 +34,6 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
   val items: List[IdentityState[Item]]
 
   val version: Int
-  val visible: Boolean
 
   val ontologyType: String
 }
@@ -39,7 +41,7 @@ trait Work extends BaseWork with MultipleSourceIdentifiers {
 case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
   version: Int,
-  title: Option[String],
+  title: String,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   workType: Option[WorkType] = None,
@@ -56,16 +58,16 @@ case class UnidentifiedWork(
   language: Option[Language] = None,
   dimensions: Option[String] = None,
   items: List[Identifiable[Item]] = Nil,
-  visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
+    with TransformedBaseWork
 
 case class IdentifiedWork(
   canonicalId: String,
   sourceIdentifier: SourceIdentifier,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
-  title: Option[String],
+  title: String,
   workType: Option[WorkType] = None,
   description: Option[String] = None,
   physicalDescription: Option[String] = None,
@@ -81,14 +83,24 @@ case class IdentifiedWork(
   dimensions: Option[String] = None,
   items: List[Identified[Item]] = Nil,
   version: Int,
-  visible: Boolean = true,
   ontologyType: String = "Work")
     extends Work
     with IdentifiedBaseWork
 
+trait InvisibleWork extends BaseWork
+
+case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
+                                     version: Int)
+    extends InvisibleWork
+    with TransformedBaseWork
+
+case class IdentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
+                                   version: Int,
+                                   canonicalId: String)
+    extends InvisibleWork
+    with IdentifiedBaseWork
+
 trait RedirectedWork extends BaseWork {
-  val sourceIdentifier: SourceIdentifier
-  val version: Int
   val redirect: Redirect
 }
 

@@ -8,7 +8,7 @@ import com.sksamuel.elastic4s.http.bulk.BulkResponse
 import com.twitter.inject.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,13 +20,16 @@ class WorkIndexer @Inject()(
     extends Logging
     with ElasticsearchExceptionManager {
 
-  implicit object IdentifiedWorkIndexable extends Indexable[IdentifiedWork] {
-    override def json(t: IdentifiedWork): String =
+  implicit object IdentifiedWorkIndexable
+      extends Indexable[IdentifiedBaseWork] {
+    override def json(t: IdentifiedBaseWork): String =
       toJson(t).get
   }
 
-  def indexWorks(works: Seq[IdentifiedWork], esIndex: String, esType: String)
-    : Future[Either[Seq[IdentifiedWork], Seq[IdentifiedWork]]] = {
+  def indexWorks(works: Seq[IdentifiedBaseWork],
+                 esIndex: String,
+                 esType: String)
+    : Future[Either[Seq[IdentifiedBaseWork], Seq[IdentifiedBaseWork]]] = {
 
     debug(s"Indexing work ${works.map(_.canonicalId).mkString(", ")}")
 

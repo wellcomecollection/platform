@@ -17,11 +17,6 @@ import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.display.models.{AllWorksIncludes, ApiVersions}
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier
-}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
@@ -35,8 +30,8 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
 
 class SnapshotServiceTest
     extends FunSpec
@@ -106,7 +101,7 @@ class SnapshotServiceTest
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createWorks(count = 3)
         val notVisibleWorks =
-          createWorks(count = 1, start = 4, visible = false)
+          createInvisibleWorks(count = 1, start = 4)
 
         val works = visibleWorks ++ notVisibleWorks
 
@@ -155,7 +150,7 @@ class SnapshotServiceTest
       case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createWorks(count = 4)
         val notVisibleWorks =
-          createWorks(count = 2, start = 5, visible = false)
+          createInvisibleWorks(count = 2, start = 5)
 
         val works = visibleWorks ++ notVisibleWorks
 
@@ -244,40 +239,6 @@ class SnapshotServiceTest
             targetLocation =
               s"http://localhost:33333/${publicBucket.name}/$publicObjectKey"
           )
-        }
-    }
-  }
-
-  it("fails a snapshot generation if one of the items in the index is invalid") {
-    withFixtures {
-      case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
-        val validWorks = createWorks(count = 3)
-
-        val invalidWork = IdentifiedWork(
-          canonicalId = "invalidwork",
-          sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("sierra-system-number"),
-            ontologyType = "Work",
-            value = "123"),
-          version = 1,
-          title = None,
-          visible = true
-        )
-
-        val works = validWorks :+ invalidWork
-        insertIntoElasticsearch(indexNameV1, itemType, works: _*)
-
-        val publicObjectKey = "target.txt.gz"
-        val snapshotJob = SnapshotJob(
-          publicBucketName = publicBucket.name,
-          publicObjectKey = publicObjectKey,
-          apiVersion = ApiVersions.v1
-        )
-
-        val future = snapshotService.generateSnapshot(snapshotJob)
-
-        whenReady(future.failed) { ex =>
-          ex shouldBe a[RuntimeException]
         }
     }
   }

@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.api.services
 
 import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.http.search.SearchHit
-
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import io.circe.Decoder
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
 import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
@@ -16,12 +16,12 @@ class WorksService @Inject()(apiConfig: ApiConfig,
                              searchService: ElasticSearchService) {
 
   def findWorkById(canonicalId: String,
-                   indexName: String): Future[Option[IdentifiedWork]] =
+                   indexName: String): Future[Option[IdentifiedBaseWork]] =
     searchService
       .findResultById(canonicalId, indexName = indexName)
       .map { result =>
         if (result.exists)
-          Some(jsonToIdentifiedWork(result.sourceAsString))
+          Some(jsonTo[IdentifiedBaseWork](result.sourceAsString))
         else None
       }
 
@@ -38,7 +38,7 @@ class WorksService @Inject()(apiConfig: ApiConfig,
       .map { searchResponse =>
         ResultList(
           results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonToIdentifiedWork(h.sourceAsString)
+            jsonTo[IdentifiedWork](h.sourceAsString)
           }.toList,
           totalResults = searchResponse.totalHits
         )
@@ -58,14 +58,15 @@ class WorksService @Inject()(apiConfig: ApiConfig,
       .map { searchResponse =>
         ResultList(
           results = searchResponse.hits.hits.map { h: SearchHit =>
-            jsonToIdentifiedWork(h.sourceAsString)
+            jsonTo[IdentifiedWork](h.sourceAsString)
           }.toList,
           totalResults = searchResponse.totalHits
         )
       }
 
-  private def jsonToIdentifiedWork(document: String): IdentifiedWork =
-    fromJson[IdentifiedWork](document) match {
+  private def jsonTo[T <: IdentifiedBaseWork](document: String)(
+    implicit decoder: Decoder[T]): T =
+    fromJson[T](document) match {
       case Success(work) => work
       case Failure(e) =>
         throw new RuntimeException(

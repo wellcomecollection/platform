@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -23,7 +23,7 @@ class MergerWorkerService @Inject()(
   vhs: VersionedHybridStore[RecorderWorkEntry,
                             EmptyMetadata,
                             ObjectStore[RecorderWorkEntry]],
-  messageWriter: MessageWriter[UnidentifiedWork]
+  messageWriter: MessageWriter[TransformedBaseWork]
 )(implicit context: ExecutionContext)
     extends Logging {
 
@@ -50,7 +50,7 @@ class MergerWorkerService @Inject()(
     } yield maybeWorkEntries
   }
 
-  private def sendWorks(maybeWorks: Seq[Option[UnidentifiedWork]]) = {
+  private def sendWorks(maybeWorks: Seq[Option[TransformedBaseWork]]) = {
     Future
       .sequence(maybeWorks.collect {
         case Some(work) =>

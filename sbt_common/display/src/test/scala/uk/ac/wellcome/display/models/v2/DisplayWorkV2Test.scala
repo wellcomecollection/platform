@@ -8,7 +8,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
   it("correctly parses a Work without any items") {
     val work = IdentifiedWork(
-      title = Some("An irritating imp is immune from items"),
+      title = "An irritating imp is immune from items",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "abcdef12"
@@ -29,7 +29,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
         locations = List()
       ))
     val work = IdentifiedWork(
-      title = Some("Inside an irate igloo"),
+      title = "Inside an irate igloo",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "b4heraz7",
@@ -52,7 +52,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
   it("correctly parses a work without any extra identifiers") {
     val work = IdentifiedWork(
-      title = Some("An irascible iguana invites impudence"),
+      title = "An irascible iguana invites impudence",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "xtsx8hwk")
@@ -69,7 +69,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     val physicalDescription = "A magnificent mural of magpies"
 
     val work = IdentifiedWork(
-      title = Some("Moving a mighty mouse to Madagascar"),
+      title = "Moving a mighty mouse to Madagascar",
       canonicalId = "mtc2wvrg",
       sourceIdentifier = sourceIdentifier,
       physicalDescription = Some(physicalDescription),
@@ -92,7 +92,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("Moving a mighty mouse to Madagascar"),
+      title = "Moving a mighty mouse to Madagascar",
       canonicalId = "mtc2wvrg",
       sourceIdentifier = sourceIdentifier,
       workType = Some(workType),
@@ -107,7 +107,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     val extent = "Bound in boxes of bark"
 
     val work = IdentifiedWork(
-      title = Some("Brilliant beeches in Bucharest"),
+      title = "Brilliant beeches in Bucharest",
       canonicalId = "bmnppscn",
       sourceIdentifier = sourceIdentifier,
       extent = Some(extent),
@@ -125,7 +125,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     )
 
     val work = IdentifiedWork(
-      title = Some("A largesse of leaping Libyan lions"),
+      title = "A largesse of leaping Libyan lions",
       canonicalId = "lfk6nkje",
       sourceIdentifier = sourceIdentifier,
       language = Some(language),
@@ -138,26 +138,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
     displayLanguage.label shouldBe language.label
   }
 
-  it("gives a helpful error if you try to convert a work with visible=False") {
-    val work = IdentifiedWork(
-      canonicalId = "xpudrscx",
-      title = Some("Invisible igloos improve iguanas"),
-      sourceIdentifier = sourceIdentifier,
-      visible = false,
-      version = 1
-    )
-
-    val caught = intercept[RuntimeException] {
-      DisplayWorkV2(work)
-    }
-
-    caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork"
-  }
-
   it("extracts contributors from a Work") {
     val work = IdentifiedWork(
       canonicalId = "vc6zww4f",
-      title = Some("Vicarious victory for violet vampires"),
+      title = "Vicarious victory for violet vampires",
       sourceIdentifier = sourceIdentifier,
       contributors = List(
         Contributor(
@@ -225,7 +209,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
     val work = IdentifiedWork(
       canonicalId = "ecgxstzd",
-      title = Some("Events entailing the exegesis of empires"),
+      title = "Events entailing the exegesis of empires",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       production = List(productionEvent)
@@ -281,7 +265,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers {
 
     val work = IdentifiedWork(
       canonicalId = "bmzwdx3t",
-      title = Some("Bizarre bees bounce below a basketball"),
+      title = "Bizarre bees bounce below a basketball",
       sourceIdentifier = sourceIdentifier,
       contributors = List(
         Contributor(

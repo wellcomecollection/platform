@@ -11,12 +11,7 @@ import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier,
-  Subject
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -25,8 +20,8 @@ import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
-import scala.concurrent.duration._
 
+import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
@@ -51,13 +46,13 @@ class IngestorWorkerServiceTest
       value = "M000765"
     )
 
-    val work = createWork().copy(sourceIdentifier = miroSourceIdentifier)
+    val work = createWork.copy(sourceIdentifier = miroSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedWork](
+            val messageBody = put[IdentifiedBaseWork](
               obj = work,
               location = ObjectLocation(
                 namespace = bucket.name,
@@ -87,13 +82,92 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = createWork().copy(sourceIdentifier = sierraSourceIdentifier)
+    val work = createWork.copy(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedWork](
+            val messageBody = put[IdentifiedBaseWork](
+              obj = work,
+              location = ObjectLocation(
+                namespace = bucket.name,
+                key = s"work.json"
+              )
+            )
+            sqsClient.sendMessage(queue.url, messageBody)
+
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              work)
+
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              work)
+        }
+      }
+    }
+  }
+
+  it("inserts an Sierra identified invisible Work into the v2 index") {
+    val sierraSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      ontologyType = "Work",
+      value = "b1027467"
+    )
+
+    val work = IdentifiedInvisibleWork(
+      canonicalId = "abcdefg",
+      sourceIdentifier = sierraSourceIdentifier,
+      version = 1)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
+            val messageBody = put[IdentifiedBaseWork](
+              obj = work,
+              location = ObjectLocation(
+                namespace = bucket.name,
+                key = s"work.json"
+              )
+            )
+            sqsClient.sendMessage(queue.url, messageBody)
+
+            assertElasticsearchNeverHasWork(
+              indexName = esIndexV1,
+              itemType = itemType,
+              work)
+
+            assertElasticsearchEventuallyHasWork(
+              indexName = esIndexV2,
+              itemType = itemType,
+              work)
+        }
+      }
+    }
+  }
+
+  it("inserts an Sierra identified redirected Work into the v2 index") {
+    val sierraSourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("sierra-system-number"),
+      ontologyType = "Work",
+      value = "b1027467"
+    )
+
+    val work = IdentifiedRedirectedWork(
+      canonicalId = "abcdefg",
+      sourceIdentifier = sierraSourceIdentifier,
+      version = 1,
+      redirect = IdentifiedRedirect(canonicalId = "defghijlk"))
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, _), bucket) =>
+            val messageBody = put[IdentifiedBaseWork](
               obj = work,
               location = ObjectLocation(
                 namespace = bucket.name,
@@ -117,16 +191,16 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
-    val miroWork1 = createWork().copy(
+    val miroWork1 = createWork.copy(
       sourceIdentifier = createIdentifier("miro-image-number", "M1"),
       canonicalId = "m1")
-    val miroWork2 = createWork().copy(
+    val miroWork2 = createWork.copy(
       sourceIdentifier = createIdentifier("miro-image-number", "M2"),
       canonicalId = "m2")
-    val sierraWork1 = createWork().copy(
+    val sierraWork1 = createWork.copy(
       sourceIdentifier = createIdentifier("sierra-system-number", "S1"),
       canonicalId = "s1")
-    val sierraWork2 = createWork().copy(
+    val sierraWork2 = createWork.copy(
       sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
       canonicalId = "s2")
 
@@ -137,7 +211,7 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedWork](
+              val messageBody = put[IdentifiedBaseWork](
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
@@ -178,13 +252,13 @@ class IngestorWorkerServiceTest
       value = "MS/237"
     )
 
-    val work = createWork().copy(sourceIdentifier = calmSourceIdentifier)
+    val work = createWork.copy(sourceIdentifier = calmSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-            val messageBody = put[IdentifiedWork](
+            val messageBody = put[IdentifiedBaseWork](
               obj = work,
               location = ObjectLocation(
                 namespace = bucket.name,
@@ -204,13 +278,13 @@ class IngestorWorkerServiceTest
 
   it(
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
-    val miroWork = createWork().copy(
+    val miroWork = createWork.copy(
       sourceIdentifier = createIdentifier("miro-image-number", "M"),
       canonicalId = "m")
-    val sierraWork = createWork().copy(
+    val sierraWork = createWork.copy(
       sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
       canonicalId = "s")
-    val invalidWork = createWork().copy(
+    val invalidWork = createWork.copy(
       sourceIdentifier = createIdentifier("calm-altref-no", "C1"),
       canonicalId = "c")
 
@@ -221,7 +295,7 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedWork](
+              val messageBody = put[IdentifiedBaseWork](
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
@@ -258,10 +332,10 @@ class IngestorWorkerServiceTest
 
   it(
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
-    val sierraWork = createWork().copy(
+    val sierraWork = createWork.copy(
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
       canonicalId = "s1")
-    val newSierraWork = createWork().copy(
+    val newSierraWork = createWork.copy(
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       canonicalId = "s2",
       version = 2)
@@ -278,7 +352,7 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedWork](
+              val messageBody = put[IdentifiedBaseWork](
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
@@ -312,12 +386,12 @@ class IngestorWorkerServiceTest
     val sierraWork = IdentifiedWork(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-      title = Some("s1 title"),
+      title = "s1 title",
       version = 1)
     val sierraWorkDoesNotMatchMapping = IdentifiedWork(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
-      title = Some("s2 title"),
+      title = "s2 title",
       version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
@@ -332,7 +406,7 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                val messageBody = put[IdentifiedWork](
+                val messageBody = put[IdentifiedBaseWork](
                   obj = work,
                   location = ObjectLocation(
                     namespace = bucket.name,
@@ -369,12 +443,12 @@ class IngestorWorkerServiceTest
     val miroWork = IdentifiedWork(
       canonicalId = "s1",
       sourceIdentifier = createIdentifier("miro-image-number", "m1"),
-      title = Some("s1 title"),
+      title = "s1 title",
       version = 1)
     val miroWorkDoesNotMatchV2Mapping = IdentifiedWork(
       canonicalId = "s2",
       sourceIdentifier = createIdentifier("miro-image-number", "m2"),
-      title = Some("s2 title"),
+      title = "s2 title",
       version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
@@ -389,7 +463,7 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                val messageBody = put[IdentifiedWork](
+                val messageBody = put[IdentifiedBaseWork](
                   obj = work,
                   location = ObjectLocation(
                     namespace = bucket.name,
@@ -429,7 +503,7 @@ class IngestorWorkerServiceTest
         withLocalSqsQueueAndDlq {
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
-              withMessageStream[IdentifiedWork, Assertion](
+              withMessageStream[IdentifiedBaseWork, Assertion](
                 actorSystem,
                 bucket,
                 queue,
@@ -460,9 +534,9 @@ class IngestorWorkerServiceTest
                   )
 
                   val work =
-                    createWork().copy(sourceIdentifier = miroSourceIdentifier)
+                    createWork.copy(sourceIdentifier = miroSourceIdentifier)
 
-                  val messageBody = put[IdentifiedWork](
+                  val messageBody = put[IdentifiedBaseWork](
                     obj = work,
                     location = ObjectLocation(
                       namespace = bucket.name,
@@ -493,7 +567,7 @@ class IngestorWorkerServiceTest
           case queuePair @ QueuePair(queue, dlq) =>
             withLocalS3Bucket { bucket =>
               withWorkIndexer[R](elasticClient = elasticClient) { workIndexer =>
-                withMessageStream[IdentifiedWork, R](
+                withMessageStream[IdentifiedBaseWork, R](
                   actorSystem,
                   bucket,
                   queue,
@@ -519,7 +593,7 @@ class IngestorWorkerServiceTest
     esIndexV2: String,
     actorSystem: ActorSystem,
     workIndexer: WorkIndexer,
-    messageStream: MessageStream[IdentifiedWork])(
+    messageStream: MessageStream[IdentifiedBaseWork])(
     testWith: TestWith[IngestorWorkerService, R]): R = {
 
     val ingestorConfig = IngestorConfig(

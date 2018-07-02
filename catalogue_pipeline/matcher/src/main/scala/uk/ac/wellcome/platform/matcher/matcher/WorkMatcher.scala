@@ -3,13 +3,18 @@ package uk.ac.wellcome.platform.matcher.matcher
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
   WorkIdentifier,
   WorkNode
 }
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedInvisibleWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.matcher.locking.{
   DynamoLockingService,
   FailedLockException,
@@ -26,10 +31,14 @@ class WorkMatcher @Inject()(
   lockingService: DynamoLockingService)(implicit context: ExecutionContext)
     extends Logging {
 
-  def matchWork(work: UnidentifiedWork): Future[MatcherResult] =
-    doMatch(work).map(MatcherResult)
-
   type FutureMatched = Future[Set[MatchedIdentifiers]]
+
+  def matchWork(work: TransformedBaseWork): Future[MatcherResult] = work match {
+    case w: UnidentifiedWork =>
+      doMatch(w).map(MatcherResult)
+    case w: UnidentifiedInvisibleWork =>
+      Future.successful(singleMatchedIdentifier(w))
+  }
 
   private def doMatch(work: UnidentifiedWork): FutureMatched = {
     val update = WorkUpdate(work)
@@ -45,6 +54,15 @@ class WorkMatcher @Inject()(
             s"Locking failed while matching work ${work.sourceIdentifier} ${e.getClass.getSimpleName} ${e.getMessage}")
           throw GracefulFailureException(e)
       }
+  }
+
+  private def singleMatchedIdentifier(w: UnidentifiedInvisibleWork) = {
+    MatcherResult(
+      Set(
+        MatchedIdentifiers(Set(WorkIdentifier(
+          Sourced
+            .id(w.sourceIdentifier.identifierType.id, w.sourceIdentifier.value),
+          w.version)))))
   }
 
   private def withUpdateLocked(update: WorkUpdate,

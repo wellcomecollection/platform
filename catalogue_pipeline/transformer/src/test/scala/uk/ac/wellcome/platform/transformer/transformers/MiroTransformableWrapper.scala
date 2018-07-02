@@ -36,7 +36,7 @@ trait MiroTransformableWrapper
       data = buildJSONForWork(data)
     )
 
-    transformToWork(miroTransformable)
+    transformToWork(miroTransformable).asInstanceOf[UnidentifiedWork]
   }
 
   def assertTransformWorkFails(

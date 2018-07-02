@@ -4,7 +4,7 @@ import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.UnidentifiedWork
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -15,14 +15,14 @@ class RecorderWorkerService @Inject()(
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
                                              EmptyMetadata,
                                              ObjectStore[RecorderWorkEntry]],
-  messageStream: MessageStream[UnidentifiedWork],
+  messageStream: MessageStream[TransformedBaseWork],
   system: ActorSystem) {
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 
-  def processMessage(work: UnidentifiedWork): Future[Unit] = {
+  private def processMessage(work: TransformedBaseWork): Future[Unit] = {
     val newRecorderEntry = RecorderWorkEntry(work)
 
     versionedHybridStore.updateRecord(newRecorderEntry.id)(

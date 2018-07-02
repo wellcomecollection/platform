@@ -6,7 +6,7 @@ import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{
   ApiConfig,
@@ -116,18 +116,15 @@ abstract class WorksController(apiConfig: ApiConfig,
   }
 
   private def generateSingleWorkResponse[T <: DisplayWork](
-    maybeWork: Option[IdentifiedWork],
+    maybeWork: Option[IdentifiedBaseWork],
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
     includes: WorksIncludes,
     request: SingleWorkRequest,
     contextUri: String) =
     maybeWork match {
       case Some(work: IdentifiedWork) =>
-        if (work.visible) {
-          respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
-        } else {
-          respondWithGoneError(contextUri: String)
-        }
+        respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
+      case Some(_) => respondWithGoneError(contextUri: String)
       case None =>
         respondWithNotFoundError(request, contextUri: String)
     }

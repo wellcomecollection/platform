@@ -16,7 +16,7 @@ class DisplayCreatorsV1SerialisationTest
       canonicalId = "v9w6cz66",
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      title = Some("Vultures vying for victory"),
+      title = "Vultures vying for victory",
       contributors = List(
         Contributor(agent = Unidentifiable(Agent("Vivian Violet"))),
         Contributor(agent = Unidentifiable(Agent("Verily Volumes"))),
@@ -34,7 +34,7 @@ class DisplayCreatorsV1SerialisationTest
                             |{
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
-                            |  "title": "${work.title.get}",
+                            |  "title": "${work.title}",
                             |  "creators": [
                             |    ${identifiedOrUnidentifiable(
                             work.contributors(0).agent,

@@ -22,7 +22,7 @@ class DisplayLocationsV1SerialisationTest
       canonicalId = "zm9q6c6h",
       sourceIdentifier = sourceIdentifier,
       version = 1,
-      title = Some("A zoo of zebras doing zumba"),
+      title = "A zoo of zebras doing zumba",
       items = List(
         Identified(
           canonicalId = "mhberjwy7",
@@ -40,7 +40,7 @@ class DisplayLocationsV1SerialisationTest
                             |{
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
-                            |  "title": "${work.title.get}",
+                            |  "title": "${work.title}",
                             |  "creators": [ ],
                             |  "items": [ ${items(work.items)} ],
                             |  "subjects": [ ],

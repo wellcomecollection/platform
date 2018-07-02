@@ -7,6 +7,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{
+  IdentifiedBaseWork,
   IdentifiedWork,
   IdentifierType,
   SourceIdentifier
@@ -39,7 +40,7 @@ class IngestorFeatureTest
         "5678")
 
     val work = IdentifiedWork(
-      title = Some("A type of a tame turtle"),
+      title = "A type of a tame turtle",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "1234")
@@ -68,7 +69,7 @@ class IngestorFeatureTest
         "5678")
 
     val work = IdentifiedWork(
-      title = Some("A type of a tame turtle"),
+      title = "A type of a tame turtle",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "1234")
@@ -132,8 +133,10 @@ class IngestorFeatureTest
     }
   }
 
-  private def sendToSqs(work: IdentifiedWork, queue: Queue, bucket: Bucket) = {
-    val messageBody = put[IdentifiedWork](
+  private def sendToSqs(work: IdentifiedBaseWork,
+                        queue: Queue,
+                        bucket: Bucket) = {
+    val messageBody = put[IdentifiedBaseWork](
       obj = work,
       location = ObjectLocation(
         namespace = bucket.name,

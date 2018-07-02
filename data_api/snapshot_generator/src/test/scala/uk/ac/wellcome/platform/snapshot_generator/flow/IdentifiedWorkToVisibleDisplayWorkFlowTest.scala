@@ -61,27 +61,4 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
       }
     }
   }
-
-  it("suppresses IdentifiedWorks with visible = false") {
-    withActorSystem { actorSystem =>
-      withMaterializer(actorSystem) { materializer =>
-        val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV1.apply)
-
-        val visibleWorks = createWorks(count = 3).toList
-        val notVisibleWorks = createWorks(count = 2, visible = false).toList
-
-        val eventualDisplayWorks = Source(visibleWorks ++ notVisibleWorks)
-          .via(flow)
-          .runWith(Sink.seq)(materializer)
-
-        whenReady(eventualDisplayWorks) { displayWorks =>
-          val expectedDisplayWorks = visibleWorks.map {
-            DisplayWorkV1(_, includes = AllWorksIncludes())
-          }
-          displayWorks shouldBe expectedDisplayWorks
-        }
-      }
-    }
-  }
 }

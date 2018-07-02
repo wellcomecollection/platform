@@ -92,19 +92,9 @@ case object DisplayWorkV2 {
 
   def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV2 = {
 
-    if (!work.visible) {
-      throw new RuntimeException(
-        s"IdentifiedWork ${work.canonicalId} has visible=false, cannot be converted to DisplayWork")
-    }
-
-    if (work.title.isEmpty && work.visible) {
-      throw new RuntimeException(
-        s"IdentifiedWork ${work.canonicalId} has visible=true, but no title! cannot be converted to DisplayWork")
-    }
-
     DisplayWorkV2(
       id = work.canonicalId,
-      title = work.title.get,
+      title = work.title,
       description = work.description,
       physicalDescription = work.physicalDescription,
       extent = work.extent,

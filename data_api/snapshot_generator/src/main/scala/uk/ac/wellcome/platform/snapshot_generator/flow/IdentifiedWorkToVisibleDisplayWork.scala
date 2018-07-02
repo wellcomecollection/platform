@@ -14,6 +14,5 @@ object IdentifiedWorkToVisibleDisplayWork {
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T)
     : Flow[IdentifiedWork, T, NotUsed] =
     Flow[IdentifiedWork]
-      .filter(_.visible)
       .map { toDisplayWork(_, AllWorksIncludes()) }
 }

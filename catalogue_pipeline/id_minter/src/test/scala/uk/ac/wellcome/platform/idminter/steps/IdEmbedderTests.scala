@@ -45,7 +45,7 @@ class IdEmbedderTests
     )
 
     val originalWork = UnidentifiedWork(
-      title = Some("crap"),
+      title = "crap",
       sourceIdentifier = identifier,
       version = 1)
 
@@ -97,7 +97,7 @@ class IdEmbedderTests
 
     val person = Person(label = "The Librarian")
     val originalWork = UnidentifiedWork(
-      title = Some("crap"),
+      title = "crap",
       sourceIdentifier = workIdentifier,
       contributors = List(
         Contributor(
@@ -162,7 +162,7 @@ class IdEmbedderTests
     )
 
     val originalWork = UnidentifiedWork(
-      title = Some("crap"),
+      title = "crap",
       sourceIdentifier = identifier,
       version = 1)
 
@@ -210,7 +210,7 @@ class IdEmbedderTests
       ))
 
     val originalWork = UnidentifiedWork(
-      title = Some("crap"),
+      title = "crap",
       sourceIdentifier = identifier,
       version = 1,
       items = List(originalItem1, originalItem2))

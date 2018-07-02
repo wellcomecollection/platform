@@ -4,7 +4,7 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.IdentifiedWork
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
 import uk.ac.wellcome.utils.JsonUtil._
@@ -49,7 +49,7 @@ class ElasticsearchServiceTest
               result.hits should have size 1
               val returnedWorks = result.hits.hits
                 .map { h: SearchHit =>
-                  jsonToIdentifiedWork(h.sourceAsString)
+                  jsonToIdentifiedBaseWork(h.sourceAsString)
                 }
               returnedWorks.toList shouldBe List(work1)
             }
@@ -79,7 +79,7 @@ class ElasticsearchServiceTest
               )
 
             whenReady(searchResultFuture) { result =>
-              val returnedWork = jsonToIdentifiedWork(result.sourceAsString)
+              val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
               returnedWork shouldBe expectedWork
             }
         }
@@ -181,8 +181,8 @@ class ElasticsearchServiceTest
 
     it("does not list works that have visible=false") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val visibleWorks = createWorks(count = 8, visible = true)
-        val invisibleWorks = createWorks(count = 2, start = 9, visible = false)
+        val visibleWorks = createWorks(count = 8)
+        val invisibleWorks = createInvisibleWorks(count = 2, start = 9)
 
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
@@ -209,7 +209,7 @@ class ElasticsearchServiceTest
     indexName: String,
     limit: Int,
     from: Int,
-    expectedWorks: List[IdentifiedWork]
+    expectedWorks: List[IdentifiedBaseWork]
   ) = {
     withElasticSearchService(indexName = indexName, itemType = itemType) {
       searchService =>
@@ -223,13 +223,13 @@ class ElasticsearchServiceTest
           result.hits should have size expectedWorks.length
           val returnedWorks = result.hits.hits
             .map { h: SearchHit =>
-              jsonToIdentifiedWork(h.sourceAsString)
+              jsonToIdentifiedBaseWork(h.sourceAsString)
             }
           returnedWorks.toList shouldBe expectedWorks
         }
     }
   }
 
-  private def jsonToIdentifiedWork(document: String): IdentifiedWork =
-    fromJson[IdentifiedWork](document).get
+  private def jsonToIdentifiedBaseWork(document: String): IdentifiedBaseWork =
+    fromJson[IdentifiedBaseWork](document).get
 }

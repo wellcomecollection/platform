@@ -20,68 +20,70 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-  override def transformForType(miroTransformable: MiroTransformable,
-                                version: Int): Try[Option[UnidentifiedWork]] =
-    Try {
-      val miroData = MiroTransformableData.create(miroTransformable.data)
-      val (title, description) = getTitleAndDescription(miroData)
+  override def transformForType = {
+    case (miroTransformable: MiroTransformable, version: Int) =>
+      Try {
+        val miroData = MiroTransformableData.create(miroTransformable.data)
+        val (title, description) = getTitleAndDescription(miroData)
 
-      try {
+        try {
 
-        // We had a request to remove records from contributor GUS from
-        // the API after we'd done the initial sort of the Miro data.
-        // We removed them from Elasticsearch by hand, but we don't want
-        // them to reappear on reindex.
-        //
-        // Until we can move them to Tandem Vault or Cold Store, we'll throw
-        // them away at this point.
-        if (miroData.sourceCode == Some("GUS")) {
-          throw new ShouldNotTransformException(
-            "Images from contributor GUS should not be sent to the pipeline"
-          )
-        }
+          // We had a request to remove records from contributor GUS from
+          // the API after we'd done the initial sort of the Miro data.
+          // We removed them from Elasticsearch by hand, but we don't want
+          // them to reappear on reindex.
+          //
+          // Until we can move them to Tandem Vault or Cold Store, we'll throw
+          // them away at this point.
+          if (miroData.sourceCode == Some("GUS")) {
+            throw new ShouldNotTransformException(
+              "Images from contributor GUS should not be sent to the pipeline"
+            )
+          }
 
-        // These images should really have been removed from the pipeline
-        // already, but we have at least one instance (B0010525).  It was
-        // throwing a MatchError when we tried to pick a license, so handle
-        // it properly here.
-        if (miroData.copyrightCleared != Some("Y")) {
-          throw new ShouldNotTransformException(
-            s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
-          )
-        }
+          // These images should really have been removed from the pipeline
+          // already, but we have at least one instance (B0010525).  It was
+          // throwing a MatchError when we tried to pick a license, so handle
+          // it properly here.
+          if (miroData.copyrightCleared != Some("Y")) {
+            throw new ShouldNotTransformException(
+              s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+            )
+          }
 
-        Some(
-          UnidentifiedWork(
-            title = Some(title),
-            sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("miro-image-number"),
-              ontologyType = "Work",
-              value = miroTransformable.sourceId),
-            version = version,
-            otherIdentifiers =
-              getOtherIdentifiers(miroData, miroTransformable.sourceId),
-            description = description,
-            lettering = miroData.suppLettering,
-            createdDate =
-              getCreatedDate(miroData, miroTransformable.MiroCollection),
-            subjects = getSubjects(miroData),
-            contributors = getContributors(
-              miroId = miroTransformable.sourceId,
-              miroData = miroData
-            ),
-            genres = getGenres(miroData),
-            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-            items = getItems(miroData, miroTransformable.sourceId)
-          ))
-      } catch {
-        case e: ShouldNotTransformException => {
-          warn(
-            s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
-          None
+          Some(
+            UnidentifiedWork(
+              title = title,
+              sourceIdentifier = SourceIdentifier(
+                identifierType = IdentifierType("miro-image-number"),
+                ontologyType = "Work",
+                value = miroTransformable.sourceId),
+              version = version,
+              otherIdentifiers =
+                getOtherIdentifiers(miroData, miroTransformable.sourceId),
+              description = description,
+              lettering = miroData.suppLettering,
+              createdDate =
+                getCreatedDate(miroData, miroTransformable.MiroCollection),
+              subjects = getSubjects(miroData),
+              contributors = getContributors(
+                miroId = miroTransformable.sourceId,
+                miroData = miroData
+              ),
+              genres = getGenres(miroData),
+              thumbnail =
+                Some(getThumbnail(miroData, miroTransformable.sourceId)),
+              items = getItems(miroData, miroTransformable.sourceId)
+            ))
+        } catch {
+          case e: ShouldNotTransformException => {
+            warn(
+              s"Should not transform ${miroTransformable.sourceId}: ${e.getMessage}")
+            None
+          }
         }
       }
-    }
+  }
 
   /*
    * Populate the title and description.  The rules are as follows:

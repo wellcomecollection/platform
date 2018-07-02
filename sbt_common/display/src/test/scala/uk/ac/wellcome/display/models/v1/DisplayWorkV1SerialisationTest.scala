@@ -20,8 +20,7 @@ class DisplayWorkV1SerialisationTest
       lettering = lettering,
       createdDate = period,
       creator = agent,
-      items = List(defaultItem),
-      visible = true)
+      items = List(defaultItem))
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV1(work))
 
@@ -70,7 +69,7 @@ class DisplayWorkV1SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "creators": [ ],
                           | "items": [ ${items(work.items)} ],
                           | "subjects": [ ],
@@ -95,7 +94,7 @@ class DisplayWorkV1SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "creators": [ ],
                           | "items": [ ],
                           | "subjects": [ ],
@@ -122,7 +121,7 @@ class DisplayWorkV1SerialisationTest
         locations = List(location)
       ))
     val workWithCopyright = IdentifiedWork(
-      title = Some("A scarf on a squirrel"),
+      title = "A scarf on a squirrel",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "yxh928a",
@@ -133,7 +132,7 @@ class DisplayWorkV1SerialisationTest
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
-                          |     "title": "${workWithCopyright.title.get}",
+                          |     "title": "${workWithCopyright.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],
@@ -165,7 +164,7 @@ class DisplayWorkV1SerialisationTest
     val concept1 = Unidentifiable(Concept("gardening"))
 
     val workWithSubjects = IdentifiedWork(
-      title = Some("A seal selling seaweed sandwiches in Scotland"),
+      title = "A seal selling seaweed sandwiches in Scotland",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "test_subject1",
@@ -179,7 +178,7 @@ class DisplayWorkV1SerialisationTest
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
-                          |     "title": "${workWithSubjects.title.get}",
+                          |     "title": "${workWithSubjects.title}",
                           |     "creators": [],
                           |     "subjects": [
                           |       ${concept(concept0.agent)},
@@ -197,7 +196,7 @@ class DisplayWorkV1SerialisationTest
     val concept1 = Unidentifiable(Concept("etching"))
 
     val wotkWithGenres = IdentifiedWork(
-      title = Some("A guppy in a greenhouse"),
+      title = "A guppy in a greenhouse",
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = "test_subject1",
@@ -212,7 +211,7 @@ class DisplayWorkV1SerialisationTest
                           |{
                           |     "type": "Work",
                           |     "id": "${wotkWithGenres.canonicalId}",
-                          |     "title": "${wotkWithGenres.title.get}",
+                          |     "title": "${wotkWithGenres.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [
@@ -242,7 +241,7 @@ class DisplayWorkV1SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "creators": [ ],
                           | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
@@ -268,7 +267,7 @@ class DisplayWorkV1SerialisationTest
                           |{
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
-                          | "title": "${work.title.get}",
+                          | "title": "${work.title}",
                           | "creators": [ ],
                           | "identifiers": [ ${identifier(sourceIdentifier)} ],
                           | "subjects": [ ],
@@ -297,7 +296,7 @@ class DisplayWorkV1SerialisationTest
                           |   {
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
-                          |     "title": "${work.title.get}",
+                          |     "title": "${work.title}",
                           |     "creators": [ ],
                           |     "subjects": [ ],
                           |     "genres": [ ],

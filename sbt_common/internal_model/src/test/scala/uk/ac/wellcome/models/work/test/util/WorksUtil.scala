@@ -35,12 +35,10 @@ trait WorksUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWork(visible: Boolean = true): IdentifiedWork =
-    createWorks(count = 1, visible = visible).head
+  def createWork: IdentifiedWork =
+    createWorks(count = 1).head
 
-  def createWorks(count: Int,
-                  start: Int = 1,
-                  visible: Boolean = true): Seq[IdentifiedWork] =
+  def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
         workWith(
@@ -50,26 +48,29 @@ trait WorksUtil {
           lettering = s"${idx}-${lettering}",
           createdDate = Period(s"${idx}-${period.label}"),
           creator = Agent(s"${idx}-${agent.label}"),
-          items = List(defaultItem),
-          visible = visible
+          items = List(defaultItem)
       ))
+
+  def createInvisibleWorks(count: Int,
+                           start: Int = 1): Seq[IdentifiedInvisibleWork] =
+    (start to count).map(
+      (idx: Int) => invisibleWorkWith(s"$idx-$canonicalId")
+    )
+
+  def invisibleWorkWith(canonicalId: String): IdentifiedInvisibleWork = {
+    IdentifiedInvisibleWork(
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      canonicalId = canonicalId
+    )
+  }
 
   def workWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = canonicalId)
-
-  def workWith(canonicalId: String,
-               title: String,
-               visible: Boolean): IdentifiedWork =
-    IdentifiedWork(
-      title = Some(title),
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId,
-      visible = visible)
 
   def workWith(
     canonicalId: String,
@@ -78,7 +79,7 @@ trait WorksUtil {
     items: List[Identified[Item]] = List()
   ): IdentifiedWork =
     IdentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1,
       otherIdentifiers = otherIdentifiers,
@@ -91,7 +92,7 @@ trait WorksUtil {
     thumbnail: Location
   ): IdentifiedWork =
     IdentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = canonicalId,
@@ -104,10 +105,9 @@ trait WorksUtil {
                lettering: String,
                createdDate: Period,
                creator: Agent,
-               items: List[Identified[Item]],
-               visible: Boolean): IdentifiedWork =
+               items: List[Identified[Item]]): IdentifiedWork =
     IdentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = canonicalId,
@@ -119,8 +119,7 @@ trait WorksUtil {
         Contributor(agent = Unidentifiable(creator))
       ),
       production = List(),
-      items = items,
-      visible = visible
+      items = items
     )
 
   def workWith(canonicalId: String,
@@ -131,10 +130,9 @@ trait WorksUtil {
                creator: Agent,
                subjects: List[Subject[Displayable[AbstractConcept]]],
                genres: List[Genre[Displayable[AbstractConcept]]],
-               items: List[Identified[Item]],
-               visible: Boolean): IdentifiedWork =
+               items: List[Identified[Item]]): IdentifiedWork =
     IdentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1,
       canonicalId = canonicalId,
@@ -147,8 +145,7 @@ trait WorksUtil {
       ),
       subjects = subjects,
       genres = genres,
-      items = items,
-      visible = visible
+      items = items
     )
 
   def defaultItem: Identified[Item] = itemWith(

@@ -6,6 +6,7 @@ import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
+  TransformedBaseWork,
   UnidentifiedWork
 }
 import uk.ac.wellcome.storage.ObjectLocation
@@ -34,7 +35,7 @@ class RecorderFeatureTest
     )
 
     val work = UnidentifiedWork(
-      title = Some(title),
+      title = title,
       sourceIdentifier = sourceIdentifier,
       version = 1
     )
@@ -49,7 +50,7 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              val messageBody = put[UnidentifiedWork](
+              val messageBody = put[TransformedBaseWork](
                 obj = work,
                 location = ObjectLocation(
                   namespace = bucket.name,
