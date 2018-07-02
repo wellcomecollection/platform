@@ -52,8 +52,8 @@ class RecordReader @Inject()(
         )
       }
 
-      outdatedRecordIds: List[String] = results.map(extractRecordID)
-    } yield outdatedRecordIds
+      recordIdsToReindex: List[String] = results.map(extractRecordID)
+    } yield recordIdsToReindex
   }
 
   private def extractRecordID(
