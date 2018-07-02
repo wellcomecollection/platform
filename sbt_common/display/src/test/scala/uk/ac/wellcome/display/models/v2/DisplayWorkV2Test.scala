@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
   it("correctly parses a Work without any items") {
-    val work = identifiedWorkWith(items = List())
+    val work = createIdentifiedWorkWith(items = List())
 
     val displayWork = DisplayWorkV2(
       work = work,
@@ -18,7 +18,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("correctly parses items on a work") {
-    val work = identifiedWorkWith(
+    val work = createIdentifiedWorkWith(
       items = createItems(count = 1)
     )
 
@@ -31,7 +31,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("correctly parses a work without any extra identifiers") {
-    val work = identifiedWorkWith(otherIdentifiers = List())
+    val work = createIdentifiedWorkWith(otherIdentifiers = List())
 
     val displayWork = DisplayWorkV2(
       work = work,
@@ -44,7 +44,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   it("gets the physicalDescription from a Work") {
     val physicalDescription = "A magnificent mural of magpies"
 
-    val work = identifiedWorkWith(
+    val work = createIdentifiedWorkWith(
       physicalDescription = Some(physicalDescription)
     )
 
@@ -63,7 +63,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       label = workType.label
     )
 
-    val work = identifiedWorkWith(workType = Some(workType))
+    val work = createIdentifiedWorkWith(workType = Some(workType))
 
     val displayWork = DisplayWorkV2(work)
     displayWork.workType shouldBe Some(expectedDisplayWorkV2)
@@ -72,7 +72,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   it("gets the extent from a Work") {
     val extent = "Bound in boxes of bark"
 
-    val work = identifiedWorkWith(extent = Some(extent))
+    val work = createIdentifiedWorkWith(extent = Some(extent))
 
     val displayWork = DisplayWorkV2(work)
     displayWork.extent shouldBe Some(extent)
@@ -84,7 +84,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       label = "British Sign Language"
     )
 
-    val work = identifiedWorkWith(language = Some(language))
+    val work = createIdentifiedWorkWith(language = Some(language))
 
     val displayWork = DisplayWorkV2(work)
     val displayLanguage = displayWork.language.get
@@ -93,7 +93,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("extracts contributors from a Work") {
-    val work = identifiedWorkWith(
+    val work = createIdentifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(
@@ -157,7 +157,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       function = Some(Concept("Manufacture"))
     )
 
-    val work = identifiedWorkWith(production = List(productionEvent))
+    val work = createIdentifiedWorkWith(production = List(productionEvent))
 
     val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
     displayWork.production shouldBe List(
@@ -201,7 +201,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       ontologyType = "Concept"
     )
 
-    val work = identifiedWorkWith(
+    val work = createIdentifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(

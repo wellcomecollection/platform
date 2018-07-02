@@ -73,7 +73,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a single work when requested with id") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = identifiedWorkWith(
+        val work = createIdentifiedWorkWith(
           canonicalId = canonicalId,
           title = title,
           description = Some(description),
@@ -119,7 +119,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("renders the items if the items include is present") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = identifiedWorkWith(items = createItems(count = 1))
+        val work = createIdentifiedWorkWith(items = createItems(count = 1))
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -265,8 +265,8 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns matching results if doing a full-text search") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work1 = identifiedWorkWith(title = "A drawing of a dodo")
-        val work2 = identifiedWorkWith(title = "A mezzotint of a mouse")
+        val work1 = createIdentifiedWorkWith(title = "A drawing of a dodo")
+        val work2 = createIdentifiedWorkWith(title = "A mezzotint of a mouse")
         insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
 
         eventually {
@@ -310,7 +310,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           ontologyType = "Work",
           value = "Test1234"
         )
-        val work1 = identifiedWorkWith(
+        val work1 = createIdentifiedWorkWith(
           otherIdentifiers = List(identifier1)
         )
 
@@ -319,7 +319,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           ontologyType = "Work",
           value = "DTest5678"
         )
-        val work2 = identifiedWorkWith(
+        val work2 = createIdentifiedWorkWith(
           otherIdentifiers = List(identifier2)
         )
 
@@ -372,7 +372,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           ontologyType = "Work",
           value = "Test1234"
         )
-        val work = identifiedWorkWith(
+        val work = createIdentifiedWorkWith(
           otherIdentifiers = List(srcIdentifier)
         )
         insertIntoElasticsearch(indexNameV2, itemType, work)
@@ -404,10 +404,10 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
-          val work = identifiedWorkWith(title = "A whale on a wave")
+          val work = createIdentifiedWorkWith(title = "A whale on a wave")
           insertIntoElasticsearch(indexNameV2, itemType, work)
 
-          val work_alt = identifiedWorkWith(title = "An impostor in an igloo")
+          val work_alt = createIdentifiedWorkWith(title = "An impostor in an igloo")
           insertIntoElasticsearch(
             indexName = otherIndex,
             itemType = itemType,
@@ -459,12 +459,12 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
-          val work = identifiedWorkWith(
+          val work = createIdentifiedWorkWith(
             title = "A wombat wallowing under a willow"
           )
           insertIntoElasticsearch(indexNameV2, itemType, work)
 
-          val work_alt = identifiedWorkWith(
+          val work_alt = createIdentifiedWorkWith(
             title = "An impostor in an igloo"
           )
           insertIntoElasticsearch(
@@ -525,7 +525,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     "includes the thumbnail field if available and we use the thumbnail include") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = identifiedWorkWith(
+        val work = createIdentifiedWorkWith(
           thumbnail = Some(
             DigitalLocation(
               locationType = LocationType("thumbnail-image"),
@@ -570,13 +570,13 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           indexNameV2,
           itemType,
           server: EmbeddedHttpServer) =>
-        val work1 = identifiedWorkWith(
+        val work1 = createIdentifiedWorkWith(
           title = "A wombat wallowing under a willow"
         )
 
         insertIntoElasticsearch(indexNameV1, itemType, work1)
 
-        val work2 = identifiedWorkWith(
+        val work2 = createIdentifiedWorkWith(
           title = "A wombat wrestling with wet weather"
         )
 

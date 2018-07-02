@@ -66,10 +66,10 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val workDodo = identifiedWorkWith(
+            val workDodo = createIdentifiedWorkWith(
               title = "A drawing of a dodo"
             )
-            val workMouse = identifiedWorkWith(
+            val workMouse = createIdentifiedWorkWith(
               title = "A mezzotint of a mouse"
             )
 
@@ -161,7 +161,7 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val workEmu = identifiedWorkWith(
+            val workEmu = createIdentifiedWorkWith(
               title = "An etching of an emu"
             )
             insertIntoElasticsearch(indexName, itemType, workEmu)

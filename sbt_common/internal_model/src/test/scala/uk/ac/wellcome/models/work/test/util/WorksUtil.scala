@@ -66,7 +66,7 @@ trait WorksUtil extends ItemsUtil {
       createIdentifiedInvisibleWork
     }
 
-  def unidentifiedWorkWith(
+  def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
     version: Int = 1,
     title: String = title,
@@ -95,7 +95,7 @@ trait WorksUtil extends ItemsUtil {
       version = version
     )
 
-  def identifiedWorkWith(
+  def createIdentifiedWorkWith(
     canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase,
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
     otherIdentifiers: List[SourceIdentifier] = List(),

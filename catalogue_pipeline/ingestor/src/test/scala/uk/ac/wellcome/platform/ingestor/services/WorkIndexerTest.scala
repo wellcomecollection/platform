@@ -27,7 +27,7 @@ class WorkIndexerTest
   val esType = "work"
 
   it("inserts an identified Work into Elasticsearch") {
-    val work = identifiedWorkWith()
+    val work = createIdentifiedWorkWith()
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -45,7 +45,7 @@ class WorkIndexerTest
   }
 
   it("only adds one record when the same ID is ingested multiple times") {
-    val work = identifiedWorkWith()
+    val work = createIdentifiedWorkWith()
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -70,7 +70,7 @@ class WorkIndexerTest
   }
 
   it("doesn't add a Work with a lower version") {
-    val work = identifiedWorkWith(version = 3)
+    val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
@@ -98,7 +98,7 @@ class WorkIndexerTest
   }
 
   it("replaces a Work with the same version") {
-    val work = identifiedWorkWith(version = 3)
+    val work = createIdentifiedWorkWith(version = 3)
     val updatedWork = work.copy(title = "boring title")
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
@@ -145,12 +145,12 @@ class WorkIndexerTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, esType)
     val validWorks = (1 to 5).map { i =>
-      identifiedWorkWith(
+      createIdentifiedWorkWith(
         canonicalId = s"s$i",
         sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
         title = "s1 title")
     }
-    val notMatchingMappingWork = identifiedWorkWith(
+    val notMatchingMappingWork = createIdentifiedWorkWith(
       canonicalId = "not-matching",
       sourceIdentifier = createIdentifier("miro-image-number", "not-matching"),
       title = "title",

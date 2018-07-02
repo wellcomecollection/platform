@@ -18,7 +18,7 @@ class DisplayLocationsV1SerialisationTest
       label = "a stack of slick slimes"
     )
 
-    val work = identifiedWorkWith(
+    val work = createIdentifiedWorkWith(
       items = List(createItem(locations = List(physicalLocation)))
     )
     val displayWork =

@@ -46,7 +46,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = unidentifiedWorkWith(sourceIdentifier = identifier)
+    val originalWork = createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
     val newCanonicalId = "5467"
 
@@ -65,7 +65,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = identifiedWorkWith(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -95,7 +95,7 @@ class IdEmbedderTests
     )
 
     val person = Person(label = "The Librarian")
-    val originalWork = unidentifiedWorkWith(
+    val originalWork = createUnidentifiedWorkWith(
       sourceIdentifier = workIdentifier,
       contributors = List(
         Contributor(
@@ -128,7 +128,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = identifiedWorkWith(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newWorkCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -158,7 +158,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = unidentifiedWorkWith(sourceIdentifier = identifier)
+    val originalWork = createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -201,7 +201,7 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalWork = unidentifiedWorkWith(
+    val originalWork = createUnidentifiedWorkWith(
       sourceIdentifier = identifier,
       items = List(originalItem1, originalItem2))
 
