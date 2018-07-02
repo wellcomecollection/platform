@@ -22,7 +22,8 @@ class DisplayWorkV2SerialisationTest
       createdDate = Some(period),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
       items = createItems(count = 2),
-      workType = None)
+      workType = None
+    )
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work))
 
@@ -238,11 +239,12 @@ class DisplayWorkV2SerialisationTest
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     val work = identifiedWorkWith(
-      thumbnail = Some(DigitalLocation(
-        locationType = LocationType("thumbnail-image"),
-        url = "https://iiif.example.org/1234/default.jpg",
-        license = License_CCBY
-      ))
+      thumbnail = Some(
+        DigitalLocation(
+          locationType = LocationType("thumbnail-image"),
+          url = "https://iiif.example.org/1234/default.jpg",
+          license = License_CCBY
+        ))
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(work, WorksIncludes(thumbnail = true)))

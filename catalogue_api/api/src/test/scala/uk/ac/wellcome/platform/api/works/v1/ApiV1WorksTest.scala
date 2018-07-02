@@ -100,7 +100,8 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
           lettering = Some(lettering),
           createdDate = Some(period),
           contributors = List(Contributor(agent = Unidentifiable(agent))),
-          items = createItems(count = 2))
+          items = createItems(count = 2)
+        )
 
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
@@ -582,11 +583,12 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = identifiedWorkWith(
-          thumbnail = Some(DigitalLocation(
-            locationType = LocationType("thumbnail-image"),
-            url = "https://iiif.example.org/1234/default.jpg",
-            license = License_CCBY
-          ))
+          thumbnail = Some(
+            DigitalLocation(
+              locationType = LocationType("thumbnail-image"),
+              url = "https://iiif.example.org/1234/default.jpg",
+              license = License_CCBY
+            ))
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
