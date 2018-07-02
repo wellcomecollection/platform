@@ -24,7 +24,13 @@ SHARD_SIZE = 1500
 
 def get_number_of_shards(source_name):
     """How many shards should we create for a given source?"""
-    return math.ceil(SOURCE_SIZES[source_name] / SHARD_SIZE)
+    try:
+        return math.ceil(SOURCE_SIZES[source_name] / SHARD_SIZE)
+    except KeyError:
+        raise ValueError(
+            f'Unrecognised source name {source_name!r}; '
+            f'expected {list(SOURCE_SIZES.keys())}'
+        )
 
 
 def create_reindex_shard(source_name, source_id):
