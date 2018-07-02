@@ -97,7 +97,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
         val work = createIdentifiedWorkWith(
           description = Some(s"A single work in ${this.getClass.getSimpleName}"),
           lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
-          createdDate = Some(period),
+          createdDate = Some(Period("The future")),
           contributors = List(Contributor(agent = Unidentifiable(agent))),
           items = createItems(count = 2)
         )

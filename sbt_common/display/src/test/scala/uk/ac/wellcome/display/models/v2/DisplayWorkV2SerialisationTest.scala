@@ -17,7 +17,7 @@ class DisplayWorkV2SerialisationTest
     val work = createIdentifiedWorkWith(
       description = Some(s"A single work in ${this.getClass.getSimpleName}"),
       lettering = Some(s"Lettering on a work in ${this.getClass.getSimpleName}"),
-      createdDate = Some(period),
+      createdDate = Some(Period("2 February 2002")),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
       items = createItems(count = 2),
       workType = None

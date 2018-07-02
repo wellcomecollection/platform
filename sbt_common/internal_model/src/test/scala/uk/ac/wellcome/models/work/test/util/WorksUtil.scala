@@ -6,7 +6,6 @@ import scala.util.Random
 
 trait WorksUtil extends ItemsUtil {
   private val defaultTitle = "this is the first image title"
-  val period = Period("the past")
   val agent = Agent("a person")
   val workType = WorkType(
     id = "1dz4yn34va",
@@ -38,7 +37,6 @@ trait WorksUtil extends ItemsUtil {
     (start to count).map(
       (idx: Int) =>
         createIdentifiedWorkWith(
-          createdDate = Some(Period(s"${idx}-${period.label}")),
           contributors = List(Contributor(
             agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
           items = createItems(count = 2)
