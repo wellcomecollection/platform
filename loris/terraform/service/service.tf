@@ -49,7 +49,7 @@ module "service" {
     "${aws_security_group.service_egress_security_group.id}",
   ]
 
-  deployment_minimum_healthy_percent = "100"
+  deployment_minimum_healthy_percent = "50"
   deployment_maximum_percent         = "200"
 
   ecs_cluster_id = "${aws_ecs_cluster.cluster.id}"
@@ -70,4 +70,41 @@ module "service" {
   healthcheck_path = "${var.healthcheck_path}"
 
   launch_type = "EC2"
+}
+
+module "cache_cleaner_task" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/single_container+ebs?ref=task-defs-with-sidecar"
+
+  aws_region = "${var.aws_region}"
+  task_name  = "${var.namespace}_cache_cleaner"
+
+  log_group_prefix = "${var.log_group_prefix}"
+
+  ebs_host_path      = "/ebs/loris"
+  ebs_container_path = "/data"
+
+  container_image = "wellcome/cache-cleaner:${var.ebs_cache_cleaner_daemon_image_version}"
+
+  cpu    = "${var.ebs_cache_cleaner_daemon_cpu}"
+  memory = "${var.ebs_cache_cleaner_daemon_memory}"
+
+  env_vars = {
+    MAX_AGE  = "${var.ebs_cache_cleaner_daemon_max_age_in_days}"
+    MAX_SIZE = "${var.ebs_cache_cleaner_daemon_max_size_in_gb}G"
+  }
+}
+
+module "cache_cleaner_service" {
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/daemon?ref=task-defs-with-sidecar"
+
+  service_name   = "${var.namespace}_cache_cleaner"
+  ecs_cluster_id = "${aws_ecs_cluster.cluster.id}"
+
+  vpc_id = "${var.vpc_id}"
+
+  subnets = [
+    "${var.private_subnets}",
+  ]
+
+  task_definition_arn = "${module.cache_cleaner_task.task_definition_arn}"
 }
