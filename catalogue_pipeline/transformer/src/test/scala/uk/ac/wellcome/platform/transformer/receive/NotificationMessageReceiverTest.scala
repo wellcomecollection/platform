@@ -22,6 +22,7 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -44,19 +45,10 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
-    with TransformableMessageUtils {
+    with TransformableMessageUtils
+    with WorksUtil {
 
-  val sourceIdentifier =
-    SourceIdentifier(
-      identifierType = IdentifierType("calm-altref-no"),
-      ontologyType = "Work",
-      value = "value")
-
-  val work = UnidentifiedWork(
-    title = "placeholder title",
-    sourceIdentifier = sourceIdentifier,
-    version = 1
-  )
+  val work = createUnidentifiedWork
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
