@@ -56,22 +56,9 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
           .mapAsyncUnordered(parallelism = sqsConfig.parallelism) {
             case (message, t) =>
               debug(s"Processing message ${message.getMessageId}")
-              readAndProcess(streamName, t, process).map(_ => message)
+              process(t).map(_ => message)
         }
     )
-
-  // Defines a "supervision strategy" -- this tells Akka how to react
-  // if one of the elements fails.  We want to log the failing message,
-  // then drop it and carry on processing the next message.
-  //
-  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
-  //
-  private def decider(metricName: String): Supervision.Decider = {
-    case e: Exception =>
-      metricsSender.count(metricName, Future.failed(e))
-      Supervision.Resume
-    case _ => Supervision.Stop
-  }
 
   def runStream(
     streamName: String,
@@ -99,23 +86,30 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
       .run()
   }
 
-  private def readAndProcess(streamName: String,
-                             message: T,
-                             process: T => Future[Unit]) = {
-    val processMessageFuture = process(message)
+  // Defines a "supervision strategy" -- this tells Akka how to react
+  // if one of the elements fails.  We want to log the failing message,
+  // then drop it and carry on processing the next message.
+  //
+  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
+  //
+  private def decider(metricName: String): Supervision.Decider = {
+    case e: Exception =>
+      logException(e)
+      metricsSender.count(metricName, Future.failed(e))
+      Supervision.Resume
+    case _ => Supervision.Stop
+  }
 
-    processMessageFuture.failed.foreach {
+  private def logException(exception: Exception) = {
+    exception match {
       case exception: GracefulFailureException =>
-        logger.warn(
-          s"Graceful failure processing $message: ${exception.getMessage}")
+        logger.warn(s"Graceful failure: ${exception.getMessage}")
       case exception: DynamoNonFatalException =>
-        logger.warn(
-          s"Non-fatal DynamoDB error processing $message: ${exception.getMessage}")
+        logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
-          s"Unrecognised failure while processing $message: ${exception.getMessage}",
+          s"Unrecognised failure while: ${exception.getMessage}",
           exception)
     }
-    processMessageFuture
   }
 }
