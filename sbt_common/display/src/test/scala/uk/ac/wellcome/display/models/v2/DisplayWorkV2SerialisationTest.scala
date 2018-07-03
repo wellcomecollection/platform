@@ -28,22 +28,13 @@ class DisplayWorkV2SerialisationTest
     val expectedJsonString = s"""
        |{
        | "type": "Work",
-       | "id": "$canonicalId",
-       | "title": "$title",
-       | "description": "$description",
+       | "id": "${work.canonicalId}",
+       | "title": "${work.title}",
+       | "description": "${work.description.get}",
        | "workType" : ${workType(work.workType.get)},
-       | "lettering": "$lettering",
+       | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
-       | "contributors": [
-       |   {
-       |     "agent": {
-       |       "label": "a person",
-       |       "type": "Agent"
-       |     },
-       |     "roles" : [ ],
-       |     "type" : "Contributor"
-       |   }
-       | ],
+       | "contributors": [ ${contributor(work.contributors.head)} ],
        | "subjects": [ ],
        | "genres": [ ],
        | "production": [ ]
