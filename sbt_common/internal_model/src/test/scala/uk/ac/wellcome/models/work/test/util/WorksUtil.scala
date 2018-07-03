@@ -67,6 +67,15 @@ trait WorksUtil extends ItemsUtil {
       createIdentifiedInvisibleWork
     }
 
+  def createUnidentifiedWorkWith(): UnidentifiedWork =
+    UnidentifiedWork(
+      sourceIdentifier = createSourceIdentifier,
+      version = 1,
+      title = createTitle
+    )
+
+  def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
+
   def createIdentifiedWorkWith(
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,

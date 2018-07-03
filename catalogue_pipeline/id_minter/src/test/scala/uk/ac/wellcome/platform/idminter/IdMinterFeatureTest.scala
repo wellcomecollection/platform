@@ -5,6 +5,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -22,7 +23,8 @@ class IdMinterFeatureTest
     with fixtures.Server
     with ExtendedPatience
     with Eventually
-    with Matchers {
+    with Matchers
+    with WorksUtil {
 
   it("mints the same IDs where source identifiers match") {
     withLocalSqsQueue { queue =>
@@ -35,21 +37,7 @@ class IdMinterFeatureTest
 
             withServer(flags) { _ =>
               eventuallyTableExists(identifiersTableConfig)
-
-              val miroID = "M0001234"
-              val title = "A limerick about a lion"
-
-              val identifier =
-                SourceIdentifier(
-                  identifierType = IdentifierType("miro-image-number"),
-                  "Work",
-                  miroID)
-
-              val work = UnidentifiedWork(
-                title = title,
-                sourceIdentifier = identifier,
-                version = 1
-              )
+              val work = createUnidentifiedWork
 
               val messageCount = 5
 
@@ -74,10 +62,8 @@ class IdMinterFeatureTest
                 works.foreach { work =>
                   work
                     .asInstanceOf[IdentifiedWork]
-                    .identifiers
-                    .head
-                    .value shouldBe miroID
-                  work.asInstanceOf[IdentifiedWork].title shouldBe title
+                    .sourceIdentifier shouldBe work.sourceIdentifier
+                  work.asInstanceOf[IdentifiedWork].title shouldBe work.title
                 }
               }
             }
@@ -205,19 +191,7 @@ class IdMinterFeatureTest
                 queue.url,
                 "Not a valid JSON string or UnidentifiedWork")
 
-              val miroId = "1234"
-
-              val identifier =
-                SourceIdentifier(
-                  identifierType = IdentifierType("miro-image-number"),
-                  "Work",
-                  miroId)
-
-              val work = UnidentifiedWork(
-                title = "A query about a queue of quails",
-                sourceIdentifier = identifier,
-                version = 1
-              )
+              val work = createUnidentifiedWork
 
               val messageBody = put[UnidentifiedWork](
                 obj = work,
