@@ -112,9 +112,10 @@ class WorkMatcherTest
               workMatcher =>
                 val identifierA = aSierraSourceIdentifier("A")
                 val identifierB = aSierraSourceIdentifier("B")
-                val work = anUnidentifiedSierraWork.copy(
+                val work = createUnidentifiedWorkWith(
                   sourceIdentifier = identifierA,
-                  mergeCandidates = List(MergeCandidate(identifierB)))
+                  mergeCandidates = List(MergeCandidate(identifierB))
+                )
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
                     MatcherResult(
@@ -175,7 +176,7 @@ class WorkMatcherTest
 
                 val bIdentifier = aSierraSourceIdentifier("B")
                 val cIdentifier = aSierraSourceIdentifier("C")
-                val work = anUnidentifiedSierraWork.copy(
+                val work = createUnidentifiedWorkWith(
                   sourceIdentifier = bIdentifier,
                   version = 2,
                   mergeCandidates = List(MergeCandidate(cIdentifier)))
@@ -282,7 +283,7 @@ class WorkMatcherTest
                       WorkNode("sierra-system-number/C", 0, Nil, "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
                     )))
 
-                    val work = anUnidentifiedSierraWork.copy(
+                    val work = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierA,
                       mergeCandidates = List(MergeCandidate(identifierB))
                     )

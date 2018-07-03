@@ -69,12 +69,14 @@ trait WorksUtil extends ItemsUtil {
 
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    mergeCandidates: List[MergeCandidate] = List(),
     version: Int = 1,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
     items: List[Identifiable[Item]] = List()
   ): UnidentifiedWork =
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
+      mergeCandidates = mergeCandidates,
       version = version,
       title = createTitle,
       contributors = contributors,

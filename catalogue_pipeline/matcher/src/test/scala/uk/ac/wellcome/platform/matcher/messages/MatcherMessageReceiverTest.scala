@@ -94,7 +94,7 @@ class MatcherMessageReceiverTest
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
-              anUnidentifiedSierraWork.copy(
+              createUnidentifiedWorkWith(
                 sourceIdentifier = aIdentifier,
                 mergeCandidates = List(MergeCandidate(bIdentifier)))
             // Work Av1 matched to B (before B exists hence version 0)
@@ -126,7 +126,7 @@ class MatcherMessageReceiverTest
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
             val workAv1 =
-              anUnidentifiedSierraWork.copy(sourceIdentifier = aIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = aIdentifier)
 
             val expectedMatchedWorks = MatcherResult(
               Set(
@@ -143,7 +143,7 @@ class MatcherMessageReceiverTest
 
             // Work Bv1
             val workBv1 =
-              anUnidentifiedSierraWork.copy(sourceIdentifier = bIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = bIdentifier)
 
             processAndAssertMatchedWorkIs(
               workBv1,
@@ -154,7 +154,7 @@ class MatcherMessageReceiverTest
               topic)
 
             // Work Av1 matched to B
-            val workAv2 = anUnidentifiedSierraWork.copy(
+            val workAv2 = createUnidentifiedWorkWith(
               sourceIdentifier = aIdentifier,
               version = 2,
               mergeCandidates = List(MergeCandidate(bIdentifier)))
@@ -173,7 +173,7 @@ class MatcherMessageReceiverTest
 
             // Work Cv1
             val workCv1 =
-              anUnidentifiedSierraWork.copy(sourceIdentifier = cIdentifier)
+              createUnidentifiedWorkWith(sourceIdentifier = cIdentifier)
 
             processAndAssertMatchedWorkIs(
               workCv1,
@@ -184,7 +184,7 @@ class MatcherMessageReceiverTest
               topic)
 
             // Work Bv2 matched to C
-            val workBv2 = anUnidentifiedSierraWork.copy(
+            val workBv2 = createUnidentifiedWorkWith(
               sourceIdentifier = bIdentifier,
               version = 2,
               mergeCandidates = List(MergeCandidate(cIdentifier)))
@@ -214,7 +214,7 @@ class MatcherMessageReceiverTest
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
             // Work Av1
-            val workAv1 = anUnidentifiedSierraWork.copy(
+            val workAv1 = createUnidentifiedWorkWith(
               sourceIdentifier = aIdentifier,
               version = 1)
 
@@ -227,7 +227,7 @@ class MatcherMessageReceiverTest
               topic)
 
             // Work Bv1
-            val workBv1 = anUnidentifiedSierraWork.copy(
+            val workBv1 = createUnidentifiedWorkWith(
               sourceIdentifier = bIdentifier,
               version = 1)
 
@@ -240,7 +240,7 @@ class MatcherMessageReceiverTest
               topic)
 
             // Match Work A to Work B
-            val workAv2MatchedToB = anUnidentifiedSierraWork.copy(
+            val workAv2MatchedToB = createUnidentifiedWorkWith(
               sourceIdentifier = aIdentifier,
               version = 2,
               mergeCandidates = List(MergeCandidate(bIdentifier)))
@@ -258,7 +258,7 @@ class MatcherMessageReceiverTest
             )
 
             // A no longer matches B
-            val workAv3WithNoMatchingWorks = anUnidentifiedSierraWork.copy(
+            val workAv3WithNoMatchingWorks = createUnidentifiedWorkWith(
               sourceIdentifier = aIdentifier,
               version = 3)
 
@@ -287,7 +287,7 @@ class MatcherMessageReceiverTest
           withMatcherMessageReceiver(queuePair.queue, storageBucket, topic) {
             _ =>
               // process Work V2
-              val workAv2 = anUnidentifiedSierraWork.copy(
+              val workAv2 = createUnidentifiedWorkWith(
                 sourceIdentifier = aIdentifier,
                 version = 2
               )
@@ -304,7 +304,7 @@ class MatcherMessageReceiverTest
                 topic)
 
               // Work V1 is sent but not matched
-              val workAv1 = anUnidentifiedSierraWork.copy(
+              val workAv1 = createUnidentifiedWorkWith(
                 sourceIdentifier = aIdentifier,
                 version = 1)
 
