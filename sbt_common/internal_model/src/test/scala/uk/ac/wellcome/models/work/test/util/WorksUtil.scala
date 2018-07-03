@@ -36,7 +36,7 @@ trait WorksUtil extends ItemsUtil {
 
   private def createCanonicalId = randomAlphanumeric(10)
 
-  private def createSourceIdentifier = SourceIdentifier(
+  def createSourceIdentifier: SourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
     value = randomAlphanumeric(10),
     ontologyType = "Work"
