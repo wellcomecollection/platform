@@ -49,6 +49,7 @@ class IdMinterFeatureTest
 
               val work =
                 createUnidentifiedWorkWith(sourceIdentifier = identifier)
+              val title = work.title
 
               val messageCount = 5
 
