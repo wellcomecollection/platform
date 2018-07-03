@@ -13,7 +13,6 @@ case class MultipleResultsRequest(
   @Min(1) @QueryParam page: Int = 1,
   @Min(1) @Max(100) @QueryParam pageSize: Option[Int],
   @QueryParam includes: Option[WorksIncludes],
-  @RouteParam id: Option[String],
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String],
   request: Request
