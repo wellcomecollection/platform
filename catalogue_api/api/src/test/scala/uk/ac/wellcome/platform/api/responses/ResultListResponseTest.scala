@@ -103,6 +103,15 @@ class ResultListResponseTest extends FunSpec with Matchers {
 
       resp.prevPage shouldBe Some(s"$requestBaseUri$requestUri?page=4")
     }
+
+    it("links to the last populated page if beyond the end") {
+      val resp = getResponse(
+        displayResultList = displayResultList.copy(totalPages = 5),
+        multipleResultsRequest = multipleResultsRequest.copy(page = 10)
+      )
+
+      resp.prevPage shouldBe Some(s"$requestBaseUri$requestUri?page=5")
+    }
   }
 
   private def getResponse(
