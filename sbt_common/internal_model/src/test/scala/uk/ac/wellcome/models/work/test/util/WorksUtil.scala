@@ -74,19 +74,6 @@ trait WorksUtil extends ItemsUtil {
       canonicalId = canonicalId,
       items = items)
 
-  def identifiedWorkWith(
-    canonicalId: String,
-    title: String,
-    thumbnail: Location
-  ): IdentifiedWork =
-    IdentifiedWork(
-      title = title,
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId,
-      thumbnail = Some(thumbnail)
-    )
-
   def createIdentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     workType: Option[WorkType] = None,
@@ -94,6 +81,7 @@ trait WorksUtil extends ItemsUtil {
     lettering: Option[String] = None,
     createdDate: Option[Period] = None,
     contributors: List[Contributor[Displayable[AbstractAgent]]] = List(),
+    thumbnail: Option[Location] = None,
     version: Int = 1
   ): IdentifiedWork =
     IdentifiedWork(
@@ -105,6 +93,7 @@ trait WorksUtil extends ItemsUtil {
       lettering = lettering,
       createdDate = createdDate,
       contributors = contributors,
+      thumbnail = thumbnail,
       version = version
     )
 

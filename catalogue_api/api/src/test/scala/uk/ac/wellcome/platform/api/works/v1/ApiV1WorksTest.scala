@@ -559,14 +559,12 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     "includes the thumbnail field if available and we use the thumbnail include") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = identifiedWorkWith(
-          canonicalId = "1234",
-          title = "A thorn in the thumb tells a traumatic tale",
-          thumbnail = DigitalLocation(
+        val work = createIdentifiedWorkWith(
+          thumbnail = Some(DigitalLocation(
             locationType = LocationType("thumbnail-image"),
             url = "https://iiif.example.org/1234/default.jpg",
             license = License_CCBY
-          )
+          ))
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
