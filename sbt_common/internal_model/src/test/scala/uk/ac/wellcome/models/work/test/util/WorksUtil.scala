@@ -101,6 +101,8 @@ trait WorksUtil extends ItemsUtil {
       version = version
     )
 
+  def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
+
   def createIdentifiedWorkWith(
     canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase,
     sourceIdentifier: SourceIdentifier = sourceIdentifier,
