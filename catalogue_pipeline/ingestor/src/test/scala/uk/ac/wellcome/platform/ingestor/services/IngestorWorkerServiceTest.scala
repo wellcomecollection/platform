@@ -46,7 +46,7 @@ class IngestorWorkerServiceTest
       value = "M000765"
     )
 
-    val work = createWork.copy(sourceIdentifier = miroSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -82,7 +82,7 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = createWork.copy(sourceIdentifier = sierraSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -188,18 +188,18 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
-    val miroWork1 = createWork.copy(
-      sourceIdentifier = createIdentifier("miro-image-number", "M1"),
-      canonicalId = "m1")
-    val miroWork2 = createWork.copy(
-      sourceIdentifier = createIdentifier("miro-image-number", "M2"),
-      canonicalId = "m2")
-    val sierraWork1 = createWork.copy(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S1"),
-      canonicalId = "s1")
-    val sierraWork2 = createWork.copy(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
-      canonicalId = "s2")
+    val miroWork1 = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("miro-image-number", "M1")
+    )
+    val miroWork2 = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("miro-image-number", "M2")
+    )
+    val sierraWork1 = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S1")
+    )
+    val sierraWork2 = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S2")
+    )
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
 
@@ -249,7 +249,7 @@ class IngestorWorkerServiceTest
       value = "MS/237"
     )
 
-    val work = createWork.copy(sourceIdentifier = calmSourceIdentifier)
+    val work = createIdentifiedWorkWith(sourceIdentifier = calmSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -275,15 +275,15 @@ class IngestorWorkerServiceTest
 
   it(
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
-    val miroWork = createWork.copy(
-      sourceIdentifier = createIdentifier("miro-image-number", "M"),
-      canonicalId = "m")
-    val sierraWork = createWork.copy(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S2"),
-      canonicalId = "s")
-    val invalidWork = createWork.copy(
-      sourceIdentifier = createIdentifier("calm-altref-no", "C1"),
-      canonicalId = "c")
+    val miroWork = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("miro-image-number", "M")
+    )
+    val sierraWork = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("sierra-system-number", "S2")
+    )
+    val invalidWork = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("calm-altref-no", "C1")
+    )
 
     val works = List(miroWork, sierraWork, invalidWork)
 
@@ -329,13 +329,13 @@ class IngestorWorkerServiceTest
 
   it(
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
-    val sierraWork = createWork.copy(
+    val sierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-      canonicalId = "s1")
-    val newSierraWork = createWork.copy(
+    )
+    val newSierraWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
-      canonicalId = "s2",
-      version = 2)
+      version = 2
+    )
     val oldSierraWork = newSierraWork.copy(version = 1)
 
     val works = List(sierraWork, oldSierraWork)
@@ -531,7 +531,7 @@ class IngestorWorkerServiceTest
                   )
 
                   val work =
-                    createWork.copy(sourceIdentifier = miroSourceIdentifier)
+                    createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
                   val messageBody = put[IdentifiedBaseWork](
                     obj = work,

@@ -50,9 +50,6 @@ trait WorksUtil extends ItemsUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWork: IdentifiedWork =
-    createWorks(count = 1).head
-
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
@@ -97,11 +94,13 @@ trait WorksUtil extends ItemsUtil {
     )
 
   def createIdentifiedWorkWith(
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
     lettering: Option[String] = None,
     createdDate: Option[Period] = None,
-    contributors: List[Contributor[Displayable[AbstractAgent]]] = List()
+    contributors: List[Contributor[Displayable[AbstractAgent]]] = List(),
+    version: Int = 1
   ): IdentifiedWork =
     IdentifiedWork(
       canonicalId = createCanonicalId,
@@ -111,7 +110,7 @@ trait WorksUtil extends ItemsUtil {
       description = description,
       lettering = lettering,
       createdDate = createdDate,
-      version = 1
+      version = version
     )
 
   def createIdentifiedWork: IdentifiedWork = createIdentifiedWorkWith()
