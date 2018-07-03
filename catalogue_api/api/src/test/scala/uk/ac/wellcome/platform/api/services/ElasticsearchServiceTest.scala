@@ -168,7 +168,7 @@ class ElasticsearchServiceTest
           indexName = indexName,
           limit = 10,
           from = 0,
-          expectedWorks = works.toList
+          expectedWorks = visibleWorks.toList
         )
       }
     }
