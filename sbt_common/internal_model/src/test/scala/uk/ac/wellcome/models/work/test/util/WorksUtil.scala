@@ -50,12 +50,6 @@ trait WorksUtil extends ItemsUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
-  def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
-    (start to count).map(
-      (idx: Int) =>
-        createIdentifiedWork
-      ))
-
   def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
     (1 to count).map { _ => createIdentifiedInvisibleWork }
 
@@ -114,4 +108,7 @@ trait WorksUtil extends ItemsUtil {
     )
 
   def createIdentifiedWork: IdentifiedWork = createIdentifiedWorkWith()
+
+  def createIdentifiedWorks(count: Int): Seq[IdentifiedWork] =
+    (1 to count).map { _ => createIdentifiedWork }
 }

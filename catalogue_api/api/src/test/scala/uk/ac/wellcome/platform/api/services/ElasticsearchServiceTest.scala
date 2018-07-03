@@ -181,7 +181,7 @@ class ElasticsearchServiceTest
 
     it("does not list works that have visible=false") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val visibleWorks = createWorks(count = 8)
+        val visibleWorks = createIdentifiedWorks(count = 8)
         val invisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
         val works = visibleWorks ++ invisibleWorks
@@ -198,7 +198,7 @@ class ElasticsearchServiceTest
   }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
-    val works = createWorks(10)
+    val works = createIdentifiedWorks(count = 10)
 
     insertIntoElasticsearch(indexName, itemType, works: _*)
 

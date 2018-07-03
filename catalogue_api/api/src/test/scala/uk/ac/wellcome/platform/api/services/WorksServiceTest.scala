@@ -23,7 +23,7 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(2)
+            val works = createIdentifiedWorks(count = 2)
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
@@ -42,19 +42,19 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(1)
+            val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, itemType, works: _*)
+            insertIntoElasticsearch(indexName, itemType, work)
 
             val recordsFuture =
               worksService.findWorkById(
-                canonicalId = works.head.canonicalId,
+                canonicalId = work.canonicalId,
                 indexName = indexName
               )
 
             whenReady(recordsFuture) { records =>
               records.isDefined shouldBe true
-              records.get shouldBe works.head
+              records.get shouldBe work
             }
           }
       }
@@ -139,7 +139,7 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(3)
+            val works = createIdentifiedWorks(count = 3)
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 

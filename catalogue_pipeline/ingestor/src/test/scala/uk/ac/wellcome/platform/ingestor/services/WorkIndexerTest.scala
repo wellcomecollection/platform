@@ -28,7 +28,7 @@ class WorkIndexerTest
   val esType = "work"
 
   it("inserts an identified Work into Elasticsearch") {
-    val work = createVersionedWork()
+    val work = createIdentifiedWork
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -46,7 +46,7 @@ class WorkIndexerTest
   }
 
   it("only adds one record when the same ID is ingested multiple times") {
-    val work = createVersionedWork()
+    val work = createIdentifiedWork
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -71,7 +71,7 @@ class WorkIndexerTest
   }
 
   it("doesn't add a Work with a lower version") {
-    val work = createVersionedWork(version = 3)
+    val work = createIdentifiedWorkWith(version = 3)
     val olderWork = work.copy(version = 1)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
@@ -99,8 +99,8 @@ class WorkIndexerTest
   }
 
   it("replaces a Work with the same version") {
-    val work = createVersionedWork(version = 3)
-    val updatedWork = work.copy(title = "boring title")
+    val work = createIdentifiedWorkWith(version = 3)
+    val updatedWork = work.copy(title = "a different title")
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       insertIntoElasticsearch(indexName = indexName, itemType = esType, work)
@@ -124,9 +124,7 @@ class WorkIndexerTest
   }
 
   it("inserts a list of works into elasticsearch and returns them") {
-    val works = (1 to 5).map { i =>
-      createVersionedWork().copy(canonicalId = s"$i-workid")
-    }
+    val works = createIdentifiedWorks(count = 5)
 
     withLocalElasticsearchIndex(itemType = esType) { indexName =>
       withWorkIndexerFixtures(esType, elasticClient) { workIndexer =>
@@ -193,8 +191,4 @@ class WorkIndexerTest
       value = value
     )
   }
-
-  def createVersionedWork(version: Int = 1): IdentifiedWork =
-    createWorks(count = 1).head
-      .copy(version = version)
 }

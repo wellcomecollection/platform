@@ -11,7 +11,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a list of works") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val works = createWorks(3)
+        val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
@@ -135,7 +135,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     "returns the requested page of results when requested with page & pageSize") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val works = createWorks(3)
+        val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 

@@ -99,7 +99,7 @@ class SnapshotServiceTest
   it("completes a V1 snapshot generation successfully") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
-        val visibleWorks = createWorks(count = 3)
+        val visibleWorks = createIdentifiedWorks(count = 3)
         val notVisibleWorks = createIdentifiedInvisibleWorks(count = 1)
 
         val works = visibleWorks ++ notVisibleWorks
@@ -147,7 +147,7 @@ class SnapshotServiceTest
   it("completes a V2 snapshot generation successfully") {
     withFixtures {
       case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
-        val visibleWorks = createWorks(count = 4)
+        val visibleWorks = createIdentifiedWorks(count = 4)
         val notVisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
         val works = visibleWorks ++ notVisibleWorks
@@ -244,7 +244,7 @@ class SnapshotServiceTest
   it("returns a failed future if the S3 upload fails") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, _) =>
-        val works = createWorks(count = 3)
+        val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
