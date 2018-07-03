@@ -44,7 +44,7 @@ class CalmTransformableTransformer
                 items = List(),
                 version = version
               )
-            )
+          )
         )
   }
 }
