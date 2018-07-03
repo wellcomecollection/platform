@@ -40,7 +40,7 @@ trait WorksUtil extends ItemsUtil {
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
-        identifiedWorkWith(
+        createUnidentifiedWorkWith(
           canonicalId = s"${idx}-${canonicalId}",
           title = s"${idx}-${title}",
           description = Some(s"${idx}-${description}"),
