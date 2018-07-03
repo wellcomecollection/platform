@@ -13,15 +13,15 @@ class DisplayWorkV2SerialisationTest
     with WorksUtil {
 
   it("serialises a DisplayWorkV2 correctly") {
-
-    val work = workWith(
-      canonicalId = canonicalId,
-      title = title,
-      description = description,
-      lettering = lettering,
-      createdDate = period,
-      creator = agent,
-      items = createItems(count = 2))
+    val work = createIdentifiedWorkWith(
+      workType = Some(WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
+      description = Some(randomAlphanumeric(100)),
+      lettering = Some(randomAlphanumeric(100)),
+      createdDate = Some(Period("1901")),
+      contributors = List(
+        Contributor(Unidentifiable(Agent(randomAlphanumeric(25))))
+      )
+    )
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work))
 

@@ -31,7 +31,7 @@ trait WorksUtil extends ItemsUtil {
       Unidentifiable(Period("a genre period")))
   )
 
-  private def randomAlphanumeric(length: Int) =
+  def randomAlphanumeric(length: Int) =
     (Random.alphanumeric take length mkString) toLowerCase
 
   private def createCanonicalId = randomAlphanumeric(10)
@@ -56,14 +56,7 @@ trait WorksUtil extends ItemsUtil {
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
-        workWith(
-          canonicalId = s"${idx}-${canonicalId}",
-          title = s"${idx}-${title}",
-          description = s"${idx}-${description}",
-          lettering = s"${idx}-${lettering}",
-          createdDate = Period(s"${idx}-${period.label}"),
-          creator = Agent(s"${idx}-${agent.label}"),
-          items = createItems(count = 2)
+        createIdentifiedWork
       ))
 
   def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
@@ -103,34 +96,21 @@ trait WorksUtil extends ItemsUtil {
       thumbnail = Some(thumbnail)
     )
 
-  def workWith(canonicalId: String,
-               title: String,
-               description: String,
-               lettering: String,
-               createdDate: Period,
-               creator: Agent,
-               items: List[Identified[Item]]): IdentifiedWork =
-    IdentifiedWork(
-      title = title,
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId,
-      workType = Some(workType),
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(createdDate),
-      contributors = List(
-        Contributor(agent = Unidentifiable(creator))
-      ),
-      production = List(),
-      items = items
-    )
-
-  def createIdentifiedWorkWith(): IdentifiedWork =
+  def createIdentifiedWorkWith(
+    workType: Option[WorkType] = None,
+    description: Option[String] = None,
+    lettering: Option[String] = None,
+    createdDate: Option[Period] = None,
+    contributors: List[Contributor[Displayable[AbstractAgent]]] = List()
+  ): IdentifiedWork =
     IdentifiedWork(
       canonicalId = createCanonicalId,
       sourceIdentifier = sourceIdentifier,
       title = createTitle,
+      workType = workType,
+      description = description,
+      lettering = lettering,
+      createdDate = createdDate,
       version = 1
     )
 
