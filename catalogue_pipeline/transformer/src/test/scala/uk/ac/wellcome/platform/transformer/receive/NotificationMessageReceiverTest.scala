@@ -175,7 +175,7 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidCalmSqsMessage =
+          val invalidSqsMessage =
             hybridRecordNotificationMessage(
               message = "not a json string",
               sourceName = "calm",
@@ -185,7 +185,7 @@ class NotificationMessageReceiverTest
             )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(invalidCalmSqsMessage)
+            val future = recordReceiver.receiveMessage(invalidSqsMessage)
 
             whenReady(future.failed) { x =>
               x shouldBe a[GracefulFailureException]
