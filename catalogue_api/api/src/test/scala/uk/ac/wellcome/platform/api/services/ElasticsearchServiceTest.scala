@@ -202,7 +202,7 @@ class ElasticsearchServiceTest
             .map { h: SearchHit =>
               jsonToIdentifiedBaseWork(h.sourceAsString)
             }
-          returnedWorks.toList shouldBe expectedWorks
+          returnedWorks.toList should contain theSameElementsAs expectedWorks
         }
     }
   }
