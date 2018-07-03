@@ -458,8 +458,7 @@ class IdEmbedderTests
     }
   }
 
-  describe ("sets the new type id the field identifiedType is present") {
-    it("sets the type field in the root object if it has a identifedType field") {
+  it ("sets the new type if the field identifiedType is present") {
       val ontologyType = "false capitals"
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("miro-image-number"),
@@ -519,7 +518,6 @@ class IdEmbedderTests
           }
       }
     }
-  }
 
   def generateMockCanonicalId(
     sourceIdentifier: SourceIdentifier,
