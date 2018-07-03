@@ -60,40 +60,32 @@ trait WorksUtil extends ItemsUtil {
       canonicalId = createCanonicalId
     )
 
-  def workWith(
-    canonicalId: String,
-    title: String,
-    otherIdentifiers: List[SourceIdentifier] = List(),
-    items: List[Identified[Item]] = List()
-  ): IdentifiedWork =
-    IdentifiedWork(
-      title = title,
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      otherIdentifiers = otherIdentifiers,
-      canonicalId = canonicalId,
-      items = items)
-
   def createIdentifiedWorkWith(
+    canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    otherIdentifiers: List[SourceIdentifier] = List(),
+    title: String = createTitle,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
     lettering: Option[String] = None,
     createdDate: Option[Period] = None,
     contributors: List[Contributor[Displayable[AbstractAgent]]] = List(),
     thumbnail: Option[Location] = None,
+    items: List[Identified[Item]] = List(),
     version: Int = 1
   ): IdentifiedWork =
     IdentifiedWork(
-      canonicalId = createCanonicalId,
+      canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
-      title = createTitle,
+      otherIdentifiers = otherIdentifiers,
+      title = title,
       workType = workType,
       description = description,
       lettering = lettering,
       createdDate = createdDate,
       contributors = contributors,
       thumbnail = thumbnail,
+      items = items,
       version = version
     )
 

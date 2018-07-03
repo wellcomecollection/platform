@@ -48,9 +48,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("renders an item if the items include is present") {
-    val work = workWith(
-      canonicalId = "b4heraz7",
-      title = "Inside an irate igloo",
+    val work = createIdentifiedWorkWith(
       items = createItems(count = 1)
     )
 
@@ -74,9 +72,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes 'items' if the items include is present, even with no items") {
-    val work = workWith(
-      canonicalId = "dgdb712",
-      title = "Without windows or wind or washing-up liquid",
+    val work = createIdentifiedWorkWith(
       items = List()
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -216,9 +212,7 @@ class DisplayWorkV1SerialisationTest
       ontologyType = "Work",
       value = "Test1234"
     )
-    val work = workWith(
-      canonicalId = "1234",
-      title = "An insect huddled in an igloo",
+    val work = createIdentifiedWorkWith(
       otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -229,7 +223,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
@@ -242,9 +236,7 @@ class DisplayWorkV1SerialisationTest
 
   it(
     "always includes 'identifiers' with the identifiers include, even if there are no extra identifiers") {
-    val work = workWith(
-      canonicalId = "a87na87",
-      title = "Idling inkwells of indigo images",
+    val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -255,7 +247,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],

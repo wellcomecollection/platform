@@ -31,7 +31,6 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
 
 class SnapshotServiceTest
     extends FunSpec
@@ -197,9 +196,9 @@ class SnapshotServiceTest
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val works = (1 to 11000).map { id =>
-          workWith(
-            canonicalId = id.toString,
-            title = Random.alphanumeric.take(1500).mkString)
+          createIdentifiedWorkWith(
+            title = randomAlphanumeric(length = 1500)
+          )
         }
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
