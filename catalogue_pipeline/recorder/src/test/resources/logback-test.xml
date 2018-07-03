@@ -8,6 +8,17 @@
     </encoder>
   </appender>
 
+  <!--
+    We often see errors of the form:
+
+        Unable to parse HTTP response content to XML document
+        The server was not able to produce a timely response to your request.
+
+    These are emitted when the test container is being a bit slow, but
+    they're harmless and just spam the test logs.  Hide them!
+  -->
+  <logger name="com.amazonaws.http.DefaultErrorResponseHandler" level="WARN"/>
+
   <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
