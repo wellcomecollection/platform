@@ -53,27 +53,35 @@ class MiroTransformableTransformer
 
           Some(
             UnidentifiedWork(
-              title = title,
               sourceIdentifier = SourceIdentifier(
                 identifierType = IdentifierType("miro-image-number"),
                 ontologyType = "Work",
-                value = miroTransformable.sourceId),
-              version = version,
+                value = miroTransformable.sourceId
+              ),
               otherIdentifiers =
                 getOtherIdentifiers(miroData, miroTransformable.sourceId),
+              mergeCandidates = List(),
+              title = title,
+              workType = None,
               description = description,
+              physicalDescription = None,
+              extent = None,
               lettering = miroData.suppLettering,
               createdDate =
                 getCreatedDate(miroData, miroTransformable.MiroCollection),
               subjects = getSubjects(miroData),
+              genres = getGenres(miroData),
               contributors = getContributors(
                 miroId = miroTransformable.sourceId,
                 miroData = miroData
               ),
-              genres = getGenres(miroData),
               thumbnail =
                 Some(getThumbnail(miroData, miroTransformable.sourceId)),
-              items = getItems(miroData, miroTransformable.sourceId)
+              production = List(),
+              language = None,
+              dimensions = None,
+              items = getItems(miroData, miroTransformable.sourceId),
+              version = version
             ))
         } catch {
           case e: ShouldNotTransformException => {

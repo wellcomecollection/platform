@@ -20,13 +20,31 @@ class CalmTransformableTransformer
           _ =>
             Some(
               UnidentifiedWork(
-                title = "placeholder title",
                 sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("calm-altref-no"),
                   ontologyType = "Work",
                   value = "value"
                 ),
+                otherIdentifiers = List(),
+                mergeCandidates = List(),
+                title = "placeholder title",
+                workType = None,
+                description = None,
+                physicalDescription = None,
+                extent = None,
+                lettering = None,
+                createdDate = None,
+                subjects = List(),
+                genres = List(),
+                contributors = List(),
+                thumbnail = None,
+                production = List(),
+                language = None,
+                dimensions = None,
+                items = List(),
                 version = version
-              )))
+              )
+            )
+        )
   }
 }
