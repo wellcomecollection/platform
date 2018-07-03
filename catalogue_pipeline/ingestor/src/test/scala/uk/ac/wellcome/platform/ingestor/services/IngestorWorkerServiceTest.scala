@@ -118,10 +118,7 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = IdentifiedInvisibleWork(
-      canonicalId = "abcdefg",
-      sourceIdentifier = sierraSourceIdentifier,
-      version = 1)
+    val work = createIdentifiedInvisibleWork
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
