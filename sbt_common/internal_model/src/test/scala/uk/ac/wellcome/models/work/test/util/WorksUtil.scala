@@ -104,6 +104,7 @@ trait WorksUtil extends ItemsUtil {
       description = description,
       lettering = lettering,
       createdDate = createdDate,
+      contributors = contributors,
       version = version
     )
 
