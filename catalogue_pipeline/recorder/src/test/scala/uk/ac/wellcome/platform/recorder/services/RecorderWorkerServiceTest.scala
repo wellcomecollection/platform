@@ -7,7 +7,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedInvisibleWork}
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -30,21 +31,10 @@ class RecorderWorkerServiceTest
     with ScalaFutures
     with Messaging
     with MetricsSenderFixture
-    with ExtendedPatience {
+    with ExtendedPatience
+    with WorksUtil {
 
-  val title = "Whose umbrella did I find?"
-
-  val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("miro-image-number"),
-    value = "U8634924",
-    ontologyType = "Work"
-  )
-
-  val work = UnidentifiedWork(
-    title = title,
-    sourceIdentifier = sourceIdentifier,
-    version = 2
-  )
+  val work = createUnidentifiedWork
 
   it("successfully records a UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
