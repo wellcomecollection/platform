@@ -59,6 +59,18 @@ trait WorksUtil extends ItemsUtil {
       )
     )
 
+  def createIdentifiedRedirectedWorkWith(
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier
+  ): IdentifiedRedirectedWork =
+    IdentifiedRedirectedWork(
+      canonicalId = createCanonicalId,
+      sourceIdentifier = sourceIdentifier,
+      version = 1,
+      redirect = IdentifiedRedirect(
+        canonicalId = createCanonicalId
+      )
+    )
+
   def createUnidentifiedInvisibleWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier
   ): UnidentifiedInvisibleWork =
