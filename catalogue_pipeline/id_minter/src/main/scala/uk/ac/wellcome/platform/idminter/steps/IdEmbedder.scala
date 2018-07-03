@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
-import io.circe.{Json, _}
+import io.circe._
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -55,7 +55,8 @@ class IdEmbedder @Inject()(identifierGenerator: IdentifierGenerator)(
       case Some(identifiedType) =>
         root.obj.modify { obj =>
           ("type", identifiedType) +:
-            ("canonicalId", Json.fromString(canonicalId)) +: obj.remove("identifiedType")
+            ("canonicalId", Json.fromString(canonicalId)) +:
+            obj.remove("identifiedType")
         }(json)
       case None =>
         root.obj.modify(obj => ("canonicalId", Json.fromString(canonicalId)) +: obj)(json)
