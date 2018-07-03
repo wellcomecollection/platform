@@ -71,13 +71,6 @@ trait WorksUtil extends ItemsUtil {
       canonicalId = createCanonicalId
     )
 
-  def workWith(canonicalId: String, title: String): IdentifiedWork =
-    IdentifiedWork(
-      title = title,
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId)
-
   def workWith(
     canonicalId: String,
     title: String,
