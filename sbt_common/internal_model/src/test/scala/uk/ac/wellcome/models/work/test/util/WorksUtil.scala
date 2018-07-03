@@ -50,9 +50,24 @@ trait WorksUtil extends ItemsUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
+  def createUnidentifiedInvisibleWorkWith(
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier
+  ): UnidentifiedInvisibleWork =
+    UnidentifiedInvisibleWork(
+      sourceIdentifier = sourceIdentifier,
+      version = 1
+    )
+
+  def createUnidentifiedInvisibleWork: UnidentifiedInvisibleWork = createUnidentifiedInvisibleWorkWith()
+
   def createIdentifiedInvisibleWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier
   ): IdentifiedInvisibleWork =
+
+  def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
+    (1 to count).map { _ => createIdentifiedInvisibleWork }
+
+  def createIdentifiedInvisibleWork: IdentifiedInvisibleWork =
     IdentifiedInvisibleWork(
       sourceIdentifier = sourceIdentifier,
       version = 1,
@@ -69,17 +84,26 @@ trait WorksUtil extends ItemsUtil {
 
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
-    mergeCandidates: List[MergeCandidate] = List(),
     version: Int = 1,
+    title: String = createTitle,
+    otherIdentifiers: List[SourceIdentifier] = List(),
+    mergeCandidates: List[MergeCandidate] = List(),
+    description: Option[String] = None,
+    lettering: Option[String] = None,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
+    production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = List(),
     items: List[Identifiable[Item]] = List()
   ): UnidentifiedWork =
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
-      mergeCandidates = mergeCandidates,
       version = version,
-      title = createTitle,
+      title = title,
+      otherIdentifiers = otherIdentifiers,
+      mergeCandidates = mergeCandidates,
+      description = description,
+      lettering = lettering,
       contributors = contributors,
+      production = production,
       items = items
     )
 

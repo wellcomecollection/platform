@@ -66,9 +66,7 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              val invisibleWork = UnidentifiedInvisibleWork(
-                sourceIdentifier = sourceIdentifier,
-                version = 2)
+              val invisibleWork = createUnidentifiedInvisibleWork
               sendMessage(queue, messagesBucket, invisibleWork)
               eventually {
                 assertStoredSingleWork(storageBucket, table, invisibleWork)

@@ -62,12 +62,12 @@ class MatcherMessageReceiverTest
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
-            val invisibleWork = UnidentifiedInvisibleWork(
-              SourceIdentifier(
+            val invisibleWork = createUnidentifiedInvisibleWorkWith(
+              sourceIdentifier = SourceIdentifier(
                 IdentifierType("sierra-system-number"),
                 "Work",
-                "id"),
-              1)
+                "id")
+            )
             val expectedMatchedWorks =
               MatcherResult(
                 Set(MatchedIdentifiers(

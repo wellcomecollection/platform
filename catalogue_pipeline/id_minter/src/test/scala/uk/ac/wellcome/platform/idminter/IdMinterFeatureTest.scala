@@ -59,11 +59,11 @@ class IdMinterFeatureTest
                 val works =
                   messages.map(message => get[IdentifiedBaseWork](message))
                 works.map(_.canonicalId).distinct should have size 1
-                works.foreach { work =>
-                  work
+                works.foreach { receivedWork =>
+                  receivedWork
                     .asInstanceOf[IdentifiedWork]
                     .sourceIdentifier shouldBe work.sourceIdentifier
-                  work.asInstanceOf[IdentifiedWork].title shouldBe work.title
+                  receivedWork.asInstanceOf[IdentifiedWork].title shouldBe work.title
                 }
               }
             }
@@ -84,18 +84,7 @@ class IdMinterFeatureTest
 
             withServer(flags) { _ =>
               eventuallyTableExists(identifiersTableConfig)
-
-              val id = "id"
-              val identifier =
-                SourceIdentifier(
-                  identifierType = IdentifierType("sierra-system-number"),
-                  "Work",
-                  id)
-
-              val work = UnidentifiedInvisibleWork(
-                sourceIdentifier = identifier,
-                version = 1
-              )
+              val work = createUnidentifiedInvisibleWork
 
               val messageBody = put[UnidentifiedInvisibleWork](
                 obj = work,
@@ -110,9 +99,9 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(1)
 
-                val work = get[IdentifiedBaseWork](messages.head)
-                val invisibleWork = work.asInstanceOf[IdentifiedInvisibleWork]
-                invisibleWork.sourceIdentifier shouldBe identifier
+                val receivedWork = get[IdentifiedBaseWork](messages.head)
+                val invisibleWork = receivedWork.asInstanceOf[IdentifiedInvisibleWork]
+                invisibleWork.sourceIdentifier shouldBe work.sourceIdentifier
                 invisibleWork.canonicalId shouldNot be(empty)
               }
             }

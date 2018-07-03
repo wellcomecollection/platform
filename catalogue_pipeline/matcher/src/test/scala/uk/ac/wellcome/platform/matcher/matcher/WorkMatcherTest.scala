@@ -17,8 +17,7 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   MergeCandidate,
-  SourceIdentifier,
-  UnidentifiedInvisibleWork
+  SourceIdentifier
 }
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.locking.{
@@ -77,12 +76,12 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                val invisibleWork = UnidentifiedInvisibleWork(
-                  SourceIdentifier(
+                val invisibleWork = createUnidentifiedInvisibleWorkWith(
+                  sourceIdentifier = SourceIdentifier(
                     IdentifierType("sierra-system-number"),
                     "Work",
-                    "id"),
-                  1)
+                    "id")
+                )
                 whenReady(workMatcher.matchWork(invisibleWork)) {
                   matcherResult =>
                     val workId = "sierra-system-number/id"
