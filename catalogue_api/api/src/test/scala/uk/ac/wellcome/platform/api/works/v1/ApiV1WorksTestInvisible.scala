@@ -28,9 +28,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
     withApiFixtures(apiVersion = ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
-
-        // Then we index two ordinary works into Elasticsearch.
-        val works = createIdentifiedWorks(count = 2)
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
         insertIntoElasticsearch(indexNameV1, itemType, worksToIndex: _*)
@@ -47,13 +45,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
-               |     "description": "${works(0).description.get}",
-               |     "workType" : ${workType(works(0).workType.get)},
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).contributors(0).agent,
-                                abstractAgent)} ],
+               |     "creators": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -63,13 +55,7 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
-               |     "description": "${works(1).description.get}",
-               |     "workType" : ${workType(works(1).workType.get)},
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).contributors(0).agent,
-                                abstractAgent)} ],
+               |     "creators": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "publishers": [ ],
@@ -86,13 +72,15 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
   it("excludes works with visible=false from search results") {
     withApiFixtures(apiVersion = ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = createIdentifiedWork
+        val work = createIdentifiedWorkWith(
+          title = "An upside-down umbrella"
+        )
         val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV1, itemType, work, deletedWork)
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works?query=deleted",
+            path = s"/$apiPrefix/works?query=umbrella",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
