@@ -2,6 +2,8 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
+import scala.util.Random
+
 trait WorksUtil extends ItemsUtil {
   val canonicalId = "1234"
   val title = "this is the first image title"
@@ -29,6 +31,14 @@ trait WorksUtil extends ItemsUtil {
       Unidentifiable(Period("a genre period")))
   )
 
+  private def createCanonicalId = (Random.alphanumeric take 10 mkString) toLowerCase
+
+  private def createSourceIdentifier = SourceIdentifier(
+    identifierType = IdentifierType("miro-image-number"),
+    value = (Random.alphanumeric take 10 mkString) toLowerCase,
+    ontologyType = "Work"
+  )
+
   val sourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
     "Work",
@@ -51,19 +61,15 @@ trait WorksUtil extends ItemsUtil {
           items = createItems(count = 2)
       ))
 
-  def createInvisibleWorks(count: Int,
-                           start: Int = 1): Seq[IdentifiedInvisibleWork] =
-    (start to count).map(
-      (idx: Int) => invisibleWorkWith(s"$idx-$canonicalId")
-    )
+  def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
+    (1 to count).map { _ => createIdentifiedInvisibleWork }
 
-  def invisibleWorkWith(canonicalId: String): IdentifiedInvisibleWork = {
+  def createIdentifiedInvisibleWork: IdentifiedInvisibleWork =
     IdentifiedInvisibleWork(
-      sourceIdentifier = sourceIdentifier,
+      sourceIdentifier = createSourceIdentifier,
       version = 1,
-      canonicalId = canonicalId
+      canonicalId = createCanonicalId
     )
-  }
 
   def workWith(canonicalId: String, title: String): IdentifiedWork =
     IdentifiedWork(

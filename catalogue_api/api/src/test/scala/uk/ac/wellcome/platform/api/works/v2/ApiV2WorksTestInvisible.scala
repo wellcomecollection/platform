@@ -11,9 +11,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = invisibleWorkWith(
-          canonicalId = "g9dtcj2e"
-        )
+        val work = createIdentifiedInvisibleWork
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -30,10 +28,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("excludes works with visible=false from list results") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        // Start by indexing a work with visible=false.
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "gze7bc24"
-        )
+        val deletedWork = createIdentifiedInvisibleWork
 
         // Then we index two ordinary works into Elasticsearch.
         val works = createWorks(2)
@@ -90,9 +85,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
           canonicalId = "r8dx6std",
           title = "A deleted dodo"
         )
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "e7rxkty8"
-        )
+        val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 
         eventually {
