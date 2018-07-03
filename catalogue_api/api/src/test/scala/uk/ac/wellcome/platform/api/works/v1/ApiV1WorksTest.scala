@@ -277,20 +277,10 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
-        val identifier0 = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "Test1234"
-        )
-
-        val identifier1 = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "DTest5678"
-        )
+        val identifier0 = createSourceIdentifier
+        val identifier1 = createSourceIdentifier
 
         val work0 = works(0).copy(otherIdentifiers = List(identifier0))
         val work1 = works(1).copy(otherIdentifiers = List(identifier1))

@@ -11,7 +11,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a list of works") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val works = createIdentifiedWorks(count = 3)
+        val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
@@ -27,11 +27,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
-               |     "description": "${works(0).description.get}",
-               |     "workType" : ${workType(works(0).workType.get)},
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "contributors": [${contributor(works(0).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -40,11 +36,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
-               |     "description": "${works(1).description.get}",
-               |     "workType" : ${workType(works(1).workType.get)},
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "contributors": [${contributor(works(1).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -53,11 +45,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
-               |     "description": "${works(2).description.get}",
-               |     "workType" : ${workType(works(2).workType.get)},
-               |     "lettering": "${works(2).lettering.get}",
-               |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "contributors": [${contributor(works(2).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -133,7 +121,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     "returns the requested page of results when requested with page & pageSize") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val works = createIdentifiedWorks(count = 3)
+        val works = createIdentifiedWorks(count = 3).sortBy { _.canonicalId }
 
         insertIntoElasticsearch(indexNameV2, itemType, works: _*)
 
@@ -155,11 +143,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
-               |     "description": "${works(1).description.get}",
-               |     "workType" : ${workType(works(1).workType.get)},
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "contributors": [${contributor(works(1).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -186,11 +170,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
-               |     "description": "${works(0).description.get}",
-               |     "workType" : ${workType(works(0).workType.get)},
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "contributors": [${contributor(works(0).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -217,11 +197,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
-               |     "description": "${works(2).description.get}",
-               |     "workType" : ${workType(works(2).workType.get)},
-               |     "lettering": "${works(2).lettering.get}",
-               |     "createdDate": ${period(works(2).createdDate.get)},
-               |     "contributors": [${contributor(works(2).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -293,25 +269,15 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val identifier1 = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "Test1234"
-        )
-        val work1 = createIdentifiedWorkWith(
-          otherIdentifiers = List(identifier1)
-        )
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
-        val identifier2 = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "DTest5678"
-        )
-        val work2 = createIdentifiedWorkWith(
-          otherIdentifiers = List(identifier2)
-        )
+        val identifier0 = createSourceIdentifier
+        val identifier1 = createSourceIdentifier
 
-        insertIntoElasticsearch(indexNameV2, itemType, work1, work2)
+        val work0 = works(0).copy(otherIdentifiers = List(identifier0))
+        val work1 = works(1).copy(otherIdentifiers = List(identifier1))
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
 
         eventually {
           server.httpGet(
@@ -323,22 +289,22 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |  "results": [
                |   {
                |     "type": "Work",
-               |     "id": "${work1.canonicalId}",
-               |     "title": "${work1.title}",
+               |     "id": "${work0.canonicalId}",
+               |     "title": "${work0.title}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(work1.sourceIdentifier)}, ${identifier(
-                                identifier1)} ],
+               |     "identifiers": [ ${identifier(work0.sourceIdentifier)}, ${identifier(
+                                identifier0)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   },
                |   {
                |     "type": "Work",
-               |     "id": "${work2.canonicalId}",
-               |     "title": "${work2.title}",
+               |     "id": "${work1.canonicalId}",
+               |     "title": "${work1.title}",
                |     "contributors": [ ],
-               |     "identifiers": [ ${identifier(work2.sourceIdentifier)}, ${identifier(
-                                identifier2)} ],
+               |     "identifiers": [ ${identifier(work1.sourceIdentifier)}, ${identifier(
+                                identifier1)} ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -563,13 +529,13 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
         insertIntoElasticsearch(indexNameV1, itemType, work1)
 
         val work2 = createIdentifiedWorkWith(
-          title = "Working with wombats"
+          title = work1.title
         )
         insertIntoElasticsearch(indexNameV2, itemType, work2)
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works?query=wombat",
+            path = s"/$apiPrefix/works?query=wombats",
             andExpect = Status.Ok,
             withJsonBody = s"""
                  |{
