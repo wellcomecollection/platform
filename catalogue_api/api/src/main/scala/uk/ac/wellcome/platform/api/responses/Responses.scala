@@ -36,10 +36,15 @@ object ResultListResponse {
 
     val apiLink = createApiLink(requestBaseUri, multipleResultsRequest) _
 
+    // We want to link to the previous *non-empty* page.
+    // e.g. if there are 5 pages and you're looking at page 10, this should
+    // link to page 5, not page 9.
     val prevLink =
-      if (!isFirstPage)
-        Some(apiLink(Map("page" -> (currentPage - 1))))
-      else None
+      if (!isFirstPage) {
+        val pageNumber = List(currentPage - 1, displayResultList.totalPages).min
+        Some(apiLink(Map("page" -> pageNumber)))
+      } else None
+
     val nextLink =
       if (!isLastPage && !isOutOfBounds)
         Some(apiLink(Map("page" -> (currentPage + 1))))
