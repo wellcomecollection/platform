@@ -43,13 +43,13 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val recorderWorkEntry1 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+          recorderWorkEntryWith(version = 1)
 
         val recorderWorkEntry2 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+          recorderWorkEntryWith(version = 1)
 
         val recorderWorkEntry3 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b678910", 1)
+          recorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(
           Set(
@@ -104,7 +104,7 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), topic, metricsSender) =>
         val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+          recorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
@@ -125,11 +125,11 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+          recorderWorkEntryWith(version = 1)
         val olderVersionRecorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+          recorderWorkEntryWith(version = 1)
         val newerVersionRecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 2)
+          recorderWorkEntryWith(version = 2)
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
@@ -154,9 +154,9 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val versionZeroWork: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 0)
+          recorderWorkEntryWith(version = 0)
         val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+          recorderWorkEntryWith(version = 1)
 
         val matcherResult =
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))

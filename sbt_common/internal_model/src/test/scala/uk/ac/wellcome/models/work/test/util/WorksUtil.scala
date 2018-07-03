@@ -37,6 +37,12 @@ trait WorksUtil extends ItemsUtil {
     "sourceIdentifierFromWorksUtil"
   )
 
+  private def createSourceIdentifier = SourceIdentifier(
+    identifierType = IdentifierType("miro-image-number"),
+    value = (Random.alphanumeric take 10 mkString) toLowerCase,
+    ontologyType = "Work"
+  )
+
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
@@ -67,7 +73,7 @@ trait WorksUtil extends ItemsUtil {
     }
 
   def createUnidentifiedWorkWith(
-    sourceIdentifier: SourceIdentifier = sourceIdentifier,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     version: Int = 1,
     title: String = title,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
