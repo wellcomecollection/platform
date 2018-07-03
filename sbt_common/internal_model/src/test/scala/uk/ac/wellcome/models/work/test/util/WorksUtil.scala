@@ -43,9 +43,6 @@ trait WorksUtil extends ItemsUtil {
         createUnidentifiedWorkWith(
           canonicalId = s"${idx}-${canonicalId}",
           title = s"${idx}-${title}",
-          description = Some(s"${idx}-${description}"),
-          lettering = Some(s"${idx}-${lettering}"),
-          createdDate = Some(Period(s"${idx}-${period.label}")),
           contributors = List(Contributor(
             agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
           items = createItems(count = 2)
