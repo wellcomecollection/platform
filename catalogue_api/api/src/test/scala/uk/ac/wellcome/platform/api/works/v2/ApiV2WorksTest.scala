@@ -73,41 +73,23 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   it("returns a single work when requested with id") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = canonicalId,
-          title = title,
-          description = description,
-          lettering = lettering,
-          createdDate = period,
-          creator = agent,
-          subjects = List(subject),
-          genres = List(genre),
-          items = createItems(count = 2)
-        )
+        val work = createIdentifiedWork
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/$canonicalId",
+            path = s"/$apiPrefix/works/${work.canonicalId}",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
                | "@context": "https://localhost:8888/$apiPrefix/context.json",
                | "type": "Work",
-               | "id": "$canonicalId",
-               | "title": "$title",
-               | "description": "$description",
-               | "workType" : ${workType(work.workType.get)},
-               | "lettering": "$lettering",
-               | "createdDate": ${period(work.createdDate.get)},
-               | "contributors": [${contributor(work.contributors(0))}],
-               | "subjects": [
-               |   ${subjects(work.subjects)}
-               | ],
-               | "genres": [
-               |   ${genres(work.genres)}
-               | ],
+               | "id": "${work.canonicalId}",
+               | "title": "${work.title}",
+               | "contributors": [],
+               | "subjects": [],
+               | "genres": [],
                | "production": [ ]
                |}
           """.stripMargin

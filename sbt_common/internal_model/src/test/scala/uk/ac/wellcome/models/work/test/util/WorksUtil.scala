@@ -31,13 +31,18 @@ trait WorksUtil extends ItemsUtil {
       Unidentifiable(Period("a genre period")))
   )
 
-  private def createCanonicalId = (Random.alphanumeric take 10 mkString) toLowerCase
+  private def randomAlphanumeric(length: Int) =
+    (Random.alphanumeric take length mkString) toLowerCase
+
+  private def createCanonicalId = randomAlphanumeric(10)
 
   private def createSourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
-    value = (Random.alphanumeric take 10 mkString) toLowerCase,
+    value = randomAlphanumeric(10),
     ontologyType = "Work"
   )
+
+  private def createTitle = randomAlphanumeric(100)
 
   val sourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
@@ -121,29 +126,13 @@ trait WorksUtil extends ItemsUtil {
       items = items
     )
 
-  def workWith(canonicalId: String,
-               title: String,
-               description: String,
-               lettering: String,
-               createdDate: Period,
-               creator: Agent,
-               subjects: List[Subject[Displayable[AbstractConcept]]],
-               genres: List[Genre[Displayable[AbstractConcept]]],
-               items: List[Identified[Item]]): IdentifiedWork =
+  def createIdentifiedWorkWith(): IdentifiedWork =
     IdentifiedWork(
-      title = title,
+      canonicalId = createCanonicalId,
       sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = canonicalId,
-      workType = Some(workType),
-      description = Some(description),
-      lettering = Some(lettering),
-      createdDate = Some(createdDate),
-      contributors = List(
-        Contributor(agent = Unidentifiable(creator))
-      ),
-      subjects = subjects,
-      genres = genres,
-      items = items
+      title = createTitle,
+      version = 1
     )
+
+  def createIdentifiedWork: IdentifiedWork = createIdentifiedWorkWith()
 }
