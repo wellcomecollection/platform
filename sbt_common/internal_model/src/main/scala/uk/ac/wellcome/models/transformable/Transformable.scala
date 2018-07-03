@@ -9,19 +9,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
 
-case class CalmTransformable(
-  sourceId: String,
-  RecordType: String,
-  AltRefNo: String,
-  RefNo: String,
-  data: String,
-  sourceName: String = "calm"
-) extends Transformable
-
-case class CalmTransformableData(
-  AccessStatus: Array[String]
-)
-
 case class MiroTransformable(sourceId: String,
                              sourceName: String = "miro",
                              MiroCollection: String,

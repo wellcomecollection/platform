@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
   MiroTransformable,
   SierraTransformable
 }
@@ -19,17 +18,6 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait TransformableMessageUtils {
-  def createValidCalmTramsformableJson(RecordID: String,
-                                       RecordType: String,
-                                       AltRefNo: String,
-                                       RefNo: String,
-                                       data: String): String = {
-    val calmTransformable =
-      CalmTransformable(RecordID, RecordType, AltRefNo, RefNo, data)
-
-    JsonUtil.toJson(calmTransformable).get
-  }
-
   def createValidEmptySierraBibNotificationMessage(
     id: String,
     s3Client: AmazonS3,
