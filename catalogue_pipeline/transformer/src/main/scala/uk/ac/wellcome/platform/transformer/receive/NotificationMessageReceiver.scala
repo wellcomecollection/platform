@@ -8,14 +8,12 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
   MiroTransformable,
   SierraTransformable,
   Transformable
 }
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.platform.transformer.transformers.{
-  CalmTransformableTransformer,
   MiroTransformableTransformer,
   SierraTransformableTransformer
 }
@@ -32,7 +30,6 @@ class NotificationMessageReceiver @Inject()(
   s3Client: AmazonS3,
   s3Config: S3Config)(
   implicit miroTransformableStore: ObjectStore[MiroTransformable],
-  calmTransformableStore: ObjectStore[CalmTransformable],
   sierraTransformableStore: ObjectStore[SierraTransformable],
   ec: ExecutionContext
 ) extends Logging {
@@ -71,7 +68,6 @@ class NotificationMessageReceiver @Inject()(
 
     sourceMetadata.sourceName match {
       case "miro"   => miroTransformableStore.get(s3ObjectLocation)
-      case "calm"   => calmTransformableStore.get(s3ObjectLocation)
       case "sierra" => sierraTransformableStore.get(s3ObjectLocation)
     }
   }
@@ -94,7 +90,6 @@ class NotificationMessageReceiver @Inject()(
 
   private def chooseTransformer(transformable: Transformable) = {
     transformable match {
-      case _: CalmTransformable   => new CalmTransformableTransformer
       case _: MiroTransformable   => new MiroTransformableTransformer
       case _: SierraTransformable => new SierraTransformableTransformer
     }

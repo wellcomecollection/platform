@@ -15,13 +15,8 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.test.fixtures.S3
@@ -91,22 +86,20 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val calmSqsMessage = hybridRecordNotificationMessage(
-            message = createValidCalmTramsformableJson(
-              RecordID = "abcdef",
-              RecordType = "collection",
-              AltRefNo = "AB/CD/12",
-              RefNo = "AB/CD/12",
-              data = """{"foo": ["bar"], "AccessStatus": ["restricted"]}"""
+          val sqsMessage = hybridRecordNotificationMessage(
+            message = createValidSierraTransformableJson(
+              id = "b1234567",
+              title = "A calming breeze on the sea",
+              lastModifiedDate = Instant.now
             ),
-            sourceName = "calm",
+            sourceName = "sierra",
             version = 1,
             s3Client = s3Client,
             bucket = bucket
           )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(calmSqsMessage)
+            val future = recordReceiver.receiveMessage(sqsMessage)
 
             whenReady(future) { _ =>
               val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -230,24 +223,23 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val failingTransformCalmSqsMessage =
+          val miroTransformable = MiroTransformable(
+            sourceId = "B1234567",
+            MiroCollection = "Images-B",
+            data = "not a json string"
+          )
+
+          val failingSqsMessage =
             hybridRecordNotificationMessage(
-              message = createValidCalmTramsformableJson(
-                RecordID = "abcdef",
-                RecordType = "collection",
-                AltRefNo = "AB/CD/12",
-                RefNo = "AB/CD/12",
-                data = """not a json string"""
-              ),
-              sourceName = "calm",
-              version = 1,
+              message = toJson(miroTransformable).get,
+              sourceName = "miro",
               s3Client = s3Client,
               bucket = bucket
             )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
-              recordReceiver.receiveMessage(failingTransformCalmSqsMessage)
+              recordReceiver.receiveMessage(failingSqsMessage)
 
             whenReady(future.failed) { x =>
               x shouldBe a[GracefulFailureException]

@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.transformer.modules
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.transformable.{
-  CalmTransformable,
   MiroTransformable,
   SierraTransformable
 }
@@ -23,16 +22,6 @@ object TransformablesModule extends TwitterModule {
     implicit val executionContext = injector.instance[ExecutionContext]
 
     ObjectStore[MiroTransformable]
-  }
-
-  @Provides
-  @Singleton
-  def provideMiroCalmTransformableObjectStore(
-    injector: Injector): ObjectStore[CalmTransformable] = {
-    implicit val storageBackend = injector.instance[S3StorageBackend]
-    implicit val executionContext = injector.instance[ExecutionContext]
-
-    ObjectStore[CalmTransformable]
   }
 
   @Provides
