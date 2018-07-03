@@ -19,8 +19,7 @@ class DisplayWorkV1SerialisationTest
       lettering = Some(lettering),
       createdDate = Some(period),
       contributors = List(Contributor(agent = Unidentifiable(agent))),
-      items = createItems(count = 2),
-      workType = None
+      items = createItems(count = 2)
     )
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV1(work))
@@ -31,7 +30,6 @@ class DisplayWorkV1SerialisationTest
        | "id": "${work.canonicalId}",
        | "title": "$title",
        | "description": "$description",
-       | "workType" : ${workType(work.workType.get)},
        | "lettering": "$lettering",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
