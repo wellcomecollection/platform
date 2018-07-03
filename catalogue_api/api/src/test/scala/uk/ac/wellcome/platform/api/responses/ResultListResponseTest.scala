@@ -30,6 +30,16 @@ class ResultListResponseTest extends FunSpec with Matchers {
     request = Request(method = Method.Get, uri = requestUri)
   )
 
+  it("inclues a nextPage and prevPage parameter where appropriate") {
+    val resp = getResponse(
+      displayResultList = displayResultList.copy(totalPages = 5),
+      multipleResultsRequest = multipleResultsRequest.copy(page = 3)
+    )
+
+    resp.prevPage shouldBe Some(s"$requestBaseUri$requestUri?page=2")
+    resp.nextPage shouldBe Some(s"$requestBaseUri$requestUri?page=4")
+  }
+
   describe("nextPage") {
     it("omits the parameter if this is the only page") {
       val resp = getResponse(
