@@ -495,11 +495,12 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withApiFixtures(ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          thumbnail = Some(DigitalLocation(
-            locationType = LocationType("thumbnail-image"),
-            url = "https://iiif.example.org/1234/default.jpg",
-            license = License_CCBY
-          ))
+          thumbnail = Some(
+            DigitalLocation(
+              locationType = LocationType("thumbnail-image"),
+              url = "https://iiif.example.org/1234/default.jpg",
+              license = License_CCBY
+            ))
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)
 

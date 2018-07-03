@@ -14,7 +14,8 @@ class DisplayWorkV2SerialisationTest
 
   it("serialises a DisplayWorkV2 correctly") {
     val work = createIdentifiedWorkWith(
-      workType = Some(WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
+      workType = Some(
+        WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
       description = Some(randomAlphanumeric(100)),
       lettering = Some(randomAlphanumeric(100)),
       createdDate = Some(Period("1901")),
@@ -243,11 +244,12 @@ class DisplayWorkV2SerialisationTest
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
     val work = createIdentifiedWorkWith(
-      thumbnail = Some(DigitalLocation(
-        locationType = LocationType("thumbnail-image"),
-        url = "https://iiif.example.org/1234/default.jpg",
-        license = License_CCBY
-      ))
+      thumbnail = Some(
+        DigitalLocation(
+          locationType = LocationType("thumbnail-image"),
+          url = "https://iiif.example.org/1234/default.jpg",
+          license = License_CCBY
+        ))
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(work, WorksIncludes(thumbnail = true)))

@@ -63,7 +63,9 @@ trait WorksUtil extends ItemsUtil {
     createIdentifiedInvisibleWorkWith()
 
   def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
-    (1 to count).map { _ => createIdentifiedInvisibleWork }
+    (1 to count).map { _ =>
+      createIdentifiedInvisibleWork
+    }
 
   def createIdentifiedWorkWith(
     canonicalId: String = createCanonicalId,
@@ -97,5 +99,7 @@ trait WorksUtil extends ItemsUtil {
   def createIdentifiedWork: IdentifiedWork = createIdentifiedWorkWith()
 
   def createIdentifiedWorks(count: Int): Seq[IdentifiedWork] =
-    (1 to count).map { _ => createIdentifiedWork }
+    (1 to count).map { _ =>
+      createIdentifiedWork
+    }
 }
