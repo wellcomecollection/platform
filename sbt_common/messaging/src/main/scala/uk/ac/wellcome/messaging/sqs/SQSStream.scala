@@ -103,11 +103,9 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   private def logException(exception: Exception) = {
     exception match {
       case exception: GracefulFailureException =>
-        logger.warn(
-          s"Graceful failure: ${exception.getMessage}")
+        logger.warn(s"Graceful failure: ${exception.getMessage}")
       case exception: DynamoNonFatalException =>
-        logger.warn(
-          s"Non-fatal DynamoDB error: ${exception.getMessage}")
+        logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
           s"Unrecognised failure while: ${exception.getMessage}",
