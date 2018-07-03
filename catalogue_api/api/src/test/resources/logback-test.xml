@@ -14,8 +14,8 @@
   <logger name="io.netty" level="ERROR"/>
   <logger name="com.twitter" level="INFO"/>
   <logger name="com.sksamuel.elastic4s" level="INFO"/>
-  <logger name="org.elasticsearch.client.RestClient" level="INFO">
-  <logger name="uk.ac.wellcome.platform.api.Server" level="INFO">
+  <logger name="org.elasticsearch.client.RestClient" level="INFO"/>
+  <logger name="uk.ac.wellcome.platform.api.Server" level="INFO"/>
   <logger name="com.amazonaws" level="INFO"/>
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
