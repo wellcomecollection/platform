@@ -15,7 +15,6 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
         eventually {
-
           server.httpGet(
             path = s"/$apiPrefix/works",
             andExpect = Status.Ok,
@@ -27,13 +26,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${works(0).canonicalId}",
                  |     "title": "${works(0).title}",
-                 |     "description": "${works(0).description.get}",
-                 |     "workType" : ${workType(works(0).workType.get)},
-                 |     "lettering": "${works(0).lettering.get}",
-                 |     "createdDate": ${period(works(0).createdDate.get)},
-                 |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(0).contributors(0).agent,
-                                abstractAgent)} ],
+                 |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -43,13 +36,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${works(1).canonicalId}",
                  |     "title": "${works(1).title}",
-                 |     "description": "${works(1).description.get}",
-                 |     "workType" : ${workType(works(1).workType.get)},
-                 |     "lettering": "${works(1).lettering.get}",
-                 |     "createdDate": ${period(works(1).createdDate.get)},
-                 |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(1).contributors(0).agent,
-                                abstractAgent)} ],
+                 |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -59,13 +46,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${works(2).canonicalId}",
                  |     "title": "${works(2).title}",
-                 |     "description": "${works(2).description.get}",
-                 |     "workType" : ${workType(works(2).workType.get)},
-                 |     "lettering": "${works(2).lettering.get}",
-                 |     "createdDate": ${period(works(2).createdDate.get)},
-                 |     "creators": [ ${identifiedOrUnidentifiable(
-                                works(2).contributors(0).agent,
-                                abstractAgent)} ],
+                 |     "creators": [ ],
                  |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "publishers": [ ],
@@ -95,7 +76,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
                  | "@context": "https://localhost:8888/$apiPrefix/context.json",
                  | "type": "Work",
                  | "id": "${work.canonicalId}",
-                 | "title": "${work.title}"
+                 | "title": "${work.title}",
                  | "creators": [ ],
                  | "subjects": [ ],
                  | "genres": [ ],

@@ -447,10 +447,14 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         withLocalElasticsearchIndex(itemType = itemType) { otherIndex =>
-          val work = createIdentifiedWork
+          val work = createIdentifiedWorkWith(
+            title = "Playing with pangolins"
+          )
           insertIntoElasticsearch(indexNameV2, itemType, work)
 
-          val work_alt = createIdentifiedWork
+          val work_alt = createIdentifiedWorkWith(
+            title = "Playing with pangolins"
+          )
           insertIntoElasticsearch(
             indexName = otherIndex,
             itemType = itemType,
@@ -458,7 +462,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=wombat",
+              path = s"/$apiPrefix/works?query=pangolins",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
@@ -481,7 +485,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
           eventually {
             server.httpGet(
-              path = s"/$apiPrefix/works?query=igloo&_index=$otherIndex",
+              path = s"/$apiPrefix/works?query=pangolins&_index=$otherIndex",
               andExpect = Status.Ok,
               withJsonBody = s"""
                    |{
@@ -553,10 +557,14 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
           indexNameV2,
           itemType,
           server: EmbeddedHttpServer) =>
-        val work1 = createIdentifiedWork
+        val work1 = createIdentifiedWorkWith(
+          title = "Working with wombats"
+        )
         insertIntoElasticsearch(indexNameV1, itemType, work1)
 
-        val work2 = createIdentifiedWork
+        val work2 = createIdentifiedWorkWith(
+          title = "Working with wombats"
+        )
         insertIntoElasticsearch(indexNameV2, itemType, work2)
 
         eventually {
