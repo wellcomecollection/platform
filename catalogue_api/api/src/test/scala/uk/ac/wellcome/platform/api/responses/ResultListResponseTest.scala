@@ -24,7 +24,6 @@ class ResultListResponseTest extends FunSpec with Matchers {
     page = 1,
     pageSize = Some(displayResultList.pageSize),
     includes = None,
-    id = None,
     query = None,
     _index = None,
     request = Request(method = Method.Get, uri = requestUri)
