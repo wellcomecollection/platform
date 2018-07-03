@@ -55,15 +55,6 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
   def recorderWorkEntryWith(version: Int) =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
 
-  def recorderInvisibleWorkEntryWith(identifierType: String,
-                                     sourceId: String,
-                                     version: Int) =
-    RecorderWorkEntry(
-      UnidentifiedInvisibleWork(
-        sourceIdentifier =
-          SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
-        version = version))
-
   def getWorksSent(topic: Topic) = {
     val messagesSent = listMessagesReceivedFromSNS(topic)
     val worksSent = messagesSent.map { message =>

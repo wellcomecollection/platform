@@ -75,8 +75,9 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry =
-          recorderInvisibleWorkEntryWith("sierra-system-number", "b123456", 1)
+        val recorderWorkEntry = RecorderWorkEntry(
+          work = createUnidentifiedInvisibleWork
+        )
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
