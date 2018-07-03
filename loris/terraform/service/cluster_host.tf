@@ -15,4 +15,7 @@ module "cluster_host" {
   asg_min     = "${var.asg_min}"
   asg_desired = "${var.asg_desired}"
   asg_max     = "${var.asg_max}"
+
+  ebs_size        = "${var.ebs_size}"
+  ebs_volume_type = "${var.ebs_volume_type}"
 }
