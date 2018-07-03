@@ -15,7 +15,8 @@ case class Identified[T](agent: T,
 
 case class Identifiable[T](agent: T,
                            sourceIdentifier: SourceIdentifier,
-                           otherIdentifiers: List[SourceIdentifier] = List())
+                           otherIdentifiers: List[SourceIdentifier] = List(),
+                           identifiedType: String = classOf[Identified[T]].getSimpleName)
     extends IdentityState[T]
     with MaybeDisplayable[T]
     with MultipleSourceIdentifiers

@@ -42,6 +42,7 @@ case class UnidentifiedWork(
   sourceIdentifier: SourceIdentifier,
   version: Int,
   title: String,
+  identifiedType: String = classOf[IdentifiedWork].getSimpleName,
   otherIdentifiers: List[SourceIdentifier] = List(),
   mergeCandidates: List[MergeCandidate] = List(),
   workType: Option[WorkType] = None,
@@ -90,7 +91,7 @@ case class IdentifiedWork(
 trait InvisibleWork extends BaseWork
 
 case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
-                                     version: Int)
+                                     version: Int,identifiedType: String = classOf[IdentifiedInvisibleWork].getSimpleName)
     extends InvisibleWork
     with TransformedBaseWork
 
@@ -107,7 +108,8 @@ trait RedirectedWork extends BaseWork {
 case class UnidentifiedRedirectedWork(
   sourceIdentifier: SourceIdentifier,
   version: Int,
-  redirect: IdentifiableRedirect
+  redirect: IdentifiableRedirect,
+  identifiedType: String = classOf[IdentifiedRedirectedWork].getSimpleName
 ) extends RedirectedWork
 
 case class IdentifiedRedirectedWork(
