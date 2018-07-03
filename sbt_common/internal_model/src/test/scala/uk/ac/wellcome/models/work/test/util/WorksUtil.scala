@@ -40,9 +40,12 @@ trait WorksUtil extends ItemsUtil {
   def createWorks(count: Int, start: Int = 1): Seq[IdentifiedWork] =
     (start to count).map(
       (idx: Int) =>
-        createUnidentifiedWorkWith(
+        createIdentifiedWorkWith(
           canonicalId = s"${idx}-${canonicalId}",
           title = s"${idx}-${title}",
+          description = Some(s"${idx}-${description}"),
+          lettering = Some(s"${idx}-${lettering}"),
+          createdDate = Some(Period(s"${idx}-${period.label}")),
           contributors = List(Contributor(
             agent = Unidentifiable(Agent(s"${idx}-${agent.label}")))),
           items = createItems(count = 2)
