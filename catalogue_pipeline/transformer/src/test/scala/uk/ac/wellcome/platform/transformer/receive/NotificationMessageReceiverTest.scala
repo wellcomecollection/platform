@@ -88,7 +88,7 @@ class NotificationMessageReceiverTest
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
             message = createValidSierraTransformableJson(
-              id = "b1234567",
+              id = "1234567",
               title = "A calming breeze on the sea",
               lastModifiedDate = Instant.now
             ),
@@ -178,7 +178,7 @@ class NotificationMessageReceiverTest
           val invalidSqsMessage =
             hybridRecordNotificationMessage(
               message = "not a json string",
-              sourceName = "calm",
+              sourceName = "miro",
               version = 1,
               s3Client = s3Client,
               bucket = bucket
