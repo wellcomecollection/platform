@@ -23,11 +23,7 @@ class ElastisearchSourceTest
       withMaterializer(actorSystem) { actorMaterialiser =>
         withLocalElasticsearchIndex(itemType = itemType) { indexName =>
           implicit val materialiser = actorMaterialiser
-          val works = (1 to 10).map { i =>
-            workWith(
-              canonicalId = s"$i-id",
-              title = "woah! a wise wizard with walnuts!")
-          }
+          val works = createWorks(count = 10)
           insertIntoElasticsearch(indexName, itemType, works: _*)
 
           val future =
@@ -50,7 +46,7 @@ class ElastisearchSourceTest
           implicit val materialiser = actorMaterialiser
           val visibleWorks = createWorks(count = 10)
           val invisibleWorks =
-            createInvisibleWorks(count = 3, start = 11)
+            createIdentifiedInvisibleWorks(count = 3, start = 11)
 
           val works = visibleWorks ++ invisibleWorks
           insertIntoElasticsearch(indexName, itemType, works: _*)

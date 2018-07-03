@@ -6,7 +6,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.ItemsUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -23,7 +23,7 @@ class IdEmbedderTests
     with Akka
     with JsonTestUtil
     with ExtendedPatience
-    with ItemsUtil {
+    with WorksUtil {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
@@ -46,10 +46,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
     val newCanonicalId = "5467"
 
@@ -68,7 +65,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -98,14 +95,12 @@ class IdEmbedderTests
     )
 
     val person = Person(label = "The Librarian")
-    val originalWork = UnidentifiedWork(
-      title = "crap",
+    val originalWork = createUnidentifiedWorkWith(
       sourceIdentifier = workIdentifier,
       contributors = List(
         Contributor(
           agent = Identifiable(person, sourceIdentifier = creatorIdentifier))
-      ),
-      version = 1
+      )
     )
 
     val newWorkCanonicalId = "5467"
@@ -133,7 +128,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newWorkCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -163,10 +158,7 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWorkWith(sourceIdentifier = identifier)
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -209,10 +201,8 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
+    val originalWork = createUnidentifiedWorkWith(
       sourceIdentifier = identifier,
-      version = 1,
       items = List(originalItem1, originalItem2))
 
     val newItemCanonicalId1 = "item1-canonical-id"

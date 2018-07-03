@@ -18,14 +18,8 @@ class DisplayLocationsV1SerialisationTest
       label = "a stack of slick slimes"
     )
 
-    val work = IdentifiedWork(
-      canonicalId = "zm9q6c6h",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      title = "A zoo of zebras doing zumba",
-      items = List(
-        createItem(locations = List(physicalLocation))
-      )
+    val work = createIdentifiedWorkWith(
+      items = List(createItem(locations = List(physicalLocation)))
     )
     val displayWork =
       DisplayWorkV1(work, includes = WorksIncludes(items = true))

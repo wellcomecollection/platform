@@ -37,11 +37,7 @@ class MergerFeatureTest
                     storageBucket = storageBucket,
                     messageBucket = messagesBucket,
                     table = table) { _ =>
-                    val recorderWorkEntry = recorderWorkEntryWith(
-                      title = "dfmsng",
-                      identifierType = "sierra-system-number",
-                      sourceId = "b123456",
-                      version = 1)
+                    val recorderWorkEntry = recorderWorkEntryWith(version = 1)
 
                     whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
                       val matcherResult =

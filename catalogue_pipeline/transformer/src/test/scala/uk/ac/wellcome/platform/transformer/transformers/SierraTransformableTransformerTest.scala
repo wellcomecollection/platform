@@ -11,6 +11,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -18,7 +19,8 @@ class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
     with SierraData
-    with TransformableTestBase[SierraTransformable] {
+    with TransformableTestBase[SierraTransformable]
+    with WorksUtil {
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
@@ -245,10 +247,9 @@ class SierraTransformableTransformerTest
 
     val work = transformDataToWork(id = id, data = data)
 
-    work shouldBe UnidentifiedWork(
+    work shouldBe createUnidentifiedWorkWith(
       title = title,
       sourceIdentifier = sourceIdentifier,
-      version = 1,
       otherIdentifiers = List(sierraIdentifier),
       description = Some("A delightful description of a dead daisy."),
       production = List(

@@ -3,17 +3,13 @@ package uk.ac.wellcome.platform.api.works.v1
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 
 class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
 
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withApiFixtures(apiVersion = ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = invisibleWorkWith(
-          canonicalId = "g9dtcj2e"
-        )
-
+        val work = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV1, itemType, work)
 
         eventually {
@@ -29,15 +25,10 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
   it("excludes works with visible=false from list results") {
     withApiFixtures(apiVersion = ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        // Start by indexing a work with visible=false.
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "gze7bc24"
-        )
+        val deletedWork = createIdentifiedInvisibleWorks(count = 1)
+        val works = createWorks(count = 2)
+        val worksToIndex = deletedWork ++ works
 
-        // Then we index two ordinary works into Elasticsearch.
-        val works = createWorks(2)
-
-        val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
         insertIntoElasticsearch(indexNameV1, itemType, worksToIndex: _*)
 
         eventually {
@@ -91,13 +82,8 @@ class ApiV1WorksTestInvisible extends ApiV1WorksTestBase {
   it("excludes works with visible=false from search results") {
     withApiFixtures(apiVersion = ApiVersions.v1) {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "r8dx6std",
-          title = "A deleted dodo"
-        )
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "e7rxkty8"
-        )
+        val work = createIdentifiedWorkWith(title = "A deleted dodo")
+        val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV1, itemType, work, deletedWork)
 
         eventually {

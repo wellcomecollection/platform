@@ -3,12 +3,8 @@ package uk.ac.wellcome.platform.recorder
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
@@ -23,22 +19,11 @@ class RecorderFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalVersionedHybridStore
-    with Messaging {
+    with Messaging
+    with WorksUtil {
 
   it("receives a transformed Work, and saves it to the VHS") {
-    val title = "Not from Guildford after all"
-
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      value = "V0237865",
-      ontologyType = "Work"
-    )
-
-    val work = UnidentifiedWork(
-      title = title,
-      sourceIdentifier = sourceIdentifier,
-      version = 1
-    )
+    val work = createUnidentifiedWork
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
