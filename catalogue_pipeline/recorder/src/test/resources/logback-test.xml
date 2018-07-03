@@ -21,7 +21,7 @@
 
   <logger name="org.apache.http" level="INFO"/>
   <logger name="com.amazonaws" level="INFO"/>
-  <root level="debug">
+  <root level="DEBUG">
     <appender-ref ref="STDOUT" />
   </root>
 </configuration>
