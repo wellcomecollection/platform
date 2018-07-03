@@ -175,4 +175,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
        |}
      """.stripMargin
 
+  def workType(w: WorkType) =
+    s"""
+       |{
+       |  "id": "${w.id}",
+       |  "label": "${w.label}",
+       |  "type": "WorkType"
+       |}
+     """.stripMargin
 }
