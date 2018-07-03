@@ -30,7 +30,7 @@ class WorksServiceTest
             val future = worksService.listWorks(indexName = indexName)
 
             whenReady(future) { resultList =>
-              resultList.results shouldBe works
+              resultList.results should contain theSameElementsAs works
             }
           }
       }
