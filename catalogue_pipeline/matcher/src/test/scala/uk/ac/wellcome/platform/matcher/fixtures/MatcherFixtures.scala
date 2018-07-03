@@ -16,6 +16,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server

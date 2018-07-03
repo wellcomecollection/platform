@@ -45,10 +45,9 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWorkWith(
+      sourceIdentifier = identifier
+    )
 
     val newCanonicalId = "5467"
 
@@ -97,14 +96,12 @@ class IdEmbedderTests
     )
 
     val person = Person(label = "The Librarian")
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = workIdentifier,
+    val originalWork = createUnidentifiedWorkWith(
       contributors = List(
         Contributor(
-          agent = Identifiable(person, sourceIdentifier = creatorIdentifier))
-      ),
-      version = 1
+          agent = Identifiable(person, sourceIdentifier = creatorIdentifier)
+        )
+      )
     )
 
     val newWorkCanonicalId = "5467"
@@ -156,16 +153,7 @@ class IdEmbedderTests
   }
 
   it("returns a failed future if the call to IdentifierGenerator fails") {
-    val identifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "1234"
-    )
-
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWork
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -174,7 +162,7 @@ class IdEmbedderTests
         when(
           identifierGenerator
             .retrieveOrGenerateCanonicalId(
-              identifier
+              originalWork.sourceIdentifier
             )
         ).thenReturn(Try(throw expectedException))
 
@@ -208,11 +196,9 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1,
-      items = List(originalItem1, originalItem2))
+    val originalWork = createUnidentifiedWorkWith(
+      items = List(originalItem1, originalItem2)
+    )
 
     val newItemCanonicalId1 = "item1-canonical-id"
     val newItemCanonicalId2 = "item2-canonical-id"
