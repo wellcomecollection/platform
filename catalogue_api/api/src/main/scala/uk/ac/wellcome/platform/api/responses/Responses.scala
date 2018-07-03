@@ -43,8 +43,7 @@ object ResultListResponse {
       if (!isFirstPage) {
         val pageNumber = List(currentPage - 1, displayResultList.totalPages).min
         Some(apiLink(Map("page" -> pageNumber)))
-      }
-      else None
+      } else None
 
     val nextLink =
       if (!isLastPage && !isOutOfBounds)
