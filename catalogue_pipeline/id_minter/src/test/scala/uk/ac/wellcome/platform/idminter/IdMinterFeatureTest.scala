@@ -123,22 +123,7 @@ class IdMinterFeatureTest
             withServer(flags) { _ =>
               eventuallyTableExists(identifiersTableConfig)
 
-              val id = "id"
-              val identifier =
-                SourceIdentifier(
-                  identifierType = IdentifierType("sierra-system-number"),
-                  "Work",
-                  id)
-
-              val work = UnidentifiedRedirectedWork(
-                sourceIdentifier = identifier,
-                version = 1,
-                redirect = IdentifiableRedirect(
-                  sourceIdentifier = SourceIdentifier(
-                    IdentifierType("sierra-system-number"),
-                    "Work",
-                    "b1234567"))
-              )
+              val work = createUnidentifiedRedirectedWork
 
               val messageBody = put[UnidentifiedRedirectedWork](
                 obj = work,
@@ -153,9 +138,9 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(1)
 
-                val work = get[IdentifiedBaseWork](messages.head)
+                val receivedWork = get[IdentifiedBaseWork](messages.head)
                 val redirectedWork = work.asInstanceOf[IdentifiedRedirectedWork]
-                redirectedWork.sourceIdentifier shouldBe identifier
+                redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
                 redirectedWork.canonicalId shouldNot be(empty)
                 redirectedWork.redirect.canonicalId shouldNot be(empty)
               }
