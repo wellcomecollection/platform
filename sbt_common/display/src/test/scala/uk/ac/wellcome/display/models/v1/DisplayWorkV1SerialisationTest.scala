@@ -103,12 +103,9 @@ class DisplayWorkV1SerialisationTest
       license = License_CCBY
     )
     val item = createItem(locations = List(location))
-    val workWithCopyright = IdentifiedWork(
-      title = "A scarf on a squirrel",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "yxh928a",
-      items = List(item))
+    val workWithCopyright = createIdentifiedWorkWith(
+      items = List(item)
+    )
 
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV1(workWithCopyright, WorksIncludes(items = true)))
@@ -146,11 +143,7 @@ class DisplayWorkV1SerialisationTest
     val concept0 = Unidentifiable(Concept("fish"))
     val concept1 = Unidentifiable(Concept("gardening"))
 
-    val workWithSubjects = IdentifiedWork(
-      title = "A seal selling seaweed sandwiches in Scotland",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "test_subject1",
+    val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
         Subject("label", List(concept0)),
         Subject("label", List(concept1))
@@ -178,11 +171,7 @@ class DisplayWorkV1SerialisationTest
     val concept0 = Unidentifiable(Concept("woodwork"))
     val concept1 = Unidentifiable(Concept("etching"))
 
-    val wotkWithGenres = IdentifiedWork(
-      title = "A guppy in a greenhouse",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "test_subject1",
+    val wotkWithGenres = createIdentifiedWorkWith(
       genres = List(
         Genre("label", List(concept0)),
         Genre("label", List(concept1))

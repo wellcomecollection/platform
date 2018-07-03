@@ -74,10 +74,16 @@ trait WorksUtil extends ItemsUtil {
     title: String = createTitle,
     workType: Option[WorkType] = None,
     description: Option[String] = None,
+    physicalDescription: Option[String] = None,
+    extent: Option[String] = None,
     lettering: Option[String] = None,
     createdDate: Option[Period] = None,
+    subjects: List[Subject[Displayable[AbstractConcept]]] = List(),
+    genres: List[Genre[Displayable[AbstractConcept]]] = List(),
     contributors: List[Contributor[Displayable[AbstractAgent]]] = List(),
     thumbnail: Option[Location] = None,
+    production: List[ProductionEvent[Displayable[AbstractAgent]]] = List(),
+    language: Option[Language] = None,
     items: List[Identified[Item]] = List(),
     version: Int = 1
   ): IdentifiedWork =
@@ -88,10 +94,16 @@ trait WorksUtil extends ItemsUtil {
       title = title,
       workType = workType,
       description = description,
+      physicalDescription = physicalDescription,
+      extent = extent,
       lettering = lettering,
       createdDate = createdDate,
+      subjects = subjects,
+      genres = genres,
       contributors = contributors,
       thumbnail = thumbnail,
+      production = production,
+      language = language,
       items = items,
       version = version
     )

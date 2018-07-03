@@ -8,10 +8,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{
   IdentifiedBaseWork,
-  IdentifiedWork,
   IdentifierType,
   SourceIdentifier
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
@@ -27,7 +27,8 @@ class IngestorFeatureTest
     with fixtures.Server
     with ElasticsearchFixtures
     with Messaging
-    with SQS {
+    with SQS
+    with WorksUtil {
 
   val itemType = "work"
 
@@ -39,11 +40,7 @@ class IngestorFeatureTest
         "Item",
         "5678")
 
-    val work = IdentifiedWork(
-      title = "A type of a tame turtle",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "1234")
+    val work = createIdentifiedWorkWith(sourceIdentifier = sourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
@@ -68,11 +65,7 @@ class IngestorFeatureTest
         "Item",
         "5678")
 
-    val work = IdentifiedWork(
-      title = "A type of a tame turtle",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "1234")
+    val work = createIdentifiedWorkWith(sourceIdentifier = sourceIdentifier)
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>

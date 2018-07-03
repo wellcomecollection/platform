@@ -12,11 +12,7 @@ class DisplayCreatorsV1SerialisationTest
     with WorksUtil {
 
   it("serialises creators") {
-    val work = IdentifiedWork(
-      canonicalId = "v9w6cz66",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      title = "Vultures vying for victory",
+    val work = createIdentifiedWorkWith(
       contributors = List(
         Contributor(agent = Unidentifiable(Agent("Vivian Violet"))),
         Contributor(agent = Unidentifiable(Agent("Verily Volumes"))),

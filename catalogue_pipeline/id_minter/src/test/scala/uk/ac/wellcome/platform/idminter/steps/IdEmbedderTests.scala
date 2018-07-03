@@ -6,13 +6,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.ItemsUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.util.Try
 
 class IdEmbedderTests
@@ -23,7 +22,7 @@ class IdEmbedderTests
     with Akka
     with JsonTestUtil
     with ExtendedPatience
-    with ItemsUtil {
+    with WorksUtil {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
@@ -68,7 +67,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -133,7 +132,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newWorkCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
