@@ -1,0 +1,9 @@
+language: none
+
+branches:
+  only:
+    - master
+
+build:
+  ci:
+    - make ingestor-test
