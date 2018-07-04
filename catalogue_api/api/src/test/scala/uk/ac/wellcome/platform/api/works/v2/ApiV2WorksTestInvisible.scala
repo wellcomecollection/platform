@@ -29,9 +29,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val deletedWork = createIdentifiedInvisibleWork
-
-        // Then we index two ordinary works into Elasticsearch.
-        val works = createIdentifiedWorks(count = 2)
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
         insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
