@@ -6,7 +6,7 @@ def colour_distance(colour_1, colour_2):
 
 
 def hex_to_rgb(hex):
-    return [int(hex[i : i + 2], 16) for i in range(0, 6, 2)]
+    return [int(hex[i: i + 2], 16) for i in range(0, 6, 2)]
 
 
 def rgb_to_lab(rgb_palette):

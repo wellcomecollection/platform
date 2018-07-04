@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, redirect, send_from_directory
 from flask_restful import Resource, Api
-from utils import *
+from utils import hex_to_rgb, rgb_to_lab, ids_to_urls
 from flask_cors import CORS
+import numpy as np
 import pandas as pd
 import pickle
 import itertools
-
 
 app = Flask(__name__)
 api = Api(app)
@@ -19,7 +19,7 @@ with open('../data/palettes.pkl', 'rb') as f:
 
 image_ids = np.sort(list(palette_dict.keys()))
 palettes = [palette_dict[image_id] for image_id in image_ids]
-all_possible_palettes = np.stack([list(itertools.permutations(palette, 5)) 
+all_possible_palettes = np.stack([list(itertools.permutations(palette, 5))
                                   for palette in palettes])
 
 
@@ -43,14 +43,14 @@ class palette_search(Resource):
             no #s, 5 colours of len  6, total len 30, no delimiters
             eg 'bbafa557534d383530726b63958b81'
         """
-        query_palette = [query_string[i : i + 6] for i in range(0, 30, 6)]
+        query_palette = [query_string[i: i + 6] for i in range(0, 30, 6)]
         rgb_palette = np.array([hex_to_rgb(colour) for colour in query_palette])
         palette = rgb_to_lab(rgb_palette)
 
         distances = (np.linalg.norm(all_possible_palettes - palette, axis=3)
-                    .sum(axis=2)
-                    .min(axis=1))
-        
+                     .sum(axis=2)
+                     .min(axis=1))
+
         palette_distances = pd.Series(dict(zip(image_ids, distances)))
         most_similar_ids = (palette_distances
                             .sort_values()
@@ -70,10 +70,10 @@ def index():
 def send_index(path):
     return send_from_directory('static', path)
 
+
 # Define endpoints
 api.add_resource(most_similar, '/api/most_similar/<string:query_id>')
 api.add_resource(palette_search, '/api/palette_search/<string:query_string>')
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=80)
