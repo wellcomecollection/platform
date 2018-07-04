@@ -1,15 +1,11 @@
-package uk.ac.wellcome.platform.reindex_worker.models;
+package uk.ac.wellcome.platform.reindex_worker.models
 
-// A request to reindex a shard of the SourceData table, as received
-// from the reindex-job-creator.
+/** A request to identify all the shards in the table that need reindexing.
+  *
+  * @param shardId Name of the shard to reindex.
+  * @param desiredVersion Version to reindex everything in this shard to.
+  */
 case class ReindexJob(
   shardId: String,
   desiredVersion: Int
-)
-
-case class ReindexRecord(
-  id: String,
-  version: Int,
-  reindexShard: String,
-  reindexVersion: Int
 )

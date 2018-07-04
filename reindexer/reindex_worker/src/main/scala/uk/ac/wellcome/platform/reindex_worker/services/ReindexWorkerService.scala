@@ -11,7 +11,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.Future
 
 class ReindexWorkerService @Inject()(
-  targetService: ReindexService,
+  readerService: RecordReader,
+  notificationService: NotificationSender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
 ) {
@@ -19,8 +20,13 @@ class ReindexWorkerService @Inject()(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexJob <- Future.fromTry(fromJson[ReindexJob](message.Message))
-      _ <- targetService.runReindex(reindexJob = reindexJob)
+      reindexJob: ReindexJob <- Future.fromTry(
+        fromJson[ReindexJob](message.Message))
+      outdatedRecordIds: List[String] <- readerService.findRecordsForReindexing(
+        reindexJob)
+      _ <- notificationService.sendNotifications(
+        outdatedRecordIds,
+        desiredVersion = reindexJob.desiredVersion)
     } yield ()
 
   def stop() = system.terminate()
