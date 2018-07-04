@@ -4,7 +4,7 @@ import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 
 import scala.util.Random
 
-class IdentifiersUtil {
+trait IdentifiersUtil {
   def randomAlphanumeric(length: Int): String =
     (Random.alphanumeric take length mkString) toLowerCase
 
