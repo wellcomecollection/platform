@@ -233,7 +233,7 @@ class SierraGenresTest extends FunSpec with Matchers {
       .getGenres(bibData)
       .map { _.concepts.head }
       .map {
-        case Identifiable(_: Concept, sourceIdentifier, _) => sourceIdentifier
+        case Identifiable(_: Concept, sourceIdentifier, _, _) => sourceIdentifier
         case other                                         => assert(false, other)
       }
 
