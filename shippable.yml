@@ -16,6 +16,11 @@ env:
     #
     - PYTHONUNBUFFERED=x
 
+matrix:
+  include:
+    - env: TASK=common-test
+    - env: TASK=display-test
+
 build:
 
   # Because Shippable runs everything inside a Docker container,
@@ -29,4 +34,4 @@ build:
     options: --volume /root:/root
 
   ci:
-    - make ingestor-test
+    - python run_travis_task.py
