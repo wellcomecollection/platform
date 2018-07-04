@@ -11,9 +11,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = invisibleWorkWith(
-          canonicalId = "g9dtcj2e"
-        )
+        val work = createIdentifiedInvisibleWork
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -30,13 +28,8 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("excludes works with visible=false from list results") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        // Start by indexing a work with visible=false.
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "gze7bc24"
-        )
-
-        // Then we index two ordinary works into Elasticsearch.
-        val works = createWorks(2)
+        val deletedWork = createIdentifiedInvisibleWork
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
         val worksToIndex = Seq[IdentifiedBaseWork](deletedWork) ++ works
         insertIntoElasticsearch(indexNameV2, itemType, worksToIndex: _*)
@@ -53,11 +46,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
-               |     "description": "${works(0).description.get}",
-               |     "workType" : ${workType(works(0).workType.get)},
-               |     "lettering": "${works(0).lettering.get}",
-               |     "createdDate": ${period(works(0).createdDate.get)},
-               |     "contributors": [${contributor(works(0).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -66,11 +55,7 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "type": "Work",
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
-               |     "description": "${works(1).description.get}",
-               |     "workType" : ${workType(works(1).workType.get)},
-               |     "lettering": "${works(1).lettering.get}",
-               |     "createdDate": ${period(works(1).createdDate.get)},
-               |     "contributors": [${contributor(works(1).contributors(0))}],
+               |     "contributors": [ ],
                |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
@@ -86,13 +71,10 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
   it("excludes works with visible=false from search results") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val work = workWith(
-          canonicalId = "r8dx6std",
-          title = "A deleted dodo"
+        val work = createIdentifiedWorkWith(
+          title = "This shouldn't be deleted!"
         )
-        val deletedWork = invisibleWorkWith(
-          canonicalId = "e7rxkty8"
-        )
+        val deletedWork = createIdentifiedInvisibleWork
         insertIntoElasticsearch(indexNameV2, itemType, work, deletedWork)
 
         eventually {

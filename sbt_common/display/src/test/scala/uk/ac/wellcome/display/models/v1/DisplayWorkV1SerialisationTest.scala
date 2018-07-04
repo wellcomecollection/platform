@@ -13,25 +13,27 @@ class DisplayWorkV1SerialisationTest
     with WorksUtil {
 
   it("serialises a DisplayWorkV1 correctly") {
-    val work = workWith(
-      canonicalId = canonicalId,
-      title = title,
-      description = description,
-      lettering = lettering,
-      createdDate = period,
-      creator = agent,
-      items = createItems(count = 2))
+    val work = createIdentifiedWorkWith(
+      workType = Some(
+        WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
+      description = Some(randomAlphanumeric(100)),
+      lettering = Some(randomAlphanumeric(100)),
+      createdDate = Some(Period("1901")),
+      contributors = List(
+        Contributor(Unidentifiable(Agent(randomAlphanumeric(25))))
+      )
+    )
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV1(work))
 
     val expectedJsonString = s"""
        |{
        | "type": "Work",
-       | "id": "$canonicalId",
-       | "title": "$title",
-       | "description": "$description",
+       | "id": "${work.canonicalId}",
+       | "title": "${work.title}",
+       | "description": "${work.description.get}",
        | "workType" : ${workType(work.workType.get)},
-       | "lettering": "$lettering",
+       | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "creators": [ ${identifiedOrUnidentifiable(
                                   work.contributors(0).agent,
@@ -47,9 +49,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("renders an item if the items include is present") {
-    val work = workWith(
-      canonicalId = "b4heraz7",
-      title = "Inside an irate igloo",
+    val work = createIdentifiedWorkWith(
       items = createItems(count = 1)
     )
 
@@ -73,9 +73,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes 'items' if the items include is present, even with no items") {
-    val work = workWith(
-      canonicalId = "dgdb712",
-      title = "Without windows or wind or washing-up liquid",
+    val work = createIdentifiedWorkWith(
       items = List()
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -215,9 +213,7 @@ class DisplayWorkV1SerialisationTest
       ontologyType = "Work",
       value = "Test1234"
     )
-    val work = workWith(
-      canonicalId = "1234",
-      title = "An insect huddled in an igloo",
+    val work = createIdentifiedWorkWith(
       otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -228,7 +224,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)}, ${identifier(
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
@@ -241,9 +237,7 @@ class DisplayWorkV1SerialisationTest
 
   it(
     "always includes 'identifiers' with the identifiers include, even if there are no extra identifiers") {
-    val work = workWith(
-      canonicalId = "a87na87",
-      title = "Idling inkwells of indigo images",
+    val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
@@ -254,7 +248,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "identifiers": [ ${identifier(sourceIdentifier)} ],
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
@@ -266,14 +260,13 @@ class DisplayWorkV1SerialisationTest
 
   it(
     "includes the thumbnail field if available and we use the thumbnail include") {
-    val work = identifiedWorkWith(
-      canonicalId = "1234",
-      title = "A thorn in the thumb tells a traumatic tale",
-      thumbnail = DigitalLocation(
-        locationType = LocationType("thumbnail-image"),
-        url = "https://iiif.example.org/1234/default.jpg",
-        license = License_CCBY
-      )
+    val work = createIdentifiedWorkWith(
+      thumbnail = Some(
+        DigitalLocation(
+          locationType = LocationType("thumbnail-image"),
+          url = "https://iiif.example.org/1234/default.jpg",
+          license = License_CCBY
+        ))
     )
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV1(work, WorksIncludes(thumbnail = true)))

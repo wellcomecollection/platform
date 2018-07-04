@@ -23,18 +23,9 @@ class ElasticsearchServiceTest
   describe("simpleStringQueryResults") {
     it("finds results for a simpleStringQuery search") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = workWith(
-          canonicalId = "000Z",
-          title = "Amid an Aegean"
-        )
-        val work2 = workWith(
-          canonicalId = "000Y",
-          title = "Before a Bengal"
-        )
-        val work3 = workWith(
-          canonicalId = "000X",
-          title = "Circling a Cheetah"
-        )
+        val work1 = createIdentifiedWorkWith(title = "Amid an Aegean")
+        val work2 = createIdentifiedWorkWith(title = "Before a Bengal")
+        val work3 = createIdentifiedWorkWith(title = "Circling a Cheetah")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
@@ -61,26 +52,21 @@ class ElasticsearchServiceTest
   describe("findResultById") {
     it("finds a result by ID") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val canonicalId = "000Z"
+        val work = createIdentifiedWork
 
-        val expectedWork = workWith(
-          canonicalId = canonicalId,
-          title = "Amid an Aegean"
-        )
-
-        insertIntoElasticsearch(indexName, itemType, expectedWork)
+        insertIntoElasticsearch(indexName, itemType, work)
 
         withElasticSearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             val searchResultFuture: Future[GetResponse] =
               searchService.findResultById(
-                canonicalId = canonicalId,
+                canonicalId = work.canonicalId,
                 indexName = indexName
               )
 
             whenReady(searchResultFuture) { result =>
               val returnedWork = jsonToIdentifiedBaseWork(result.sourceAsString)
-              returnedWork shouldBe expectedWork
+              returnedWork shouldBe work
             }
         }
       }
@@ -90,18 +76,9 @@ class ElasticsearchServiceTest
   describe("listResults") {
     it("sorts results from Elasticsearch in the correct order") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val work1 = workWith(
-          canonicalId = "000Z",
-          title = "Amid an Aegean"
-        )
-        val work2 = workWith(
-          canonicalId = "000Y",
-          title = "Before a Bengal"
-        )
-        val work3 = workWith(
-          canonicalId = "000X",
-          title = "Circling a Cheetah"
-        )
+        val work1 = createIdentifiedWorkWith(canonicalId = "000Z")
+        val work2 = createIdentifiedWorkWith(canonicalId = "000Y")
+        val work3 = createIdentifiedWorkWith(canonicalId = "000X")
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
@@ -181,8 +158,8 @@ class ElasticsearchServiceTest
 
     it("does not list works that have visible=false") {
       withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-        val visibleWorks = createWorks(count = 8)
-        val invisibleWorks = createInvisibleWorks(count = 2, start = 9)
+        val visibleWorks = createIdentifiedWorks(count = 8)
+        val invisibleWorks = createIdentifiedInvisibleWorks(count = 2)
 
         val works = visibleWorks ++ invisibleWorks
         insertIntoElasticsearch(indexName, itemType, works: _*)
@@ -191,14 +168,14 @@ class ElasticsearchServiceTest
           indexName = indexName,
           limit = 10,
           from = 0,
-          expectedWorks = works.toList
+          expectedWorks = visibleWorks.toList
         )
       }
     }
   }
 
   private def populateElasticsearch(indexName: String): List[IdentifiedWork] = {
-    val works = createWorks(10)
+    val works = createIdentifiedWorks(count = 10)
 
     insertIntoElasticsearch(indexName, itemType, works: _*)
 
@@ -225,7 +202,7 @@ class ElasticsearchServiceTest
             .map { h: SearchHit =>
               jsonToIdentifiedBaseWork(h.sourceAsString)
             }
-          returnedWorks.toList shouldBe expectedWorks
+          returnedWorks.toList should contain theSameElementsAs expectedWorks
         }
     }
   }

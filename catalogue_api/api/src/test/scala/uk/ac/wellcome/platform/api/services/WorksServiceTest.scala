@@ -23,14 +23,14 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(2)
+            val works = createIdentifiedWorks(count = 2)
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
             val future = worksService.listWorks(indexName = indexName)
 
             whenReady(future) { resultList =>
-              resultList.results shouldBe works
+              resultList.results should contain theSameElementsAs works
             }
           }
       }
@@ -42,19 +42,19 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(1)
+            val work = createIdentifiedWork
 
-            insertIntoElasticsearch(indexName, itemType, works: _*)
+            insertIntoElasticsearch(indexName, itemType, work)
 
             val recordsFuture =
               worksService.findWorkById(
-                canonicalId = works.head.canonicalId,
+                canonicalId = work.canonicalId,
                 indexName = indexName
               )
 
             whenReady(recordsFuture) { records =>
               records.isDefined shouldBe true
-              records.get shouldBe works.head
+              records.get shouldBe work
             }
           }
       }
@@ -66,12 +66,10 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val workDodo = workWith(
-              canonicalId = "1234",
+            val workDodo = createIdentifiedWorkWith(
               title = "A drawing of a dodo"
             )
-            val workMouse = workWith(
-              canonicalId = "5678",
+            val workMouse = createIdentifiedWorkWith(
               title = "A mezzotint of a mouse"
             )
 
@@ -139,7 +137,7 @@ class WorksServiceTest
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val works = createWorks(3)
+            val works = createIdentifiedWorks(count = 3)
 
             insertIntoElasticsearch(indexName, itemType, works: _*)
 
@@ -158,13 +156,12 @@ class WorksServiceTest
   }
 
   it(
-    "throws an exception if passed an invalid query string for full-text search") {
+    "doesn't throw an exception if passed an invalid query string for full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
       withElasticSearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
-            val workEmu = workWith(
-              canonicalId = "1234",
+            val workEmu = createIdentifiedWorkWith(
               title = "An etching of an emu"
             )
             insertIntoElasticsearch(indexName, itemType, workEmu)

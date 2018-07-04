@@ -24,7 +24,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
         val flow = IdentifiedWorkToVisibleDisplayWork(
           toDisplayWork = DisplayWorkV1.apply)
 
-        val works = createWorks(count = 3).toList
+        val works = createIdentifiedWorks(count = 3).toList
 
         val eventualDisplayWorks = Source(works)
           .via(flow)
@@ -46,7 +46,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
         val flow = IdentifiedWorkToVisibleDisplayWork(
           toDisplayWork = DisplayWorkV2.apply)
 
-        val works = createWorks(count = 3).toList
+        val works = createIdentifiedWorks(count = 3).toList
 
         val eventualDisplayWorks = Source(works)
           .via(flow)
