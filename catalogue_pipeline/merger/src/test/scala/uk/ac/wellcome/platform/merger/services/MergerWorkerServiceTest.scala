@@ -42,9 +42,9 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry1 = recorderWorkEntryWith(version = 1)
-        val recorderWorkEntry2 = recorderWorkEntryWith(version = 1)
-        val recorderWorkEntry3 = recorderWorkEntryWith(version = 1)
+        val recorderWorkEntry1 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry2 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry3 = createRecorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(
           Set(
@@ -99,7 +99,7 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), topic, metricsSender) =>
-        val recorderWorkEntry = recorderWorkEntryWith(version = 1)
+        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
@@ -119,9 +119,9 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry = recorderWorkEntryWith(version = 1)
-        val olderVersionRecorderWorkEntry = recorderWorkEntryWith(version = 1)
-        val newerVersionRecorderWorkEntry = recorderWorkEntryWith(version = 2)
+        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+        val olderVersionRecorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+        val newerVersionRecorderWorkEntry = createRecorderWorkEntryWith(version = 2)
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
@@ -145,8 +145,8 @@ class MergerWorkerServiceTest
   it("discards works with version 0 and sends along the others") {
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val versionZeroWork = recorderWorkEntryWith(version = 0)
-        val recorderWorkEntry = recorderWorkEntryWith(version = 1)
+        val versionZeroWork = createRecorderWorkEntryWith(version = 0)
+        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
 
         val matcherResult =
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))

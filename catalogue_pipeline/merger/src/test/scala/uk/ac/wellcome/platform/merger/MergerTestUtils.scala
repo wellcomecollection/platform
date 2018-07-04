@@ -52,7 +52,7 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
     })
   }
 
-  def recorderWorkEntryWith(version: Int) =
+  def createRecorderWorkEntryWith(version: Int) =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
 
   def getWorksSent(topic: Topic) = {
