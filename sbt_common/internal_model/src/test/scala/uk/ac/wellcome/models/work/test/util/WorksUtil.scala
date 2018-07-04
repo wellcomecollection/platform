@@ -2,8 +2,6 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
-import scala.util.Random
-
 trait WorksUtil extends ItemsUtil {
   val canonicalId = "1234"
   val title = "this is the first image title"
@@ -31,18 +29,7 @@ trait WorksUtil extends ItemsUtil {
       Unidentifiable(Period("a genre period")))
   )
 
-  def randomAlphanumeric(length: Int) =
-    (Random.alphanumeric take length mkString) toLowerCase
-
-  private def createCanonicalId = randomAlphanumeric(10)
-
-  def createSourceIdentifier: SourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("miro-image-number"),
-    value = randomAlphanumeric(10),
-    ontologyType = "Work"
-  )
-
-  private def createTitle = randomAlphanumeric(100)
+  private def createTitle: String = randomAlphanumeric(length =100)
 
   val sourceIdentifier = SourceIdentifier(
     identifierType = IdentifierType("miro-image-number"),
