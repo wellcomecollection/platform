@@ -28,3 +28,8 @@ resource "aws_cloudwatch_metric_alarm" "cloudfront_4xx_alarm" {
 
   provider = "aws.us_east_1"
 }
+
+resource "aws_sns_topic" "cloudfront_errors" {
+  name     = "cloudfront_errors"
+  provider = "aws.us_east_1"
+}
