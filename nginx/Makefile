@@ -22,6 +22,9 @@ nginx-build-api:
 nginx-build-loris:
 	$(call nginx_build_image,loris)
 
+nginx-build-loris-delta:
+	$(call nginx_build_image,loris-delta)
+
 nginx-build-grafana:
 	$(call nginx_build_image,grafana)
 
@@ -33,6 +36,9 @@ nginx-publish-api: nginx-build-api
 
 nginx-publish-loris: nginx-build-loris
 	$(call publish_service,nginx_loris)
+
+nginx-publish-loris-delta: nginx-build-loris-delta
+	$(call publish_service,nginx_loris-delta)
 
 nginx-publish-grafana: nginx-build-grafana
 	$(call publish_service,nginx_grafana)

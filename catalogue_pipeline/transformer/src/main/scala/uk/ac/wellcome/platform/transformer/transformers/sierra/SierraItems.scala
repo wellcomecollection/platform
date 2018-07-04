@@ -52,6 +52,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
 
   def getItems(
     sierraTransformable: SierraTransformable): List[Identifiable[Item]] = {
+
     extractItemData(sierraTransformable)
       .filterNot { _.deleted }
       .map(transformItemData)
