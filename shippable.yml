@@ -17,5 +17,16 @@ env:
     - PYTHONUNBUFFERED=x
 
 build:
+
+  # Because Shippable runs everything inside a Docker container,
+  # new containers are started with volume mounts from the *host*, not
+  # inside the container.  Mounting the entire /home directory inside the
+  # container ensures volume mounts work correctly.
+  #
+  # See https://github.com/Shippable/support/issues/2353
+  #
+  pre_ci_boot:
+    options: --volume /home:/home
+
   ci:
     - make ingestor-test
