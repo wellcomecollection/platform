@@ -1,21 +1,31 @@
 pipeline {
-    agent any
+  agent any
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building..'
-            }
+  stages {
+    stage('Build') {
+      steps {
+        echo 'Building..'
+      }
+    }
+    stage('Test') {
+      parallel
+        ingestor: {
+          node('ingestor') {
+            checkout scm
+            echo 'Testing ingestor'
+          }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-            }
+        id_minter: {
+          node('id_minter') {
+            checkout scm
+            echo 'Testing id_minter'
+          }
         }
     }
+    stage('Deploy') {
+      steps {
+        echo 'Deploying....'
+      }
+    }
+  }
 }
