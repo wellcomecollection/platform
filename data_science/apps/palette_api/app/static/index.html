@@ -1,0 +1,47 @@
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        Palette explorer
+    </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+    <link rel="stylesheet" href="style.css">
+    <script src="jscolor.js"></script>
+    <script src="javascript.js"></script>
+</head>
+
+<div class="ph4 black-80">
+    <h1 class="pt2">Palette explorer</h1>
+    <hr class="divider divider--black" />
+
+    <div class="pt4">
+        Explore the collection using a colour palette of your choice
+        <form id="form" action="#" class="pt2">
+            <input name="c_1" class="jscolor pv2" value="bbafa5">
+            <input name="c_2" class="jscolor pv2" value="57534d">
+            <input name="c_3" class="jscolor pv2" value="383530">
+            <input name="c_4" class="jscolor pv2" value="726b63">
+            <input name="c_5" class="jscolor pv2" value="958b81">
+            <a class="f6 link dim br-pill ba ph3 pv2 mb2 dib black" onclick="display_palette_search_images()">
+                Run</a>
+        </form>
+    </div>
+
+    Or according to the palette of a specific image
+    <div class='pv2'>
+        <input value="B0004731" name="query_id" id="query_id" class="pv2">
+        <a class="f6 link dim br-pill ba ph3 pv2 mb2 dib black" onclick="display_most_similar_images(document.getElementById('query_id').value);">Run</a>
+    </div>
+
+    <hr class="divider divider--black" />
+
+    <section class="cf w-100 ph2">
+        <div id="images"></div>
+    </section>
+</div>
+
+</html>
