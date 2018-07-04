@@ -59,11 +59,13 @@ class IdEmbedder @Inject()(identifierGenerator: IdentifierGenerator)(
             obj.remove("identifiedType")
         }(json)
       case None =>
-        root.obj.modify(obj => ("canonicalId", Json.fromString(canonicalId)) +: obj)(json)
+        root.obj.modify(obj =>
+          ("canonicalId", Json.fromString(canonicalId)) +: obj)(json)
     }
   }
 
-  private def parseSourceIdentifier(sourceIdentifierJson: Json): SourceIdentifier = {
+  private def parseSourceIdentifier(
+    sourceIdentifierJson: Json): SourceIdentifier = {
     fromJson[SourceIdentifier](sourceIdentifierJson.toString()) match {
       case Success(sourceIdentifier) => sourceIdentifier
       case Failure(exception) =>

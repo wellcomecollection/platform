@@ -90,8 +90,10 @@ case class IdentifiedWork(
 
 trait InvisibleWork extends BaseWork
 
-case class UnidentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
-                                     version: Int,identifiedType: String = classOf[IdentifiedInvisibleWork].getSimpleName)
+case class UnidentifiedInvisibleWork(
+  sourceIdentifier: SourceIdentifier,
+  version: Int,
+  identifiedType: String = classOf[IdentifiedInvisibleWork].getSimpleName)
     extends InvisibleWork
     with TransformedBaseWork
 

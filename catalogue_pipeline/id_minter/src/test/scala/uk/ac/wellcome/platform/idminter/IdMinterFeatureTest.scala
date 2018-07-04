@@ -72,7 +72,11 @@ class IdMinterFeatureTest
                   messages.map(message => get[IdentifiedBaseWork](message))
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { work =>
-                  work.asInstanceOf[IdentifiedWork].identifiers.head.value shouldBe miroID
+                  work
+                    .asInstanceOf[IdentifiedWork]
+                    .identifiers
+                    .head
+                    .value shouldBe miroID
                   work.asInstanceOf[IdentifiedWork].title shouldBe title
                 }
               }

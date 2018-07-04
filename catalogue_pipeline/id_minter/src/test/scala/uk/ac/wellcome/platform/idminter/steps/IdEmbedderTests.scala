@@ -458,27 +458,27 @@ class IdEmbedderTests
     }
   }
 
-  it ("sets the new type if the field identifiedType is present") {
-      val ontologyType = "false capitals"
-      val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = ontologyType,
-        "sydney"
-      )
+  it("sets the new type if the field identifiedType is present") {
+    val ontologyType = "false capitals"
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      ontologyType = ontologyType,
+      "sydney"
+    )
 
-      val newCanonicalId =
-        generateMockCanonicalId(sourceIdentifier, ontologyType)
+    val newCanonicalId =
+      generateMockCanonicalId(sourceIdentifier, ontologyType)
 
-      withIdEmbedder {
-        case (identifierGenerator, idEmbedder) =>
-          setUpIdentifierGeneratorMock(
-            mockIdentifierGenerator = identifierGenerator,
-            sourceIdentifier = sourceIdentifier,
-            ontologyType = ontologyType,
-            newCanonicalId = newCanonicalId
-          )
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = sourceIdentifier,
+          ontologyType = ontologyType,
+          newCanonicalId = newCanonicalId
+        )
 
-          val inputJson = s"""
+        val inputJson = s"""
         {
           "sourceIdentifier": {
             "identifierType": {
@@ -494,7 +494,7 @@ class IdEmbedderTests
         }
         """
 
-          val outputJson = s"""
+        val outputJson = s"""
         {
           "canonicalId": "$newCanonicalId",
           "sourceIdentifier": {
@@ -511,13 +511,13 @@ class IdEmbedderTests
         }
         """
 
-          val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+        val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
 
-          whenReady(eventualJson) { json =>
-            assertJsonStringsAreEqual(json.toString, outputJson)
-          }
-      }
+        whenReady(eventualJson) { json =>
+          assertJsonStringsAreEqual(json.toString, outputJson)
+        }
     }
+  }
 
   def generateMockCanonicalId(
     sourceIdentifier: SourceIdentifier,
