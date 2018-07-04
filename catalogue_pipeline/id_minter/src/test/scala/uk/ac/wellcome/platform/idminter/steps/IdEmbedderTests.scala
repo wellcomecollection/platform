@@ -78,7 +78,7 @@ class IdEmbedderTests
         whenReady(newWorkFuture) { newWorkJson =>
           assertJsonStringsAreEqual(
             newWorkJson.toString(),
-            toJson(expectedWork).get
+            toJson[IdentifiedBaseWork](expectedWork).get
           )
         }
     }
@@ -150,7 +150,7 @@ class IdEmbedderTests
         whenReady(newWorkFuture) { newWorkJson =>
           assertJsonStringsAreEqual(
             newWorkJson.toString(),
-            toJson(expectedWork).get
+            toJson[IdentifiedBaseWork](expectedWork).get
           )
         }
     }
@@ -455,6 +455,67 @@ class IdEmbedderTests
             assertJsonStringsAreEqual(json.toString, outputJson)
           }
       }
+    }
+  }
+
+  it("sets the new type if the field identifiedType is present") {
+    val ontologyType = "false capitals"
+    val sourceIdentifier = SourceIdentifier(
+      identifierType = IdentifierType("miro-image-number"),
+      ontologyType = ontologyType,
+      "sydney"
+    )
+
+    val newCanonicalId =
+      generateMockCanonicalId(sourceIdentifier, ontologyType)
+
+    withIdEmbedder {
+      case (identifierGenerator, idEmbedder) =>
+        setUpIdentifierGeneratorMock(
+          mockIdentifierGenerator = identifierGenerator,
+          sourceIdentifier = sourceIdentifier,
+          ontologyType = ontologyType,
+          newCanonicalId = newCanonicalId
+        )
+
+        val inputJson = s"""
+        {
+          "sourceIdentifier": {
+            "identifierType": {
+              "id": "${sourceIdentifier.identifierType.id}",
+              "label": "${sourceIdentifier.identifierType.label}",
+              "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+            },
+            "ontologyType": "$ontologyType",
+            "value": "${sourceIdentifier.value}"
+          },
+          "identifiedType": "NewType",
+          "ontologyType": "$ontologyType"
+        }
+        """
+
+        val outputJson = s"""
+        {
+          "canonicalId": "$newCanonicalId",
+          "sourceIdentifier": {
+            "identifierType": {
+              "id": "${sourceIdentifier.identifierType.id}",
+              "label": "${sourceIdentifier.identifierType.label}",
+              "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
+            },
+            "ontologyType": "$ontologyType",
+            "value": "${sourceIdentifier.value}"
+          },
+          "type": "NewType",
+          "ontologyType": "$ontologyType"
+        }
+        """
+
+        val eventualJson = idEmbedder.embedId(parse(inputJson).right.get)
+
+        whenReady(eventualJson) { json =>
+          assertJsonStringsAreEqual(json.toString, outputJson)
+        }
     }
   }
 

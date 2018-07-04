@@ -69,11 +69,15 @@ class IdMinterFeatureTest
                 messages.length shouldBe >=(messageCount)
 
                 val works =
-                  messages.map(message => get[IdentifiedWork](message))
+                  messages.map(message => get[IdentifiedBaseWork](message))
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { work =>
-                  work.identifiers.head.value shouldBe miroID
-                  work.title shouldBe title
+                  work
+                    .asInstanceOf[IdentifiedWork]
+                    .identifiers
+                    .head
+                    .value shouldBe miroID
+                  work.asInstanceOf[IdentifiedWork].title shouldBe title
                 }
               }
             }
@@ -120,9 +124,10 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(1)
 
-                val work = get[IdentifiedInvisibleWork](messages.head)
-                work.sourceIdentifier shouldBe identifier
-                work.canonicalId shouldNot be(empty)
+                val work = get[IdentifiedBaseWork](messages.head)
+                val invisibleWork = work.asInstanceOf[IdentifiedInvisibleWork]
+                invisibleWork.sourceIdentifier shouldBe identifier
+                invisibleWork.canonicalId shouldNot be(empty)
               }
             }
           }
@@ -173,10 +178,11 @@ class IdMinterFeatureTest
                 val messages = listMessagesReceivedFromSNS(topic)
                 messages.length shouldBe >=(1)
 
-                val work = get[IdentifiedRedirectedWork](messages.head)
-                work.sourceIdentifier shouldBe identifier
-                work.canonicalId shouldNot be(empty)
-                work.redirect.canonicalId shouldNot be(empty)
+                val work = get[IdentifiedBaseWork](messages.head)
+                val redirectedWork = work.asInstanceOf[IdentifiedRedirectedWork]
+                redirectedWork.sourceIdentifier shouldBe identifier
+                redirectedWork.canonicalId shouldNot be(empty)
+                redirectedWork.redirect.canonicalId shouldNot be(empty)
               }
             }
           }

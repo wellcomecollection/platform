@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
-import io.circe.{Json, _}
+import io.circe._
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -31,32 +31,42 @@ class IdEmbedder @Inject()(identifierGenerator: IdentifierGenerator)(
 
   private def addIdentifierToJson(json: Json): Json = {
     if (json.isObject) {
-      json.mapObject(obj => addIdentifierToJsonObject(obj))
+      generateAndAddCanonicalId(json)
     } else json
   }
 
-  private def addIdentifierToJsonObject(obj: JsonObject): JsonObject = {
-    if (obj.contains("sourceIdentifier")) {
-      val sourceIdentifier = parseSourceIdentifier(obj)
+  private def generateAndAddCanonicalId(json: Json): Json = {
+    root.sourceIdentifier.json.getOption(json) match {
+      case Some(sourceIdentifierJson) =>
+        val sourceIdentifier = parseSourceIdentifier(sourceIdentifierJson)
+        val canonicalId = identifierGenerator
+          .retrieveOrGenerateCanonicalId(
+            identifier = sourceIdentifier
+          )
+          .get
+        addCanonicalId(json, canonicalId)
 
-      val canonicalId = identifierGenerator
-        .retrieveOrGenerateCanonicalId(
-          identifier = sourceIdentifier
-        )
-        .get
-
-      if (obj.contains("type")) {
-        ("type", Json.fromString("Identified")) +:
-          ("canonicalId", Json.fromString(canonicalId)) +: obj
-      } else {
-        ("canonicalId", Json.fromString(canonicalId)) +: obj
-      }
-
-    } else obj
+      case None => json
+    }
   }
 
-  private def parseSourceIdentifier(obj: JsonObject): SourceIdentifier = {
-    fromJson[SourceIdentifier](obj("sourceIdentifier").get.toString()) match {
+  private def addCanonicalId(json: Json, canonicalId: String) = {
+    root.identifiedType.json.getOption(json) match {
+      case Some(identifiedType) =>
+        root.obj.modify { obj =>
+          ("type", identifiedType) +:
+            ("canonicalId", Json.fromString(canonicalId)) +:
+            obj.remove("identifiedType")
+        }(json)
+      case None =>
+        root.obj.modify(obj =>
+          ("canonicalId", Json.fromString(canonicalId)) +: obj)(json)
+    }
+  }
+
+  private def parseSourceIdentifier(
+    sourceIdentifierJson: Json): SourceIdentifier = {
+    fromJson[SourceIdentifier](sourceIdentifierJson.toString()) match {
       case Success(sourceIdentifier) => sourceIdentifier
       case Failure(exception) =>
         error(s"Error parsing source identifier: $exception")
