@@ -72,10 +72,10 @@ locals {
   remus_nginx_release_id = "${local.remus_nginx_is_pinned == "true" ? var.pinned_romulus_api_nginx-delta : var.release_ids["nginx_api-delta"]}"
 
   romulus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
-  romulus_nginx_uri = "${module.ecr_repository_nginx_api.repository_url}:${local.romulus_nginx_release_id}"
+  romulus_nginx_uri = "${module.ecr_repository_nginx_api-delta.repository_url}:${local.romulus_nginx_release_id}"
 
   remus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
-  remus_nginx_uri = "${module.ecr_repository_nginx_api.repository_url}:${local.remus_nginx_release_id}"
+  remus_nginx_uri = "${module.ecr_repository_nginx_api-delta.repository_url}:${local.remus_nginx_release_id}"
 
   romulus_is_prod = "${var.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod   = "${var.production_api == "remus" ? "true" : "false"}"
