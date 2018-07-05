@@ -1,4 +1,6 @@
-variable "public_subnets" {}
+variable "public_subnets" {
+  type = "list"
+}
 variable "vpc_id" {}
 variable "certificate_domain" {}
 variable "default_target_group_arn" {}
