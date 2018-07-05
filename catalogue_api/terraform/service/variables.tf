@@ -76,3 +76,11 @@ variable "sidecar_env_vars" {
 variable "alb_id" {}
 variable "cluster_id" {}
 variable "namespace_id" {}
+
+variable "es_cluster_credentials" {
+  type = "map"
+}
+
+variable "es_config" {
+  type = "map"
+}

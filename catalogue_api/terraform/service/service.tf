@@ -1,3 +1,13 @@
+data "template_file" "es_cluster_host" {
+  template = "$${name}.$${region}.aws.found.io"
+
+  vars {
+    name   = "${var.es_cluster_credentials["name"]}"
+    region = "${var.es_cluster_credentials["region"]}"
+  }
+}
+
+
 module "task" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v11.1.0"
 
@@ -54,6 +64,18 @@ module "service" {
   container_name = "${module.task.sidecar_task_name}"
 
   task_definition_arn = "${module.task.task_definition_arn}"
+
+  env_vars = {
+    api_host    = "${var.host_name}"
+    es_host     = "${data.template_file.es_cluster_host.rendered}"
+    es_port     = "${var.es_cluster_credentials["port"]}"
+    es_username = "${var.es_cluster_credentials["username"]}"
+    es_password = "${var.es_cluster_credentials["password"]}"
+    es_protocol = "${var.es_cluster_credentials["protocol"]}"
+    es_index_v1 = "${var.es_config["index_v1"]}"
+    es_index_v2 = "${var.es_config["index_v2"]}"
+    es_doc_type = "${var.es_config["doc_type"]}"
+  }
 
   healthcheck_path = "${var.healthcheck_path}"
 
