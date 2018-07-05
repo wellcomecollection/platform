@@ -54,6 +54,11 @@ variable "pinned_romulus_api" {
   default     = "3e731d10c993c7a2bce109835439dbb0b1b7f467"
 }
 
+variable "pinned_romulus_api_nginx-delta" {
+  description = "Which version of the nginx API image to pin romulus to, if any"
+  default     = "0c6240295dd7997ecc507a31ca61cfa2add9ff72"
+}
+
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
   default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
@@ -67,6 +72,11 @@ variable "pinned_remus_api" {
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = ""
+}
+
+variable "pinned_remus_api_nginx-delta" {
+  description = "Which version of the nginx API image to pin remus to, if any"
+  default     = "0c6240295dd7997ecc507a31ca61cfa2add9ff72"
 }
 
 variable "es_config_romulus" {
