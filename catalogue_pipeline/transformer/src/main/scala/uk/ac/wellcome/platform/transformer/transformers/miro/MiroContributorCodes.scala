@@ -50,14 +50,26 @@ trait MiroContributorCodes {
     // use lowercased versions, so we cast everything to ALL CAPS just in case.
     val creditCode = code.toUpperCase()
 
+    // We had a request to remove records from contributor GUS from
+    // the API after we'd done the initial sort of the Miro data.
+    // We removed them from Elasticsearch by hand, but we don't want
+    // them to reappear on reindex.
+    //
+    // Until we can move them to Tandem Vault or Cold Store, we'll throw
+    // them away at this point.
+    if (creditCode == "GUS") {
+      throw new ShouldNotTransformException(
+        s"Image $miroId has contributor code GUS, which should not be sent to the pipeline"
+      )
+    }
+
     contributorMap.get(creditCode) match {
       case Some(creditLine) => Some(creditLine)
-      case None => {
+      case None =>
         perRecordContributorMap.get(miroId) match {
           case Some(perRecordMap) => perRecordMap.get(creditCode)
           case None               => None
         }
-      }
     }
   }
 }

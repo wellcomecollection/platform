@@ -5,14 +5,13 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.util.Success
 
 class SierraTransformableTransformerTest
     extends FunSpec
@@ -604,6 +603,30 @@ class SierraTransformableTransformerTest
           IdentifierType("sierra-system-number"),
           "Work",
           mergeCandidateBibNumber)))
+  }
+
+  it("returns None if bibData has no title") {
+    val id = "2141444"
+    val bibData =
+      s"""
+        |{
+        | "id": "$id",
+        | "deleted": false,
+        | "suppressed": false
+        |}
+      """.stripMargin
+    val bibRecord = SierraBibRecord(
+      id = id,
+      data = bibData,
+      modifiedDate = now()
+    )
+
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData = Some(bibRecord)
+    )
+    transformer.transform(sierraTransformable, version =1) shouldBe Success(None)
+
   }
 
   private def transformDataToWork(id: String,
