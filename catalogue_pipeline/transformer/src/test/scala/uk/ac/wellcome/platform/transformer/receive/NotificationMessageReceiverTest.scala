@@ -115,7 +115,8 @@ class NotificationMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                get[UnidentifiedWork](snsMessage)
+                val work = get[TransformedBaseWork](snsMessage)
+                work shouldBe a[UnidentifiedWork]
                 snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
@@ -162,12 +163,14 @@ class NotificationMessageReceiverTest
               snsMessages.size should be >= 1
 
               snsMessages.map { snsMessage =>
-                val actualWork = get[UnidentifiedWork](snsMessage)
+                val actualWork = get[TransformedBaseWork](snsMessage)
+                actualWork shouldBe a[UnidentifiedWork]
+                val unidentifiedWork = actualWork.asInstanceOf[UnidentifiedWork]
 
-                actualWork.title shouldBe title
-                actualWork.sourceIdentifier shouldBe sourceIdentifier
-                actualWork.version shouldBe version
-                actualWork.identifiers shouldBe List(
+                unidentifiedWork.title shouldBe title
+                unidentifiedWork.sourceIdentifier shouldBe sourceIdentifier
+                unidentifiedWork.version shouldBe version
+                unidentifiedWork.identifiers shouldBe List(
                   sourceIdentifier,
                   sierraIdentifier)
 
