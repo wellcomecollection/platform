@@ -23,17 +23,6 @@ module "task" {
 
   app_cpu      = "${var.app_cpu}"
   app_memory   = "${var.app_memory}"
-  app_env_vars = "${var.app_env_vars}"
-
-  sidecar_container_image = "${var.sidecar_container_image}"
-  sidecar_container_port  = "${var.sidecar_container_port}"
-
-  sidecar_cpu      = "${var.sidecar_cpu}"
-  sidecar_memory   = "${var.sidecar_memory}"
-  sidecar_env_vars = "${var.sidecar_env_vars}"
-
-  sidecar_is_proxy = "true"
-
   app_env_vars = {
     api_host    = "${var.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
@@ -45,6 +34,15 @@ module "task" {
     es_index_v2 = "${var.es_config["index_v2"]}"
     es_doc_type = "${var.es_config["doc_type"]}"
   }
+
+  sidecar_container_image = "${var.sidecar_container_image}"
+  sidecar_container_port  = "${var.sidecar_container_port}"
+
+  sidecar_cpu      = "${var.sidecar_cpu}"
+  sidecar_memory   = "${var.sidecar_memory}"
+  sidecar_env_vars = "${var.sidecar_env_vars}"
+
+  sidecar_is_proxy = "true"
 }
 
 module "service" {
