@@ -22,11 +22,11 @@ variable "log_group_prefix" {
 }
 
 variable "cpu" {
-  default = "3960"
+  default = "2048"
 }
 
 variable "memory" {
-  default = "7350"
+  default = "4096"
 }
 
 variable "task_desired_count" {
@@ -40,11 +40,11 @@ variable "app_container_port" {
 }
 
 variable "app_cpu" {
-  default = "1024"
+  default = "1920"
 }
 
 variable "app_memory" {
-  default = "2048"
+  default = "4032"
 }
 
 variable "app_env_vars" {
@@ -64,7 +64,7 @@ variable "sidecar_cpu" {
 }
 
 variable "sidecar_memory" {
-  default = "128"
+  default = "64"
 }
 
 variable "sidecar_env_vars" {
