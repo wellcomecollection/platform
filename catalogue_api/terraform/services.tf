@@ -59,16 +59,16 @@ module "api_remus_v1" {
 // api-delta
 
 locals {
-  romulus_api_is_pinned = "${var.pinned_romulus_api == "" ? "false" : "true" }"
+  romulus_api_is_pinned   = "${var.pinned_romulus_api == "" ? "false" : "true" }"
   romulus_nginx_is_pinned = "${var.pinned_romulus_api_nginx == "" ? "false" : "true" }"
 
   remus_api_is_pinned   = "${var.pinned_remus_api == "" ? "false" : "true" }"
-  remus_nginx_is_pinned   = "${var.pinned_remus_api_nginx == "" ? "false" : "true" }"
-  
+  remus_nginx_is_pinned = "${var.pinned_remus_api_nginx == "" ? "false" : "true" }"
+
   romulus_api_release_id   = "${local.romulus_api_is_pinned == "true" ? var.pinned_romulus_api : var.release_ids["api"]}"
   romulus_nginx_release_id = "${local.romulus_nginx_is_pinned == "true" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
 
-  remus_api_release_id       = "${local.remus_api_is_pinned == "true" ? var.pinned_romulus_api : var.release_ids["api"]}"
+  remus_api_release_id   = "${local.remus_api_is_pinned == "true" ? var.pinned_romulus_api : var.release_ids["api"]}"
   remus_nginx_release_id = "${local.remus_nginx_is_pinned == "true" ? var.pinned_romulus_api_nginx : var.release_ids["nginx_api"]}"
 
   romulus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.romulus_api_release_id}"
@@ -76,10 +76,10 @@ locals {
 
   remus_app_uri   = "${module.ecr_repository_api.repository_url}:${local.remus_api_release_id}"
   remus_nginx_uri = "${module.ecr_repository_api.repository_url}:${local.remus_nginx_release_id}"
-  
+
   romulus_is_prod = "${var.production_api == "romulus" ? "true" : "false"}"
   remus_is_prod   = "${var.production_api == "remus" ? "true" : "false"}"
-  
+
   remus_hostname   = "${local.remus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
   romulus_hostname = "${local.romulus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
 }
@@ -106,7 +106,7 @@ module "load_balancer" {
 
   service_lb_security_group_ids = [
     "${module.api_romulus_delta.service_lb_security_group_id}",
-    "${module.api_remus_delta.service_lb_security_group_id}"
+    "${module.api_remus_delta.service_lb_security_group_id}",
   ]
 }
 
@@ -125,7 +125,7 @@ module "api_romulus_delta" {
 
   sidecar_container_image = "${local.romulus_nginx_uri}"
   app_container_image     = "${local.romulus_app_uri}"
-  
+
   host_name = "${local.romulus_hostname}"
 }
 
