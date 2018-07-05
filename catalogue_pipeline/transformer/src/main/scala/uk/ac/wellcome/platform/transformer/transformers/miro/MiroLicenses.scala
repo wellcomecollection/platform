@@ -43,10 +43,10 @@ trait MiroLicenses {
           // so they don't end up on the DLQ.
           case "Do not use" =>
             throw new ShouldNotTransformException(
-              "Usage restriction is 'Do not use'")
+              s"Image $miroId has usage restriction 'Do not use'")
           case "Image withdrawn, see notes" =>
             throw new ShouldNotTransformException(
-              "Usage restriction is 'Image withdrawn'")
+              s"Image $miroId has usage restriction 'Image withdrawn'")
         }
     }
 
