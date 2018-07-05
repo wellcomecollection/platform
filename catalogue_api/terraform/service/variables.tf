@@ -2,6 +2,7 @@ variable "name" {}
 variable "vpc_id" {}
 variable "aws_region" {}
 variable "alb_listener_arn" {}
+variable "host_name" {}
 
 variable "private_subnets" {
   type = "list"
