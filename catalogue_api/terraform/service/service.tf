@@ -7,7 +7,6 @@ data "template_file" "es_cluster_host" {
   }
 }
 
-
 module "task" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v11.1.0"
 
@@ -35,7 +34,7 @@ module "task" {
 
   sidecar_is_proxy = "true"
 
-  env_vars = {
+  app_env_vars = {
     api_host    = "${var.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_cluster_credentials["port"]}"
