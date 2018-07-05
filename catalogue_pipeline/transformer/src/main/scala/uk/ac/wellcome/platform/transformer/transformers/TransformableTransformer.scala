@@ -16,10 +16,9 @@ trait TransformableTransformer[T <: Transformable] extends Logging {
     Try {
       transformable match {
         case t if transformForType.isDefinedAt((t, version)) =>
-          transformForType((t, version)).recover{
+          transformForType((t, version)).recover {
             case e: ShouldNotTransformException =>
-              warn(
-                s"Should not transform: ${e.getMessage}")
+              warn(s"Should not transform: ${e.getMessage}")
               None
           }
         case _ =>

@@ -20,47 +20,47 @@ class MiroTransformableTransformer
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
-  override def transformForType: PartialFunction[(Transformable, Int), Try[Some[UnidentifiedWork]]] = {
+  override def transformForType
+    : PartialFunction[(Transformable, Int), Try[Some[UnidentifiedWork]]] = {
     case (miroTransformable: MiroTransformable, version: Int) =>
       Try {
         val miroData = MiroTransformableData.create(miroTransformable.data)
 
-          // These images should really have been removed from the pipeline
-          // already, but we have at least one instance (B0010525).  It was
-          // throwing a MatchError when we tried to pick a license, so handle
-          // it properly here.
-          if (!miroData.copyrightCleared.contains("Y")) {
-            throw new ShouldNotTransformException(
-              s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
-            )
-          }
+        // These images should really have been removed from the pipeline
+        // already, but we have at least one instance (B0010525).  It was
+        // throwing a MatchError when we tried to pick a license, so handle
+        // it properly here.
+        if (!miroData.copyrightCleared.contains("Y")) {
+          throw new ShouldNotTransformException(
+            s"Image ${miroTransformable.sourceId} does not have copyright clearance!"
+          )
+        }
 
         val (title, description) = getTitleAndDescription(miroData)
 
-          Some(
-            UnidentifiedWork(
-              title = title,
-              sourceIdentifier = SourceIdentifier(
-                identifierType = IdentifierType("miro-image-number"),
-                ontologyType = "Work",
-                value = miroTransformable.sourceId),
-              version = version,
-              otherIdentifiers =
-                getOtherIdentifiers(miroData, miroTransformable.sourceId),
-              description = description,
-              lettering = miroData.suppLettering,
-              createdDate =
-                getCreatedDate(miroData, miroTransformable.MiroCollection),
-              subjects = getSubjects(miroData),
-              contributors = getContributors(
-                miroId = miroTransformable.sourceId,
-                miroData = miroData
-              ),
-              genres = getGenres(miroData),
-              thumbnail =
-                Some(getThumbnail(miroData, miroTransformable.sourceId)),
-              items = getItems(miroData, miroTransformable.sourceId)
-            ))
+        Some(
+          UnidentifiedWork(
+            title = title,
+            sourceIdentifier = SourceIdentifier(
+              identifierType = IdentifierType("miro-image-number"),
+              ontologyType = "Work",
+              value = miroTransformable.sourceId),
+            version = version,
+            otherIdentifiers =
+              getOtherIdentifiers(miroData, miroTransformable.sourceId),
+            description = description,
+            lettering = miroData.suppLettering,
+            createdDate =
+              getCreatedDate(miroData, miroTransformable.MiroCollection),
+            subjects = getSubjects(miroData),
+            contributors = getContributors(
+              miroId = miroTransformable.sourceId,
+              miroData = miroData
+            ),
+            genres = getGenres(miroData),
+            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+            items = getItems(miroData, miroTransformable.sourceId)
+          ))
       }
   }
 
@@ -174,7 +174,7 @@ class MiroTransformableTransformer
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
       url = buildImageApiURL(miroId, "thumbnail"),
-      license = chooseLicense(miroId,miroData.useRestrictions)
+      license = chooseLicense(miroId, miroData.useRestrictions)
     )
   }
 

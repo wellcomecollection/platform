@@ -5,7 +5,10 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
@@ -625,7 +628,8 @@ class SierraTransformableTransformerTest
       sourceId = id,
       maybeBibData = Some(bibRecord)
     )
-    transformer.transform(sierraTransformable, version =1) shouldBe Success(None)
+    transformer.transform(sierraTransformable, version = 1) shouldBe Success(
+      None)
 
   }
 
