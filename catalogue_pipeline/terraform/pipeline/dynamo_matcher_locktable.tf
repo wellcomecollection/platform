@@ -1,5 +1,5 @@
-resource "aws_dynamodb_table" "matcher_graph_table" {
-  name           = "works-graph"
+resource "aws_dynamodb_table" "matcher_lock_table" {
+  name           = "${var.namespace}_matcher-lock-table"
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "id"
@@ -10,16 +10,21 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   }
 
   attribute {
-    name = "componentId"
+    name = "contextId"
     type = "S"
   }
 
   global_secondary_index {
-    name            = "${var.matcher_graph_table_index}"
-    hash_key        = "componentId"
+    name            = "${var.matcher_lock_table_index}"
+    hash_key        = "contextId"
     write_capacity  = 1
     read_capacity   = 1
     projection_type = "ALL"
+  }
+
+  ttl {
+    attribute_name = "expires"
+    enabled        = true
   }
 
   lifecycle {
@@ -33,10 +38,10 @@ resource "aws_dynamodb_table" "matcher_graph_table" {
   }
 }
 
-module "matcher_graph_dynamo_autoscaling" {
+module "matcher_lock_table_dynamo_autoscaling" {
   source = "git::https://github.com/wellcometrust/terraform.git//autoscaling/dynamodb?ref=v10.2.0"
 
-  table_name = "${aws_dynamodb_table.matcher_graph_table.name}"
+  table_name = "${aws_dynamodb_table.matcher_lock_table.name}"
 
   enable_read_scaling     = true
   read_target_utilization = 30
@@ -47,4 +52,14 @@ module "matcher_graph_dynamo_autoscaling" {
   write_target_utilization = 30
   write_min_capacity       = 1
   write_max_capacity       = 750
+}
+
+module "lambda_dynamodb_write_heartbeat" {
+  source = "../../shared_infra/dynamo_write_heartbeat"
+
+  name               = "matcher"
+  dynamo_table_names = ["${aws_dynamodb_table.matcher_lock_table.name}"]
+
+  infra_bucket           = "${var.infra_bucket}"
+  lambda_error_alarm_arn = "${var.lambda_error_alarm_arn}"
 }
