@@ -127,6 +127,9 @@ module "api_romulus_delta" {
   app_container_image     = "${local.romulus_app_uri}"
 
   host_name = "${local.romulus_hostname}"
+
+  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_config              = "${var.es_config_romulus}"
 }
 
 module "api_remus_delta" {
@@ -146,4 +149,7 @@ module "api_remus_delta" {
   app_container_image     = "${local.remus_app_uri}"
 
   host_name = "${local.remus_hostname}"
+
+  es_cluster_credentials = "${var.es_cluster_credentials}"
+  es_config              = "${var.es_config_remus}"
 }
