@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -145,8 +145,10 @@ class MergerWorkerServiceTest
   it("discards works with version 0 and sends along the others") {
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val versionZeroWork = createRecorderWorkEntryWith(version = 0)
-        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+        val versionZeroWork: RecorderWorkEntry = createRecorderWorkEntryWith(version = 0)
+        val recorderWorkEntry = versionZeroWork.copy(
+          work = versionZeroWork.work.asInstanceOf[UnidentifiedWork].copy(version = 1)
+        )
 
         val matcherResult =
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
