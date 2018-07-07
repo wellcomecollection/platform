@@ -43,7 +43,7 @@ class MergerFeatureTest
                       sourceId = "b123456",
                       version = 1)
 
-                    whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+                    whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
                       val matcherResult =
                         matcherResultWith(Set(Set(recorderWorkEntry)))
 

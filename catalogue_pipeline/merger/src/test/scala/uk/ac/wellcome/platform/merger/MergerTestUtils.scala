@@ -41,14 +41,19 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
     sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
   }
 
+  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry, EmptyMetadata, ObjectStore[RecorderWorkEntry]],
+                 recorderWorkEntry: RecorderWorkEntry): Future[Unit] =
+    vhs.updateRecord(recorderWorkEntry.id)(
+      ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+      throw new RuntimeException("Not possible, VHS is empty!")
+    )
+
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
                                            ObjectStore[RecorderWorkEntry]],
                  entries: List[RecorderWorkEntry]) = {
     Future.sequence(entries.map { recorderWorkEntry =>
-      vhs.updateRecord(recorderWorkEntry.id)(
-        ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
-        throw new RuntimeException("Not possible, VHS is empty!"))
+      storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
     })
   }
 

@@ -81,7 +81,7 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+        whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
           sendSQSMessage(queue, matcherResult)
 
           eventually {
@@ -151,7 +151,7 @@ class MergerWorkerServiceTest
         val matcherResult =
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+        whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
           sendSQSMessage(queue, matcherResult)
 
           eventually {
