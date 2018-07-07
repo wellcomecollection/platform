@@ -79,7 +79,8 @@ trait WorksUtil extends ItemsUtil {
       version = 1
     )
 
-  def createUnidentifiedInvisibleWork: UnidentifiedInvisibleWork = createUnidentifiedInvisibleWorkWith()
+  def createUnidentifiedInvisibleWork: UnidentifiedInvisibleWork =
+    createUnidentifiedInvisibleWorkWith()
 
   def createIdentifiedInvisibleWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier
@@ -94,7 +95,9 @@ trait WorksUtil extends ItemsUtil {
     createIdentifiedInvisibleWorkWith()
 
   def createIdentifiedInvisibleWorks(count: Int): Seq[IdentifiedInvisibleWork] =
-    (1 to count).map { _ => createIdentifiedInvisibleWork }
+    (1 to count).map { _ =>
+      createIdentifiedInvisibleWork
+    }
 
   def createUnidentifiedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,

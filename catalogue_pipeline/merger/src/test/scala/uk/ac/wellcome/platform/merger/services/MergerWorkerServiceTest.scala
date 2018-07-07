@@ -11,7 +11,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -120,8 +123,10 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
-        val olderVersionRecorderWorkEntry = createRecorderWorkEntryWith(version = 1)
-        val newerVersionRecorderWorkEntry = createRecorderWorkEntryWith(version = 2)
+        val olderVersionRecorderWorkEntry =
+          createRecorderWorkEntryWith(version = 1)
+        val newerVersionRecorderWorkEntry =
+          createRecorderWorkEntryWith(version = 2)
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
@@ -145,9 +150,12 @@ class MergerWorkerServiceTest
   it("discards works with version 0 and sends along the others") {
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val versionZeroWork: RecorderWorkEntry = createRecorderWorkEntryWith(version = 0)
+        val versionZeroWork: RecorderWorkEntry =
+          createRecorderWorkEntryWith(version = 0)
         val recorderWorkEntry = versionZeroWork.copy(
-          work = versionZeroWork.work.asInstanceOf[UnidentifiedWork].copy(version = 1)
+          work = versionZeroWork.work
+            .asInstanceOf[UnidentifiedWork]
+            .copy(version = 1)
         )
 
         val matcherResult =

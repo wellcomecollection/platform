@@ -63,7 +63,9 @@ class IdMinterFeatureTest
                   receivedWork
                     .asInstanceOf[IdentifiedWork]
                     .sourceIdentifier shouldBe work.sourceIdentifier
-                  receivedWork.asInstanceOf[IdentifiedWork].title shouldBe work.title
+                  receivedWork
+                    .asInstanceOf[IdentifiedWork]
+                    .title shouldBe work.title
                 }
               }
             }
@@ -100,7 +102,8 @@ class IdMinterFeatureTest
                 messages.length shouldBe >=(1)
 
                 val receivedWork = get[IdentifiedBaseWork](messages.head)
-                val invisibleWork = receivedWork.asInstanceOf[IdentifiedInvisibleWork]
+                val invisibleWork =
+                  receivedWork.asInstanceOf[IdentifiedInvisibleWork]
                 invisibleWork.sourceIdentifier shouldBe work.sourceIdentifier
                 invisibleWork.canonicalId shouldNot be(empty)
               }
@@ -139,7 +142,8 @@ class IdMinterFeatureTest
                 messages.length shouldBe >=(1)
 
                 val receivedWork = get[IdentifiedBaseWork](messages.head)
-                val redirectedWork = receivedWork.asInstanceOf[IdentifiedRedirectedWork]
+                val redirectedWork =
+                  receivedWork.asInstanceOf[IdentifiedRedirectedWork]
                 redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
                 redirectedWork.canonicalId shouldNot be(empty)
                 redirectedWork.redirect.canonicalId shouldNot be(empty)

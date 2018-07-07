@@ -37,8 +37,8 @@ class MergerFeatureTest
                     storageBucket = storageBucket,
                     messageBucket = messagesBucket,
                     table = table) { _ =>
-                    val recorderWorkEntry = createRecorderWorkEntryWith(
-                      version = 1)
+                    val recorderWorkEntry =
+                      createRecorderWorkEntryWith(version = 1)
 
                     whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
                       val matcherResult =
