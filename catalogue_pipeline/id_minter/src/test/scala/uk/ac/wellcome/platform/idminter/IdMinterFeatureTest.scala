@@ -139,7 +139,7 @@ class IdMinterFeatureTest
                 messages.length shouldBe >=(1)
 
                 val receivedWork = get[IdentifiedBaseWork](messages.head)
-                val redirectedWork = work.asInstanceOf[IdentifiedRedirectedWork]
+                val redirectedWork = receivedWork.asInstanceOf[IdentifiedRedirectedWork]
                 redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
                 redirectedWork.canonicalId shouldNot be(empty)
                 redirectedWork.redirect.canonicalId shouldNot be(empty)

@@ -83,12 +83,6 @@ class IdEmbedderTests
   }
 
   it("mints identifiers for creators in work") {
-    val workIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "1234"
-    )
-
     val creatorIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),
       ontologyType = "Person",
@@ -111,7 +105,7 @@ class IdEmbedderTests
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = workIdentifier,
+          sourceIdentifier = originalWork.sourceIdentifier,
           ontologyType = originalWork.ontologyType,
           newCanonicalId = newWorkCanonicalId
         )
@@ -119,7 +113,7 @@ class IdEmbedderTests
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
           sourceIdentifier = creatorIdentifier,
-          ontologyType = "Person",
+          ontologyType = creatorIdentifier.ontologyType,
           newCanonicalId = newCreatorCanonicalId
         )
 
@@ -207,7 +201,7 @@ class IdEmbedderTests
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = identifier,
+          sourceIdentifier = originalWork.sourceIdentifier,
           ontologyType = originalWork.ontologyType,
           newCanonicalId = "work-canonical-id"
         )
