@@ -52,7 +52,7 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
                                            ObjectStore[RecorderWorkEntry]],
-                 entries: List[RecorderWorkEntry]) = {
+                 entries: List[RecorderWorkEntry]): Future[List[Unit]] = {
     Future.sequence(entries.map { recorderWorkEntry =>
       storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
     })
