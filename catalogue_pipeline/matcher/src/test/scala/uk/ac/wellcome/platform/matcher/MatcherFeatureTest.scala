@@ -47,9 +47,9 @@ class MatcherFeatureTest
                   topic,
                   graphTable,
                   lockTable) { _ =>
-                  val work = createUnidentifiedWorkWith(
-                    sourceIdentifier = sourceIdentifierA
-                  )
+                  val work = createUnidentifiedWork
+                  val workId = s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
+
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
                       message = toJson(RecorderWorkEntry(work = work)).get,
@@ -72,7 +72,8 @@ class MatcherFeatureTest
 
                       identifiersList shouldBe
                         MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier("sierra-system-number/A", 1)))))
+                          Set(WorkIdentifier(identifier = workId, version = 1))
+                        )))
                     }
                   }
                 }
