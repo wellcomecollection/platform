@@ -44,23 +44,25 @@ class SierraTransformableTransformer
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
               Some(
                 UnidentifiedWork(
-                  title = getTitle(sierraBibData),
                   sourceIdentifier = identifier,
-                  version = version,
                   otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                  mergeCandidates = getMergeCandidates(sierraBibData),
+                  title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
                   description = getDescription(sierraBibData),
                   physicalDescription = getPhysicalDescription(sierraBibData),
                   extent = getExtent(sierraBibData),
                   lettering = getLettering(sierraBibData),
-                  items = getItems(sierraTransformable),
-                  production = getProduction(sierraBibData),
-                  language = getLanguage(sierraBibData),
-                  contributors = getContributors(sierraBibData),
-                  dimensions = getDimensions(sierraBibData),
+                  createdDate = None,
                   subjects = getSubjects(sierraBibData),
                   genres = getGenres(sierraBibData),
-                  mergeCandidates = getMergeCandidates(sierraBibData)
+                  contributors = getContributors(sierraBibData),
+                  thumbnail = None,
+                  production = getProduction(sierraBibData),
+                  language = getLanguage(sierraBibData),
+                  dimensions = getDimensions(sierraBibData),
+                  items = getItems(sierraTransformable),
+                  version = version
                 ))
             } else {
               Some(UnidentifiedInvisibleWork(identifier, version))

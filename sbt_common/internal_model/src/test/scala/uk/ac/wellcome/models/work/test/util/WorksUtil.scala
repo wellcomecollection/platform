@@ -68,15 +68,24 @@ trait WorksUtil extends ItemsUtil {
   ): UnidentifiedWork =
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
-      version = version,
-      title = title,
       otherIdentifiers = otherIdentifiers,
       mergeCandidates = mergeCandidates,
+      title = title,
+      workType = None,
       description = description,
+      physicalDescription = None,
+      extent = None,
       lettering = lettering,
+      createdDate = None,
+      subjects = List(),
+      genres = List(),
       contributors = contributors,
+      thumbnail = None,
       production = production,
-      items = items
+      language = None,
+      dimensions = None,
+      items = items,
+      version = version
     )
 
   def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
