@@ -16,6 +16,7 @@ import uk.ac.wellcome.models.work.internal.{
   SourceIdentifier,
   UnidentifiedWork
 }
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
@@ -46,7 +47,8 @@ trait MatcherFixtures
     with SNS
     with LocalWorkGraphDynamoDb
     with MetricsSenderFixture
-    with S3 {
+    with S3
+    with WorksUtil {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =
     DynamoFormat.coercedXmap[Instant, Long, IllegalArgumentException](
@@ -194,14 +196,10 @@ trait MatcherFixtures
       "Work",
       id)
 
-  def anUnidentifiedSierraWork: UnidentifiedWork = {
-    val sourceIdentifier = aSierraSourceIdentifier("id")
-    UnidentifiedWork(
-      sourceIdentifier = sourceIdentifier,
-      title = "WorkTitle",
-      version = 1
+  def anUnidentifiedSierraWork: UnidentifiedWork =
+    createUnidentifiedWorkWith(
+      sourceIdentifier = aSierraSourceIdentifier("id")
     )
-  }
 
   def ciHash(str: String): String = {
     MurmurHash3

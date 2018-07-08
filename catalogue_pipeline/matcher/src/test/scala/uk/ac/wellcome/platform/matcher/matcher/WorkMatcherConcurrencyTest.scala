@@ -32,12 +32,12 @@ class WorkMatcherConcurrencyTest
                     val identifierA = aSierraSourceIdentifier("A")
                     val identifierB = aSierraSourceIdentifier("B")
 
-                    val workA = anUnidentifiedSierraWork.copy(
+                    val workA = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierA,
                       mergeCandidates = List(MergeCandidate(identifierB))
                     )
 
-                    val workB = anUnidentifiedSierraWork.copy(
+                    val workB = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierB
                     )
 

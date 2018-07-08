@@ -8,6 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -30,27 +31,15 @@ class RecorderWorkerServiceTest
     with ScalaFutures
     with Messaging
     with MetricsSenderFixture
-    with ExtendedPatience {
-
-  val title = "Whose umbrella did I find?"
-
-  val sourceIdentifier = SourceIdentifier(
-    identifierType = IdentifierType("miro-image-number"),
-    value = "U8634924",
-    ontologyType = "Work"
-  )
-
-  val work = UnidentifiedWork(
-    title = title,
-    sourceIdentifier = sourceIdentifier,
-    version = 2
-  )
+    with ExtendedPatience
+    with WorksUtil {
 
   it("successfully records a UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
+            val work = createUnidentifiedWork
             sendMessage(queue, messagesBucket, work)
             withRecorderWorkerService(
               table,
@@ -77,9 +66,7 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              val invisibleWork = UnidentifiedInvisibleWork(
-                sourceIdentifier = sourceIdentifier,
-                version = 2)
+              val invisibleWork = createUnidentifiedInvisibleWork
               sendMessage(queue, messagesBucket, invisibleWork)
               eventually {
                 assertStoredSingleWork(storageBucket, table, invisibleWork)
@@ -92,8 +79,8 @@ class RecorderWorkerServiceTest
   }
 
   it("doesn't overwrite a newer work with an older work") {
-    val olderWork = work
-    val newerWork = work.copy(version = 10, title = "A nice new thing")
+    val olderWork = createUnidentifiedWork
+    val newerWork = olderWork.copy(version = 10, title = "A nice new thing")
 
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
@@ -120,8 +107,8 @@ class RecorderWorkerServiceTest
   }
 
   it("overwrites an older work with an newer work") {
-    val olderWork = work
-    val newerWork = work.copy(version = 10, title = "A nice new thing")
+    val olderWork = createUnidentifiedWork
+    val newerWork = olderWork.copy(version = 10, title = "A nice new thing")
 
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
@@ -159,6 +146,7 @@ class RecorderWorkerServiceTest
           case QueuePair(queue, dlq) =>
             withRecorderWorkerService(table, badBucket, messagesBucket, queue) {
               service =>
+                val work = createUnidentifiedWork
                 sendMessage(queue, messagesBucket, work)
                 eventually {
                   assertQueueEmpty(queue)
@@ -181,6 +169,7 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
+              val work = createUnidentifiedWork
               sendMessage(queue, messagesBucket, work)
               eventually {
                 assertQueueEmpty(queue)

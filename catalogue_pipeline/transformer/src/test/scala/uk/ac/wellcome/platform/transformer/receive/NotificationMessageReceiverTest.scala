@@ -50,18 +50,6 @@ class NotificationMessageReceiverTest
     with ScalaFutures
     with TransformableMessageUtils {
 
-  val sourceIdentifier =
-    SourceIdentifier(
-      identifierType = IdentifierType("calm-altref-no"),
-      ontologyType = "Work",
-      value = "value")
-
-  val work = UnidentifiedWork(
-    title = "placeholder title",
-    sourceIdentifier = sourceIdentifier,
-    version = 1
-  )
-
   def withNotificationMessageReceiver[R](
     topic: Topic,
     bucket: Bucket,

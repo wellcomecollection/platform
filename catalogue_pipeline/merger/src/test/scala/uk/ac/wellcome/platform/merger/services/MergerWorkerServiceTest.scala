@@ -11,7 +11,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -42,14 +45,9 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry1 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
-
-        val recorderWorkEntry2 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
-
-        val recorderWorkEntry3 =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b678910", 1)
+        val recorderWorkEntry1 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry2 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry3 = createRecorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(
           Set(
@@ -80,12 +78,13 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry =
-          recorderInvisibleWorkEntryWith("sierra-system-number", "b123456", 1)
+        val recorderWorkEntry = RecorderWorkEntry(
+          work = createUnidentifiedInvisibleWork
+        )
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+        whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
           sendSQSMessage(queue, matcherResult)
 
           eventually {
@@ -103,8 +102,7 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), topic, metricsSender) =>
-        val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
+        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
@@ -124,12 +122,11 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
-        val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 1)
-        val olderVersionRecorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+        val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+        val work = createUnidentifiedWorkWith(version = 1)
+        val olderVersionRecorderWorkEntry = RecorderWorkEntry(work = work)
         val newerVersionRecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 2)
+          RecorderWorkEntry(work = work.copy(version = 2))
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
@@ -154,14 +151,17 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val versionZeroWork: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b123456", 0)
-        val recorderWorkEntry: RecorderWorkEntry =
-          recorderWorkEntryWith("dfmsng", "sierra-system-number", "b987654", 1)
+          createRecorderWorkEntryWith(version = 0)
+        val recorderWorkEntry = versionZeroWork.copy(
+          work = versionZeroWork.work
+            .asInstanceOf[UnidentifiedWork]
+            .copy(version = 1)
+        )
 
         val matcherResult =
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
 
-        whenReady(storeInVHS(vhs, List(recorderWorkEntry))) { _ =>
+        whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
           sendSQSMessage(queue, matcherResult)
 
           eventually {

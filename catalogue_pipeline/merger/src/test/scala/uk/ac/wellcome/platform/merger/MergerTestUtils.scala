@@ -10,6 +10,7 @@ import uk.ac.wellcome.models.matcher.{
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
@@ -18,7 +19,7 @@ import uk.ac.wellcome.storage.dynamo._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait MergerTestUtils { this: SQS with SNS with Messaging =>
+trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
 
   def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
     MatcherResult(
@@ -43,33 +44,22 @@ trait MergerTestUtils { this: SQS with SNS with Messaging =>
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
                                            ObjectStore[RecorderWorkEntry]],
-                 entries: List[RecorderWorkEntry]) = {
+                 recorderWorkEntry: RecorderWorkEntry): Future[Unit] =
+    vhs.updateRecord(recorderWorkEntry.id)(
+      ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
+      throw new RuntimeException("Not possible, VHS is empty!"))
+
+  def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
+                                           EmptyMetadata,
+                                           ObjectStore[RecorderWorkEntry]],
+                 entries: List[RecorderWorkEntry]): Future[List[Unit]] = {
     Future.sequence(entries.map { recorderWorkEntry =>
-      vhs.updateRecord(recorderWorkEntry.id)(
-        ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
-        throw new RuntimeException("Not possible, VHS is empty!"))
+      storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
     })
   }
 
-  def recorderWorkEntryWith(title: String,
-                            identifierType: String,
-                            sourceId: String,
-                            version: Int) =
-    RecorderWorkEntry(
-      UnidentifiedWork(
-        title = title,
-        sourceIdentifier =
-          SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
-        version = version))
-
-  def recorderInvisibleWorkEntryWith(identifierType: String,
-                                     sourceId: String,
-                                     version: Int) =
-    RecorderWorkEntry(
-      UnidentifiedInvisibleWork(
-        sourceIdentifier =
-          SourceIdentifier(IdentifierType(identifierType), "Work", sourceId),
-        version = version))
+  def createRecorderWorkEntryWith(version: Int) =
+    RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
 
   def getWorksSent(topic: Topic) = {
     val messagesSent = listMessagesReceivedFromSNS(topic)

@@ -6,13 +6,12 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.models.work.test.util.ItemsUtil
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.util.Try
 
 class IdEmbedderTests
@@ -23,7 +22,7 @@ class IdEmbedderTests
     with Akka
     with JsonTestUtil
     with ExtendedPatience
-    with ItemsUtil {
+    with WorksUtil {
 
   private def withIdEmbedder(
     testWith: TestWith[(IdentifierGenerator, IdEmbedder), Assertion]) = {
@@ -46,10 +45,9 @@ class IdEmbedderTests
       value = "1234"
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWorkWith(
+      sourceIdentifier = identifier
+    )
 
     val newCanonicalId = "5467"
 
@@ -68,7 +66,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -85,12 +83,6 @@ class IdEmbedderTests
   }
 
   it("mints identifiers for creators in work") {
-    val workIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "1234"
-    )
-
     val creatorIdentifier = SourceIdentifier(
       identifierType = IdentifierType("lc-names"),
       ontologyType = "Person",
@@ -98,14 +90,12 @@ class IdEmbedderTests
     )
 
     val person = Person(label = "The Librarian")
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = workIdentifier,
+    val originalWork = createUnidentifiedWorkWith(
       contributors = List(
         Contributor(
-          agent = Identifiable(person, sourceIdentifier = creatorIdentifier))
-      ),
-      version = 1
+          agent = Identifiable(person, sourceIdentifier = creatorIdentifier)
+        )
+      )
     )
 
     val newWorkCanonicalId = "5467"
@@ -115,7 +105,7 @@ class IdEmbedderTests
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = workIdentifier,
+          sourceIdentifier = originalWork.sourceIdentifier,
           ontologyType = originalWork.ontologyType,
           newCanonicalId = newWorkCanonicalId
         )
@@ -123,7 +113,7 @@ class IdEmbedderTests
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
           sourceIdentifier = creatorIdentifier,
-          ontologyType = "Person",
+          ontologyType = creatorIdentifier.ontologyType,
           newCanonicalId = newCreatorCanonicalId
         )
 
@@ -133,7 +123,7 @@ class IdEmbedderTests
           ).right.get
         )
 
-        val expectedWork = IdentifiedWork(
+        val expectedWork = createIdentifiedWorkWith(
           canonicalId = newWorkCanonicalId,
           title = originalWork.title,
           sourceIdentifier = originalWork.sourceIdentifier,
@@ -157,16 +147,7 @@ class IdEmbedderTests
   }
 
   it("returns a failed future if the call to IdentifierGenerator fails") {
-    val identifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "1234"
-    )
-
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1)
+    val originalWork = createUnidentifiedWork
 
     val expectedException = new Exception("Aaaaah something happened!")
 
@@ -175,7 +156,7 @@ class IdEmbedderTests
         when(
           identifierGenerator
             .retrieveOrGenerateCanonicalId(
-              identifier
+              originalWork.sourceIdentifier
             )
         ).thenReturn(Try(throw expectedException))
 
@@ -209,11 +190,9 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalWork = UnidentifiedWork(
-      title = "crap",
-      sourceIdentifier = identifier,
-      version = 1,
-      items = List(originalItem1, originalItem2))
+    val originalWork = createUnidentifiedWorkWith(
+      items = List(originalItem1, originalItem2)
+    )
 
     val newItemCanonicalId1 = "item1-canonical-id"
     val newItemCanonicalId2 = "item2-canonical-id"
@@ -222,7 +201,7 @@ class IdEmbedderTests
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = identifier,
+          sourceIdentifier = originalWork.sourceIdentifier,
           ontologyType = originalWork.ontologyType,
           newCanonicalId = "work-canonical-id"
         )

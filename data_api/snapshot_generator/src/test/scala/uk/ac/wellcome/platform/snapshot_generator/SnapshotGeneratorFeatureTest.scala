@@ -13,11 +13,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
@@ -46,27 +42,15 @@ class SnapshotGeneratorFeatureTest
     with JsonTestUtil
     with ExtendedPatience
     with ElasticsearchFixtures
-    with DisplayV1SerialisationTestBase {
+    with DisplayV1SerialisationTestBase
+    with WorksUtil {
 
   val itemType = "work"
 
   it("completes a snapshot generation successfully") {
     withFixtures {
       case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
-        // Create a collection of works.  These three differ by version,
-        // if not anything more interesting!
-        val works = (1 to 3).map { version =>
-          IdentifiedWork(
-            canonicalId = s"rbfhv6b4$version",
-            title = "Rumblings from a rambunctious rodent",
-            sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("miro-image-number"),
-              ontologyType = "work",
-              value = "R0060400"
-            ),
-            version = version
-          )
-        }
+        val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
 
@@ -99,7 +83,7 @@ class SnapshotGeneratorFeatureTest
           val actualJsonLines: List[String] =
             readGzipFile(downloadFile.getPath).split("\n").toList
 
-          val expectedJsonLines = works.map { work =>
+          val expectedJsonLines = works.sortBy { _.canonicalId }.map { work =>
             s"""{
                  |  "id": "${work.canonicalId}",
                  |  "title": "${work.title}",
@@ -114,7 +98,7 @@ class SnapshotGeneratorFeatureTest
                    }""".stripMargin
           }
 
-          actualJsonLines.zip(expectedJsonLines).foreach {
+          actualJsonLines.sorted.zip(expectedJsonLines).foreach {
             case (actualLine, expectedLine) =>
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }

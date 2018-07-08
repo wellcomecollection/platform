@@ -157,11 +157,9 @@ class IngestorWorkerServiceTest
       value = "b1027467"
     )
 
-    val work = IdentifiedRedirectedWork(
-      canonicalId = "abcdefg",
-      sourceIdentifier = sierraSourceIdentifier,
-      version = 1,
-      redirect = IdentifiedRedirect(canonicalId = "defghijlk"))
+    val work = createIdentifiedRedirectedWorkWith(
+      sourceIdentifier = sierraSourceIdentifier
+    )
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -383,16 +381,11 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val sierraWork = IdentifiedWork(
-      canonicalId = "s1",
-      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-      title = "s1 title",
-      version = 1)
-    val sierraWorkDoesNotMatchMapping = IdentifiedWork(
-      canonicalId = "s2",
+    val sierraWork = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("sierra-system-number", "s1")
+    )
+    val sierraWorkDoesNotMatchMapping = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
-      title = "s2 title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -440,16 +433,11 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val miroWork = IdentifiedWork(
-      canonicalId = "s1",
-      sourceIdentifier = createIdentifier("miro-image-number", "m1"),
-      title = "s1 title",
-      version = 1)
-    val miroWorkDoesNotMatchV2Mapping = IdentifiedWork(
-      canonicalId = "s2",
+    val miroWork = createIdentifiedWorkWith(
+      sourceIdentifier = createIdentifier("miro-image-number", "m1")
+    )
+    val miroWorkDoesNotMatchV2Mapping = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("miro-image-number", "m2"),
-      title = "s2 title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 

@@ -22,6 +22,8 @@
   <logger name="org.apache.http" level="WARN"/>
   <logger name="com.amazonaws" level="INFO"/>
   <logger name="com.sksamuel.elastic4s" level="INFO"/>
+  <logger name="org.elasticsearch.client.RestClient" level="INFO"/>
+  <logger name="uk.ac.wellcome.platform.snapshot_generator.Server" level="INFO"/>
   <root level="debug">
     <appender-ref ref="STDOUT" />
   </root>

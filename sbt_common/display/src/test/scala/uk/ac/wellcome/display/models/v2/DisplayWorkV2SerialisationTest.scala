@@ -98,12 +98,9 @@ class DisplayWorkV2SerialisationTest
       license = License_CCBY
     )
     val item = createItem(locations = List(location))
-    val workWithCopyright = IdentifiedWork(
-      title = "A scarf on a squirrel",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "yxh928a",
-      items = List(item))
+    val workWithCopyright = createIdentifiedWorkWith(
+      items = List(item)
+    )
 
     val actualJson = objectMapper.writeValueAsString(
       DisplayWorkV2(workWithCopyright, WorksIncludes(items = true)))
@@ -137,14 +134,11 @@ class DisplayWorkV2SerialisationTest
   }
 
   it("includes subject information in DisplayWorkV2 serialisation") {
-    val workWithSubjects = IdentifiedWork(
-      title = "A seal selling seaweed sandwiches in Scotland",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "test_subject1",
+    val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
         Subject("label", List(Unidentifiable(Concept("fish")))),
-        Subject("label", List(Unidentifiable(Concept("gardening")))))
+        Subject("label", List(Unidentifiable(Concept("gardening"))))
+      )
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
@@ -163,11 +157,7 @@ class DisplayWorkV2SerialisationTest
   }
 
   it("includes genre information in DisplayWorkV2 serialisation") {
-    val workWithSubjects = IdentifiedWork(
-      title = "A guppy in a greenhouse",
-      sourceIdentifier = sourceIdentifier,
-      version = 1,
-      canonicalId = "test_subject1",
+    val workWithSubjects = createIdentifiedWorkWith(
       genres = List(
         Genre(
           label = "genre",
@@ -175,7 +165,8 @@ class DisplayWorkV2SerialisationTest
             Unidentifiable(Concept("woodwork")),
             Unidentifiable(Concept("etching"))
           )
-        ))
+        )
+      )
     )
     val actualJson =
       objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))

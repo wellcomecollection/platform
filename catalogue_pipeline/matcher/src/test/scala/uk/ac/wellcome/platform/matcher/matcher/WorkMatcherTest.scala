@@ -17,8 +17,7 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   MergeCandidate,
-  SourceIdentifier,
-  UnidentifiedInvisibleWork
+  SourceIdentifier
 }
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.locking.{
@@ -77,12 +76,12 @@ class WorkMatcherTest
           withWorkGraphStore(graphTable) { workGraphStore =>
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
-                val invisibleWork = UnidentifiedInvisibleWork(
-                  SourceIdentifier(
+                val invisibleWork = createUnidentifiedInvisibleWorkWith(
+                  sourceIdentifier = SourceIdentifier(
                     IdentifierType("sierra-system-number"),
                     "Work",
-                    "id"),
-                  1)
+                    "id")
+                )
                 whenReady(workMatcher.matchWork(invisibleWork)) {
                   matcherResult =>
                     val workId = "sierra-system-number/id"
@@ -112,9 +111,10 @@ class WorkMatcherTest
               workMatcher =>
                 val identifierA = aSierraSourceIdentifier("A")
                 val identifierB = aSierraSourceIdentifier("B")
-                val work = anUnidentifiedSierraWork.copy(
+                val work = createUnidentifiedWorkWith(
                   sourceIdentifier = identifierA,
-                  mergeCandidates = List(MergeCandidate(identifierB)))
+                  mergeCandidates = List(MergeCandidate(identifierB))
+                )
                 whenReady(workMatcher.matchWork(work)) { identifiersList =>
                   identifiersList shouldBe
                     MatcherResult(
@@ -175,7 +175,7 @@ class WorkMatcherTest
 
                 val bIdentifier = aSierraSourceIdentifier("B")
                 val cIdentifier = aSierraSourceIdentifier("C")
-                val work = anUnidentifiedSierraWork.copy(
+                val work = createUnidentifiedWorkWith(
                   sourceIdentifier = bIdentifier,
                   version = 2,
                   mergeCandidates = List(MergeCandidate(cIdentifier)))
@@ -282,7 +282,7 @@ class WorkMatcherTest
                       WorkNode("sierra-system-number/C", 0, Nil, "sierra-system-number/A+sierra-system-number/B+sierra-system-number/C")
                     )))
 
-                    val work = anUnidentifiedSierraWork.copy(
+                    val work = createUnidentifiedWorkWith(
                       sourceIdentifier = identifierA,
                       mergeCandidates = List(MergeCandidate(identifierB))
                     )

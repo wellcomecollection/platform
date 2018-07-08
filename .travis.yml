@@ -86,7 +86,10 @@ jobs:
   include:
     - stage: quicktest
       env: TASK=travis-format
-    - env: TASK=travistooling-test
+
+    # Because this isn't under active development, and we're really squeezed
+    # for build VMs, we aren't testing this in CI right now.
+    # - env: TASK=travistooling-test
 
     - stage: sbt-common-test
       env: TASK=common-test

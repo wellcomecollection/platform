@@ -4,7 +4,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.{
-  IdentifiedWork,
   IdentifierType,
   SourceIdentifier,
   Subject
@@ -145,18 +144,14 @@ class WorkIndexerTest
     "inserts a list of works into elasticsearch and return the list of works that failed inserting") {
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, esType)
-    val validWorks = (1 to 5).map { i =>
-      IdentifiedWork(
-        canonicalId = s"s$i",
-        sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
-        title = "s1 title",
-        version = 1)
+
+    val validWorks = (1 to 5).map { _ =>
+      createIdentifiedWorkWith(
+        sourceIdentifier = createIdentifier("sierra-system-number", "s1")
+      )
     }
-    val notMatchingMappingWork = IdentifiedWork(
-      canonicalId = "not-matching",
+    val notMatchingMappingWork = createIdentifiedWorkWith(
       sourceIdentifier = createIdentifier("miro-image-number", "not-matching"),
-      title = "title",
-      version = 1,
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
