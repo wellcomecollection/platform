@@ -123,11 +123,9 @@ class MergerWorkerServiceTest
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, _) =>
         val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
-        val olderVersionRecorderWorkEntry =
-          createRecorderWorkEntryWith(version = 1)
-        val newerVersionRecorderWorkEntry = olderVersionRecorderWorkEntry.copy(
-          work = recorderWorkEntry.work.copy(version = 2)
-        )
+        val work = createUnidentifiedWorkWith(version = 1)
+        val olderVersionRecorderWorkEntry = RecorderWorkEntry(work = work)
+        val newerVersionRecorderWorkEntry = RecorderWorkEntry(work = work.copy(version = 2))
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
