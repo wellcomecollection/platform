@@ -12,10 +12,10 @@ trait IdentifiersUtil {
 
   def createSourceIdentifier: SourceIdentifier = createSourceIdentifierWith()
 
-  def createSourceIdentifierWith(identifierType: String = "miro-image-number", ontologyType: String = "Work"): SourceIdentifier =
+  def createSourceIdentifierWith(identifierType: String = "miro-image-number", value: String = randomAlphanumeric(length = 10), ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
       identifierType = IdentifierType(identifierType),
-      value = randomAlphanumeric(length = 10),
+      value = value,
       ontologyType = ontologyType
     )
 }
