@@ -98,7 +98,7 @@ class SnapshotGeneratorFeatureTest
                    }""".stripMargin
           }
 
-          actualJsonLines.zip(expectedJsonLines).foreach {
+          actualJsonLines.sorted.zip(expectedJsonLines).foreach {
             case (actualLine, expectedLine) =>
               assertJsonStringsAreEqual(actualLine, expectedLine)
           }
