@@ -11,7 +11,7 @@ import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -40,11 +40,7 @@ class IngestorWorkerServiceTest
   val itemType = "work"
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
-    val miroSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "M000765"
-    )
+    val miroSourceIdentifier = createSourceIdentifier
 
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
@@ -76,14 +72,11 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified Work only into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
+    val work = createIdentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
-
-    val work =
-      createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -113,14 +106,10 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified invisible Work into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
-    )
-
     val work = createIdentifiedInvisibleWorkWith(
-      sourceIdentifier = sierraSourceIdentifier
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
@@ -151,14 +140,10 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified redirected Work into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
-    )
-
     val work = createIdentifiedRedirectedWorkWith(
-      sourceIdentifier = sierraSourceIdentifier
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
@@ -244,13 +229,11 @@ class IngestorWorkerServiceTest
   }
 
   it("fails inserting a non sierra or miro identified work") {
-    val calmSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("calm-altref-no"),
-      ontologyType = "Work",
-      value = "MS/237"
+    val work = createIdentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "calm-altref-no"
+      )
     )
-
-    val work = createIdentifiedWorkWith(sourceIdentifier = calmSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -509,15 +492,7 @@ class IngestorWorkerServiceTest
                   actorSystem,
                   brokenWorkIndexer,
                   messageStream) { _ =>
-                  val miroSourceIdentifier = SourceIdentifier(
-                    identifierType = IdentifierType("miro-image-number"),
-                    ontologyType = "Work",
-                    value = "B000675"
-                  )
-
-                  val work =
-                    createIdentifiedWorkWith(
-                      sourceIdentifier = miroSourceIdentifier)
+                  val work = createIdentifiedWork
 
                   val messageBody = put[IdentifiedBaseWork](
                     obj = work,
