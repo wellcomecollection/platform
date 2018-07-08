@@ -3,11 +3,7 @@ package uk.ac.wellcome.platform.ingestor.services
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  Subject
-}
+import uk.ac.wellcome.models.work.internal.Subject
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
 
@@ -145,13 +141,8 @@ class WorkIndexerTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, esType)
 
-    val validWorks = (1 to 5).map { _ =>
-      createIdentifiedWorkWith(
-        sourceIdentifier = createIdentifier("sierra-system-number", "s1")
-      )
-    }
+    val validWorks = createIdentifiedWorks(count = 5)
     val notMatchingMappingWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "not-matching"),
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -177,13 +168,5 @@ class WorkIndexerTest
           }
         }
     }
-  }
-
-  private def createIdentifier(identifierType: String, value: String) = {
-    SourceIdentifier(
-      identifierType = IdentifierType(identifierType),
-      ontologyType = "Work",
-      value = value
-    )
   }
 }
