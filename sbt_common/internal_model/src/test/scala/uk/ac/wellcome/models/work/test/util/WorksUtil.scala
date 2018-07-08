@@ -114,6 +114,7 @@ trait WorksUtil extends ItemsUtil {
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
       otherIdentifiers = otherIdentifiers,
+      mergeCandidates = List(),
       title = title,
       workType = workType,
       description = description,
@@ -127,6 +128,7 @@ trait WorksUtil extends ItemsUtil {
       thumbnail = thumbnail,
       production = production,
       language = language,
+      dimensions = None,
       items = items,
       version = version
     )
