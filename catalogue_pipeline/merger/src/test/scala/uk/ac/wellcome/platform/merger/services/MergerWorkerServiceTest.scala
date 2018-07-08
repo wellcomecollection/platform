@@ -125,7 +125,8 @@ class MergerWorkerServiceTest
         val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
         val work = createUnidentifiedWorkWith(version = 1)
         val olderVersionRecorderWorkEntry = RecorderWorkEntry(work = work)
-        val newerVersionRecorderWorkEntry = RecorderWorkEntry(work = work.copy(version = 2))
+        val newerVersionRecorderWorkEntry =
+          RecorderWorkEntry(work = work.copy(version = 2))
 
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
