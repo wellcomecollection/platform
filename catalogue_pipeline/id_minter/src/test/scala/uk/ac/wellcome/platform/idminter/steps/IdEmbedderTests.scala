@@ -91,7 +91,6 @@ class IdEmbedderTests
 
     val person = Person(label = "The Librarian")
     val originalWork = createUnidentifiedWorkWith(
-      sourceIdentifier = workIdentifier,
       contributors = List(
         Contributor(
           agent = Identifiable(person, sourceIdentifier = creatorIdentifier)
