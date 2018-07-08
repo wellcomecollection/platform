@@ -98,9 +98,8 @@ class IdentifierGeneratorTest
 
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe Identifier(
-          CanonicalId = id,
-          SourceSystem = sourceIdentifier.identifierType.id,
-          SourceId = sourceIdentifier.value
+          canonicalId = id,
+          sourceIdentifier = sourceIdentifier
         )
     }
   }
@@ -162,10 +161,8 @@ class IdentifierGeneratorTest
 
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe Identifier(
-          CanonicalId = id,
-          SourceSystem = sourceIdentifier.identifierType.id,
-          SourceId = sourceIdentifier.value,
-          OntologyType = sourceIdentifier.ontologyType
+          canonicalId = id,
+          sourceIdentifier = sourceIdentifier
         )
     }
   }
