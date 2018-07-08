@@ -6,11 +6,7 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifiedBaseWork,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -34,13 +30,7 @@ class IngestorFeatureTest
 
   it(
     "reads a miro identified work from the queue and ingests it in the v1 and v2 index") {
-    val sourceIdentifier =
-      SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        "Item",
-        "5678")
-
-    val work = createIdentifiedWorkWith(sourceIdentifier = sourceIdentifier)
+    val work = createIdentifiedWork
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
@@ -59,13 +49,11 @@ class IngestorFeatureTest
 
   it(
     "reads a sierra identified work from the queue and ingests it in the v2 index only") {
-    val sourceIdentifier =
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        "Item",
-        "5678")
-
-    val work = createIdentifiedWorkWith(sourceIdentifier = sourceIdentifier)
+    val work = createIdentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
+    )
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
