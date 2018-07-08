@@ -321,13 +321,9 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
-        val srcIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          ontologyType = "Work",
-          value = "Test1234"
-        )
+        val otherIdentifier = createSourceIdentifier
         val work = createIdentifiedWorkWith(
-          otherIdentifiers = List(srcIdentifier)
+          otherIdentifiers = List(otherIdentifier)
         )
         insertIntoElasticsearch(indexNameV2, itemType, work)
 
@@ -343,7 +339,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "title": "${work.title}",
                | "contributors": [ ],
                | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
-                                srcIdentifier)} ],
+                                otherIdentifier)} ],
                | "subjects": [ ],
                | "genres": [ ],
                | "production": [ ]
