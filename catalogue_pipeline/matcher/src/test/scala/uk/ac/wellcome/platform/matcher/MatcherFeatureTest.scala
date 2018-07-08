@@ -29,11 +29,6 @@ class MatcherFeatureTest
     with MatcherFixtures
     with WorksUtil {
 
-  val sourceIdentifierA = SourceIdentifier(
-    identifierType = IdentifierType("sierra-system-number"),
-    ontologyType = "Work",
-    value = "A")
-
   it("processes a message with a simple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
@@ -101,18 +96,18 @@ class MatcherFeatureTest
                   val existingWorkVersion = 2
                   val updatedWorkVersion = 1
 
-                  val existingWorkAv2 = WorkNode(
-                    id = "sierra-system-number/A",
-                    version = existingWorkVersion,
-                    linkedIds = Nil,
-                    componentId = "sierra-system-number/A"
-                  )
-                  Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
-
                   val workAv1 = createUnidentifiedWorkWith(
-                    sourceIdentifier = sourceIdentifierA,
                     version = updatedWorkVersion
                   )
+                  val workId = s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
+
+                  val existingWorkAv2 = WorkNode(
+                    id = workId,
+                    version = existingWorkVersion,
+                    linkedIds = Nil,
+                    componentId = workId
+                  )
+                  Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
