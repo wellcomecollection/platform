@@ -3,20 +3,20 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 
 class DisplayGenreV2SerialisationTest
     extends FunSpec
     with DisplayV2SerialisationTestBase
-    with JsonMapperTestUtil {
+    with JsonMapperTestUtil
+    with IdentifiersUtil {
 
   it("serialises a DisplayGenre constructed from a Genre correctly") {
     val concept0 = Unidentifiable(Concept("conceptLabel"))
     val concept1 = Unidentifiable(Place("placeLabel"))
     val concept2 = Identified(
-      canonicalId = "sqwyavpj",
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("lc-names"),
-        value = "lcsh/sqw",
+      canonicalId = createCanonicalId,
+      sourceIdentifier = createSourceIdentifierWith(
         ontologyType = "Period"
       ),
       agent = Period("periodLabel")

@@ -197,11 +197,7 @@ class DisplayWorkV1SerialisationTest
   }
 
   it("includes a list of identifiers on DisplayWorkV1") {
-    val otherIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "Test1234"
-    )
+    val otherIdentifier = createSourceIdentifier
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List(otherIdentifier)
     )

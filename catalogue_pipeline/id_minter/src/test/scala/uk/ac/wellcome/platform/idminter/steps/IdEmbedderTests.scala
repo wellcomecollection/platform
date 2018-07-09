@@ -39,23 +39,14 @@ class IdEmbedderTests
   }
 
   it("sets the canonicalId given by the IdentifierGenerator on the work") {
-    val identifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "1234"
-    )
-
-    val originalWork = createUnidentifiedWorkWith(
-      sourceIdentifier = identifier
-    )
-
-    val newCanonicalId = "5467"
+    val originalWork = createUnidentifiedWork
+    val newCanonicalId = createCanonicalId
 
     withIdEmbedder {
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = identifier,
+          sourceIdentifier = originalWork.sourceIdentifier,
           ontologyType = originalWork.ontologyType,
           newCanonicalId = newCanonicalId
         )
@@ -83,10 +74,8 @@ class IdEmbedderTests
   }
 
   it("mints identifiers for creators in work") {
-    val creatorIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      ontologyType = "Person",
-      value = "1234"
+    val creatorIdentifier = createSourceIdentifierWith(
+      ontologyType = "Person"
     )
 
     val person = Person(label = "The Librarian")
@@ -170,10 +159,8 @@ class IdEmbedderTests
   }
 
   it("adds canonicalIds to all items") {
-    val identifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Item",
-      value = "1234"
+    val identifier = createSourceIdentifierWith(
+      ontologyType = "Item"
     )
 
     val originalItem1 = Identifiable(
@@ -182,10 +169,8 @@ class IdEmbedderTests
     )
 
     val originalItem2 = Identifiable(
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = "Item",
-        value = "1235"
+      sourceIdentifier = createSourceIdentifierWith(
+        ontologyType = "Item"
       ),
       agent = Item(locations = List())
     )
@@ -308,23 +293,17 @@ class IdEmbedderTests
   describe("identifiable objects should be updated correctly") {
 
     it("identify a document that is Identifiable") {
-
-      val ontologyType = "false capitals"
-      val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = ontologyType,
-        "sydney"
+      val sourceIdentifier = createSourceIdentifierWith(
+        ontologyType = "false capitals"
       )
-
-      val newCanonicalId =
-        generateMockCanonicalId(sourceIdentifier, ontologyType)
+      val newCanonicalId = createCanonicalId
 
       withIdEmbedder {
         case (identifierGenerator, idEmbedder) =>
           setUpIdentifierGeneratorMock(
             mockIdentifierGenerator = identifierGenerator,
             sourceIdentifier = sourceIdentifier,
-            ontologyType = ontologyType,
+            ontologyType = sourceIdentifier.ontologyType,
             newCanonicalId = newCanonicalId
           )
 
@@ -336,10 +315,10 @@ class IdEmbedderTests
               "label": "${sourceIdentifier.identifierType.label}",
               "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
             },
-            "ontologyType": "$ontologyType",
+            "ontologyType": "${sourceIdentifier.ontologyType}",
             "value": "${sourceIdentifier.value}"
           },
-          "ontologyType": "$ontologyType"
+          "ontologyType": "${sourceIdentifier.ontologyType}"
         }
         """
 
@@ -352,10 +331,10 @@ class IdEmbedderTests
               "label": "${sourceIdentifier.identifierType.label}",
               "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
             },
-            "ontologyType": "$ontologyType",
+            "ontologyType": "${sourceIdentifier.ontologyType}",
             "value": "${sourceIdentifier.value}"
           },
-          "ontologyType": "$ontologyType"
+          "ontologyType": "${sourceIdentifier.ontologyType}"
         }
         """
 
@@ -368,25 +347,18 @@ class IdEmbedderTests
     }
 
     it("identify a document with a key that is identifiable") {
-      val ontologyType = "fictional cities"
-
-      val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("miro-image-number"),
-        ontologyType = ontologyType,
-        "king's landing"
+      val sourceIdentifier = createSourceIdentifierWith(
+        ontologyType = "fictional cities"
       )
 
-      val newCanonicalId = generateMockCanonicalId(
-        sourceIdentifier,
-        ontologyType
-      )
+      val newCanonicalId = createCanonicalId
 
       withIdEmbedder {
         case (identifierGenerator, idEmbedder) =>
           setUpIdentifierGeneratorMock(
             mockIdentifierGenerator = identifierGenerator,
             sourceIdentifier = sourceIdentifier,
-            ontologyType = ontologyType,
+            ontologyType = sourceIdentifier.ontologyType,
             newCanonicalId = newCanonicalId
           )
 
@@ -401,10 +373,10 @@ class IdEmbedderTests
                 "label": "${sourceIdentifier.identifierType.label}",
                 "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
               },
-              "ontologyType": "$ontologyType",
+              "ontologyType": "${sourceIdentifier.ontologyType}",
               "value": "${sourceIdentifier.value}"
             },
-            "ontologyType": "$ontologyType"
+            "ontologyType": "${sourceIdentifier.ontologyType}"
           }
         }
         """
@@ -421,10 +393,10 @@ class IdEmbedderTests
                 "label": "${sourceIdentifier.identifierType.label}",
                 "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
               },
-              "ontologyType": "$ontologyType",
+              "ontologyType": "${sourceIdentifier.ontologyType}",
               "value": "${sourceIdentifier.value}"
             },
-            "ontologyType": "$ontologyType"
+            "ontologyType": "${sourceIdentifier.ontologyType}"
           }
         }
         """
@@ -439,22 +411,18 @@ class IdEmbedderTests
   }
 
   it("sets the new type if the field identifiedType is present") {
-    val ontologyType = "false capitals"
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = ontologyType,
-      "sydney"
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "false capitals"
     )
 
-    val newCanonicalId =
-      generateMockCanonicalId(sourceIdentifier, ontologyType)
+    val newCanonicalId = createCanonicalId
 
     withIdEmbedder {
       case (identifierGenerator, idEmbedder) =>
         setUpIdentifierGeneratorMock(
           mockIdentifierGenerator = identifierGenerator,
           sourceIdentifier = sourceIdentifier,
-          ontologyType = ontologyType,
+          ontologyType = sourceIdentifier.ontologyType,
           newCanonicalId = newCanonicalId
         )
 
@@ -466,11 +434,11 @@ class IdEmbedderTests
               "label": "${sourceIdentifier.identifierType.label}",
               "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
             },
-            "ontologyType": "$ontologyType",
+            "ontologyType": "${sourceIdentifier.ontologyType}",
             "value": "${sourceIdentifier.value}"
           },
           "identifiedType": "NewType",
-          "ontologyType": "$ontologyType"
+          "ontologyType": "${sourceIdentifier.ontologyType}"
         }
         """
 
@@ -483,11 +451,11 @@ class IdEmbedderTests
               "label": "${sourceIdentifier.identifierType.label}",
               "ontologyType": "${sourceIdentifier.identifierType.ontologyType}"
             },
-            "ontologyType": "$ontologyType",
+            "ontologyType": "${sourceIdentifier.ontologyType}",
             "value": "${sourceIdentifier.value}"
           },
           "type": "NewType",
-          "ontologyType": "$ontologyType"
+          "ontologyType": "${sourceIdentifier.ontologyType}"
         }
         """
 
@@ -498,12 +466,6 @@ class IdEmbedderTests
         }
     }
   }
-
-  def generateMockCanonicalId(
-    sourceIdentifier: SourceIdentifier,
-    ontologyType: String
-  ): String =
-    s"${sourceIdentifier.identifierType.id}==${sourceIdentifier.value}"
 
   private def setUpIdentifierGeneratorMock(
     mockIdentifierGenerator: IdentifierGenerator,

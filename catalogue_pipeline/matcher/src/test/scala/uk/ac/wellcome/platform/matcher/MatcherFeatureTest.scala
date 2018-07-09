@@ -12,9 +12,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.IdentifierType
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.models.work.internal.SourceIdentifier
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
@@ -29,11 +27,6 @@ class MatcherFeatureTest
     with MatcherFixtures
     with WorksUtil {
 
-  val sourceIdentifierA = SourceIdentifier(
-    identifierType = IdentifierType("sierra-system-number"),
-    ontologyType = "Work",
-    value = "A")
-
   it("processes a message with a simple UnidentifiedWork with no linked works") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
@@ -47,9 +40,10 @@ class MatcherFeatureTest
                   topic,
                   graphTable,
                   lockTable) { _ =>
-                  val work = createUnidentifiedWorkWith(
-                    sourceIdentifier = sourceIdentifierA
-                  )
+                  val work = createUnidentifiedWork
+                  val workId =
+                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
+
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
                       message = toJson(RecorderWorkEntry(work = work)).get,
@@ -72,7 +66,8 @@ class MatcherFeatureTest
 
                       identifiersList shouldBe
                         MatcherResult(Set(MatchedIdentifiers(
-                          Set(WorkIdentifier("sierra-system-number/A", 1)))))
+                          Set(WorkIdentifier(identifier = workId, version = 1))
+                        )))
                     }
                   }
                 }
@@ -100,18 +95,19 @@ class MatcherFeatureTest
                   val existingWorkVersion = 2
                   val updatedWorkVersion = 1
 
-                  val existingWorkAv2 = WorkNode(
-                    id = "sierra-system-number/A",
-                    version = existingWorkVersion,
-                    linkedIds = Nil,
-                    componentId = "sierra-system-number/A"
-                  )
-                  Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
-
                   val workAv1 = createUnidentifiedWorkWith(
-                    sourceIdentifier = sourceIdentifierA,
                     version = updatedWorkVersion
                   )
+                  val workId =
+                    s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
+
+                  val existingWorkAv2 = WorkNode(
+                    id = workId,
+                    version = existingWorkVersion,
+                    linkedIds = Nil,
+                    componentId = workId
+                  )
+                  Scanamo.put(dynamoDbClient)(graphTable.name)(existingWorkAv2)
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(

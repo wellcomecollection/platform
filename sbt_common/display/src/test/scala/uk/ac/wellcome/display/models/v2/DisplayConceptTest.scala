@@ -2,8 +2,9 @@ package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 
-class DisplayConceptTest extends FunSpec with Matchers {
+class DisplayConceptTest extends FunSpec with Matchers with IdentifiersUtil {
 
   it("reads an unidentified generic Concept as a DisplayConcept") {
     assertDisplayConceptIsCorrect(
@@ -39,10 +40,8 @@ class DisplayConceptTest extends FunSpec with Matchers {
   }
 
   it("reads an identified Concept as a DisplayConcept with identifiers") {
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      ontologyType = "Concept",
-      value = "lcsh/ehw"
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Concept"
     )
 
     assertDisplayConceptIsCorrect(
@@ -60,10 +59,8 @@ class DisplayConceptTest extends FunSpec with Matchers {
   }
 
   it("reads an identified Period as a DisplayPeriod with identifiers") {
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      ontologyType = "Period",
-      value = "lcsh/zbm"
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Period"
     )
 
     assertDisplayConceptIsCorrect(
@@ -81,10 +78,8 @@ class DisplayConceptTest extends FunSpec with Matchers {
   }
 
   it("reads an identified Place as a DisplayPlace with identifiers") {
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      ontologyType = "Place",
-      value = "lcsh/axt"
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Place"
     )
 
     assertDisplayConceptIsCorrect(

@@ -2,21 +2,15 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.internal.{
-  Agent,
-  Identified,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal.{Agent, Identified}
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 
-class DisplayAgentV1Test extends FunSpec with Matchers {
+class DisplayAgentV1Test extends FunSpec with Matchers with IdentifiersUtil {
   it("errors if you try to serialise from an identified Agent") {
     val agent = Identified(
       agent = Agent(label = "Henry Wellcome"),
-      canonicalId = "hw1234",
-      sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("lc-names"),
-        value = "lc-wellcome",
+      canonicalId = createCanonicalId,
+      sourceIdentifier = createSourceIdentifierWith(
         ontologyType = "Agent"
       ),
       otherIdentifiers = List()

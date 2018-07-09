@@ -5,7 +5,7 @@ import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.idminter.database.{
   IdentifiersDao,
   TableProvisioner
@@ -20,7 +20,8 @@ class IdentifierGeneratorTest
     extends FunSpec
     with fixtures.IdentifiersDatabase
     with Matchers
-    with MockitoSugar {
+    with MockitoSugar
+    with IdentifiersUtil {
 
   def withIdentifierGenerator[R](maybeIdentifiersDao: Option[IdentifiersDao] =
                                    None)(
@@ -45,6 +46,9 @@ class IdentifierGeneratorTest
     }
 
   it("queries the database and return a matching canonical id") {
+    val sourceIdentifier = createSourceIdentifier
+    val canonicalId = createCanonicalId
+
     withIdentifierGenerator() {
       case (identifierGenerator, identifiersTable) =>
         implicit val session = AutoSession
@@ -53,35 +57,30 @@ class IdentifierGeneratorTest
           insert
             .into(identifiersTable)
             .namedValues(
-              identifiersTable.column.CanonicalId -> "5678",
-              identifiersTable.column.SourceSystem -> IdentifierType(
-                "miro-image-number").id,
-              identifiersTable.column.SourceId -> "1234",
-              identifiersTable.column.OntologyType -> "Work"
+              identifiersTable.column.CanonicalId -> canonicalId,
+              identifiersTable.column.SourceSystem -> sourceIdentifier.identifierType.id,
+              identifiersTable.column.SourceId -> sourceIdentifier.value,
+              identifiersTable.column.OntologyType -> sourceIdentifier.ontologyType
             )
         }.update().apply()
 
         val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            "Work",
-            "1234")
+          sourceIdentifier
         )
 
-        triedId shouldBe Success("5678")
+        triedId shouldBe Success(canonicalId)
     }
   }
 
   it("generates and saves a new identifier") {
+    val sourceIdentifier = createSourceIdentifier
+
     withIdentifierGenerator() {
       case (identifierGenerator, identifiersTable) =>
         implicit val session = AutoSession
 
         val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            "Work",
-            "1234")
+          sourceIdentifier
         )
 
         triedId shouldBe a[Success[_]]
@@ -96,15 +95,14 @@ class IdentifierGeneratorTest
           select
             .from(identifiersTable as i)
             .where
-            .eq(i.SourceId, "1234")
+            .eq(i.SourceId, sourceIdentifier.value)
 
         }.map(Identifier(i)).single.apply()
 
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe Identifier(
-          CanonicalId = id,
-          SourceSystem = IdentifierType("miro-image-number").id,
-          SourceId = "1234"
+          canonicalId = id,
+          sourceIdentifier = sourceIdentifier
         )
     }
   }
@@ -112,11 +110,7 @@ class IdentifierGeneratorTest
   it("returns a failure if it fails registering a new identifier") {
     val identifiersDao = mock[IdentifiersDao]
 
-    val sourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      "Work",
-      value = "1234"
-    )
+    val sourceIdentifier = createSourceIdentifier
 
     val triedLookup = identifiersDao.lookupId(
       sourceIdentifier = sourceIdentifier
@@ -147,14 +141,12 @@ class IdentifierGeneratorTest
       case (identifierGenerator, identifiersTable) =>
         implicit val session = AutoSession
 
-        val ontologyType = "Item"
-        val miroId = "1234"
+        val sourceIdentifier = createSourceIdentifierWith(
+          ontologyType = "Item"
+        )
 
         val triedId = identifierGenerator.retrieveOrGenerateCanonicalId(
-          SourceIdentifier(
-            identifierType = IdentifierType("miro-image-number"),
-            ontologyType,
-            miroId)
+          sourceIdentifier
         )
 
         val id = triedId.get
@@ -166,16 +158,14 @@ class IdentifierGeneratorTest
           select
             .from(identifiersTable as i)
             .where
-            .eq(i.SourceId, miroId)
+            .eq(i.SourceId, sourceIdentifier.value)
 
         }.map(Identifier(i)).single.apply()
 
         maybeIdentifier shouldBe defined
         maybeIdentifier.get shouldBe Identifier(
-          CanonicalId = id,
-          SourceSystem = IdentifierType("miro-image-number").id,
-          SourceId = miroId,
-          OntologyType = ontologyType
+          canonicalId = id,
+          sourceIdentifier = sourceIdentifier
         )
     }
   }

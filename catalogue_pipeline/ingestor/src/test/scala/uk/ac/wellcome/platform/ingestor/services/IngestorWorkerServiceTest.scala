@@ -11,7 +11,7 @@ import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
@@ -40,11 +40,7 @@ class IngestorWorkerServiceTest
   val itemType = "work"
 
   it("inserts an Miro identified Work into v1 and v2 indices") {
-    val miroSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      ontologyType = "Work",
-      value = "M000765"
-    )
+    val miroSourceIdentifier = createSourceIdentifier
 
     val work = createIdentifiedWorkWith(sourceIdentifier = miroSourceIdentifier)
 
@@ -76,14 +72,11 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified Work only into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
+    val work = createIdentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
-
-    val work =
-      createIdentifiedWorkWith(sourceIdentifier = sierraSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -113,14 +106,10 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified invisible Work into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
-    )
-
     val work = createIdentifiedInvisibleWorkWith(
-      sourceIdentifier = sierraSourceIdentifier
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
@@ -151,14 +140,10 @@ class IngestorWorkerServiceTest
   }
 
   it("inserts an Sierra identified redirected Work into the v2 index") {
-    val sierraSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("sierra-system-number"),
-      ontologyType = "Work",
-      value = "b1027467"
-    )
-
     val work = createIdentifiedRedirectedWorkWith(
-      sourceIdentifier = sierraSourceIdentifier
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "sierra-system-number"
+      )
     )
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
@@ -190,16 +175,20 @@ class IngestorWorkerServiceTest
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
     val miroWork1 = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "M1")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val miroWork2 = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "M2")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val sierraWork1 = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S1")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val sierraWork2 = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S2")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
@@ -244,13 +233,11 @@ class IngestorWorkerServiceTest
   }
 
   it("fails inserting a non sierra or miro identified work") {
-    val calmSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("calm-altref-no"),
-      ontologyType = "Work",
-      value = "MS/237"
+    val work = createIdentifiedWorkWith(
+      sourceIdentifier = createSourceIdentifierWith(
+        identifierType = "calm-altref-no"
+      )
     )
-
-    val work = createIdentifiedWorkWith(sourceIdentifier = calmSourceIdentifier)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
@@ -277,13 +264,16 @@ class IngestorWorkerServiceTest
   it(
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
     val miroWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "M")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val sierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "S2")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val invalidWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("calm-altref-no", "C1")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "calm-altref-no")
     )
 
     val works = List(miroWork, sierraWork, invalidWork)
@@ -331,10 +321,12 @@ class IngestorWorkerServiceTest
   it(
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
     val sierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "s1"),
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val newSierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
       version = 2
     )
     val oldSierraWork = newSierraWork.copy(version = 1)
@@ -381,11 +373,8 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val sierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "s1")
-    )
+    val sierraWork = createIdentifiedWork
     val sierraWorkDoesNotMatchMapping = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("sierra-system-number", "s2"),
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -433,11 +422,8 @@ class IngestorWorkerServiceTest
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val miroWork = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "m1")
-    )
+    val miroWork = createIdentifiedWork
     val miroWorkDoesNotMatchV2Mapping = createIdentifiedWorkWith(
-      sourceIdentifier = createIdentifier("miro-image-number", "m2"),
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
@@ -515,15 +501,7 @@ class IngestorWorkerServiceTest
                   actorSystem,
                   brokenWorkIndexer,
                   messageStream) { _ =>
-                  val miroSourceIdentifier = SourceIdentifier(
-                    identifierType = IdentifierType("miro-image-number"),
-                    ontologyType = "Work",
-                    value = "B000675"
-                  )
-
-                  val work =
-                    createIdentifiedWorkWith(
-                      sourceIdentifier = miroSourceIdentifier)
+                  val work = createIdentifiedWork
 
                   val messageBody = put[IdentifiedBaseWork](
                     obj = work,
@@ -603,13 +581,5 @@ class IngestorWorkerServiceTest
     )
 
     testWith(ingestorWorkerService)
-  }
-
-  private def createIdentifier(identifierType: String, value: String) = {
-    SourceIdentifier(
-      identifierType = IdentifierType(identifierType),
-      ontologyType = "Work",
-      value = value
-    )
   }
 }

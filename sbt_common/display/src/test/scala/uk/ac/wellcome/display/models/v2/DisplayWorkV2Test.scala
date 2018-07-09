@@ -103,17 +103,18 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("extracts contributors from a Work") {
+    val canonicalId = createCanonicalId
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Person"
+    )
+
     val work = createIdentifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(
             Person(label = "Vlad the Vanquished"),
-            canonicalId = "vs7jd5dx",
-            sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("lc-names"),
-              ontologyType = "Person",
-              value = "v1"
-            )
+            canonicalId = canonicalId,
+            sourceIdentifier = sourceIdentifier
           )
         ),
         Contributor(
@@ -133,18 +134,11 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayWork.contributors shouldBe List(
       DisplayContributor(
         agent = DisplayPersonV2(
-          id = Some("vs7jd5dx"),
+          id = Some(canonicalId),
           label = "Vlad the Vanquished",
           identifiers = Some(
-            List(
-              DisplayIdentifierV2(
-                SourceIdentifier(
-                  identifierType = IdentifierType("lc-names"),
-                  ontologyType = "Person",
-                  value = "v1"
-                )
-              )
-            ))
+            List(DisplayIdentifierV2(sourceIdentifier))
+          )
         ),
         roles = List()
       ),
@@ -177,39 +171,27 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   describe("correctly uses the WorksIncludes.identifiers include") {
-    val contributorAgentSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/007",
+    val contributorAgentSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
 
-    val contributorPersonSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/bla",
+    val contributorPersonSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
 
-    val contributorOrganisationSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-names"),
-      value = "lcnames/bus",
+    val contributorOrganisationSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
 
-    val conceptSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-subjects"),
-      value = "lcsh/bonds",
+    val conceptSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Concept"
     )
 
-    val periodSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-subjects"),
-      value = "lcsh/before",
+    val periodSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Concept"
     )
 
-    val placeSourceIdentifier = SourceIdentifier(
-      identifierType = IdentifierType("lc-subjects"),
-      value = "lcsh/bul",
+    val placeSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Concept"
     )
 
@@ -218,7 +200,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
         Contributor(
           agent = Identified(
             Agent(label = "Bond"),
-            canonicalId = "bcwth7yg",
+            canonicalId = createCanonicalId,
             sourceIdentifier = contributorAgentSourceIdentifier
           ),
           roles = List()
@@ -226,7 +208,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
         Contributor(
           agent = Identified(
             Organisation(label = "Big Business"),
-            canonicalId = "bsf3kfwm",
+            canonicalId = createCanonicalId,
             sourceIdentifier = contributorOrganisationSourceIdentifier
           ),
           roles = List()
@@ -234,7 +216,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
         Contributor(
           agent = Identified(
             Person(label = "Blue Blaise"),
-            canonicalId = "b5szcu3c",
+            canonicalId = createCanonicalId,
             sourceIdentifier = contributorPersonSourceIdentifier
           ),
           roles = List()
@@ -247,17 +229,17 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           concepts = List(
             Identified(
               Concept("Bonding"),
-              canonicalId = "b5qsqkyh",
+              canonicalId = createCanonicalId,
               sourceIdentifier = conceptSourceIdentifier
             ),
             Identified(
               Period("Before"),
-              canonicalId = "bwn894hk",
+              canonicalId = createCanonicalId,
               sourceIdentifier = periodSourceIdentifier
             ),
             Identified(
               Place("Bulgaria"),
-              canonicalId = "bf42vqst",
+              canonicalId = createCanonicalId,
               sourceIdentifier = placeSourceIdentifier
             )
           )
@@ -269,7 +251,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           concepts = List(
             Identified(
               Concept("Colours"),
-              canonicalId = "chzwu4ea",
+              canonicalId = createCanonicalId,
               sourceIdentifier = conceptSourceIdentifier
             )
           )
