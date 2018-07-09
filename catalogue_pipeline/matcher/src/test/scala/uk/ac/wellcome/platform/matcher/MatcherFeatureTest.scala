@@ -43,7 +43,8 @@ class MatcherFeatureTest
                   graphTable,
                   lockTable) { _ =>
                   val work = createUnidentifiedWork
-                  val workId = s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
+                  val workId =
+                    s"${work.sourceIdentifier.identifierType.id}/${work.sourceIdentifier.value}"
 
                   val workSqsMessage: NotificationMessage =
                     hybridRecordNotificationMessage(
@@ -99,7 +100,8 @@ class MatcherFeatureTest
                   val workAv1 = createUnidentifiedWorkWith(
                     version = updatedWorkVersion
                   )
-                  val workId = s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
+                  val workId =
+                    s"${workAv1.sourceIdentifier.identifierType.id}/${workAv1.sourceIdentifier.value}"
 
                   val existingWorkAv2 = WorkNode(
                     id = workId,

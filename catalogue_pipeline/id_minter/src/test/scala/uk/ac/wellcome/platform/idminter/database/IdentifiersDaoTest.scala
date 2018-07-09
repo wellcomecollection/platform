@@ -95,9 +95,7 @@ class IdentifiersDaoTest
             select
               .from(identifiersTable as identifiersTable.i)
               .where
-              .eq(
-                identifiersTable.i.SourceSystem,
-                identifier.SourceSystem)
+              .eq(identifiersTable.i.SourceSystem, identifier.SourceSystem)
               .and
               .eq(identifiersTable.i.CanonicalId, identifier.CanonicalId)
           }.map(Identifier(identifiersTable.i)).single.apply()

@@ -77,7 +77,8 @@ class WorkMatcherTest
             withWorkMatcher(workGraphStore, lockTable, mockMetricsSender) {
               workMatcher =>
                 val invisibleWork = createUnidentifiedInvisibleWork
-                val workId = s"${invisibleWork.sourceIdentifier.identifierType.id}/${invisibleWork.sourceIdentifier.value}"
+                val workId =
+                  s"${invisibleWork.sourceIdentifier.identifierType.id}/${invisibleWork.sourceIdentifier.value}"
                 whenReady(workMatcher.matchWork(invisibleWork)) {
                   matcherResult =>
                     matcherResult shouldBe

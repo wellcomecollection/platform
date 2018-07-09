@@ -175,16 +175,20 @@ class IngestorWorkerServiceTest
 
   it("inserts a mixture of miro and sierra works into the correct indices") {
     val miroWork1 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "miro-image-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val miroWork2 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "miro-image-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val sierraWork1 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "sierra-system-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val sierraWork2 = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "sierra-system-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
 
     val works = List(miroWork1, miroWork2, sierraWork1, sierraWork2)
@@ -260,13 +264,16 @@ class IngestorWorkerServiceTest
   it(
     "inserts a mixture of miro and sierra works into the correct indices and sends invalid messages to the dlq") {
     val miroWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "miro-image-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number")
     )
     val sierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "sierra-system-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val invalidWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "calm-altref-no")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "calm-altref-no")
     )
 
     val works = List(miroWork, sierraWork, invalidWork)
@@ -314,10 +321,12 @@ class IngestorWorkerServiceTest
   it(
     "deletes successfully ingested works from the queue, including older versions of already ingested works") {
     val sierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "sierra-system-number")
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number")
     )
     val newSierraWork = createIdentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType = "sierra-system-number"),
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
       version = 2
     )
     val oldSierraWork = newSierraWork.copy(version = 1)

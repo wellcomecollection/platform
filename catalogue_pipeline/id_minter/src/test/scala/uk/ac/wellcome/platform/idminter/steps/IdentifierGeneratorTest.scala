@@ -6,7 +6,10 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
-import uk.ac.wellcome.platform.idminter.database.{IdentifiersDao, TableProvisioner}
+import uk.ac.wellcome.platform.idminter.database.{
+  IdentifiersDao,
+  TableProvisioner
+}
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 import uk.ac.wellcome.test.fixtures.TestWith
