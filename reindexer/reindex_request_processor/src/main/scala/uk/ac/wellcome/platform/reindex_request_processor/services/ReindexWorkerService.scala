@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex_request_processor.GlobalExecutionContext.context
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 
