@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.models
+package uk.ac.wellcome.models.reindexer
 
 /** A request to update a single record in SourceData to [[desiredVersion]].
   *
