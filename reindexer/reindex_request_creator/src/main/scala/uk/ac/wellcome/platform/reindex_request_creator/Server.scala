@@ -27,7 +27,8 @@ import uk.ac.wellcome.platform.reindex_request_creator.modules.ReindexerWorkerMo
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.reindex_request_creator ReindexRequestCreator"
+  override val name =
+    "uk.ac.wellcome.platform.reindex_request_creator ReindexRequestCreator"
 
   override val modules = Seq(
     MetricsSenderModule,
