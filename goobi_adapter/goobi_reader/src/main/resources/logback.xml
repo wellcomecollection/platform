@@ -1,24 +1,3 @@
 <configuration>
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
-
-  <!--
-    Hide logs from the ALB healthchecks.
-
-    This helps keep our logs clean - we know that healthchecks are working
-    unless an application gets stopped by ECS, and then we can re-enable these
-    logs by setting the log level to DEBUG.
-  -->
-  <logger name="com.twitter.finatra.http.filters.AccessLoggingFilter" level="WARN"/>
-
-  <logger name="com.amazonaws.services.s3" level="ERROR"/>
-  <root level="${log_level:-INFO}">
-    <appender-ref ref="STDOUT" />
-  </root>
+  <include resource="base-logback.xml"/>
 </configuration>
