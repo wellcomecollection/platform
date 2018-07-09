@@ -10,18 +10,7 @@ import com.twitter.finatra.http.filters.{
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.{
-  SNSClientModule,
-  SNSConfigModule,
-  SQSClientModule,
-  SQSConfigModule
-}
-import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{
-  DynamoClientModule,
-  DynamoConfigModule,
-  S3ClientModule
-}
+import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.platform.reindex_request_processor.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
@@ -30,16 +19,10 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.reindex_request_processor ReindexRequestCreator"
 
   override val modules = Seq(
-    MetricsSenderModule,
-    DynamoClientModule,
-    DynamoConfigModule,
-    SNSClientModule,
-    SNSConfigModule,
+    AkkaModule,
     SQSClientModule,
     SQSConfigModule,
-    S3ClientModule,
-    ReindexerWorkerModule,
-    AkkaModule
+    ReindexerWorkerModule
   )
 
   override def configureHttp(router: HttpRouter) {

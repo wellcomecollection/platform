@@ -6,7 +6,6 @@ import uk.ac.wellcome.platform.reindex_request_processor.services.ReindexWorkerS
 
 object ReindexerWorkerModule extends TwitterModule {
 
-  // eagerly load worker service
   override def singletonStartup(injector: Injector) {
     super.singletonStartup(injector)
     injector.instance[ReindexWorkerService]
@@ -21,5 +20,4 @@ object ReindexerWorkerModule extends TwitterModule {
     workerService.stop()
     system.terminate()
   }
-
 }
