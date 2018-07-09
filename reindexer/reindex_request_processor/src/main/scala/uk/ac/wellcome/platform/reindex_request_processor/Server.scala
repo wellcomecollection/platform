@@ -17,7 +17,8 @@ import uk.ac.wellcome.platform.reindex_request_processor.modules.ReindexerWorker
 object ServerMain extends Server
 
 class Server extends HttpServer {
-  override val name = "uk.ac.wellcome.platform.reindex_request_processor ReindexRequestCreator"
+  override val name =
+    "uk.ac.wellcome.platform.reindex_request_processor ReindexRequestCreator"
 
   override val modules = Seq(
     AkkaModule,
