@@ -64,12 +64,12 @@ trait LocalVersionedHybridStore
   def assertStored[T <: Id](bucket: Bucket, table: Table, record: T)(
     implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
-      getJsonFor[T](bucket, table, record),
+      getJsonFor(bucket, table, record.id),
       toJson(record).get
     )
 
-  def getJsonFor[T <: Id](bucket: Bucket, table: Table, record: T) = {
-    val hybridRecord = getHybridRecord(table, record.id)
+  def getJsonFor(bucket: Bucket, table: Table, id: String) = {
+    val hybridRecord = getHybridRecord(table, id)
 
     getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
   }
