@@ -103,15 +103,18 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("extracts contributors from a Work") {
+    val canonicalId = createCanonicalId
+    val sourceIdentifier = createSourceIdentifierWith(
+      ontologyType = "Person"
+    )
+
     val work = createIdentifiedWorkWith(
       contributors = List(
         Contributor(
           agent = Identified(
             Person(label = "Vlad the Vanquished"),
-            canonicalId = createCanonicalId,
-            sourceIdentifier = createSourceIdentifierWith(
-              ontologyType = "Person"
-            )
+            canonicalId = canonicalId,
+            sourceIdentifier = sourceIdentifier
           )
         ),
         Contributor(
@@ -131,16 +134,11 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayWork.contributors shouldBe List(
       DisplayContributor(
         agent = DisplayPersonV2(
-          id = Some(createCanonicalId),
+          id = Some(canonicalId),
           label = "Vlad the Vanquished",
           identifiers = Some(
-            List(
-              DisplayIdentifierV2(
-                createSourceIdentifierWith(
-                  ontologyType = "Person"
-                )
-              )
-            ))
+            List(DisplayIdentifierV2(sourceIdentifier))
+          )
         ),
         roles = List()
       ),
