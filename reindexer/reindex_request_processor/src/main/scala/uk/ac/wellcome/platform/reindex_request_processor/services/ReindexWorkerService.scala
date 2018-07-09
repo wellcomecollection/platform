@@ -13,9 +13,12 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.Try
 
-class ReindexWorkerService @Inject()(versionedHybridStore: VersionedHybridStore[ReindexableRecord, EmptyMetadata, ObjectStore[ReindexableRecord]],
-                                     sqsStream: SQSStream[NotificationMessage],
-                                     system: ActorSystem) {
+class ReindexWorkerService @Inject()(
+  versionedHybridStore: VersionedHybridStore[ReindexableRecord,
+                                             EmptyMetadata,
+                                             ObjectStore[ReindexableRecord]],
+  sqsStream: SQSStream[NotificationMessage],
+  system: ActorSystem) {
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
@@ -26,13 +29,18 @@ class ReindexWorkerService @Inject()(versionedHybridStore: VersionedHybridStore[
       _ <- Future.fromTry(
         Try {
           val reindexRequest = fromJson[ReindexRequest](message.Message).get
-          versionedHybridStore.updateRecord(reindexRequest.id)(
-            (ReindexableRecord(reindexRequest.id, reindexRequest.desiredVersion), EmptyMetadata()))(
+          versionedHybridStore.updateRecord(reindexRequest.id)((
+            ReindexableRecord(reindexRequest.id, reindexRequest.desiredVersion),
+            EmptyMetadata()))(
             (existingRecord, existingMetadata) =>
-            if (existingRecord.reindexVersion > reindexRequest.desiredVersion) {
-              (existingRecord, existingMetadata)
-            } else {
-              (ReindexableRecord(reindexRequest.id, reindexRequest.desiredVersion), EmptyMetadata())
+              if (existingRecord.reindexVersion > reindexRequest.desiredVersion) {
+                (existingRecord, existingMetadata)
+              } else {
+                (
+                  ReindexableRecord(
+                    reindexRequest.id,
+                    reindexRequest.desiredVersion),
+                  EmptyMetadata())
             }
           )
         }
