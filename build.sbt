@@ -135,11 +135,13 @@ lazy val matcher = doServiceSetup(project, "catalogue_pipeline/matcher")
   .dependsOn(finatra_akka % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.scalaGraphDependencies)
 
-lazy val reindex_worker = doServiceSetup(project, "reindexer/reindex_worker")
+
+lazy val reindex_request_creator = doServiceSetup(project, "reindexer/reindex_request_creator")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .dependsOn(finatra_storage % "compile->compile;test->test")
+
 
 lazy val goobi_reader = doServiceSetup(project, "goobi_adapter/goobi_reader")
   .dependsOn(finatra_controllers % "compile->compile;test->test")
@@ -211,7 +213,9 @@ lazy val root = (project in file("."))
     recorder,
     matcher,
     merger,
-    reindex_worker,
+
+    reindex_request_creator,
+
     goobi_reader,
     sierra_adapter_common,
     sierra_reader,
