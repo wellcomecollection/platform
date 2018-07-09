@@ -1,10 +1,7 @@
 <configuration>
   <include resource="base-logback-test.xml"/>
 
-  <!--
-    The DEBUG logs for internal SQL behaviour are quite chatty.  Log them
-    at INFO to keep the logs clean.
-  -->
-  <logger name="scalikejdbc.StatementExecutor" level="INFO"/>
-  <logger name="org.flywaydb.core" level="INFO"/>
+  <logger name="org.flywaydb.core" level="WARN"/>
+  <logger name="scalikejdbc" level="INFO"/>
+  <logger name="uk.ac.wellcome.platform.idminter.Server" level="INFO"/>
 </configuration>
