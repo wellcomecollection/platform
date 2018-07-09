@@ -1,3 +1,8 @@
+data "template_file" "table_names" {
+  count = "${length(var.heartbeat_json_config)}"
+  template = "${lookup(var.heartbeat_json_config[count.index], "table_name")}"
+}
+
 data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
   statement {
     actions = [
@@ -5,7 +10,7 @@ data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
     ]
 
     resources = [
-      "${join(",", formatlist("arn:aws:dynamodb:*:*:table/%s", var.dynamo_table_names))}",
+      "${join(",", formatlist("arn:aws:dynamodb:*:*:table/%s", data.template_file.table_names.*.rendered))}",
     ]
   }
 }

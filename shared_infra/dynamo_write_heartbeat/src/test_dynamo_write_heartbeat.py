@@ -14,48 +14,55 @@ TABLES = [{'name': 'Table1', 'index': 'Index1'},
 
 @pytest.yield_fixture(autouse=True)
 def run_around_tests(dynamodb_client):
-    tables = TABLES
-
-    for table in tables:
+    for table in TABLES:
         create_table(dynamodb_client, table['name'], table['index'])
     yield
-    for table in tables:
+    for table in TABLES:
         dynamodb_client.delete_table(TableName=table['name'])
 
 
-def test_executing_lambda(dynamodb_client):
+def test_updating_item(dynamodb_client):
     heartbeats_json_str = json.dumps([
         {
             '__heartbeat__': True,
             'table_name': 'Table1',
             'key': {'id': {'S': 'heartbeat-dummy-record-id-1'}},
-            'update_expression': "SET indexedId = :v",
-            'expression_attribute_values': {':v': {'S': 'value-1'}}
+            'index': 'Indexed1'
         },
         {
             '__heartbeat__': True,
             'table_name': 'Table3',
             'key': {'id': {'S': 'heartbeat-dummy-record-id-3'}},
-            'update_expression': "SET indexedId = :v",
-            'expression_attribute_values': {':v': {'S': 'value-3'}}
+            'index': 'Indexed3'
         }
     ])
     os.environ.update({HEARTBEAT_CONFIG_KEY: heartbeats_json_str})
     dynamo_write_heartbeat.main(event=None, context=None, dynamodb_client=dynamodb_client)
 
-    assert_heartbeat_record_in_table(dynamodb_client,
-                                     table_name='Table1',
-                                     key={'id': {'S': 'heartbeat-dummy-record-id-1'}},
-                                     value={'indexedId': {'S': 'value-1'}})
+    assert_no_dynamo_writes(dynamodb_client)
 
+
+def test_executing_update_without_index(dynamodb_client):
+    heartbeats_json_str = json.dumps([
+        {
+            '__heartbeat__': True,
+            'table_name': 'Table1',
+            'key': {'id': {'S': 'heartbeat-dummy-record-id-1'}}
+        }
+    ])
+    os.environ.update({HEARTBEAT_CONFIG_KEY: heartbeats_json_str})
+    dynamo_write_heartbeat.main(event=None, context=None, dynamodb_client=dynamodb_client)
+
+    assert_no_dynamo_writes(dynamodb_client)
+
+
+def assert_no_dynamo_writes(dynamodb_client):
+    table = dynamodb_client.describe_table(TableName='Table1')
+    assert table['Table']['ItemCount'] == 0
     table = dynamodb_client.describe_table(TableName='Table2')
     assert table['Table']['ItemCount'] == 0
-
-    assert_heartbeat_record_in_table(dynamodb_client,
-                                     table_name='Table3',
-                                     key={'id': {'S': 'heartbeat-dummy-record-id-3'}},
-                                     value={'indexedId': {'S': 'value-3'}})
-
+    table = dynamodb_client.describe_table(TableName='Table3')
+    assert table['Table']['ItemCount'] == 0
 
 
 def test_executing_lambda_config_not_provided(dynamodb_client):

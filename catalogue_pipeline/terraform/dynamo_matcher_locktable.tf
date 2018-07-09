@@ -58,7 +58,7 @@ module "lambda_dynamodb_write_heartbeat" {
   source = "../../shared_infra/dynamo_write_heartbeat"
 
   name               = "matcher"
-  dynamo_table_names = ["${aws_dynamodb_table.matcher_lock_table.name}"]
+  dynamo_tables = ["${aws_dynamodb_table.matcher_lock_table.name}"]
 
   infra_bucket           = "${var.infra_bucket}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
