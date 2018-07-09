@@ -1,10 +1,11 @@
 package uk.ac.wellcome.models.work.internal
 
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class WorkTest extends FunSpec {
+class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
 
   // This is based on a real failure.  We deployed a version of the API
   // with a newer model than was in Elasticsearch -- in particular, it had
@@ -14,33 +15,19 @@ class WorkTest extends FunSpec {
   // issues for /works pages on wellcomecollection.org.  This test checks
   // for "strictness" in our JSON parsing.
   //
+  // The problem is that the "items" field has an outdated model -- it
+  // should be wrapped in an "Identified" block, with the item data
+  // inside an "agent" field.
+  //
   it("fails to parse Work JSON with an outdated Item definition") {
     val jsonString =
-      """
+      s"""
         |{
-        |  "canonicalId": "sgmzn6pu",
-        |  "sourceIdentifier": {
-        |    "identifierType": {
-        |      "id": "miro-image-number",
-        |      "label": "Miro image number",
-        |      "ontologyType": "IdentifierType"
-        |    },
-        |    "ontologyType": "Work",
-        |    "value": "L0057464"
-        |  },
-        |  "otherIdentifiers": [
-        |    {
-        |      "identifierType": {
-        |        "id": "miro-library-reference",
-        |        "label": "Miro library reference",
-        |        "ontologyType": "IdentifierType"
-        |      },
-        |      "ontologyType": "Work",
-        |      "value": "Science Museum A113324|CLAC100116"
-        |    }
-        |  ],
+        |  "canonicalId": "$createCanonicalId",
+        |  "sourceIdentifier": ${toJson(createSourceIdentifier).get},
+        |  "otherIdentifiers": [],
         |  "mergeCandidates": [],
-        |  "title": "Adult human mummy in sarcophagus, 323BC-31AD. Photographed on display in the Upper Wellcome Gallery of the Science Museum",
+        |  "title": "${randomAlphanumeric(length = 10)}",
         |  "workType": null,
         |  "description": null,
         |  "physicalDescription": null,
@@ -49,82 +36,29 @@ class WorkTest extends FunSpec {
         |  "createdDate": null,
         |  "subjects": [],
         |  "genres": [],
-        |  "contributors": [
-        |    {
-        |      "agent": {
-        |        "agent": {
-        |          "label": "Science Museum, London",
-        |          "type": "Agent"
-        |        },
-        |        "type": "Unidentifiable"
-        |      },
-        |      "roles": [],
-        |      "ontologyType": "Contributor"
-        |    }
-        |  ],
-        |  "thumbnail": {
-        |    "url": "https://iiif.wellcomecollection.org/image/L0057464.jpg/full/300,/0/default.jpg",
-        |    "license": {
-        |      "id": "cc-by",
-        |      "label": "Attribution 4.0 International (CC BY 4.0)",
-        |      "url": "http://creativecommons.org/licenses/by/4.0/",
-        |      "ontologyType": "License"
-        |    },
-        |    "locationType": {
-        |      "id": "thumbnail-image",
-        |      "label": "Thumbnail Image",
-        |      "ontologyType": "LocationType"
-        |    },
-        |    "credit": null,
-        |    "ontologyType": "DigitalLocation",
-        |    "type": "DigitalLocation"
-        |  },
+        |  "contributors": [],
+        |  "thumbnail": null,
         |  "production": [],
         |  "language": null,
         |  "dimensions": null,
         |  "items": [
         |    {
-        |      "canonicalId": "hy2cbxkh",
-        |      "sourceIdentifier": {
-        |        "identifierType": {
-        |          "id": "miro-image-number",
-        |          "label": "Miro image number",
-        |          "ontologyType": "IdentifierType"
-        |        },
-        |        "ontologyType": "Item",
-        |        "value": "L0057464"
-        |      },
+        |      "canonicalId": "$createCanonicalId",
+        |      "sourceIdentifier": ${toJson(createSourceIdentifier).get},
         |      "otherIdentifiers": [],
-        |      "locations": [
-        |        {
-        |          "url": "https://iiif.wellcomecollection.org/image/L0057464.jpg/info.json",
-        |          "license": {
-        |            "id": "cc-by",
-        |            "label": "Attribution 4.0 International (CC BY 4.0)",
-        |            "url": "http://creativecommons.org/licenses/by/4.0/",
-        |            "ontologyType": "License"
-        |          },
-        |          "locationType": {
-        |            "id": "iiif-image",
-        |            "label": "IIIF image",
-        |            "ontologyType": "LocationType"
-        |          },
-        |          "credit": "Science Museum, London",
-        |          "ontologyType": "DigitalLocation",
-        |          "type": "DigitalLocation"
-        |        }
-        |      ],
+        |      "locations": [],
         |      "ontologyType": "Item"
         |    }
         |  ],
-        |  "version": 27,
+        |  "version": 1,
         |  "visible": true,
         |  "ontologyType": "Work"
         |}
       """.stripMargin
 
-    intercept[GracefulFailureException] {
+    val caught = intercept[GracefulFailureException] {
       fromJson[IdentifiedWork](jsonString).get
     }
+    caught.getMessage shouldBe "Attempt to decode value on failed cursor: DownField(agent),DownArray,DownField(items)"
   }
 }
