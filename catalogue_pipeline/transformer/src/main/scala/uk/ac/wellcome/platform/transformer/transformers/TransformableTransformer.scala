@@ -1,11 +1,13 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.platform.transformer.transformers.miro.ShouldNotTransformException
 
 import scala.util.Try
 
-trait TransformableTransformer[T <: Transformable] {
+trait TransformableTransformer[T <: Transformable] extends Logging {
   def transformForType
     : PartialFunction[(Transformable, Int), Try[Option[TransformedBaseWork]]]
 
@@ -14,7 +16,11 @@ trait TransformableTransformer[T <: Transformable] {
     Try {
       transformable match {
         case t if transformForType.isDefinedAt((t, version)) =>
-          transformForType((t, version))
+          transformForType((t, version)).recover {
+            case e: ShouldNotTransformException =>
+              warn(s"Should not transform: ${e.getMessage}")
+              None
+          }
         case _ =>
           throw new RuntimeException(s"$transformable is not of the right type")
       }

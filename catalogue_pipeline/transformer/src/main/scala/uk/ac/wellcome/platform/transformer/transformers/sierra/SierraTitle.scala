@@ -13,5 +13,6 @@ trait SierraTitle {
   // http://www.loc.gov/marc/bibliographic/bd245.html
   def getTitle(bibData: SierraBibData): String =
     bibData.title.getOrElse(
-      throw new ShouldNotTransformException("Sierra record with no title!"))
+      throw new ShouldNotTransformException(
+        s"Sierra record ${bibData.id} has no title!"))
 }

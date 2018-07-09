@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import com.twitter.inject.Logging
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData

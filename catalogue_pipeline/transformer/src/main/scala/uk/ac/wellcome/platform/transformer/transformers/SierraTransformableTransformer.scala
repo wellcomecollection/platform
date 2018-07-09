@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import com.twitter.inject.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
@@ -26,8 +25,7 @@ class SierraTransformableTransformer
     with SierraDimensions
     with SierraSubjects
     with SierraGenres
-    with SierraMergeCandidates
-    with Logging {
+    with SierraMergeCandidates {
 
   override def transformForType = {
     case (sierraTransformable: SierraTransformable, version: Int) =>

@@ -18,12 +18,14 @@ trait MiroLicenses {
     *  TODO: Update these mappings based on the final version of Christy's
     *        document.
     */
-  def chooseLicense(maybeUseRestrictions: Option[String]): License =
+  def chooseLicense(miroId: String,
+                    maybeUseRestrictions: Option[String]): License =
     maybeUseRestrictions match {
 
       // These images need more data.
       case None =>
-        throw new ShouldNotTransformException("No usage restriction specified!")
+        throw new ShouldNotTransformException(
+          s"Image $miroId has no usage restriction specified!")
 
       case Some(useRestrictions) =>
         useRestrictions match {
@@ -43,10 +45,10 @@ trait MiroLicenses {
           // so they don't end up on the DLQ.
           case "Do not use" =>
             throw new ShouldNotTransformException(
-              "Usage restriction is 'Do not use'")
+              s"Image $miroId has usage restriction 'Do not use'")
           case "Image withdrawn, see notes" =>
             throw new ShouldNotTransformException(
-              "Usage restriction is 'Image withdrawn'")
+              s"Image $miroId has usage restriction 'Image withdrawn'")
         }
     }
 
