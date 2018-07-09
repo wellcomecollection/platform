@@ -2,17 +2,7 @@ package uk.ac.wellcome.models.work.test.util
 
 import uk.ac.wellcome.models.work.internal._
 
-import scala.util.Random
-
-trait ItemsUtil {
-  private def defaultSourceIdentifier = {
-    SourceIdentifier(
-      identifierType = IdentifierType("miro-image-number"),
-      value = (Random.alphanumeric take 10 mkString) toLowerCase,
-      ontologyType = "Item"
-    )
-  }
-
+trait ItemsUtil extends IdentifiersUtil {
   private def defaultLocation = DigitalLocation(
     locationType = LocationType("iiif-image"),
     url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
@@ -20,8 +10,8 @@ trait ItemsUtil {
   )
 
   def createItem(
-    canonicalId: String = (Random.alphanumeric take 10 mkString) toLowerCase,
-    sourceIdentifier: SourceIdentifier = defaultSourceIdentifier,
+    canonicalId: String = createCanonicalId,
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     locations: List[Location] = List(defaultLocation)
   ): Identified[Item] =
     Identified(

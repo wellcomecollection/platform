@@ -191,6 +191,7 @@ class IdEmbedderTests
     )
 
     val originalWork = createUnidentifiedWorkWith(
+      sourceIdentifier = identifier,
       items = List(originalItem1, originalItem2)
     )
 
