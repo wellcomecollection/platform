@@ -3,11 +3,13 @@ package uk.ac.wellcome.display.models.v2
 import org.scalatest.FunSpec
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 
 class DisplayAbstractConceptSerialisationTest
     extends FunSpec
     with DisplayV2SerialisationTestBase
-    with JsonMapperTestUtil {
+    with JsonMapperTestUtil
+    with IdentifiersUtil {
 
   it("serialises an unidentified DisplayConcept") {
     assertObjectMapsToJson(
