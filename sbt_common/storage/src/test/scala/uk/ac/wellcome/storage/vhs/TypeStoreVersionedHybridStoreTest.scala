@@ -2,7 +2,6 @@ package uk.ac.wellcome.storage.vhs
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
@@ -15,9 +14,9 @@ import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class ExampleRecord(
-  override val id: String,
+  id: String,
   content: String
-) extends Id
+)
 
 class TypeStoreVersionedHybridStoreTest
     extends FunSpec
