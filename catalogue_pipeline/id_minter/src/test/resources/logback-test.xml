@@ -1,23 +1,5 @@
 <configuration>
-
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
-
-  <!--
-    We often see errors of the form:
-
-        Unable to parse HTTP response content to XML document
-        The server was not able to produce a timely response to your request.
-
-    These are emitted when the test container is being a bit slow, but
-    they're harmless and just spam the test logs.  Hide them!
-  -->
-  <logger name="com.amazonaws.http.DefaultErrorResponseHandler" level="WARN"/>
+  <include resource="base-logback-test.xml"/>
 
   <!--
     The DEBUG logs for internal SQL behaviour are quite chatty.  Log them
@@ -25,10 +7,4 @@
   -->
   <logger name="scalikejdbc.StatementExecutor" level="INFO"/>
   <logger name="org.flywaydb.core" level="INFO"/>
-
-  <logger name="org.apache.http" level="WARN"/>
-  <logger name="com.amazonaws" level="INFO"/>
-  <root level="debug">
-    <appender-ref ref="STDOUT" />
-  </root>
 </configuration>
