@@ -193,14 +193,10 @@ class MergerWorkerServiceTest
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        val testObject = TestObject("lallabalula")
-        val notificationMessage = NotificationMessage(
-          MessageId = "MessageId",
-          TopicArn = "topic-arn",
-          Subject = "subject",
-          Message = toJson(testObject).get
+        sendNotificationToSQS(
+          queue = queue,
+          message = TestObject("lallabalula")
         )
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
         eventually {
           assertQueueEmpty(queue)
