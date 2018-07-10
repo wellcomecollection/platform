@@ -6,8 +6,6 @@ import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 
 class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
-  def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
-
   it("returns an HTTP 410 Gone if looking up a work with visible = false") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>

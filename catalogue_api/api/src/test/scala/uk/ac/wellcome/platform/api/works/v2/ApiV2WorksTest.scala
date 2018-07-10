@@ -6,8 +6,6 @@ import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksTest extends ApiV2WorksTestBase {
-  def withV2Api[R] = withApiFixtures[R](ApiVersions.v2)(_)
-
   it("returns a list of works") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
