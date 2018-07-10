@@ -5,6 +5,7 @@ Prints information about which version of the API is currently running,
 so you can create a new set of pins.
 """
 
+import difflib
 import json
 import os
 import sys
@@ -102,16 +103,29 @@ def check_staging_api():
         params={'includes': includes}
     )
 
-    if prod_resp.json() == stage_resp.json():
+    prod_json = prod_resp.json()
+    stage_json = stage_resp.json()
+
+    # TODO: Doesn't this indicate a problem with the context URLs
+    # when we flip the APIs?  Won't prod temporarily point at stage?
+    # See https://github.com/wellcometrust/platform/issues/2413
+    stage_json['@context'] = stage_json['@context'].replace('api-stage', 'api')
+
+    if prod_json == stage_json:
         print('OK!')
     else:
         print(bold('Responses do not match!'))
 
-        print('\nProd response:')
-        print(json.dumps(prod_resp.json(), indent=2, sort_keys=True))
+        prod_lines = json.dumps(prod_json, indent=2, sort_keys=True)
+        stage_lines = json.dumps(stage_json, indent=2, sort_keys=True)
 
-        print('\nStage response:')
-        print(json.dumps(stage_resp.json(), indent=2, sort_keys=True))
+        for line in difflib.context_diff(
+            prod_lines.splitlines(),
+            stage_lines.splitlines(),
+            fromfile='api.wellcomecollection.org',
+            tofile='api-stage.wellcomecollection.org'
+        ):
+            print(line)
 
         sys.exit(1)
 
