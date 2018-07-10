@@ -6,7 +6,6 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
@@ -34,16 +33,11 @@ class SierraItemsToDynamoFeatureTest
           val bibId = "b54321"
           val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
           val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
-          val message = SierraRecord(id, data, modifiedDate)
 
-          val sqsMessage = NotificationMessage(
-            MessageId = "message-id",
-            TopicArn = "topic",
-            Subject = "subject",
-            Message = toJson(message).get
+          sendNotificationToSQS(
+            queue = queue,
+            message = SierraRecord(id, data, modifiedDate)
           )
-
-          sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
           eventually {
             Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
