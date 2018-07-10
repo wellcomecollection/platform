@@ -130,6 +130,42 @@ def check_staging_api():
         sys.exit(1)
 
 
+def print_new_tfvars(new_prod_api, romulus_api, remus_api):
+    print('If you want to switch the prod/staging API, copy the following')
+    print('Terraform into variables.tf:')
+    print('')
+
+    print(f'''
+\033[32mvariable "production_api" {{
+  description = "Which version of the API is production? (romulus | remus)"
+  default     = "{new_prod_api}"
+}}
+
+variable "pinned_romulus_api" {{
+  description = "Which version of the API image to pin romulus to, if any"
+  default     = "{romulus_api.api}"
+}}
+
+variable "pinned_romulus_api_nginx" {{
+  description = "Which version of the nginx API image to pin romulus to, if any"
+  default     = "{romulus_api.nginx}"
+}}
+
+variable "pinned_remus_api" {{
+  description = "Which version of the API image to pin remus to, if any"
+  default     = "{remus_api.api}"
+}}
+
+variable "pinned_remus_api_nginx" {{
+  description = "Which version of the nginx API image to pin remus to, if any"
+  default     = "{remus_api.nginx}"
+}}\033[0m
+    '''.strip())
+
+    print('\nOnce the change has successfully deployed, you can remove the')
+    print('pins for the staging API.')
+
+
 if __name__ == '__main__':
     with open(os.path.join(API_TF, 'variables.tf')) as var_tf:
         variables = hcl.load(var_tf)['variable']
@@ -145,37 +181,20 @@ if __name__ == '__main__':
     print('\n---\n')
 
     check_staging_api()
-#
-#     print('If you want to switch the prod/staging API, copy the following')
-#     print('Terraform into variables.tf:')
-#     print('')
-#
-#     new_prod_api = staging_api
-#     new_prod_api_info = staging_api_info
-#
-#     print(f'''
-# \033[32mvariable "production_api" {{
-#   description = "Which version of the API is production? (romulus | remus)"
-#   default     = "{staging_api}"
-# }}
-#
-# variable "pinned_romulus_api" {{
-#   description = "Which version of the API image to pin romulus to, if any"
-#   default     = "{new_prod_api_info['api'] if new_prod_api == 'romulus' else ''}"
-# }}
-#
-# variable "pinned_romulus_api_nginx" {{
-#   description = "Which version of the nginx API image to pin romulus to, if any"
-#   default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'romulus' else ''}"
-# }}
-#
-# variable "pinned_remus_api" {{
-#   description = "Which version of the API image to pin remus to, if any"
-#   default     = "{new_prod_api_info['api'] if new_prod_api == 'remus' else ''}"
-# }}
-#
-# variable "pinned_remus_api_nginx" {{
-#   description = "Which version of the nginx API image to pin remus to, if any"
-#   default     = "{new_prod_api_info['nginx_api'] if new_prod_api == 'remus' else ''}"
-# }}
-# '''.strip())
+
+    print('\n---\n')
+
+    if prod_api == 'romulus':
+        romulus_api = prod_api_info
+        remus_api = staging_api_info
+        new_prod_api = 'remus'
+    else:
+        romulus_api = staging_api_info
+        remus_api = prod_api_info
+        new_prod_api = 'romulus'
+
+    print_new_tfvars(
+        new_prod_api=new_prod_api,
+        romulus_api=romulus_api,
+        remus_api=remus_api
+    )
