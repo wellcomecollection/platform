@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_processor
+package uk.ac.wellcome.platform.reindex.processor
 
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec

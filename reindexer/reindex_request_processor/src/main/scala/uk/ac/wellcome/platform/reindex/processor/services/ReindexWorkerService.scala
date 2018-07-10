@@ -1,12 +1,12 @@
-package uk.ac.wellcome.platform.reindex_request_processor.services
+package uk.ac.wellcome.platform.reindex.processor.services
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
-import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -47,5 +47,5 @@ class ReindexWorkerService @Inject()(
       )
     } yield ()
 
-  def stop() = system.terminate()
+  def stop(): Future[Terminated] = system.terminate()
 }
