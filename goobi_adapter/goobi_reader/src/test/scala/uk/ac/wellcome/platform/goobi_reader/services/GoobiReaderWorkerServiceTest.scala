@@ -183,8 +183,6 @@ class GoobiReaderWorkerServiceTest
           message = anS3Notification(sourceKey, bucket.name, newerEventTime)
         )
 
-        sqsClient.sendMessage(queue.url, toJson(message).get)
-
         eventually {
           val expectedRecord = HybridRecord(
             id = id,
