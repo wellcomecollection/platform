@@ -157,6 +157,19 @@ trait SQS extends Matchers {
     testwith(stream)
   }
 
+  def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
+    val message = NotificationMessage(
+      MessageId = Random.alphanumeric take 10 mkString,
+      TopicArn = Random.alphanumeric take 10 mkString,
+      Subject = Random.alphanumeric take 10 mkString,
+      Message = body
+    )
+    sqsClient.sendMessage(queue.url, toJson(message).get)
+  }
+
+  def sendNotificationToSQS[T](queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult =
+    sendNotificationToSQS(queue = queue, body = toJson(message).get)
+
   object TestNotificationMessage {
     def apply(messageBody: String) =
       NotificationMessage(
