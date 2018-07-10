@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.ingestor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -76,19 +75,11 @@ class IngestorFeatureTest
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
-              val invalidMessage = toJson(
-                NotificationMessage(
-                  Subject = "identified-item",
-                  Message = "not a json string - this will fail parsing",
-                  TopicArn = "ingester",
-                  MessageId = "messageId"
-                )
-              ).get
-
-              sqsClient.sendMessage(
-                queue.url,
-                invalidMessage
+              sendNotificationToSQS(
+                queue = queue,
+                body = "not a json string -- this will fail parsing"
               )
+
               // After a message is read, it stays invisible for 1 second and then it gets sent again.
               // So we wait for longer than the visibility timeout and then we assert that it has become
               // invisible again, which means that the ingestor picked it up again,
