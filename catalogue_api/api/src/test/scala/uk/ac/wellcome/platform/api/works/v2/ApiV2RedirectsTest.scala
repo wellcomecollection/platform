@@ -14,7 +14,8 @@ class ApiV2RedirectsTest extends ApiV2WorksTestBase {
           path = s"/$apiPrefix/works/${redirectedWork.canonicalId}",
           andExpect = Status.Found,
           withBody = "",
-          withLocation = s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}"
+          withLocation =
+            s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}"
         )
     }
   }
@@ -26,10 +27,12 @@ class ApiV2RedirectsTest extends ApiV2WorksTestBase {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         insertIntoElasticsearch(indexNameV2, itemType, redirectedWork)
         server.httpGet(
-          path = s"/$apiPrefix/works/${redirectedWork.canonicalId}?includes=identifiers",
+          path =
+            s"/$apiPrefix/works/${redirectedWork.canonicalId}?includes=identifiers",
           andExpect = Status.Found,
           withBody = "",
-          withLocation = s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}?includes=identifiers"
+          withLocation =
+            s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}?includes=identifiers"
         )
     }
   }

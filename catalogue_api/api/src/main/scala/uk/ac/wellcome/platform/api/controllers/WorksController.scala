@@ -148,8 +148,7 @@ abstract class WorksController(apiConfig: ApiConfig,
   private def respondWithRedirect(originalUri: String,
                                   work: IdentifiedRedirectedWork,
                                   contextUri: String) =
-    response
-      .found
+    response.found
       .body("")
       .location(
         uri = originalUri.replaceAll(
