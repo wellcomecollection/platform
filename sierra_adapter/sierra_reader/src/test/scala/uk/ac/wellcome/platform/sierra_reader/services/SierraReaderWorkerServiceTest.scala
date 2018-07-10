@@ -17,7 +17,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
 import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.{
