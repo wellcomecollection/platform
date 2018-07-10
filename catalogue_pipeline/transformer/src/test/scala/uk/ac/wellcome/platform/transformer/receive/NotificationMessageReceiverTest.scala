@@ -159,8 +159,6 @@ class NotificationMessageReceiverTest
                 unidentifiedWork.identifiers shouldBe List(
                   sourceIdentifier,
                   sierraIdentifier)
-
-                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }
