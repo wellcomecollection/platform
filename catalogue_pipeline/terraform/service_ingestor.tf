@@ -1,7 +1,7 @@
 locals {
   es_config_ingestor = {
-    index_v1 = "v1-2018-07-02-invisible-works"
-    index_v2 = "v2-2018-07-02-invisible-works"
+    index_v1 = "v1-2018-07-10-fresh-reindex"
+    index_v2 = "v2-2018-07-10-fresh-reindex"
     doc_type = "work"
   }
 }
