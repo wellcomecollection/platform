@@ -95,28 +95,20 @@ class SierraReaderWorkerServiceTest
 
   it(
     "reads a window message from SQS, retrieves the bibs from Sierra and writes them to S3") {
+    val body =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
     withSierraReaderWorkerService(
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title",
       batchSize = 10,
       resourceType = SierraResourceTypes.bibs
     ) { fixtures =>
-      val message =
-        """
-          |{
-          | "start": "2013-12-10T17:16:35Z",
-          | "end": "2013-12-13T21:34:35Z"
-          |}
-        """.stripMargin
-
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
         s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
@@ -139,27 +131,20 @@ class SierraReaderWorkerServiceTest
 
   it(
     "reads a window message from SQS, retrieves the items from Sierra and writes them to S3") {
+    val body =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
       batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
-      val message =
-        """
-          |{
-          | "start": "2013-12-10T17:16:35Z",
-          | "end": "2013-12-13T21:34:35Z"
-          |}
-        """.stripMargin
-
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -207,7 +192,7 @@ class SierraReaderWorkerServiceTest
       )
 
       // Then we trigger the reader, and we expect it to fill in the rest.
-      val message =
+      val body =
         """
           |{
           | "start": "2013-12-10T17:16:35Z",
@@ -215,14 +200,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>

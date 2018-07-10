@@ -28,22 +28,16 @@ class SierraReaderFeatureTest
           "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
         )
 
-        withServer(flags) { _ =>
-          val message =
-            """
+        val body =
+          """
             |{
             | "start": "2013-12-10T17:16:35Z",
             | "end": "2013-12-13T21:34:35Z"
             |}
-            """.stripMargin
+          """.stripMargin
 
-          val notificationMessage = NotificationMessage(
-            Subject = "subject",
-            Message = message,
-            TopicArn = "topic",
-            MessageId = "message-id"
-          )
-          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+        withServer(flags) { _ =>
+          sendNotificationToSQS(queue = queue, body = body)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response
