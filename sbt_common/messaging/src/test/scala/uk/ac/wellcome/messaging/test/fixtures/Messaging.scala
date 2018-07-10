@@ -155,13 +155,8 @@ trait Messaging
     val examplePointer =
       MessagePointer(ObjectLocation(location.namespace, location.key))
 
-    val serialisedExamplePointer = toJson(examplePointer).get
-
-    val exampleNotification = NotificationMessage(
-      MessageId = "MessageId",
-      TopicArn = "TopicArn",
-      Subject = "Subject",
-      Message = serialisedExamplePointer
+    val exampleNotification = createNotificationMessageWith(
+      message = examplePointer
     )
 
     toJson(exampleNotification).get

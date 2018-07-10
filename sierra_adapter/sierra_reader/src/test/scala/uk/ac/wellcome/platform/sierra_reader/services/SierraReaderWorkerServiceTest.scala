@@ -233,20 +233,14 @@ class SierraReaderWorkerServiceTest
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
-      val message =
+      val body =
         """
           |{
           | "start": "2013-12-10T17:16:35Z"
           |}
         """.stripMargin
 
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
+      val notificationMessage = createNotificationMessageWith(body = body)
       whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
         ex =>
           ex shouldBe a[GracefulFailureException]
@@ -260,7 +254,7 @@ class SierraReaderWorkerServiceTest
     "does not return a GracefulFailureException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
-        val message =
+        val body =
           """
           |{
           | "start": "2013-12-10T17:16:35Z",
@@ -268,13 +262,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-        val notificationMessage =
-          NotificationMessage(
-            Subject = "subject",
-            Message = message,
-            TopicArn = "topic",
-            MessageId = "message-id"
-          )
+        val notificationMessage = createNotificationMessageWith(body = body)
 
         whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
           ex =>
