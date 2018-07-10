@@ -6,7 +6,6 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -41,15 +40,12 @@ class IdMinterFeatureTest
 
               val messageCount = 5
 
-              (1 to messageCount).foreach { i =>
-                val messageBody = put[UnidentifiedWork](
-                  obj = work,
-                  location = ObjectLocation(
-                    namespace = bucket.name,
-                    key = s"$i.json"
-                  )
+              (1 to messageCount).foreach { _ =>
+                sendMessage(
+                  bucket = bucket,
+                  queue = queue,
+                  message = work
                 )
-                sqsClient.sendMessage(queue.url, messageBody)
               }
 
               eventually {
@@ -88,14 +84,11 @@ class IdMinterFeatureTest
               eventuallyTableExists(identifiersTableConfig)
               val work = createUnidentifiedInvisibleWork
 
-              val messageBody = put[UnidentifiedInvisibleWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = "invisible-work.json"
-                )
+              sendMessage(
+                bucket = bucket,
+                queue = queue,
+                message = work
               )
-              sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
                 val messages = listMessagesReceivedFromSNS(topic)
@@ -128,14 +121,11 @@ class IdMinterFeatureTest
 
               val work = createUnidentifiedRedirectedWork
 
-              val messageBody = put[UnidentifiedRedirectedWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = "redirected-work.json"
-                )
+              sendMessage(
+                bucket = bucket,
+                queue = queue,
+                message = work
               )
-              sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
                 val messages = listMessagesReceivedFromSNS(topic)
@@ -171,15 +161,11 @@ class IdMinterFeatureTest
 
               val work = createUnidentifiedWork
 
-              val messageBody = put[UnidentifiedWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"key.json"
-                )
+              sendMessage(
+                bucket = bucket,
+                queue = queue,
+                message = work
               )
-
-              sqsClient.sendMessage(queue.url, messageBody)
 
               eventually {
                 val snsMessages = listMessagesReceivedFromSNS(topic)
