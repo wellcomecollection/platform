@@ -7,6 +7,7 @@ import com.amazonaws.services.sns.model.{
   SubscribeResult,
   UnsubscribeRequest
 }
+import com.amazonaws.services.sqs.model.SendMessageResult
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
@@ -177,15 +178,13 @@ trait Messaging
     tryT.get
   }
 
-  def sendMessage(bucket: Bucket,
-                  queue: SQS.Queue,
-                  exampleObject: ExampleObject) = {
-    val key = Random.alphanumeric take 10 mkString
-    val notice = put(exampleObject, ObjectLocation(bucket.name, key))
-
-    sqsClient.sendMessage(
-      queue.url,
-      notice
+  def sendMessage[T](bucket: Bucket, queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult = {
+    val s3key = Random.alphanumeric take 10 mkString
+    val notificationJson = put(
+      obj = message,
+      location = ObjectLocation(namespace = bucket.name, key = s3key)
     )
+
+    sqsClient.sendMessage(queue.url, notificationJson)
   }
 }
