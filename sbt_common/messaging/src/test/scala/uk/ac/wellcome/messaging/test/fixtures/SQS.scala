@@ -170,20 +170,6 @@ trait SQS extends Matchers {
   def sendNotificationToSQS[T](queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson(message).get)
 
-  object TestNotificationMessage {
-    def apply(messageBody: String) =
-      NotificationMessage(
-        MessageId = "message-id",
-        TopicArn = "topic",
-        Subject = "subject",
-        Message = messageBody
-      )
-
-    def apply[T](testObject: T)(
-      implicit encoder: Encoder[T]): NotificationMessage =
-      TestNotificationMessage(toJson(testObject).get)
-  }
-
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight
     sqsClient
