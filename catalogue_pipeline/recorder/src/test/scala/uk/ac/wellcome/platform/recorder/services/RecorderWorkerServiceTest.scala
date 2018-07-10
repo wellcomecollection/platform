@@ -10,7 +10,6 @@ import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
@@ -40,7 +39,11 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
             val work = createUnidentifiedWork
-            sendMessage(queue, messagesBucket, work)
+            sendMessage(
+              bucket = messagesBucket,
+              queue = queue,
+              message = work
+            )
             withRecorderWorkerService(
               table,
               storageBucket,
@@ -67,7 +70,11 @@ class RecorderWorkerServiceTest
               messagesBucket,
               queue) { service =>
               val invisibleWork = createUnidentifiedInvisibleWork
-              sendMessage(queue, messagesBucket, invisibleWork)
+              sendMessage(
+                bucket = messagesBucket,
+                queue = queue,
+                message = invisibleWork
+              )
               eventually {
                 assertStoredSingleWork(storageBucket, table, invisibleWork)
               }
@@ -91,10 +98,18 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              sendMessage(queue, messagesBucket, newerWork)
+              sendMessage(
+                bucket = messagesBucket,
+                queue = queue,
+                message = newerWork
+              )
               eventually {
                 assertStoredSingleWork(storageBucket, table, newerWork)
-                sendMessage(queue, messagesBucket, olderWork)
+                sendMessage(
+                  bucket = messagesBucket,
+                  queue = queue,
+                  message = olderWork
+                )
                 eventually {
                   assertStoredSingleWork(storageBucket, table, newerWork)
                 }
@@ -119,10 +134,18 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              sendMessage(queue, messagesBucket, olderWork)
+              sendMessage(
+                bucket = messagesBucket,
+                queue = queue,
+                message = olderWork
+              )
               eventually {
                 assertStoredSingleWork(storageBucket, table, olderWork)
-                sendMessage(queue, messagesBucket, newerWork)
+                sendMessage(
+                  bucket = messagesBucket,
+                  queue = queue,
+                  message = newerWork
+                )
                 eventually {
                   assertStoredSingleWork(
                     storageBucket,
@@ -147,7 +170,11 @@ class RecorderWorkerServiceTest
             withRecorderWorkerService(table, badBucket, messagesBucket, queue) {
               service =>
                 val work = createUnidentifiedWork
-                sendMessage(queue, messagesBucket, work)
+                sendMessage(
+                  bucket = messagesBucket,
+                  queue = queue,
+                  message = work
+                )
                 eventually {
                   assertQueueEmpty(queue)
                   assertQueueHasSize(dlq, 1)
@@ -170,7 +197,11 @@ class RecorderWorkerServiceTest
               messagesBucket,
               queue) { service =>
               val work = createUnidentifiedWork
-              sendMessage(queue, messagesBucket, work)
+              sendMessage(
+                bucket = messagesBucket,
+                queue = queue,
+                message = work
+              )
               eventually {
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
@@ -179,19 +210,6 @@ class RecorderWorkerServiceTest
         }
       }
     }
-  }
-
-  private def sendMessage(queue: Queue,
-                          bucket: Bucket,
-                          work: TransformedBaseWork) = {
-    val messageToSend = put[TransformedBaseWork](
-      obj = work,
-      location = ObjectLocation(
-        namespace = bucket.name,
-        key = "work_message.json"
-      )
-    )
-    sqsClient.sendMessage(queue.url, messageToSend)
   }
 
   private def assertStoredSingleWork(bucket: Bucket,
