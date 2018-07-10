@@ -12,7 +12,7 @@ class ApiV1RedirectsTest extends ApiV1WorksTestBase {
         insertIntoElasticsearch(indexNameV1, itemType, redirectedWork)
         server.httpGet(
           path = s"/$apiPrefix/works/${redirectedWork.canonicalId}",
-          andExpect = Status.TemporaryRedirect,
+          andExpect = Status.Found,
           withBody = "",
           withLocation = s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}"
         )
