@@ -44,7 +44,10 @@ class MergerFeatureTest
                       val matcherResult =
                         matcherResultWith(Set(Set(recorderWorkEntry)))
 
-                      sendSQSMessage(queue, matcherResult)
+                      sendNotificationToSQS(
+                        queue = queue,
+                        message = matcherResult
+                      )
 
                       eventually {
                         assertQueueEmpty(queue)

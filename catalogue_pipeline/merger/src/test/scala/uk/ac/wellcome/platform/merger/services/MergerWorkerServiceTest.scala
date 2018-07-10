@@ -59,7 +59,10 @@ class MergerWorkerServiceTest
             vhs,
             List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) {
           _ =>
-            sendSQSMessage(queue, matcherResult)
+            sendNotificationToSQS(
+              queue = queue,
+              message = matcherResult
+            )
 
             eventually {
               assertQueueEmpty(queue)
@@ -85,7 +88,10 @@ class MergerWorkerServiceTest
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
         whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)
@@ -106,7 +112,10 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
-        sendSQSMessage(queue, matcherResult)
+        sendNotificationToSQS(
+          queue = queue,
+          message = matcherResult
+        )
 
         eventually {
           assertQueueEmpty(queue)
@@ -135,7 +144,10 @@ class MergerWorkerServiceTest
           storeInVHS(
             vhs,
             List(recorderWorkEntry, newerVersionRecorderWorkEntry))) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)
@@ -162,7 +174,10 @@ class MergerWorkerServiceTest
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
 
         whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)

@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.merger
 
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{
@@ -30,16 +29,6 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
               WorkIdentifier(
                 identifier = workEntry.id,
                 version = workEntry.work.version)))))
-
-  def sendSQSMessage(queue: SQS.Queue, matcherResult: MatcherResult) = {
-    val notificationMessage = NotificationMessage(
-      MessageId = "MessageId",
-      TopicArn = "topic-arn",
-      Subject = "subject",
-      Message = toJson(matcherResult).get
-    )
-    sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
-  }
 
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
