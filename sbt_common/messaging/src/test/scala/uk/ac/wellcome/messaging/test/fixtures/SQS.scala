@@ -165,7 +165,7 @@ trait SQS extends Matchers {
       Message = body
     )
 
-  def createNotificationMessageWith[T](message: T)(implicit encoder: Encoder[T]: NotificationMessage =
+  def createNotificationMessageWith[T](message: T)(implicit encoder: Encoder[T]): NotificationMessage =
     createNotificationMessageWith(body = toJson(message).get)
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
