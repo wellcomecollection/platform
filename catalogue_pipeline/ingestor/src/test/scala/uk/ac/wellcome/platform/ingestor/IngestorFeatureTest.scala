@@ -3,12 +3,8 @@ package uk.ac.wellcome.platform.ingestor
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
-import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -33,7 +29,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendToSqs(work, queue, bucket)
+        sendMessage(bucket = bucket, queue = queue, message = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
@@ -56,7 +52,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendToSqs(work, queue, bucket)
+        sendMessage(bucket = bucket, queue = queue, message = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
@@ -103,18 +99,5 @@ class IngestorFeatureTest
         }
       }
     }
-  }
-
-  private def sendToSqs(work: IdentifiedBaseWork,
-                        queue: Queue,
-                        bucket: Bucket) = {
-    val messageBody = put[IdentifiedBaseWork](
-      obj = work,
-      location = ObjectLocation(
-        namespace = bucket.name,
-        key = s"${work.canonicalId}.json"
-      )
-    )
-    sqsClient.sendMessage(queue.url, messageBody)
   }
 }
