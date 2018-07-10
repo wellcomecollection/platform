@@ -6,7 +6,7 @@ import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
-import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{
   ApiConfig,
@@ -124,6 +124,11 @@ abstract class WorksController(apiConfig: ApiConfig,
     maybeWork match {
       case Some(work: IdentifiedWork) =>
         respondWithWork[T](toDisplayWork(work, includes), contextUri: String)
+      case Some(work: IdentifiedRedirectedWork) =>
+        respondWithRedirect(
+          originalUri = request.request.uri,
+          work = work,
+          contextUri: String)
       case Some(_) => respondWithGoneError(contextUri: String)
       case None =>
         respondWithNotFoundError(request, contextUri: String)
@@ -133,6 +138,25 @@ abstract class WorksController(apiConfig: ApiConfig,
                                                 contextUri: String) = {
     response.ok.json(ResultResponse(context = contextUri, result = result))
   }
+
+  /** Create a 302 Redirect to a new Work.
+    *
+    * Assumes the original URI requested was for a single work, i.e. a request
+    * of the form /works/{id}.
+    *
+    */
+  private def respondWithRedirect(originalUri: String,
+                                  work: IdentifiedRedirectedWork,
+                                  contextUri: String) =
+    response
+      .found
+      .body("")
+      .location(
+        uri = originalUri.replaceAll(
+          s"/${work.canonicalId}",
+          s"/${work.redirect.canonicalId}"
+        )
+      )
 
   private def respondWithGoneError(contextUri: String) = {
     val result = Error(
