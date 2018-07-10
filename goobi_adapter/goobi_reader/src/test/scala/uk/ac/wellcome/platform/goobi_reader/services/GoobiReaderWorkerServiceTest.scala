@@ -12,7 +12,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -37,6 +37,7 @@ class GoobiReaderWorkerServiceTest
     with ExtendedPatience
     with MockitoSugar
     with GoobiReaderFixtures
+    with Messaging
     with SQS {
 
   private val id = "mets-0001"
@@ -53,11 +54,10 @@ class GoobiReaderWorkerServiceTest
       case (bucket, QueuePair(queue, _), _, table, _) =>
         s3Client.putObject(bucket.name, sourceKey, contents)
 
-        val message = aNotificationMessage(
-          topicArn = queue.arn,
+        sendNotificationToSQS(
+          queue = queue,
           message = anS3Notification(sourceKey, bucket.name, eventTime)
         )
-        sqsClient.sendMessage(queue.url, toJson(message).get)
 
         eventually {
           val expectedRecord = HybridRecord(
@@ -83,12 +83,10 @@ class GoobiReaderWorkerServiceTest
           java.net.URLEncoder.encode(sourceKey, "utf-8")
         s3Client.putObject(bucket.name, sourceKey, contents)
 
-        val message = aNotificationMessage(
-          topicArn = queue.arn,
-          message =
-            anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
+        sendNotificationToSQS(
+          queue = queue,
+          message = anS3Notification(sourceKey, bucket.name, eventTime)
         )
-        sqsClient.sendMessage(queue.url, toJson(message).get)
 
         eventually {
           val contentsStorageKey = s"$goobiS3Prefix/kr/$id work/cd92f8d3"
@@ -133,11 +131,11 @@ class GoobiReaderWorkerServiceTest
         s3Client.putObject(bucket.name, sourceKey, contents)
 
         val olderEventTime = eventTime.minus(1, ChronoUnit.HOURS)
-        val message = aNotificationMessage(
-          topicArn = queue.arn,
-          message = anS3Notification(sourceKey, bucket.name, olderEventTime))
 
-        sqsClient.sendMessage(queue.url, toJson(message).get)
+        sendNotificationToSQS(
+          queue = queue,
+          message = anS3Notification(sourceKey, bucket.name, olderEventTime)
+        )
 
         eventually {
           val expectedRecord = HybridRecord(
@@ -179,9 +177,11 @@ class GoobiReaderWorkerServiceTest
 
         s3Client.putObject(bucket.name, sourceKey, updatedContents)
         val newerEventTime = eventTime.plus(1, ChronoUnit.HOURS)
-        val message = aNotificationMessage(
-          topicArn = queue.arn,
-          message = anS3Notification(sourceKey, bucket.name, newerEventTime))
+
+        sendNotificationToSQS(
+          queue = queue,
+          message = anS3Notification(sourceKey, bucket.name, newerEventTime)
+        )
 
         sqsClient.sendMessage(queue.url, toJson(message).get)
 
@@ -205,12 +205,10 @@ class GoobiReaderWorkerServiceTest
   it("fails gracefully if Json cannot be parsed") {
     withGoobiReaderWorkerService(s3Client) {
       case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
-        val notificationMessage = aNotificationMessage(
-          topicArn = queue.arn,
-          message = "NotJson"
+        sendNotificationToSQS(
+          queue = queue,
+          body = "NotJson"
         )
-
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
         eventually {
           assertMessageSentToDlq(queue, dlq)
@@ -225,12 +223,10 @@ class GoobiReaderWorkerServiceTest
       case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
         val sourceKey = "NotThere.xml"
 
-        val notificationMessage = aNotificationMessage(
-          topicArn = queue.arn,
+        sendNotificationToSQS(
+          queue = queue,
           message = anS3Notification(sourceKey, bucket.name, eventTime)
         )
-
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
         eventually {
           assertMessageSentToDlq(queue, dlq)
@@ -248,12 +244,10 @@ class GoobiReaderWorkerServiceTest
     withGoobiReaderWorkerService(mockClient) {
       case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
         val sourceKey = "any.xml"
-        val notificationMessage = aNotificationMessage(
-          topicArn = queue.arn,
+        sendNotificationToSQS(
+          queue = queue,
           message = anS3Notification(sourceKey, bucket.name, eventTime)
         )
-
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
         eventually {
           assertMessageSentToDlq(queue, dlq)
