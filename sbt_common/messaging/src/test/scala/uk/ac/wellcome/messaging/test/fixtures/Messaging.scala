@@ -144,7 +144,8 @@ trait Messaging
     }
   }
 
-  private def put[T](obj: T, location: ObjectLocation)(implicit encoder: Encoder[T]) = {
+  private def put[T](obj: T, location: ObjectLocation)(
+    implicit encoder: Encoder[T]) = {
     val serialisedExampleObject = toJson[T](obj).get
 
     s3Client.putObject(
@@ -163,7 +164,8 @@ trait Messaging
     toJson(exampleNotification).get
   }
 
-  private def get[T](snsMessage: MessageInfo)(implicit decoder: Decoder[T]): T = {
+  private def get[T](snsMessage: MessageInfo)(
+    implicit decoder: Decoder[T]): T = {
     val tryMessagePointer = fromJson[MessagePointer](snsMessage.message)
     tryMessagePointer shouldBe a[Success[_]]
 
@@ -182,9 +184,9 @@ trait Messaging
     * to objects in S3, return the unpacked objects.
     */
   def getMessages[T](topic: Topic): List[T] =
-    listMessagesReceivedFromSNS(topic)
-      .map { snsMessage => get[T](snsMessage)}
-      .toList
+    listMessagesReceivedFromSNS(topic).map { snsMessage =>
+      get[T](snsMessage)
+    }.toList
 
   /** Store an object in S3 and send the notification to SQS.
     *
@@ -192,7 +194,8 @@ trait Messaging
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
     */
-  def sendMessage[T](bucket: Bucket, queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult = {
+  def sendMessage[T](bucket: Bucket, queue: Queue, message: T)(
+    implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
     val notificationJson = put(
       obj = message,
