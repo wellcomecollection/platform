@@ -104,7 +104,6 @@ class NotificationMessageReceiverTest
 
               works.map { work =>
                 work shouldBe a[UnidentifiedWork]
-                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }
