@@ -11,7 +11,7 @@ import com.amazonaws.services.sqs.model.SendMessageResult
 import io.circe.{Decoder, Encoder}
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.message._
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
@@ -183,7 +183,7 @@ trait Messaging
   /** Given a topic ARN which has received notifications containing pointers
     * to objects in S3, return the unpacked objects.
     */
-  def getMessages[T](topic: Topic): List[T] =
+  def getMessages[T](topic: Topic)(implicit decoder: Decoder[T]): List[T] =
     listMessagesReceivedFromSNS(topic).map { snsMessage =>
       get[T](snsMessage)
     }.toList
