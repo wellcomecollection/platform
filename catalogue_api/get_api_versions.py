@@ -5,11 +5,14 @@ Prints information about which version of the API is currently running,
 so you can create a new set of pins.
 """
 
+import json
 import os
+import sys
 
 import attr
 import boto3
 import hcl
+import requests
 
 
 API_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -80,6 +83,39 @@ def print_current_state(prod_api, staging_api):
     print(f'- nginx = {bold(staging_api.nginx)}')
 
 
+def check_staging_api():
+    """
+    Check the responses in the staging and the prod API for a given Miro
+    work are the same.
+    """
+    id = 'a22au6yn'
+    includes = 'identifiers,items,thumbnail'
+
+    print(f'Checking that responses for work {id} match...')
+
+    prod_resp = requests.get(
+        f'https://api.wellcomecollection.org/catalogue/v1/works/{id}',
+        params={'includes': includes}
+    )
+    stage_resp = requests.get(
+        f'https://api-stage.wellcomecollection.org/catalogue/v1/works/{id}',
+        params={'includes': includes}
+    )
+
+    if prod_resp.json() == stage_resp.json():
+        print('OK!')
+    else:
+        print(bold('Responses do not match!'))
+
+        print('\nProd response:')
+        print(json.dumps(prod_resp.json(), indent=2, sort_keys=True))
+
+        print('\nStage response:')
+        print(json.dumps(stage_resp.json(), indent=2, sort_keys=True))
+
+        sys.exit(1)
+
+
 if __name__ == '__main__':
     with open(os.path.join(API_TF, 'variables.tf')) as var_tf:
         variables = hcl.load(var_tf)['variable']
@@ -93,6 +129,8 @@ if __name__ == '__main__':
     print_current_state(prod_api=prod_api_info, staging_api=staging_api_info)
 
     print('\n---\n')
+
+    check_staging_api()
 #
 #     print('If you want to switch the prod/staging API, copy the following')
 #     print('Terraform into variables.tf:')
