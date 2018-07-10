@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.merger
 
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
@@ -8,11 +7,9 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -49,12 +46,4 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
 
   def createRecorderWorkEntryWith(version: Int) =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
-
-  def getWorksSent(topic: Topic) = {
-    val messagesSent = listMessagesReceivedFromSNS(topic)
-    val worksSent = messagesSent.map { message =>
-      get[TransformedBaseWork](message)
-    }
-    worksSent
-  }
 }

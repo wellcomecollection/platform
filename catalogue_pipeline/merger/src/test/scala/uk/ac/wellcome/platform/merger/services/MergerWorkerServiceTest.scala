@@ -68,7 +68,7 @@ class MergerWorkerServiceTest
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
 
-              val worksSent = getWorksSent(topic)
+              val worksSent = getMessages[TransformedBaseWork](topic)
               worksSent should contain only (recorderWorkEntry1.work,
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
@@ -97,7 +97,7 @@ class MergerWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
 
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
@@ -152,7 +152,7 @@ class MergerWorkerServiceTest
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
@@ -183,7 +183,7 @@ class MergerWorkerServiceTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
 
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }

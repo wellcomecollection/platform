@@ -49,11 +49,9 @@ class IdMinterFeatureTest
               }
 
               eventually {
-                val messages = listMessagesReceivedFromSNS(topic)
-                messages.length shouldBe >=(messageCount)
+                val works = getMessages[IdentifiedBaseWork](topic)
+                works.length shouldBe >=(messageCount)
 
-                val works =
-                  messages.map(message => get[IdentifiedBaseWork](message))
                 works.map(_.canonicalId).distinct should have size 1
                 works.foreach { receivedWork =>
                   receivedWork
@@ -91,10 +89,10 @@ class IdMinterFeatureTest
               )
 
               eventually {
-                val messages = listMessagesReceivedFromSNS(topic)
-                messages.length shouldBe >=(1)
+                val works = getMessages[IdentifiedBaseWork](topic)
+                works.length shouldBe >=(1)
 
-                val receivedWork = get[IdentifiedBaseWork](messages.head)
+                val receivedWork = works.head
                 val invisibleWork =
                   receivedWork.asInstanceOf[IdentifiedInvisibleWork]
                 invisibleWork.sourceIdentifier shouldBe work.sourceIdentifier
@@ -128,10 +126,10 @@ class IdMinterFeatureTest
               )
 
               eventually {
-                val messages = listMessagesReceivedFromSNS(topic)
-                messages.length shouldBe >=(1)
+                val works = getMessages[IdentifiedBaseWork](topic)
+                works.length shouldBe >=(1)
 
-                val receivedWork = get[IdentifiedBaseWork](messages.head)
+                val receivedWork = works.head
                 val redirectedWork =
                   receivedWork.asInstanceOf[IdentifiedRedirectedWork]
                 redirectedWork.sourceIdentifier shouldBe work.sourceIdentifier
