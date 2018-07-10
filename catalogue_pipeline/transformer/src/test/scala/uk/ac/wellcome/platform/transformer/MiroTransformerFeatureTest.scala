@@ -58,12 +58,10 @@ class MiroTransformerFeatureTest
 
             withServer(flags) { _ =>
               eventually {
-                val snsMessages = listMessagesReceivedFromSNS(topic)
-                snsMessages.length shouldBe >=(1)
+                val works = getMessages[UnidentifiedWork](topic)
+                works.length shouldBe >=(1)
 
-                snsMessages.map { snsMessage =>
-                  val actualWork = get[UnidentifiedWork](snsMessage)
-
+                works.map { actualWork =>
                   actualWork.identifiers.head.value shouldBe miroID
                   actualWork.title shouldBe title
                 }
