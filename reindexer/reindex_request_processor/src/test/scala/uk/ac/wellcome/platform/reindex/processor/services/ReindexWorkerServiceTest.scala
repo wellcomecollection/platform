@@ -19,14 +19,15 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReindexWorkerServiceTest extends FunSpec
-  with Akka
-  with LocalVersionedHybridStore
-  with SQS
-  with ScalaFutures
-  with Messaging
-  with MetricsSenderFixture
-  with ExtendedPatience {
+class ReindexWorkerServiceTest
+    extends FunSpec
+    with Akka
+    with LocalVersionedHybridStore
+    with SQS
+    with ScalaFutures
+    with Messaging
+    with MetricsSenderFixture
+    with ExtendedPatience {
 
   val id = "sierra/1234567"
 
@@ -35,14 +36,16 @@ class ReindexWorkerServiceTest extends FunSpec
       withLocalS3Bucket { vhsBucket =>
         withLocalDynamoDbTable { vhsTable =>
           withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-
             val version = 1
             val reindexRequest = ReindexRequest(id, version)
 
             sendMessage(queue, reindexRequest)
 
             eventually {
-              assertStored[ReindexableRecord](vhsBucket, vhsTable, ReindexableRecord(id, version))
+              assertStored[ReindexableRecord](
+                vhsBucket,
+                vhsTable,
+                ReindexableRecord(id, version))
             }
           }
         }
@@ -55,7 +58,6 @@ class ReindexWorkerServiceTest extends FunSpec
       withLocalS3Bucket { vhsBucket =>
         withLocalDynamoDbTable { vhsTable =>
           withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-
             val originalVersion = 1
             val updatedVersion = 2
 
@@ -63,12 +65,20 @@ class ReindexWorkerServiceTest extends FunSpec
             sendMessage(queue, reindexRequest)
 
             eventually {
-              assertStored[ReindexableRecord](vhsBucket, vhsTable, ReindexableRecord(id, originalVersion))
+              assertStored[ReindexableRecord](
+                vhsBucket,
+                vhsTable,
+                ReindexableRecord(id, originalVersion))
 
-              sendMessage(queue, reindexRequest.copy(desiredVersion = updatedVersion))
+              sendMessage(
+                queue,
+                reindexRequest.copy(desiredVersion = updatedVersion))
 
               eventually {
-                assertStored[ReindexableRecord](vhsBucket, vhsTable, ReindexableRecord(id, updatedVersion))
+                assertStored[ReindexableRecord](
+                  vhsBucket,
+                  vhsTable,
+                  ReindexableRecord(id, updatedVersion))
               }
             }
           }
@@ -82,7 +92,6 @@ class ReindexWorkerServiceTest extends FunSpec
       withLocalS3Bucket { vhsBucket =>
         withLocalDynamoDbTable { vhsTable =>
           withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-
             val originalVersion = 2
             val olderVersion = 1
 
@@ -90,13 +99,21 @@ class ReindexWorkerServiceTest extends FunSpec
             sendMessage(queue, reindexRequest)
 
             eventually {
-              assertStored[ReindexableRecord](vhsBucket, vhsTable, ReindexableRecord(id, originalVersion))
+              assertStored[ReindexableRecord](
+                vhsBucket,
+                vhsTable,
+                ReindexableRecord(id, originalVersion))
 
-              sendMessage(queue, reindexRequest.copy(desiredVersion = olderVersion))
+              sendMessage(
+                queue,
+                reindexRequest.copy(desiredVersion = olderVersion))
 
               assertQueueEmpty(queue)
               eventually {
-                assertStored[ReindexableRecord](vhsBucket, vhsTable, ReindexableRecord(id, originalVersion))
+                assertStored[ReindexableRecord](
+                  vhsBucket,
+                  vhsTable,
+                  ReindexableRecord(id, originalVersion))
               }
             }
           }
@@ -106,34 +123,42 @@ class ReindexWorkerServiceTest extends FunSpec
   }
 
   it("fails if saving to S3 fails") {
-    withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-      withLocalDynamoDbTable { vhsTable =>
-        withReindexWorkerService(vhsTable, Bucket("wrongBucket"), queue) { _ =>
-          sendMessage(queue, ReindexRequest(id = id, desiredVersion = 1))
+    withLocalSqsQueueAndDlq {
+      case QueuePair(queue, dlq) =>
+        withLocalDynamoDbTable { vhsTable =>
+          withReindexWorkerService(vhsTable, Bucket("wrongBucket"), queue) {
+            _ =>
+              sendMessage(queue, ReindexRequest(id = id, desiredVersion = 1))
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
           }
         }
-      }
     }
   }
 
   private def sendMessage(queue: Queue, reindexRequest: ReindexRequest) = {
-    sqsClient.sendMessage(queue.url,
-      toJson(NotificationMessage("snsID", "snsTopic", "snsSubject", toJson(reindexRequest).get)).get)
+    sqsClient.sendMessage(
+      queue.url,
+      toJson(
+        NotificationMessage(
+          "snsID",
+          "snsTopic",
+          "snsSubject",
+          toJson(reindexRequest).get)).get)
   }
 
-  private def withReindexWorkerService[R](vhsTable: Table,
-                                          vhsBucket: Bucket,
-                                          queue: Queue)(testWith: TestWith[ReindexWorkerService, R]) = {
+  private def withReindexWorkerService[R](
+    vhsTable: Table,
+    vhsBucket: Bucket,
+    queue: Queue)(testWith: TestWith[ReindexWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withTypeVHS[ReindexableRecord, EmptyMetadata, R](
           bucket = vhsBucket,
           table = vhsTable) { versionedHybridStore =>
-
           val sqsStream = new SQSStream[NotificationMessage](
             actorSystem,
             asyncSqsClient,
@@ -141,19 +166,19 @@ class ReindexWorkerServiceTest extends FunSpec
             metricsSender)
 
           val workerService = new ReindexWorkerService(
-              versionedHybridStore = versionedHybridStore,
-              sqsStream = sqsStream,
-              system = actorSystem
-            )
+            versionedHybridStore = versionedHybridStore,
+            sqsStream = sqsStream,
+            system = actorSystem
+          )
 
-            try {
-              testWith(workerService)
-            } finally {
-              workerService.stop()
-            }
+          try {
+            testWith(workerService)
+          } finally {
+            workerService.stop()
           }
         }
       }
     }
+  }
 
 }
