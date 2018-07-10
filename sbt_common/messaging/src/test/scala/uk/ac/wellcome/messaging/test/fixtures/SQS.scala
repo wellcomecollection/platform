@@ -165,7 +165,8 @@ trait SQS extends Matchers {
       Message = body
     )
 
-  def createNotificationMessageWith[T](message: T)(implicit encoder: Encoder[T]): NotificationMessage =
+  def createNotificationMessageWith[T](message: T)(
+    implicit encoder: Encoder[T]): NotificationMessage =
     createNotificationMessageWith(body = toJson(message).get)
 
   def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
@@ -173,7 +174,8 @@ trait SQS extends Matchers {
     sqsClient.sendMessage(queue.url, toJson(message).get)
   }
 
-  def sendNotificationToSQS[T](queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult =
+  def sendNotificationToSQS[T](queue: Queue, message: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson(message).get)
 
   def noMessagesAreWaitingIn(queue: Queue) = {
