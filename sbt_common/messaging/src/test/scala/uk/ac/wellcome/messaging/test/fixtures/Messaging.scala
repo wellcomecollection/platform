@@ -178,6 +178,19 @@ trait Messaging
     tryT.get
   }
 
+  /** Given a topic ARN which has received notifications containing pointers
+    * to objects in S3, return the unpacked objects.
+    */
+  def getMessages[T](topic: Topic): List[T] =
+    listMessagesReceivedFromSNS(topic)
+      .map { snsMessage => get[T](snsMessage)}
+      .toList
+
+  /** Store an object in S3 and send the notification to SQS.
+    *
+    * As if another application had used a MessageWriter to send the message.
+    * TODO: Why not use the MessageWriter directly?
+    */
   def sendMessage[T](bucket: Bucket, queue: Queue, message: T)(implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
     val notificationJson = put(
