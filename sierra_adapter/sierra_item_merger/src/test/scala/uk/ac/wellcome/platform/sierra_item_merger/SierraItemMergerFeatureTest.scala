@@ -4,7 +4,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -21,7 +21,7 @@ class SierraItemMergerFeatureTest
     with SQS
     with S3
     with LocalVersionedHybridStore
-    with SierraItemMergerTestUtil {
+    with SierraUtil {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
@@ -32,12 +32,9 @@ class SierraItemMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val id = "i1000001"
               val bibId = "b1000001"
 
-              val record = sierraItemRecord(
-                id = id,
-                updatedDate = "2001-01-01T01:01:01Z",
+              val record = createSierraItemRecordWith(
                 bibIds = List(bibId)
               )
 
@@ -45,7 +42,7 @@ class SierraItemMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(
                 sourceId = bibId,
-                itemData = Map(id -> record)
+                itemData = Map(record.id -> record)
               )
 
               eventually {
@@ -71,23 +68,14 @@ class SierraItemMergerFeatureTest
               bucket,
               table) { hybridStore =>
               val bibId1 = "b1000001"
-
-              val id1 = "1000001"
-
-              val record1 = sierraItemRecord(
-                id = id1,
-                updatedDate = "2001-01-01T01:01:01Z",
+              val record1 = createSierraItemRecordWith(
                 bibIds = List(bibId1)
               )
 
               sendNotificationToSQS(queue = queue, message = record1)
 
               val bibId2 = "b2000002"
-              val id2 = "2000002"
-
-              val record2 = sierraItemRecord(
-                id = id2,
-                updatedDate = "2002-02-02T02:02:02Z",
+              val record2 = createSierraItemRecordWith(
                 bibIds = List(bibId2)
               )
 
@@ -96,12 +84,12 @@ class SierraItemMergerFeatureTest
               eventually {
                 val expectedSierraTransformable1 = SierraTransformable(
                   sourceId = bibId1,
-                  itemData = Map(id1 -> record1)
+                  itemData = Map(record1.id -> record1)
                 )
 
                 val expectedSierraTransformable2 = SierraTransformable(
                   sourceId = bibId2,
-                  itemData = Map(id2 -> record2)
+                  itemData = Map(record2.id -> record2)
                 )
 
                 assertStored[SierraTransformable](
