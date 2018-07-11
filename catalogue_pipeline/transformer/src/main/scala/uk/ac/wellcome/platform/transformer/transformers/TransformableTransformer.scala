@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.transformer.transformers
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.transformers.miro.ShouldNotTransformException
 
 import scala.util.Try
 

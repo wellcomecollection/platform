@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 
 trait MiroLicenses {
 
