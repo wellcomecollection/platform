@@ -146,12 +146,12 @@ trait Messaging
 
   private def put[T](obj: T, location: ObjectLocation)(
     implicit encoder: Encoder[T]) = {
-    val serialisedExampleObject = toJson[T](obj).get
+    val serialisedObj = toJson[T](obj).get
 
     s3Client.putObject(
       location.namespace,
       location.key,
-      serialisedExampleObject
+      serialisedObj
     )
 
     val examplePointer =
@@ -194,11 +194,11 @@ trait Messaging
     * to an SNS topic, which was forwarded to the queue.  We don't use a
     * MessageWriter instance because that sends to SNS, not SQS.
     */
-  def sendMessage[T](bucket: Bucket, queue: Queue, message: T)(
+  def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
     val notificationJson = put(
-      obj = message,
+      obj = obj,
       location = ObjectLocation(namespace = bucket.name, key = s3key)
     )
 

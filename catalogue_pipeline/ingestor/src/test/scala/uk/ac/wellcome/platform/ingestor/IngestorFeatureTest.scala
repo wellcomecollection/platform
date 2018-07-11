@@ -29,7 +29,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage(bucket = bucket, queue = queue, message = work)
+        sendMessage(bucket = bucket, queue = queue, obj = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
@@ -52,7 +52,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage(bucket = bucket, queue = queue, message = work)
+        sendMessage(bucket = bucket, queue = queue, obj = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>

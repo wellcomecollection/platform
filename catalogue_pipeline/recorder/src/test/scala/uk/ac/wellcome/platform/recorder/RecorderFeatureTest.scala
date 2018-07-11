@@ -33,7 +33,7 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              sendMessage(bucket = bucket, queue = queue, message = work)
+              sendMessage(bucket = bucket, queue = queue, obj = work)
 
               eventually {
                 assertStored[RecorderWorkEntry](

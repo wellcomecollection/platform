@@ -44,7 +44,7 @@ class IdMinterFeatureTest
                 sendMessage(
                   bucket = bucket,
                   queue = queue,
-                  message = work
+                  obj = work
                 )
               }
 
@@ -85,7 +85,7 @@ class IdMinterFeatureTest
               sendMessage(
                 bucket = bucket,
                 queue = queue,
-                message = work
+                obj = work
               )
 
               eventually {
@@ -122,7 +122,7 @@ class IdMinterFeatureTest
               sendMessage(
                 bucket = bucket,
                 queue = queue,
-                message = work
+                obj = work
               )
 
               eventually {
@@ -162,7 +162,7 @@ class IdMinterFeatureTest
               sendMessage(
                 bucket = bucket,
                 queue = queue,
-                message = work
+                obj = work
               )
 
               eventually {

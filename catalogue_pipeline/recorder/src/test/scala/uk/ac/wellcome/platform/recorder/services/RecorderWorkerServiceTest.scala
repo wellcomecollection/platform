@@ -42,7 +42,7 @@ class RecorderWorkerServiceTest
             sendMessage(
               bucket = messagesBucket,
               queue = queue,
-              message = work
+              obj = work
             )
             withRecorderWorkerService(
               table,
@@ -73,7 +73,7 @@ class RecorderWorkerServiceTest
               sendMessage(
                 bucket = messagesBucket,
                 queue = queue,
-                message = invisibleWork
+                obj = invisibleWork
               )
               eventually {
                 assertStoredSingleWork(storageBucket, table, invisibleWork)
@@ -101,14 +101,14 @@ class RecorderWorkerServiceTest
               sendMessage(
                 bucket = messagesBucket,
                 queue = queue,
-                message = newerWork
+                obj = newerWork
               )
               eventually {
                 assertStoredSingleWork(storageBucket, table, newerWork)
                 sendMessage(
                   bucket = messagesBucket,
                   queue = queue,
-                  message = olderWork
+                  obj = olderWork
                 )
                 eventually {
                   assertStoredSingleWork(storageBucket, table, newerWork)
@@ -137,14 +137,14 @@ class RecorderWorkerServiceTest
               sendMessage(
                 bucket = messagesBucket,
                 queue = queue,
-                message = olderWork
+                obj = olderWork
               )
               eventually {
                 assertStoredSingleWork(storageBucket, table, olderWork)
                 sendMessage(
                   bucket = messagesBucket,
                   queue = queue,
-                  message = newerWork
+                  obj = newerWork
                 )
                 eventually {
                   assertStoredSingleWork(
@@ -173,7 +173,7 @@ class RecorderWorkerServiceTest
                 sendMessage(
                   bucket = messagesBucket,
                   queue = queue,
-                  message = work
+                  obj = work
                 )
                 eventually {
                   assertQueueEmpty(queue)
@@ -200,7 +200,7 @@ class RecorderWorkerServiceTest
               sendMessage(
                 bucket = messagesBucket,
                 queue = queue,
-                message = work
+                obj = work
               )
               eventually {
                 assertQueueEmpty(queue)
