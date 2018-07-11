@@ -27,7 +27,8 @@ class SierraTransformableTransformer
     with SierraGenres
     with SierraMergeCandidates {
 
-  override def transformForType: PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
+  override def transformForType
+    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
@@ -42,42 +43,44 @@ class SierraTransformableTransformer
         .map { bibData =>
           debug(s"Attempting to transform ${bibData.id}")
 
-          fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-            if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
-              UnidentifiedWork(
-                sourceIdentifier = sourceIdentifier,
-                otherIdentifiers = getOtherIdentifiers(sierraBibData),
-                mergeCandidates = getMergeCandidates(sierraBibData),
-                title = getTitle(sierraBibData),
-                workType = getWorkType(sierraBibData),
-                description = getDescription(sierraBibData),
-                physicalDescription = getPhysicalDescription(sierraBibData),
-                extent = getExtent(sierraBibData),
-                lettering = getLettering(sierraBibData),
-                createdDate = None,
-                subjects = getSubjects(sierraBibData),
-                genres = getGenres(sierraBibData),
-                contributors = getContributors(sierraBibData),
-                thumbnail = None,
-                production = getProduction(sierraBibData),
-                language = getLanguage(sierraBibData),
-                dimensions = getDimensions(sierraBibData),
-                items = getItems(sierraTransformable),
-                version = version
-              )
-            } else {
-              throw new ShouldNotTransformException(
-                s"Sierra record ${bibData.id} is either deleted or suppressed!"
-              )
+          fromJson[SierraBibData](bibData.data)
+            .map { sierraBibData =>
+              if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
+                UnidentifiedWork(
+                  sourceIdentifier = sourceIdentifier,
+                  otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                  mergeCandidates = getMergeCandidates(sierraBibData),
+                  title = getTitle(sierraBibData),
+                  workType = getWorkType(sierraBibData),
+                  description = getDescription(sierraBibData),
+                  physicalDescription = getPhysicalDescription(sierraBibData),
+                  extent = getExtent(sierraBibData),
+                  lettering = getLettering(sierraBibData),
+                  createdDate = None,
+                  subjects = getSubjects(sierraBibData),
+                  genres = getGenres(sierraBibData),
+                  contributors = getContributors(sierraBibData),
+                  thumbnail = None,
+                  production = getProduction(sierraBibData),
+                  language = getLanguage(sierraBibData),
+                  dimensions = getDimensions(sierraBibData),
+                  items = getItems(sierraTransformable),
+                  version = version
+                )
+              } else {
+                throw new ShouldNotTransformException(
+                  s"Sierra record ${bibData.id} is either deleted or suppressed!"
+                )
+              }
             }
-          }.recover {
-            case e: ShouldNotTransformException =>
-              warn(s"Should not transform: ${e.getMessage}")
-              UnidentifiedInvisibleWork(
-                sourceIdentifier = sourceIdentifier,
-                version = version
-              )
-          }
+            .recover {
+              case e: ShouldNotTransformException =>
+                warn(s"Should not transform: ${e.getMessage}")
+                UnidentifiedInvisibleWork(
+                  sourceIdentifier = sourceIdentifier,
+                  version = version
+                )
+            }
         }
 
         // A merged record can have both bibs and items.  If we only have

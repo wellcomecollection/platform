@@ -11,7 +11,8 @@ trait TransformableTestBase[T <: Transformable] extends Matchers {
   val transformer: TransformableTransformer[T]
 
   def transformToWork(transformable: T): TransformedBaseWork = {
-    val triedWork: Try[TransformedBaseWork] = transformer.transform(transformable, version = 1)
+    val triedWork: Try[TransformedBaseWork] =
+      transformer.transform(transformable, version = 1)
     if (triedWork.isFailure) triedWork.failed.get.printStackTrace()
     triedWork.isSuccess shouldBe true
     triedWork.get

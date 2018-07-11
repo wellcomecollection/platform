@@ -224,7 +224,8 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it("returns an InvisibleWork if usage restrictions mean we suppress the image") {
+  it(
+    "returns an InvisibleWork if usage restrictions mean we suppress the image") {
     assertTransformReturnsInvisibleWork(
       data =
         buildJSONForWork("""

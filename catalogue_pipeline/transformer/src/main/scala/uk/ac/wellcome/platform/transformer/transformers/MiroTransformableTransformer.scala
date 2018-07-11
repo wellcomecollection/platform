@@ -23,7 +23,6 @@ class MiroTransformableTransformer
   override def transformForType
     : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (miroTransformable: MiroTransformable, version: Int) =>
-
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("miro-image-number"),
         ontologyType = "Work",
