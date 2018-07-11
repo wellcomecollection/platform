@@ -39,7 +39,7 @@ class RecorderWorkerServiceTest
         withLocalS3Bucket { messagesBucket =>
           withLocalSqsQueue { queue =>
             val work = createUnidentifiedWork
-            sendMessage(
+            sendMessage[TransformedBaseWork](
               bucket = messagesBucket,
               queue = queue,
               obj = work
@@ -70,7 +70,7 @@ class RecorderWorkerServiceTest
               messagesBucket,
               queue) { service =>
               val invisibleWork = createUnidentifiedInvisibleWork
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = messagesBucket,
                 queue = queue,
                 obj = invisibleWork
@@ -98,7 +98,7 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = messagesBucket,
                 queue = queue,
                 obj = newerWork
@@ -134,14 +134,14 @@ class RecorderWorkerServiceTest
               storageBucket,
               messagesBucket,
               queue) { service =>
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = messagesBucket,
                 queue = queue,
                 obj = olderWork
               )
               eventually {
                 assertStoredSingleWork(storageBucket, table, olderWork)
-                sendMessage(
+                sendMessage[TransformedBaseWork](
                   bucket = messagesBucket,
                   queue = queue,
                   obj = newerWork
@@ -170,7 +170,7 @@ class RecorderWorkerServiceTest
             withRecorderWorkerService(table, badBucket, messagesBucket, queue) {
               service =>
                 val work = createUnidentifiedWork
-                sendMessage(
+                sendMessage[TransformedBaseWork](
                   bucket = messagesBucket,
                   queue = queue,
                   obj = work
@@ -197,7 +197,7 @@ class RecorderWorkerServiceTest
               messagesBucket,
               queue) { service =>
               val work = createUnidentifiedWork
-              sendMessage(
+              sendMessage[TransformedBaseWork](
                 bucket = messagesBucket,
                 queue = queue,
                 obj = work

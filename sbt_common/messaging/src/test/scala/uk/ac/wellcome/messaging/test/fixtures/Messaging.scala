@@ -197,7 +197,7 @@ trait Messaging
   def sendMessage[T](bucket: Bucket, queue: Queue, obj: T)(
     implicit encoder: Encoder[T]): SendMessageResult = {
     val s3key = Random.alphanumeric take 10 mkString
-    val notificationJson = put(
+    val notificationJson = put[T](
       obj = obj,
       location = ObjectLocation(namespace = bucket.name, key = s3key)
     )

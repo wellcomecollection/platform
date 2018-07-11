@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.recorder
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
@@ -33,7 +34,7 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              sendMessage(bucket = bucket, queue = queue, obj = work)
+              sendMessage[TransformedBaseWork](bucket = bucket, queue = queue, obj = work)
 
               eventually {
                 assertStored[RecorderWorkEntry](
