@@ -13,8 +13,6 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.Random
-
 class ReindexWorkerServiceTest
     extends FunSpec
     with Akka
@@ -179,16 +177,5 @@ class ReindexWorkerServiceTest
         }
       }
     }
-  }
-
-  private def sendMessageInNotification(queue: Queue, message: ReindexRequest) = {
-    sqsClient.sendMessage(
-      queue.url,
-      toJson(
-        NotificationMessage(
-          MessageId = Random.alphanumeric take 5 mkString,
-          TopicArn = "TopicArn",
-          Subject = "Subject test notification",
-          Message = toJson(message).get)).get)
   }
 }

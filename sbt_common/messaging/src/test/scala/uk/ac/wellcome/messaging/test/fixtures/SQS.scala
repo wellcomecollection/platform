@@ -238,4 +238,14 @@ trait SQS extends Matchers {
     messages
   }
 
+  def sendMessageInNotification[T](queue: Queue, message: T)(implicit encoder: Encoder[T]) = {
+    sqsClient.sendMessage(
+      queue.url,
+      toJson(
+        NotificationMessage(
+          MessageId = Random.alphanumeric take 5 mkString,
+          TopicArn = "TopicArn",
+          Subject = "Subject test notification",
+          Message = toJson(message).get)).get)
+  }
 }
