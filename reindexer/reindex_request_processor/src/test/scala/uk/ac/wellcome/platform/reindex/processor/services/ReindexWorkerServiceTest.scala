@@ -15,14 +15,15 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-class ReindexWorkerServiceTest extends FunSpec
-  with Akka
-  with LocalDynamoDbVersioned
-  with SQS
-  with ScalaFutures
-  with Messaging
-  with MetricsSenderFixture
-  with ExtendedPatience {
+class ReindexWorkerServiceTest
+    extends FunSpec
+    with Akka
+    with LocalDynamoDbVersioned
+    with SQS
+    with ScalaFutures
+    with Messaging
+    with MetricsSenderFixture
+    with ExtendedPatience {
 
   val id = "sierra/2371838"
   val data = "data"
@@ -34,20 +35,20 @@ class ReindexWorkerServiceTest extends FunSpec
                                      data: String)
 
   it("does not insert a new record if there is no existing record") {
-    withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-      withLocalDynamoDbTable { table =>
-        withReindexWorkerService(table, queue) { _ =>
+    withLocalSqsQueueAndDlq {
+      case queuePair @ QueuePair(queue, dlq) =>
+        withLocalDynamoDbTable { table =>
+          withReindexWorkerService(table, queue) { _ =>
+            val reindexRequest = ReindexRequest("unknownId", 1)
+            sendMessage(queue, reindexRequest)
 
-          val reindexRequest = ReindexRequest("unknownId", 1)
-          sendMessage(queue, reindexRequest)
-
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueHasSize(dlq, 1)
-            assertNoRecords(table)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueHasSize(dlq, 1)
+              assertNoRecords(table)
+            }
           }
         }
-      }
     }
   }
 
@@ -55,16 +56,23 @@ class ReindexWorkerServiceTest extends FunSpec
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
-
           val reindexVersion = 1
-          givenRecord(SimpleReindexableRecord(id, recordVersion, reindexVersion, data), table)
+          givenRecord(
+            SimpleReindexableRecord(id, recordVersion, reindexVersion, data),
+            table)
 
           val updatedReindexVersion = 2
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
-            assertRecord(id,
-              SimpleReindexableRecord(id, recordVersion+1, updatedReindexVersion, data), table)
+            assertRecord(
+              id,
+              SimpleReindexableRecord(
+                id,
+                recordVersion + 1,
+                updatedReindexVersion,
+                data),
+              table)
           }
         }
       }
@@ -75,17 +83,28 @@ class ReindexWorkerServiceTest extends FunSpec
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
-
           val originalReindexVersion = 2
-          givenRecord(SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data), table)
+          givenRecord(
+            SimpleReindexableRecord(
+              id,
+              recordVersion,
+              originalReindexVersion,
+              data),
+            table)
 
           val updatedReindexVersion = 1
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
-            assertRecord(id,
-              SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data), table)
+            assertRecord(
+              id,
+              SimpleReindexableRecord(
+                id,
+                recordVersion,
+                originalReindexVersion,
+                data),
+              table)
           }
         }
       }
@@ -93,17 +112,18 @@ class ReindexWorkerServiceTest extends FunSpec
   }
 
   it("fails if saving to dynamo fails") {
-    withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-      val badTable = Table("table","index")
-      withReindexWorkerService(badTable, queue) { _ =>
-        val reindexRequest = ReindexRequest("unknownId", 1)
-        sendMessage(queue, reindexRequest)
+    withLocalSqsQueueAndDlq {
+      case queuePair @ QueuePair(queue, dlq) =>
+        val badTable = Table("table", "index")
+        withReindexWorkerService(badTable, queue) { _ =>
+          val reindexRequest = ReindexRequest("unknownId", 1)
+          sendMessage(queue, reindexRequest)
 
-        eventually {
-          assertQueueEmpty(queue)
-          assertQueueHasSize(dlq, 1)
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, 1)
+          }
         }
-      }
     }
   }
 
@@ -111,17 +131,21 @@ class ReindexWorkerServiceTest extends FunSpec
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
-
-          case class SourceDataRecord(
-                                       id: String,
-                                       version: Int,
-                                       reindexVersion: Int,
-                                       reIndexShard: String,
-                                       s3key: String,
-                                       sourceName: String,
-                                       sourceId: String)
+          case class SourceDataRecord(id: String,
+                                      version: Int,
+                                      reindexVersion: Int,
+                                      reIndexShard: String,
+                                      s3key: String,
+                                      sourceName: String,
+                                      sourceId: String)
           val sourceDataRecord = SourceDataRecord(
-            id, 1, 100, "sierra/2058", "sierra/83/2371838/-324571730.json", "sierra", "L0054256")
+            id,
+            1,
+            100,
+            "sierra/2058",
+            "sierra/83/2371838/-324571730.json",
+            "sierra",
+            "L0054256")
           Scanamo.put(dynamoDbClient)(table.name)(sourceDataRecord)
 
           val updatedReindexVersion = 102
@@ -129,8 +153,10 @@ class ReindexWorkerServiceTest extends FunSpec
 
           eventually {
             assertQueueEmpty(queue)
-            val actualRecord = Scanamo.get[SourceDataRecord](dynamoDbClient)(table.name)('id -> id)
-            actualRecord shouldBe Some(Right(sourceDataRecord.copy(version=2, reindexVersion=102)))
+            val actualRecord = Scanamo.get[SourceDataRecord](dynamoDbClient)(
+              table.name)('id -> id)
+            actualRecord shouldBe Some(
+              Right(sourceDataRecord.copy(version = 2, reindexVersion = 102)))
           }
         }
       }
@@ -142,29 +168,41 @@ class ReindexWorkerServiceTest extends FunSpec
     records.size shouldBe 0
   }
 
-  private def assertRecord(id: String, record: SimpleReindexableRecord, table: Table) = {
-    val actualRecord = Scanamo.get[SimpleReindexableRecord](dynamoDbClient)(table.name)('id -> id)
+  private def assertRecord(id: String,
+                           record: SimpleReindexableRecord,
+                           table: Table) = {
+    val actualRecord = Scanamo.get[SimpleReindexableRecord](dynamoDbClient)(
+      table.name)('id -> id)
     actualRecord shouldBe Some(Right(record))
   }
 
-
-  private def givenRecord(reindexableRecord: SimpleReindexableRecord, table: Table) = {
+  private def givenRecord(reindexableRecord: SimpleReindexableRecord,
+                          table: Table) = {
     Scanamo.put(dynamoDbClient)(table.name)(reindexableRecord)
   }
 
   private def sendMessage(queue: Queue, reindexRequest: ReindexRequest) = {
-    sqsClient.sendMessage(queue.url,
-      toJson(NotificationMessage("snsID", "snsTopic", "snsSubject", toJson(reindexRequest).get)).get)
+    sqsClient.sendMessage(
+      queue.url,
+      toJson(
+        NotificationMessage(
+          "snsID",
+          "snsTopic",
+          "snsSubject",
+          toJson(reindexRequest).get)).get)
   }
 
-  private def withReindexWorkerService[R](table: Table,
-                                          queue: Queue)(testWith: TestWith[ReindexWorkerService, R]) = {
+  private def withReindexWorkerService[R](table: Table, queue: Queue)(
+    testWith: TestWith[ReindexWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withVersionedDao(table) { versionedDao =>
-          withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-
-            val workerService = new ReindexWorkerService(versionedDao, sqsStream, actorSystem)
+          withSQSStream[NotificationMessage, R](
+            actorSystem,
+            queue,
+            metricsSender) { sqsStream =>
+            val workerService =
+              new ReindexWorkerService(versionedDao, sqsStream, actorSystem)
 
             try {
               testWith(workerService)

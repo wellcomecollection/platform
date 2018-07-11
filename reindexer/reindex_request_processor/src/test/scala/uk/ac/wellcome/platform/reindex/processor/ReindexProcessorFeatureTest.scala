@@ -11,7 +11,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 class ReindexProcessorFeatureTest
-  extends FunSpec
+    extends FunSpec
     with fixtures.Server
     with SQS
     with LocalDynamoDbVersioned
@@ -22,24 +22,27 @@ class ReindexProcessorFeatureTest
       withLocalDynamoDbTable { table =>
         val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
         withServer(flags) { _ =>
-
           val id = "sierra/1234567"
-          val record = ReindexableRecord(id = id, version = 1, reindexVersion = 10)
+          val record =
+            ReindexableRecord(id = id, version = 1, reindexVersion = 10)
           Scanamo.put(dynamoDbClient)(table.name)(record)
 
           val reindexRequest = ReindexRequest(id = id, desiredVersion = 11)
-          val message = toJson(NotificationMessage(
-            "snsID",
-            "snsTopic",
-            "snsSubject",
-            toJson(reindexRequest).get)).get
+          val message = toJson(
+            NotificationMessage(
+              "snsID",
+              "snsTopic",
+              "snsSubject",
+              toJson(reindexRequest).get)).get
 
           sqsClient.sendMessage(queue.url, message)
 
           eventually {
             assertQueueEmpty(queue)
-            val actualRecord = Scanamo.get[ReindexableRecord](dynamoDbClient)(table.name)('id -> id)
-            actualRecord shouldBe Some(Right(record.copy(version=2, reindexVersion=11)))
+            val actualRecord = Scanamo.get[ReindexableRecord](dynamoDbClient)(
+              table.name)('id -> id)
+            actualRecord shouldBe Some(
+              Right(record.copy(version = 2, reindexVersion = 11)))
           }
         }
       }
