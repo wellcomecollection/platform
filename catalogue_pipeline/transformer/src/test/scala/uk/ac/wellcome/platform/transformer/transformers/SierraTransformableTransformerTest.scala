@@ -4,7 +4,7 @@ import java.time.Instant
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.{SierraData, SierraUtil}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -22,29 +22,29 @@ class SierraTransformableTransformerTest
 
   it("performs a transformation on a work with items") {
     val id = "5757575"
-    val title = "A morning mixture of molasses and muesli"
     val data =
       s"""
          |{
          | "id": "$id",
-         | "title": "$title",
+         | "title": "${randomAlphanumeric(50)}",
          | "varFields": []
          |}
         """.stripMargin
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData =
-        Some(createSierraBibRecordWith(id = id, data = data)),
+      maybeBibData = Some(
+        createSierraBibRecordWith(id = id, data = data)
+      ),
       itemData = Map(
-        "5151515" -> sierraItemRecord(
+        "5151515" -> createSierraItemRecordWith(
           id = "5151515",
-          title = title,
-          bibIds = List(id)),
-        "5252525" -> sierraItemRecord(
+          bibIds = List(id)
+        ),
+        "5252525" -> createSierraItemRecordWith(
           id = "5252525",
-          title = title,
-          bibIds = List(id))
+          bibIds = List(id)
+        )
       )
     )
 
@@ -140,16 +140,11 @@ class SierraTransformableTransformerTest
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
+    val itemRecord = createSierraItemRecord
+
     assertTransformReturnsInvisibleWork(
       maybeBibData = None,
-      itemData = Map(
-        "1313131" -> sierraItemRecord(
-          id = "1313131",
-          title = "An incomplete invocation of items",
-          modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("1113111")
-        )
-      )
+      itemData = Map(itemRecord.id -> itemRecord)
     )
   }
 

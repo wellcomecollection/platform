@@ -48,4 +48,6 @@ trait SierraUtil {
       bibIds = bibIds,
       unlinkedBibIds = unlinkedBibIds
     )
+
+  def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 }
