@@ -21,7 +21,7 @@ class MiroTransformableTransformer
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType
-    : PartialFunction[(Transformable, Int), Try[Some[UnidentifiedWork]]] = {
+    : PartialFunction[(Transformable, Int), Try[Some[TransformedBaseWork]]] = {
     case (miroTransformable: MiroTransformable, version: Int) =>
       Try {
         val miroData = MiroTransformableData.create(miroTransformable.data)
