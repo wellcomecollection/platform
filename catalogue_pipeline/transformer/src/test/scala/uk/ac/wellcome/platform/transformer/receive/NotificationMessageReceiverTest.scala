@@ -15,6 +15,7 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable,
@@ -48,6 +49,7 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
+    with SierraUtil
     with TransformableMessageUtils {
 
   def withNotificationMessageReceiver[R](
@@ -224,17 +226,10 @@ class NotificationMessageReceiverTest
 
   it("fails if it's unable to publish the work") {
     val id = "1001001"
-    val sierraTransformable: Transformable =
-      SierraTransformable(
-        sourceId = id,
-        maybeBibData = Some(
-          SierraBibRecord(
-            id = id,
-            data = s"""{"id": "$id", "title": "A title"}""",
-            modifiedDate = Instant.now
-          )
-        )
-      )
+    val sierraTransformable = SierraTransformable(
+      sourceId = id,
+      maybeBibData = Some(createSierraBibRecord)
+    )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
