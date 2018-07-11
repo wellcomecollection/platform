@@ -1,10 +1,12 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
+import java.time.temporal.ChronoUnit
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
@@ -23,7 +25,7 @@ class SierraItemMergerUpdaterServiceTest
     with ScalaFutures
     with LocalVersionedHybridStore
     with SQS
-    with SierraItemMergerTestUtil {
+    with SierraUtil {
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,
@@ -44,9 +46,7 @@ class SierraItemMergerUpdaterServiceTest
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val bibId = "b666"
-            val newItemRecord = sierraItemRecord(
-              id = "i666",
-              updatedDate = "2014-04-04T04:04:04Z",
+            val newItemRecord = createSierraItemRecordWith(
               bibIds = List(bibId)
             )
 
@@ -81,35 +81,41 @@ class SierraItemMergerUpdaterServiceTest
             val bibIdWithOldData = "b555"
             val bibIdWithNewerData = "b777"
 
-            val itemId = "i666"
-
             val bibIds = List(
               bibIdNotExisting,
               bibIdWithOldData,
               bibIdWithNewerData
             )
 
-            val itemRecord = sierraItemRecord(
-              id = itemId,
-              updatedDate = "2014-04-04T04:04:04Z",
+            val itemRecord = createSierraItemRecordWith(
               bibIds = bibIds
             )
 
-            val otherItem = sierraItemRecord(
-              id = "i888",
-              updatedDate = "2003-03-03T03:03:03Z",
+            val otherItemRecord = createSierraItemRecordWith(
               bibIds = bibIds
             )
+//
+//            val itemRecord = sierraItemRecord(
+//              id = itemId,
+//              updatedDate = "2014-04-04T04:04:04Z",
+//              bibIds = bibIds
+//            )
+
+//            val otherItem = sierraItemRecord(
+//              id = "i888",
+//              updatedDate = "2003-03-03T03:03:03Z",
+//              bibIds = bibIds
+//            )
 
             val oldRecord = SierraTransformable(
               sourceId = bibIdWithOldData,
               itemData = Map(
-                itemId -> sierraItemRecord(
-                  id = itemId,
-                  updatedDate = "2003-03-03T03:03:03Z",
-                  bibIds = bibIds
+                itemRecord.id -> itemRecord.copy(
+                  modifiedDate = itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 ),
-                "i888" -> otherItem
+                otherItemRecord.id -> otherItemRecord.copy(
+                  modifiedDate = otherItemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
+                )
               )
             )
 
@@ -117,21 +123,19 @@ class SierraItemMergerUpdaterServiceTest
               (oldRecord, SourceMetadata(oldRecord.sourceName)))(ifExisting =
               (t, m) => (t, m))
 
-            val anotherItem = sierraItemRecord(
-              id = "i999",
-              updatedDate = "2003-03-03T03:03:03Z",
+            val anotherItemRecord = createSierraItemRecordWith(
               bibIds = bibIds
             )
 
             val newRecord = SierraTransformable(
               sourceId = bibIdWithNewerData,
               itemData = Map(
-                itemId -> sierraItemRecord(
-                  id = itemId,
-                  updatedDate = "3003-03-03T03:03:03Z",
-                  bibIds = bibIds
+                itemRecord.id -> itemRecord.copy(
+                  modifiedDate = itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 ),
-                "i999" -> anotherItem
+                anotherItemRecord.id -> anotherItemRecord.copy(
+                  modifiedDate = anotherItemRecord.modifiedDate.plus(1, ChronoUnit.HOURS)
+                )
               )
             )
 
@@ -156,8 +160,8 @@ class SierraItemMergerUpdaterServiceTest
 
                   val expectedUpdatedSierraTransformable = oldRecord.copy(
                     itemData = Map(
-                      itemId -> itemRecord,
-                      "i888" -> otherItem
+                      itemRecord.id -> itemRecord,
+                      otherItemRecord.id -> otherItemRecord
                     )
                   )
 
@@ -185,14 +189,14 @@ class SierraItemMergerUpdaterServiceTest
             val id = "i3000003"
             val bibId = "b3000003"
 
+            val oldItemRecord = createSierraItemRecordWith(
+              modifiedDate = olderDate,
+              bibIds = List(bibId)
+            )
+
             val oldRecord = SierraTransformable(
               sourceId = bibId,
-              itemData = Map(
-                id -> sierraItemRecord(
-                  id = id,
-                  updatedDate = "2003-03-03T03:03:03Z",
-                  bibIds = List(bibId)
-                ))
+              itemData = Map(oldItemRecord.id -> oldItemRecord)
             )
 
             val f1 = hybridStore.updateRecord(oldRecord.id)(ifNotExisting =
@@ -200,9 +204,9 @@ class SierraItemMergerUpdaterServiceTest
               (t, m) => (t, m))
 
             whenReady(f1) { _ =>
-              val newItemRecord = sierraItemRecord(
-                id = id,
-                updatedDate = "2014-04-04T04:04:04Z",
+              val newItemRecord = createSierraItemRecordWith(
+                id = oldItemRecord.id,
+                modifiedDate = newerDate,
                 bibIds = List(bibId)
               )
 
@@ -230,14 +234,10 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val itemId = "i3000003"
-
             val bibId1 = "b9000001"
             val bibId2 = "b9000002"
 
-            val itemRecord = sierraItemRecord(
-              id = itemId,
-              updatedDate = "2003-03-03T03:03:03Z",
+            val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
             )
 
@@ -320,9 +320,7 @@ class SierraItemMergerUpdaterServiceTest
             val bibId1 = "b9000001"
             val bibId2 = "b9000002"
 
-            val itemRecord = sierraItemRecord(
-              id = itemId,
-              updatedDate = "2003-03-03T03:03:03Z",
+            val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
             )
 
@@ -397,24 +395,16 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val itemId = "i3000003"
-
             val bibId1 = "b9000001"
             val bibId2 = "b9000002"
 
-            val itemRecord = sierraItemRecord(
-              id = itemId,
-              updatedDate = "2003-03-03T03:03:03Z",
+            val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
-            )
-
-            val itemData = Map(
-              itemRecord.id -> itemRecord
             )
 
             val sierraTransformable1 = SierraTransformable(
               sourceId = bibId1,
-              itemData = itemData
+              itemData = Map(itemRecord.id -> itemRecord)
             )
 
             val sierraTransformable2 = SierraTransformable(
@@ -480,27 +470,28 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val id = "i6000006"
             val bibId = "b6000006"
+
+            val record = createSierraItemRecordWith(
+              data = "<<newer data>>",
+              modifiedDate = newerDate,
+              bibIds = List(bibId)
+            )
 
             val sierraRecord = SierraTransformable(
               sourceId = bibId,
-              itemData = Map(
-                id -> sierraItemRecord(
-                  id = id,
-                  updatedDate = "2006-06-06T06:06:06Z",
-                  bibIds = List(bibId)
-                ))
+              itemData = Map(record.id -> record)
             )
 
             val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
               (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
               ifExisting = (t, m) => (t, m))
 
-            val oldItemRecord = sierraItemRecord(
-              id = id,
-              updatedDate = "2001-01-01T01:01:01Z",
-              bibIds = List(bibId)
+            val oldItemRecord = createSierraItemRecordWith(
+              id = record.id,
+              data = "<<older data>>",
+              modifiedDate = olderDate,
+              bibIds = record.bibIds
             )
 
             whenReady(f1) { _ =>
@@ -531,9 +522,7 @@ class SierraItemMergerUpdaterServiceTest
               (sierraRecord, SourceMetadata(sierraRecord.sourceName)))(
               ifExisting = (t, m) => (t, m))
 
-            val itemRecord = sierraItemRecord(
-              id = "i7000007",
-              updatedDate = "2007-07-07T07:07:07Z",
+            val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId)
             )
 
@@ -564,13 +553,7 @@ class SierraItemMergerUpdaterServiceTest
       withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
         brokenStore =>
           withSierraUpdaterService(brokenStore) { brokenService =>
-            val bibId = "b242"
-
-            val itemRecord = sierraItemRecord(
-              "i000",
-              "2007-07-07T07:07:07Z",
-              List(bibId)
-            )
+            val itemRecord = createSierraItemRecord
 
             whenReady(brokenService.update(itemRecord).failed) { ex =>
               ex shouldBe a[RuntimeException]
