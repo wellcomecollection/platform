@@ -29,18 +29,18 @@ class SierraTransformableTransformer
 
   override def transformForType: PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Work",
+        value = addCheckDigit(
+          sierraTransformable.sourceId,
+          recordType = SierraRecordTypes.bibs
+        )
+      )
+
       sierraTransformable.maybeBibData
         .map { bibData =>
           debug(s"Attempting to transform ${bibData.id}")
-
-          val sourceIdentifier = SourceIdentifier(
-            identifierType = IdentifierType("sierra-system-number"),
-            ontologyType = "Work",
-            value = addCheckDigit(
-              bibData.id,
-              recordType = SierraRecordTypes.bibs
-            )
-          )
 
           fromJson[SierraBibData](bibData.data).map { sierraBibData =>
             if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
@@ -80,13 +80,17 @@ class SierraTransformableTransformer
           }
         }
 
-
         // A merged record can have both bibs and items.  If we only have
         // the item data so far, we don't have enough to build a Work, so we
         // return None.
         .getOrElse {
           debug("No bib data on the record, so skipping")
-          Success(None)
+          Success(
+            UnidentifiedInvisibleWork(
+              sourceIdentifier = sourceIdentifier,
+              version = version
+            )
+          )
         }
   }
 
