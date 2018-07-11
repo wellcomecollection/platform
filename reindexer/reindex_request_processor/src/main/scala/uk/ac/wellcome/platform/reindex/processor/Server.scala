@@ -12,6 +12,7 @@ import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.SQSClientModule
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
+import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule}
 import uk.ac.wellcome.platform.reindex.processor.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
@@ -24,6 +25,8 @@ class Server extends HttpServer {
     AkkaModule,
     MetricsSenderModule,
     SQSClientModule,
+    DynamoConfigModule,
+    DynamoClientModule,
     ReindexerWorkerModule
   )
 

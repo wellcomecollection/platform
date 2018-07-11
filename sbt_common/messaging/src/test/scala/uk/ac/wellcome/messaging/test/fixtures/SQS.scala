@@ -220,14 +220,14 @@ trait SQS extends Matchers {
     messages should have size size
   }
 
-  private def waitVisibilityTimeoutExipiry() = {
+  def waitVisibilityTimeoutExipiry() = {
     // The visibility timeout is set to 1 second for test queues.
     // Wait for slightly longer than that to make sure that messages
     // that fail processing become visible again before asserting.
     Thread.sleep(1500)
   }
 
-  private def getMessages(queue: Queue) = {
+  def getMessages(queue: Queue) = {
     val messages = sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(queue.url)

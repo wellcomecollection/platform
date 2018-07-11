@@ -2,23 +2,19 @@ package uk.ac.wellcome.platform.reindex.processor.services
 
 import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
-import scala.util.Try
 
 class ReindexWorkerService @Inject()(
-  versionedHybridStore: VersionedHybridStore[ReindexableRecord,
-                                             EmptyMetadata,
-                                             ObjectStore[ReindexableRecord]],
+  versionedDao: VersionedDao,
   sqsStream: SQSStream[NotificationMessage],
-  system: ActorSystem) {
+  system: ActorSystem) extends Logging {
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
@@ -26,26 +22,18 @@ class ReindexWorkerService @Inject()(
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      _ <- Future.fromTry(
-        Try {
-          val reindexRequest = fromJson[ReindexRequest](message.Message).get
-          versionedHybridStore.updateRecord(reindexRequest.id)((
-            ReindexableRecord(reindexRequest.id, reindexRequest.desiredVersion),
-            EmptyMetadata()))(
-            (existingRecord, existingMetadata) =>
-              if (existingRecord.reindexVersion > reindexRequest.desiredVersion) {
-                (existingRecord, existingMetadata)
-              } else {
-                (
-                  ReindexableRecord(
-                    reindexRequest.id,
-                    reindexRequest.desiredVersion),
-                  EmptyMetadata())
-            }
-          )
+      reindexRequest <- Future.fromTry(fromJson[ReindexRequest](message.Message))
+      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
+    } yield maybeReindexableRecord match {
+      case Some(existingRecord) =>
+        if (reindexRequest.desiredVersion > existingRecord.reindexVersion) {
+          val mergedRecord = existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
+          versionedDao.updateRecord(mergedRecord)
+        } else {
+          Future.successful(())
         }
-      )
-    } yield ()
+      case None => throw new RuntimeException(s"VersionedDao has no record for $reindexRequest")
+    }
 
   def stop(): Future[Terminated] = system.terminate()
 }

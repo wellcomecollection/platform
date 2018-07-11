@@ -9,5 +9,6 @@ import uk.ac.wellcome.models.Id
   */
 case class ReindexableRecord(
   id: String,
+  version: Int,
   reindexVersion: Int
 ) extends Id

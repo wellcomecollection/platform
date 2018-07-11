@@ -1,52 +1,50 @@
 package uk.ac.wellcome.platform.reindex.processor.services
 
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
+import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+class ReindexWorkerServiceTest extends FunSpec
+  with Akka
+  with LocalDynamoDbVersioned
+  with SQS
+  with ScalaFutures
+  with Messaging
+  with MetricsSenderFixture
+  with ExtendedPatience {
 
-class ReindexWorkerServiceTest
-    extends FunSpec
-    with Akka
-    with LocalVersionedHybridStore
-    with SQS
-    with ScalaFutures
-    with Messaging
-    with MetricsSenderFixture
-    with ExtendedPatience {
+  val id = "sierra/2371838"
+  val data = "data"
+  val recordVersion = 10
 
-  val id = "sierra/1234567"
+  case class SimpleReindexableRecord(id: String,
+                                     version: Int,
+                                     reindexVersion: Int,
+                                     data: String)
 
-  it("creates a new record") {
-    withLocalSqsQueue { queue =>
-      withLocalS3Bucket { vhsBucket =>
-        withLocalDynamoDbTable { vhsTable =>
-          withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-            val version = 1
-            val reindexRequest = ReindexRequest(id, version)
+  it("does not insert a new record if there is no existing record") {
+    withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
+      withLocalDynamoDbTable { table =>
+        withReindexWorkerService(table, queue) { _ =>
 
-            sendMessage(queue, reindexRequest)
+          val reindexRequest = ReindexRequest("unknownId", 1)
+          sendMessage(queue, reindexRequest)
 
-            eventually {
-              assertStored[ReindexableRecord](
-                vhsBucket,
-                vhsTable,
-                ReindexableRecord(id, version))
-            }
+          eventually {
+            assertQueueEmpty(queue)
+            assertQueueHasSize(dlq, 1)
+            assertNoRecords(table)
           }
         }
       }
@@ -55,130 +53,127 @@ class ReindexWorkerServiceTest
 
   it("updates an existing record with a newer version") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { vhsBucket =>
-        withLocalDynamoDbTable { vhsTable =>
-          withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-            val originalVersion = 1
-            val updatedVersion = 2
+      withLocalDynamoDbTable { table =>
+        withReindexWorkerService(table, queue) { _ =>
 
-            val reindexRequest = ReindexRequest(id, originalVersion)
-            sendMessage(queue, reindexRequest)
+          val reindexVersion = 1
+          givenRecord(SimpleReindexableRecord(id, recordVersion, reindexVersion, data), table)
 
-            eventually {
-              assertStored[ReindexableRecord](
-                vhsBucket,
-                vhsTable,
-                ReindexableRecord(id, originalVersion))
+          val updatedReindexVersion = 2
+          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
-              sendMessage(
-                queue,
-                reindexRequest.copy(desiredVersion = updatedVersion))
-
-              eventually {
-                assertStored[ReindexableRecord](
-                  vhsBucket,
-                  vhsTable,
-                  ReindexableRecord(id, updatedVersion))
-              }
-            }
+          eventually {
+            assertRecord(id,
+              SimpleReindexableRecord(id, recordVersion+1, updatedReindexVersion, data), table)
           }
         }
       }
     }
   }
 
-  it("an existing record is not updated by an older version") {
+  it("does not update an existing record with an older version") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { vhsBucket =>
-        withLocalDynamoDbTable { vhsTable =>
-          withReindexWorkerService(vhsTable, vhsBucket, queue) { _ =>
-            val originalVersion = 2
-            val olderVersion = 1
+      withLocalDynamoDbTable { table =>
+        withReindexWorkerService(table, queue) { _ =>
 
-            val reindexRequest = ReindexRequest(id, originalVersion)
-            sendMessage(queue, reindexRequest)
+          val originalReindexVersion = 2
+          givenRecord(SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data), table)
 
-            eventually {
-              assertStored[ReindexableRecord](
-                vhsBucket,
-                vhsTable,
-                ReindexableRecord(id, originalVersion))
+          val updatedReindexVersion = 1
+          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
-              sendMessage(
-                queue,
-                reindexRequest.copy(desiredVersion = olderVersion))
-
-              assertQueueEmpty(queue)
-              eventually {
-                assertStored[ReindexableRecord](
-                  vhsBucket,
-                  vhsTable,
-                  ReindexableRecord(id, originalVersion))
-              }
-            }
+          eventually {
+            assertQueueEmpty(queue)
+            assertRecord(id,
+              SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data), table)
           }
         }
       }
     }
   }
 
-  it("fails if saving to S3 fails") {
-    withLocalSqsQueueAndDlq {
-      case QueuePair(queue, dlq) =>
-        withLocalDynamoDbTable { vhsTable =>
-          withReindexWorkerService(vhsTable, Bucket("wrongBucket"), queue) {
-            _ =>
-              sendMessage(queue, ReindexRequest(id = id, desiredVersion = 1))
+  it("fails if saving to dynamo fails") {
+    withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
+      val badTable = Table("table","index")
+      withReindexWorkerService(badTable, queue) { _ =>
+        val reindexRequest = ReindexRequest("unknownId", 1)
+        sendMessage(queue, reindexRequest)
 
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
-              }
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueHasSize(dlq, 1)
+        }
+      }
+    }
+  }
+
+  it("updates a sourcedata record") {
+    withLocalSqsQueue { queue =>
+      withLocalDynamoDbTable { table =>
+        withReindexWorkerService(table, queue) { _ =>
+
+          case class SourceDataRecord(
+                                       id: String,
+                                       version: Int,
+                                       reindexVersion: Int,
+                                       reIndexShard: String,
+                                       s3key: String,
+                                       sourceName: String,
+                                       sourceId: String)
+          val sourceDataRecord = SourceDataRecord(
+            id, 1, 100, "sierra/2058", "sierra/83/2371838/-324571730.json", "sierra", "L0054256")
+          Scanamo.put(dynamoDbClient)(table.name)(sourceDataRecord)
+
+          val updatedReindexVersion = 102
+          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
+
+          eventually {
+            assertQueueEmpty(queue)
+            val actualRecord = Scanamo.get[SourceDataRecord](dynamoDbClient)(table.name)('id -> id)
+            actualRecord shouldBe Some(Right(sourceDataRecord.copy(version=2, reindexVersion=102)))
           }
         }
+      }
     }
+  }
+
+  private def assertNoRecords(table: Table) = {
+    val records = Scanamo.scan[ReindexableRecord](dynamoDbClient)(table.name)
+    records.size shouldBe 0
+  }
+
+  private def assertRecord(id: String, record: SimpleReindexableRecord, table: Table) = {
+    val actualRecord = Scanamo.get[SimpleReindexableRecord](dynamoDbClient)(table.name)('id -> id)
+    actualRecord shouldBe Some(Right(record))
+  }
+
+
+  private def givenRecord(reindexableRecord: SimpleReindexableRecord, table: Table) = {
+    Scanamo.put(dynamoDbClient)(table.name)(reindexableRecord)
   }
 
   private def sendMessage(queue: Queue, reindexRequest: ReindexRequest) = {
-    sqsClient.sendMessage(
-      queue.url,
-      toJson(
-        NotificationMessage(
-          "snsID",
-          "snsTopic",
-          "snsSubject",
-          toJson(reindexRequest).get)).get)
+    sqsClient.sendMessage(queue.url,
+      toJson(NotificationMessage("snsID", "snsTopic", "snsSubject", toJson(reindexRequest).get)).get)
   }
 
-  private def withReindexWorkerService[R](
-    vhsTable: Table,
-    vhsBucket: Bucket,
-    queue: Queue)(testWith: TestWith[ReindexWorkerService, R]) = {
+  private def withReindexWorkerService[R](table: Table,
+                                          queue: Queue)(testWith: TestWith[ReindexWorkerService, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withTypeVHS[ReindexableRecord, EmptyMetadata, R](
-          bucket = vhsBucket,
-          table = vhsTable) { versionedHybridStore =>
-          val sqsStream = new SQSStream[NotificationMessage](
-            actorSystem,
-            asyncSqsClient,
-            SQSConfig(queue.url, waitTime = 1 second, maxMessages = 1),
-            metricsSender)
+        withVersionedDao(table) { versionedDao =>
+          withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
 
-          val workerService = new ReindexWorkerService(
-            versionedHybridStore = versionedHybridStore,
-            sqsStream = sqsStream,
-            system = actorSystem
-          )
+            val workerService = new ReindexWorkerService(versionedDao, sqsStream, actorSystem)
 
-          try {
-            testWith(workerService)
-          } finally {
-            workerService.stop()
+            try {
+              testWith(workerService)
+            } finally {
+              workerService.stop()
+            }
           }
         }
       }
     }
   }
-
 }
