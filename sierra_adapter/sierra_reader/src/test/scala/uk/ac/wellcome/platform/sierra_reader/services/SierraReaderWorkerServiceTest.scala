@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -15,8 +14,8 @@ import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
-import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.platform.sierra_reader.models.{
@@ -26,7 +25,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
 }
 
 import collection.JavaConverters._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraReaderWorkerServiceTest
@@ -62,30 +60,23 @@ class SierraReaderWorkerServiceTest
               fields = fields
             )
 
-            val worker = new SierraReaderWorkerService(
-              system = actorSystem,
-              sqsStream = new SQSStream(
-                actorSystem = actorSystem,
-                sqsClient = asyncSqsClient,
-                sqsConfig = SQSConfig(
-                  queueUrl = queue.url,
-                  waitTime = 1.second,
-                  maxMessages = 1
+            withSQSStream[NotificationMessage, Assertion](actorSystem, queue, metricsSender) { sqsStream =>
+              val worker = new SierraReaderWorkerService(
+                system = actorSystem,
+                sqsStream = sqsStream,
+                s3client = s3Client,
+                s3Config = S3Config(bucket.name),
+                windowManager = new WindowManager(
+                  s3Client,
+                  S3Config(bucket.name),
+                  sierraConfig = sierraConfig
                 ),
-                metricsSender = metricsSender
-              ),
-              s3client = s3Client,
-              s3Config = S3Config(bucket.name),
-              windowManager = new WindowManager(
-                s3Client,
-                S3Config(bucket.name),
+                readerConfig = ReaderConfig(batchSize = batchSize),
                 sierraConfig = sierraConfig
-              ),
-              readerConfig = ReaderConfig(batchSize = batchSize),
-              sierraConfig = sierraConfig
-            )
+              )
 
-            testWith(FixtureParams(worker, queue, bucket))
+              testWith(FixtureParams(worker, queue, bucket))
+            }
           }
         }
       }
