@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import java.time.Instant
-
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
@@ -69,7 +67,6 @@ class SierraTransformableTransformerTest
   }
 
   it("should extract information from items") {
-    val modifiedDate = Instant.now
     val bibId = "6262626"
     val itemId = "6363636"
     val locationType = LocationType("sgmed")
@@ -95,13 +92,12 @@ class SierraTransformableTransformerTest
           id = bibId,
           data = bibData)),
       itemData = Map(
-        itemId -> SierraItemRecord(
+        itemId -> createSierraItemRecordWith(
           id = itemId,
           data = itemData,
-          modifiedDate = modifiedDate,
-          bibIds = List(bibId),
-          unlinkedBibIds = Nil,
-          version = 1))
+          bibIds = List(bibId)
+        )
+      )
     )
 
     val work = transformToWork(transformable)
