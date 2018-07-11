@@ -84,7 +84,7 @@ class SierraTransformableTransformer
         // the item data so far, we don't have enough to build a Work, so we
         // return None.
         .getOrElse {
-          debug("No bib data on the record, so skipping")
+          debug(s"No bib data for ${sierraTransformable.sourceId}, so skipping")
           Success(
             UnidentifiedInvisibleWork(
               sourceIdentifier = sourceIdentifier,
