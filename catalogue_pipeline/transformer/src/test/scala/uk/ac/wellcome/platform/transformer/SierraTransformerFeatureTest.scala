@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer
 
-import java.time.Instant
-
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
@@ -31,7 +29,6 @@ class SierraTransformerFeatureTest
   it("transforms sierra records and publishes the result to the given topic") {
     val id = "1001001"
     val title = "A pot of possums"
-    val lastModifiedDate = Instant.now()
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
@@ -41,8 +38,7 @@ class SierraTransformerFeatureTest
               hybridRecordNotificationMessage(
                 message = createValidSierraTransformableJson(
                   id = id,
-                  title = title,
-                  lastModifiedDate = lastModifiedDate
+                  title = title
                 ),
                 sourceName = "sierra",
                 version = 1,

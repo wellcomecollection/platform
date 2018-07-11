@@ -41,8 +41,7 @@ trait TransformableMessageUtils extends SQS {
   }
 
   def createValidSierraTransformableJson(id: String,
-                                         title: String,
-                                         lastModifiedDate: Instant): String = {
+                                         title: String): String = {
     val data =
       s"""
          |{
@@ -54,7 +53,7 @@ trait TransformableMessageUtils extends SQS {
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
+      maybeBibData = Some(SierraBibRecord(id, data, Instant.now)),
       itemData = Map[String, SierraItemRecord]()
     )
 
