@@ -39,14 +39,16 @@ trait SierraUtil {
     data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[String] = List(Random.alphanumeric take 7 mkString),
-    unlinkedBibIds: List[String] = List()
+    unlinkedBibIds: List[String] = List(),
+    version: Int = 1
   ): SierraItemRecord =
     SierraItemRecord(
       id = id,
       data = if (data == "") createSierraRecordStringWith(id = id) else data,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
+      unlinkedBibIds = unlinkedBibIds,
+      version = version
     )
 
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
