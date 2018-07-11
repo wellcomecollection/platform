@@ -42,6 +42,17 @@ trait SierraUtil {
   def createSierraBibRecordWith(
     id: String = Random.alphanumeric take 7 mkString,
     data: String = "",
+    modifiedDate: String
+  ): SierraBibRecord =
+    createSierraBibRecordWith(
+      id = id,
+      data = data,
+      modifiedDate = Instant.parse(modifiedDate)
+    )
+
+  def createSierraBibRecordWith(
+    id: String = Random.alphanumeric take 7 mkString,
+    data: String = "",
     modifiedDate: Instant = Instant.now
   ): SierraBibRecord =
     SierraBibRecord(

@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
-import java.time.Instant
-
 import io.circe.Encoder
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
@@ -109,15 +107,15 @@ class SierraBibMergerFeatureTest
               bucket,
               table) { hybridStore =>
               val oldBibRecord = createSierraBibRecordWith(
-                modifiedDate = Instant.parse("1999-09-09T09:09:09Z"),
-                data = "<<old data>>"
+                data = "<<old data>>",
+                modifiedDate = "1999-09-09T09:09:09Z"
               )
               val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
 
               val record = createSierraBibRecordWith(
                 id = oldBibRecord.id,
-                modifiedDate = Instant.parse("2001-01-01T01:01:01Z"),
-                data = "<<newer data>>"
+                data = "<<newer data>>",
+                modifiedDate = "2001-01-01T01:01:01Z"
               )
 
               hybridStore
@@ -154,8 +152,8 @@ class SierraBibMergerFeatureTest
               bucket,
               table) { hybridStore =>
               val newBibRecord = createSierraBibRecordWith(
-                modifiedDate = Instant.parse("2001-01-01T01:01:01Z"),
-                data = "<<newer data>>"
+                data = "<<newer data>>",
+                modifiedDate = "2001-01-01T01:01:01Z"
               )
 
               val expectedSierraTransformable =
@@ -163,8 +161,8 @@ class SierraBibMergerFeatureTest
 
               val oldBibRecord = createSierraBibRecordWith(
                 id = newBibRecord.id,
-                modifiedDate = Instant.parse("1999-09-09T09:09:09Z"),
-                data = "<<old data>>"
+                data = "<<old data>>",
+                modifiedDate = "1999-09-09T09:09:09Z"
               )
 
               hybridStore
