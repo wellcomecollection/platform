@@ -8,18 +8,14 @@ import scala.util.Try
 
 trait TransformableTransformer[T <: Transformable] extends Logging {
   def transformForType
-    : PartialFunction[(Transformable, Int), Try[Option[TransformedBaseWork]]]
+    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]]
 
   def transform(transformable: Transformable,
-                version: Int): Try[Option[TransformedBaseWork]] =
+                version: Int): Try[TransformedBaseWork] =
     Try {
       transformable match {
-        case t if transformForType.isDefinedAt((t, version)) =>
-          transformForType((t, version)).recover {
-            case e: ShouldNotTransformException =>
-              warn(s"Should not transform: ${e.getMessage}")
-              None
-          }
+        case t if transformForType.isDefinedAt(t, version) =>
+          transformForType(t, version)
         case _ =>
           throw new RuntimeException(s"$transformable is not of the right type")
       }
