@@ -191,29 +191,6 @@ class NotificationMessageReceiverTest
     }
   }
 
-  it("sends no message where Transformable work is None") {
-    withLocalSnsTopic { topic =>
-      withLocalSqsQueue { _ =>
-        withLocalS3Bucket { bucket =>
-          withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(
-              createValidEmptySierraBibNotificationMessage(
-                id = "0101010",
-                s3Client = s3Client,
-                bucket = bucket
-              )
-            )
-
-            whenReady(future) { _ =>
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages shouldBe empty
-            }
-          }
-        }
-      }
-    }
-  }
-
   it("fails if it's unable to perform a transformation") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
