@@ -8,7 +8,7 @@ import scala.util.Random
 
 trait SierraUtil {
 
-  def createSierraBibRecordStringWith(id: String): String =
+  private def createSierraBibRecordStringWith(id: String): String =
     s"""
        |{
        |      "id": "$id",
