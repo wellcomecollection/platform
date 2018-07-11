@@ -1,6 +1,9 @@
 package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
+import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.syntax._
+import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.storage.dynamo.DynamoClientFactory
 import uk.ac.wellcome.test.fixtures._
@@ -13,7 +16,7 @@ object LocalDynamoDb {
   case class Table(name: String, index: String)
 }
 
-trait LocalDynamoDb extends Eventually with ExtendedPatience {
+trait LocalDynamoDb extends Eventually with Matchers with ExtendedPatience {
 
   import LocalDynamoDb._
 
@@ -72,5 +75,26 @@ trait LocalDynamoDb extends Eventually with ExtendedPatience {
       .getTableNames
       .asScala
       .foreach(dynamoDbClient.deleteTable)
+  }
+
+  def givenDynamoHasItem[T: DynamoFormat](item: T, table: Table) = {
+    Scanamo.put(dynamoDbClient)(table.name)(item)
+  }
+
+  def assertDynamoHasNoItems[T: DynamoFormat](table: Table) = {
+    val records = Scanamo.scan[T](dynamoDbClient)(table.name)
+    records.size shouldBe 0
+  }
+
+  def assertDynamoHasItem[T: DynamoFormat](id: String, item: T, table: Table) = {
+    val actualRecord = Scanamo.get[T](dynamoDbClient)(
+      table.name)('id -> id)
+    actualRecord shouldBe Some(Right(item))
+  }
+
+  def assertDynamoOnlyHasItem[T: DynamoFormat](item: T, table: Table) = {
+    val records = Scanamo.scan[T](dynamoDbClient)(table.name)
+    records.size shouldBe 1
+    records.head shouldBe Right(item)
   }
 }

@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.reindex.processor.services
 
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -36,7 +34,7 @@ class ReindexWorkerServiceTest
 
   it("does not insert a new record if there is no existing record") {
     withLocalSqsQueueAndDlq {
-      case queuePair @ QueuePair(queue, dlq) =>
+      case QueuePair(queue, dlq) =>
         withLocalDynamoDbTable { table =>
           withReindexWorkerService(table, queue) { _ =>
             val reindexRequest = ReindexRequest("unknownId", 1)
@@ -45,7 +43,7 @@ class ReindexWorkerServiceTest
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
-              assertNoRecords(table)
+              assertDynamoHasNoItems[ReindexableRecord](table)
             }
           }
         }
@@ -57,7 +55,7 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val reindexVersion = 1
-          givenRecord(
+          givenDynamoHasItem(
             SimpleReindexableRecord(id, recordVersion, reindexVersion, data),
             table)
 
@@ -65,8 +63,7 @@ class ReindexWorkerServiceTest
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
-            assertRecord(
-              id,
+            assertDynamoOnlyHasItem(
               SimpleReindexableRecord(
                 id,
                 recordVersion + 1,
@@ -84,7 +81,7 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val originalReindexVersion = 2
-          givenRecord(
+          givenDynamoHasItem(
             SimpleReindexableRecord(
               id,
               recordVersion,
@@ -97,8 +94,7 @@ class ReindexWorkerServiceTest
 
           eventually {
             assertQueueEmpty(queue)
-            assertRecord(
-              id,
+            assertDynamoOnlyHasItem(
               SimpleReindexableRecord(
                 id,
                 recordVersion,
@@ -113,7 +109,7 @@ class ReindexWorkerServiceTest
 
   it("fails if saving to dynamo fails") {
     withLocalSqsQueueAndDlq {
-      case queuePair @ QueuePair(queue, dlq) =>
+      case QueuePair(queue, dlq) =>
         val badTable = Table("table", "index")
         withReindexWorkerService(badTable, queue) { _ =>
           val reindexRequest = ReindexRequest("unknownId", 1)
@@ -146,39 +142,18 @@ class ReindexWorkerServiceTest
             "sierra/83/2371838/-324571730.json",
             "sierra",
             "L0054256")
-          Scanamo.put(dynamoDbClient)(table.name)(sourceDataRecord)
+          givenDynamoHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
-            val actualRecord = Scanamo.get[SourceDataRecord](dynamoDbClient)(
-              table.name)('id -> id)
-            actualRecord shouldBe Some(
-              Right(sourceDataRecord.copy(version = 2, reindexVersion = 102)))
+            assertDynamoOnlyHasItem(sourceDataRecord.copy(version = 2, reindexVersion = 102), table)
           }
         }
       }
     }
-  }
-
-  private def assertNoRecords(table: Table) = {
-    val records = Scanamo.scan[ReindexableRecord](dynamoDbClient)(table.name)
-    records.size shouldBe 0
-  }
-
-  private def assertRecord(id: String,
-                           record: SimpleReindexableRecord,
-                           table: Table) = {
-    val actualRecord = Scanamo.get[SimpleReindexableRecord](dynamoDbClient)(
-      table.name)('id -> id)
-    actualRecord shouldBe Some(Right(record))
-  }
-
-  private def givenRecord(reindexableRecord: SimpleReindexableRecord,
-                          table: Table) = {
-    Scanamo.put(dynamoDbClient)(table.name)(reindexableRecord)
   }
 
   private def sendMessage(queue: Queue, reindexRequest: ReindexRequest) = {
