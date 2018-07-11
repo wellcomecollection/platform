@@ -642,7 +642,7 @@ class SierraTransformableTransformerTest
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = sierraTransformable.sourceId
+        value = "b01020109"
       ),
       version = 1
     )
