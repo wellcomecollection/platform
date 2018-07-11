@@ -8,6 +8,12 @@ import scala.util.Random
 
 trait SierraUtil {
 
+  // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
+  // a record with a newer version, or vice versa.  Provide two dates here
+  // for convenience.
+  val olderDate: Instant = Instant.parse("1999-09-09T09:09:09Z")
+  val newerDate: Instant = Instant.parse("2001-01-01T01:01:01Z")
+
   private def createSierraRecordStringWith(id: String): String =
     s"""
        |{
@@ -38,19 +44,6 @@ trait SierraUtil {
     )
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
-
-  def createSierraItemRecordWith(
-    id: String = Random.alphanumeric take 7 mkString,
-    data: String = "",
-    modifiedDate: String,
-    bibIds: List[String] = List()
-  ): SierraItemRecord =
-    createSierraItemRecordWith(
-      id = id,
-      data = data,
-      modifiedDate = Instant.parse(modifiedDate),
-      bibIds = bibIds
-    )
 
   def createSierraItemRecordWith(
     id: String = Random.alphanumeric take 7 mkString,

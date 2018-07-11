@@ -20,7 +20,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData with SierraUt
   it("should update itemData when merging item records with newer data") {
     val olderRecord = createSierraItemRecordWith(
       data = "<<older data>>",
-      modifiedDate = "1999-09-09T09:09:09Z",
+      modifiedDate = olderDate,
       bibIds = List("b999")
     )
 
@@ -32,7 +32,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData with SierraUt
     val newerRecord = createSierraItemRecordWith(
       id = olderRecord.id,
       data = "<<newer data>>",
-      modifiedDate = "2001-01-01T01:01:01Z",
+      modifiedDate = newerDate,
       bibIds = olderRecord.bibIds
     )
     val result = ItemLinker.linkItemRecord(sierraTransformable, newerRecord)
@@ -46,7 +46,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData with SierraUt
 
     val newerRecord = createSierraItemRecordWith(
       data = "<<newer data>>",
-      modifiedDate = "2001-01-01T01:01:01Z",
+      modifiedDate = newerDate,
       bibIds = List("b111")
     )
 
@@ -58,7 +58,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraData with SierraUt
     val oldRecord = createSierraItemRecordWith(
       id = newerRecord.id,
       data = "<<older data>>",
-      modifiedDate = "1999-09-09T09:09:09Z",
+      modifiedDate = olderDate,
       bibIds = newerRecord.bibIds
     )
 
