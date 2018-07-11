@@ -19,7 +19,7 @@ object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.reindex.processor ReindexRequestCreator"
+    "uk.ac.wellcome.platform.reindex.processor ReindexRequestProcessor"
 
   override val modules = Seq(
     AkkaModule,
