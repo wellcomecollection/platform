@@ -39,11 +39,15 @@ trait SierraUtil {
        |    }
     """.stripMargin
 
-  def createSierraBibRecordWith(id: String = Random.alphanumeric take 7 mkString): SierraBibRecord =
+  def createSierraBibRecordWith(
+    id: String = Random.alphanumeric take 7 mkString,
+    data: String = "",
+    modifiedDate: Instant = Instant.now
+  ): SierraBibRecord =
     SierraBibRecord(
       id = id,
-      data = createSierraBibRecordStringWith(id = id),
-      modifiedDate = Instant.now
+      data = if (data == "") createSierraBibRecordStringWith(id = id) else data,
+      modifiedDate = modifiedDate
     )
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
