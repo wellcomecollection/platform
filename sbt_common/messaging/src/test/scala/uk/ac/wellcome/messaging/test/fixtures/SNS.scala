@@ -26,8 +26,7 @@ trait SNS {
 
   import SNS._
 
-  protected val snsInternalEndpointUrl = "http://sns:9292"
-  protected val localSNSEndpointUrl = "http://localhost:9292"
+  private val localSNSEndpointUrl = "http://localhost:9292"
 
   private val regionName = "localhost"
 

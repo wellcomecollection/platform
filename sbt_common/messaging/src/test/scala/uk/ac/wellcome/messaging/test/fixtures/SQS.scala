@@ -29,8 +29,8 @@ trait SQS extends Matchers {
 
   import SQS._
 
-  protected val sqsInternalEndpointUrl = "http://sqs:9324"
-  protected val sqsEndpointUrl = "http://localhost:9324"
+  private val sqsInternalEndpointUrl = "http://sqs:9324"
+  private val sqsEndpointUrl = "http://localhost:9324"
 
   private val regionName = "localhost"
 
