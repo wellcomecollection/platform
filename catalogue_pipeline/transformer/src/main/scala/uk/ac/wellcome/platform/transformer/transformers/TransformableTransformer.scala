@@ -14,8 +14,8 @@ trait TransformableTransformer[T <: Transformable] extends Logging {
                 version: Int): Try[TransformedBaseWork] =
     Try {
       transformable match {
-        case t if transformForType.isDefinedAt(t, version) =>
-          transformForType(t, version)
+        case t if transformForType.isDefinedAt((t, version)) =>
+          transformForType((t, version))
         case _ =>
           throw new RuntimeException(s"$transformable is not of the right type")
       }
