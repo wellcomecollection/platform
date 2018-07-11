@@ -13,6 +13,8 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.util.Random
+
 class ReindexWorkerServiceTest
     extends FunSpec
     with Akka
@@ -38,7 +40,7 @@ class ReindexWorkerServiceTest
         withLocalDynamoDbTable { table =>
           withReindexWorkerService(table, queue) { _ =>
             val reindexRequest = ReindexRequest("unknownId", 1)
-            sendMessage(queue, reindexRequest)
+            sendMessageInNotification(queue, reindexRequest)
 
             eventually {
               assertQueueEmpty(queue)
@@ -60,7 +62,7 @@ class ReindexWorkerServiceTest
             table)
 
           val updatedReindexVersion = 2
-          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
+          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertDynamoDbOnlyHasItem(
@@ -90,7 +92,7 @@ class ReindexWorkerServiceTest
             table)
 
           val updatedReindexVersion = 1
-          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
+          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
@@ -113,7 +115,7 @@ class ReindexWorkerServiceTest
         val badTable = Table("table", "index")
         withReindexWorkerService(badTable, queue) { _ =>
           val reindexRequest = ReindexRequest("unknownId", 1)
-          sendMessage(queue, reindexRequest)
+          sendMessageInNotification(queue, reindexRequest)
 
           eventually {
             assertQueueEmpty(queue)
@@ -145,7 +147,7 @@ class ReindexWorkerServiceTest
           givenDynamoDbHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
-          sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
+          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
@@ -154,17 +156,6 @@ class ReindexWorkerServiceTest
         }
       }
     }
-  }
-
-  private def sendMessage(queue: Queue, reindexRequest: ReindexRequest) = {
-    sqsClient.sendMessage(
-      queue.url,
-      toJson(
-        NotificationMessage(
-          "snsID",
-          "snsTopic",
-          "snsSubject",
-          toJson(reindexRequest).get)).get)
   }
 
   private def withReindexWorkerService[R](table: Table, queue: Queue)(
@@ -188,5 +179,16 @@ class ReindexWorkerServiceTest
         }
       }
     }
+  }
+
+  private def sendMessageInNotification(queue: Queue, message: ReindexRequest) = {
+    sqsClient.sendMessage(
+      queue.url,
+      toJson(
+        NotificationMessage(
+          MessageId = Random.alphanumeric take 5 mkString,
+          TopicArn = "TopicArn",
+          Subject = "Subject test notification",
+          Message = toJson(message).get)).get)
   }
 }
