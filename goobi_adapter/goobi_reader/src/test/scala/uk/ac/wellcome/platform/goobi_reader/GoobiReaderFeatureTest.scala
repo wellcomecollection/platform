@@ -29,7 +29,7 @@ class GoobiReaderFeatureTest
 
           sendNotificationToSQS(
             queue = queue,
-            message = anS3Notification(sourceKey, bucket.name, eventTime)
+            body = anS3Notification(sourceKey, bucket.name, eventTime)
           )
 
           withServer(goobiReaderLocalFlags(queue, bucket, table)) { _ =>

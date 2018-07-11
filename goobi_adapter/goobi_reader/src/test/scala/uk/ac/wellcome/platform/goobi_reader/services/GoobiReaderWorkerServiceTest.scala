@@ -55,7 +55,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, eventTime)
+          body = anS3Notification(sourceKey, bucket.name, eventTime)
         )
 
         eventually {
@@ -84,8 +84,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message =
-            anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
+          body = anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
         )
 
         eventually {
@@ -134,7 +133,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, olderEventTime)
+          body = anS3Notification(sourceKey, bucket.name, olderEventTime)
         )
 
         eventually {
@@ -180,7 +179,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, newerEventTime)
+          body = anS3Notification(sourceKey, bucket.name, newerEventTime)
         )
 
         eventually {
@@ -223,7 +222,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, eventTime)
+          body = anS3Notification(sourceKey, bucket.name, eventTime)
         )
 
         eventually {
