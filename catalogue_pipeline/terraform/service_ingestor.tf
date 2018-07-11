@@ -1,7 +1,7 @@
 locals {
   es_config_ingestor = {
-    index_v1 = "v1-2018-07-11-reindex-for-a-rainy-day"
-    index_v2 = "v2-2018-07-11-reindex-for-a-rainy-day"
+    index_v1 = "v1-2018-07-11-reindex-with-a-bit-less-ingestor"
+    index_v2 = "v2-2018-07-11-reindex-with-a-bit-less-ingestor"
     doc_type = "work"
   }
 }
@@ -53,7 +53,7 @@ module "ingestor" {
 
   enable_alb_alarm = false
 
-  max_capacity = 15
+  max_capacity = 10
 
   log_retention_in_days = 30
 }
