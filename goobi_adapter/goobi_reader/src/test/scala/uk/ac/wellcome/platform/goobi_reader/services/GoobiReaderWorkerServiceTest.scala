@@ -243,7 +243,7 @@ class GoobiReaderWorkerServiceTest
         val sourceKey = "any.xml"
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, eventTime)
+          body = anS3Notification(sourceKey, bucket.name, eventTime)
         )
 
         eventually {
