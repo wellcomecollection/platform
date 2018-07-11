@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.Try
+import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
