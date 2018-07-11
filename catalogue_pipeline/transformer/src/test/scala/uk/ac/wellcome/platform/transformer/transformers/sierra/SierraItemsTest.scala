@@ -5,7 +5,6 @@ import java.time.Instant
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{
   Identifiable,
   IdentifierType,
@@ -15,7 +14,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.platform.transformer.source.{SierraItemData, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
-class SierraItemsTest extends FunSpec with Matchers with SierraData {
+class SierraItemsTest extends FunSpec with Matchers {
 
   val transformer = new Object with SierraItems
 
