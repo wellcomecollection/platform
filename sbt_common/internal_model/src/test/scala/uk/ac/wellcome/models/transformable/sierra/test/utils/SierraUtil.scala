@@ -38,7 +38,7 @@ trait SierraUtil {
     id: String = Random.alphanumeric take 7 mkString,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String] = List(),
+    bibIds: List[String] = List(Random.alphanumeric take 7 mkString),
     unlinkedBibIds: List[String] = List()
   ): SierraItemRecord =
     SierraItemRecord(
