@@ -94,18 +94,6 @@ class SierraItemMergerUpdaterServiceTest
             val otherItemRecord = createSierraItemRecordWith(
               bibIds = bibIds
             )
-//
-//            val itemRecord = sierraItemRecord(
-//              id = itemId,
-//              updatedDate = "2014-04-04T04:04:04Z",
-//              bibIds = bibIds
-//            )
-
-//            val otherItem = sierraItemRecord(
-//              id = "i888",
-//              updatedDate = "2003-03-03T03:03:03Z",
-//              bibIds = bibIds
-//            )
 
             val oldRecord = SierraTransformable(
               sourceId = bibIdWithOldData,
