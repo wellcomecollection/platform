@@ -43,7 +43,7 @@ class ReindexWorkerServiceTest
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
-              assertDynamoHasNoItems[ReindexableRecord](table)
+              assertDynamoDbHasNoItems[ReindexableRecord](table)
             }
           }
         }
@@ -55,7 +55,7 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val reindexVersion = 1
-          givenDynamoHasItem(
+          givenDynamoDbHasItem(
             SimpleReindexableRecord(id, recordVersion, reindexVersion, data),
             table)
 
@@ -63,7 +63,7 @@ class ReindexWorkerServiceTest
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
-            assertDynamoOnlyHasItem(
+            assertDynamoDbOnlyHasItem(
               SimpleReindexableRecord(
                 id,
                 recordVersion + 1,
@@ -81,7 +81,7 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val originalReindexVersion = 2
-          givenDynamoHasItem(
+          givenDynamoDbHasItem(
             SimpleReindexableRecord(
               id,
               recordVersion,
@@ -94,7 +94,7 @@ class ReindexWorkerServiceTest
 
           eventually {
             assertQueueEmpty(queue)
-            assertDynamoOnlyHasItem(
+            assertDynamoDbOnlyHasItem(
               SimpleReindexableRecord(
                 id,
                 recordVersion,
@@ -142,14 +142,14 @@ class ReindexWorkerServiceTest
             "sierra/83/2371838/-324571730.json",
             "sierra",
             "L0054256")
-          givenDynamoHasItem(sourceDataRecord, table)
+          givenDynamoDbHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
           sendMessage(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
-            assertDynamoOnlyHasItem(sourceDataRecord.copy(version = 2, reindexVersion = 102), table)
+            assertDynamoDbOnlyHasItem(sourceDataRecord.copy(version = 2, reindexVersion = 102), table)
           }
         }
       }

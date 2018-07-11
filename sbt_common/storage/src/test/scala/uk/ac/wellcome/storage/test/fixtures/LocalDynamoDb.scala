@@ -77,22 +77,22 @@ trait LocalDynamoDb extends Eventually with Matchers with ExtendedPatience {
       .foreach(dynamoDbClient.deleteTable)
   }
 
-  def givenDynamoHasItem[T: DynamoFormat](item: T, table: Table) = {
+  def givenDynamoDbHasItem[T: DynamoFormat](item: T, table: Table) = {
     Scanamo.put(dynamoDbClient)(table.name)(item)
   }
 
-  def assertDynamoHasNoItems[T: DynamoFormat](table: Table) = {
+  def assertDynamoDbHasNoItems[T: DynamoFormat](table: Table) = {
     val records = Scanamo.scan[T](dynamoDbClient)(table.name)
     records.size shouldBe 0
   }
 
-  def assertDynamoHasItem[T: DynamoFormat](id: String, item: T, table: Table) = {
+  def assertDynamoDbHasItem[T: DynamoFormat](id: String, item: T, table: Table) = {
     val actualRecord = Scanamo.get[T](dynamoDbClient)(
       table.name)('id -> id)
     actualRecord shouldBe Some(Right(item))
   }
 
-  def assertDynamoOnlyHasItem[T: DynamoFormat](item: T, table: Table) = {
+  def assertDynamoDbOnlyHasItem[T: DynamoFormat](item: T, table: Table) = {
     val records = Scanamo.scan[T](dynamoDbClient)(table.name)
     records.size shouldBe 1
     records.head shouldBe Right(item)
