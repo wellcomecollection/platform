@@ -12,6 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.type_classes.{
   IdGetter,
@@ -31,7 +32,8 @@ class DynamoInserterTest
     with DynamoInserterFixture
     with ScalaFutures
     with MockitoSugar
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraUtil {
 
   it("ingests a json item into DynamoDB") {
     withLocalDynamoDbTable { table =>
@@ -225,31 +227,19 @@ class DynamoInserterTest
   it("preserves existing unlinked bibIds in DynamoDB") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "300003"
-        val oldUpdatedDate = "2001-01-01T01:01:01Z"
-        val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-        val oldRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = oldUpdatedDate,
-          data =
-            s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1" ,"b2", "b3"]}""",
+        val oldRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate,
+          data = "<<old data>>",
           bibIds = List("b1", "b2", "b3"),
           unlinkedBibIds = List("b5")
         )
 
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$newUpdatedDate",
-             |  "bibIds": ["b2", "b3", "b4"]
-             |}
-       """.stripMargin,
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
+          data = "<<new data>>",
           bibIds = List("b2", "b3", "b4")
         )
 
@@ -257,7 +247,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(
+            'id -> oldRecord.id) shouldBe Some(
             Right(
               newRecord.copy(version = 1, unlinkedBibIds = List("b5", "b1"))))
         }
