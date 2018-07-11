@@ -38,13 +38,14 @@ trait SierraUtil {
     id: String = Random.alphanumeric take 7 mkString,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String] = List()
+    bibIds: List[String] = List(),
+    unlinkedBibIds: List[String] = List()
   ): SierraItemRecord =
     SierraItemRecord(
       id = id,
       data = if (data == "") createSierraRecordStringWith(id = id) else data,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
-      unlinkedBibIds = List()
+      unlinkedBibIds = unlinkedBibIds
     )
 }
