@@ -108,14 +108,14 @@ class SierraBibMergerFeatureTest
               table) { hybridStore =>
               val oldBibRecord = createSierraBibRecordWith(
                 data = "<<old data>>",
-                modifiedDate = "1999-09-09T09:09:09Z"
+                modifiedDate = olderDate
               )
               val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
 
               val record = createSierraBibRecordWith(
                 id = oldBibRecord.id,
                 data = "<<newer data>>",
-                modifiedDate = "2001-01-01T01:01:01Z"
+                modifiedDate = newerDate
               )
 
               hybridStore
@@ -153,7 +153,7 @@ class SierraBibMergerFeatureTest
               table) { hybridStore =>
               val newBibRecord = createSierraBibRecordWith(
                 data = "<<newer data>>",
-                modifiedDate = "2001-01-01T01:01:01Z"
+                modifiedDate = newerDate
               )
 
               val expectedSierraTransformable =
@@ -162,7 +162,7 @@ class SierraBibMergerFeatureTest
               val oldBibRecord = createSierraBibRecordWith(
                 id = newBibRecord.id,
                 data = "<<old data>>",
-                modifiedDate = "1999-09-09T09:09:09Z"
+                modifiedDate = olderDate
               )
 
               hybridStore

@@ -29,7 +29,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
       "should return the unmerged record when merging bib records with stale data") {
       val record = createSierraBibRecordWith(
         data = "<<old data>>",
-        modifiedDate = "1999-09-09T09:09:09Z"
+        modifiedDate = olderDate
       )
 
       val sierraTransformable = SierraTransformable(
@@ -38,7 +38,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
           createSierraBibRecordWith(
             id = record.id,
             data = "<<new data>>",
-            modifiedDate = "2001-01-01T01:01:01Z"
+            modifiedDate = newerDate
           )
         )
       )
@@ -50,16 +50,16 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
     it("should update bibData when merging bib records with newer data") {
       val record = createSierraBibRecordWith(
         data = "<<new data>>",
-        modifiedDate = "2001-01-01T01:01:01Z"
+        modifiedDate = newerDate
       )
 
       val sierraTransformable = SierraTransformable(
-        sourceId = "888",
+        sourceId = record.id,
         maybeBibData = Some(
           createSierraBibRecordWith(
             id = record.id,
             data = "<<old data>>",
-            modifiedDate = "1999-09-09T09:09:09Z"
+            modifiedDate = olderDate
           )
         )
       )
