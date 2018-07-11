@@ -224,9 +224,8 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it(
-    "returns None for Miro records with usage restrictions that mean we suppress the image") {
-    assertTransformReturnsNone(
+  it("returns an InvisibleWork if usage restrictions mean we suppress the image") {
+    assertTransformReturnsInvisibleWork(
       data =
         buildJSONForWork("""
         "image_title": "Private pictures of perilous penguins",
@@ -235,16 +234,16 @@ class MiroTransformableTransformerTest
     )
   }
 
-  it("returns None for Miro records from contributor GUS") {
-    assertTransformReturnsNone(
+  it("returns an InvisibleWork for images from contributor GUS") {
+    assertTransformReturnsInvisibleWork(
       data = buildJSONForWork("""
         "image_source_code": "GUS"
       """)
     )
   }
 
-  it("returns None for images which don't have copyright clearance") {
-    assertTransformReturnsNone(
+  it("returns an InvisibleWork for images without copyright clearance") {
+    assertTransformReturnsInvisibleWork(
       data = """{
         "image_cleared": "Y",
         "image_copyright_cleared": "N",
@@ -273,7 +272,7 @@ class MiroTransformableTransformerTest
     work.items.head.agent.locations shouldBe List(expectedDigitalLocation)
   }
 
-  private def assertTransformReturnsNone(data: String) = {
+  private def assertTransformReturnsInvisibleWork(data: String) = {
     val miroTransformable = MiroTransformable(
       sourceId = "G0000001",
       MiroCollection = "TestCollection",
@@ -282,7 +281,15 @@ class MiroTransformableTransformerTest
 
     val triedMaybeWork = transformer.transform(miroTransformable, version = 1)
     triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get shouldBe None
+
+    triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
+      sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("miro-image-number"),
+        ontologyType = "Work",
+        value = miroTransformable.sourceId
+      ),
+      version = 1
+    )
   }
 
   private def transformRecordAndCheckSierraSystemNumber(
