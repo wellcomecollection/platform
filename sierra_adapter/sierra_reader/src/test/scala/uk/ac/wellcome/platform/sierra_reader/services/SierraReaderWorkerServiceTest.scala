@@ -60,7 +60,10 @@ class SierraReaderWorkerServiceTest
               fields = fields
             )
 
-            withSQSStream[NotificationMessage, Assertion](actorSystem, queue, metricsSender) { sqsStream =>
+            withSQSStream[NotificationMessage, Assertion](
+              actorSystem,
+              queue,
+              metricsSender) { sqsStream =>
               val worker = new SierraReaderWorkerService(
                 system = actorSystem,
                 sqsStream = sqsStream,

@@ -47,7 +47,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchEventuallyHasWork(
               indexName = esIndexV1,
@@ -74,7 +77,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -101,7 +107,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -128,7 +137,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -169,7 +181,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchNeverHasWork(
@@ -206,7 +221,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-            sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             eventually {
               assertQueueEmpty(queue)
@@ -239,7 +257,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchNeverHasWork(
@@ -290,7 +311,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchEventuallyHasWork(
@@ -328,7 +352,10 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
               }
 
               assertElasticsearchNeverHasWork(
@@ -369,7 +396,10 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
               }
 
               assertElasticsearchNeverHasWork(
@@ -427,7 +457,10 @@ class IngestorWorkerServiceTest
                   messageStream) { _ =>
                   val work = createIdentifiedWork
 
-                  sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
+                  sendMessage[IdentifiedBaseWork](
+                    bucket = bucket,
+                    queue = queue,
+                    obj = work)
 
                   eventually {
                     assertQueueEmpty(queue)

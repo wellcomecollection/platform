@@ -105,7 +105,10 @@ trait MatcherFixtures
             withWorkGraphStore(graphTable) { workGraphStore =>
               withWorkMatcher(workGraphStore, lockTable, metricsSender) {
                 workMatcher =>
-                  withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
+                  withSQSStream[NotificationMessage, R](
+                    actorSystem,
+                    queue,
+                    metricsSender) { sqsStream =>
                     val matcherMessageReceiver = new MatcherMessageReceiver(
                       sqsStream,
                       snsWriter,

@@ -34,7 +34,10 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              sendMessage[TransformedBaseWork](bucket = bucket, queue = queue, obj = work)
+              sendMessage[TransformedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
 
               eventually {
                 assertStored[RecorderWorkEntry](

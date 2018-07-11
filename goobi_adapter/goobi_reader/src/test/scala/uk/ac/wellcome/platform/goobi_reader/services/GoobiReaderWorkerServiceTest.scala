@@ -84,7 +84,8 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
+          message =
+            anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
         )
 
         eventually {
