@@ -227,13 +227,14 @@ class NotificationMessageReceiverTest
     val sierraTransformable: Transformable =
       SierraTransformable(
         sourceId = id,
-        bibData = JsonUtil
-          .toJson(
-            SierraBibRecord(
-              id = id,
-              data = s"""{"id": "$id", "title": "A title"}""",
-              modifiedDate = Instant.now))
-          .get)
+        maybeBibData = Some(
+          SierraBibRecord(
+            id = id,
+            data = s"""{"id": "$id", "title": "A title"}""",
+            modifiedDate = Instant.now
+          )
+        )
+      )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
