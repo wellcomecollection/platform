@@ -15,8 +15,6 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.Success
-
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
