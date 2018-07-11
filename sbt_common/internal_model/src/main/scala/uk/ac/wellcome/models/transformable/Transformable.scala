@@ -31,7 +31,7 @@ case class SierraTransformable(
   sourceId: String,
   sourceName: String = "sierra",
   maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map[String, SierraItemRecord]()
+  itemData: Map[String, SierraItemRecord] = Map()
 ) extends Transformable
 
 object SierraTransformable {
