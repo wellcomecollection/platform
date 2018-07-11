@@ -4,6 +4,8 @@ import java.time.Instant
 
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 
+import scala.util.Random
+
 trait SierraUtil {
 
   def createSierraBibRecordStringWith(id: String): String =
@@ -37,10 +39,12 @@ trait SierraUtil {
        |    }
     """.stripMargin
 
-  def createSierraBibRecordWith(id: String): SierraBibRecord =
+  def createSierraBibRecordWith(id: String = Random.alphanumeric take 7 mkString): SierraBibRecord =
     SierraBibRecord(
       id = id,
       data = createSierraBibRecordStringWith(id = id),
       modifiedDate = Instant.now
     )
+
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecord()
 }
