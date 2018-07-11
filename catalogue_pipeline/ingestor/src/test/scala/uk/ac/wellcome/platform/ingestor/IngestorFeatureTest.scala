@@ -4,6 +4,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -29,7 +30,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage(bucket = bucket, queue = queue, obj = work)
+        sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
@@ -52,7 +53,7 @@ class IngestorFeatureTest
 
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
-        sendMessage(bucket = bucket, queue = queue, obj = work)
+        sendMessage[IdentifiedBaseWork](bucket = bucket, queue = queue, obj = work)
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withServer(queue, bucket, indexNameV1, indexNameV2, itemType) { _ =>
