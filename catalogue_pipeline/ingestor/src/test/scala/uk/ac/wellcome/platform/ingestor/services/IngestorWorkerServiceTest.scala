@@ -15,7 +15,6 @@ import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -48,14 +47,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedBaseWork](
-              obj = work,
-              location = ObjectLocation(
-                namespace = bucket.name,
-                key = s"work.json"
-              )
-            )
-            sqsClient.sendMessage(queue.url, messageBody)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchEventuallyHasWork(
               indexName = esIndexV1,
@@ -82,14 +77,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedBaseWork](
-              obj = work,
-              location = ObjectLocation(
-                namespace = bucket.name,
-                key = s"work.json"
-              )
-            )
-            sqsClient.sendMessage(queue.url, messageBody)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -116,14 +107,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedBaseWork](
-              obj = work,
-              location = ObjectLocation(
-                namespace = bucket.name,
-                key = s"work.json"
-              )
-            )
-            sqsClient.sendMessage(queue.url, messageBody)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -150,14 +137,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, _), bucket) =>
-            val messageBody = put[IdentifiedBaseWork](
-              obj = work,
-              location = ObjectLocation(
-                namespace = bucket.name,
-                key = s"work.json"
-              )
-            )
-            sqsClient.sendMessage(queue.url, messageBody)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             assertElasticsearchNeverHasWork(
               indexName = esIndexV1,
@@ -198,15 +181,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedBaseWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"${work.canonicalId}.json"
-                )
-              )
-
-              sqsClient.sendMessage(queue.url, messageBody)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchNeverHasWork(
@@ -243,14 +221,10 @@ class IngestorWorkerServiceTest
       withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
-            val messageBody = put[IdentifiedBaseWork](
-              obj = work,
-              location = ObjectLocation(
-                namespace = bucket.name,
-                key = s"work.json"
-              )
-            )
-            sqsClient.sendMessage(queue.url, messageBody)
+            sendMessage[IdentifiedBaseWork](
+              bucket = bucket,
+              queue = queue,
+              obj = work)
 
             eventually {
               assertQueueEmpty(queue)
@@ -283,15 +257,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedBaseWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"${work.canonicalId}.json"
-                )
-              )
-
-              sqsClient.sendMessage(queue.url, messageBody)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchNeverHasWork(
@@ -342,15 +311,10 @@ class IngestorWorkerServiceTest
         withIngestorWorkerService(esIndexV1, esIndexV2) {
           case (QueuePair(queue, dlq), bucket) =>
             works.foreach { work =>
-              val messageBody = put[IdentifiedBaseWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = s"${work.canonicalId}.json"
-                )
-              )
-
-              sqsClient.sendMessage(queue.url, messageBody)
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
             }
 
             assertElasticsearchEventuallyHasWork(
@@ -388,15 +352,10 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                val messageBody = put[IdentifiedBaseWork](
-                  obj = work,
-                  location = ObjectLocation(
-                    namespace = bucket.name,
-                    key = s"${work.canonicalId}.json"
-                  )
-                )
-
-                sqsClient.sendMessage(queue.url, messageBody)
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
               }
 
               assertElasticsearchNeverHasWork(
@@ -437,15 +396,10 @@ class IngestorWorkerServiceTest
           withIngestorWorkerService(esIndexV1, esIndexV2) {
             case (QueuePair(queue, dlq), bucket) =>
               works.foreach { work =>
-                val messageBody = put[IdentifiedBaseWork](
-                  obj = work,
-                  location = ObjectLocation(
-                    namespace = bucket.name,
-                    key = s"${work.canonicalId}.json"
-                  )
-                )
-
-                sqsClient.sendMessage(queue.url, messageBody)
+                sendMessage[IdentifiedBaseWork](
+                  bucket = bucket,
+                  queue = queue,
+                  obj = work)
               }
 
               assertElasticsearchNeverHasWork(
@@ -503,14 +457,10 @@ class IngestorWorkerServiceTest
                   messageStream) { _ =>
                   val work = createIdentifiedWork
 
-                  val messageBody = put[IdentifiedBaseWork](
-                    obj = work,
-                    location = ObjectLocation(
-                      namespace = bucket.name,
-                      key = s"work.json"
-                    )
-                  )
-                  sqsClient.sendMessage(queue.url, messageBody)
+                  sendMessage[IdentifiedBaseWork](
+                    bucket = bucket,
+                    queue = queue,
+                    obj = work)
 
                   eventually {
                     assertQueueEmpty(queue)

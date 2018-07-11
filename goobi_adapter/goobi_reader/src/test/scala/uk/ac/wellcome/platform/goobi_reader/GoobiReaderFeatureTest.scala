@@ -7,7 +7,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
 
 class GoobiReaderFeatureTest
     extends FunSpec
@@ -25,13 +24,13 @@ class GoobiReaderFeatureTest
           val id = "mets-0001"
           val sourceKey = s"$id.xml"
           val contents = "muddling the machinations of morose METS"
-          val notificationMessage =
-            aNotificationMessage(
-              queue.arn,
-              anS3Notification(sourceKey, bucket.name, eventTime))
 
           s3Client.putObject(bucket.name, sourceKey, contents)
-          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+
+          sendNotificationToSQS(
+            queue = queue,
+            body = anS3Notification(sourceKey, bucket.name, eventTime)
+          )
 
           withServer(goobiReaderLocalFlags(queue, bucket, table)) { _ =>
             eventually {

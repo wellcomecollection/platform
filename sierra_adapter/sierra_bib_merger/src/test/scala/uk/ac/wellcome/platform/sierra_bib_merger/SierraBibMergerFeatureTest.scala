@@ -4,9 +4,7 @@ import io.circe.Encoder
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.dynamo._
@@ -83,7 +81,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2001-01-01T01:01:01Z"
               )
 
-              sendMessageToSQS(toJson(record).get, queue)
+              sendNotificationToSQS(queue = queue, message = record)
 
               val expectedSierraTransformable =
                 SierraTransformable(bibRecord = record)
@@ -121,7 +119,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2001-01-01T01:01:01Z"
               )
 
-              sendMessageToSQS(toJson(record1).get, queue)
+              sendNotificationToSQS(queue = queue, message = record1)
 
               val expectedSierraTransformable1 =
                 SierraTransformable(bibRecord = record1)
@@ -137,7 +135,7 @@ class SierraBibMergerFeatureTest
                 modifiedDate = "2002-02-02T02:02:02Z"
               )
 
-              sendMessageToSQS(toJson(record2).get, queue)
+              sendNotificationToSQS(queue = queue, message = record2)
 
               val expectedSierraTransformable2 =
                 SierraTransformable(bibRecord = record2)
@@ -198,7 +196,7 @@ class SierraBibMergerFeatureTest
                   (oldRecord, SourceMetadata(oldRecord.sourceName)))((t, m) =>
                   (t, m))
                 .map { _ =>
-                  sendMessageToSQS(toJson(record).get, queue)
+                  sendNotificationToSQS(queue = queue, message = record)
                 }
 
               val expectedSierraTransformable =
@@ -258,7 +256,7 @@ class SierraBibMergerFeatureTest
                   SourceMetadata(expectedSierraTransformable.sourceName)))(
                   (t, m) => (t, m))
                 .map { _ =>
-                  sendMessageToSQS(toJson(record).get, queue)
+                  sendNotificationToSQS(queue = queue, message = record)
                 }
 
               // Blocking in Scala is generally a bad idea; we do it here so there's
@@ -306,7 +304,7 @@ class SierraBibMergerFeatureTest
                   (t, m))
 
               future.map { _ =>
-                sendMessageToSQS(toJson(record).get, queue)
+                sendNotificationToSQS(queue = queue, message = record)
               }
 
               val expectedSierraTransformable =
@@ -323,15 +321,5 @@ class SierraBibMergerFeatureTest
         }
       }
     }
-  }
-
-  private def sendMessageToSQS(body: String, queue: Queue) = {
-    val message = NotificationMessage(
-      MessageId = "message-id",
-      TopicArn = "topic",
-      Subject = "Test message sent by SierraBibMergerWorkerServiceTest",
-      Message = body
-    )
-    sqsClient.sendMessage(queue.url, toJson(message).get)
   }
 }

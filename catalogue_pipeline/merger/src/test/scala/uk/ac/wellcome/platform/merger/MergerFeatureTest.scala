@@ -5,6 +5,7 @@ import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -44,12 +45,15 @@ class MergerFeatureTest
                       val matcherResult =
                         matcherResultWith(Set(Set(recorderWorkEntry)))
 
-                      sendSQSMessage(queue, matcherResult)
+                      sendNotificationToSQS(
+                        queue = queue,
+                        message = matcherResult
+                      )
 
                       eventually {
                         assertQueueEmpty(queue)
                         assertQueueEmpty(dlq)
-                        val worksSent = getWorksSent(topic)
+                        val worksSent = getMessages[TransformedBaseWork](topic)
                         worksSent should contain only recorderWorkEntry.work
                       }
                     }

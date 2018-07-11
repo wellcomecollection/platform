@@ -35,14 +35,10 @@ class SierraBibMergerWorkerServiceTest
 
     withWorkerServiceFixtures {
       case (metricsSender, QueuePair(queue, dlq), _) =>
-        sqsClient.sendMessage(
-          queue.url,
-          toJson(
-            NotificationMessage(
-              Subject = "default-subject",
-              Message = "null",
-              TopicArn = "",
-              MessageId = "")).get)
+        sendNotificationToSQS(
+          queue = queue,
+          body = "null"
+        )
 
         eventually {
           assertQueueEmpty(queue)

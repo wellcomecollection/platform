@@ -29,8 +29,8 @@ trait SQS extends Matchers {
 
   import SQS._
 
-  protected val sqsInternalEndpointUrl = "http://sqs:9324"
-  protected val sqsEndpointUrl = "http://localhost:9324"
+  private val sqsInternalEndpointUrl = "http://sqs:9324"
+  private val sqsEndpointUrl = "http://localhost:9324"
 
   private val regionName = "localhost"
 
@@ -157,19 +157,26 @@ trait SQS extends Matchers {
     testwith(stream)
   }
 
-  object TestNotificationMessage {
-    def apply(messageBody: String) =
-      NotificationMessage(
-        MessageId = "message-id",
-        TopicArn = "topic",
-        Subject = "subject",
-        Message = messageBody
-      )
+  def createNotificationMessageWith(body: String): NotificationMessage =
+    NotificationMessage(
+      MessageId = Random.alphanumeric take 10 mkString,
+      TopicArn = Random.alphanumeric take 10 mkString,
+      Subject = Random.alphanumeric take 10 mkString,
+      Message = body
+    )
 
-    def apply[T](testObject: T)(
-      implicit encoder: Encoder[T]): NotificationMessage =
-      TestNotificationMessage(toJson(testObject).get)
+  def createNotificationMessageWith[T](message: T)(
+    implicit encoder: Encoder[T]): NotificationMessage =
+    createNotificationMessageWith(body = toJson(message).get)
+
+  def sendNotificationToSQS(queue: Queue, body: String): SendMessageResult = {
+    val message = createNotificationMessageWith(body = body)
+    sqsClient.sendMessage(queue.url, toJson(message).get)
   }
+
+  def sendNotificationToSQS[T](queue: Queue, message: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
+    sendNotificationToSQS(queue = queue, body = toJson(message).get)
 
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight

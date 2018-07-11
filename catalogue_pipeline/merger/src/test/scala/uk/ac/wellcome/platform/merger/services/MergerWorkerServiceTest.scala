@@ -59,13 +59,16 @@ class MergerWorkerServiceTest
             vhs,
             List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) {
           _ =>
-            sendSQSMessage(queue, matcherResult)
+            sendNotificationToSQS(
+              queue = queue,
+              message = matcherResult
+            )
 
             eventually {
               assertQueueEmpty(queue)
               assertQueueEmpty(dlq)
 
-              val worksSent = getWorksSent(topic)
+              val worksSent = getMessages[TransformedBaseWork](topic)
               worksSent should contain only (recorderWorkEntry1.work,
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
@@ -85,13 +88,16 @@ class MergerWorkerServiceTest
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
         whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
 
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
@@ -106,7 +112,10 @@ class MergerWorkerServiceTest
 
         val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
 
-        sendSQSMessage(queue, matcherResult)
+        sendNotificationToSQS(
+          queue = queue,
+          message = matcherResult
+        )
 
         eventually {
           assertQueueEmpty(queue)
@@ -135,12 +144,15 @@ class MergerWorkerServiceTest
           storeInVHS(
             vhs,
             List(recorderWorkEntry, newerVersionRecorderWorkEntry))) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
@@ -162,13 +174,16 @@ class MergerWorkerServiceTest
           matcherResultWith(Set(Set(recorderWorkEntry, versionZeroWork)))
 
         whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-          sendSQSMessage(queue, matcherResult)
+          sendNotificationToSQS(
+            queue = queue,
+            message = matcherResult
+          )
 
           eventually {
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
 
-            val worksSent = getWorksSent(topic)
+            val worksSent = getMessages[TransformedBaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
           }
         }
@@ -178,14 +193,10 @@ class MergerWorkerServiceTest
   it("fails if the message sent is not a matcher result") {
     withMergerWorkerServiceFixtures {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        val testObject = TestObject("lallabalula")
-        val notificationMessage = NotificationMessage(
-          MessageId = "MessageId",
-          TopicArn = "topic-arn",
-          Subject = "subject",
-          Message = toJson(testObject).get
+        sendNotificationToSQS(
+          queue = queue,
+          message = TestObject("lallabalula")
         )
-        sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
 
         eventually {
           assertQueueEmpty(queue)
