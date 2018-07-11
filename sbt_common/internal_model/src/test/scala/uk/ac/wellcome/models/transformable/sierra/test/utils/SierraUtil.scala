@@ -46,5 +46,5 @@ trait SierraUtil {
       modifiedDate = Instant.now
     )
 
-  def createSierraBibRecord: SierraBibRecord = createSierraBibRecord()
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 }
