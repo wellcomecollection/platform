@@ -25,7 +25,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -85,7 +84,7 @@ class GoobiReaderWorkerServiceTest
 
         sendNotificationToSQS(
           queue = queue,
-          message = anS3Notification(sourceKey, bucket.name, eventTime)
+          message = anS3Notification(urlEncodedSourceKey, bucket.name, eventTime)
         )
 
         eventually {
