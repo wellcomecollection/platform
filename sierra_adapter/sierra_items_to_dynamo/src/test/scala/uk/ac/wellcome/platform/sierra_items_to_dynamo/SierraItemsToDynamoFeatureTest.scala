@@ -32,7 +32,7 @@ class SierraItemsToDynamoFeatureTest
           val id = "i12345"
           val bibId = "b54321"
           val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
-          val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
+          val modifiedDate = Instant.now
 
           sendNotificationToSQS(
             queue = queue,
@@ -49,11 +49,14 @@ class SierraItemsToDynamoFeatureTest
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(
               SierraItemRecord(
-                id,
-                data,
-                modifiedDate,
-                List(bibId),
-                version = 1))
+                id = id,
+                data = data,
+                modifiedDate = modifiedDate,
+                bibIds = List(bibId),
+                unlinkedBibIds = List(),
+                version = 1
+              )
+            )
           }
         }
       }
