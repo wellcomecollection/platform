@@ -73,7 +73,7 @@ class MiroTransformableTransformer
         )
       }.recover {
         case e: ShouldNotTransformException =>
-          warn(s"Should not transform: ${e.getMessage}")
+          info(s"Should not transform: ${e.getMessage}")
           UnidentifiedInvisibleWork(
             sourceIdentifier = sourceIdentifier,
             version = version
