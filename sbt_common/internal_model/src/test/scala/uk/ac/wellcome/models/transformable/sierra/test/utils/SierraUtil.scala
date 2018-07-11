@@ -2,7 +2,10 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 
 import scala.util.Random
 

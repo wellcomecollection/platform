@@ -67,7 +67,6 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-
               val record1 = createSierraBibRecord
               sendNotificationToSQS(queue = queue, message = record1)
 

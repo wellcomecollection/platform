@@ -99,10 +99,12 @@ class SierraItemMergerUpdaterServiceTest
               sourceId = bibIdWithOldData,
               itemData = Map(
                 itemRecord.id -> itemRecord.copy(
-                  modifiedDate = itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
+                  modifiedDate =
+                    itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 ),
                 otherItemRecord.id -> otherItemRecord.copy(
-                  modifiedDate = otherItemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
+                  modifiedDate =
+                    otherItemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 )
               )
             )
@@ -119,10 +121,12 @@ class SierraItemMergerUpdaterServiceTest
               sourceId = bibIdWithNewerData,
               itemData = Map(
                 itemRecord.id -> itemRecord.copy(
-                  modifiedDate = itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
+                  modifiedDate =
+                    itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 ),
                 anotherItemRecord.id -> anotherItemRecord.copy(
-                  modifiedDate = anotherItemRecord.modifiedDate.plus(1, ChronoUnit.HOURS)
+                  modifiedDate =
+                    anotherItemRecord.modifiedDate.plus(1, ChronoUnit.HOURS)
                 )
               )
             )

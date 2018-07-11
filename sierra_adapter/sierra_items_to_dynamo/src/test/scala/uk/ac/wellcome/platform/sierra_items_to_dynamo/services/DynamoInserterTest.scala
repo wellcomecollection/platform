@@ -14,7 +14,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.type_classes.{IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 
 import scala.concurrent.Future
@@ -86,7 +90,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> oldRecord.id) shouldBe Some(Right(newRecord.copy(version = 2)))
+            'id -> oldRecord.id) shouldBe Some(
+            Right(newRecord.copy(version = 2)))
         }
       }
     }
@@ -186,9 +191,10 @@ class DynamoInserterTest
     when(
       mockedDao.getRecord[SierraItemRecord](any[String])(
         any[DynamoFormat[SierraItemRecord]]))
-      .thenReturn(Future.successful(
-        Some(record.copy(modifiedDate = olderDate))
-      ))
+      .thenReturn(
+        Future.successful(
+          Some(record.copy(modifiedDate = olderDate))
+        ))
 
     when(
       mockedDao.updateRecord(any[SierraItemRecord])(

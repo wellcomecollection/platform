@@ -118,8 +118,7 @@ class NotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message =
-              createValidSierraTransformableJson(id, title),
+            message = createValidSierraTransformableJson(id, title),
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,

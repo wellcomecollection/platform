@@ -36,8 +36,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
     )
   }
 
-  def createValidSierraTransformableJson(id: String,
-                                         title: String): String = {
+  def createValidSierraTransformableJson(id: String, title: String): String = {
     val data =
       s"""
          |{
