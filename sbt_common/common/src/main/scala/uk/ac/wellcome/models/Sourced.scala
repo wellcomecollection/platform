@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models
 
-trait Sourced extends Id {
+trait Sourced {
   val sourceId: String
   val sourceName: String
   val id: String = Sourced.id(sourceName, sourceId)

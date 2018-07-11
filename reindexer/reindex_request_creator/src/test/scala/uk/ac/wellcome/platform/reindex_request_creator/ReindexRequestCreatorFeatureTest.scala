@@ -6,7 +6,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
-import uk.ac.wellcome.models.Id
 import uk.ac.wellcome.platform.reindex_request_creator.models.{
   ReindexJob,
   ReindexRequest
@@ -22,7 +21,7 @@ case class TestRecord(
   version: Int,
   reindexShard: String,
   reindexVersion: Int
-) extends Id
+)
 
 class ReindexRequestCreatorFeatureTest
     extends FunSpec
