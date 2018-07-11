@@ -53,11 +53,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-
-    transformedSierraRecord.isSuccess shouldBe true
-    val work = transformedSierraRecord.get.get
+    val work = transformToWork(sierraTransformable)
 
     val sourceIdentifier1 =
       SourceIdentifier(
@@ -115,10 +111,7 @@ class SierraTransformableTransformerTest
           version = 1))
     )
 
-    val triedMaybeWork = transformer.transform(transformable, version = 1)
-    triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get.isDefined shouldBe true
-    val work = triedMaybeWork.get.get
+    val work = transformToWork(transformable)
     work shouldBe a[UnidentifiedWork]
     val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
     unidentifiedWork.items should have size 1
