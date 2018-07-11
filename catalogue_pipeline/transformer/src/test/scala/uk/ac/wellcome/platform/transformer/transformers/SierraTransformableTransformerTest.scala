@@ -1,15 +1,11 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
 import java.time.Instant
-import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.{SierraData, SierraUtil}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
@@ -19,6 +15,7 @@ class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
     with SierraData
+    with SierraUtil
     with TransformableTestBase[SierraTransformable]
     with WorksUtil {
   val transformer = new SierraTransformableTransformer
@@ -38,7 +35,7 @@ class SierraTransformableTransformerTest
     val sierraTransformable = SierraTransformable(
       sourceId = id,
       maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+        Some(createSierraBibRecordWith(id = id, data = data)),
       itemData = Map(
         "5151515" -> sierraItemRecord(
           id = "5151515",
@@ -95,10 +92,9 @@ class SierraTransformableTransformerTest
     val transformable = SierraTransformable(
       sourceId = bibId,
       maybeBibData = Some(
-        SierraBibRecord(
+        createSierraBibRecordWith(
           id = bibId,
-          data = bibData,
-          modifiedDate = modifiedDate)),
+          data = bibData)),
       itemData = Map(
         itemId -> SierraItemRecord(
           id = itemId,
@@ -600,10 +596,9 @@ class SierraTransformableTransformerTest
         | "suppressed": false
         |}
       """.stripMargin
-    val bibRecord = SierraBibRecord(
+    val bibRecord = createSierraBibRecordWith(
       id = id,
-      data = bibData,
-      modifiedDate = now()
+      data = bibData
     )
 
     assertTransformReturnsInvisibleWork(
@@ -613,10 +608,9 @@ class SierraTransformableTransformerTest
 
   private def transformDataToWork(id: String,
                                   data: String): TransformedBaseWork = {
-    val bibRecord = SierraBibRecord(
+    val bibRecord = createSierraBibRecordWith(
       id = id,
-      data = data,
-      modifiedDate = now()
+      data = data
     )
 
     val sierraTransformable = SierraTransformable(
