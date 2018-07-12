@@ -15,8 +15,6 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.Success
-
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
@@ -53,11 +51,7 @@ class SierraTransformableTransformerTest
       )
     )
 
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-
-    transformedSierraRecord.isSuccess shouldBe true
-    val work = transformedSierraRecord.get.get
+    val work = transformToWork(sierraTransformable)
 
     val sourceIdentifier1 =
       SourceIdentifier(
@@ -115,10 +109,7 @@ class SierraTransformableTransformerTest
           version = 1))
     )
 
-    val triedMaybeWork = transformer.transform(transformable, version = 1)
-    triedMaybeWork.isSuccess shouldBe true
-    triedMaybeWork.get.isDefined shouldBe true
-    val work = triedMaybeWork.get.get
+    val work = transformToWork(transformable)
     work shouldBe a[UnidentifiedWork]
     val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
     unidentifiedWork.items should have size 1
@@ -145,21 +136,15 @@ class SierraTransformableTransformerTest
     )
   }
 
-  it("should not perform a transformation without bibData") {
-    val sierraTransformable =
-      SierraTransformable(sourceId = "0102010", maybeBibData = None)
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-
-    transformedSierraRecord.get shouldBe None
+  it("returns an InvisibleWork if there isn't any bib data") {
+    assertTransformReturnsInvisibleWork(
+      maybeBibData = None
+    )
   }
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
-    val sierraTransformable = SierraTransformable(
-      sourceId = "1113111",
+    assertTransformReturnsInvisibleWork(
       maybeBibData = None,
       itemData = Map(
         "1313131" -> sierraItemRecord(
@@ -167,13 +152,9 @@ class SierraTransformableTransformerTest
           title = "An incomplete invocation of items",
           modifiedDate = "2001-01-01T01:01:01Z",
           bibIds = List("1113111")
-        ))
+        )
+      )
     )
-
-    val transformedSierraRecord =
-      transformer.transform(sierraTransformable, version = 1)
-    transformedSierraRecord.isSuccess shouldBe true
-    transformedSierraRecord.get shouldBe None
   }
 
   it("performs a transformation on a work using all varfields") {
@@ -609,7 +590,7 @@ class SierraTransformableTransformerTest
           mergeCandidateBibNumber)))
   }
 
-  it("returns None if bibData has no title") {
+  it("returns an InvisibleWork if bibData has no title") {
     val id = "2141444"
     val bibData =
       s"""
@@ -625,13 +606,9 @@ class SierraTransformableTransformerTest
       modifiedDate = now()
     )
 
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
+    assertTransformReturnsInvisibleWork(
       maybeBibData = Some(bibRecord)
     )
-    transformer.transform(sierraTransformable, version = 1) shouldBe Success(
-      None)
-
   }
 
   private def transformDataToWork(id: String,
@@ -648,6 +625,27 @@ class SierraTransformableTransformerTest
     )
 
     transformToWork(sierraTransformable)
+  }
+
+  private def assertTransformReturnsInvisibleWork(
+    maybeBibData: Option[SierraBibRecord],
+    itemData: Map[String, SierraItemRecord] = Map()) = {
+    val sierraTransformable = SierraTransformable(
+      sourceId = "0102010",
+      maybeBibData = maybeBibData
+    )
+
+    val triedMaybeWork = transformer.transform(sierraTransformable, version = 1)
+    triedMaybeWork.isSuccess shouldBe true
+
+    triedMaybeWork.get shouldBe UnidentifiedInvisibleWork(
+      sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Work",
+        value = "b01020109"
+      ),
+      version = 1
+    )
   }
 
   private def transformDataToUnidentifiedWork(

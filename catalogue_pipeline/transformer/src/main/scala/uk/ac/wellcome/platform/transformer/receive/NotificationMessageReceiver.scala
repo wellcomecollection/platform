@@ -75,7 +75,7 @@ class NotificationMessageReceiver @Inject()(
   private def transformTransformable(
     transformable: Transformable,
     version: Int
-  ): Try[Option[TransformedBaseWork]] = {
+  ): Try[TransformedBaseWork] = {
     val transformableTransformer = chooseTransformer(transformable)
     transformableTransformer.transform(transformable, version) map {
       transformed =>
@@ -95,11 +95,9 @@ class NotificationMessageReceiver @Inject()(
     }
   }
 
-  private def publishMessage(
-    maybeWork: Option[TransformedBaseWork]): Future[Unit] =
-    maybeWork.fold(Future.successful(())) { work =>
-      messageWriter.write(
-        work,
-        s"source: ${this.getClass.getSimpleName}.publishMessage")
-    }
+  private def publishMessage(work: TransformedBaseWork): Future[Unit] =
+    messageWriter.write(
+      message = work,
+      subject = s"source: ${this.getClass.getSimpleName}.publishMessage"
+    )
 }

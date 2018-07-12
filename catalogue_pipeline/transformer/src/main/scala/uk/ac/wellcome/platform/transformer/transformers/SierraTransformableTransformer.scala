@@ -1,12 +1,12 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.util.Success
+import scala.util.{Success, Try}
 
 class SierraTransformableTransformer
     extends TransformableTransformer[SierraTransformable]
@@ -27,24 +27,27 @@ class SierraTransformableTransformer
     with SierraGenres
     with SierraMergeCandidates {
 
-  override def transformForType = {
+  override def transformForType
+    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Work",
+        value = addCheckDigit(
+          sierraTransformable.sourceId,
+          recordType = SierraRecordTypes.bibs
+        )
+      )
+
       sierraTransformable.maybeBibData
         .map { bibData =>
           debug(s"Attempting to transform ${bibData.id}")
 
-          fromJson[SierraBibData](bibData.data).map { sierraBibData =>
-            val identifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-system-number"),
-              ontologyType = "Work",
-              value = addCheckDigit(
-                sierraBibData.id,
-                recordType = SierraRecordTypes.bibs
-              ))
-            if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
-              Some(
+          fromJson[SierraBibData](bibData.data)
+            .map { sierraBibData =>
+              if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
-                  sourceIdentifier = identifier,
+                  sourceIdentifier = sourceIdentifier,
                   otherIdentifiers = getOtherIdentifiers(sierraBibData),
                   mergeCandidates = getMergeCandidates(sierraBibData),
                   title = getTitle(sierraBibData),
@@ -63,18 +66,34 @@ class SierraTransformableTransformer
                   dimensions = getDimensions(sierraBibData),
                   items = getItems(sierraTransformable),
                   version = version
-                ))
-            } else {
-              Some(UnidentifiedInvisibleWork(identifier, version))
+                )
+              } else {
+                throw new ShouldNotTransformException(
+                  s"Sierra record ${bibData.id} is either deleted or suppressed!"
+                )
+              }
             }
-          }
+            .recover {
+              case e: ShouldNotTransformException =>
+                info(s"Should not transform: ${e.getMessage}")
+                UnidentifiedInvisibleWork(
+                  sourceIdentifier = sourceIdentifier,
+                  version = version
+                )
+            }
         }
+
         // A merged record can have both bibs and items.  If we only have
-        // the item data so far, we don't have enough to build a Work, so we
-        // return None.
+        // the item data so far, we don't have enough to build a Work to show
+        // in the API, so we return an InvisibleWork.
         .getOrElse {
-          debug("No bib data on the record, so skipping")
-          Success(None)
+          debug(s"No bib data for ${sierraTransformable.sourceId}, so skipping")
+          Success(
+            UnidentifiedInvisibleWork(
+              sourceIdentifier = sourceIdentifier,
+              version = version
+            )
+          )
         }
   }
 

@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
-import uk.ac.wellcome.platform.transformer.transformers.miro.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 
 class SierraTitleTest extends FunSpec with Matchers with SierraData {
 

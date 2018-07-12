@@ -18,6 +18,7 @@
   -->
   <logger name="com.amazonaws.http.DefaultErrorResponseHandler" level="WARN"/>
 
+  <logger name="ch.qos.logback" level="WARN"/>
   <logger name="com.amazonaws" level="INFO"/>
   <logger name="com.sksamuel.elastic4s" level="INFO"/>
   <logger name="com.twitter" level="INFO"/>

@@ -21,8 +21,14 @@ class MiroTransformableTransformer
   // TODO this class is too big as the different test classes would suggest. Split it.
 
   override def transformForType
-    : PartialFunction[(Transformable, Int), Try[Some[UnidentifiedWork]]] = {
+    : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (miroTransformable: MiroTransformable, version: Int) =>
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("miro-image-number"),
+        ontologyType = "Work",
+        value = miroTransformable.sourceId
+      )
+
       Try {
         val miroData = MiroTransformableData.create(miroTransformable.data)
 
@@ -38,36 +44,39 @@ class MiroTransformableTransformer
 
         val (title, description) = getTitleAndDescription(miroData)
 
-        Some(
-          UnidentifiedWork(
-            sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("miro-image-number"),
-              ontologyType = "Work",
-              value = miroTransformable.sourceId),
-            otherIdentifiers =
-              getOtherIdentifiers(miroData, miroTransformable.sourceId),
-            mergeCandidates = List(),
-            title = title,
-            workType = None,
-            description = description,
-            physicalDescription = None,
-            extent = None,
-            lettering = miroData.suppLettering,
-            createdDate =
-              getCreatedDate(miroData, miroTransformable.MiroCollection),
-            subjects = getSubjects(miroData),
-            genres = getGenres(miroData),
-            contributors = getContributors(
-              miroId = miroTransformable.sourceId,
-              miroData = miroData
-            ),
-            thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
-            production = List(),
-            language = None,
-            dimensions = None,
-            items = getItems(miroData, miroTransformable.sourceId),
+        UnidentifiedWork(
+          sourceIdentifier = sourceIdentifier,
+          otherIdentifiers =
+            getOtherIdentifiers(miroData, miroTransformable.sourceId),
+          mergeCandidates = List(),
+          title = title,
+          workType = None,
+          description = description,
+          physicalDescription = None,
+          extent = None,
+          lettering = miroData.suppLettering,
+          createdDate =
+            getCreatedDate(miroData, miroTransformable.MiroCollection),
+          subjects = getSubjects(miroData),
+          genres = getGenres(miroData),
+          contributors = getContributors(
+            miroId = miroTransformable.sourceId,
+            miroData = miroData
+          ),
+          thumbnail = Some(getThumbnail(miroData, miroTransformable.sourceId)),
+          production = List(),
+          language = None,
+          dimensions = None,
+          items = getItems(miroData, miroTransformable.sourceId),
+          version = version
+        )
+      }.recover {
+        case e: ShouldNotTransformException =>
+          info(s"Should not transform: ${e.getMessage}")
+          UnidentifiedInvisibleWork(
+            sourceIdentifier = sourceIdentifier,
             version = version
-          ))
+          )
       }
   }
 
