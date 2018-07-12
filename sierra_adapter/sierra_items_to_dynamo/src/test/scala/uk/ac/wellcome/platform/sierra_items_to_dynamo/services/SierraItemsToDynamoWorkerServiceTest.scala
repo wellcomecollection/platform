@@ -71,11 +71,9 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  it("reads a sierra record from sqs an inserts it into DynamoDb") {
+  it("reads a Sierra record from SQS and inserts it into DynamoDb") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
-        val id = "12345"
-
         val bibIds1 = List("1", "2", "3")
         val record1 = createSierraItemRecordWith(
           modifiedDate = olderDate,
@@ -89,7 +87,7 @@ class SierraItemsToDynamoWorkerServiceTest
           id = record1.id,
           data = s"""
             |{
-            |  "id": "i111",
+            |  "id": "${record1.id}",
             |  "updatedDate": "${newerDate.toString}",
             |  "bibIds": ${toJson(bibIds2).get}
             |}""".stripMargin,
@@ -110,10 +108,10 @@ class SierraItemsToDynamoWorkerServiceTest
           Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
           val scanamoResult =
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> id)
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> record1.id)
 
           scanamoResult shouldBe defined
-          scanamoResult.get shouldBe Right(expectedRecord)
+          scanamoResult.get shouldBe Right(expectedRecord.copy(version = 1))
         }
     }
   }
