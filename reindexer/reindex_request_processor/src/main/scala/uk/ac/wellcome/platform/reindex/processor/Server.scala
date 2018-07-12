@@ -2,15 +2,11 @@ package uk.ac.wellcome.platform.reindex.processor
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
-import com.twitter.finatra.http.filters.{
-  CommonFilters,
-  LoggingMDCFilter,
-  TraceIdMDCFilter
-}
+import com.twitter.finatra.http.filters.{CommonFilters, LoggingMDCFilter, TraceIdMDCFilter}
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.finatra.controllers.ManagementController
-import uk.ac.wellcome.finatra.messaging.SQSClientModule
+import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule}
 import uk.ac.wellcome.platform.reindex.processor.modules.ReindexerWorkerModule
@@ -24,6 +20,7 @@ class Server extends HttpServer {
   override val modules = Seq(
     AkkaModule,
     MetricsSenderModule,
+    SQSConfigModule,
     SQSClientModule,
     DynamoConfigModule,
     DynamoClientModule,
