@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
-import java.time.Instant
-
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
