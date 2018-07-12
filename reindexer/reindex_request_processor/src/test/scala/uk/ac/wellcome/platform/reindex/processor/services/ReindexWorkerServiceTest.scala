@@ -38,7 +38,7 @@ class ReindexWorkerServiceTest
         withLocalDynamoDbTable { table =>
           withReindexWorkerService(table, queue) { _ =>
             val reindexRequest = ReindexRequest("unknownId", 1)
-            sendMessageInNotification(queue, reindexRequest)
+            sendNotificationToSQS(queue, reindexRequest)
 
             eventually {
               assertQueueEmpty(queue)
@@ -61,7 +61,7 @@ class ReindexWorkerServiceTest
             table)
 
           val updatedReindexVersion = 2
-          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertTableOnlyHasItem(
@@ -82,7 +82,7 @@ class ReindexWorkerServiceTest
           givenTableHasItem(record, table)
 
           val updatedReindexVersion = 1
-          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
@@ -99,7 +99,7 @@ class ReindexWorkerServiceTest
         val badTable = Table("table", "index")
         withReindexWorkerService(badTable, queue) { _ =>
           val reindexRequest = ReindexRequest("unknownId", 1)
-          sendMessageInNotification(queue, reindexRequest)
+          sendNotificationToSQS(queue, reindexRequest)
 
           eventually {
             assertQueueEmpty(queue)
@@ -131,7 +131,7 @@ class ReindexWorkerServiceTest
           givenTableHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
-          sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)

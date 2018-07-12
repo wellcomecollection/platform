@@ -1,7 +1,5 @@
 package uk.ac.wellcome.models.reindexer
 
-import uk.ac.wellcome.models.Id
-
 /** Represents a record in a source table which we might be able to reindex.
   *
   * @param id ID of the record.
@@ -11,4 +9,4 @@ case class ReindexableRecord(
   id: String,
   version: Int,
   reindexVersion: Int
-) extends Id
+)
