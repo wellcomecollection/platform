@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
-import java.time.Instant
-
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
-import io.circe.parser.parse
 import org.mockito.Matchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -83,7 +80,7 @@ class DynamoInserterTest
         val newRecord = createSierraItemRecordWith(
           id = oldRecord.id,
           modifiedDate = newerDate,
-          bibIds = oldRecord.bibIds :+ List("1234")
+          bibIds = oldRecord.bibIds :+ "1234"
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
@@ -237,7 +234,6 @@ class DynamoInserterTest
       modifiedDate = olderDate
     )
 
-    val newUpdatedDate = "2014-12-13T12:43:16Z"
     val newRecord = createSierraItemRecordWith(
       id = record.id,
       modifiedDate = newerDate,

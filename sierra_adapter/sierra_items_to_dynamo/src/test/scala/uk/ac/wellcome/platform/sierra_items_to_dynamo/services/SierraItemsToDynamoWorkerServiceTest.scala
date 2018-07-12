@@ -18,7 +18,6 @@ import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
 
@@ -78,8 +77,6 @@ class SierraItemsToDynamoWorkerServiceTest
         val id = "12345"
 
         val bibIds1 = List("1", "2", "3")
-        val modifiedDate1 = "2001-01-01T01:01:01Z"
-
         val record1 = createSierraItemRecordWith(
           modifiedDate = olderDate,
           bibIds = bibIds1
@@ -88,7 +85,6 @@ class SierraItemsToDynamoWorkerServiceTest
         Scanamo.put(dynamoDbClient)(table.name)(record1)
 
         val bibIds2 = List("3", "4", "5")
-
         val record2 = SierraRecord(
           id = record1.id,
           data = s"""
