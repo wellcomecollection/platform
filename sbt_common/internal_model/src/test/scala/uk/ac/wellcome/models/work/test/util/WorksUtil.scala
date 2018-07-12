@@ -14,6 +14,9 @@ trait WorksUtil extends ItemsUtil {
       )
     )
 
+  def createIdentifiedRedirectedWork: IdentifiedRedirectedWork =
+    createIdentifiedRedirectedWorkWith()
+
   def createIdentifiedRedirectedWorkWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier
   ): IdentifiedRedirectedWork =
