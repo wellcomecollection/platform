@@ -20,16 +20,14 @@ trait SierraUtil {
 
   /** Returns a random digit as a string.  This is copied from the
     * definition of Random.alphanumeric.
-    *
-    * @return
     */
   private def randomNumeric: Stream[Char] = {
-    def nextAlphaNum: Char = {
-      val chars = "0123456789"
+    def nextDigit: Char = {
+      val chars = ('0' to '9')
       chars charAt Random.nextInt(chars.length)
     }
 
-    Stream continually nextAlphaNum
+    Stream continually nextDigit
   }
 
   /** Creates a Sierra ID, which must be a 7 digit number.  (Some of our
