@@ -33,7 +33,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
       )
 
       val sierraTransformable = SierraTransformable(
-        sourceId = "777",
+        sourceId = record.id,
         maybeBibData = Some(
           createSierraBibRecordWith(
             id = record.id,
