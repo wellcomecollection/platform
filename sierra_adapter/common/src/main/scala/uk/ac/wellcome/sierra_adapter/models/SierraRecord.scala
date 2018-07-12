@@ -34,7 +34,9 @@ case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
         id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
-        bibIds = bibIds)
+        bibIds = bibIds,
+        unlinkedBibIds = List()
+      )
     }
 }
 

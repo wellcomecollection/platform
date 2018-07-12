@@ -7,6 +7,6 @@ case class SierraItemRecord(
   data: String,
   modifiedDate: Instant,
   bibIds: List[String],
-  unlinkedBibIds: List[String] = List(),
+  unlinkedBibIds: List[String],
   version: Int = 0
 )
