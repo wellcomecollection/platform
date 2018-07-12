@@ -122,7 +122,7 @@ trait SierraProduction {
   private def getProductionFrom264Fields(varFields: List[VarField]) =
     varFields
       .filterNot { vf =>
-        vf.indicator2 == Some("4")
+        vf.indicator2.contains("4") || vf.indicator2.contains(" ")
       }
       .map { vf =>
         val places = placesFromSubfields(vf, subfieldTag = "a")
