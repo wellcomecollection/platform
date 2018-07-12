@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, ZoneOffset}
+import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
@@ -24,7 +24,7 @@ object SierraRecordWrapperFlow extends Logging {
         SierraRecord(
           id = getId(json),
           data = json.noSpaces,
-          modifiedDate = updatedDate
+          modifiedDate = Instant.parse(updatedDate)
         )
       case None =>
         SierraRecord(
