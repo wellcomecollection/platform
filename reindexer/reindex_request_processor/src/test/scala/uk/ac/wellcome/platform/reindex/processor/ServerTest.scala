@@ -5,7 +5,11 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
 
-class ServerTest extends FunSpec with fixtures.Server with SQS with LocalDynamoDbVersioned {
+class ServerTest
+    extends FunSpec
+    with fixtures.Server
+    with SQS
+    with LocalDynamoDbVersioned {
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
