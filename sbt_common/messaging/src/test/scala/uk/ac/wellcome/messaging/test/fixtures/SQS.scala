@@ -227,7 +227,7 @@ trait SQS extends Matchers {
     Thread.sleep(1500)
   }
 
-  def getMessages(queue: Queue) = {
+  private def getMessages(queue: Queue) = {
     val messages = sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(queue.url)

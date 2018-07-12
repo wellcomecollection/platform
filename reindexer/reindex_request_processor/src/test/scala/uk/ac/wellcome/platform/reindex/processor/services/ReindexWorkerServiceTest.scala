@@ -32,7 +32,7 @@ class ReindexWorkerServiceTest
                                      reindexVersion: Int,
                                      data: String)
 
-  it("does not insert a new record if there is no existing record") {
+  it("it throws an error if the reindex request refers to a non-existent record") {
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
         withLocalDynamoDbTable { table =>
@@ -43,7 +43,7 @@ class ReindexWorkerServiceTest
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
-              assertDynamoDbHasNoItems[ReindexableRecord](table)
+              assertTableHasNoItems[ReindexableRecord](table)
             }
           }
         }
@@ -55,20 +55,17 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val reindexVersion = 1
-          givenDynamoDbHasItem(
-            SimpleReindexableRecord(id, recordVersion, reindexVersion, data),
+          val record = SimpleReindexableRecord(id, recordVersion, reindexVersion, data)
+          givenTableHasItem(
+            record,
             table)
 
           val updatedReindexVersion = 2
           sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
-            assertDynamoDbOnlyHasItem(
-              SimpleReindexableRecord(
-                id,
-                recordVersion + 1,
-                updatedReindexVersion,
-                data),
+            assertTableOnlyHasItem(
+              record.copy(version = record.version + 1, reindexVersion = updatedReindexVersion),
               table)
           }
         }
@@ -81,26 +78,15 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val originalReindexVersion = 2
-          givenDynamoDbHasItem(
-            SimpleReindexableRecord(
-              id,
-              recordVersion,
-              originalReindexVersion,
-              data),
-            table)
+          val record = SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data)
+          givenTableHasItem(record, table)
 
           val updatedReindexVersion = 1
           sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
-            assertDynamoDbOnlyHasItem(
-              SimpleReindexableRecord(
-                id,
-                recordVersion,
-                originalReindexVersion,
-                data),
-              table)
+            assertTableOnlyHasItem(record, table)
           }
         }
       }
@@ -123,7 +109,7 @@ class ReindexWorkerServiceTest
     }
   }
 
-  it("updates a sourcedata record") {
+  it("updates a sourcedata record, preserving fields not involved in reindexing") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
@@ -142,14 +128,23 @@ class ReindexWorkerServiceTest
             "sierra/83/2371838/-324571730.json",
             "sierra",
             "L0054256")
-          givenDynamoDbHasItem(sourceDataRecord, table)
+          givenTableHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
           sendMessageInNotification(queue, ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
-            assertDynamoDbOnlyHasItem(sourceDataRecord.copy(version = 2, reindexVersion = 102), table)
+
+            val actualrecord = getExistingTableItem[SourceDataRecord](id, table)
+            actualrecord.version shouldBe sourceDataRecord.version + 1
+            actualrecord.reindexVersion shouldBe updatedReindexVersion
+
+            // Non reindexing field values are preserved
+            actualrecord.reIndexShard shouldBe sourceDataRecord.reIndexShard
+            actualrecord.s3key shouldBe sourceDataRecord.s3key
+            actualrecord.sourceName shouldBe sourceDataRecord.sourceName
+            actualrecord.sourceId shouldBe sourceDataRecord.sourceId
           }
         }
       }
