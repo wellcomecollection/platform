@@ -310,6 +310,39 @@ class SierraProductionTest extends FunSpec with Matchers {
       transformToProduction(varFields) shouldBe expectedProductions
     }
 
+    it("ignores instances of the 264 field with an empty 2nd indicator") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "a",
+          indicator2 = Some(" "),
+          subfields = List(
+            MarcSubfield(tag = "c", content = "copyright 2005")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "a",
+          indicator2 = Some("3"),
+          subfields = List(
+            MarcSubfield(tag = "a", content = "London"),
+            MarcSubfield(tag = "b", content = "Wellcome Collection Publishing")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("London")),
+          agents = List(Unidentifiable(Agent("Wellcome Collection Publishing"))),
+          dates = List(),
+          function = Some(Concept("Manufacture"))
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+
     it("picks up multiple instances of the 264 field") {
       val varFields = List(
         VarField(
