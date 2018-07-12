@@ -39,7 +39,8 @@ class ReindexProcessorFeatureTest
 
           eventually {
             assertQueueEmpty(queue)
-            val actualRecord = Scanamo.get[ReindexableRecord](dynamoDbClient)(table.name)('id -> id)
+            val actualRecord = Scanamo.get[ReindexableRecord](dynamoDbClient)(
+              table.name)('id -> id)
             val expectedRecord = record.copy(
               version = record.version + 1,
               reindexVersion = reindexRequest.desiredVersion

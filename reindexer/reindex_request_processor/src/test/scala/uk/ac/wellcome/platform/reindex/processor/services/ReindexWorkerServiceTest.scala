@@ -32,7 +32,8 @@ class ReindexWorkerServiceTest
                                      reindexVersion: Int,
                                      data: String)
 
-  it("it throws an error if the reindex request refers to a non-existent record") {
+  it(
+    "it throws an error if the reindex request refers to a non-existent record") {
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
         withLocalDynamoDbTable { table =>
@@ -55,17 +56,20 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val reindexVersion = 1
-          val record = SimpleReindexableRecord(id, recordVersion, reindexVersion, data)
-          givenTableHasItem(
-            record,
-            table)
+          val record =
+            SimpleReindexableRecord(id, recordVersion, reindexVersion, data)
+          givenTableHasItem(record, table)
 
           val updatedReindexVersion = 2
-          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(
+            queue,
+            ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertTableOnlyHasItem(
-              record.copy(version = record.version + 1, reindexVersion = updatedReindexVersion),
+              record.copy(
+                version = record.version + 1,
+                reindexVersion = updatedReindexVersion),
               table)
           }
         }
@@ -78,11 +82,17 @@ class ReindexWorkerServiceTest
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
           val originalReindexVersion = 2
-          val record = SimpleReindexableRecord(id, recordVersion, originalReindexVersion, data)
+          val record = SimpleReindexableRecord(
+            id,
+            recordVersion,
+            originalReindexVersion,
+            data)
           givenTableHasItem(record, table)
 
           val updatedReindexVersion = 1
-          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(
+            queue,
+            ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)
@@ -109,7 +119,8 @@ class ReindexWorkerServiceTest
     }
   }
 
-  it("updates a sourcedata record, preserving fields not involved in reindexing") {
+  it(
+    "updates a sourcedata record, preserving fields not involved in reindexing") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withReindexWorkerService(table, queue) { _ =>
@@ -131,7 +142,9 @@ class ReindexWorkerServiceTest
           givenTableHasItem(sourceDataRecord, table)
 
           val updatedReindexVersion = 102
-          sendNotificationToSQS(queue, ReindexRequest(id, updatedReindexVersion))
+          sendNotificationToSQS(
+            queue,
+            ReindexRequest(id, updatedReindexVersion))
 
           eventually {
             assertQueueEmpty(queue)

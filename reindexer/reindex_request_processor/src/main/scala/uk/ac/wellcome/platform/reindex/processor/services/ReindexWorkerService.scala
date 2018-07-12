@@ -22,8 +22,10 @@ class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexRequest <- Future.fromTry(fromJson[ReindexRequest](message.Message))
-      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
+      reindexRequest <- Future.fromTry(
+        fromJson[ReindexRequest](message.Message))
+      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](
+        reindexRequest.id)
       _ <- maybeReindexableRecord match {
         case Some(existingRecord) =>
           if (reindexRequest.desiredVersion > existingRecord.reindexVersion) {
@@ -32,13 +34,15 @@ class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
             Future.successful(())
           }
         case None =>
-          throw new RuntimeException(s"VersionedDao has no record for $reindexRequest")
-        }
+          throw new RuntimeException(
+            s"VersionedDao has no record for $reindexRequest")
+      }
     } yield ()
 
-  private def updateRecord(reindexRequest: ReindexRequest, existingRecord: ReindexableRecord) = {
-    val mergedRecord = existingRecord.copy(
-      reindexVersion = reindexRequest.desiredVersion)
+  private def updateRecord(reindexRequest: ReindexRequest,
+                           existingRecord: ReindexableRecord) = {
+    val mergedRecord =
+      existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
     versionedDao.updateRecord(mergedRecord)
   }
 
