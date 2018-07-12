@@ -41,7 +41,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> record.id) shouldBe Some(Right(record))
+            'id -> record.id) shouldBe Some(Right(record.copy(version = 1)))
         }
       }
     }

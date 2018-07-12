@@ -65,7 +65,7 @@ trait SierraUtil {
     modifiedDate: Instant = Instant.now,
     bibIds: List[String] = List(createSierraId),
     unlinkedBibIds: List[String] = List(),
-    version: Int = 1
+    version: Int = 0
   ): SierraItemRecord =
     SierraItemRecord(
       id = id,
