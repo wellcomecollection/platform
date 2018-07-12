@@ -307,8 +307,6 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val itemId = "i3000003"
-
             val bibId1 = "b9000001"
             val bibId2 = "b9000002"
 

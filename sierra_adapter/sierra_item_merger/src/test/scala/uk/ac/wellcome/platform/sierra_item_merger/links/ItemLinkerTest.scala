@@ -42,8 +42,6 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("should return itself when merging item records with stale data") {
-    val itemId = "i111"
-
     val newerRecord = createSierraItemRecordWith(
       data = "<<newer data>>",
       modifiedDate = newerDate,

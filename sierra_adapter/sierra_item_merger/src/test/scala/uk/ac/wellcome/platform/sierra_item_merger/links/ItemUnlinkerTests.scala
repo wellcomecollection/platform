@@ -57,7 +57,6 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
   it(
     "returns the original record when merging an unlinked record which has linked more recently") {
     val bibId = "444"
-    val itemId = "i111"
 
     val record = createSierraItemRecordWith(
       modifiedDate = newerDate,
