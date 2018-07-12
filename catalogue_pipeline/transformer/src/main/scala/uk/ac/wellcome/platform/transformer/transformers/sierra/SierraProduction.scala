@@ -23,10 +23,10 @@ trait SierraProduction {
   def getProduction(bibData: SierraBibData)
     : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
     val maybeMarc260fields = bibData.varFields.filter {
-      _.marcTag == Some("260")
+      _.marcTag.contains("260")
     }
     val maybeMarc264fields = bibData.varFields.filter {
-      _.marcTag == Some("264")
+      _.marcTag.contains("264")
     }
 
     (maybeMarc260fields, maybeMarc264fields) match {
