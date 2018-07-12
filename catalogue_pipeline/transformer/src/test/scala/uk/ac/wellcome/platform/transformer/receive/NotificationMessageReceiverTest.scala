@@ -221,10 +221,11 @@ class NotificationMessageReceiverTest
     val id = "1001001"
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = Some(createSierraBibRecordWith(
-        id = id,
-        data = s"""{"id": "$id", "title": "A title"}"""
-      ))
+      maybeBibData = Some(
+        createSierraBibRecordWith(
+          id = id,
+          data = s"""{"id": "$id", "title": "A title"}"""
+        ))
     )
 
     withLocalSnsTopic { topic =>
