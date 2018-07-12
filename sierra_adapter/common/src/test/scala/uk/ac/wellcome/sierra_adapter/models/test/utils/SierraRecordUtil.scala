@@ -8,11 +8,14 @@ import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 trait SierraRecordUtil extends SierraUtil {
   def createSierraRecordWith(
     id: String = createSierraId,
-    data: String = "<<default data>>"
+    data: String = "<<default data>>",
+    modifiedDate: Instant = Instant.now
   ): SierraRecord =
     SierraRecord(
       id = id,
       data = data,
-      modifiedDate = Instant.now
+      modifiedDate = modifiedDate
     )
+
+  def createSierraRecord: SierraRecord = createSierraRecordWith()
 }

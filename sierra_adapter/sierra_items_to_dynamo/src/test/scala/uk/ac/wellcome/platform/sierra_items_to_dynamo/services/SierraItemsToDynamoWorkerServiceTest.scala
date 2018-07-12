@@ -15,6 +15,7 @@ import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.models.test.utils.SierraRecordUtil
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -31,7 +32,8 @@ class SierraItemsToDynamoWorkerServiceTest
     with Akka
     with MetricsSenderFixture
     with ScalaFutures
-    with SierraUtil {
+    with SierraUtil
+    with SierraRecordUtil {
 
   def withSierraWorkerService[R](
     testWith: TestWith[(SierraItemsToDynamoWorkerService,
@@ -83,7 +85,7 @@ class SierraItemsToDynamoWorkerServiceTest
         Scanamo.put(dynamoDbClient)(table.name)(record1)
 
         val bibIds2 = List("3", "4", "5")
-        val record2 = SierraRecord(
+        val record2 = createSierraRecordWith(
           id = record1.id,
           data = s"""
             |{
