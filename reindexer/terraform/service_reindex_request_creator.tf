@@ -17,6 +17,7 @@ module "reindex_request_creator" {
     reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
     metrics_namespace          = "reindex_request_creator"
   }
+
   env_vars_length = 4
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"

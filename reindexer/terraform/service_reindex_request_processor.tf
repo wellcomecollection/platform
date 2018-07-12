@@ -12,10 +12,11 @@ module "reindex_request_processor" {
   memory = 2048
 
   env_vars = {
-    dynamo_table_name          = "${local.vhs_table_name}"
-    reindex_requests_queue_id  = "${module.reindex_requests_queue.id}"
-    metrics_namespace          = "reindex_request_processor"
+    dynamo_table_name         = "${local.vhs_table_name}"
+    reindex_requests_queue_id = "${module.reindex_requests_queue.id}"
+    metrics_namespace         = "reindex_request_processor"
   }
+
   env_vars_length = 3
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"

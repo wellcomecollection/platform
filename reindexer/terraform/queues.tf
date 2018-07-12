@@ -22,8 +22,9 @@ module "reindexer_queue" {
   # TODO: Reduce these limits when we fix the reindexer.
   #
   visibility_timeout_seconds = 120
+
   max_receive_count = 50
-  alarm_topic_arn = "${local.dlq_alarm_arn}"
+  alarm_topic_arn   = "${local.dlq_alarm_arn}"
 }
 
 module "reindex_requests_queue" {
@@ -34,6 +35,6 @@ module "reindex_requests_queue" {
   topic_names = ["${module.reindex_requests_topic.name}"]
 
   visibility_timeout_seconds = 30
-  max_receive_count = 3
-  alarm_topic_arn = "${local.dlq_alarm_arn}"
+  max_receive_count          = 3
+  alarm_topic_arn            = "${local.dlq_alarm_arn}"
 }
