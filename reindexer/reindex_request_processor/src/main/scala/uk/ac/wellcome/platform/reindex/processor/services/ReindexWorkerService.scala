@@ -24,26 +24,23 @@ class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
     for {
       reindexRequest <- Future.fromTry(
         fromJson[ReindexRequest](message.Message))
-      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](
-        reindexRequest.id)
-      _ <- maybeReindexableRecord match {
-        case Some(existingRecord) =>
-          if (reindexRequest.desiredVersion > existingRecord.reindexVersion) {
-            updateRecord(reindexRequest, existingRecord)
-          } else {
-            Future.successful(())
-          }
-        case None =>
-          throw new RuntimeException(
-            s"VersionedDao has no record for $reindexRequest")
-      }
+      ‘maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
+      _ <- updateRecord(reindexRequest, maybeReindexableRecord)
     } yield ()
 
-  private def updateRecord(reindexRequest: ReindexRequest,
-                           existingRecord: ReindexableRecord) = {
-    val mergedRecord =
-      existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
-    versionedDao.updateRecord(mergedRecord)
+  private def updateRecord(reindexRequest: ReindexRequest, maybeReindexableRecord: Option[ReindexableRecord]) = {
+    maybeReindexableRecord match {
+      case Some(existingRecord) =>
+        if (reindexRequest.desiredVersion > existingRecord.reindexVersion) {
+          val mergedRecord = existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
+          versionedDao.updateRecord(mergedRecord)
+        } else {
+          Future.successful(())
+        }
+      case None =>
+        throw new RuntimeException(
+          s"VersionedDao has no record for $reindexRequest")
+    }
   }
 
   def stop(): Future[Terminated] = system.terminate()

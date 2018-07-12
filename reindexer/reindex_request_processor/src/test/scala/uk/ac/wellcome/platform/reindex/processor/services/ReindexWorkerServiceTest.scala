@@ -32,8 +32,7 @@ class ReindexWorkerServiceTest
                                      reindexVersion: Int,
                                      data: String)
 
-  it(
-    "it throws an error if the reindex request refers to a non-existent record") {
+  it("throws an error if the reindex request refers to a non-existent record") {
     withLocalSqsQueueAndDlq {
       case QueuePair(queue, dlq) =>
         withLocalDynamoDbTable { table =>
