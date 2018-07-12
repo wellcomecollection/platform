@@ -36,7 +36,7 @@ trait SierraUtil {
     * code explicitly expects this format, and errors if it gets a
     * non-numeric ID.)
     */
-  private def createSierraId: String =
+  protected def createSierraId: String =
     randomNumeric take 7 mkString
 
   private def createSierraRecordStringWith(id: String): String =
