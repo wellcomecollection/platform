@@ -102,10 +102,7 @@ class SierraItemMergerUpdaterServiceTest
                   modifiedDate =
                     itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
                 ),
-                otherItemRecord.id -> otherItemRecord.copy(
-                  modifiedDate =
-                    otherItemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
-                )
+                otherItemRecord.id -> otherItemRecord
               )
             )
 
@@ -178,7 +175,6 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val id = "i3000003"
             val bibId = "b3000003"
 
             val oldItemRecord = createSierraItemRecordWith(
@@ -204,7 +200,7 @@ class SierraItemMergerUpdaterServiceTest
 
               whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
                 val expectedSierraRecord = oldRecord.copy(
-                  itemData = Map(id -> newItemRecord)
+                  itemData = Map(newItemRecord.id -> newItemRecord)
                 )
 
                 assertStored[SierraTransformable](
