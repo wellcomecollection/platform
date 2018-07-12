@@ -3,24 +3,13 @@ package uk.ac.wellcome.platform.goobi_reader.fixtures
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
-import scala.util.Random
-
 trait GoobiReaderFixtures extends SQS with LocalVersionedHybridStore {
-
-  def aNotificationMessage(topicArn: String, message: String) =
-    NotificationMessage(
-      MessageId = Random.alphanumeric take 5 mkString,
-      TopicArn = topicArn,
-      Subject = "Test notification in GoobiReaderFeatureTest",
-      Message = message
-    )
 
   private val dateTimeFormatter: DateTimeFormatter =
     DateTimeFormatter

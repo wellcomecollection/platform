@@ -104,14 +104,7 @@ class SierraItemsToDynamoWorkerServiceTest
           modifiedDate = modifiedDate2
         )
 
-        val sqsMessage = NotificationMessage(
-          MessageId = "message-id",
-          TopicArn = "topic",
-          Subject = "subject",
-          Message = toJson(record2).get
-        )
-
-        sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+        sendNotificationToSQS(queue = queue, message = record2)
 
         val expectedBibIds = List("3", "4", "5")
         val expectedUnlinkedBibIds = List("1", "2")
@@ -145,21 +138,14 @@ class SierraItemsToDynamoWorkerServiceTest
   it("returns a GracefulFailureException if it receives an invalid message") {
     withSierraWorkerService {
       case (_, QueuePair(queue, dlq), _, metricsSender) =>
-        val message =
+        val body =
           """
           |{
           | "something": "something"
           |}
         """.stripMargin
 
-        val sqsMessage = NotificationMessage(
-          MessageId = "message-id",
-          TopicArn = "topic",
-          Subject = "subject",
-          Message = message
-        )
-
-        sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+        sendNotificationToSQS(queue = queue, body = body)
 
         eventually {
           assertQueueEmpty(queue)

@@ -93,8 +93,7 @@ jobs:
     # - env: TASK=travistooling-test
 
     - stage: sbt-common-test
-      env: TASK=common-test
-    - env: TASK=elasticsearch-test
+      env: TASK=elasticsearch-test
     - env: TASK=messaging-test
     - env: TASK=storage-test
     - env: TASK=monitoring-test

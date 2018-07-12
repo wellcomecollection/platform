@@ -1,23 +1,6 @@
 <configuration>
-    <!-- Don't log logback status -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    </encoder>
-  </appender>
+  <include resource="base-logback-test.xml"/>
 
-  <logger name="org.apache.http" level="ERROR"/>
   <logger name="io.swagger" level="ERROR"/>
-  <logger name="io.netty" level="ERROR"/>
-  <logger name="com.twitter" level="INFO"/>
-  <logger name="com.sksamuel.elastic4s" level="INFO"/>
-  <logger name="org.elasticsearch.client.RestClient" level="INFO"/>
   <logger name="uk.ac.wellcome.platform.api.Server" level="INFO"/>
-  <logger name="com.amazonaws" level="INFO"/>
-    <root level="DEBUG">
-        <appender-ref ref="STDOUT"/>
-    </root>
 </configuration>

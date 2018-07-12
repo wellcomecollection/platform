@@ -4,6 +4,7 @@ import java.time.Instant
 
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
@@ -17,7 +18,7 @@ import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait TransformableMessageUtils {
+trait TransformableMessageUtils extends SQS {
   def createValidEmptySierraBibNotificationMessage(
     id: String,
     s3Client: AmazonS3,
@@ -106,13 +107,8 @@ trait TransformableMessageUtils {
       sourceName = sourceMetadata.sourceName
     )
 
-    val hListJson = JsonUtil.toJson(joinedCaseClass).get
-
-    NotificationMessage(
-      Subject = "",
-      Message = hListJson,
-      TopicArn = "test_transformer_topic",
-      MessageId = "notification"
+    createNotificationMessageWith(
+      message = joinedCaseClass
     )
   }
 }

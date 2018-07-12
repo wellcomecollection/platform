@@ -8,7 +8,6 @@ import org.mockito.Matchers.{any, endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -116,20 +115,10 @@ class MessageStreamTest
 
         val examplePointer =
           MessagePointer(ObjectLocation(bucket.name, key))
-        val serialisedExamplePointer = toJson(examplePointer).get
 
-        val exampleNotification = NotificationMessage(
-          MessageId = "MessageId",
-          TopicArn = "TopicArn",
-          Subject = "Subject",
-          Message = serialisedExamplePointer
-        )
-
-        val serialisedExampleNotification = toJson(exampleNotification).get
-
-        sqsClient.sendMessage(
-          queue.url,
-          serialisedExampleNotification
+        sendNotificationToSQS(
+          queue = queue,
+          message = examplePointer
         )
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()

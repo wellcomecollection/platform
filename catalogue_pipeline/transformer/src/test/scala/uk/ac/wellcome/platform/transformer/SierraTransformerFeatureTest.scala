@@ -79,9 +79,10 @@ class SierraTransformerFeatureTest
                   value = id
                 )
 
-                snsMessages.map { snsMessage =>
-                  val actualWork = get[UnidentifiedWork](snsMessage)
+                val works = getMessages[UnidentifiedWork](topic)
+                works.length shouldBe >=(1)
 
+                works.map { actualWork =>
                   actualWork.sourceIdentifier shouldBe sourceIdentifier
                   actualWork.title shouldBe title
                   actualWork.identifiers shouldBe List(

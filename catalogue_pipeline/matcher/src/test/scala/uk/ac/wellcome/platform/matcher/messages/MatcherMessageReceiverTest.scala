@@ -375,11 +375,6 @@ class MatcherMessageReceiverTest
       s3key = key
     )
 
-    NotificationMessage(
-      "messageId",
-      "topicArn",
-      "subject",
-      toJson(hybridRecord).get
-    )
+    createNotificationMessageWith(message = hybridRecord)
   }
 }

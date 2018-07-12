@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -15,7 +14,6 @@ import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 
-import scala.concurrent.duration._
 import org.scalatest.compatible.Assertion
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
@@ -27,7 +25,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
 }
 
 import collection.JavaConverters._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraReaderWorkerServiceTest
@@ -63,30 +60,26 @@ class SierraReaderWorkerServiceTest
               fields = fields
             )
 
-            val worker = new SierraReaderWorkerService(
-              system = actorSystem,
-              sqsStream = new SQSStream(
-                actorSystem = actorSystem,
-                sqsClient = asyncSqsClient,
-                sqsConfig = SQSConfig(
-                  queueUrl = queue.url,
-                  waitTime = 1.second,
-                  maxMessages = 1
+            withSQSStream[NotificationMessage, Assertion](
+              actorSystem,
+              queue,
+              metricsSender) { sqsStream =>
+              val worker = new SierraReaderWorkerService(
+                system = actorSystem,
+                sqsStream = sqsStream,
+                s3client = s3Client,
+                s3Config = S3Config(bucket.name),
+                windowManager = new WindowManager(
+                  s3Client,
+                  S3Config(bucket.name),
+                  sierraConfig = sierraConfig
                 ),
-                metricsSender = metricsSender
-              ),
-              s3client = s3Client,
-              s3Config = S3Config(bucket.name),
-              windowManager = new WindowManager(
-                s3Client,
-                S3Config(bucket.name),
+                readerConfig = ReaderConfig(batchSize = batchSize),
                 sierraConfig = sierraConfig
-              ),
-              readerConfig = ReaderConfig(batchSize = batchSize),
-              sierraConfig = sierraConfig
-            )
+              )
 
-            testWith(FixtureParams(worker, queue, bucket))
+              testWith(FixtureParams(worker, queue, bucket))
+            }
           }
         }
       }
@@ -95,28 +88,20 @@ class SierraReaderWorkerServiceTest
 
   it(
     "reads a window message from SQS, retrieves the bibs from Sierra and writes them to S3") {
+    val body =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
     withSierraReaderWorkerService(
       fields = "updatedDate,deletedDate,deleted,suppressed,author,title",
       batchSize = 10,
       resourceType = SierraResourceTypes.bibs
     ) { fixtures =>
-      val message =
-        """
-          |{
-          | "start": "2013-12-10T17:16:35Z",
-          | "end": "2013-12-13T21:34:35Z"
-          |}
-        """.stripMargin
-
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json").map { label =>
         s"records_bibs/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z/$label"
@@ -139,27 +124,20 @@ class SierraReaderWorkerServiceTest
 
   it(
     "reads a window message from SQS, retrieves the items from Sierra and writes them to S3") {
+    val body =
+      """
+        |{
+        | "start": "2013-12-10T17:16:35Z",
+        | "end": "2013-12-13T21:34:35Z"
+        |}
+      """.stripMargin
+
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
       batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
-      val message =
-        """
-          |{
-          | "start": "2013-12-10T17:16:35Z",
-          | "end": "2013-12-13T21:34:35Z"
-          |}
-        """.stripMargin
-
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -207,7 +185,7 @@ class SierraReaderWorkerServiceTest
       )
 
       // Then we trigger the reader, and we expect it to fill in the rest.
-      val message =
+      val body =
         """
           |{
           | "start": "2013-12-10T17:16:35Z",
@@ -215,14 +193,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
-      sqsClient.sendMessage(fixtures.queue.url, toJson(notificationMessage).get)
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
         .map { label =>
@@ -255,20 +226,14 @@ class SierraReaderWorkerServiceTest
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
-      val message =
+      val body =
         """
           |{
           | "start": "2013-12-10T17:16:35Z"
           |}
         """.stripMargin
 
-      val notificationMessage =
-        NotificationMessage(
-          Subject = "subject",
-          Message = message,
-          TopicArn = "topic",
-          MessageId = "message-id"
-        )
+      val notificationMessage = createNotificationMessageWith(body = body)
       whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
         ex =>
           ex shouldBe a[GracefulFailureException]
@@ -282,7 +247,7 @@ class SierraReaderWorkerServiceTest
     "does not return a GracefulFailureException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
-        val message =
+        val body =
           """
           |{
           | "start": "2013-12-10T17:16:35Z",
@@ -290,13 +255,7 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
-        val notificationMessage =
-          NotificationMessage(
-            Subject = "subject",
-            Message = message,
-            TopicArn = "topic",
-            MessageId = "message-id"
-          )
+        val notificationMessage = createNotificationMessageWith(body = body)
 
         whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
           ex =>

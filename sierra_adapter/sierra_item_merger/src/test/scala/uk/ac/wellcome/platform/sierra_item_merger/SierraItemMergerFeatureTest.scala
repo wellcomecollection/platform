@@ -2,11 +2,8 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
 import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -44,7 +41,7 @@ class SierraItemMergerFeatureTest
                 bibIds = List(bibId)
               )
 
-              sendItemRecordToSQS(record, queue)
+              sendNotificationToSQS(queue = queue, message = record)
 
               val expectedSierraTransformable = SierraTransformable(
                 sourceId = bibId,
@@ -83,7 +80,7 @@ class SierraItemMergerFeatureTest
                 bibIds = List(bibId1)
               )
 
-              sendItemRecordToSQS(record1, queue)
+              sendNotificationToSQS(queue = queue, message = record1)
 
               val bibId2 = "b2000002"
               val id2 = "2000002"
@@ -94,7 +91,7 @@ class SierraItemMergerFeatureTest
                 bibIds = List(bibId2)
               )
 
-              sendItemRecordToSQS(record2, queue)
+              sendNotificationToSQS(queue = queue, message = record2)
 
               eventually {
                 val expectedSierraTransformable1 = SierraTransformable(
@@ -121,16 +118,5 @@ class SierraItemMergerFeatureTest
         }
       }
     }
-  }
-
-  private def sendItemRecordToSQS(itemRecord: SierraItemRecord,
-                                  queue: Queue) = {
-    val message = NotificationMessage(
-      MessageId = "message-id",
-      TopicArn = "topic",
-      Subject = "Test message sent by SierraItemMergerWorkerServiceTest",
-      Message = toJson(itemRecord).get
-    )
-    sqsClient.sendMessage(queue.url, toJson(message).get)
   }
 }

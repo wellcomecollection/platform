@@ -99,13 +99,11 @@ class NotificationMessageReceiverTest
             val future = recordReceiver.receiveMessage(sqsMessage)
 
             whenReady(future) { _ =>
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages.size should be >= 1
+              val works = getMessages[TransformedBaseWork](topic)
+              works.size should be >= 1
 
-              snsMessages.map { snsMessage =>
-                val work = get[TransformedBaseWork](snsMessage)
+              works.map { work =>
                 work shouldBe a[UnidentifiedWork]
-                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }
@@ -147,11 +145,10 @@ class NotificationMessageReceiverTest
             )
 
             whenReady(future) { _ =>
-              val snsMessages = listMessagesReceivedFromSNS(topic)
-              snsMessages.size should be >= 1
+              val works = getMessages[TransformedBaseWork](topic)
+              works.size should be >= 1
 
-              snsMessages.map { snsMessage =>
-                val actualWork = get[TransformedBaseWork](snsMessage)
+              works.map { actualWork =>
                 actualWork shouldBe a[UnidentifiedWork]
                 val unidentifiedWork = actualWork.asInstanceOf[UnidentifiedWork]
 
@@ -161,8 +158,6 @@ class NotificationMessageReceiverTest
                 unidentifiedWork.identifiers shouldBe List(
                   sourceIdentifier,
                   sierraIdentifier)
-
-                snsMessage.subject shouldBe "source: NotificationMessageReceiver.publishMessage"
               }
             }
           }

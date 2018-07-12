@@ -6,7 +6,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
-import uk.ac.wellcome.messaging.sqs.{SQSConfig, SQSStream}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -37,7 +36,6 @@ import uk.ac.wellcome.storage.test.fixtures.{LocalDynamoDb, S3}
 import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.hashing.MurmurHash3
 
@@ -107,20 +105,19 @@ trait MatcherFixtures
             withWorkGraphStore(graphTable) { workGraphStore =>
               withWorkMatcher(workGraphStore, lockTable, metricsSender) {
                 workMatcher =>
-                  val sqsStream = new SQSStream[NotificationMessage](
-                    actorSystem = actorSystem,
-                    sqsClient = asyncSqsClient,
-                    sqsConfig = SQSConfig(queue.url, 1 second, 1),
-                    metricsSender = metricsSender
-                  )
-                  val matcherMessageReceiver = new MatcherMessageReceiver(
-                    sqsStream,
-                    snsWriter,
-                    objectStore,
-                    storageS3Config,
+                  withSQSStream[NotificationMessage, R](
                     actorSystem,
-                    workMatcher)
-                  testWith(matcherMessageReceiver)
+                    queue,
+                    metricsSender) { sqsStream =>
+                    val matcherMessageReceiver = new MatcherMessageReceiver(
+                      sqsStream,
+                      snsWriter,
+                      objectStore,
+                      storageS3Config,
+                      actorSystem,
+                      workMatcher)
+                    testWith(matcherMessageReceiver)
+                  }
               }
             }
           }

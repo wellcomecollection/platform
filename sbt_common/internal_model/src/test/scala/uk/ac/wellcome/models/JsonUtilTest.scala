@@ -1,8 +1,9 @@
-package uk.ac.wellcome.utils
-import JsonUtil._
+package uk.ac.wellcome.models
+
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.test.utils.JsonTestUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 class JsonUtilTest extends FunSpec with Matchers with JsonTestUtil {
   case class A(id: String, b: B)

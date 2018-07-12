@@ -2,11 +2,9 @@ package uk.ac.wellcome.platform.sierra_reader
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.storage.test.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraReaderFeatureTest
     extends FunSpec
@@ -28,22 +26,16 @@ class SierraReaderFeatureTest
           "sierra.fields" -> "updatedDate,deletedDate,deleted,suppressed,author,title"
         )
 
-        withServer(flags) { _ =>
-          val message =
-            """
+        val body =
+          """
             |{
             | "start": "2013-12-10T17:16:35Z",
             | "end": "2013-12-13T21:34:35Z"
             |}
-            """.stripMargin
+          """.stripMargin
 
-          val notificationMessage = NotificationMessage(
-            Subject = "subject",
-            Message = message,
-            TopicArn = "topic",
-            MessageId = "message-id"
-          )
-          sqsClient.sendMessage(queue.url, toJson(notificationMessage).get)
+        withServer(flags) { _ =>
+          sendNotificationToSQS(queue = queue, body = body)
 
           eventually {
             // This comes from the wiremock recordings for Sierra API response

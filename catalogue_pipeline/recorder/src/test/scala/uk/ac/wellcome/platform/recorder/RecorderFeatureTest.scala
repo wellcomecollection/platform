@@ -5,7 +5,6 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -35,15 +34,10 @@ class RecorderFeatureTest
               bucket,
               queue)
             withServer(flags) { _ =>
-              val messageBody = put[TransformedBaseWork](
-                obj = work,
-                location = ObjectLocation(
-                  namespace = bucket.name,
-                  key = "work_message.json"
-                )
-              )
-
-              sqsClient.sendMessage(queue.url, messageBody)
+              sendMessage[TransformedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
 
               eventually {
                 assertStored[RecorderWorkEntry](

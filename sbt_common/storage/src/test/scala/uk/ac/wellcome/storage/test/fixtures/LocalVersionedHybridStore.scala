@@ -4,7 +4,7 @@ import com.gu.scanamo._
 import com.gu.scanamo.syntax._
 import io.circe.Encoder
 import org.scalatest.Matchers
-import uk.ac.wellcome.models.Id
+import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.s3._
@@ -61,15 +61,15 @@ trait LocalVersionedHybridStore
     testWith(store)
   }
 
-  def assertStored[T <: Id](bucket: Bucket, table: Table, record: T)(
+  def assertStored[T <: Sourced](bucket: Bucket, table: Table, record: T)(
     implicit encoder: Encoder[T]) =
     assertJsonStringsAreEqual(
-      getJsonFor[T](bucket, table, record),
+      getJsonFor(bucket, table, record.id),
       toJson(record).get
     )
 
-  def getJsonFor[T <: Id](bucket: Bucket, table: Table, record: T) = {
-    val hybridRecord = getHybridRecord(table, record.id)
+  def getJsonFor(bucket: Bucket, table: Table, id: String) = {
+    val hybridRecord = getHybridRecord(table, id)
 
     getJsonFromS3(bucket, hybridRecord.s3key).noSpaces
   }
