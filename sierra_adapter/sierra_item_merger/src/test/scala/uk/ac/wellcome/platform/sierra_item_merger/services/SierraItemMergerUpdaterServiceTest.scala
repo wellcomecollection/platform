@@ -88,10 +88,12 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val itemRecord = createSierraItemRecordWith(
+              data = "<<itemRecord>>",
               bibIds = bibIds
             )
 
             val otherItemRecord = createSierraItemRecordWith(
+              data = "<<otherItemRecord>>",
               bibIds = bibIds
             )
 
@@ -111,16 +113,14 @@ class SierraItemMergerUpdaterServiceTest
               (t, m) => (t, m))
 
             val anotherItemRecord = createSierraItemRecordWith(
+              data = "<<anotherItemRecord>>",
               bibIds = bibIds
             )
 
             val newRecord = SierraTransformable(
               sourceId = bibIdWithNewerData,
               itemData = Map(
-                itemRecord.id -> itemRecord.copy(
-                  modifiedDate =
-                    itemRecord.modifiedDate.minus(1, ChronoUnit.HOURS)
-                ),
+                itemRecord.id -> itemRecord,
                 anotherItemRecord.id -> anotherItemRecord.copy(
                   modifiedDate =
                     anotherItemRecord.modifiedDate.plus(1, ChronoUnit.HOURS)
