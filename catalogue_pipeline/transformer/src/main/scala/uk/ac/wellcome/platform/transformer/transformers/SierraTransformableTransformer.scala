@@ -75,7 +75,7 @@ class SierraTransformableTransformer
             }
             .recover {
               case e: ShouldNotTransformException =>
-                warn(s"Should not transform: ${e.getMessage}")
+                info(s"Should not transform: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version
@@ -84,8 +84,8 @@ class SierraTransformableTransformer
         }
 
         // A merged record can have both bibs and items.  If we only have
-        // the item data so far, we don't have enough to build a Work, so we
-        // return None.
+        // the item data so far, we don't have enough to build a Work to show
+        // in the API, so we return an InvisibleWork.
         .getOrElse {
           debug(s"No bib data for ${sierraTransformable.sourceId}, so skipping")
           Success(
