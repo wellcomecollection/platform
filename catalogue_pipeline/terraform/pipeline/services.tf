@@ -19,7 +19,7 @@ module "transformer"{
   env_vars_length = 5
 
   container_image = "${var.transformer_container_image}"
-  source_queue_name = "${module.transformer_queue.id}"
+  source_queue_name = "${module.transformer_queue.name}"
   source_queue_arn = "${module.transformer_queue.arn}"
 }
 
@@ -45,7 +45,7 @@ module "recorder"{
   env_vars_length = 5
 
   container_image = "${var.recorder_container_image}"
-  source_queue_name = "${module.recorder_queue.id}"
+  source_queue_name = "${module.recorder_queue.name}"
   source_queue_arn = "${module.recorder_queue.arn}"
 }
 
@@ -73,7 +73,7 @@ module "matcher"{
   env_vars_length = 9
 
   container_image = "${var.matcher_container_image}"
-  source_queue_name = "${module.matcher_queue.id}"
+  source_queue_name = "${module.matcher_queue.name}"
   source_queue_arn = "${module.matcher_queue.arn}"
 }
 
@@ -100,7 +100,7 @@ module "merger"{
   env_vars_length = 8
 
   container_image = "${var.merger_container_image}"
-  source_queue_name = "${module.merger_queue.id}"
+  source_queue_name = "${module.merger_queue.name}"
   source_queue_arn = "${module.merger_queue.arn}"
 }
 
@@ -128,7 +128,7 @@ module "id_minter"{
 
   env_vars_length = 8
   container_image = "${var.id_minter_container_image}"
-  source_queue_name = "${module.id_minter_queue.id}"
+  source_queue_name = "${module.id_minter_queue.name}"
   source_queue_arn = "${module.id_minter_queue.arn}"
 
   security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
@@ -176,7 +176,7 @@ module "ingestor"{
   }
   env_vars_length = 11
   container_image = "${var.ingestor_container_image}"
-  source_queue_name = "${module.es_ingest_queue.id}"
+  source_queue_name = "${module.es_ingest_queue.name}"
   source_queue_arn = "${module.es_ingest_queue.arn}"
 
   max_capacity = 10
