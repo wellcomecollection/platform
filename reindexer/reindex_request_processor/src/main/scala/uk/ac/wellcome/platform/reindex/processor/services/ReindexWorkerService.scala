@@ -22,16 +22,21 @@ class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexRequest <- Future.fromTry(fromJson[ReindexRequest](message.Message))
-      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
+      reindexRequest <- Future.fromTry(
+        fromJson[ReindexRequest](message.Message))
+      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](
+        reindexRequest.id)
       _ <- updateRecord(reindexRequest, maybeReindexableRecord)
     } yield ()
 
-  private def updateRecord(reindexRequest: ReindexRequest, maybeReindexableRecord: Option[ReindexableRecord]) = {
+  private def updateRecord(
+    reindexRequest: ReindexRequest,
+    maybeReindexableRecord: Option[ReindexableRecord]) = {
     maybeReindexableRecord match {
       case Some(existingRecord) =>
         if (reindexRequest.desiredVersion > existingRecord.reindexVersion) {
-          val mergedRecord = existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
+          val mergedRecord =
+            existingRecord.copy(reindexVersion = reindexRequest.desiredVersion)
           versionedDao.updateRecord(mergedRecord)
         } else {
           Future.successful(())
