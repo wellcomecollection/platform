@@ -13,7 +13,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.sierra_adapter.models.test.utils.SierraRecordUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 
 class SierraRecordWrapperFlowTest
     extends FunSpec
@@ -21,6 +21,7 @@ class SierraRecordWrapperFlowTest
     with ScalaFutures
     with ExtendedPatience
     with Matchers
+    with JsonTestUtil
     with SierraRecordUtil {
 
   private def withRecordWrapperFlow(actorSystem: ActorSystem)(
@@ -56,7 +57,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -90,7 +91,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -123,7 +124,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -151,5 +152,11 @@ class SierraRecordWrapperFlowTest
         }
       }
     }
+  }
+
+  private def assertSierraRecordsAreEqual(x: SierraRecord, y: SierraRecord) = {
+    x.id shouldBe y.id
+    assertJsonStringsAreEqual(x.data, y.data)
+    x.modifiedDate shouldBe y.modifiedDate
   }
 }
