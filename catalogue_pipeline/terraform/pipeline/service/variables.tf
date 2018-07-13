@@ -22,3 +22,6 @@ variable "source_queue_name" {
 }
 variable "source_queue_arn" {
 }
+variable "max_capacity" {
+  default = 15
+}

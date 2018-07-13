@@ -144,8 +144,8 @@ module "id_minter"{
 
 locals {
   es_config_ingestor = {
-    index_v1 = "v1-2018-07-02-invisible-works"
-    index_v2 = "v2-2018-07-02-invisible-works"
+    index_v1 = "v1-2018-07-11-reindex-with-a-bit-less-ingestor"
+    index_v2 = "v2-2018-07-11-reindex-with-a-bit-less-ingestor"
     doc_type = "work"
   }
 }
@@ -189,4 +189,6 @@ module "ingestor"{
   container_image = "${var.ingestor_container_image}"
   source_queue_name = "${module.es_ingest_queue.id}"
   source_queue_arn = "${module.es_ingest_queue.arn}"
+
+  max_capacity = 10
 }

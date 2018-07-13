@@ -33,4 +33,6 @@ module "service" {
   namespace_id = "${var.namespace_id}"
 
   launch_type = "FARGATE"
+
+  max_capacity = "${var.max_capacity}"
 }
