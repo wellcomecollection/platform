@@ -7,7 +7,6 @@ module "lambda_dynamo_write_heartbeat" {
   timeout     = 5
   memory_size = 128
 
-
   environment_variables = {
     HEARTBEAT_CONFIG = "${var.heartbeat_json_config.rendered}"
   }

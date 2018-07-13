@@ -1,5 +1,5 @@
 data "template_file" "table_names" {
-  count = "${length(var.heartbeat_json_config)}"
+  count    = "${length(var.heartbeat_json_config)}"
   template = "${lookup(var.heartbeat_json_config[count.index], "table_name")}"
 }
 
