@@ -1,4 +1,4 @@
 module "vhs_recorder" {
   source = "../vhs"
-  name   = "${var.namespace}_Recorder"
+  name = "${replace(var.namespace, "_", "-")}-Recorder"
 }

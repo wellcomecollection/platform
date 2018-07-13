@@ -1,7 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace = "catalogue_pipeline"
+  namespace = "catalogue_pipeline_v2"
   transformer_container_image = "${local.transformer_container_image}"
   recorder_container_image = "${local.recorder_container_image}"
   matcher_container_image = "${local.matcher_container_image}"
@@ -26,4 +26,5 @@ module "catalogue_pipeline" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn = "${local.dlq_alarm_arn}"
   lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
+  vhs_sourcedata_table_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
 }

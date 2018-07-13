@@ -67,3 +67,6 @@ variable "id_minter_container_image" {
 
 variable "ingestor_container_image" {
 }
+
+variable "vhs_sourcedata_table_stream_arn" {
+}
