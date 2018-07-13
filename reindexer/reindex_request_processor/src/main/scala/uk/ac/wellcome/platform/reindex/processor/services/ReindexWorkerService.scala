@@ -22,9 +22,8 @@ class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
-      reindexRequest <- Future.fromTry(
-        fromJson[ReindexRequest](message.Message))
-      ‘maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
+      reindexRequest <- Future.fromTry(fromJson[ReindexRequest](message.Message))
+      maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](reindexRequest.id)
       _ <- updateRecord(reindexRequest, maybeReindexableRecord)
     } yield ()
 
