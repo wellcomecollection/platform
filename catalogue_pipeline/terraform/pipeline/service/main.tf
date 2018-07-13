@@ -3,17 +3,14 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=env_vars_cpunt"
 
   service_name       = "${var.service_name}"
   task_desired_count = "0"
 
   container_image = "${var.container_image}"
 
-  security_group_ids = [
-    "${var.interservice_security_group_id}",
-    "${var.service_egress_security_group_id}",
-  ]
+  security_group_ids = "${local.security_group_ids}"
 
   source_queue_name = "${var.source_queue_name}"
   source_queue_arn  = "${var.source_queue_arn}"
@@ -25,14 +22,19 @@ module "service" {
   memory = 2048
 
   env_vars = "${var.env_vars}"
+  env_vars_length = "${var.env_vars_length}"
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"
-  subnets    = ["${var.subnets}"]
+  subnets    = "${var.subnets}"
 
   namespace_id = "${var.namespace_id}"
 
   launch_type = "FARGATE"
 
   max_capacity = "${var.max_capacity}"
+}
+
+locals {
+  security_group_ids = "${concat(list(var.service_egress_security_group_id), var.security_group_ids)}"
 }

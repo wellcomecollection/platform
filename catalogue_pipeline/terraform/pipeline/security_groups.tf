@@ -1,5 +1,5 @@
 resource "aws_security_group" "service_egress_security_group" {
-  name        = "service_egress_security_group"
+  name        = "${var.namespace}_service_egress_security_group"
   description = "Allow traffic between services"
   vpc_id      = "${var.vpc_id}"
 
@@ -15,9 +15,9 @@ resource "aws_security_group" "service_egress_security_group" {
   }
 }
 
-resource "aws_security_group" "interservice_security_group" {
-  name        = "interservice_security_group"
-  description = "Allow traffic between services"
+resource "aws_security_group" "rds_access_security_group" {
+  name        = "${var.namespace}_rds_access_security_group"
+  description = "Allow traffic to rds database"
   vpc_id      = "${var.vpc_id}"
 
   ingress {
@@ -28,6 +28,6 @@ resource "aws_security_group" "interservice_security_group" {
   }
 
   tags {
-    Name = "${var.namespace}-interservice"
+    Name = "${var.namespace}-rds-access"
   }
 }

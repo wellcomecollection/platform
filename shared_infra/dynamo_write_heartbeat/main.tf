@@ -1,7 +1,7 @@
 module "lambda_dynamo_write_heartbeat" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
-  name        = "dynamo_write_heartbeat_${var.name}"
+  name        = "${var.name}"
   module_name = "dynamo_write_heartbeat"
   description = "Keep DynamoDB capacity scaling by sending heartbeat writes"
   timeout     = 5

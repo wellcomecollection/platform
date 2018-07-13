@@ -2,14 +2,12 @@ module "transformer"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_transformer"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     sns_arn              = "${module.transformed_works_topic.arn}"
@@ -18,8 +16,8 @@ module "transformer"{
     storage_bucket_name  = "${var.vhs_sourcedata_bucket_name}"
     message_bucket_name  = "${var.messages_bucket}"
   }
+  env_vars_length = 5
 
-  account_id = "${var.account_id}"
   container_image = "${var.transformer_container_image}"
   source_queue_name = "${module.transformer_queue.id}"
   source_queue_arn = "${module.transformer_queue.arn}"
@@ -29,14 +27,12 @@ module "recorder"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_recorder"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     recorder_queue_url = "${module.recorder_queue.id}"
@@ -46,8 +42,8 @@ module "recorder"{
     vhs_recorder_dynamo_table_name = "${module.vhs_recorder.table_name}"
     vhs_recorder_bucket_name       = "${module.vhs_recorder.bucket_name}"
   }
+  env_vars_length = 5
 
-  account_id = "${var.account_id}"
   container_image = "${var.recorder_container_image}"
   source_queue_name = "${module.recorder_queue.id}"
   source_queue_arn = "${module.recorder_queue.arn}"
@@ -56,14 +52,12 @@ module "recorder"{
 module "matcher"{
   source = "service"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_matcher"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     queue_url = "${module.matcher_queue.id}"
@@ -76,8 +70,8 @@ module "matcher"{
     dynamo_lock_table       = "${aws_dynamodb_table.matcher_lock_table.id}"
     dynamo_lock_table_index = "${var.matcher_lock_table_index}"
   }
+  env_vars_length = 9
 
-  account_id = "${var.account_id}"
   container_image = "${var.matcher_container_image}"
   source_queue_name = "${module.matcher_queue.id}"
   source_queue_arn = "${module.matcher_queue.arn}"
@@ -86,14 +80,12 @@ module "matcher"{
 module "merger"{
   source = "service"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_merger"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     metrics_namespace    = "${var.namespace}_merger"
@@ -105,8 +97,8 @@ module "merger"{
     vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
     vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
   }
+  env_vars_length = 8
 
-  account_id = "${var.account_id}"
   container_image = "${var.merger_container_image}"
   source_queue_name = "${module.merger_queue.id}"
   source_queue_arn = "${module.merger_queue.arn}"
@@ -116,14 +108,12 @@ module "id_minter"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_id_minter"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     metrics_namespace    = "${var.namespace}_id_minter"
@@ -136,10 +126,12 @@ module "id_minter"{
     topic_arn           = "${module.es_ingest_topic.arn}"
   }
 
-  account_id = "${var.account_id}"
+  env_vars_length = 8
   container_image = "${var.id_minter_container_image}"
   source_queue_name = "${module.id_minter_queue.id}"
   source_queue_arn = "${module.id_minter_queue.arn}"
+
+  security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
 }
 
 locals {
@@ -162,14 +154,12 @@ module "ingestor"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
   cluster_name = "${aws_ecs_cluster.cluster.id}"
   namespace_id = "${var.namespace}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_ingestor"
   aws_region = "${var.aws_region}"
-  dlq_alarm_arn = "${var.dlq_alarm_arn}"
 
   env_vars = {
     metrics_namespace    = "${var.namespace}_ingestor"
@@ -184,8 +174,7 @@ module "ingestor"{
     es_doc_type         = "${local.es_config_ingestor["doc_type"]}"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
-
-  account_id = "${var.account_id}"
+  env_vars_length = 11
   container_image = "${var.ingestor_container_image}"
   source_queue_name = "${module.es_ingest_queue.id}"
   source_queue_arn = "${module.es_ingest_queue.arn}"
