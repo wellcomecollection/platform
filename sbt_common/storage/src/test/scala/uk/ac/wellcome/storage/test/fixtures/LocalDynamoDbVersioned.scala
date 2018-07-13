@@ -2,7 +2,9 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.dynamodbv2.model._
 import com.amazonaws.services.dynamodbv2.util.TableUtils.waitUntilActive
+import uk.ac.wellcome.storage.dynamo.{DynamoConfig, VersionedDao}
 import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.test.fixtures.TestWith
 
 trait LocalDynamoDbVersioned extends LocalDynamoDb {
 
@@ -50,4 +52,10 @@ trait LocalDynamoDbVersioned extends LocalDynamoDb {
     table
   }
 
+  def withVersionedDao[R](table: Table)(
+    testWith: TestWith[VersionedDao, R]): R = {
+    val dynamoConfig = DynamoConfig(table = table.name, index = table.index)
+    val dao = new VersionedDao(dynamoDbClient, dynamoConfig)
+    testWith(dao)
+  }
 }

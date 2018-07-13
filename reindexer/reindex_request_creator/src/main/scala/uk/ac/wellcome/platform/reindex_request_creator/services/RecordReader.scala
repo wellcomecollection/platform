@@ -8,11 +8,9 @@ import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.reindexer.ReindexableRecord
 import uk.ac.wellcome.platform.reindex_request_creator.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.reindex_request_creator.models.{
-  ReindexJob,
-  ReindexableRecord
-}
+import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.Future

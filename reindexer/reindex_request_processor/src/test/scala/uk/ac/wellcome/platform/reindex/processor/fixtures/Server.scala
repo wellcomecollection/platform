@@ -1,9 +1,9 @@
-package uk.ac.wellcome.platform.reindex_request_processor.fixtures
+package uk.ac.wellcome.platform.reindex.processor.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
-import uk.ac.wellcome.platform.reindex_request_processor.{Server => AppServer}
+import uk.ac.wellcome.platform.reindex.processor.{Server => AppServer}
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Server extends CloudWatch { this: Suite =>

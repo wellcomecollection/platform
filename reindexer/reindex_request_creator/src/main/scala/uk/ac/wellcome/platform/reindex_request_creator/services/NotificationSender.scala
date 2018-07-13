@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.reindex_request_creator.services
 
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
+import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.platform.reindex_request_creator.GlobalExecutionContext.context
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexRequest
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future

@@ -32,13 +32,6 @@ class VersionedDaoTest
     with MockitoSugar
     with Matchers {
 
-  def withVersionedDao[R](table: Table)(
-    testWith: TestWith[VersionedDao, R]): R = {
-    val dynamoConfig = DynamoConfig(table = table.name, index = table.index)
-    val dao = new VersionedDao(dynamoDbClient, dynamoConfig)
-    testWith(dao)
-  }
-
   def withFixtures[R](testWith: TestWith[(Table, VersionedDao), R]): R = {
     withLocalDynamoDbTable[R] { table =>
       withVersionedDao[R](table) { versionedDao =>

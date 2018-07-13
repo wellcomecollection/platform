@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_processor
+package uk.ac.wellcome.platform.reindex.processor
 
 import scala.concurrent.ExecutionContext
 
