@@ -27,6 +27,13 @@ import requests
 import tqdm
 from wellcome_aws_utils.sns_utils import publish_sns_message
 
+from dynamodb_capacity_helpers import (
+    get_dynamodb_max_table_capacity,
+    get_dynamodb_max_gsi_capacity,
+    set_dynamodb_table_capacity,
+    set_dynamodb_gsi_capacity
+)
+
 
 # Reindex shards are added by a "reindex_shard_generator" Lambda.
 # Import the utility code that assigns reindex shards.
@@ -147,6 +154,28 @@ def main():
         topic_arn=topic_arn,
         messages=messages
     )
+
+    # Now we update the write capacity of the SourceData table as high
+    # as it can go -- we've seen issues where the table capacity fails to
+    # scale up correctly, which slows down the reindexer.
+    max_capacity = get_dynamodb_max_table_capacity(table_name='SourceData')
+    print(f'Setting SourceData table capacity to {max_capacity}')
+    set_dynamodb_table_capacity(
+        table_name='SourceData',
+        desired_capacity=max_capacity
+    )
+
+    for gsi_name in ('reindexTracker',):
+        max_capacity = get_dynamodb_max_gsi_capacity(
+            table_name='SourceData',
+            gsi_name=gsi_name
+        )
+        print(f'Setting SourceData GSI {gsi_name} capacity to {max_capacity}')
+        set_dynamodb_gsi_capacity(
+            table_name='SourceData',
+            gsi_name=gsi_name,
+            desired_capacity=max_capacity
+        )
 
 
 if __name__ == '__main__':
