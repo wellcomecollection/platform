@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   MergeCandidate,
@@ -13,7 +12,7 @@ import uk.ac.wellcome.platform.transformer.source.{
   VarField
 }
 
-class SierraMergeCandidatesTest extends FunSpec with Matchers with SierraData {
+class SierraMergeCandidatesTest extends FunSpec with Matchers {
 
   val transformer = new SierraMergeCandidates {}
   it("extracts the bib number in 776$$w and adds it as a mergeCandidate") {

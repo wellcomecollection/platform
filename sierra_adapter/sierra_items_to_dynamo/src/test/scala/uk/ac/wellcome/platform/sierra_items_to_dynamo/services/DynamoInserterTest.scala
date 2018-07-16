@@ -1,10 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
-import java.time.Instant
-
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
-import io.circe.parser.parse
 import org.mockito.Matchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.{verify, when}
@@ -12,6 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.type_classes.{
   IdGetter,
@@ -31,32 +29,19 @@ class DynamoInserterTest
     with DynamoInserterFixture
     with ScalaFutures
     with MockitoSugar
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraUtil {
 
   it("ingests a json item into DynamoDB") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "100001"
-        val updatedDate = "2013-12-13T12:43:16Z"
-
-        val record = SierraItemRecord(
-          id = s"$id",
-          data = parse(s"""
-             |{
-             | "id": "$id",
-             | "updatedDate": "$updatedDate",
-             | "bibIds": ["1556974"]
-             |}
-      """.stripMargin).right.get.noSpaces,
-          modifiedDate = updatedDate,
-          bibIds = List("1556974")
-        )
+        val record = createSierraItemRecord
 
         val futureUnit = dynamoInserter.insertIntoDynamo(record)
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(Right(record.copy(version = 1)))
+            'id -> record.id) shouldBe Some(Right(record.copy(version = 1)))
         }
       }
     }
@@ -65,37 +50,20 @@ class DynamoInserterTest
   it("does not overwrite new data with old data") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "200002"
-        val oldUpdatedDate = "2001-01-01T00:00:01Z"
-        val newUpdatedDate = "2017-12-12T23:59:59Z"
-
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data =
-            s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record", "bibIds": ["1556974"]}""",
-          bibIds = List("1556974")
+        val newRecord = createSierraItemRecordWith(
+          modifiedDate = newerDate
         )
         Scanamo.put(dynamoDbClient)(table.name)(newRecord)
 
-        val oldRecord = SierraItemRecord(
-          id = id,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$oldUpdatedDate",
-             |  "comment": "I am an old record",
-             |  "bibIds": ["00000"]
-             |}
-       """.stripMargin,
-          modifiedDate = oldUpdatedDate,
-          bibIds = List("00000")
+        val oldRecord = createSierraItemRecordWith(
+          id = newRecord.id,
+          modifiedDate = olderDate
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(Right(newRecord))
+            'id -> newRecord.id) shouldBe Some(Right(newRecord))
         }
       }
     }
@@ -104,39 +72,23 @@ class DynamoInserterTest
   it("overwrites old data with new data") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "300003"
-        val oldUpdatedDate = "2001-01-01T01:01:01Z"
-        val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-        val oldRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = Instant.parse(oldUpdatedDate),
-          data =
-            s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "comment": "Legacy line of lamentable leopards", "bibIds": ["1556974"]}""",
-          bibIds = List("1556974"),
-          version = 1
+        val oldRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$newUpdatedDate",
-             |  "comment": "Nice! New notes about narwhals in November",
-             |  "bibIds": ["1556974", "11111"]
-             |}
-       """.stripMargin,
-          bibIds = List("1556974", "11111")
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
+          bibIds = oldRecord.bibIds :+ "1234"
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(Right(newRecord.copy(version = 2)))
+            'id -> oldRecord.id) shouldBe Some(
+            Right(newRecord.copy(version = 1)))
         }
       }
     }
@@ -145,29 +97,15 @@ class DynamoInserterTest
   it("records unlinked bibIds") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "300003"
-        val oldUpdatedDate = "2001-01-01T01:01:01Z"
-        val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-        val oldRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = oldUpdatedDate,
-          data =
-            s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1", "b2", "b3"]}""",
+        val oldRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate,
           bibIds = List("b1", "b2", "b3")
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$newUpdatedDate",
-             |  "bibIds": ["b1", "b2"]
-             |}
-       """.stripMargin,
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
           bibIds = List("b1", "b2")
         )
 
@@ -175,7 +113,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(
+            'id -> oldRecord.id) shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b3"))))
         }
       }
@@ -185,29 +123,15 @@ class DynamoInserterTest
   it("adds new bibIds and records unlinked bibIds in the same update") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "300003"
-        val oldUpdatedDate = "2001-01-01T01:01:01Z"
-        val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-        val oldRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = oldUpdatedDate,
-          data =
-            s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1", "b2", "b3"]}""",
+        val oldRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate,
           bibIds = List("b1", "b2", "b3")
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$newUpdatedDate",
-             |  "bibIds": ["b2", "b3", "b4"]
-             |}
-       """.stripMargin,
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
           bibIds = List("b2", "b3", "b4")
         )
 
@@ -215,7 +139,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(
+            'id -> oldRecord.id) shouldBe Some(
             Right(newRecord.copy(version = 1, unlinkedBibIds = List("b1"))))
         }
       }
@@ -225,31 +149,19 @@ class DynamoInserterTest
   it("preserves existing unlinked bibIds in DynamoDB") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val id = "300003"
-        val oldUpdatedDate = "2001-01-01T01:01:01Z"
-        val newUpdatedDate = "2011-11-11T11:11:11Z"
-
-        val oldRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = oldUpdatedDate,
-          data =
-            s"""{"id": "$id", "updatedDate": "$oldUpdatedDate", "bibIds": ["b1" ,"b2", "b3"]}""",
+        val oldRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate,
+          data = "<<old data>>",
           bibIds = List("b1", "b2", "b3"),
           unlinkedBibIds = List("b5")
         )
 
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = newUpdatedDate,
-          data = s"""
-             |{
-             |  "id": "$id",
-             |  "updatedDate": "$newUpdatedDate",
-             |  "bibIds": ["b2", "b3", "b4"]
-             |}
-       """.stripMargin,
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
+          data = "<<new data>>",
           bibIds = List("b2", "b3", "b4")
         )
 
@@ -257,7 +169,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> s"$id") shouldBe Some(
+            'id -> oldRecord.id) shouldBe Some(
             Right(
               newRecord.copy(version = 1, unlinkedBibIds = List("b5", "b1"))))
         }
@@ -266,8 +178,9 @@ class DynamoInserterTest
   }
 
   it("fails if a dao returns an error when updating an item") {
-    val record =
-      SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
+    val record = createSierraItemRecordWith(
+      modifiedDate = newerDate
+    )
 
     val mockedDao = mock[VersionedDao]
     val expectedException = new RuntimeException("AAAAAARGH!")
@@ -275,8 +188,10 @@ class DynamoInserterTest
     when(
       mockedDao.getRecord[SierraItemRecord](any[String])(
         any[DynamoFormat[SierraItemRecord]]))
-      .thenReturn(Future.successful(Some(
-        SierraItemRecord(id = "500005", "{}", "2001-01-01T00:00:00Z", List()))))
+      .thenReturn(
+        Future.successful(
+          Some(record.copy(modifiedDate = olderDate))
+        ))
 
     when(
       mockedDao.updateRecord(any[SierraItemRecord])(
@@ -297,8 +212,7 @@ class DynamoInserterTest
   }
 
   it("fails if the dao returns an error when getting an item") {
-    val record =
-      SierraItemRecord("500005", "{}", "2005-05-05T05:05:05Z", bibIds = List())
+    val record = createSierraItemRecord
 
     val mockedDao = mock[VersionedDao]
 
@@ -316,29 +230,14 @@ class DynamoInserterTest
   }
 
   it("does not insert an item into DynamoDb if it's not changed") {
-    val id = "100001"
-    val updatedDate = "2013-12-13T12:43:16Z"
-
-    val record = SierraItemRecord(
-      id = id,
-      data = s"""
-                                                     |{
-                                                     | "id": "$id",
-                                                     | "updatedDate": "$updatedDate",
-                                                     | "bibIds": ["1556974"]
-                                                     |}
-      """.stripMargin,
-      modifiedDate = updatedDate,
-      bibIds = List("1556974")
+    val record = createSierraItemRecordWith(
+      modifiedDate = olderDate
     )
 
-    val newUpdatedDate = "2014-12-13T12:43:16Z"
-    val newRecord = SierraItemRecord(
-      id = s"$id",
-      modifiedDate = newUpdatedDate,
-      data =
-        s"""{"id": "$id", "updatedDate": "$newUpdatedDate", "comment": "I am a shiny new record", "bibIds": ["1556974", "1556975"]}""",
-      bibIds = List("1556974")
+    val newRecord = createSierraItemRecordWith(
+      id = record.id,
+      modifiedDate = newerDate,
+      bibIds = record.bibIds
     )
 
     val mockedDao = mock[VersionedDao]

@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
+import java.time.Instant
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Sink, Source}
@@ -9,15 +11,18 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.models.test.utils.SierraRecordUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 
 class SierraRecordWrapperFlowTest
     extends FunSpec
     with Akka
     with ScalaFutures
     with ExtendedPatience
-    with Matchers {
+    with Matchers
+    with JsonTestUtil
+    with SierraRecordUtil {
 
   private def withRecordWrapperFlow(actorSystem: ActorSystem)(
     testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
@@ -32,17 +37,18 @@ class SierraRecordWrapperFlowTest
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
           val id = "100001"
           val updatedDate = "2013-12-13T12:43:16Z"
-          val json = parse(s"""
-          |{
-          | "id": "$id",
-          | "updatedDate": "$updatedDate"
-          |}
-        """.stripMargin).right.get
+          val data = s"""
+            |{
+            |  "id": "$id",
+            |  "updatedDate": "$updatedDate"
+            |}
+            |""".stripMargin
+          val json = parse(data).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
-            modifiedDate = updatedDate
+            data = data,
+            modifiedDate = Instant.parse(updatedDate)
           )
 
           val futureRecord = Source
@@ -51,7 +57,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -64,18 +70,19 @@ class SierraRecordWrapperFlowTest
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
           val id = "400004"
           val updatedDate = "2014-04-14T14:14:14Z"
-          val json = parse(s"""
-          |{
-          | "id": "$id",
-          | "updatedDate": "$updatedDate",
-          | "bibIds": ["4", "44", "444", "4444"]
-          |}
-        """.stripMargin).right.get
+          val data = s"""
+            |{
+            |  "id": "$id",
+            |  "updatedDate": "$updatedDate",
+            |  "bibIds": ["4", "44", "444", "4444"]
+            |}
+            |""".stripMargin
+          val json = parse(data).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
-            modifiedDate = updatedDate
+            data = data,
+            modifiedDate = Instant.parse(updatedDate)
           )
 
           val futureRecord = Source
@@ -84,7 +91,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -97,16 +104,18 @@ class SierraRecordWrapperFlowTest
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
           val id = "1357947"
           val deletedDate = "2014-01-31"
-          val json = parse(s"""{
-                            |  "id" : "$id",
-                            |  "deletedDate" : "$deletedDate",
-                            |  "deleted" : true
-                            |}""".stripMargin).right.get
+          val data = s"""
+            |{
+            |  "id" : "$id",
+            |  "deletedDate" : "$deletedDate",
+            |  "deleted" : true
+            |}""".stripMargin
+          val json = parse(data).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
-            modifiedDate = s"${deletedDate}T00:00:00Z"
+            data = data,
+            modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")
           )
 
           val futureRecord = Source
@@ -115,7 +124,7 @@ class SierraRecordWrapperFlowTest
             .runWith(Sink.head)(materializer)
 
           whenReady(futureRecord) { sierraRecord =>
-            sierraRecord shouldBe expectedRecord
+            assertSierraRecordsAreEqual(sierraRecord, expectedRecord)
           }
         }
       }
@@ -143,5 +152,11 @@ class SierraRecordWrapperFlowTest
         }
       }
     }
+  }
+
+  private def assertSierraRecordsAreEqual(x: SierraRecord, y: SierraRecord) = {
+    x.id shouldBe y.id
+    assertJsonStringsAreEqual(x.data, y.data)
+    x.modifiedDate shouldBe y.modifiedDate
   }
 }
