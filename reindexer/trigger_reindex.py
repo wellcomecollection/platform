@@ -25,7 +25,6 @@ import docopt
 import hcl
 import requests
 import tqdm
-from wellcome_aws_utils.sns_utils import publish_sns_message
 
 from dynamodb_capacity_helpers import (
     get_dynamodb_max_table_capacity,
@@ -70,14 +69,17 @@ def all_messages(shard_ids, desired_version):
         }
 
 
-def publish_messages(sns_client, topic_arn, messages):
+def publish_messages(topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
+    sns_client = boto3.client('sns')
     for m in tqdm.tqdm(messages):
-        publish_sns_message(
-            sns_client=sns_client,
-            topic_arn=topic_arn,
-            message=m,
-            subject=f'source: {__file__}'
+        sns_client.publish(
+            TopicArn=topic_arn,
+            MessageStructure='json',
+            Message=json.dumps({
+                'default': json.dumps(m)
+            }),
+            Subject=f'Source: {__file__}'
         )
 
 
@@ -148,9 +150,7 @@ def main():
 
     topic_arn = build_topic_arn(topic_name=TOPIC_NAME)
 
-    sns_client = boto3.client('sns')
     publish_messages(
-        sns_client=sns_client,
         topic_arn=topic_arn,
         messages=messages
     )
