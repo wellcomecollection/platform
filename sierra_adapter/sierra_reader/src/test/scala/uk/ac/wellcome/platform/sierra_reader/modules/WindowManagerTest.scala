@@ -69,7 +69,7 @@ class WindowManagerTest
 
         val record =
           SierraRecord(
-            id = "b1794165",
+            id = "1794165",
             data = "{}",
             modifiedDate = Instant.now())
 
