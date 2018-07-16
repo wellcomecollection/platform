@@ -20,17 +20,21 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
       forAll(testCases) {
         (sierraId: String, recordType: String, expectedId: String) =>
           val sierraRecordType = recordType match {
-            case "bibs" => SierraRecordTypes.bibs
+            case "bibs"  => SierraRecordTypes.bibs
             case "items" => SierraRecordTypes.items
           }
 
-          SierraRecordNumbers.addCheckDigit(sierraId, recordType = sierraRecordType) shouldBe expectedId
+          SierraRecordNumbers.addCheckDigit(
+            sierraId,
+            recordType = sierraRecordType) shouldBe expectedId
       }
     }
 
     it("throws an error if passed a Sierra ID which is non-numeric") {
       val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit("abcdefg", recordType = SierraRecordTypes.bibs)
+        SierraRecordNumbers.addCheckDigit(
+          "abcdefg",
+          recordType = SierraRecordTypes.bibs)
       }
 
       caught.getMessage shouldEqual "Expected 7-digit numeric ID, got abcdefg"
@@ -38,7 +42,9 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
 
     it("throws an error if passed a Sierra ID which is too short") {
       val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit("123", recordType = SierraRecordTypes.bibs)
+        SierraRecordNumbers.addCheckDigit(
+          "123",
+          recordType = SierraRecordTypes.bibs)
       }
 
       caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 123"
@@ -46,7 +52,9 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
 
     it("throws an error if passed a Sierra ID which is too long") {
       val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit("12345678", recordType = SierraRecordTypes.bibs)
+        SierraRecordNumbers.addCheckDigit(
+          "12345678",
+          recordType = SierraRecordTypes.bibs)
       }
 
       caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"
