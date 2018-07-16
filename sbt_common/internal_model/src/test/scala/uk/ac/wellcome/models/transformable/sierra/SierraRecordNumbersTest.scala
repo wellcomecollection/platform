@@ -1,9 +1,9 @@
-package uk.ac.wellcome.platform.transformer.transformers.sierra
+package uk.ac.wellcome.models.transformable.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class SierraCheckDigitsTest extends FunSpec with Matchers {
+class SierraRecordNumbersTest extends FunSpec with Matchers {
 
   val testCases = Table(
     // Example from the Sierra docs
@@ -23,13 +23,13 @@ class SierraCheckDigitsTest extends FunSpec with Matchers {
           case "items" => SierraRecordTypes.items
         }
 
-        transformer.addCheckDigit(sierraId, recordType = sierraRecordType) shouldBe expectedId
+        SierraRecordNumbers.addCheckDigit(sierraId, recordType = sierraRecordType) shouldBe expectedId
     }
   }
 
   it("throws an error if passed a Sierra ID which is non-numeric") {
     val caught = intercept[RuntimeException] {
-      transformer.addCheckDigit("abcdefg", recordType = SierraRecordTypes.bibs)
+      SierraRecordNumbers.addCheckDigit("abcdefg", recordType = SierraRecordTypes.bibs)
     }
 
     caught.getMessage shouldEqual "Expected 7-digit numeric ID, got abcdefg"
@@ -37,7 +37,7 @@ class SierraCheckDigitsTest extends FunSpec with Matchers {
 
   it("throws an error if passed a Sierra ID which is too short") {
     val caught = intercept[RuntimeException] {
-      transformer.addCheckDigit("123", recordType = SierraRecordTypes.bibs)
+      SierraRecordNumbers.addCheckDigit("123", recordType = SierraRecordTypes.bibs)
     }
 
     caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 123"
@@ -45,11 +45,9 @@ class SierraCheckDigitsTest extends FunSpec with Matchers {
 
   it("throws an error if passed a Sierra ID which is too long") {
     val caught = intercept[RuntimeException] {
-      transformer.addCheckDigit("12345678", recordType = SierraRecordTypes.bibs)
+      SierraRecordNumbers.addCheckDigit("12345678", recordType = SierraRecordTypes.bibs)
     }
 
     caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"
   }
-
-  val transformer = new SierraCheckDigits {}
 }

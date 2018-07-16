@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 
-trait SierraIdentifiers extends SierraCheckDigits {
+trait SierraIdentifiers {
 
   // Populate wwork:identifiers.
   //
