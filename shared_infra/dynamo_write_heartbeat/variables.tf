@@ -1,7 +1,7 @@
 variable "name" {}
 
-variable "dynamo_table_names" {
-  description = "DynamoDb table names to heartbeat"
+variable "heartbeat_json_config" {
+  description = "DynamoDb table names and indices to heartbeat, list of maps, [ { '__heartbeat__': True, 'table_name': 'Table1','key': {'id': {'S': 'heartbeat-id'}} }]"
   type        = "list"
 }
 

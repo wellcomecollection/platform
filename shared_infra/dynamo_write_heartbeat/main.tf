@@ -8,7 +8,7 @@ module "lambda_dynamo_write_heartbeat" {
   memory_size = 128
 
   environment_variables = {
-    TABLE_NAMES = "${join(",", var.dynamo_table_names)}"
+    HEARTBEAT_CONFIG = "${var.heartbeat_json_config.rendered}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
