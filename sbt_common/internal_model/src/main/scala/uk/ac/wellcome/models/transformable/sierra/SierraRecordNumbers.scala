@@ -88,11 +88,9 @@ object SierraRecordNumbers {
     * a seven- or eight-digit string.
     */
   def assertValidRecordNumber(s: String): Unit =
-    if (is7digitRecordNumber(s) || is8digitRecordNumber(s)) {
-      ()
-    } else {
-      throw new RuntimeException(s"Not a valid Sierra record number: $s")
-    }
+    assert(
+      is7digitRecordNumber(s) || is8digitRecordNumber(s),
+      s"Not a valid Sierra record number: $s")
 
   /** Increments a Sierra record number.
     *
@@ -100,11 +98,9 @@ object SierraRecordNumbers {
     * seven-digit number; the eighth digit is a check digit, not sequential.
     */
   def increment(s: String): String = {
-    if (!is7digitRecordNumber(s)) {
-      throw new RuntimeException(
-        s"increment() can only be used with 7-digit record numbers; not $s"
-      )
-    }
+    assert(
+      is7digitRecordNumber(s),
+      s"increment() can only be used with 7-digit record numbers; not $s")
 
     val result = (s.toInt + 1).toString
     assert(is7digitRecordNumber(result))
