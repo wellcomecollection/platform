@@ -5,8 +5,7 @@ data "aws_iam_policy_document" "travis_permissions" {
     ]
 
     resources = [
-      "${aws_s3_bucket.releases.arn}/*",
-      "${aws_s3_bucket.releases.arn}",
+      "${var.bucket_arn}/uk.ac.wellcome/${var.name}_2.12/*",
     ]
   }
 }
