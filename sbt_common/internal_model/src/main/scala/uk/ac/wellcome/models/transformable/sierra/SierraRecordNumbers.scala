@@ -26,14 +26,11 @@ object SierraRecordNumbers {
 
     // First check that we're being passed a 7-digit numeric ID -- anything
     // else is an error.
-    val regexMatch = """^([0-9]{7})$""".r.unapplySeq(sierraId)
-    val checkDigit = regexMatch match {
-      case Some(s) => getCheckDigit(s.head)
-      case _ =>
-        throw new RuntimeException(
-          s"Expected 7-digit numeric ID, got $sierraId"
-        )
-    }
+    assert(
+      is7digitRecordNumber(sierraId),
+      s"addCheckDigit() can only be used with 7-digit record numbers; not $sierraId")
+
+    val checkDigit = getCheckDigit(sierraId)
 
     // Then pick the record type prefix.
     val prefix = recordType match {
@@ -45,7 +42,9 @@ object SierraRecordNumbers {
         )
     }
 
-    s"$prefix$sierraId$checkDigit"
+    val result = s"$prefix$sierraId$checkDigit"
+    assertIs8DigitRecordNumber(result)
+    result
   }
 
   /** Returns the check digit that should be added to a record ID.
@@ -64,10 +63,11 @@ object SierraRecordNumbers {
     *     after the division is the check digit.  If the remainder is 10,
     *     the letter x is used as the check digit.
     *
-    * This method does no error checking, and assumes it is passed a 7-digit
-    * Sierra ID.
+    * This method can only be passed a 7-digit Sierra ID.
+    *
     */
   private def getCheckDigit(sierraId: String): String = {
+    assertIs7DigitRecordNumber(sierraId)
     val remainder = sierraId.reverse
       .zip(Stream from 2)
       .map { case (char: Char, count: Int) => char.toString.toInt * count }
@@ -113,7 +113,7 @@ object SierraRecordNumbers {
       s"increment() can only be used with 7-digit record numbers; not $s")
 
     val result = (s.toInt + 1).toString
-    assert(is7digitRecordNumber(result))
+    assertIs7DigitRecordNumber(result)
     result
   }
 }

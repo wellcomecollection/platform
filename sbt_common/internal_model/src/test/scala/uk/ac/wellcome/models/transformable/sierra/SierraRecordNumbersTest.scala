@@ -33,7 +33,7 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
         SierraRecordNumbers.addCheckDigit("abcdefg", recordType = SierraRecordTypes.bibs)
       }
 
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got abcdefg"
+      caught.getMessage shouldEqual "addCheckDigit() can only be used with 7-digit record numbers; not abcdefg"
     }
 
     it("throws an error if passed a Sierra ID which is too short") {
@@ -41,15 +41,14 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
         SierraRecordNumbers.addCheckDigit("123", recordType = SierraRecordTypes.bibs)
       }
 
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 123"
+      caught.getMessage shouldEqual "addCheckDigit() can only be used with 7-digit record numbers; not 123"
     }
 
     it("throws an error if passed a Sierra ID which is too long") {
       val caught = intercept[RuntimeException] {
         SierraRecordNumbers.addCheckDigit("12345678", recordType = SierraRecordTypes.bibs)
       }
-
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"
+      caught.getMessage shouldEqual "addCheckDigit() can only be used with 7-digit record numbers; not 12345678"
     }
   }
 
