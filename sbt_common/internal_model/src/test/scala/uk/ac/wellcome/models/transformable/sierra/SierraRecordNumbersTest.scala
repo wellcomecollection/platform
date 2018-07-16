@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models.transformable.sierra
 
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{Assertion, FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 class SierraRecordNumbersTest extends FunSpec with Matchers {
@@ -63,26 +63,52 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
     }
 
     it("rejects an invalid string") {
-      val caught = intercept[AssertionError] {
-        SierraRecordNumbers.assertValidRecordNumber("NaN")
-      }
-      caught.getMessage shouldBe "assertion failed: Not a valid Sierra record number: NaN"
+      assertThrowsAssertionError(
+        () => SierraRecordNumbers.assertValidRecordNumber("NaN"),
+        expectedMessage = "Not a valid Sierra record number: NaN"
+      )
+    }
+  }
+
+  describe("assertIs7DigitRecordNumber") {
+    it("accepts a valid record number") {
+      SierraRecordNumbers.assertIs7DigitRecordNumber("1234567")
+    }
+
+    it("rejects an invalid record number") {
+      assertThrowsAssertionError(
+        () => SierraRecordNumbers.assertIs7DigitRecordNumber("NaN"),
+        expectedMessage = "Not a 7-digit Sierra record number: NaN"
+      )
+    }
+  }
+
+  describe("assertIs8DigitRecordNumber") {
+    it("accepts a valid record number") {
+      SierraRecordNumbers.assertIs8DigitRecordNumber("12345678")
+    }
+
+    it("rejects an invalid record number") {
+      assertThrowsAssertionError(
+        () => SierraRecordNumbers.assertIs8DigitRecordNumber("NaN"),
+        expectedMessage = "Not an 8-digit Sierra record number: NaN"
+      )
     }
   }
 
   describe("increment") {
     it("rejects 8-digit record numbers") {
-      val caught = intercept[AssertionError] {
-        SierraRecordNumbers.increment("12345678")
-      }
-      caught.getMessage shouldBe "assertion failed: increment() can only be used with 7-digit record numbers; not 12345678"
+      assertThrowsAssertionError(
+        () => SierraRecordNumbers.increment("12345678"),
+        expectedMessage = "increment() can only be used with 7-digit record numbers; not 12345678"
+      )
     }
 
     it("rejects bad inputs") {
-      val caught = intercept[AssertionError] {
-        SierraRecordNumbers.increment("NaN")
-      }
-      caught.getMessage shouldBe "assertion failed: increment() can only be used with 7-digit record numbers; not NaN"
+      assertThrowsAssertionError(
+        () => SierraRecordNumbers.increment("NaN"),
+        expectedMessage = "increment() can only be used with 7-digit record numbers; not NaN"
+      )
     }
 
     it("increments a 7-digit record number") {
@@ -92,5 +118,10 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
     it("increments a 7-digit record number that wraps around") {
       SierraRecordNumbers.increment("1000009") shouldBe "1000010"
     }
+  }
+
+  private def assertThrowsAssertionError(f: => () => Unit, expectedMessage: String): Assertion = {
+    val caught = intercept[AssertionError] { f() }
+    caught.getMessage shouldBe s"assertion failed: $expectedMessage"
   }
 }
