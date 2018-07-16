@@ -19,7 +19,7 @@ module "lambda_dynamo_write_heartbeat" {
 }
 
 resource "aws_cloudwatch_event_rule" "dynamo_heartbeat_scheduler_rule" {
-  name                = "dynamo-heartbeat-scheduler-rule"
+  name                = "${var.name}-rule"
   description         = "Heartbeat scheduler for writes to dynamoDb"
   schedule_expression = "rate(10 minutes)"
 }

@@ -1,7 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace = "catalogue_pipeline_v2"
+  namespace = "catalogue_pipeline_f"
   transformer_container_image = "${local.transformer_container_image}"
   recorder_container_image = "${local.recorder_container_image}"
   matcher_container_image = "${local.matcher_container_image}"
@@ -15,8 +15,11 @@ module "catalogue_pipeline" {
   vhs_sourcedata_read_policy = "${module.vhs_sourcedata.read_policy}"
   vhs_sourcedata_bucket_name = "${module.vhs_sourcedata.bucket_name}"
   aws_region = "${var.aws_region}"
-  messages_bucket = "${local.messages_bucket_name}"
+  messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket = "${var.infra_bucket}"
+
+  index_v1 = "v1-2018-07-11-reindex-with-a-bit-less-ingestor"
+  index_v2 = "v2-2018-07-11-reindex-with-a-bit-less-ingestor"
 
   identifiers_rds_cluster_password = "${module.identifiers_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_rds_cluster.username}"

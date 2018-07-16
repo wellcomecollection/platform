@@ -70,3 +70,7 @@ variable "ingestor_container_image" {
 
 variable "vhs_sourcedata_table_stream_arn" {
 }
+variable "index_v1" {
+}
+variable "index_v2" {
+}

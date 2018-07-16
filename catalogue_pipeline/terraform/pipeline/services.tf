@@ -2,8 +2,8 @@ module "transformer"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_transformer"
@@ -27,8 +27,8 @@ module "recorder"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_recorder"
@@ -52,8 +52,8 @@ module "recorder"{
 module "matcher"{
   source = "service"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_matcher"
@@ -62,7 +62,6 @@ module "matcher"{
   env_vars = {
     queue_url = "${module.matcher_queue.id}"
     metrics_namespace    = "${var.namespace}_matcher"
-    message_bucket_name  = "${var.messages_bucket}"
     vhs_bucket_name         = "${module.vhs_recorder.bucket_name}"
     topic_arn               = "${module.matched_works_topic.arn}"
     dynamo_table            = "${aws_dynamodb_table.matcher_graph_table.id}"
@@ -80,8 +79,8 @@ module "matcher"{
 module "merger"{
   source = "service"
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_merger"
@@ -89,8 +88,7 @@ module "merger"{
 
   env_vars = {
     metrics_namespace    = "${var.namespace}_merger"
-    message_bucket_name  = "${var.messages_bucket}"
-    vhs_bucket_name         = "${module.vhs_recorder.bucket_name}"
+    messages_bucket_name  = "${var.messages_bucket}"
     topic_arn               = "${module.matched_works_topic.arn}"
     merger_queue_id          = "${module.merger_queue.id}"
     merger_topic_arn         = "${module.merged_works_topic.arn}"
@@ -108,8 +106,8 @@ module "id_minter"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_id_minter"
@@ -134,14 +132,6 @@ module "id_minter"{
   security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
 }
 
-locals {
-  es_config_ingestor = {
-    index_v1 = "v1-2018-07-11-reindex-with-a-bit-less-ingestor"
-    index_v2 = "v2-2018-07-11-reindex-with-a-bit-less-ingestor"
-    doc_type = "work"
-  }
-}
-
 data "template_file" "es_cluster_host_ingestor" {
   template = "$${name}.$${region}.aws.found.io"
 
@@ -150,12 +140,13 @@ data "template_file" "es_cluster_host_ingestor" {
     region = "${var.es_cluster_credentials["region"]}"
   }
 }
+
 module "ingestor"{
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  cluster_name = "${aws_ecs_cluster.cluster.id}"
-  namespace_id = "${var.namespace}"
+  cluster_name = "${aws_ecs_cluster.cluster.name}"
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets = "${var.subnets}"
   vpc_id = "${var.vpc_id}"
   service_name = "${var.namespace}_ingestor"
@@ -169,9 +160,9 @@ module "ingestor"{
     es_username         = "${var.es_cluster_credentials["username"]}"
     es_password         = "${var.es_cluster_credentials["password"]}"
     es_protocol         = "${var.es_cluster_credentials["protocol"]}"
-    es_index_v1         = "${local.es_config_ingestor["index_v1"]}"
-    es_index_v2         = "${local.es_config_ingestor["index_v2"]}"
-    es_doc_type         = "${local.es_config_ingestor["doc_type"]}"
+    es_index_v1         = "${var.index_v1}"
+    es_index_v2         = "${var.index_v2}"
+    es_doc_type         = "work"
     ingest_queue_id     = "${module.es_ingest_queue.id}"
   }
   env_vars_length = 11

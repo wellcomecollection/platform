@@ -12,7 +12,6 @@ locals {
   bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
 
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  public_subnets  = "${data.terraform_remote_state.shared_infra.catalogue_public_subnets}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 
   transformer_container_image        = "${module.ecr_repository_transformer.repository_url}:${var.release_ids["transformer"]}"
