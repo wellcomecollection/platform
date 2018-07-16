@@ -104,7 +104,7 @@ def post_to_slack(source_name, reason):
     webhook_url = tfvars['non_critical_slack_webhook']
 
     message = (
-        f'*{username}* started a reindex in *{source_name}*\n
+        f'*{username}* started a reindex in *{source_name}*\n'
         f'Reason: *{reason}*'
     )
 
