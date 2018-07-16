@@ -209,7 +209,7 @@ class SierraReaderWorkerServiceTest
 
   private def getRecordsFromS3(bucket: Bucket,
                                key: String): List[SierraRecord] =
-    fromJson[List[SierraRecord]](getContentFromS3(bucket, key)).get
+    getObjectFromS3[List[SierraRecord]](bucket, key)
 
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {

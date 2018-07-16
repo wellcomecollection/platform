@@ -2,13 +2,14 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import io.circe.Json
+import io.circe.{Decoder, Json}
 import io.circe.parser.parse
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3StorageBackend}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -88,6 +89,10 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
   def getJsonFromS3(bucket: Bucket, key: String): Json = {
     parse(getContentFromS3(bucket, key)).right.get
   }
+
+  /** Returns a decoded object of type T from S3. */
+  def getObjectFromS3[T](bucket: Bucket, key: String)(implicit decoder: Decoder[T]): T =
+    fromJson[T](getContentFromS3(bucket = bucket, key = key)).get
 
   /** Returns a list of keys in an S3 bucket.
     *
