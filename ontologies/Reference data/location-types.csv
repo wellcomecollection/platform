@@ -397,3 +397,7 @@ IIIFImage,iiif-image,IIIF image
 396,zcql,Acquisitions Z39.50
 397,zzzzz,-
 
+1000,searb,Closed stores Artists' Books
+1001,sg#er,Closed stores journals (RMR)
+1002,sgmip,sgmip
+1003,sgzin,Closed stores zines
