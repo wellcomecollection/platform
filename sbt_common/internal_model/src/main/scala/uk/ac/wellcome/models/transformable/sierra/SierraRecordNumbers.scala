@@ -75,6 +75,12 @@ object SierraRecordNumbers {
     if (remainder == 10) "x" else remainder.toString
   }
 
+  private def is7digitRecordNumber(s: String): Boolean =
+    """^[0-9]{7}$""".r.unapplySeq(s) isDefined
+
+  private def is8digitRecordNumber(s: String): Boolean =
+    """^[0-9]{7}[0-9xX]$""".r.unapplySeq(s) isDefined
+
   /** Throws an exception if the given string doesn't look like a valid
     * Sierra record number.
     *
@@ -82,8 +88,26 @@ object SierraRecordNumbers {
     * a seven- or eight-digit string.
     */
   def assertValidRecordNumber(s: String): Unit =
-    """^[0-9]{7}[0-9xX]?$""".r.unapplySeq(s) match {
-      case Some(_) => ()
-      case None => throw new RuntimeException(s"Not a valid Sierra record number: $s")
+    if (is7digitRecordNumber(s) || is8digitRecordNumber(s)) {
+      ()
+    } else {
+      throw new RuntimeException(s"Not a valid Sierra record number: $s")
     }
+
+  /** Increments a Sierra record number.
+    *
+    * For example, "1000001" -> "1000002".  This can only be used on a
+    * seven-digit number; the eighth digit is a check digit, not sequential.
+    */
+  def increment(s: String): String = {
+    if (!is7digitRecordNumber(s)) {
+      throw new RuntimeException(
+        s"increment() can only be used with 7-digit record numbers; not $s"
+      )
+    }
+
+    val result = (s.toInt + 1).toString
+    assert(is7digitRecordNumber(result))
+    result
+  }
 }
