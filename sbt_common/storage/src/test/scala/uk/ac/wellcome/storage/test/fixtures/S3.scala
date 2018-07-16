@@ -91,7 +91,8 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
   }
 
   /** Returns a decoded object of type T from S3. */
-  def getObjectFromS3[T](bucket: Bucket, key: String)(implicit decoder: Decoder[T]): T =
+  def getObjectFromS3[T](bucket: Bucket, key: String)(
+    implicit decoder: Decoder[T]): T =
     fromJson[T](getContentFromS3(bucket = bucket, key = key)).get
 
   /** Returns a list of keys in an S3 bucket.
