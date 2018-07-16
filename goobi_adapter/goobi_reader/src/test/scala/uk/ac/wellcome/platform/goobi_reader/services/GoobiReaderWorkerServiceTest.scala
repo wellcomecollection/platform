@@ -279,9 +279,8 @@ class GoobiReaderWorkerServiceTest
     Scanamo.scan[HybridRecord](dynamoDbClient)(table.name) shouldBe empty
   }
 
-  private def assertS3StorageIsEmpty(bucket: Bucket) = {
-    s3Client.listObjects(bucket.name).getObjectSummaries shouldBe empty
-  }
+  private def assertS3StorageIsEmpty(bucket: Bucket) =
+    listKeysInBucket(bucket) shouldBe empty
 
   private def withS3StreamStoreFixtures[R](
     testWith: TestWith[(Bucket,

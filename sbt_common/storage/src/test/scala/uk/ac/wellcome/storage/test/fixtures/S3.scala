@@ -70,10 +70,8 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
         Bucket(bucketName)
       },
       destroy = { bucket: Bucket =>
-        safeCleanup(s3Client) {
-          _.listObjects(bucket.name).getObjectSummaries.asScala.foreach { obj =>
-            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
-          }
+        listKeysInBucket(bucket).foreach { key =>
+          safeCleanup(key) { s3Client.deleteObject(bucket.name, _) }
         }
 
         s3Client.deleteBucket(bucket.name)
@@ -91,4 +89,19 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
     parse(getContentFromS3(bucket, key)).right.get
   }
 
+  /** Returns a list of keys in an S3 bucket.
+    *
+    * Note: this only makes a single call to the ListObjects API, so it
+    * gets a single page of results.
+    *
+    * @param bucket The instance of [[Bucket]] to list.
+    * @return A list of object keys.
+    */
+  def listKeysInBucket(bucket: Bucket): List[String] =
+    s3Client
+      .listObjects(bucket.name)
+      .getObjectSummaries
+      .asScala
+      .map { _.getKey }
+      .toList
 }
