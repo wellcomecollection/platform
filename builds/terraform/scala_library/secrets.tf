@@ -24,7 +24,7 @@ resource "tls_private_key" "github_key" {
 
 data "archive_file" "secrets" {
   type        = "zip"
-  output_path = "${path.module}/secrets_${var.name}.zip"
+  output_path = "${path.module}/../../secrets_${var.name}.zip"
 
   source {
     content  = "${data.template_file.aws_credentials.rendered}"
