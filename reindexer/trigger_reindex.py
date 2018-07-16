@@ -73,7 +73,7 @@ def publish_messages(topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
     sns_client = boto3.client('sns')
     for m in tqdm.tqdm(messages):
-        sns_client.publish(
+        resp = sns_client.publish(
             TopicArn=topic_arn,
             MessageStructure='json',
             Message=json.dumps({
@@ -81,6 +81,7 @@ def publish_messages(topic_arn, messages):
             }),
             Subject=f'Source: {__file__}'
         )
+        assert response['ResponseMetadata']['HTTPStatusCode'] == 200, resp
 
 
 def post_to_slack(source_name, reason):
