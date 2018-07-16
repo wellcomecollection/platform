@@ -52,4 +52,21 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
       caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"
     }
   }
+
+  describe("assertValidRecordNumber") {
+    it("accepts a valid 7-digit record number") {
+      SierraRecordNumbers.assertValidRecordNumber("1234567")
+    }
+
+    it("accepts a valid 8-digit record number") {
+      SierraRecordNumbers.assertValidRecordNumber("12345678")
+    }
+
+    it("rejects an invalid string") {
+      val caught = intercept[RuntimeException] {
+        SierraRecordNumbers.assertValidRecordNumber("NaN")
+      }
+      caught.getMessage shouldBe "Not a valid Sierra record number: NaN"
+    }
+  }
 }
