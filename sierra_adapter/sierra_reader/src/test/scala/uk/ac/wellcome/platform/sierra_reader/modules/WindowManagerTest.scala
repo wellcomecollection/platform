@@ -8,7 +8,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraConfig,
-  SierraResourceTypes
+  SierraResourceTypes,
+  WindowStatus
 }
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
