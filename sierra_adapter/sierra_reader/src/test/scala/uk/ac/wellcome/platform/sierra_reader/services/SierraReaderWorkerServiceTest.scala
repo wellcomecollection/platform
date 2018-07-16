@@ -134,7 +134,6 @@ class SierraReaderWorkerServiceTest
 
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
-      batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
       sendNotificationToSQS(queue = fixtures.queue, body = body)
@@ -163,7 +162,6 @@ class SierraReaderWorkerServiceTest
   it("resumes a window if it finds an in-progress set of records") {
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
-      batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
       val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
