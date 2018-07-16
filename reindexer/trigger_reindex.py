@@ -81,7 +81,7 @@ def publish_messages(topic_arn, messages):
             }),
             Subject=f'Source: {__file__}'
         )
-        assert response['ResponseMetadata']['HTTPStatusCode'] == 200, resp
+        assert resp['ResponseMetadata']['HTTPStatusCode'] == 200, resp
 
 
 def post_to_slack(source_name, reason):
@@ -103,7 +103,10 @@ def post_to_slack(source_name, reason):
 
     webhook_url = tfvars['non_critical_slack_webhook']
 
-    message = f'*{username}* started a reindex in *{source_name}*\nReason: *{reason}*'
+    message = (
+        f'*{username}* started a reindex in *{source_name}*\n
+        f'Reason: *{reason}*'
+    )
 
     slack_data = {
         'username': 'reindex-tracker',
