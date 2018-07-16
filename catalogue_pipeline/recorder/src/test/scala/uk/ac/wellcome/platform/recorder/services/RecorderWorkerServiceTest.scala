@@ -227,12 +227,11 @@ class RecorderWorkerServiceTest
     hybridRecord.id shouldBe s"${expectedWork.sourceIdentifier.identifierType.id}/${expectedWork.sourceIdentifier.value}"
     hybridRecord.version shouldBe expectedVhsVersion
 
-    val content = getContentFromS3(
+    val actualEntry = getObjectFromS3[RecorderWorkEntry](
       bucket = bucket,
       key = hybridRecord.s3key
     )
-    fromJson[RecorderWorkEntry](content).get shouldBe RecorderWorkEntry(
-      expectedWork)
+    actualEntry shouldBe RecorderWorkEntry(expectedWork)
   }
 
   private def withRecorderWorkerService[R](

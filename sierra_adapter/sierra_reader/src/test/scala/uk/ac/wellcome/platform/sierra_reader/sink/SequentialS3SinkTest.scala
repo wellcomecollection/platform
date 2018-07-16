@@ -13,7 +13,6 @@ import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class SequentialS3SinkTest
@@ -56,10 +55,9 @@ class SequentialS3SinkTest
               .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
-              val s3objects =
-                s3Client.listObjects(bucket.name).getObjectSummaries
-              s3objects should have size 1
-              s3objects.asScala.head.getKey() shouldBe "testA_0000.json"
+              val keys = listKeysInBucket(bucket = bucket)
+              keys should have size 1
+              keys.head shouldBe "testA_0000.json"
 
               getJsonFromS3(bucket, "testA_0000.json") shouldBe json
             }
@@ -85,12 +83,9 @@ class SequentialS3SinkTest
               .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
-              val s3objects =
-                s3Client.listObjects(bucket.name).getObjectSummaries
-              s3objects should have size 3
-              s3objects.asScala.map {
-                _.getKey()
-              } shouldBe List(
+              val keys = listKeysInBucket(bucket = bucket)
+              keys should have size 3
+              keys shouldBe List(
                 "testB_0000.json",
                 "testB_0001.json",
                 "testB_0002.json")
@@ -122,11 +117,8 @@ class SequentialS3SinkTest
               .runWith(sink)(materializer)
 
             whenReady(futureDone) { _ =>
-              val s3objects =
-                s3Client.listObjects(bucket.name).getObjectSummaries
-              s3objects.asScala.map {
-                _.getKey()
-              } shouldBe List(
+              val keys = listKeysInBucket(bucket = bucket)
+              keys shouldBe List(
                 "testC_0003.json",
                 "testC_0004.json",
                 "testC_0005.json")

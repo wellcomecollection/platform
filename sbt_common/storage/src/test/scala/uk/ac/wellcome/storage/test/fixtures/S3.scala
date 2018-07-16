@@ -2,13 +2,14 @@ package uk.ac.wellcome.storage.test.fixtures
 
 import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import io.circe.Json
+import io.circe.{Decoder, Json}
 import io.circe.parser.parse
 import org.scalatest.Matchers
 import org.scalatest.concurrent.Eventually
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3StorageBackend}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConverters._
 import scala.util.Random
@@ -70,10 +71,8 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
         Bucket(bucketName)
       },
       destroy = { bucket: Bucket =>
-        safeCleanup(s3Client) {
-          _.listObjects(bucket.name).getObjectSummaries.asScala.foreach { obj =>
-            safeCleanup(obj.getKey) { s3Client.deleteObject(bucket.name, _) }
-          }
+        listKeysInBucket(bucket).foreach { key =>
+          safeCleanup(key) { s3Client.deleteObject(bucket.name, _) }
         }
 
         s3Client.deleteBucket(bucket.name)
@@ -91,4 +90,24 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
     parse(getContentFromS3(bucket, key)).right.get
   }
 
+  /** Returns a decoded object of type T from S3. */
+  def getObjectFromS3[T](bucket: Bucket, key: String)(
+    implicit decoder: Decoder[T]): T =
+    fromJson[T](getContentFromS3(bucket = bucket, key = key)).get
+
+  /** Returns a list of keys in an S3 bucket.
+    *
+    * Note: this only makes a single call to the ListObjects API, so it
+    * gets a single page of results.
+    *
+    * @param bucket The instance of [[Bucket]] to list.
+    * @return A list of object keys.
+    */
+  def listKeysInBucket(bucket: Bucket): List[String] =
+    s3Client
+      .listObjects(bucket.name)
+      .getObjectSummaries
+      .asScala
+      .map { _.getKey }
+      .toList
 }

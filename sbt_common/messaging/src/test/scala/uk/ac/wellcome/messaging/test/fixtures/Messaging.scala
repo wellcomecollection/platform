@@ -171,13 +171,10 @@ trait Messaging
 
     val messagePointer = tryMessagePointer.get
 
-    val tryT = fromJson[T](
-      getContentFromS3(
-        Bucket(messagePointer.src.namespace),
-        messagePointer.src.key))
-    tryT shouldBe a[Success[_]]
-
-    tryT.get
+    getObjectFromS3[T](
+      bucket = Bucket(messagePointer.src.namespace),
+      key = messagePointer.src.key
+    )
   }
 
   /** Given a topic ARN which has received notifications containing pointers

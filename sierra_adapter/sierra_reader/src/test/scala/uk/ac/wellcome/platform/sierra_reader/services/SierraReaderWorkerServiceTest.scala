@@ -24,7 +24,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraResourceTypes
 }
 
-import collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraReaderWorkerServiceTest
@@ -109,11 +108,8 @@ class SierraReaderWorkerServiceTest
         "windows_bibs_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects =
-          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
-
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
-        objects.asScala.map { _.getKey() } shouldBe pageNames
+        listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
         getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
@@ -134,7 +130,6 @@ class SierraReaderWorkerServiceTest
 
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
-      batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
       sendNotificationToSQS(queue = fixtures.queue, body = body)
@@ -146,11 +141,8 @@ class SierraReaderWorkerServiceTest
         "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects =
-          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
-
         // There are 157 item records in the Sierra wiremock so we expect 4 files
-        objects.asScala.map { _.getKey() } shouldBe pageNames
+        listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
         getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
@@ -163,7 +155,6 @@ class SierraReaderWorkerServiceTest
   it("resumes a window if it finds an in-progress set of records") {
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
-      batchSize = 50,
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
       val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
@@ -202,11 +193,8 @@ class SierraReaderWorkerServiceTest
         "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
 
       eventually {
-        val objects =
-          s3Client.listObjects(fixtures.bucket.name).getObjectSummaries
-
         // There are 157 item records in the Sierra wiremock so we expect 4 files
-        objects.asScala.map { _.getKey() } shouldBe pageNames
+        listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
         // These two files were pre-populated -- we check the reader hasn't overwritten these
         getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0
@@ -221,7 +209,7 @@ class SierraReaderWorkerServiceTest
 
   private def getRecordsFromS3(bucket: Bucket,
                                key: String): List[SierraRecord] =
-    fromJson[List[SierraRecord]](getContentFromS3(bucket, key)).get
+    getObjectFromS3[List[SierraRecord]](bucket, key)
 
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {

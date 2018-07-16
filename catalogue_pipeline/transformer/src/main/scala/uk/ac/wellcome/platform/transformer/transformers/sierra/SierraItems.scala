@@ -2,13 +2,17 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraRecordNumbers,
+  SierraRecordTypes
+}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success}
 
-trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
+trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
     sierraTransformable: SierraTransformable): List[SierraItemData] = {
     sierraTransformable.itemData.values
@@ -32,7 +36,7 @@ trait SierraItems extends Logging with SierraCheckDigits with SierraLocation {
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = addCheckDigit(
+        value = SierraRecordNumbers.addCheckDigit(
           sierraItemData.id,
           recordType = SierraRecordTypes.items
         )
