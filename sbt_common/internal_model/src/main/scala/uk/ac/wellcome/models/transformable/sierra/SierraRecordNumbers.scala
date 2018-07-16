@@ -74,4 +74,16 @@ object SierraRecordNumbers {
       .sum % 11
     if (remainder == 10) "x" else remainder.toString
   }
+
+  /** Throws an exception if the given string doesn't look like a valid
+    * Sierra record number.
+    *
+    * Note: this doesn't inspect the check digit (yet), just that it's
+    * a seven- or eight-digit string.
+    */
+  def assertValidRecordNumber(s: String): Unit =
+    """^[0-9]{7}[0-9xX]?$""".r.unapplySeq(s) match {
+      case Some(_) => ()
+      case None => throw new RuntimeException(s"Not a valid Sierra record number: $s")
+    }
 }
