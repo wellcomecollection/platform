@@ -28,11 +28,11 @@ class IngestorWorkerServiceTest
     extends FunSpec
     with ScalaFutures
     with Matchers
+    with Messaging
     with ElasticsearchFixtures
     with SQS
     with S3
     with WorkIndexerFixtures
-    with Messaging
     with WorksUtil
     with CustomElasticSearchMapping {
 
