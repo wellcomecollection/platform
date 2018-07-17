@@ -16,6 +16,7 @@ include reindexer/Makefile
 include sbt_common/Makefile
 include sierra_adapter/Makefile
 include nginx/Makefile
+include archive/Makefile
 
 
 travis-lambda-test:
