@@ -18,13 +18,13 @@ module "catalogue_pipeline" {
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-07-11-reindex-with-a-bit-less-ingestor"
-  index_v2 = "v2-2018-07-11-reindex-with-a-bit-less-ingestor"
+  index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
+  index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
 
-  identifiers_rds_cluster_password = "${module.identifiers_rds_cluster.password}"
-  identifiers_rds_cluster_username = "${module.identifiers_rds_cluster.username}"
-  identifiers_rds_cluster_port = "${module.identifiers_rds_cluster.port}"
-  identifiers_rds_cluster_host = "${module.identifiers_rds_cluster.host}"
+  identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
+  identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"
+  identifiers_rds_cluster_port = "${module.identifiers_delta_rds_cluster.port}"
+  identifiers_rds_cluster_host = "${module.identifiers_delta_rds_cluster.host}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn = "${local.dlq_alarm_arn}"

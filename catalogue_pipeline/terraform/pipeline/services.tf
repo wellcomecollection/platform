@@ -69,7 +69,7 @@ module "matcher"{
     dynamo_lock_table       = "${aws_dynamodb_table.matcher_lock_table.id}"
     dynamo_lock_table_index = "${var.matcher_lock_table_index}"
   }
-  env_vars_length = 9
+  env_vars_length = 8
 
   container_image = "${var.matcher_container_image}"
   source_queue_name = "${module.matcher_queue.name}"
@@ -95,7 +95,7 @@ module "merger"{
     vhs_recorder_bucket_name = "${module.vhs_recorder.bucket_name}"
     vhs_recorder_table_name  = "${module.vhs_recorder.table_name}"
   }
-  env_vars_length = 8
+  env_vars_length = 7
 
   container_image = "${var.merger_container_image}"
   source_queue_name = "${module.merger_queue.name}"
@@ -122,9 +122,10 @@ module "id_minter"{
     db_password         = "${var.identifiers_rds_cluster_password}"
     queue_url           = "${module.id_minter_queue.id}"
     topic_arn           = "${module.es_ingest_topic.arn}"
+    sqs_max_messages    = 10
   }
 
-  env_vars_length = 8
+  env_vars_length = 9
   container_image = "${var.id_minter_container_image}"
   source_queue_name = "${module.id_minter_queue.name}"
   source_queue_arn = "${module.id_minter_queue.arn}"
