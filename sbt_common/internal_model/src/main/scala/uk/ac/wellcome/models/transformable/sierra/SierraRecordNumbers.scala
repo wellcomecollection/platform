@@ -42,9 +42,9 @@ object SierraRecordNumbers {
         )
     }
 
-    val result = s"$prefix$sierraId$checkDigit"
-    assertIs8DigitRecordNumber(result)
-    result
+    val recordNumber = s"$sierraId$checkDigit"
+    assertIs8DigitRecordNumber(recordNumber)
+    s"$prefix$recordNumber"
   }
 
   /** Returns the check digit that should be added to a record ID.
