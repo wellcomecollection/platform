@@ -107,14 +107,16 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
     it("rejects 8-digit record numbers") {
       assertThrowsAssertionError(
         () => SierraRecordNumbers.increment("12345678"),
-        expectedMessage = "increment() can only be used with 7-digit record numbers; not 12345678"
+        expectedMessage =
+          "increment() can only be used with 7-digit record numbers; not 12345678"
       )
     }
 
     it("rejects bad inputs") {
       assertThrowsAssertionError(
         () => SierraRecordNumbers.increment("NaN"),
-        expectedMessage = "increment() can only be used with 7-digit record numbers; not NaN"
+        expectedMessage =
+          "increment() can only be used with 7-digit record numbers; not NaN"
       )
     }
 
@@ -127,7 +129,8 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
     }
   }
 
-  private def assertThrowsAssertionError(f: => () => Unit, expectedMessage: String): Assertion = {
+  private def assertThrowsAssertionError(f: => () => Unit,
+                                         expectedMessage: String): Assertion = {
     val caught = intercept[AssertionError] { f() }
     caught.getMessage shouldBe s"assertion failed: $expectedMessage"
   }

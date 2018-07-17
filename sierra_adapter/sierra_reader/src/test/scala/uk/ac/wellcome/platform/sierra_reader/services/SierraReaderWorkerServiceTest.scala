@@ -183,7 +183,9 @@ class SierraReaderWorkerServiceTest
       // which we'll use to restart the window.
       listKeysInBucket(bucket = fixtures.bucket)
         .filterNot { _.endsWith("0000.json") }
-        .foreach { key => s3Client.deleteObject(fixtures.bucket.name, key) }
+        .foreach { key =>
+          s3Client.deleteObject(fixtures.bucket.name, key)
+        }
 
       eventually {
         listKeysInBucket(bucket = fixtures.bucket) should have size 1

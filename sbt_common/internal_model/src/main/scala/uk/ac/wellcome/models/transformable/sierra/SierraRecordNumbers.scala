@@ -79,17 +79,13 @@ object SierraRecordNumbers {
     """^[0-9]{7}$""".r.unapplySeq(s) isDefined
 
   def assertIs7DigitRecordNumber(s: String): Unit =
-    assert(
-      is7digitRecordNumber(s),
-      s"Not a 7-digit Sierra record number: $s")
+    assert(is7digitRecordNumber(s), s"Not a 7-digit Sierra record number: $s")
 
   private def is8digitRecordNumber(s: String): Boolean =
     """^[0-9]{7}[0-9xX]$""".r.unapplySeq(s) isDefined
 
   def assertIs8DigitRecordNumber(s: String): Unit =
-    assert(
-      is8digitRecordNumber(s),
-      s"Not an 8-digit Sierra record number: $s")
+    assert(is8digitRecordNumber(s), s"Not an 8-digit Sierra record number: $s")
 
   /** Throws an exception if the given string doesn't look like a valid
     * Sierra record number.

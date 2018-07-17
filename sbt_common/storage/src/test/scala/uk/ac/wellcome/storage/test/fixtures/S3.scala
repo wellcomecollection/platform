@@ -117,9 +117,7 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
     *
     */
   def getAllObjectContents(bucket: Bucket): Map[String, String] =
-    listKeysInBucket(bucket)
-      .map { key =>
-        key -> getContentFromS3(bucket = bucket, key = key)
-      }
-      .toMap
+    listKeysInBucket(bucket).map { key =>
+      key -> getContentFromS3(bucket = bucket, key = key)
+    }.toMap
 }
