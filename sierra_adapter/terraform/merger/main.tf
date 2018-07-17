@@ -3,7 +3,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=scale-down-on-messages-deleted"
 
   service_name       = "sierra_${local.resource_type_singular}_merger"
   task_desired_count = "0"
