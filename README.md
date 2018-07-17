@@ -30,13 +30,19 @@ Code for the platform is split across multiple repositories:
 
 *   [wellcometrust/dockerfiles][dockerfiles] contains Dockerfiles for components of the platform, including most of our build system
 
+*   [wellcometrust/terraform-modules][terraformmods] contains reusable Terraform modules that we use to define our infrastructure
+
+The bulk of our code is written in Scala.
+To reduce build times in the main repo, we've pushed out some of our libraries into external repositories:
+
+*   [wellcometrust/scala-storage][storage] provides wrappers around S3 and DynamoDB, including our "Versioned Hybrid Store" for storing large objects.
+
 *   [wellcometrust/sierra-streams-source][sierrastreams] is a Scala library that provides Akka Streams from objects in a [Sierra API][sierra].
     Sierra is the library management system we use at Wellcome Collection, and one of the data sources for the platform.
-
-*   [wellcometrust/terraform-modules][terraformmods] contains reusable Terraform modules that we use to define our infrastructure
 
 [awsutils]: https://github.com/wellcometrust/aws_utils
 [dockerfiles]: https://github.com/wellcometrust/dockerfiles
 [terraformmods]: https://github.com/wellcometrust/terraform-modules
 [sierrastreams]: https://github.com/wellcometrust/sierra-streams-source
+[storage]: https://github.com/wellcometrust/scala-storage
 [sierra]: https://techdocs.iii.com/sierraapi/Default.htm
