@@ -37,7 +37,7 @@ from travistooling.decisions import (
 
     # Certain file formats are always excluded.
     ('foo.md', 'ingestor-build', IgnoredFileFormat, False),
-    ('image.png', 'reindex_worker-test', IgnoredFileFormat, False),
+    ('image.png', 'reindex_request_creator-test', IgnoredFileFormat, False),
     ('ontology.graffle', 'nginx-test', IgnoredFileFormat, False),
     ('Makefile', 'travistooling-test', IgnoredFileFormat, False),
     ('monitoring/Makefile', 'travistooling-test', IgnoredFileFormat, False),
@@ -76,19 +76,19 @@ from travistooling.decisions import (
 
     # Changes to the display models don't affect all of the stacks
     ('sbt_common/display/model.scala', 'id_minter-test', ChangeToUnusedLibrary, False),
-    ('sbt_common/display/model.scala', 'reindex_worker-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/display/model.scala', 'reindex_request_creator-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/display/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
 
     # Changes to the elasticsearch lib don't affect all of the stacks
     ('sbt_common/elasticsearch/model.scala', 'id_minter-test', ChangeToUnusedLibrary, False),
-    ('sbt_common/elasticsearch/model.scala', 'reindex_worker-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/elasticsearch/model.scala', 'reindex_request_creator-test', ChangeToUnusedLibrary, False),
     ('sbt_common/elasticsearch/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/elasticsearch/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/elasticsearch/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
     ('sbt_common/finatra_elasticsearch/model.scala', 'id_minter-test', ChangeToUnusedLibrary, False),
-    ('sbt_common/finatra_elasticsearch/model.scala', 'reindex_worker-test', ChangeToUnusedLibrary, False),
+    ('sbt_common/finatra_elasticsearch/model.scala', 'reindex_request_creator-test', ChangeToUnusedLibrary, False),
     ('sbt_common/finatra_elasticsearch/model.scala', 'goobi_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/finatra_elasticsearch/model.scala', 'sierra_reader-test', ChangeToUnusedLibrary, False),
     ('sbt_common/finatra_elasticsearch/model.scala', 'api-test', ScalaChangeAndIsScalaApp, True),
@@ -115,11 +115,11 @@ from travistooling.decisions import (
     ('lambda_conftest.py', 'loris-publish', ChangesToTestsDontGetPublished, False),
     ('lambda_conftest.py', 'post_to_slack-publish', ChangesToTestsDontGetPublished, False),
     ('shared_conftest.py', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
-    ('reindex_job_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
+    ('reindex_request_creator/.coveragerc', 'reindex_shard_generator-publish', ChangesToTestsDontGetPublished, False),
 
     # Changes to Lambdas trigger the travis-lambda-test task.
-    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-test', CheckedByTravisLambda, True),
-    ('reindexer/reindex_job_creator/src/reindex_job_creator.py', 'travis-lambda-publish', CheckedByTravisLambda, True),
+    ('reindexer/reindex_request_creator/src/reindex_request_creator.py', 'travis-lambda-test', CheckedByTravisLambda, True),
+    ('reindexer/reindex_request_creator/src/reindex_request_creator.py', 'travis-lambda-publish', CheckedByTravisLambda, True),
 
     # Changes to travistooling only trigger the travistooling tests
     ('travistooling/decisionmaker.py', 'travistooling-test', ExclusivelyAffectsThisTask, True),
