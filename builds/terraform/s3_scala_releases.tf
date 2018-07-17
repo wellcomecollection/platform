@@ -16,4 +16,8 @@ resource "aws_s3_bucket" "releases" {
 
     enabled = true
   }
+
+  website {
+    index_document = "index.html"
+  }
 }
