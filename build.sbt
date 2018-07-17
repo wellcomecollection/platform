@@ -9,7 +9,6 @@ def doServiceSetup(project: Project, folder: String) =
     .settings(Common.settings: _*)
     .settings(Finatra.settings: _*)
     .settings(DockerCompose.settings: _*)
-    .settings(S3.settings: _*)
     .enablePlugins(DockerComposePlugin)
     .enablePlugins(JavaAppPackaging)
 
@@ -18,7 +17,6 @@ def doSharedLibrarySetup(project: Project, folder: String) =
     .in(new File(folder))
     .settings(Common.settings: _*)
     .settings(DockerCompose.settings: _*)
-    .settings(S3.settings: _*)
     .enablePlugins(DockerComposePlugin)
     .enablePlugins(JavaAppPackaging)
 
