@@ -39,11 +39,14 @@ class RecorderFeatureTest
                 queue = queue,
                 obj = work)
 
+              val workEntry = RecorderWorkEntry(work)
+
               eventually {
                 assertStored[RecorderWorkEntry](
                   bucket,
                   table,
-                  RecorderWorkEntry(work))
+                  id = workEntry.id,
+                  record = workEntry)
               }
             }
           }

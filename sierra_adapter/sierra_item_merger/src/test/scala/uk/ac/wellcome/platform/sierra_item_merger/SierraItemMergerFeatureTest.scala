@@ -52,7 +52,8 @@ class SierraItemMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable)
+                  id = expectedSierraTransformable.id,
+                  record = expectedSierraTransformable)
               }
             }
           }
@@ -107,11 +108,13 @@ class SierraItemMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable1)
+                  id = expectedSierraTransformable1.id,
+                  record = expectedSierraTransformable1)
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable2)
+                  id = expectedSierraTransformable2.id,
+                  record = expectedSierraTransformable2)
               }
             }
           }

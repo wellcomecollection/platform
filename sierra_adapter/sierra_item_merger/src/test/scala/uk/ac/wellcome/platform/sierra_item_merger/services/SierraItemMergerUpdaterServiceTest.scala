@@ -62,7 +62,8 @@ class SierraItemMergerUpdaterServiceTest
               assertStored[SierraTransformable](
                 bucket,
                 table,
-                expectedSierraTransformable)
+                id = expectedSierraTransformable.id,
+                record = expectedSierraTransformable)
             }
           }
         }
@@ -152,7 +153,8 @@ class SierraItemMergerUpdaterServiceTest
                   assertStored[SierraTransformable](
                     bucket,
                     table,
-                    expectedNewSierraTransformable)
+                    id = expectedNewSierraTransformable.id,
+                    record = expectedNewSierraTransformable)
 
                   val expectedUpdatedSierraTransformable = oldRecord.copy(
                     itemData = Map(
@@ -164,8 +166,11 @@ class SierraItemMergerUpdaterServiceTest
                   assertStored[SierraTransformable](
                     bucket,
                     table,
-                    expectedUpdatedSierraTransformable)
-                  assertStored[SierraTransformable](bucket, table, newRecord)
+                    id = expectedUpdatedSierraTransformable.id,
+                    record = expectedUpdatedSierraTransformable)
+                  assertStored[SierraTransformable](bucket, table,
+                    id = newRecord.id,
+                    record = newRecord)
                 }
               }
             }
@@ -214,7 +219,8 @@ class SierraItemMergerUpdaterServiceTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord)
+                  id = expectedSierraRecord.id,
+                  record = expectedSierraRecord)
               }
             }
           }
@@ -296,11 +302,13 @@ class SierraItemMergerUpdaterServiceTest
               assertStored[SierraTransformable](
                 bucket,
                 table,
-                expectedSierraRecord1)
+                id = expectedSierraRecord1.id,
+                record = expectedSierraRecord1)
               assertStored[SierraTransformable](
                 bucket,
                 table,
-                expectedSierraRecord2)
+                id = expectedSierraRecord2.id,
+                record = expectedSierraRecord2)
             }
           }
         }
@@ -377,11 +385,13 @@ class SierraItemMergerUpdaterServiceTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord1)
+                  id = expectedSierraRecord1.id,
+                  record = expectedSierraRecord1)
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord2)
+                  id = expectedSierraRecord2.id,
+                  record = expectedSierraRecord2)
               }
             }
           }
@@ -460,11 +470,13 @@ class SierraItemMergerUpdaterServiceTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord1)
+                  id = expectedSierraRecord1.id,
+                  record = expectedSierraRecord1)
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord2)
+                  id = expectedSierraRecord2.id,
+                  record = expectedSierraRecord2)
               }
             }
           }
@@ -505,7 +517,9 @@ class SierraItemMergerUpdaterServiceTest
 
             whenReady(f1) { _ =>
               whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-                assertStored[SierraTransformable](bucket, table, sierraRecord)
+                assertStored[SierraTransformable](bucket, table,
+                  id = sierraRecord.id,
+                  record = sierraRecord)
               }
             }
           }
@@ -549,7 +563,8 @@ class SierraItemMergerUpdaterServiceTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraRecord)
+                  id = expectedSierraRecord.id,
+                  record = expectedSierraRecord)
               }
             }
           }
