@@ -1,11 +1,15 @@
 import sbt._
 import Keys._
+import ohnosequences.sbt.SbtS3Resolver._
 
 object Common {
   val settings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.6",
     organization := "uk.ac.wellcome",
-    resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += Resolver.sonatypeRepo("releases") ++
+      s3resolver.value(
+        "Releases resolver",
+        s3("releases.mvn-repo.wellcomecollection.org")).withIvyPatterns,
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
