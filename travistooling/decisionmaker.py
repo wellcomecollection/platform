@@ -157,19 +157,6 @@ def does_file_affect_build_task(path, task):
                 )):
                     raise ChangeToUnusedLibrary('messaging')
 
-    # We have a library for storage code.
-    #
-    # The catalogue API doesn't use this code, because it only interacts
-    # with ElasticCloud.
-    #
-    if path.startswith(('sbt_common/storage', 'sbt_common/finatra_storage')):
-        for project in PROJECTS:
-            if task.startswith(project.name) and (project.type == 'sbt_app'):
-                if project.exclusive_path.startswith((
-                    'catalogue_api/',
-                )):
-                    raise ChangeToUnusedLibrary('storage')
-
     # We have a couple of sbt common libs and files scattered around the
     # repository; changes to any of these don't affect non-sbt applications.
     if path.startswith((

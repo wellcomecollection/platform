@@ -99,12 +99,6 @@ from travistooling.decisions import (
     ('sbt_common/finatra_messaging/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
     ('sbt_common/finatra_messaging/model.scala', 'api-test', ChangeToUnusedLibrary, False),
 
-    # Changes to the storage lib don't affect all the stacks
-    ('sbt_common/storage/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
-    ('sbt_common/storage/model.scala', 'api-test', ChangeToUnusedLibrary, False),
-    ('sbt_common/finatra_storage/model.scala', 'id_minter-test', ScalaChangeAndIsScalaApp, True),
-    ('sbt_common/finatra_storage/model.scala', 'api-test', ChangeToUnusedLibrary, False),
-
     # Changes to Scala test files trigger a -test Scala task, but not
     # a -publish task.
     ('sbt_common/src/test/scala/uk/ac/wellcome/MyTest.scala', 'sierra_adapter-publish', ChangesToTestsDontGetPublished, False),
