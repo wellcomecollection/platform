@@ -7,8 +7,6 @@ locals {
   vpc_services_id = "${data.terraform_remote_state.catalogue_pipeline.vpc_services_id}"
 
   alb_cloudwatch_id          = "${data.terraform_remote_state.catalogue_pipeline.alb_cloudwatch_id}"
-  alb_listener_https_arn     = "${data.terraform_remote_state.catalogue_pipeline.alb_listener_https_arn}"
-  alb_listener_http_arn      = "${data.terraform_remote_state.catalogue_pipeline.alb_listener_http_arn}"
   alb_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_client_error_alarm_arn}"
 

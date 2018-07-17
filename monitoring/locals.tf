@@ -10,7 +10,7 @@ locals {
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
 
   bucket_alb_logs_id      = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
-  ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.ecs_services_cluster_name}"
+  ecs_services_cluster_id = "${data.terraform_remote_state.catalogue_pipeline.cluster_name}"
 
   terraform_apply_topic_name  = "${data.terraform_remote_state.shared_infra.terraform_apply_topic_name}"
   cloudfront_errors_topic_arn = "${data.terraform_remote_state.loris.cloudfront_errors_topic_arn}"

@@ -4,7 +4,7 @@
 -aws.rds.password=${db_password}
 -aws.rds.port=${db_port}
 -aws.rds.userName=${db_username}
--aws.metrics.namespace=id-minter
+-aws.metrics.namespace=${metrics_namespace}
 -aws.message.reader.s3.bucketName=${message_bucket_name}
 -aws.message.writer.sns.topic.arn=${topic_arn}
 -aws.message.writer.s3.bucketName=${message_bucket_name}

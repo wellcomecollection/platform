@@ -1,3 +1,4 @@
+// TODO delete once the reindexer stack gets migrated to fargate
 module "catalogue_pipeline_cluster" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecs/cluster?ref=v6.4.1"
   name   = "catalogue-pipeline"

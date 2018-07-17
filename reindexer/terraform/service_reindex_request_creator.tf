@@ -19,9 +19,6 @@ module "reindex_request_creator" {
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"
   vpc_id                     = "${local.vpc_services_id}"
-  alb_cloudwatch_id          = "${local.alb_cloudwatch_id}"
-  alb_listener_https_arn     = "${local.alb_listener_https_arn}"
-  alb_listener_http_arn      = "${local.alb_listener_http_arn}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
 

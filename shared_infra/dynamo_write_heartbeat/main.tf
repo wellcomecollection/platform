@@ -1,7 +1,7 @@
 module "lambda_dynamo_write_heartbeat" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
-  name        = "dynamo_write_heartbeat_${var.name}"
+  name        = "${var.name}"
   module_name = "dynamo_write_heartbeat"
   description = "Keep DynamoDB capacity scaling by sending heartbeat writes"
   timeout     = 5
@@ -19,7 +19,7 @@ module "lambda_dynamo_write_heartbeat" {
 }
 
 resource "aws_cloudwatch_event_rule" "dynamo_heartbeat_scheduler_rule" {
-  name                = "dynamo-heartbeat-scheduler-rule"
+  name                = "${var.name}-rule"
   description         = "Heartbeat scheduler for writes to dynamoDb"
   schedule_expression = "rate(10 minutes)"
 }
