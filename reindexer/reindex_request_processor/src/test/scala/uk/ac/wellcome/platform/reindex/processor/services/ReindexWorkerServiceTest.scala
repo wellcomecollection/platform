@@ -43,7 +43,7 @@ class ReindexWorkerServiceTest
             eventually {
               assertQueueEmpty(queue)
               assertQueueHasSize(dlq, 1)
-              assertTableHasNoItems[ReindexableRecord](table)
+              assertTableEmpty[ReindexableRecord](table)
             }
           }
         }
