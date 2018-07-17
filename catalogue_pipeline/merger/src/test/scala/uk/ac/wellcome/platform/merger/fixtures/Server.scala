@@ -7,9 +7,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
 import uk.ac.wellcome.platform.merger.{Server => AppServer}
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
 trait Server

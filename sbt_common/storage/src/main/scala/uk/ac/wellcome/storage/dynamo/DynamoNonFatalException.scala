@@ -11,4 +11,4 @@ package uk.ac.wellcome.storage.dynamo
 // It wouldn't be thrown for errors that can't be recovered from,
 // e.g. authentication errors.
 //
-case class DynamoNonFatalException(e: Throwable) extends Exception(e.getMessage)
+case class DynamoNonFatalError(e: Throwable) extends Exception(e.getMessage)

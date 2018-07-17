@@ -14,7 +14,7 @@ import uk.ac.wellcome.models.matcher.{
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._

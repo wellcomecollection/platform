@@ -5,7 +5,7 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.platform.sierra_item_merger.utils.SierraItemMergerTestUtil
-import uk.ac.wellcome.storage.test.fixtures.{LocalVersionedHybridStore, S3}
+import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._

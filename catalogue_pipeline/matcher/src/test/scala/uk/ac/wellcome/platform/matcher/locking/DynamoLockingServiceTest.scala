@@ -8,7 +8,7 @@ import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
 
 import scala.collection.immutable
 import scala.concurrent.ExecutionContext.Implicits.global

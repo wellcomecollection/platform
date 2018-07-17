@@ -15,8 +15,8 @@ import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
 import uk.ac.wellcome.platform.ingestor.fixtures.WorkIndexerFixtures
-import uk.ac.wellcome.storage.test.fixtures.S3
-import uk.ac.wellcome.storage.test.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.fixtures.S3
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 
