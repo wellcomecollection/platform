@@ -21,8 +21,9 @@ module "task" {
   app_container_image = "${var.app_container_image}"
   app_container_port  = "${var.app_container_port}"
 
-  app_cpu      = "${var.app_cpu}"
-  app_memory   = "${var.app_memory}"
+  app_cpu    = "${var.app_cpu}"
+  app_memory = "${var.app_memory}"
+
   app_env_vars = {
     api_host    = "${var.host_name}"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
