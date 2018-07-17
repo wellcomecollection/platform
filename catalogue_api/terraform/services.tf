@@ -84,6 +84,14 @@ locals {
   romulus_hostname = "${local.romulus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
 }
 
+output "romulus_app_uri" {
+  value = "${local.romulus_app_uri}"
+}
+
+output "remus_app_uri" {
+  value = "${local.remus_app_uri}"
+}
+
 resource "aws_service_discovery_private_dns_namespace" "namespace" {
   name = "${local.namespace}"
   vpc  = "${local.vpc_id}"
@@ -130,6 +138,8 @@ module "api_romulus_delta" {
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   es_config              = "${var.es_config_romulus}"
+
+  task_desired_count = "0"
 }
 
 module "api_remus_delta" {
@@ -152,4 +162,6 @@ module "api_remus_delta" {
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   es_config              = "${var.es_config_remus}"
+
+  task_desired_count = "0"
 }
