@@ -25,7 +25,7 @@ object Dependencies {
   }
 
   lazy val wellcomeVersions = new {
-    val storage = "0.1.0"
+    val storage = "1.0.0"
   }
 
   // External Library dependency groups
