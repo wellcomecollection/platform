@@ -168,7 +168,9 @@ class SierraItemMergerUpdaterServiceTest
                     table,
                     id = expectedUpdatedSierraTransformable.id,
                     record = expectedUpdatedSierraTransformable)
-                  assertStored[SierraTransformable](bucket, table,
+                  assertStored[SierraTransformable](
+                    bucket,
+                    table,
                     id = newRecord.id,
                     record = newRecord)
                 }
@@ -517,7 +519,9 @@ class SierraItemMergerUpdaterServiceTest
 
             whenReady(f1) { _ =>
               whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
-                assertStored[SierraTransformable](bucket, table,
+                assertStored[SierraTransformable](
+                  bucket,
+                  table,
                   id = sierraRecord.id,
                   record = sierraRecord)
               }
