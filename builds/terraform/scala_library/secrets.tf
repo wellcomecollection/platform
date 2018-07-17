@@ -37,7 +37,7 @@ data "archive_file" "secrets" {
   }
 
   source {
-    content  = "${tls_private_key.github_key.public_key_pem}"
+    content  = "${tls_private_key.github_key.public_key_openssh}"
     filename = "id_rsa.pub"
   }
 }
