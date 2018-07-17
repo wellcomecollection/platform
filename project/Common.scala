@@ -1,15 +1,11 @@
 import sbt._
 import Keys._
-import ohnosequences.sbt.SbtS3Resolver._
 
 object Common {
   val settings: Seq[Def.Setting[_]] = Seq(
     scalaVersion := "2.12.6",
     organization := "uk.ac.wellcome",
-    resolvers += Resolver.sonatypeRepo("releases") ++
-      s3resolver.value(
-        "Releases resolver",
-        s3("releases.mvn-repo.wellcomecollection.org")).withIvyPatterns,
+    resolvers += Resolver.sonatypeRepo("releases"),
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
@@ -46,5 +42,11 @@ object Finatra {
   val settings: Seq[Def.Setting[_]] = Seq(
     resolvers += "maven.twttr.com" at "https://maven.twttr.com",
     fork in run := true
+  )
+}
+
+object S3 {
+  val settings: Seq[Def.Setting[_]] = Seq(
+    resolvers += "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org"
   )
 }
