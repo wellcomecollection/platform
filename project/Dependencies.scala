@@ -126,7 +126,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0",
-    "uk.ac.wellcome" % "storage" % wellcomeVersions.storage
+    "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage
   ) ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val commonStorageDependencies = Seq(
@@ -136,7 +136,7 @@ object Dependencies {
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val finatraStorageDependencies = finatraDependencies ++ Seq(
-    "uk.ac.wellcome" % "storage" % wellcomeVersions.storage
+    "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage
   )
 
   val commonMonitoringDependencies = Seq(

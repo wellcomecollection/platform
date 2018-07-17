@@ -47,6 +47,8 @@ object Finatra {
 
 object S3 {
   val settings: Seq[Def.Setting[_]] = Seq(
-    resolvers += "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org"
+    resolvers += Resolver.url(
+      "S3 releases",
+      url("http://releases.mvn-repo.wellcomecollection.org.s3-website-eu-west-1.amazonaws.com"))(Resolver.ivyStylePatterns)
   )
 }
