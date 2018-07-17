@@ -95,6 +95,11 @@ if __name__ == '__main__':
         cmd += ['--volume', '%s/.sbt:/root/.sbt' % os.environ['HOME']]
         cmd += ['--volume', '%s/.ivy2:/root/.ivy2' % os.environ['HOME']]
 
+        # We need AWS credentials so we can resolve releases that are
+        # published to our private S3 bucket.
+        if not namespace.share_aws_creds:
+            cmd += _aws_credentials_args()
+
     if namespace.expose_host_root_folder:
         cmd += ['-e', 'ROOT=%s' % ROOT]
 
