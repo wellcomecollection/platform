@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "travis_permissions" {
 
   statement {
     actions = [
-      "s3:ListBucket"
+      "s3:ListBucket",
     ]
 
     resources = [
