@@ -130,10 +130,6 @@ object Dependencies {
     "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage % "test" classifier "tests"
   ) ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
-  val commonStorageDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  ) ++ dynamoDependencies ++ guiceDependencies
-
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
   val finatraStorageDependencies = finatraDependencies ++ Seq(
