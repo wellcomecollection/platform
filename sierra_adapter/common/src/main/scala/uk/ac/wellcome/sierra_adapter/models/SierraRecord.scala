@@ -12,7 +12,9 @@ import uk.ac.wellcome.models.transformable.sierra.{
 
 import scala.util.Try
 
-case class SierraRecord(id: SierraRecordNumber, data: String, modifiedDate: Instant) {
+case class SierraRecord(id: SierraRecordNumber,
+                        data: String,
+                        modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
     SierraBibRecord(
       id = this.id,

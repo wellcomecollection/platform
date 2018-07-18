@@ -31,7 +31,8 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
 
   describe("increments") {
     it("increments an ID correctly") {
-      SierraRecordNumber("1000000").increment shouldBe SierraRecordNumber("1000001")
+      SierraRecordNumber("1000000").increment shouldBe SierraRecordNumber(
+        "1000001")
     }
   }
 

@@ -1,7 +1,11 @@
 package uk.ac.wellcome.models.transformable
 
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
@@ -28,7 +32,9 @@ case class SierraTransformable(
 object SierraTransformable {
   def apply(sourceId: String, bibData: String): SierraTransformable = {
     val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(sierraId = SierraRecordNumber(sourceId), maybeBibData = Some(bibRecord))
+    SierraTransformable(
+      sierraId = SierraRecordNumber(sourceId),
+      maybeBibData = Some(bibRecord))
   }
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =

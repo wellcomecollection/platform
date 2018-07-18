@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.transformer.source
 
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
-import uk.ac.wellcome.platform.transformer.source.sierra.{Country => SierraCountry, Language => SierraLanguage}
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Country => SierraCountry,
+  Language => SierraLanguage
+}
 
 case class SierraBibData(
   id: SierraRecordNumber,

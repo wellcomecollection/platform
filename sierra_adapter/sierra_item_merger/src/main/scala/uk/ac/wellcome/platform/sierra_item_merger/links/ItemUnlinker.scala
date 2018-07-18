@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 
 object ItemUnlinker {
 
@@ -12,18 +15,19 @@ object ItemUnlinker {
         s"Non-matching bib id ${sierraTransformable.sierraId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
-    val itemData: Map[SierraRecordNumber, SierraItemRecord] = sierraTransformable.itemData
-      .filterNot {
-        case (id, currentItemRecord) => {
-          val matchesCurrentItemRecord = id == itemRecord.id
+    val itemData: Map[SierraRecordNumber, SierraItemRecord] =
+      sierraTransformable.itemData
+        .filterNot {
+          case (id, currentItemRecord) => {
+            val matchesCurrentItemRecord = id == itemRecord.id
 
-          val modifiedAfter = itemRecord.modifiedDate.isAfter(
-            currentItemRecord.modifiedDate
-          )
+            val modifiedAfter = itemRecord.modifiedDate.isAfter(
+              currentItemRecord.modifiedDate
+            )
 
-          matchesCurrentItemRecord && modifiedAfter
+            matchesCurrentItemRecord && modifiedAfter
+          }
         }
-      }
 
     sierraTransformable.copy(itemData = itemData)
   }

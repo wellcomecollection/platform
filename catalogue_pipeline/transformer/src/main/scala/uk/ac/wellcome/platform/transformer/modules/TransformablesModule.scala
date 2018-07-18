@@ -30,7 +30,8 @@ object TransformablesModule extends TwitterModule {
     injector: Injector): ObjectStore[SierraTransformable] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
-    implicit val serialisationStrategy = injector.instance[SerialisationStrategy[SierraTransformable]]
+    implicit val serialisationStrategy =
+      injector.instance[SerialisationStrategy[SierraTransformable]]
 
     ObjectStore.createObjectStore[SierraTransformable, S3StorageBackend](
       storageStrategy = serialisationStrategy,

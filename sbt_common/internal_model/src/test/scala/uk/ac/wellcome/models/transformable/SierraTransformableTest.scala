@@ -1,7 +1,10 @@
 package uk.ac.wellcome.models.transformable
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 
 class SierraTransformableTest extends FunSpec with Matchers with SierraData {

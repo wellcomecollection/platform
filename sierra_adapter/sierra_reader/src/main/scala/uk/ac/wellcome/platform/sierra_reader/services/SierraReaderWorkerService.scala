@@ -8,7 +8,11 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  WindowStatus
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
