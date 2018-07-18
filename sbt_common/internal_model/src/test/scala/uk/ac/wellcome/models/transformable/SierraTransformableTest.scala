@@ -1,13 +1,13 @@
 package uk.ac.wellcome.models.transformable
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecordNumber}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 
 class SierraTransformableTest extends FunSpec with Matchers with SierraData {
 
   it("should allow creation of SierraTransformable with no data") {
-    SierraTransformable(sourceId = "111")
+    SierraTransformable(sierraId = SierraRecordNumber("111"))
   }
 
   it("should allow creation from only a SierraBibRecord") {
