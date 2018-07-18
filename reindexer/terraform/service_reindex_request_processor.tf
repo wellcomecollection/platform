@@ -19,8 +19,9 @@ module "reindex_request_processor" {
   env_vars_length = 3
 
   ecs_cluster_name               = "${aws_ecs_cluster.cluster.name}"
-  ecs_cluster_id   = "${data.aws_ecs_cluster.cluster.id}"
+  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
   vpc_id                     = "${local.vpc_id}"
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}"]
 
   aws_region = "${var.aws_region}"
   subnets    =  ["${local.private_subnets}"]

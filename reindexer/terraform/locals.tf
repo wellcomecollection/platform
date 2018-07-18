@@ -4,7 +4,7 @@ locals {
   vhs_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_name}"
   vhs_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_stream_arn}"
 
-  vpc_id = "${data.terraform_remote_state.catalogue_pipeline.vpc_services_id}"
+  vpc_id                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
   private_subnets             = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 
   lambda_error_alarm_arn = "${data.terraform_remote_state.shared_infra.lambda_error_alarm_arn}"
