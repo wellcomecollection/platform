@@ -2,18 +2,14 @@ package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
-class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
+class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it("removes the item if it already exists") {
-    val bibId = "222"
+    val bibId = createSierraRecordNumber
 
-    val record = sierraItemRecord(
-      id = "i111",
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val record = createSierraItemRecordWith(
       bibIds = List(bibId),
       unlinkedBibIds = List()
     )
@@ -21,11 +17,11 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     val unlinkedItemRecord = record.copy(
       bibIds = Nil,
       modifiedDate = record.modifiedDate.plusSeconds(1),
-      unlinkedBibIds = List(SierraRecordNumber(bibId))
+      unlinkedBibIds = List(bibId)
     )
 
     val sierraTransformable = SierraTransformable(
-      sierraId = SierraRecordNumber(bibId),
+      sierraId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -38,26 +34,20 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
 
   it(
     "returns the original record when merging an unlinked record which is already absent") {
-    val bibId = "333"
+    val bibId = createSierraRecordNumber
 
-    val record = sierraItemRecord(
-      id = "i111",
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val record = createSierraItemRecordWith(
       bibIds = List(bibId),
       unlinkedBibIds = List()
     )
 
-    val previouslyUnlinkedRecord = sierraItemRecord(
-      id = "i222",
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val previouslyUnlinkedRecord = createSierraItemRecordWith(
       bibIds = List(),
       unlinkedBibIds = List(bibId)
     )
 
     val sierraTransformable = SierraTransformable(
-      sourceId = bibId,
+      sierraId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -68,27 +58,22 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
 
   it(
     "returns the original record when merging an unlinked record which has linked more recently") {
-    val bibId = "444"
-    val itemId = "i111"
+    val bibId = createSierraRecordNumber
 
-    val record = sierraItemRecord(
-      id = itemId,
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val record = createSierraItemRecordWith(
+      modifiedDate = newerDate,
       bibIds = List(bibId),
       unlinkedBibIds = List()
     )
 
-    val outOfDateUnlinkedRecord = sierraItemRecord(
-      id = record.id,
-      title = "Curious clams caught in caul",
-      modifiedDate = "2000-01-01T01:01:01Z",
+    val outOfDateUnlinkedRecord = record.copy(
+      modifiedDate = olderDate,
       bibIds = List(),
       unlinkedBibIds = List(bibId)
     )
 
     val sierraTransformable = SierraTransformable(
-      sourceId = bibId,
+      sierraId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -98,27 +83,21 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
   }
 
   it("should only unlink item records with matching bib IDs") {
-    val bibId = "222"
-    val unrelatedBibId = "846"
+    val bibId = createSierraRecordNumber
+    val unrelatedBibId = createSierraRecordNumber
 
-    val record = sierraItemRecord(
-      id = "i111",
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val record = createSierraItemRecordWith(
       bibIds = List(bibId),
       unlinkedBibIds = List()
     )
 
-    val unrelatedItemRecord = sierraItemRecord(
-      id = "i999",
-      title = "Only otters occupy the orange oval",
-      modifiedDate = "2001-01-01T01:01:01Z",
+    val unrelatedItemRecord = createSierraItemRecordWith(
       bibIds = List(),
       unlinkedBibIds = List(unrelatedBibId)
     )
 
     val sierraTransformable = SierraTransformable(
-      sourceId = bibId,
+      sierraId = bibId,
       itemData = Map(record.id -> record)
     )
 
@@ -126,6 +105,6 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
       ItemUnlinker.unlinkItemRecord(sierraTransformable, unrelatedItemRecord)
     }
 
-    caught.getMessage shouldEqual "Non-matching bib id 222 in item unlink bibs List(846)"
+    caught.getMessage shouldEqual s"Non-matching bib id $bibId in item unlink bibs List($unrelatedBibId)"
   }
 }
