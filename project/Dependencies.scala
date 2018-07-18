@@ -5,7 +5,7 @@ object WellcomeDependencies {
     storage = "1.2.0"
   }
 
-  val storage: Seq[ModuleID] = Seq(
+  val storageLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" % "storage_2.12" % versions.storage,
     "uk.ac.wellcome" % "storage_2.12" % versions.storage % "test" classifier "tests"
   )
@@ -133,11 +133,11 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.storage ++ akkaDependencies ++ guiceDependencies ++ testDependencies
+  ) ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
-  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storage
+  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
