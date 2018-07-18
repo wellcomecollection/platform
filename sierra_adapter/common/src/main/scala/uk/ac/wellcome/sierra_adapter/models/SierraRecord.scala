@@ -15,7 +15,7 @@ import scala.util.Try
 case class SierraRecord(id: SierraRecordNumber, data: String, modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
     SierraBibRecord(
-      id = this.id.s,
+      id = this.id,
       data = this.data,
       modifiedDate = this.modifiedDate)
 
@@ -32,7 +32,7 @@ case class SierraRecord(id: SierraRecordNumber, data: String, modifiedDate: Inst
       }.toList
     } yield {
       SierraItemRecord(
-        id = this.id.s,
+        id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
         bibIds = bibIds)

@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.transformable.sierra
 import java.time.Instant
 
 case class SierraBibRecord(
-  id: String,
+  id: SierraRecordNumber,
   data: String,
   modifiedDate: Instant
 )
@@ -14,5 +14,12 @@ object SierraBibRecord {
       id = id,
       data = data,
       modifiedDate = Instant.parse(modifiedDate)
+    )
+
+  def apply(id: String, data: String, modifiedDate: Instant): SierraBibRecord =
+    SierraBibRecord(
+      id = SierraRecordNumber(id),
+      data = data,
+      modifiedDate = modifiedDate
     )
 }
