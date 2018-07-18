@@ -15,6 +15,20 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
     assertCreatingWithIdFails("NaN")
   }
 
+  describe("withCheckDigit") {
+    it("adds a 'b' prefix to bibs") {
+      SierraRecordNumber("1024364").withCheckDigit(SierraRecordTypes.bibs) shouldBe "b10243641"
+    }
+
+    it("adds an 'i' prefix to bibs") {
+      SierraRecordNumber("1024364").withCheckDigit(SierraRecordTypes.items) shouldBe "i10243641"
+    }
+
+    it("can add an 'x' check digit") {
+      SierraRecordNumber("1840974").withCheckDigit(SierraRecordTypes.items) shouldBe "i1840974x"
+    }
+  }
+
   private def assertCreatingWithIdFails(s: String) = {
     val caught = intercept[IllegalArgumentException] {
       SierraRecordNumber(s)
