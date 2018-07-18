@@ -1,10 +1,12 @@
 package uk.ac.wellcome.models.transformable.sierra.test.utils
 
-import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
+import java.time.Instant
+
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecordNumber}
 
 import scala.util.Random
 
-class SierraUtil {
+trait SierraUtil {
 
   /** Returns a random digit as a string.  This is copied from the
     * definition of Random.alphanumeric.
@@ -21,4 +23,14 @@ class SierraUtil {
   def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
 
+  def createSierraBibRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String = "<<BibRecord>>"): SierraBibRecord =
+    SierraBibRecord(
+      id = id,
+      data = data,
+      modifiedDate = Instant.now
+    )
+
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 }

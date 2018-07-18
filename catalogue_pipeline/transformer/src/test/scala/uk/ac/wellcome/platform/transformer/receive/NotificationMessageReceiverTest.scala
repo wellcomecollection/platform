@@ -14,18 +14,9 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  TransformedBaseWork,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
@@ -48,6 +39,7 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
+    with SierraUtil
     with TransformableMessageUtils {
 
   def withNotificationMessageReceiver[R](
@@ -227,13 +219,7 @@ class NotificationMessageReceiverTest
     val sierraTransformable: Transformable =
       SierraTransformable(
         sourceId = id,
-        bibData = JsonUtil
-          .toJson(
-            SierraBibRecord(
-              id = id,
-              data = s"""{"id": "$id", "title": "A title"}""",
-              modifiedDate = Instant.now))
-          .get)
+        bibData = toJson(createSierraBibRecordWith(id = id)).get)
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
