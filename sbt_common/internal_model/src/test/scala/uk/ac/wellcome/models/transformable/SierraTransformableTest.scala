@@ -13,7 +13,7 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraData {
   it("should allow creation from only a SierraBibRecord") {
     val bibRecord = sierraBibRecord(id = "1010101")
     val mergedRecord = SierraTransformable(bibRecord = bibRecord)
-    mergedRecord.sourceId shouldEqual bibRecord.id.s
+    mergedRecord.sierraId shouldEqual bibRecord.id
     mergedRecord.maybeBibData.get shouldEqual bibRecord
   }
 

@@ -6,8 +6,8 @@ case class SierraItemRecord(
   id: SierraRecordNumber,
   data: String,
   modifiedDate: Instant,
-  bibIds: List[String],
-  unlinkedBibIds: List[String] = List(),
+  bibIds: List[SierraRecordNumber],
+  unlinkedBibIds: List[SierraRecordNumber] = List(),
   version: Int = 0
 )
 
@@ -20,7 +20,7 @@ object SierraItemRecord {
       id = SierraRecordNumber(id),
       data = data,
       modifiedDate = Instant.parse(modifiedDate),
-      bibIds = bibIds
+      bibIds = bibIds.map { SierraRecordNumber }
     )
   def apply(id: String,
             data: String,
@@ -31,7 +31,7 @@ object SierraItemRecord {
       id = SierraRecordNumber(id),
       data = data,
       modifiedDate = Instant.parse(modifiedDate),
-      bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
+      bibIds = bibIds.map { SierraRecordNumber },
+      unlinkedBibIds = unlinkedBibIds.map { SierraRecordNumber }
     )
 }
