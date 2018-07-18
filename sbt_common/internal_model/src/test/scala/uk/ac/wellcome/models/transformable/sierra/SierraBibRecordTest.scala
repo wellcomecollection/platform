@@ -7,11 +7,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 class SierraBibRecordTest extends FunSpec with Matchers with SierraUtil {
 
   it("can cast a SierraBibRecord to JSON and back again") {
-    val originalRecord = SierraBibRecord(
-      id = "1234567",
-      data = """{"title": "A jumping jaguar in a jungle of junipers"}""",
-      modifiedDate = "2007-07-07T07:07:07Z"
-    )
+    val originalRecord = createSierraBibRecordWith()
 
     val jsonString = toJson(originalRecord).get
     val parsedRecord = fromJson[SierraBibRecord](jsonString).get
