@@ -18,7 +18,7 @@ class SierraUtil {
     Stream continually nextDigit
   }
 
-  def createSierraRecordNumber: SierraRecordNumber =
-    SierraRecordNumber(randomNumeric take 7 mkString)
+  def createSierraRecordNumberString: String =
+    randomNumeric take 7 mkString
 
 }

@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
-import java.time.Instant
-
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -11,7 +9,7 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraResourceTypes,
   WindowStatus
 }
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -26,7 +24,8 @@ class WindowManagerTest
     with Matchers
     with S3
     with ScalaFutures
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraRecordUtil {
 
   private def withWindowManager(bucket: Bucket)(
     testWith: TestWith[WindowManager, Assertion]) = {
@@ -67,11 +66,7 @@ class WindowManagerTest
         // We pre-populate S3 with files as if they'd come from a prior run of the reader.
         s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
-        val record =
-          SierraRecord(
-            id = "1794165",
-            data = "{}",
-            modifiedDate = Instant.now())
+        val record = createSierraRecordWith(id = "1794165")
 
         s3Client.putObject(
           bucket.name,
@@ -82,7 +77,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result) {
-          _ shouldBe WindowStatus(id = Some("1794166"), offset = 2)
+          _ shouldBe WindowStatus(id = Some("1794165"), offset = 2)
         }
       }
     }
