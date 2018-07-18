@@ -61,10 +61,7 @@ class WindowManager @Inject()(
         val triedStatus = triedMaybeLastId
           .map {
             case Some(id) =>
-              WindowStatus(
-                id = Some(id.increment),
-                offset = offset + 1
-              )
+              WindowStatus(id = Some(id), offset = offset + 1)
             case None =>
               throw GracefulFailureException(
                 new RuntimeException("Json did not contain an id"))
