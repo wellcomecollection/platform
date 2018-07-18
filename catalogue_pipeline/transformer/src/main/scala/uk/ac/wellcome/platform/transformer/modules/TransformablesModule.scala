@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.transformable.{
 }
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
-
+import uk.ac.wellcome.storage.type_classes.SerialisationStrategy
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
@@ -30,7 +30,12 @@ object TransformablesModule extends TwitterModule {
     injector: Injector): ObjectStore[SierraTransformable] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
+    implicit val serialisationStrategy = injector.instance[SerialisationStrategy[SierraTransformable]]
 
-    ObjectStore[SierraTransformable]
+    ObjectStore.createObjectStore[SierraTransformable, S3StorageBackend](
+      storageStrategy = serialisationStrategy,
+      storageBackend = storageBackend,
+      ec = executionContext
+    )
   }
 }
