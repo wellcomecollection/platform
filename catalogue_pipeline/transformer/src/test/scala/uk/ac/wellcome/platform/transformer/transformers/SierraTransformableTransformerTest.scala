@@ -135,17 +135,11 @@ class SierraTransformableTransformerTest
   }
 
   it(
-    "should not perform a transformation without bibData, even if some itemData is present") {
+    "does not perform a transformation without bibData, even if some itemData is present") {
+    val sierraItemRecord = createSierraItemRecord
     assertTransformReturnsInvisibleWork(
       maybeBibData = None,
-      itemData = Map(
-        "1313131" -> sierraItemRecord(
-          id = "1313131",
-          title = "An incomplete invocation of items",
-          modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("1113111")
-        )
-      )
+      itemData = Map(sierraItemRecord.id -> sierraItemRecord)
     )
   }
 
