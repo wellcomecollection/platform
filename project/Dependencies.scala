@@ -1,5 +1,16 @@
 import sbt._
 
+object WellcomeDependencies {
+  private lazy val versions = new {
+    storage = "1.2.0"
+  }
+
+  val storage: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "storage_2.12" % versions.storage,
+    "uk.ac.wellcome" % "storage_2.12" % versions.storage % "test" classifier "tests"
+  )
+}
+
 object Dependencies {
 
   lazy val versions = new {
@@ -22,10 +33,6 @@ object Dependencies {
     val sierraStreamsSourceVersion = "0.4"
     val jaxbVersion = "2.2.11"
     val scalaGraphVersion = "1.12.5"
-  }
-
-  lazy val wellcomeVersions = new {
-    val storage = "1.1.0"
   }
 
   // External Library dependency groups
@@ -125,16 +132,12 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
-    "io.circe" %% "circe-yaml" % "0.8.0",
-    "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage,
-    "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage % "test" classifier "tests"
-  ) ++ akkaDependencies ++ guiceDependencies ++ testDependencies
+    "io.circe" %% "circe-yaml" % "0.8.0"
+  ) ++ WellcomeDependencies.storage ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
-  val finatraStorageDependencies = finatraDependencies ++ Seq(
-    "uk.ac.wellcome" % "storage_2.12" % wellcomeVersions.storage
-  )
+  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storage
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws

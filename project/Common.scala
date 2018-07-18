@@ -12,9 +12,7 @@ object Common {
     // S3-published packages first.
     fullResolvers :=
       Seq(
-        Resolver.url(
-          "S3 releases",
-          url("http://releases.mvn-repo.wellcomecollection.org.s3-website-eu-west-1.amazonaws.com"))(Resolver.ivyStylePatterns)
+        "S3 releases" at "s3://releases.mvn-repo.wellcomecollection.org/"
       ) ++ fullResolvers.value ++ Seq(Resolver.sonatypeRepo("releases")),
 
     scalacOptions ++= Seq(
