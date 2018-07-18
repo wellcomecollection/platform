@@ -46,27 +46,27 @@ variable "es_cluster_credentials" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "remus"
+  default     = "romulus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = ""
+  default     = "3e731d10c993c7a2bce109835439dbb0b1b7f467"
 }
 
 variable "pinned_romulus_api_nginx" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = ""
+  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "58d71745bc3b50ef0bde45be7e27a63e1dee4b1a"
+  default     = ""
 }
 
 variable "pinned_remus_api_nginx" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
+  default     = ""
 }
 
 variable "es_config_romulus" {
@@ -74,8 +74,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-02-invisible-works"
-    index_v2 = "v2-2018-07-02-invisible-works"
+    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
     doc_type = "work"
   }
 }
@@ -85,8 +85,8 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
+    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
     doc_type = "work"
   }
 }
