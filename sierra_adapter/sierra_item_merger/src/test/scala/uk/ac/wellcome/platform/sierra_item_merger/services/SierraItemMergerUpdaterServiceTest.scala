@@ -240,7 +240,7 @@ class SierraItemMergerUpdaterServiceTest
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
             val itemId = "i3000003"
 
-            val bibId1 = "b9000001"
+            val bibId1 = SierraRecordNumber("9000001")
             val bibId2 = "b9000002"
 
             val itemRecord = sierraItemRecord(

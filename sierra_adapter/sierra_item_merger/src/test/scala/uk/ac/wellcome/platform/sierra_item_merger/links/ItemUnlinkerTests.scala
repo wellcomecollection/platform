@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 
 class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
@@ -20,11 +21,11 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraData {
     val unlinkedItemRecord = record.copy(
       bibIds = Nil,
       modifiedDate = record.modifiedDate.plusSeconds(1),
-      unlinkedBibIds = List(bibId)
+      unlinkedBibIds = List(SierraRecordNumber(bibId))
     )
 
     val sierraTransformable = SierraTransformable(
-      sourceId = bibId,
+      sierraId = SierraRecordNumber(bibId),
       itemData = Map(record.id -> record)
     )
 
