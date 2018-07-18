@@ -37,22 +37,8 @@ case class SierraRecord(id: SierraRecordNumber,
         id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
-        bibIds = bibIds)
+        bibIds = bibIds.map { SierraRecordNumber },
+        unlinkedBibIds = List()
+      )
     }
-}
-
-case object SierraRecord {
-  def apply(id: String, data: String, modifiedDate: String): SierraRecord =
-    SierraRecord(
-      id = id,
-      data = data,
-      modifiedDate = Instant.parse(modifiedDate)
-    )
-
-  def apply(id: String, data: String, modifiedDate: Instant): SierraRecord =
-    SierraRecord(
-      id = SierraRecordNumber(id),
-      data = data,
-      modifiedDate = modifiedDate
-    )
 }
