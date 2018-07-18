@@ -27,8 +27,8 @@ variable "es_config_snapshot" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-06-05-new-location-types"
-    index_v2 = "v2-2018-06-05-new-location-types"
+    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
     doc_type = "work"
   }
 }
