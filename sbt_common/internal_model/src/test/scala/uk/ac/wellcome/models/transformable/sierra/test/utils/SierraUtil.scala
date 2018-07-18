@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
 
 import scala.util.Random
 
@@ -43,4 +43,17 @@ trait SierraUtil {
     )
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
+
+  def createSierraItemRecordWith(
+    modifiedDate: Instant = Instant.now,
+    bibIds: List[SierraRecordNumber] = List()
+  ): SierraItemRecord =
+    SierraItemRecord(
+      id = createSierraRecordNumber,
+      data = "<<ItemRecord>>",
+      modifiedDate = modifiedDate,
+      bibIds = bibIds
+    )
+
+  def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 }
