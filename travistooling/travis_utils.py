@@ -25,7 +25,7 @@ def unpack_secrets():  # pragma: no cover
 
     This unencrypts the credentials, and copies them into place.
     """
-    if os.path.exists('secrets'):
+    if os.path.exists('id_rsa'):
         return
 
     print('*** Loading secrets for Travis')
@@ -56,11 +56,11 @@ def unpack_secrets():  # pragma: no cover
     os.makedirs(os.path.join(os.environ['HOME'], '.aws'), exist_ok=True)
     for f in ['config', 'credentials']:
         shutil.move(
-            src=os.path.join('secrets', f),
+            src=f,
             dst=os.path.join(os.environ['HOME'], '.aws', f)
         )
 
-    check_call(['chmod', '400', 'secrets/id_rsa'])
+    check_call(['chmod', '400', 'id_rsa'])
 
     print('*** Unpacked an SSH private key with corresponding public key:')
-    check_call(['ssh-keygen', '-y', '-f', 'secrets/id_rsa'])
+    check_call(['ssh-keygen', '-y', '-f', 'id_rsa'])

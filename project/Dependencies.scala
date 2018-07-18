@@ -1,5 +1,16 @@
 import sbt._
 
+object WellcomeDependencies {
+  private lazy val versions = new {
+    val storage = "1.2.0"
+  }
+
+  val storageLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "storage_2.12" % versions.storage,
+    "uk.ac.wellcome" % "storage_2.12" % versions.storage % "test" classifier "tests"
+  )
+}
+
 object Dependencies {
 
   lazy val versions = new {
@@ -122,13 +133,11 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ akkaDependencies ++ guiceDependencies ++ testDependencies
-
-  val commonStorageDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-s3" % versions.aws
-  ) ++ dynamoDependencies ++ guiceDependencies
+  ) ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
+
+  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
   val commonMonitoringDependencies = Seq(
     "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws

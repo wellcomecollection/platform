@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.storage.test.fixtures.LocalDynamoDbVersioned
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 
 class ServerTest
     extends FunSpec
