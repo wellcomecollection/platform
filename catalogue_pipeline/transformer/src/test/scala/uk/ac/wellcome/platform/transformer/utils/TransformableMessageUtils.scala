@@ -5,7 +5,10 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
@@ -33,8 +36,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
     )
   }
 
-  def createValidSierraTransformableJson(id: String,
-                                         title: String): String = {
+  def createValidSierraTransformableJson(id: String, title: String): String = {
     val data =
       s"""
          |{

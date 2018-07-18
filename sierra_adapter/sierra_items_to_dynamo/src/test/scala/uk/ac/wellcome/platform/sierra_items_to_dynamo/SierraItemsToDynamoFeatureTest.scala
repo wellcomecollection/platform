@@ -7,7 +7,10 @@ import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned

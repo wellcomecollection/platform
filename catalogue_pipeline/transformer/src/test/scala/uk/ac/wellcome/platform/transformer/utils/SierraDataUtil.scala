@@ -1,10 +1,15 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
-import uk.ac.wellcome.platform.transformer.source.sierra.{Language => SierraLanguage}
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Language => SierraLanguage
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraDataUtil extends IdentifiersUtil with SierraUtil {

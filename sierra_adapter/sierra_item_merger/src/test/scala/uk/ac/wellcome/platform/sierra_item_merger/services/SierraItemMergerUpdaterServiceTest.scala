@@ -104,8 +104,10 @@ class SierraItemMergerUpdaterServiceTest
               )
             )
 
-            val f1 = hybridStore.updateRecord(oldTransformable.id)(ifNotExisting =
-              (oldTransformable, SourceMetadata(oldTransformable.sourceName)))(ifExisting =
+            val f1 = hybridStore.updateRecord(oldTransformable.id)(
+              ifNotExisting = (
+                oldTransformable,
+                SourceMetadata(oldTransformable.sourceName)))(ifExisting =
               (t, m) => (t, m))
 
             val anotherItem = createSierraItemRecordWith(bibIds = bibIds)
@@ -119,8 +121,10 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             whenReady(f1) { _ =>
-              val f2 = hybridStore.updateRecord(newTransformable.id)(ifNotExisting =
-                (newTransformable, SourceMetadata(newTransformable.sourceName)))(ifExisting =
+              val f2 = hybridStore.updateRecord(newTransformable.id)(
+                ifNotExisting = (
+                  newTransformable,
+                  SourceMetadata(newTransformable.sourceName)))(ifExisting =
                 (t, m) => (t, m))
 
               whenReady(f2) { _ =>
@@ -138,12 +142,13 @@ class SierraItemMergerUpdaterServiceTest
                     id = expectedNewSierraTransformable.id,
                     record = expectedNewSierraTransformable)
 
-                  val expectedUpdatedSierraTransformable = oldTransformable.copy(
-                    itemData = Map(
-                      itemRecord1.id -> itemRecord1,
-                      itemRecord2.id -> itemRecord2
+                  val expectedUpdatedSierraTransformable =
+                    oldTransformable.copy(
+                      itemData = Map(
+                        itemRecord1.id -> itemRecord1,
+                        itemRecord2.id -> itemRecord2
+                      )
                     )
-                  )
 
                   assertStored[SierraTransformable](
                     bucket,
@@ -182,8 +187,10 @@ class SierraItemMergerUpdaterServiceTest
               itemData = Map(itemRecord.id -> itemRecord)
             )
 
-            val f1 = hybridStore.updateRecord(oldTransformable.id)(ifNotExisting =
-              (oldTransformable, SourceMetadata(oldTransformable.sourceName)))(ifExisting =
+            val f1 = hybridStore.updateRecord(oldTransformable.id)(
+              ifNotExisting = (
+                oldTransformable,
+                SourceMetadata(oldTransformable.sourceName)))(ifExisting =
               (t, m) => (t, m))
 
             whenReady(f1) { _ =>

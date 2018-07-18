@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -96,10 +100,7 @@ class SierraTransformableTransformerTest
 
     val transformable = SierraTransformable(
       sierraId = SierraRecordNumber(bibId),
-      maybeBibData = Some(
-        createSierraBibRecordWith(
-          id = bibId,
-          data = bibData)),
+      maybeBibData = Some(createSierraBibRecordWith(id = bibId, data = bibData)),
       itemData = Map(itemRecord.id -> itemRecord)
     )
 

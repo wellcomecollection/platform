@@ -10,7 +10,10 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
@@ -79,7 +82,9 @@ class SierraItemsToDynamoWorkerServiceTest
   it("reads a sierra record from sqs an inserts it into DynamoDb") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
-        val bibIds1 = List("1111111", "2222222", "3333333").map { SierraRecordNumber }
+        val bibIds1 = List("1111111", "2222222", "3333333").map {
+          SierraRecordNumber
+        }
 
         val record1 = createSierraItemRecordWith(
           data = "<<older data>>",
@@ -102,8 +107,12 @@ class SierraItemsToDynamoWorkerServiceTest
 
         sendNotificationToSQS(queue = queue, message = record2)
 
-        val expectedBibIds = List("3333333", "4444444", "5555555").map { SierraRecordNumber }
-        val expectedUnlinkedBibIds = List("1111111", "2222222").map { SierraRecordNumber }
+        val expectedBibIds = List("3333333", "4444444", "5555555").map {
+          SierraRecordNumber
+        }
+        val expectedUnlinkedBibIds = List("1111111", "2222222").map {
+          SierraRecordNumber
+        }
 
         val expectedRecord = SierraItemRecordMerger.mergeItems(
           existingRecord = record1,
@@ -116,7 +125,8 @@ class SierraItemsToDynamoWorkerServiceTest
           Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
           val scanamoResult =
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> record1.id.withoutCheckDigit)
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
+              'id -> record1.id.withoutCheckDigit)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(

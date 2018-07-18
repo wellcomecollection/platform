@@ -2,7 +2,10 @@ package uk.ac.wellcome.sierra_adapter.models
 
 import io.circe.ParsingFailure
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 
 import scala.util.{Failure, Success}

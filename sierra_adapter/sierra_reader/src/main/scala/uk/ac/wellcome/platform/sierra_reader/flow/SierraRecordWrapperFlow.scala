@@ -23,7 +23,7 @@ object SierraRecordWrapperFlow extends Logging {
 
     val modifiedDate: Instant = maybeUpdatedDate match {
       case Some(updatedDate) => Instant.parse(updatedDate)
-      case None => getDeletedDateTimeAtStartOfDay(json)
+      case None              => getDeletedDateTimeAtStartOfDay(json)
     }
 
     SierraRecord(

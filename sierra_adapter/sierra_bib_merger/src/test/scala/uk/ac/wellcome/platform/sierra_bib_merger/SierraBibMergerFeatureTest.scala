@@ -113,7 +113,8 @@ class SierraBibMergerFeatureTest
                 modifiedDate = olderDate
               )
 
-              val oldTransformable = SierraTransformable(bibRecord = oldBibRecord)
+              val oldTransformable =
+                SierraTransformable(bibRecord = oldBibRecord)
 
               val newRecord = oldBibRecord.copy(
                 modifiedDate = newerDate
@@ -121,7 +122,9 @@ class SierraBibMergerFeatureTest
 
               hybridStore
                 .updateRecord(oldTransformable.id)(
-                  (oldTransformable, SourceMetadata(oldTransformable.sourceName)))((t, m) =>
+                  (
+                    oldTransformable,
+                    SourceMetadata(oldTransformable.sourceName)))((t, m) =>
                   (t, m))
                 .map { _ =>
                   sendNotificationToSQS(queue = queue, message = newRecord)
@@ -198,7 +201,8 @@ class SierraBibMergerFeatureTest
               bucket,
               table) { hybridStore =>
               val id = createSierraRecordNumberString
-              val newRecord = SierraTransformable(sierraId = SierraRecordNumber(id))
+              val newRecord =
+                SierraTransformable(sierraId = SierraRecordNumber(id))
 
               val record = createSierraBibRecordWith(id = id)
 

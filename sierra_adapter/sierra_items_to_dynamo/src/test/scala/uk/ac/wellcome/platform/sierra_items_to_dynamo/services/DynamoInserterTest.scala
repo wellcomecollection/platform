@@ -9,10 +9,17 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.type_classes.{IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 
 import scala.concurrent.Future
@@ -38,7 +45,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> record.id.withoutCheckDigit) shouldBe Some(Right(record.copy(version = 1)))
+            'id -> record.id.withoutCheckDigit) shouldBe Some(
+            Right(record.copy(version = 1)))
         }
       }
     }
@@ -59,7 +67,8 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(Right(newRecord))
+            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(
+            Right(newRecord))
         }
       }
     }
@@ -79,7 +88,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(Right(newRecord.copy(version = 2)))
+            'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
+            Right(newRecord.copy(version = 2)))
         }
       }
     }
@@ -90,7 +100,9 @@ class DynamoInserterTest
       withDynamoInserter(table) { dynamoInserter =>
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
-          bibIds = List("1111111", "2222222", "3333333").map { SierraRecordNumber }
+          bibIds = List("1111111", "2222222", "3333333").map {
+            SierraRecordNumber
+          }
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
@@ -104,9 +116,10 @@ class DynamoInserterTest
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
-            Right(newRecord.copy(
-              version = 1,
-              unlinkedBibIds = List("3333333").map { SierraRecordNumber })))
+            Right(
+              newRecord.copy(version = 1, unlinkedBibIds = List("3333333").map {
+                SierraRecordNumber
+              })))
         }
       }
     }
@@ -117,13 +130,17 @@ class DynamoInserterTest
       withDynamoInserter(table) { dynamoInserter =>
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
-          bibIds = List("1111111", "2222222", "3333333").map { SierraRecordNumber }
+          bibIds = List("1111111", "2222222", "3333333").map {
+            SierraRecordNumber
+          }
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = oldRecord.copy(
           modifiedDate = newerDate,
-          bibIds = List("2222222", "3333333", "4444444").map { SierraRecordNumber }
+          bibIds = List("2222222", "3333333", "4444444").map {
+            SierraRecordNumber
+          }
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
@@ -131,9 +148,10 @@ class DynamoInserterTest
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
-            Right(newRecord.copy(
-              version = 1,
-              unlinkedBibIds = List("1111111").map { SierraRecordNumber })))
+            Right(
+              newRecord.copy(version = 1, unlinkedBibIds = List("1111111").map {
+                SierraRecordNumber
+              })))
         }
       }
     }
@@ -148,7 +166,9 @@ class DynamoInserterTest
 
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
-          bibIds = List("1111111", "22222222", "3333333").map { SierraRecordNumber },
+          bibIds = List("1111111", "22222222", "3333333").map {
+            SierraRecordNumber
+          },
           unlinkedBibIds = List("5555555").map { SierraRecordNumber }
         )
 
@@ -156,7 +176,9 @@ class DynamoInserterTest
 
         val newRecord = oldRecord.copy(
           modifiedDate = newerDate,
-          bibIds = List("22222222", "3333333", "4444444").map { SierraRecordNumber }
+          bibIds = List("22222222", "3333333", "4444444").map {
+            SierraRecordNumber
+          }
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
@@ -167,7 +189,9 @@ class DynamoInserterTest
             Right(
               newRecord.copy(
                 version = 1,
-                unlinkedBibIds = List("5555555", "1111111").map { SierraRecordNumber }
+                unlinkedBibIds = List("5555555", "1111111").map {
+                  SierraRecordNumber
+                }
               )))
         }
       }
@@ -185,8 +209,8 @@ class DynamoInserterTest
     when(
       mockedDao.getRecord[SierraItemRecord](any[String])(
         any[DynamoFormat[SierraItemRecord]]))
-      .thenReturn(Future.successful(Some(
-        record.copy(modifiedDate = olderDate))))
+      .thenReturn(
+        Future.successful(Some(record.copy(modifiedDate = olderDate))))
 
     when(
       mockedDao.updateRecord(any[SierraItemRecord])(
