@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import java.time.Instant
-
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -78,9 +76,7 @@ class NotificationMessageReceiverTest
           val sqsMessage = hybridRecordNotificationMessage(
             message = createValidSierraTransformableJson(
               id = "1234567",
-              title = "A calming breeze on the sea",
-              lastModifiedDate = Instant.now
-            ),
+              title = "A calming breeze on the sea"),
             sourceName = "sierra",
             version = 1,
             s3Client = s3Client,
@@ -107,15 +103,13 @@ class NotificationMessageReceiverTest
   it("receives a message and add the version to the transformed work") {
     val id = "5005005"
     val title = "A pot of possums"
-    val lastModifiedDate = Instant.now()
     val version = 5
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message =
-              createValidSierraTransformableJson(id, title, lastModifiedDate),
+            message = createValidSierraTransformableJson(id, title),
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
