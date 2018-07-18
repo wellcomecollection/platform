@@ -8,6 +8,12 @@ import scala.util.Random
 
 trait SierraUtil {
 
+  // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
+  // a record with a newer version, or vice versa.  Provide two dates here
+  // for convenience.
+  val olderDate: Instant = Instant.parse("1999-09-09T09:09:09Z")
+  val newerDate: Instant = Instant.parse("2001-01-01T01:01:01Z")
+
   /** Returns a random digit as a string.  This is copied from the
     * definition of Random.alphanumeric.
     */
@@ -23,13 +29,17 @@ trait SierraUtil {
   def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
 
+  def createSierraRecordNumber: SierraRecordNumber =
+    SierraRecordNumber(createSierraRecordNumberString)
+
   def createSierraBibRecordWith(
     id: String = createSierraRecordNumberString,
-    data: String = "<<BibRecord>>"): SierraBibRecord =
+    data: String = "<<BibRecord>>",
+    modifiedDate: Instant = Instant.now): SierraBibRecord =
     SierraBibRecord(
-      id = id,
+      id = SierraRecordNumber(id),
       data = data,
-      modifiedDate = Instant.now
+      modifiedDate = modifiedDate
     )
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
