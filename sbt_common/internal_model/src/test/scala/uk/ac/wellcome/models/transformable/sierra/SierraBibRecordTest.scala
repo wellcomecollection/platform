@@ -10,7 +10,7 @@ class SierraBibRecordTest extends FunSpec with Matchers {
 
   it("can cast a SierraBibRecord to JSON and back again") {
     val originalRecord = SierraBibRecord(
-      id = "b0123456",
+      id = "1234567",
       data = """{"title": "A jumping jaguar in a jungle of junipers"}""",
       modifiedDate = "2007-07-07T07:07:07Z"
     )
