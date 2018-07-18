@@ -9,3 +9,6 @@ variable "release_ids" {
 }
 
 variable "infra_bucket" {}
+variable "namespace" {
+  default = "reindexer"
+}
