@@ -10,16 +10,3 @@ case class SierraItemRecord(
   unlinkedBibIds: List[SierraRecordNumber] = List(),
   version: Int = 0
 )
-
-object SierraItemRecord {
-  def apply(id: String,
-            data: String,
-            modifiedDate: String,
-            bibIds: List[String]): SierraItemRecord =
-    SierraItemRecord(
-      id = SierraRecordNumber(id),
-      data = data,
-      modifiedDate = Instant.parse(modifiedDate),
-      bibIds = bibIds.map { SierraRecordNumber }
-    )
-}
