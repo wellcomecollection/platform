@@ -9,6 +9,15 @@ case class SierraRecordNumber(s: String) {
     s"Not a 7-digit Sierra record number: $s"
   )
 
+  /** Returns the next ID in the sequence.
+    *
+    * e.g. SierraRecordNumber("1000001").increment =>
+    *      SierraRecordNumber("1000002")
+    *
+    */
+  def increment: SierraRecordNumber =
+    SierraRecordNumber((s.toInt + 1).toString)
+
   /** Returns the ID with the check digit and prefix. */
   def withCheckDigit(recordType: SierraRecordTypes.Value): String = {
     val prefix = recordType match {

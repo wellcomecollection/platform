@@ -29,6 +29,12 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
     }
   }
 
+  describe("increments") {
+    it("increments an ID correctly") {
+      SierraRecordNumber("1000000").increment shouldBe SierraRecordNumber("1000001")
+    }
+  }
+
   private def assertCreatingWithIdFails(s: String) = {
     val caught = intercept[IllegalArgumentException] {
       SierraRecordNumber(s)
