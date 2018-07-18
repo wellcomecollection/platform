@@ -11,17 +11,6 @@ EOF
   }
 }
 
-# The docs for this resource say pretty clearly:
-#
-#     Usage in production deployments is not recommended
-#
-# Since this key is only used to grant push access to a couple of
-# non-critical repos, I'll take the risk.
-
-resource "tls_private_key" "github_key" {
-  algorithm = "RSA"
-}
-
 data "archive_file" "secrets" {
   type        = "zip"
   output_path = "${path.module}/../../secrets_${var.name}.zip"
