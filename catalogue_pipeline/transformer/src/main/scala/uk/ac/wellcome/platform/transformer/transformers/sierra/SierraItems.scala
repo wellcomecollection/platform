@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
@@ -36,8 +33,7 @@ trait SierraItems extends Logging with SierraLocation {
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraItemData.id,
+        value = sierraItemData.id.withCheckDigit(
           recordType = SierraRecordTypes.items
         )
       ),
