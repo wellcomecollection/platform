@@ -57,3 +57,7 @@ output "catalogue_vpc_id" {
 output "catalogue_ssh_controlled_ingress_sg" {
   value = "${module.bastion.ssh_controlled_ingress_sg}"
 }
+
+output "infra_bucket_arn" {
+  value = "${aws_s3_bucket.platform_infra.arn}"
+}

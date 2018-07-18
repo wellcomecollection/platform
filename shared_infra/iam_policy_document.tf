@@ -26,14 +26,6 @@ data "aws_iam_policy_document" "describe_services" {
   }
 }
 
-data "aws_sns_topic" "lambda_pushes_topic" {
-  name = "${local.lambda_pushes_topic_name}"
-}
-
-data "aws_sns_topic" "ecr_pushes_topic" {
-  name = "${local.ecr_pushes_topic_name}"
-}
-
 data "aws_iam_policy_document" "s3_alb_logs" {
   statement {
     actions = [
