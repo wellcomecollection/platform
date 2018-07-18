@@ -41,7 +41,7 @@ trait SierraItems extends Logging with SierraLocation {
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
-          value = sierraItemData.id
+          value = sierraItemData.id.withoutCheckDigit
         )
       ),
       agent = Item(

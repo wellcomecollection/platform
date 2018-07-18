@@ -33,7 +33,7 @@ case object SierraBibData {
       deleted = deleted,
       suppressed = false,
       country = country,
-      lang = lang
+      lang = lang,
       materialType = materialType,
       fixedFields = fixedFields,
       varFields = varFields

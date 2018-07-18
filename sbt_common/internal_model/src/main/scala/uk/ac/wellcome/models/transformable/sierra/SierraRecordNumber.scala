@@ -18,6 +18,9 @@ case class SierraRecordNumber(s: String) {
   def increment: SierraRecordNumber =
     SierraRecordNumber((s.toInt + 1).toString)
 
+  /** Returns the ID without the check digit or prefix. */
+  def withoutCheckDigit: String = s
+
   /** Returns the ID with the check digit and prefix. */
   def withCheckDigit(recordType: SierraRecordTypes.Value): String = {
     val prefix = recordType match {
