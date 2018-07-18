@@ -7,8 +7,9 @@ import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -21,7 +22,8 @@ class SierraItemsToDynamoFeatureTest
     with fixtures.Server
     with Matchers
     with Eventually
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraRecordUtil {
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { table =>
@@ -29,14 +31,15 @@ class SierraItemsToDynamoFeatureTest
         val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
 
         withServer(flags) { server =>
-          val id = "i12345"
-          val bibId = "b54321"
+          val id = createSierraRecordNumberString
+          val bibId = createSierraRecordNumberString
           val data = s"""{"id": "$id", "bibIds": ["$bibId"]}"""
-          val modifiedDate = Instant.ofEpochSecond(Instant.now.getEpochSecond)
+
+          val record = createSierraRecordWith(id = id, data = data)
 
           sendNotificationToSQS(
             queue = queue,
-            message = SierraRecord(id, data, modifiedDate)
+            message = record
           )
 
           eventually {
@@ -49,10 +52,10 @@ class SierraItemsToDynamoFeatureTest
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(
               SierraItemRecord(
-                id,
-                data,
-                modifiedDate,
-                List(bibId),
+                id = id,
+                data = data,
+                modifiedDate = record.modifiedDate,
+                bibIds = List(bibId).map { SierraRecordNumber },
                 version = 1))
           }
         }
