@@ -17,7 +17,12 @@ data "archive_file" "secrets" {
 
   source {
     content  = "${data.template_file.aws_credentials.rendered}"
-    filename = "awscredentials"
+    filename = "credentials"
+  }
+
+  source {
+    content  = "[default]\nregion = eu-west-1"
+    filename = "config"
   }
 
   source {
