@@ -53,6 +53,7 @@ define terraform_plan
 		--env BUCKET_NAME=wellcomecollection-platform-infra \
 		--env OBJECT_KEY=terraform.tfvars \
 		--env IS_PUBLIC_FACING=$(2) \
+		--env GITHUB_TOKEN=$(GITHUB_TOKEN) \
 		wellcome/terraform_wrapper:latest
 endef
 
@@ -69,6 +70,7 @@ define terraform_apply
 		--workdir $(ROOT)/$(1) \
 		--env BUCKET_NAME=wellcomecollection-platform-monitoring \
 		--env OP=apply \
+		--env GITHUB_TOKEN=$(GITHUB_TOKEN) \
 		wellcome/terraform_wrapper:latest
 endef
 

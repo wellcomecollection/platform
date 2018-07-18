@@ -3,6 +3,7 @@ include functions.Makefile
 include formatting.Makefile
 
 include assets/Makefile
+include builds/Makefile
 include loris/Makefile
 include shared_infra/Makefile
 include data_api/Makefile
