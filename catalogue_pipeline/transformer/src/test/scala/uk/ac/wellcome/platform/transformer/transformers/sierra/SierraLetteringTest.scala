@@ -1,14 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraLetteringTest extends FunSpec with Matchers with SierraData {
+class SierraLetteringTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("ignores records with the wrong MARC field") {
     assertFindsCorrectLettering(
@@ -119,13 +115,7 @@ class SierraLetteringTest extends FunSpec with Matchers with SierraData {
     varFields: List[VarField],
     expectedLettering: Option[String]
   ) = {
-
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = Some("A libel of lions"),
-      varFields = varFields
-    )
-
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getLettering(bibData = bibData) shouldBe expectedLettering
   }
 }
