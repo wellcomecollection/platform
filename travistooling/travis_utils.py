@@ -25,7 +25,7 @@ def unpack_secrets():  # pragma: no cover
 
     This unencrypts the credentials, and copies them into place.
     """
-    if os.path.exists('secrets'):
+    if os.path.exists('id_rsa'):
         return
 
     print('*** Loading secrets for Travis')
