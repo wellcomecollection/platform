@@ -110,4 +110,14 @@ trait S3 extends ExtendedPatience with Logging with Eventually with Matchers {
       .asScala
       .map { _.getKey }
       .toList
+
+  /** Returns a map (key -> contents) for all objects in an S3 bucket.
+    *
+    * @param bucket The instance of [[Bucket]] to read.
+    *
+    */
+  def getAllObjectContents(bucket: Bucket): Map[String, String] =
+    listKeysInBucket(bucket).map { key =>
+      key -> getContentFromS3(bucket = bucket, key = key)
+    }.toMap
 }
