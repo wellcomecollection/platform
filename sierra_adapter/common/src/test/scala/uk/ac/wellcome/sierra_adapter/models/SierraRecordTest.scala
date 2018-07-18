@@ -25,7 +25,8 @@ class SierraRecordTest extends FunSpec with Matchers with SierraRecordUtil {
           id = SierraRecordNumber(id),
           data = data,
           modifiedDate = sierraRecord.modifiedDate,
-          bibIds = List(SierraRecordNumber(bibId))))
+          bibIds = List(SierraRecordNumber(bibId)),
+          unlinkedBibIds = List()))
     }
 
     it("return a failure for an invalid json") {

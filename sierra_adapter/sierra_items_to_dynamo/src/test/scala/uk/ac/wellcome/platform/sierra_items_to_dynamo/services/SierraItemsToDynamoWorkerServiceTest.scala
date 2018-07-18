@@ -121,7 +121,7 @@ class SierraItemsToDynamoWorkerServiceTest
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(
             SierraItemRecord(
-              id = SierraRecordNumber(id),
+              id = record1.id,
               data = expectedData,
               modifiedDate = newerDate,
               bibIds = expectedBibIds,
@@ -155,9 +155,8 @@ class SierraItemsToDynamoWorkerServiceTest
   private def sierraRecordData(bibIds: List[String],
                                unlinkedBibIds: List[String] = List(),
                                modifiedDate: Instant): String = {
-
-    val sierraItemRecord = SierraItemRecord(
-      id = s"i111",
+    val sierraItemRecord = createSierraItemRecordWith(
+      id = createSierraRecordNumberString,
       modifiedDate = modifiedDate,
       data = s"""
                 |{
@@ -166,8 +165,8 @@ class SierraItemsToDynamoWorkerServiceTest
                 |  "comment": "Legacy line of lamentable leopards",
                 |  "bibIds": ${toJson(bibIds).get}
                 |}""".stripMargin,
-      bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
+      bibIds = bibIds.map { SierraRecordNumber },
+      unlinkedBibIds = unlinkedBibIds.map { SierraRecordNumber }
     )
 
     JsonUtil.toJson(sierraItemRecord).get
