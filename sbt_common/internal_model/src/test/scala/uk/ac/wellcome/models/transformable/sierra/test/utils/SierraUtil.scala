@@ -45,13 +45,15 @@ trait SierraUtil {
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String = "<<ItemRecord>>",
     modifiedDate: Instant = Instant.now,
     bibIds: List[SierraRecordNumber] = List(),
     unlinkedBibIds: List[SierraRecordNumber] = List()
   ): SierraItemRecord =
     SierraItemRecord(
-      id = createSierraRecordNumber,
-      data = "<<ItemRecord>>",
+      id = SierraRecordNumber(id),
+      data = data,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
       unlinkedBibIds = unlinkedBibIds
