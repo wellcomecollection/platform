@@ -47,6 +47,8 @@ object Dependencies {
     val scalaGraphVersion = "1.12.5"
   }
 
+  val archiverDependencies = Seq()
+
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
