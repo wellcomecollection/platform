@@ -1,5 +1,5 @@
 module "reindex_request_creator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
   name   = "reindex_request_creator"
 
   source_queue_name = "${module.reindexer_queue.name}"
@@ -12,10 +12,13 @@ module "reindex_request_creator" {
   memory = 2048
 
   env_vars = {
-    dynamo_table_name     = "${local.vhs_table_name}"
-    reindex_jobs_queue_id = "${module.reindexer_queue.id}"
-    metrics_namespace     = "reindex_request_creator"
+    dynamo_table_name          = "${local.vhs_table_name}"
+    reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
+    reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
+    metrics_namespace          = "reindex_request_creator"
   }
+
+  env_vars_length = 4
 
   cluster_name               = "${local.catalogue_pipeline_cluster_name}"
   vpc_id                     = "${local.vpc_services_id}"
@@ -35,4 +38,9 @@ resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
 resource "aws_iam_role_policy" "reindexer_allow_table_access" {
   role   = "${module.reindex_request_creator.task_role_name}"
   policy = "${local.vhs_full_access_policy}"
+}
+
+resource "aws_iam_role_policy" "reindex_creator_publish_requests" {
+  role   = "${module.reindex_request_creator.task_role_name}"
+  policy = "${module.reindex_requests_topic.publish_policy}"
 }
