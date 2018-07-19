@@ -6,7 +6,7 @@ import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLoc
 
 class SierraLocationTest extends FunSpec with Matchers {
 
-  val transformer = new SierraLocation {}
+  private val transformer = new SierraLocation {}
 
   describe("Physical locations") {
     it("extracts location from item data") {

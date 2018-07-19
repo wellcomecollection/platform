@@ -62,4 +62,17 @@ class DisplayLocationV2Test extends FunSpec with Matchers {
         locationLabel)
     }
   }
+
+  describe("DisplayDigitalLocationV2") {
+    it("should create a DisplayDigitalLocationV2 from a DigitalLocation") {
+      val locationType = LocationType("iiif-image")
+      val url = "https://wellcomelibrary.org/iiif/b2201508/manifest"
+
+      val digitalLocation = DigitalLocation(url, locationType)
+
+      DisplayLocationV2(digitalLocation) shouldBe DisplayDigitalLocationV2(
+        locationType = DisplayLocationType(locationType),
+        url = url)
+    }
+  }
 }
