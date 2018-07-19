@@ -6,13 +6,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
-import uk.ac.wellcome.models.work.internal.{
-  Identifiable,
-  IdentifierType,
-  Item,
-  SourceIdentifier
-}
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, VarField}
+import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.source.{SierraBibData, SierraItemData, SierraMaterialType, VarField}
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraItemsTest extends FunSpec with Matchers with SierraData {
@@ -28,7 +23,6 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
       val item2 = SierraItemData(
         id = "i1000002",
-        deleted = false,
         varFields = List(
           VarField(fieldTag = "b", content = "X111658"),
           VarField(fieldTag = "c", content = "X111659")
@@ -151,7 +145,47 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
         itemData = itemData
       )
 
-      transformer.getItems(transformable) should have size (1)
+      transformer.getPhysicalItems(transformable) should have size (1)
+    }
+
+    it("creates an DigitalLocation within items for an e-book record") {
+      val id = "b1234567"
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = id
+      )
+
+      val bibData = SierraBibData(
+        id = id,
+        title = Some("title"),
+        materialType = Some(
+          SierraMaterialType(
+            code = "v",
+            value = "E-books"
+          ))
+      )
+
+      val expectedLocations = List(Identifiable(
+        sourceIdentifier = sourceIdentifier,
+        agent = Item(locations = List(DigitalLocation(
+          url = s"https://wellcomelibrary.org/iiif/$id/manifest",
+          license = None,
+          locationType = LocationType("iiif-image"))))))
+      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedLocations
+    }
+
+    it("returns no DigitalItems if the work is not an eBook") {
+      val id = "b1234567"
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = id
+      )
+
+      val sierraBibData = SierraBibData(id)
+
+      transformer.getDigitalItems(sourceIdentifier, sierraBibData) shouldBe List.empty
     }
   }
 }

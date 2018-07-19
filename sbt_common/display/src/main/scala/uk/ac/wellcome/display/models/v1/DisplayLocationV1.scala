@@ -2,11 +2,7 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{
-  DigitalLocation,
-  Location,
-  PhysicalLocation
-}
+import uk.ac.wellcome.models.work.internal.{DigitalLocation, Location, PhysicalLocation}
 
 @ApiModel(
   value = "Location",
@@ -18,12 +14,15 @@ sealed trait DisplayLocationV1
 
 object DisplayLocationV1 {
   def apply(location: Location): DisplayLocationV1 = location match {
-    case l: DigitalLocation =>
+    case digitalLocation: DigitalLocation =>
       DisplayDigitalLocationV1(
-        locationType = l.locationType.id,
-        url = l.url,
-        credit = l.credit,
-        license = DisplayLicenseV1(l.license)
+        locationType = digitalLocation.locationType.id,
+        url = digitalLocation.url,
+        credit = digitalLocation.credit,
+        license = digitalLocation.license match {
+          case Some(license) => Some(DisplayLicenseV1(license))
+          case None => None
+        }
       )
     case l: PhysicalLocation =>
       DisplayPhysicalLocationV1(
@@ -52,7 +51,7 @@ case class DisplayDigitalLocationV1(
   @ApiModelProperty(
     value =
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
-  ) license: DisplayLicenseV1
+  ) license: Option[DisplayLicenseV1]
 ) extends DisplayLocationV1 {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "DigitalLocation"

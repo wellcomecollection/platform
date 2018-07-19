@@ -68,7 +68,9 @@ class SierraTransformableTransformer
                   production = getProduction(sierraBibData),
                   language = getLanguage(sierraBibData),
                   dimensions = getDimensions(sierraBibData),
-                  items = getItems(sierraTransformable),
+                  items =
+                    getPhysicalItems(sierraTransformable) ++
+                    getDigitalItems(sourceIdentifier.copy(ontologyType = "Item"), sierraBibData),
                   version = version
                 )
               } else {

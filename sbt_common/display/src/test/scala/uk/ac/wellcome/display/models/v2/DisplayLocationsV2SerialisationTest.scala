@@ -40,4 +40,60 @@ class DisplayLocationsV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
+  it("serialises a digital location correctly") {
+    val digitalLocation = DigitalLocation(
+      url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
+      locationType = LocationType("iiif-image")
+    )
+
+    val work = createIdentifiedWorkWith(
+      items = List(createItem(locations = List(digitalLocation)))
+    )
+    val displayWork =
+      DisplayWorkV2(work, includes = WorksIncludes(items = true))
+
+    val actualJson = objectMapper.writeValueAsString(displayWork)
+    val expectedJson = s"""
+                          |{
+                          |  "type": "Work",
+                          |  "id": "${work.canonicalId}",
+                          |  "title": "${work.title}",
+                          |  "contributors": [ ],
+                          |  "items": [ ${items(work.items)} ],
+                          |  "subjects": [ ],
+                          |  "genres": [ ],
+                          |  "production": [ ]
+                          |}""".stripMargin
+
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
+
+  it("serialises a digital location with a license correctly") {
+    val digitalLocation = DigitalLocation(
+      url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
+      locationType = LocationType("iiif-image"),
+      license = Some(License_CC0)
+    )
+
+    val work = createIdentifiedWorkWith(
+      items = List(createItem(locations = List(digitalLocation)))
+    )
+    val displayWork =
+      DisplayWorkV2(work, includes = WorksIncludes(items = true))
+
+    val actualJson = objectMapper.writeValueAsString(displayWork)
+    val expectedJson = s"""
+                          |{
+                          |  "type": "Work",
+                          |  "id": "${work.canonicalId}",
+                          |  "title": "${work.title}",
+                          |  "contributors": [ ],
+                          |  "items": [ ${items(work.items)} ],
+                          |  "subjects": [ ],
+                          |  "genres": [ ],
+                          |  "production": [ ]
+                          |}""".stripMargin
+
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
 }

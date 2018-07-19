@@ -100,7 +100,7 @@ class DisplayWorkV1SerialisationTest
       locationType = LocationType("thumbnail-image"),
       url = "",
       credit = Some("Wellcome Collection"),
-      license = License_CCBY
+      license = Some(License_CCBY)
     )
     val item = createItem(locations = List(location))
     val workWithCopyright = createIdentifiedWorkWith(
@@ -126,9 +126,8 @@ class DisplayWorkV1SerialisationTest
                           |           {
                           |             "type": "${location.ontologyType}",
                           |             "url": "",
-                          |             "locationType": ${locationType(
-                            location.locationType)},
-                          |             "license": ${license(location.license)},
+                          |             "locationType": ${locationType(location.locationType)},
+                          |             "license": ${license(location.license.get)},
                           |             "credit": "${location.credit.get}"
                           |           }
                           |         ]
@@ -250,7 +249,7 @@ class DisplayWorkV1SerialisationTest
         DigitalLocation(
           locationType = LocationType("thumbnail-image"),
           url = "https://iiif.example.org/1234/default.jpg",
-          license = License_CCBY
+          license = Some(License_CCBY)
         ))
     )
     val actualJson = objectMapper.writeValueAsString(
