@@ -49,5 +49,7 @@ module "sierra_reader_service" {
     batch_size = 50
   }
 
+  env_vars_length = 9
+
   launch_type = "FARGATE"
 }

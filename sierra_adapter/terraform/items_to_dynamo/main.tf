@@ -31,6 +31,8 @@ module "sierra_to_dynamo_service" {
     dynamo_table_name = "${aws_dynamodb_table.sierra_table.id}"
   }
 
+  env_vars_length = 3
+
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"
 

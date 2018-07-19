@@ -30,6 +30,7 @@ module "sierra_merger_service" {
     dynamo_table_name = "${var.merged_dynamo_table_name}"
     bucket_name       = "${var.bucket_name}"
   }
+  env_vars_length = 4
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"
