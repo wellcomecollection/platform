@@ -1,7 +1,7 @@
 module "catalogue_pipeline" {
   source = "pipeline"
 
-  namespace                   = "catalogue_pipeline_f"
+  namespace                   = "catalogue_pipeline"
   transformer_container_image = "${local.transformer_container_image}"
   recorder_container_image    = "${local.recorder_container_image}"
   matcher_container_image     = "${local.matcher_container_image}"
@@ -18,8 +18,8 @@ module "catalogue_pipeline" {
   messages_bucket            = "${aws_s3_bucket.messages.id}"
   infra_bucket               = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-  index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+  index_v1 = "v1-2018-07-18"
+  index_v2 = "v2-2018-07-18"
 
   identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"

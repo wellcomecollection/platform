@@ -1,12 +1,13 @@
 module "reindex_request_creator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.2.2"
-  name   = "reindex_request_creator"
+  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  service_name = "reindex_request_creator"
 
-  source_queue_name = "${module.reindexer_queue.name}"
-  source_queue_arn  = "${module.reindexer_queue.arn}"
+  task_desired_count = "0"
+  source_queue_name  = "${module.reindexer_queue.name}"
+  source_queue_arn   = "${module.reindexer_queue.arn}"
 
-  ecr_repository_url = "${module.ecr_repository_reindex_request_creator.repository_url}"
-  release_id         = "${var.release_ids["reindex_request_creator"]}"
+  container_image    = "${local.reindex_request_creator_container_image}"
+  security_group_ids = ["${aws_security_group.service_egress_security_group.id}"]
 
   cpu    = 512
   memory = 2048
@@ -20,14 +21,18 @@ module "reindex_request_creator" {
 
   env_vars_length = 4
 
-  cluster_name               = "${local.catalogue_pipeline_cluster_name}"
-  vpc_id                     = "${local.vpc_services_id}"
-  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
+  ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
+  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  vpc_id           = "${local.vpc_id}"
 
-  enable_alb_alarm = false
+  aws_region = "${var.aws_region}"
+  subnets    = ["${local.private_subnets}"]
 
-  log_retention_in_days = 30
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+
+  launch_type = "FARGATE"
+
+  max_capacity = 5
 }
 
 resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
