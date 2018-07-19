@@ -1,14 +1,14 @@
 module "reindex_request_processor" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
-  service_name   = "reindex_request_processor"
+  source       = "git::https://github.com/wellcometrust/terraform-modules.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  service_name = "reindex_request_processor"
 
   task_desired_count = "0"
-  source_queue_name = "${module.reindex_requests_queue.name}"
-  source_queue_arn  = "${module.reindex_requests_queue.arn}"
+  source_queue_name  = "${module.reindex_requests_queue.name}"
+  source_queue_arn   = "${module.reindex_requests_queue.arn}"
 
-  container_image         = "${local.reindex_request_processor_container_image}"
-  cpu    = 512
-  memory = 2048
+  container_image = "${local.reindex_request_processor_container_image}"
+  cpu             = 512
+  memory          = 2048
 
   env_vars = {
     dynamo_table_name         = "${local.vhs_table_name}"
@@ -18,13 +18,13 @@ module "reindex_request_processor" {
 
   env_vars_length = 3
 
-  ecs_cluster_name               = "${aws_ecs_cluster.cluster.name}"
-  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
-  vpc_id                     = "${local.vpc_id}"
+  ecs_cluster_name   = "${aws_ecs_cluster.cluster.name}"
+  ecs_cluster_id     = "${aws_ecs_cluster.cluster.id}"
+  vpc_id             = "${local.vpc_id}"
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}"]
 
   aws_region = "${var.aws_region}"
-  subnets    =  ["${local.private_subnets}"]
+  subnets    = ["${local.private_subnets}"]
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
