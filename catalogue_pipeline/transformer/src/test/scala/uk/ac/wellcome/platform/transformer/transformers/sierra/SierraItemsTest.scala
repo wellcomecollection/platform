@@ -19,14 +19,14 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val data1 = createSierraItemDataWith(deleted = true)
       val data2 = createSierraItemDataWith(deleted = false)
 
-      val itemData = Map(
-        data1.id -> createSierraItemRecordWith(data1),
-        data2.id -> createSierraItemRecordWith(data2)
+      val itemRecords = Map(
+        data1.sierraId -> createSierraItemRecordWith(data1),
+        data2.sierraId -> createSierraItemRecordWith(data2)
       )
 
       val transformable = SierraTransformable(
         sierraId = createSierraRecordNumber,
-        itemRecords = itemData
+        itemRecords = itemRecords
       )
 
       transformer.extractItemData(transformable) shouldBe List(data1, data2)
@@ -38,7 +38,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val otherId = createSierraRecordNumber
 
       val itemData = Map(
-        data.id -> createSierraItemRecordWith(data),
+        data.sierraId -> createSierraItemRecordWith(data),
         otherId -> createSierraItemRecordWith(
           id = otherId.withoutCheckDigit,
           data = "<xml?>This is not a real 'JSON' string"
@@ -98,8 +98,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val data2 = createSierraItemDataWith(deleted = false)
 
       val itemData = Map(
-        data1.id -> createSierraItemRecordWith(data1),
-        data2.id -> createSierraItemRecordWith(data2)
+        data1.sierraId -> createSierraItemRecordWith(data1),
+        data2.sierraId -> createSierraItemRecordWith(data2)
       )
 
       val transformable = SierraTransformable(

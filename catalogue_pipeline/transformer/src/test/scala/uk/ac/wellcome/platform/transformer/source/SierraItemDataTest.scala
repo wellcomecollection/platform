@@ -13,10 +13,10 @@ class SierraItemDataTest extends FunSpec with Matchers with IdentifiersUtil with
       s"""
          |{
          |  "id": "$id",
-         |  "bibIds": ["${createSierraRecordNumberString}"]
+         |  "fixedFields": {}
          |}
       """.stripMargin).get
 
-    record.id shouldBe SierraRecordNumber(id)
+    record.sierraId shouldBe SierraRecordNumber(id)
   }
 }

@@ -18,6 +18,6 @@ class SierraBibDataTest extends FunSpec with Matchers with IdentifiersUtil with 
         |}
       """.stripMargin).get
 
-    record.id shouldBe SierraRecordNumber(id)
+    record.sierraId shouldBe SierraRecordNumber(id)
   }
 }

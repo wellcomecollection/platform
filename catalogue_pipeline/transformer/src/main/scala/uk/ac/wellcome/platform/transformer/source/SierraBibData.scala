@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.source
 
-import io.circe.generic.extras.JsonKey
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Country => SierraCountry,
@@ -8,7 +7,7 @@ import uk.ac.wellcome.platform.transformer.source.sierra.{
 }
 
 case class SierraBibData(
-  @JsonKey("id") _id: String,
+  id: String,
   title: Option[String] = None,
   deleted: Boolean = false,
   suppressed: Boolean = false,
@@ -18,5 +17,5 @@ case class SierraBibData(
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 ) {
-  val id = SierraRecordNumber(_id)
+  val sierraId = SierraRecordNumber(_id)
 }

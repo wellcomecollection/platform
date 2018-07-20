@@ -82,7 +82,6 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and sends it to SNS client") {
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
