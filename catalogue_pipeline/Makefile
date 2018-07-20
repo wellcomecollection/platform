@@ -8,7 +8,7 @@ SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 ECS_TASKS 	=
-LAMBDAS 	=
+LAMBDAS 	= wiretap
 
 TF_NAME 	= catalogue_pipeline
 TF_PATH 	= $(STACK_ROOT)/terraform
