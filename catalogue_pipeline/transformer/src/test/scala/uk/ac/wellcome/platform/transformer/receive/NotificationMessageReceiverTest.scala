@@ -61,6 +61,9 @@ class NotificationMessageReceiverTest
     // Required for MessageWriter
     implicit val storageBackend = new S3StorageBackend(s3Client)
 
+    implicit val miroTransformableStore = ObjectStore[MiroTransformable]
+    implicit val sierraTransformableStore = ObjectStore[SierraTransformable]
+
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
         messageConfig = messageConfig,
