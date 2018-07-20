@@ -4,11 +4,8 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.platform.sierra_reader.models.{
-  SierraConfig,
-  SierraResourceTypes,
-  WindowStatus
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
@@ -77,7 +74,10 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result) {
-          _ shouldBe WindowStatus(id = Some("1794165"), offset = 2)
+          _ shouldBe WindowStatus(
+            id = Some(SierraRecordNumber("1794165")),
+            offset = 2
+          )
         }
       }
     }
