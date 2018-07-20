@@ -2,11 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord,
-  SierraRecordNumber
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber, SierraRecordTypes}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -85,13 +81,15 @@ class SierraTransformableTransformerTest
             "title": "a title"
           }"""
     val itemData =
-      s"""{
-          |"id": "$itemId",
-          |"location": {
-          |   "code": "${locationType.id}",
-          |   "name": "$locationLabel"
-          | }
-          |}""".stripMargin
+      s"""
+          |{
+          |  "id": "$itemId",
+          |  "location": {
+          |    "code": "${locationType.id}",
+          |    "name": "$locationLabel"
+          |  }
+          |}
+          |""".stripMargin
 
     val itemRecord = createSierraItemRecordWith(
       id = itemId,
@@ -611,8 +609,10 @@ class SierraTransformableTransformerTest
   private def assertTransformReturnsInvisibleWork(
     maybeBibData: Option[SierraBibRecord],
     itemData: Map[SierraRecordNumber, SierraItemRecord] = Map()) = {
+    val sierraId = createSierraRecordNumber
+
     val sierraTransformable = SierraTransformable(
-      sierraId = createSierraRecordNumber,
+      sierraId = sierraId,
       maybeBibRecord = maybeBibData
     )
 
@@ -623,7 +623,7 @@ class SierraTransformableTransformerTest
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = "b01020109"
+        value = sierraId.withCheckDigit(SierraRecordTypes.bibs)
       ),
       version = 1
     )
