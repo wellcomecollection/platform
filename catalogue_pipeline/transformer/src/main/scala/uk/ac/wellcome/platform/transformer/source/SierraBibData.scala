@@ -17,5 +17,5 @@ case class SierraBibData(
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 ) {
-  val sierraId = SierraRecordNumber(_id)
+  val sierraId = SierraRecordNumber(id)
 }
