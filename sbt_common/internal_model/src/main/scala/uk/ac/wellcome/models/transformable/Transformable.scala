@@ -39,10 +39,4 @@ object SierraTransformable {
 
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
     SierraTransformable(sierraId = bibRecord.id, maybeBibData = Some(bibRecord))
-
-  def apply(sourceId: String,
-            itemRecord: SierraItemRecord): SierraTransformable =
-    SierraTransformable(
-      sierraId = SierraRecordNumber(sourceId),
-      itemData = Map(itemRecord.id -> itemRecord))
 }
