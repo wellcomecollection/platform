@@ -3,6 +3,7 @@ package uk.ac.wellcome.sierra_adapter.modules
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformableCodec._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.utils.JsonUtil._
