@@ -6,7 +6,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecordNumber
 }
-import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
 
