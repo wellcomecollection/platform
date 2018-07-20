@@ -3,6 +3,7 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 import scala.util.Random
 
 trait SierraUtil {
+
   /** Returns a random digit as a string.  This is copied from the
     * definition of Random.alphanumeric.
     */
