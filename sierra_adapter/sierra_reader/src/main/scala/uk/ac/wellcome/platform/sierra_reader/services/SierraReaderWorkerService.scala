@@ -61,7 +61,7 @@ class SierraReaderWorkerService @Inject()(
     val baseParams =
       Map("updatedDate" -> window, "fields" -> sierraConfig.fields)
     val params = windowStatus.id match {
-      case Some(id) => baseParams ++ Map("id" -> s"[$id,]")
+      case Some(id) => baseParams ++ Map("id" -> s"[${id.withoutCheckDigit},]")
       case None     => baseParams
     }
 

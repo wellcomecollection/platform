@@ -196,6 +196,7 @@ class SierraReaderWorkerServiceTest
       sendNotificationToSQS(queue = fixtures.queue, body = body)
 
       eventually {
+        listKeysInBucket(bucket = fixtures.bucket) shouldBe expectedContents.keys.toList.sorted
         getAllObjectContents(bucket = fixtures.bucket) shouldBe expectedContents
       }
     }
