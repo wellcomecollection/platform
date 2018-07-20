@@ -4,7 +4,10 @@ import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable
+}
 import uk.ac.wellcome.models.transformable.SierraTransformableCodec._
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}

@@ -13,7 +13,8 @@ import scala.concurrent.ExecutionContext
 object SierraTransformableModule extends TwitterModule {
   @Provides
   @Singleton
-  def provideSierraTransformableObjectStore(injector: Injector): ObjectStore[SierraTransformable] = {
+  def provideSierraTransformableObjectStore(
+    injector: Injector): ObjectStore[SierraTransformable] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 

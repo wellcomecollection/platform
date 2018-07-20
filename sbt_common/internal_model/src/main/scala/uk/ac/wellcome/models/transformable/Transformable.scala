@@ -3,7 +3,11 @@ package uk.ac.wellcome.models.transformable
 import io.circe._
 import io.circe.syntax._
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
@@ -51,24 +55,29 @@ object SierraTransformable {
   *
   */
 object SierraTransformableCodec {
-  implicit val itemRecordsDecoder: Decoder[Map[SierraRecordNumber, SierraItemRecord]] =
-    Decoder.instance[Map[SierraRecordNumber, SierraItemRecord]] { cursor: HCursor =>
-      cursor
-        .as[Map[String, SierraItemRecord]]
-        .map { itemRecordsByString: Map[String, SierraItemRecord] =>
-          itemRecordsByString
-            .map { case (id: String, itemRecord: SierraItemRecord) =>
-              SierraRecordNumber(id) -> itemRecord
-            }
-        }
+  implicit val itemRecordsDecoder
+    : Decoder[Map[SierraRecordNumber, SierraItemRecord]] =
+    Decoder.instance[Map[SierraRecordNumber, SierraItemRecord]] {
+      cursor: HCursor =>
+        cursor
+          .as[Map[String, SierraItemRecord]]
+          .map { itemRecordsByString: Map[String, SierraItemRecord] =>
+            itemRecordsByString
+              .map {
+                case (id: String, itemRecord: SierraItemRecord) =>
+                  SierraRecordNumber(id) -> itemRecord
+              }
+          }
     }
 
-  implicit val itemRecordsEncoder: Encoder[Map[SierraRecordNumber, SierraItemRecord]] =
+  implicit val itemRecordsEncoder
+    : Encoder[Map[SierraRecordNumber, SierraItemRecord]] =
     Encoder.instance[Map[SierraRecordNumber, SierraItemRecord]] {
       itemRecords: Map[SierraRecordNumber, SierraItemRecord] =>
         Json.fromFields(
-          itemRecords.map { case (id: SierraRecordNumber, itemRecord: SierraItemRecord) =>
-            id.withoutCheckDigit -> itemRecord.asJson
+          itemRecords.map {
+            case (id: SierraRecordNumber, itemRecord: SierraItemRecord) =>
+              id.withoutCheckDigit -> itemRecord.asJson
           }
         )
     }

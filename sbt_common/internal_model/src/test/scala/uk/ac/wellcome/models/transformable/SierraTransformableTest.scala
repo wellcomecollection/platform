@@ -20,8 +20,12 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraUtil {
 
   it("can serialise a SierraTransformable via JSON") {
     val itemRecords = (1 to 3)
-      .map { _ => createSierraItemRecord }
-      .map { itemRecord => itemRecord.id -> itemRecord }
+      .map { _ =>
+        createSierraItemRecord
+      }
+      .map { itemRecord =>
+        itemRecord.id -> itemRecord
+      }
       .toMap
 
     val transformable = SierraTransformable(
