@@ -30,13 +30,9 @@ case class SierraTransformable(
 }
 
 object SierraTransformable {
-  def apply(sourceId: String, bibData: String): SierraTransformable = {
-    val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(
-      sierraId = SierraRecordNumber(sourceId),
-      maybeBibData = Some(bibRecord))
-  }
-
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sierraId = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(
+      sierraId = bibRecord.id,
+      maybeBibData = Some(bibRecord)
+    )
 }

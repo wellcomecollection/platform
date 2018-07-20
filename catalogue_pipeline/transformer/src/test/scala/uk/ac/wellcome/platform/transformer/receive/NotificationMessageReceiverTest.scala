@@ -221,11 +221,9 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val id = "1001001"
-    val sierraTransformable: Transformable =
-      SierraTransformable(
-        sourceId = id,
-        bibData = toJson(createSierraBibRecordWith(id = id)).get)
+    val sierraTransformable = SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
