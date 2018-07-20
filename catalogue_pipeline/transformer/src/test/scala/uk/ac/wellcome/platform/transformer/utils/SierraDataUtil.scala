@@ -21,7 +21,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
-      id = SierraRecordNumber(id),
+      _id = id,
       title = title,
       lang = lang,
       materialType = materialType,
