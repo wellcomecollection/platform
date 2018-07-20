@@ -4,11 +4,8 @@ import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
@@ -22,9 +19,9 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
   ): NotificationMessage = {
 
     val sierraTransformable = SierraTransformable(
-      sourceId = id,
+      sierraId = SierraRecordNumber(id),
       maybeBibData = None,
-      itemData = Map[String, SierraItemRecord]()
+      itemData = Map()
     )
 
     hybridRecordNotificationMessage(
@@ -47,9 +44,9 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
       """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      sourceId = id,
+      sierraId = SierraRecordNumber(id),
       maybeBibData = Some(createSierraBibRecordWith(id = id, data = data)),
-      itemData = Map[String, SierraItemRecord]()
+      itemData = Map()
     )
 
     JsonUtil.toJson(sierraTransformable).get
