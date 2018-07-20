@@ -72,7 +72,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
     result2.itemRecords(record2.id) shouldBe record2
   }
 
-  it("should only merge item records with matching bib IDs") {
+  it("only allows merging item records with matching bib IDs") {
     val bibId = createSierraRecordNumber
     val unrelatedBibId = createSierraRecordNumber
 
@@ -86,6 +86,6 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       ItemLinker.linkItemRecord(sierraTransformable, record)
     }
 
-    caught.getMessage shouldEqual s"Non-matching bib id $bibId in item bib List($unrelatedBibId)"
+    caught.getMessage shouldEqual s"Non-matching bib id $unrelatedBibId in item bib List($bibId)"
   }
 }
