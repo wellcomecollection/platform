@@ -38,30 +38,40 @@ trait SierraUtil {
 
   def createSierraBibRecordWith(
     id: String = createSierraRecordNumberString,
-    data: String = "<<BibRecord>>",
-    modifiedDate: Instant = Instant.now): SierraBibRecord =
+    data: String = "",
+    modifiedDate: Instant = Instant.now): SierraBibRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id"}"""
+    } else data
+
     SierraBibRecord(
       id = SierraRecordNumber(id),
-      data = data,
+      data = recordData,
       modifiedDate = modifiedDate
     )
+  }
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
-    data: String = "<<ItemRecord>>",
+    data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[SierraRecordNumber] = List(),
     unlinkedBibIds: List[SierraRecordNumber] = List()
-  ): SierraItemRecord =
+  ): SierraItemRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id"}"""
+    } else data
+
     SierraItemRecord(
       id = SierraRecordNumber(id),
-      data = data,
+      data = recordData,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
       unlinkedBibIds = unlinkedBibIds
     )
+  }
 
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 }
