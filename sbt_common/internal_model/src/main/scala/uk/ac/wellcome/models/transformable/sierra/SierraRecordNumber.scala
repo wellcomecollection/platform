@@ -23,7 +23,7 @@ case class SierraRecordNumber(s: String) {
         )
     }
 
-    s"$prefix$s$getCheckDigit"
+    s"$prefix$withoutCheckDigit$getCheckDigit"
   }
 
   /** Returns the check digit that should be added to a record ID.
