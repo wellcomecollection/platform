@@ -68,7 +68,7 @@ if __name__ == '__main__':
         git('fetch', 'ssh-origin')
         git('checkout', branch_name())
 
-        git('add', '--verbose', '--all')
+        git('add', '--verbose', '--update')
         git('commit', '-m', 'Apply auto-formatting rules')
         git('push', 'ssh-origin', 'HEAD:%s' % branch_name())
 
