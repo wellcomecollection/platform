@@ -15,8 +15,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
-  SierraTransformable,
-  Transformable
+  SierraTransformable
 }
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
@@ -24,6 +23,7 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
@@ -87,7 +87,7 @@ class NotificationMessageReceiverTest
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
             message = createValidSierraTransformableJson(
-              id = "1234567",
+              id = createSierraRecordNumberString,
               title = "A calming breeze on the sea"),
             sourceName = "sierra",
             version = 1,
