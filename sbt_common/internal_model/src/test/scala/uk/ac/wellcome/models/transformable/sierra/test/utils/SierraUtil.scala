@@ -58,7 +58,8 @@ trait SierraUtil {
     data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[SierraRecordNumber] = List(),
-    unlinkedBibIds: List[SierraRecordNumber] = List()
+    unlinkedBibIds: List[SierraRecordNumber] = List(),
+    version: Int = 0
   ): SierraItemRecord = {
     val recordData = if (data == "") {
       s"""{"id": "$id"}"""
@@ -69,7 +70,8 @@ trait SierraUtil {
       data = recordData,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
+      unlinkedBibIds = unlinkedBibIds,
+      version = version
     )
   }
 
