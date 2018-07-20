@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.transformer.source
 
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Country => SierraCountry,
   Language => SierraLanguage
@@ -15,4 +16,6 @@ case class SierraBibData(
   materialType: Option[SierraMaterialType] = None,
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
-)
+) {
+  val sierraId = SierraRecordNumber(id)
+}

@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import java.time.Instant
-
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -14,18 +12,19 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
-  SierraTransformable,
-  Transformable
+  SierraTransformable
 }
+import uk.ac.wellcome.models.transformable.SierraTransformableCodec._
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
   TransformedBaseWork,
   UnidentifiedWork
 }
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
@@ -48,6 +47,7 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
+    with SierraUtil
     with TransformableMessageUtils {
 
   def withNotificationMessageReceiver[R](
@@ -61,6 +61,9 @@ class NotificationMessageReceiverTest
 
     // Required for MessageWriter
     implicit val storageBackend = new S3StorageBackend(s3Client)
+
+    implicit val miroTransformableStore = ObjectStore[MiroTransformable]
+    implicit val sierraTransformableStore = ObjectStore[SierraTransformable]
 
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
@@ -79,16 +82,13 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and sends it to SNS client") {
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
             message = createValidSierraTransformableJson(
-              id = "1234567",
-              title = "A calming breeze on the sea",
-              lastModifiedDate = Instant.now
-            ),
+              id = createSierraRecordNumberString,
+              title = "A calming breeze on the sea"),
             sourceName = "sierra",
             version = 1,
             s3Client = s3Client,
@@ -115,15 +115,13 @@ class NotificationMessageReceiverTest
   it("receives a message and add the version to the transformed work") {
     val id = "5005005"
     val title = "A pot of possums"
-    val lastModifiedDate = Instant.now()
     val version = 5
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message =
-              createValidSierraTransformableJson(id, title, lastModifiedDate),
+            message = createValidSierraTransformableJson(id, title),
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
@@ -223,17 +221,9 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val id = "1001001"
-    val sierraTransformable: Transformable =
-      SierraTransformable(
-        sourceId = id,
-        bibData = JsonUtil
-          .toJson(
-            SierraBibRecord(
-              id = id,
-              data = s"""{"id": "$id", "title": "A title"}""",
-              modifiedDate = Instant.now))
-          .get)
+    val sierraTransformable = SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>

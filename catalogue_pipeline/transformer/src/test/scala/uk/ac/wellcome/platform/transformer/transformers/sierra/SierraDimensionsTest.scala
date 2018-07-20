@@ -1,18 +1,15 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraDimensionsTest extends FunSpec with Matchers {
+class SierraDimensionsTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new SierraDimensions {}
 
   it("gets no dimensions if there is no MARC field 300 with subfield $$c") {
-    val bibData = SierraBibData(id = "d1000001", varFields = List())
+    val bibData = createSierraBibDataWith(varFields = List())
     transformer.getDimensions(bibData = bibData) shouldBe None
   }
 
@@ -38,7 +35,7 @@ class SierraDimensionsTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(id = "d2000002", varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getDimensions(bibData = bibData) shouldBe Some(dimensions)
   }
 
@@ -79,7 +76,7 @@ class SierraDimensionsTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(id = "d3000003", varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getDimensions(bibData = bibData) shouldBe Some(
       expectedDimensions)
   }

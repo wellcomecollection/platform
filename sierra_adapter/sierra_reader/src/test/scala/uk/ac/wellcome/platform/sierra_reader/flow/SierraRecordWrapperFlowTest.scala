@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
+import java.time.Instant
+
 import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Sink, Source}
@@ -9,6 +11,7 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.test.util.SierraRecordUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
@@ -17,7 +20,8 @@ class SierraRecordWrapperFlowTest
     with Akka
     with ScalaFutures
     with ExtendedPatience
-    with Matchers {
+    with Matchers
+    with SierraRecordUtil {
 
   private def withRecordWrapperFlow(actorSystem: ActorSystem)(
     testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
@@ -30,7 +34,7 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "100001"
+          val id = createSierraRecordNumberString
           val updatedDate = "2013-12-13T12:43:16Z"
           val json = parse(s"""
           |{
@@ -39,10 +43,10 @@ class SierraRecordWrapperFlowTest
           |}
         """.stripMargin).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
             data = json.noSpaces,
-            modifiedDate = updatedDate
+            modifiedDate = Instant.parse(updatedDate)
           )
 
           val futureRecord = Source
@@ -62,7 +66,7 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "400004"
+          val id = createSierraRecordNumberString
           val updatedDate = "2014-04-14T14:14:14Z"
           val json = parse(s"""
           |{
@@ -72,10 +76,10 @@ class SierraRecordWrapperFlowTest
           |}
         """.stripMargin).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
             data = json.noSpaces,
-            modifiedDate = updatedDate
+            modifiedDate = Instant.parse(updatedDate)
           )
 
           val futureRecord = Source
@@ -95,7 +99,7 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "1357947"
+          val id = createSierraRecordNumberString
           val deletedDate = "2014-01-31"
           val json = parse(s"""{
                             |  "id" : "$id",
@@ -103,10 +107,10 @@ class SierraRecordWrapperFlowTest
                             |  "deleted" : true
                             |}""".stripMargin).right.get
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
             data = json.noSpaces,
-            modifiedDate = s"${deletedDate}T00:00:00Z"
+            modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")
           )
 
           val futureRecord = Source

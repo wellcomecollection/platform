@@ -1,41 +1,19 @@
 package uk.ac.wellcome.models.transformable.sierra
 
-object SierraRecordTypes extends Enumeration {
-  val bibs, items = Value
-}
-
-/** Utilities for working with Sierra "record numbers".
-  *
-  * These record numbers are the seven- or eight-digit IDs that
-  * are used to identify resources in Sierra.
+/** Represents the seven-digit IDs that are used to identify resources
+  * in Sierra.
   */
-object SierraRecordNumbers {
+case class SierraRecordNumber(s: String) {
+  require(
+    """^[0-9]{7}$""".r.unapplySeq(s) isDefined,
+    s"Not a 7-digit Sierra record number: $s"
+  )
 
-  /** Add the check digit to a Sierra ID.
-    *
-    * Examples:
-    *
-    * scala> addCheckDigit("1024364", recordType = SierraRecordTypes.bibs)
-    * res0: String = b10243641
-    *
-    * scala> addCheckDigit("1952770", recordType = SierraRecordTypes.items)
-    * res1: String = i19527706
-    */
-  def addCheckDigit(sierraId: String,
-                    recordType: SierraRecordTypes.Value): String = {
+  /** Returns the ID without the check digit or prefix. */
+  def withoutCheckDigit: String = s
 
-    // First check that we're being passed a 7-digit numeric ID -- anything
-    // else is an error.
-    val regexMatch = """^([0-9]{7})$""".r.unapplySeq(sierraId)
-    val checkDigit = regexMatch match {
-      case Some(s) => getCheckDigit(s.head)
-      case _ =>
-        throw new RuntimeException(
-          s"Expected 7-digit numeric ID, got $sierraId"
-        )
-    }
-
-    // Then pick the record type prefix.
+  /** Returns the ID with the check digit and prefix. */
+  def withCheckDigit(recordType: SierraRecordTypes.Value): String = {
     val prefix = recordType match {
       case SierraRecordTypes.bibs  => "b"
       case SierraRecordTypes.items => "i"
@@ -45,7 +23,7 @@ object SierraRecordNumbers {
         )
     }
 
-    s"$prefix$sierraId$checkDigit"
+    s"$prefix$withoutCheckDigit$getCheckDigit"
   }
 
   /** Returns the check digit that should be added to a record ID.
@@ -67,8 +45,8 @@ object SierraRecordNumbers {
     * This method does no error checking, and assumes it is passed a 7-digit
     * Sierra ID.
     */
-  private def getCheckDigit(sierraId: String): String = {
-    val remainder = sierraId.reverse
+  private def getCheckDigit: String = {
+    val remainder = s.reverse
       .zip(Stream from 2)
       .map { case (char: Char, count: Int) => char.toString.toInt * count }
       .sum % 11

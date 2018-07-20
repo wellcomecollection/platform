@@ -1,9 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
@@ -37,13 +34,12 @@ class SierraTransformableTransformer
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraTransformable.sourceId,
+        value = sierraTransformable.sierraId.withCheckDigit(
           recordType = SierraRecordTypes.bibs
         )
       )
 
-      sierraTransformable.maybeBibData
+      sierraTransformable.maybeBibRecord
         .map { bibData =>
           debug(s"Attempting to transform ${bibData.id}")
 

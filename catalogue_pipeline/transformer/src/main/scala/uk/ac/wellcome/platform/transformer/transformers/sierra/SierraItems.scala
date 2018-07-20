@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.utils.JsonUtil._
@@ -15,7 +12,7 @@ import scala.util.{Failure, Success}
 trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
     sierraTransformable: SierraTransformable): List[SierraItemData] = {
-    sierraTransformable.itemData.values
+    sierraTransformable.itemRecords.values
       .map { _.data }
       .map { jsonString =>
         fromJson[SierraItemData](jsonString) match {
@@ -31,13 +28,12 @@ trait SierraItems extends Logging with SierraLocation {
   }
 
   def transformItemData(sierraItemData: SierraItemData): Identifiable[Item] = {
-    debug(s"Attempting to transform ${sierraItemData.id}")
+    debug(s"Attempting to transform ${sierraItemData.sierraId}")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraItemData.id,
+        value = sierraItemData.sierraId.withCheckDigit(
           recordType = SierraRecordTypes.items
         )
       ),
@@ -45,7 +41,7 @@ trait SierraItems extends Logging with SierraLocation {
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
-          value = sierraItemData.id
+          value = sierraItemData.sierraId.withoutCheckDigit
         )
       ),
       agent = Item(

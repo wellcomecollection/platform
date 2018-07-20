@@ -1,24 +1,19 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
+class SierraPhysicalDescriptionTest
+    extends FunSpec
+    with Matchers
+    with SierraDataUtil {
 
   val transformer = new SierraPhysicalDescription {}
 
   it(
     "gets no physical description if there is no MARC field 300 with subfield $b") {
-    val bibData = SierraBibData(
-      id = "pd1000001",
-      title = Some("Quick!  The quails are quadrupling."),
-      varFields = List()
-    )
-
+    val bibData = createSierraBibDataWith(varFields = List())
     transformer.getPhysicalDescription(bibData = bibData) shouldBe None
   }
 
@@ -44,11 +39,7 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(
-      id = "pd2000002",
-      title = Some("Quaint quants are quite quiet"),
-      varFields = varFields
-    )
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     transformer
       .getPhysicalDescription(bibData = bibData)
@@ -94,11 +85,7 @@ class SierraPhysicalDescriptionTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(
-      id = "pd3000003",
-      title = Some("A qualified quetzal is quixotic"),
-      varFields = varFields
-    )
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     transformer
       .getPhysicalDescription(bibData = bibData)

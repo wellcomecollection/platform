@@ -2,12 +2,10 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.WorkType
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraBibData,
-  SierraMaterialType
-}
+import uk.ac.wellcome.platform.transformer.source.SierraMaterialType
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraWorkTypeTest extends FunSpec with Matchers {
+class SierraWorkTypeTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new SierraWorkType {}
 
@@ -16,9 +14,7 @@ class SierraWorkTypeTest extends FunSpec with Matchers {
     val workTypeId = "workTypeCode"
     val sierraValue = "Sierra Material Type Label"
 
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = Some("A trifle of tangy tangerine tigers"),
+    val bibData = createSierraBibDataWith(
       materialType = Some(
         SierraMaterialType(
           code = workTypeId,

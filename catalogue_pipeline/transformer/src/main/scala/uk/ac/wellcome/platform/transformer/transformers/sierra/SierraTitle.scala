@@ -14,5 +14,5 @@ trait SierraTitle {
   def getTitle(bibData: SierraBibData): String =
     bibData.title.getOrElse(
       throw new ShouldNotTransformException(
-        s"Sierra record ${bibData.id} has no title!"))
+        s"Sierra record ${bibData.sierraId} has no title!"))
 }

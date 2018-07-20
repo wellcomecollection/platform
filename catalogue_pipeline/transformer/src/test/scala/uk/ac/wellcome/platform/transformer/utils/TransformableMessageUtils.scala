@@ -1,48 +1,21 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import java.time.Instant
-
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
 }
+import uk.ac.wellcome.models.transformable.SierraTransformableCodec._
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait TransformableMessageUtils extends SQS {
-  def createValidEmptySierraBibNotificationMessage(
-    id: String,
-    s3Client: AmazonS3,
-    bucket: Bucket
-  ): NotificationMessage = {
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData = None,
-      itemData = Map[String, SierraItemRecord]()
-    )
-
-    hybridRecordNotificationMessage(
-      message = JsonUtil.toJson(sierraTransformable).get,
-      sourceName = "sierra",
-      version = 1,
-      s3Client = s3Client,
-      bucket = bucket
-    )
-  }
-
-  def createValidSierraTransformableJson(id: String,
-                                         title: String,
-                                         lastModifiedDate: Instant): String = {
+trait TransformableMessageUtils extends SierraUtil with SQS {
+  def createValidSierraTransformableJson(id: String, title: String): String = {
     val data =
       s"""
          |{
@@ -53,9 +26,9 @@ trait TransformableMessageUtils extends SQS {
       """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
-      itemData = Map[String, SierraItemRecord]()
+      sierraId = SierraRecordNumber(id),
+      maybeBibRecord = Some(createSierraBibRecordWith(id = id, data = data)),
+      itemRecords = Map()
     )
 
     JsonUtil.toJson(sierraTransformable).get

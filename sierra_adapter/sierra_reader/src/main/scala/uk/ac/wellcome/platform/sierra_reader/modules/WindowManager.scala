@@ -4,17 +4,17 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.platform.sierra_reader.models.SierraConfig
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
-
-case class WindowStatus(id: Option[String], offset: Int)
+import scala.util.Try
 
 class WindowManager @Inject()(
   s3client: AmazonS3,
@@ -52,21 +52,16 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(s3Config.bucketName, key).getObjectContent)
-        val triedMaybeLastId =
+        val triedMaybeLastId: Try[Option[SierraRecordNumber]] =
           JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
-            r.map { _.id }.sorted.lastOption
+            r.map { _.id }.sortBy { _.withoutCheckDigit }.lastOption
           }
 
         info(s"Found latest ID in S3: $triedMaybeLastId")
         val triedStatus = triedMaybeLastId
           .map {
             case Some(id) =>
-              // The Sierra IDs we store in S3 are prefixed with "b" or "i".
-              // Remove the first character
-              val unprefixedId = id.substring(1)
-
-              val newId = (unprefixedId.toInt + 1).toString
-              WindowStatus(id = Some(newId), offset = offset + 1)
+              WindowStatus(id = Some(id), offset = offset + 1)
             case None =>
               throw GracefulFailureException(
                 new RuntimeException("Json did not contain an id"))
