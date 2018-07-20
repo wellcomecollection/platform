@@ -82,8 +82,6 @@ class SierraItemMergerUpdaterServiceTest
             val bibIdWithOldData = createSierraRecordNumber
             val bibIdWithNewerData = createSierraRecordNumber
 
-            val itemId = "i666"
-
             val bibIds = List(
               bibIdNotExisting,
               bibIdWithOldData,
