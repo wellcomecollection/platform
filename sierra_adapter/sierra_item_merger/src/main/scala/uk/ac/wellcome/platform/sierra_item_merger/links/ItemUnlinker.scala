@@ -16,7 +16,7 @@ object ItemUnlinker {
     }
 
     val itemData: Map[SierraRecordNumber, SierraItemRecord] =
-      sierraTransformable.itemData
+      sierraTransformable.itemRecords
         .filterNot {
           case (id, currentItemRecord) => {
             val matchesCurrentItemRecord = id == itemRecord.id
@@ -29,6 +29,6 @@ object ItemUnlinker {
           }
         }
 
-    sierraTransformable.copy(itemData = itemData)
+    sierraTransformable.copy(itemRecords = itemData)
   }
 }

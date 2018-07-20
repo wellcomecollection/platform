@@ -46,8 +46,8 @@ class SierraTransformableTransformerTest
 
     val sierraTransformable = SierraTransformable(
       sierraId = bibId,
-      maybeBibData = Some(createSierraBibRecordWith(id = id, data = data)),
-      itemData = Map(
+      maybeBibRecord = Some(createSierraBibRecordWith(id = id, data = data)),
+      itemRecords = Map(
         itemRecord1.id -> itemRecord1,
         itemRecord2.id -> itemRecord2
       )
@@ -100,8 +100,8 @@ class SierraTransformableTransformerTest
 
     val transformable = SierraTransformable(
       sierraId = SierraRecordNumber(bibId),
-      maybeBibData = Some(createSierraBibRecordWith(id = bibId, data = bibData)),
-      itemData = Map(itemRecord.id -> itemRecord)
+      maybeBibRecord = Some(createSierraBibRecordWith(id = bibId, data = bibData)),
+      itemRecords = Map(itemRecord.id -> itemRecord)
     )
 
     val work = transformToWork(transformable)
@@ -602,7 +602,7 @@ class SierraTransformableTransformerTest
 
     val sierraTransformable = SierraTransformable(
       sierraId = SierraRecordNumber(id),
-      maybeBibData = Some(bibRecord)
+      maybeBibRecord = Some(bibRecord)
     )
 
     transformToWork(sierraTransformable)
@@ -613,7 +613,7 @@ class SierraTransformableTransformerTest
     itemData: Map[SierraRecordNumber, SierraItemRecord] = Map()) = {
     val sierraTransformable = SierraTransformable(
       sierraId = createSierraRecordNumber,
-      maybeBibData = maybeBibData
+      maybeBibRecord = maybeBibData
     )
 
     val triedMaybeWork = transformer.transform(sierraTransformable, version = 1)

@@ -54,8 +54,8 @@ class SierraItemMergerUpdaterServiceTest
               val expectedSierraTransformable =
                 SierraTransformable(
                   sierraId = bibId,
-                  maybeBibData = None,
-                  itemData = Map(newItemRecord.id -> newItemRecord)
+                  maybeBibRecord = None,
+                  itemRecords = Map(newItemRecord.id -> newItemRecord)
                 )
 
               assertStored[SierraTransformable](
@@ -98,7 +98,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val oldTransformable = SierraTransformable(
               sierraId = bibIdWithOldData,
-              itemData = Map(
+              itemRecords = Map(
                 itemRecord1.id -> itemRecord1.copy(modifiedDate = olderDate),
                 itemRecord2.id -> itemRecord2
               )
@@ -114,7 +114,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val newTransformable = SierraTransformable(
               sierraId = bibIdWithNewerData,
-              itemData = Map(
+              itemRecords = Map(
                 itemRecord1.id -> itemRecord1.copy(modifiedDate = Instant.now),
                 anotherItem.id -> anotherItem
               )
@@ -132,8 +132,8 @@ class SierraItemMergerUpdaterServiceTest
                   val expectedNewSierraTransformable =
                     SierraTransformable(
                       sierraId = bibIdNotExisting,
-                      maybeBibData = None,
-                      itemData = Map(itemRecord1.id -> itemRecord1)
+                      maybeBibRecord = None,
+                      itemRecords = Map(itemRecord1.id -> itemRecord1)
                     )
 
                   assertStored[SierraTransformable](
@@ -144,7 +144,7 @@ class SierraItemMergerUpdaterServiceTest
 
                   val expectedUpdatedSierraTransformable =
                     oldTransformable.copy(
-                      itemData = Map(
+                      itemRecords = Map(
                         itemRecord1.id -> itemRecord1,
                         itemRecord2.id -> itemRecord2
                       )
@@ -184,7 +184,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val oldTransformable = SierraTransformable(
               sierraId = bibId,
-              itemData = Map(itemRecord.id -> itemRecord)
+              itemRecords = Map(itemRecord.id -> itemRecord)
             )
 
             val f1 = hybridStore.updateRecord(oldTransformable.id)(
@@ -198,7 +198,7 @@ class SierraItemMergerUpdaterServiceTest
 
               whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
                 val expectedTransformable = oldTransformable.copy(
-                  itemData = Map(newItemRecord.id -> newItemRecord)
+                  itemRecords = Map(newItemRecord.id -> newItemRecord)
                 )
 
                 assertStored[SierraTransformable](
@@ -232,7 +232,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val sierraTransformable1 = SierraTransformable(
               sierraId = bibId1,
-              itemData = itemData
+              itemRecords = itemData
             )
 
             val sierraTransformable2 = SierraTransformable(
@@ -264,7 +264,7 @@ class SierraItemMergerUpdaterServiceTest
 
             whenReady(unlinkItemRecordFuture) { _ =>
               val expectedSierraRecord1 = sierraTransformable1.copy(
-                itemData = Map.empty
+                itemRecords = Map.empty
               )
 
               val expectedItemData = Map(
@@ -275,7 +275,7 @@ class SierraItemMergerUpdaterServiceTest
                 )
               )
               val expectedSierraRecord2 = sierraTransformable2.copy(
-                itemData = expectedItemData
+                itemRecords = expectedItemData
               )
 
               assertStored[SierraTransformable](
@@ -313,12 +313,12 @@ class SierraItemMergerUpdaterServiceTest
 
             val sierraTransformable1 = SierraTransformable(
               sierraId = bibId1,
-              itemData = itemData
+              itemRecords = itemData
             )
 
             val sierraTransformable2 = SierraTransformable(
               sierraId = bibId2,
-              itemData = itemData
+              itemRecords = itemData
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
@@ -346,13 +346,13 @@ class SierraItemMergerUpdaterServiceTest
             whenReady(Future.sequence(List(f1, f2))) { _ =>
               whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
                 val expectedSierraRecord1 = sierraTransformable1.copy(
-                  itemData = Map.empty
+                  itemRecords = Map.empty
                 )
 
                 // In this situation the item was already linked to sierraTransformable2
                 // but the modified date is updated in line with the item update
                 val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemData = expectedItemData
+                  itemRecords = expectedItemData
                 )
 
                 assertStored[SierraTransformable](
@@ -393,7 +393,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val sierraTransformable1 = SierraTransformable(
               sierraId = bibId1,
-              itemData = itemData
+              itemRecords = itemData
             )
 
             val sierraTransformable2 = SierraTransformable(
@@ -433,7 +433,7 @@ class SierraItemMergerUpdaterServiceTest
                 // time we've seen the link so it is valid for that bib.
                 val expectedSierraRecord1 = sierraTransformable1
                 val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemData = expectedItemData
+                  itemRecords = expectedItemData
                 )
 
                 assertStored[SierraTransformable](
@@ -470,7 +470,7 @@ class SierraItemMergerUpdaterServiceTest
 
             val sierraRecord = SierraTransformable(
               sierraId = bibId,
-              itemData = Map(itemRecord.id -> itemRecord)
+              itemRecords = Map(itemRecord.id -> itemRecord)
             )
 
             val f1 = hybridStore.updateRecord(sierraRecord.id)(ifNotExisting =
@@ -517,7 +517,7 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                 val expectedSierraRecord = SierraTransformable(
                   sierraId = bibId,
-                  itemData = Map(itemRecord.id -> itemRecord)
+                  itemRecords = Map(itemRecord.id -> itemRecord)
                 )
 
                 assertStored[SierraTransformable](

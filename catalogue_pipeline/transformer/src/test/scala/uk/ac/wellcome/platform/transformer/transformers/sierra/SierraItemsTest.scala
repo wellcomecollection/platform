@@ -26,7 +26,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = SierraTransformable(
         sierraId = createSierraRecordNumber,
-        itemData = itemData
+        itemRecords = itemData
       )
 
       transformer.extractItemData(transformable) shouldBe List(data1, data2)
@@ -47,7 +47,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = SierraTransformable(
         sierraId = createSierraRecordNumber,
-        itemData = itemData
+        itemRecords = itemData
       )
 
       transformer.extractItemData(transformable) shouldBe List(data)
@@ -104,7 +104,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = SierraTransformable(
         sierraId = createSierraRecordNumber,
-        itemData = itemData
+        itemRecords = itemData
       )
 
       transformer.getItems(transformable) should have size 1
