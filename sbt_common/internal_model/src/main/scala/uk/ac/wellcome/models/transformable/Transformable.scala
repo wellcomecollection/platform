@@ -24,11 +24,10 @@ case class MiroTransformable(sourceId: String,
   */
 case class SierraTransformable(
   sierraId: SierraRecordNumber,
+  sourceName: String = "sierra",
   maybeBibRecord: Option[SierraBibRecord] = None,
   itemRecords: Map[SierraRecordNumber, SierraItemRecord] = Map()
 ) extends Transformable {
-  val sourceName = "sierra"
-
   def sourceId: String =
     sierraId.withoutCheckDigit
 }
