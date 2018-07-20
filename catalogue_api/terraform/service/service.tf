@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host" {
 }
 
 module "task" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v11.1.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/task/prebuilt/container_with_sidecar?ref=v11.4.1"
 
   aws_region = "${var.aws_region}"
   task_name  = "${var.name}"
@@ -36,6 +36,8 @@ module "task" {
     es_doc_type = "${var.es_config["doc_type"]}"
   }
 
+  app_env_vars_length = 9
+
   sidecar_container_image = "${var.sidecar_container_image}"
   sidecar_container_port  = "${var.sidecar_container_port}"
 
@@ -47,7 +49,7 @@ module "task" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.1.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.4.1"
 
   service_name       = "${var.name}"
   task_desired_count = "${var.task_desired_count}"
