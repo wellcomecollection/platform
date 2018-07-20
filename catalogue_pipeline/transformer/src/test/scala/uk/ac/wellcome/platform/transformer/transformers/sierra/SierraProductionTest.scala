@@ -425,7 +425,7 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   }
 
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
-    val bibData = val bibData = createSierraBibDataWith(varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     intercept[GracefulFailureException] {
       transformer.getProduction(bibData)
@@ -434,7 +434,7 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
 
   private def transformToProduction(varFields: List[VarField])
     : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
-    val bibData = val bibData = createSierraBibDataWith(varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     transformer.getProduction(bibData)
   }
