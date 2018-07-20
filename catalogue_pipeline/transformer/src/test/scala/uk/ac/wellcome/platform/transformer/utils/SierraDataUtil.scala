@@ -18,7 +18,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
-      _id = id,
+      id = id,
       title = title,
       lang = lang,
       materialType = materialType,
@@ -33,7 +33,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     location: Option[SierraItemLocation] = None
   ): SierraItemData =
     SierraItemData(
-      _id = id,
+      id = id,
       deleted = deleted,
       location = location
     )
