@@ -46,7 +46,6 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val itemId = "i111"
     val sierraTransformable = SierraTransformable(
       sierraId = bibId,
       itemRecords = Map(itemRecord.id -> itemRecord)
