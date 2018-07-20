@@ -3,11 +3,8 @@ package uk.ac.wellcome.platform.transformer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
-  UnidentifiedWork
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraRecordNumber, SierraRecordTypes}
+import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
@@ -27,8 +24,10 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "1001001"
+    val id = createSierraRecordNumberString
     val title = "A pot of possums"
+
+    val sierraId = SierraRecordNumber(id)
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
@@ -41,7 +40,6 @@ class SierraTransformerFeatureTest
                   title = title
                 ),
                 sourceName = "sierra",
-                version = 1,
                 s3Client = s3Client,
                 bucket = storageBucket
               )
@@ -66,13 +64,13 @@ class SierraTransformerFeatureTest
                 val sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
-                  value = "b10010014"
+                  value = sierraId.withCheckDigit(SierraRecordTypes.bibs)
                 )
 
                 val sierraIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-identifier"),
                   ontologyType = "Work",
-                  value = id
+                  value = sierraId.withoutCheckDigit
                 )
 
                 val works = getMessages[UnidentifiedWork](topic)
