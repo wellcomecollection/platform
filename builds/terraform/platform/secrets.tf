@@ -13,11 +13,16 @@ EOF
 
 data "archive_file" "secrets" {
   type        = "zip"
-  output_path = "${path.module}/../../secrets_${var.name}.zip"
+  output_path = "${path.module}/../../secrets_platform.zip"
 
   source {
     content  = "${data.template_file.aws_credentials.rendered}"
-    filename = "awscredentials"
+    filename = "credentials"
+  }
+
+  source {
+    content  = "[default]\nregion = eu-west-1"
+    filename = "config"
   }
 
   source {
