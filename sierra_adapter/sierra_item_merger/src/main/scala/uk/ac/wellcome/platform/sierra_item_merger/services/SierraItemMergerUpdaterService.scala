@@ -21,6 +21,8 @@ class SierraItemMergerUpdaterService @Inject()(
 )(implicit ec: ExecutionContext)
     extends Logging {
 
+  val sourceName = "sierra"
+
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
 
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>

@@ -18,6 +18,8 @@ class SierraBibMergerUpdaterService @Inject()(
                                              ObjectStore[SierraTransformable]]
 ) extends Logging {
 
+  val sourceName = "sierra"
+
   def update(bibRecord: SierraBibRecord): Future[Unit] =
     versionedHybridStore.updateRecord(Sourced.id(bibRecord.id))(
       (SierraTransformable(bibRecord), SourceMetadata(sourceName)))(
