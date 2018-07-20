@@ -1,23 +1,15 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraExtentTest extends FunSpec with Matchers {
+class SierraExtentTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new SierraExtent {}
 
   it("gets no extent if there is no MARC field 300 with subfield $$a") {
-    val bibData = SierraBibData(
-      id = "e1000001",
-      title = Some("Egad!  An egg exits eastwards."),
-      varFields = List()
-    )
-
+    val bibData = createSierraBibDataWith(varFields = List())
     transformer.getExtent(bibData = bibData) shouldBe None
   }
 
@@ -43,12 +35,7 @@ class SierraExtentTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(
-      id = "e2000002",
-      title = Some("Even eagles eschew exasperating elephants"),
-      varFields = varFields
-    )
-
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getExtent(bibData = bibData) shouldBe Some(extent)
   }
 
@@ -104,12 +91,7 @@ class SierraExtentTest extends FunSpec with Matchers {
       )
     )
 
-    val bibData = SierraBibData(
-      id = "e3000003",
-      title = Some("Eager electric eels are exciting"),
-      varFields = varFields
-    )
-
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getExtent(bibData = bibData) shouldBe Some(expectedExtent)
   }
 }

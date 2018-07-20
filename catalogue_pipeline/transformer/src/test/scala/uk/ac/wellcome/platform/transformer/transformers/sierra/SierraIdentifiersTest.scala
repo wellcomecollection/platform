@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
-import uk.ac.wellcome.platform.transformer.source.SierraBibData
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
+class SierraIdentifiersTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("passes through the main identifier from the bib record") {
     assertIdentifiersAreCorrect(
@@ -26,14 +25,7 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraData {
     bibDataId: String,
     expectedIdentifiers: List[SourceIdentifier]
   ) = {
-
-    val bibData = SierraBibData(
-      id = bibDataId,
-      title = Some("An imprint of insects on the inside of an igloo"),
-      deleted = false,
-      suppressed = false
-    )
-
+    val bibData = createSierraBibDataWith(id = bibDataId)
     transformer.getOtherIdentifiers(bibData = bibData) shouldBe expectedIdentifiers
   }
 }

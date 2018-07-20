@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source.{SierraBibData, SierraMaterialType, VarField}
 import uk.ac.wellcome.platform.transformer.source.sierra.{Language => SierraLanguage}
 
-class SierraDataUtil extends IdentifiersUtil with SierraUtil {
+trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibDataWith(
     id: String = createSierraRecordNumberString,
     title: Option[String] = Some(randomAlphanumeric(25)),

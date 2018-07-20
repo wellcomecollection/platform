@@ -3,13 +3,10 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraContributorsTest extends FunSpec with Matchers {
+class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new SierraContributors {}
 
@@ -666,14 +663,12 @@ class SierraContributorsTest extends FunSpec with Matchers {
     varFields: List[VarField],
     expectedContributors: List[Contributor[MaybeDisplayable[AbstractAgent]]]
   ) = {
-    val bibData =
-      SierraBibData(id = "1661847", title = None, varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getContributors(bibData) shouldBe expectedContributors
   }
 
   private def assertTransformFails(varFields: List[VarField]) = {
-    val bibData =
-      SierraBibData(id = "1663540", title = None, varFields = varFields)
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     intercept[GracefulFailureException] {
       transformer.getContributors(bibData)
