@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import os
 
@@ -12,7 +13,22 @@ def test_messages_are_copied_to_s3(s3_client, bucket):
             {
                 'Sns': {
                     'Message': message,
-                    'TopicArn': topic_arn
+                    'TopicArn': topic_arn,
+                    'Timestamp': dt.datetime.now().isoformat()
+                }
+            },
+            {
+                'Sns': {
+                    'Message': message * 2,
+                    'TopicArn': topic_arn,
+                    'Timestamp': dt.datetime.now().isoformat()
+                }
+            },
+            {
+                'Sns': {
+                    'Message': message * 3,
+                    'TopicArn': topic_arn,
+                    'Timestamp': dt.datetime.now().isoformat()
                 }
             }
         ]
@@ -26,6 +42,15 @@ def test_messages_are_copied_to_s3(s3_client, bucket):
     assert "Contents" in resp, resp
     objects = resp["Contents"]
 
-    assert len(objects) == 1
-    body = s3_client.get_object(Bucket=bucket, Key=objects[0]["Key"])['Body'].read()
-    assert json.loads(body) == event['Records'][0]['Sns']
+    assert len(objects) == len(event['Records'])
+
+    expected_bodies = [r['Sns'] for r in event['Records']]
+
+    actual_bodies = set()
+    for obj in objects:
+        key = obj['Key']
+        body = s3_client.get_object(Bucket=bucket, Key=key)['Body'].read()
+        actual_bodies.add(body)
+
+    for b in actual_bodies:
+        assert json.loads(b) in expected_bodies

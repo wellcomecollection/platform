@@ -10,10 +10,10 @@ def main(event, context=None, s3_client=None):
 
     bucket = os.environ['BUCKET']
 
-    sns_event = event['Records'][0]['Sns']
-
-    s3_client.put_object(
-        Bucket=bucket,
-        Key=str(uuid.uuid4()),
-        Body=json.dumps(sns_event, separators=(',',':'))
-    )
+    for record in event['Records']:
+        sns_event = record['Sns']
+        s3_client.put_object(
+            Bucket=bucket,
+            Key=str(uuid.uuid4()),
+            Body=json.dumps(sns_event, separators=(',',':'))
+        )
