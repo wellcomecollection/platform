@@ -1,6 +1,9 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraItemRecord,
+  SierraRecordNumber
+}
 
 object SierraItemRecordMerger {
   def mergeItems(existingRecord: SierraItemRecord,
@@ -37,11 +40,13 @@ object SierraItemRecordMerger {
     }
   }
 
-  private def addList(x: List[SierraRecordNumber], y: List[SierraRecordNumber]): List[SierraRecordNumber] = {
+  private def addList(x: List[SierraRecordNumber],
+                      y: List[SierraRecordNumber]): List[SierraRecordNumber] = {
     (x.toSet ++ y.toSet).toList
   }
 
-  private def subList(x: List[SierraRecordNumber], y: List[SierraRecordNumber]): List[SierraRecordNumber] = {
+  private def subList(x: List[SierraRecordNumber],
+                      y: List[SierraRecordNumber]): List[SierraRecordNumber] = {
     (x.toSet -- y.toSet).toList
   }
 }

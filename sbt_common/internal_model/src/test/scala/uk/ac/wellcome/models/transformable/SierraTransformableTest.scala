@@ -21,7 +21,8 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraUtil {
 
   it("has the correct ID") {
     val sierraId = createSierraRecordNumberString
-    val transformable = SierraTransformable(sierraId = SierraRecordNumber(sierraId))
+    val transformable =
+      SierraTransformable(sierraId = SierraRecordNumber(sierraId))
     transformable.id shouldBe s"sierra/$sierraId"
   }
 
