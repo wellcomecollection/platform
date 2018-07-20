@@ -1,4 +1,6 @@
+import json
 import os
+
 import wiretap
 
 
@@ -25,4 +27,5 @@ def test_messages_are_copied_to_s3(s3_client, bucket):
     objects = resp["Contents"]
 
     assert len(objects) == 1
-    s3_client.get_object(Bucket=bucket, Key=objects[0]["Key"])
+    body = s3_client.get_object(Bucket=bucket, Key=objects[0]["Key"])['Body'].read()
+    assert json.loads(body) == event['Records'][0]['Sns']
