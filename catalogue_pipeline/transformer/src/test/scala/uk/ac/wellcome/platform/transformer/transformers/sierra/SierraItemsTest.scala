@@ -5,35 +5,23 @@ import java.time.Instant
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
 import uk.ac.wellcome.models.work.internal.{
   Identifiable,
   IdentifierType,
   Item,
   SourceIdentifier
 }
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class SierraItemsTest extends FunSpec with Matchers with SierraData {
+class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new Object with SierraItems
 
   describe("extractItemData") {
     it("parses instances of SierraItemData") {
-      val item1 = SierraItemData(
-        id = "i1000001",
-        deleted = true
-      )
-
-      val item2 = SierraItemData(
-        id = "i1000002",
-        deleted = false,
-        varFields = List(
-          VarField(fieldTag = "b", content = "X111658"),
-          VarField(fieldTag = "c", content = "X111659")
-        )
-      )
+      val item1 = createSierraItemData
+      val item2 = createSierraItemData
 
       val itemData = Map(
         item1.id -> SierraItemRecord(
@@ -51,7 +39,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       )
 
       val transformable = SierraTransformable(
-        sourceId = "b1111111",
+        sourceId = createSierraRecordNumberString,
         itemData = itemData
       )
 
@@ -59,10 +47,9 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
     }
 
     it("ignores items it can't parse as JSON") {
-      val item = SierraItemData(
-        id = "i2000001",
-        deleted = true
-      )
+      val item = createSierraItemData
+
+      val itemId = createSierraRecordNumberString
 
       val itemData = Map(
         item.id -> SierraItemRecord(
@@ -71,8 +58,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
           modifiedDate = Instant.now,
           bibIds = List()
         ),
-        "i2000002" -> SierraItemRecord(
-          id = "i2000002",
+        itemId -> SierraItemRecord(
+          id = itemId,
           data = "<xml?>This is not a real 'JSON' string",
           modifiedDate = Instant.now,
           bibIds = List()
@@ -80,7 +67,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       )
 
       val transformable = SierraTransformable(
-        sourceId = "b2222222",
+        sourceId = createSierraRecordNumberString,
         itemData = itemData
       )
 
@@ -90,7 +77,9 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
   describe("transformItemData") {
     it("creates both forms of the Sierra ID in 'identifiers'") {
-      val item = SierraItemData(id = "4000004", deleted = false)
+      val item = createSierraItemDataWith(
+        id = "4000004"
+      )
 
       val sourceIdentifier1 = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
@@ -113,7 +102,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
     }
 
     it("uses the full Sierra system number as the source identifier") {
-      val item = SierraItemData(id = "5000005", deleted = false)
+      val item = createSierraItemDataWith(id = "5000005")
 
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
@@ -128,8 +117,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
 
   describe("getItems") {
     it("removes items with deleted=true") {
-      val item1 = SierraItemData(id = "3000001", deleted = true)
-      val item2 = SierraItemData(id = "3000002", deleted = false)
+      val item1 = createSierraItemDataWith(deleted = true)
+      val item2 = createSierraItemDataWith(deleted = false)
 
       val itemData = Map(
         item1.id -> SierraItemRecord(
@@ -147,11 +136,11 @@ class SierraItemsTest extends FunSpec with Matchers with SierraData {
       )
 
       val transformable = SierraTransformable(
-        sourceId = "3333333",
+        sourceId = createSierraRecordNumberString,
         itemData = itemData
       )
 
-      transformer.getItems(transformable) should have size (1)
+      transformer.getItems(transformable) should have size 1
     }
   }
 }
