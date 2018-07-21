@@ -2,12 +2,10 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal.{LocationType, PhysicalLocation}
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraItemData,
-  SierraItemLocation
-}
+import uk.ac.wellcome.platform.transformer.source.SierraItemLocation
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraLocationTest extends FunSpec with Matchers {
+class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
 
   val transformer = new SierraLocation {}
 
@@ -15,8 +13,7 @@ class SierraLocationTest extends FunSpec with Matchers {
     val locationTypeCode = "sgmed"
     val locationType = LocationType("sgmed")
     val label = "A museum of mermaids"
-    val itemData = SierraItemData(
-      id = "i1234567",
+    val itemData = createSierraItemDataWith(
       location = Some(SierraItemLocation(locationTypeCode, label))
     )
 
@@ -26,8 +23,7 @@ class SierraLocationTest extends FunSpec with Matchers {
   }
 
   it("returns None if the location field only contains empty strings") {
-    val itemData = SierraItemData(
-      id = "i1234567",
+    val itemData = createSierraItemDataWith(
       location = Some(SierraItemLocation("", ""))
     )
 
@@ -35,8 +31,7 @@ class SierraLocationTest extends FunSpec with Matchers {
   }
 
   it("returns None if the location field only contains the string 'none'") {
-    val itemData = SierraItemData(
-      id = "i1234567",
+    val itemData = createSierraItemDataWith(
       location = Some(SierraItemLocation("none", "none"))
     )
 
@@ -44,8 +39,8 @@ class SierraLocationTest extends FunSpec with Matchers {
   }
 
   it("returns None if there is no location in the item data") {
-    val itemData = SierraItemData(
-      id = "i1234567"
+    val itemData = createSierraItemDataWith(
+      location = None
     )
 
     transformer.getLocation(itemData = itemData) shouldBe None
