@@ -11,6 +11,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
@@ -32,7 +33,8 @@ class SierraItemsToDynamoWorkerServiceTest
     with ExtendedPatience
     with Akka
     with MetricsSenderFixture
-    with ScalaFutures {
+    with ScalaFutures
+    with SierraUtil {
 
   def withSierraWorkerService[R](
     testWith: TestWith[(SierraItemsToDynamoWorkerService,
@@ -75,42 +77,35 @@ class SierraItemsToDynamoWorkerServiceTest
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
-        val id = "12345"
+        val bibIds = createSierraRecordNumberStrings(count = 5)
 
-        val bibIds1 = List("1", "2", "3")
-        val modifiedDate1 = "2001-01-01T01:01:01Z"
+        val bibIds1 = List(bibIds(0), bibIds(1), bibIds(2))
 
-        val record1 = SierraItemRecord(
-          id = s"$id",
-          modifiedDate = modifiedDate1,
-          data = sierraRecordData(
-            bibIds = bibIds1,
-            modifiedDate = modifiedDate1
-          ),
+        val itemRecord = createSierraItemRecordWith(
+          modifiedDate = olderDate,
           bibIds = bibIds1
         )
 
-        Scanamo.put(dynamoDbClient)(table.name)(record1)
+        Scanamo.put(dynamoDbClient)(table.name)(itemRecord)
 
-        val bibIds2 = List("3", "4", "5")
-        val modifiedDate2 = Instant.parse("2002-01-01T01:01:01Z")
+        val bibIds2 = List(bibIds(2), bibIds(3), bibIds(4))
 
         val record2 = SierraRecord(
-          id = id,
+          id = itemRecord.id,
           data = sierraRecordData(
             bibIds = bibIds2,
             modifiedDate = modifiedDate2.toString
           ),
-          modifiedDate = modifiedDate2
+          modifiedDate = newerDate
         )
 
         sendNotificationToSQS(queue = queue, message = record2)
 
-        val expectedBibIds = List("3", "4", "5")
-        val expectedUnlinkedBibIds = List("1", "2")
+        val expectedBibIds = List(bibIds(2), bibIds(3), bibIds(4))
+        val expectedUnlinkedBibIds = List(bibIds(0), bibIds(1))
 
         val expectedRecord = SierraItemRecordMerger.mergeItems(
-          existingRecord = record1,
+          existingRecord = itemRecord,
           updatedRecord = record2.toItemRecord.get
         )
 
@@ -120,7 +115,7 @@ class SierraItemsToDynamoWorkerServiceTest
           Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
           val scanamoResult =
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> id)
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> itemRecord.id)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(
