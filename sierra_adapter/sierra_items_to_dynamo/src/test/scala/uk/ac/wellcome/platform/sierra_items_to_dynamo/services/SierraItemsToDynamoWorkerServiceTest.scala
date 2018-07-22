@@ -92,10 +92,14 @@ class SierraItemsToDynamoWorkerServiceTest
 
         val record2 = SierraRecord(
           id = itemRecord.id,
-          data = sierraRecordData(
-            bibIds = bibIds2,
-            modifiedDate = modifiedDate2.toString
-          ),
+          data =
+            s"""
+               |{
+               |  "id": "${itemRecord.id}",
+               |  "bibIds": ${toJson(bibIds2).get},
+               |  "updatedDate": "${newerDate.toString}"
+               |}
+             """.stripMargin,
           modifiedDate = newerDate
         )
 
@@ -149,26 +153,5 @@ class SierraItemsToDynamoWorkerServiceTest
             "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
         }
     }
-  }
-
-  private def sierraRecordData(bibIds: List[String],
-                               unlinkedBibIds: List[String] = List(),
-                               modifiedDate: String): String = {
-
-    val sierraItemRecord = SierraItemRecord(
-      id = s"i111",
-      modifiedDate = Instant.parse(modifiedDate),
-      data = s"""
-                |{
-                |  "id": "i111",
-                |  "updatedDate": "$modifiedDate",
-                |  "comment": "Legacy line of lamentable leopards",
-                |  "bibIds": ${toJson(bibIds).get}
-                |}""".stripMargin,
-      bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
-    )
-
-    JsonUtil.toJson(sierraItemRecord).get
   }
 }
