@@ -72,7 +72,7 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  it("reads a sierra record from sqs an inserts it into DynamoDb") {
+  it("reads a sierra record from SQS and inserts it into DynamoDB") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
         val id = "12345"
