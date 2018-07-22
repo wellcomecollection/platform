@@ -1,28 +1,6 @@
 package uk.ac.wellcome.models.transformable.sierra.test.utils
 
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-
 trait SierraData {
-
-  def sierraItemRecord(
-    id: String = "i111",
-    title: String = "Ingenious imps invent invasive implements",
-    modifiedDate: String = "2001-01-01T01:01:01Z",
-    bibIds: List[String] = List(),
-    unlinkedBibIds: List[String] = List(),
-    deleted: Boolean = false
-  ) = SierraItemRecord(
-    id = id,
-    data = sierraRecordString(
-      id = id,
-      updatedDate = modifiedDate,
-      title = title,
-      deleted = deleted
-    ),
-    modifiedDate = modifiedDate,
-    bibIds = bibIds,
-    unlinkedBibIds = unlinkedBibIds
-  )
 
   def sierraRecordString(
     id: String,
