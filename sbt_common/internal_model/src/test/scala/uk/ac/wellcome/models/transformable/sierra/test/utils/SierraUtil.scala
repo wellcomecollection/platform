@@ -3,6 +3,7 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
 
@@ -38,7 +39,13 @@ trait SierraUtil {
     version: Int = 0
   ): SierraItemRecord = {
     val recordData = if (data == "") {
-      s"""{"id": "$id"}"""
+      s"""
+         |{
+         |  "id": "$id",
+         |  "updatedDate": "${modifiedDate.toString}",
+         |  "bibIds": ${toJson(bibIds).get}
+         |}
+         |""".stripMargin
     } else data
 
     SierraItemRecord(
