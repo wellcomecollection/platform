@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.test.utils.{SierraData, SierraUtil}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
 class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
 
