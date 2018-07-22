@@ -5,11 +5,8 @@ import java.time.Instant.now
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
@@ -18,7 +15,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 class SierraTransformableTransformerTest
     extends FunSpec
     with Matchers
-    with SierraData
+    with SierraUtil
     with TransformableTestBase[SierraTransformable]
     with WorksUtil {
   val transformer = new SierraTransformableTransformer
@@ -40,14 +37,8 @@ class SierraTransformableTransformerTest
       maybeBibData =
         Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
       itemData = Map(
-        "5151515" -> sierraItemRecord(
-          id = "5151515",
-          title = title,
-          bibIds = List(id)),
-        "5252525" -> sierraItemRecord(
-          id = "5252525",
-          title = title,
-          bibIds = List(id))
+        "5151515" -> createSierraItemRecordWith(id = "5151515"),
+        "5252525" -> createSierraItemRecordWith(id = "5252525")
       )
     )
 
@@ -144,16 +135,11 @@ class SierraTransformableTransformerTest
 
   it(
     "should not perform a transformation without bibData, even if some itemData is present") {
+    val itemRecord = createSierraItemRecord
+
     assertTransformReturnsInvisibleWork(
       maybeBibData = None,
-      itemData = Map(
-        "1313131" -> sierraItemRecord(
-          id = "1313131",
-          title = "An incomplete invocation of items",
-          modifiedDate = "2001-01-01T01:01:01Z",
-          bibIds = List("1113111")
-        )
-      )
+      itemData = Map(itemRecord.id -> itemRecord)
     )
   }
 
