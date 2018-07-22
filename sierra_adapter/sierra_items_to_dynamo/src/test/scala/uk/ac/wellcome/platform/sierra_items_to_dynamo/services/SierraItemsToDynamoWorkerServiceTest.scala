@@ -124,9 +124,9 @@ class SierraItemsToDynamoWorkerServiceTest
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(
             SierraItemRecord(
-              id = id,
+              id = itemRecord.id,
               data = expectedData,
-              modifiedDate = modifiedDate2,
+              modifiedDate = newerDate,
               bibIds = expectedBibIds,
               unlinkedBibIds = expectedUnlinkedBibIds,
               version = 1))
