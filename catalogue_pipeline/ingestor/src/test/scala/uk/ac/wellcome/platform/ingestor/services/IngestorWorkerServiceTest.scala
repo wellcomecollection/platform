@@ -332,17 +332,52 @@ class IngestorWorkerServiceTest
 
   }
 
-  it(
-    "deletes successfully ingested works from the queue, does not delete others") {
+  it("ingests lots of works") {
+    val works = createIdentifiedWorks(count = 250)
+
+    withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
+      withLocalElasticsearchIndex(itemType = itemType) { esIndexV2 =>
+        withIngestorWorkerService(esIndexV1, esIndexV2) {
+          case (QueuePair(queue, dlq), bucket) =>
+            works.foreach { work =>
+              sendMessage[IdentifiedBaseWork](
+                bucket = bucket,
+                queue = queue,
+                obj = work)
+            }
+
+            eventually {
+              works.foreach { work =>
+                assertElasticsearchEventuallyHasWork(
+                  indexName = esIndexV2,
+                  itemType = itemType,
+                  work)
+                assertElasticsearchEventuallyHasWork(
+                  indexName = esIndexV1,
+                  itemType = itemType,
+                  work)
+              }
+            }
+
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
+            }
+        }
+      }
+    }
+  }
+
+  it("only deletes successfully ingested works from the queue") {
     val subsetOfFieldsIndex =
       new SubsetOfFieldsWorksIndex(elasticClient, itemType)
 
-    val sierraWork = createIdentifiedWork
-    val sierraWorkDoesNotMatchMapping = createIdentifiedWorkWith(
+    val work = createIdentifiedWork
+    val workDoesNotMatchMapping = createIdentifiedWorkWith(
       subjects = List(Subject(label = "crystallography", concepts = Nil))
     )
 
-    val works = List(sierraWork, sierraWorkDoesNotMatchMapping)
+    val works = List(work, workDoesNotMatchMapping)
 
     withLocalElasticsearchIndex(itemType = itemType) { esIndexV1 =>
       withLocalElasticsearchIndex(
@@ -361,11 +396,11 @@ class IngestorWorkerServiceTest
               assertElasticsearchNeverHasWork(
                 indexName = esIndexV2,
                 itemType = itemType,
-                sierraWorkDoesNotMatchMapping)
+                workDoesNotMatchMapping)
               assertElasticsearchEventuallyHasWork(
                 indexName = esIndexV2,
                 itemType = itemType,
-                sierraWork)
+                work)
               eventually {
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
