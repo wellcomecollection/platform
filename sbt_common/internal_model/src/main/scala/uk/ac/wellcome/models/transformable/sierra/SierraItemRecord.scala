@@ -22,16 +22,4 @@ object SierraItemRecord {
       modifiedDate = Instant.parse(modifiedDate),
       bibIds = bibIds
     )
-  def apply(id: String,
-            data: String,
-            modifiedDate: String,
-            bibIds: List[String],
-            unlinkedBibIds: List[String]): SierraItemRecord =
-    SierraItemRecord(
-      id = id,
-      data = data,
-      modifiedDate = Instant.parse(modifiedDate),
-      bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds
-    )
 }
