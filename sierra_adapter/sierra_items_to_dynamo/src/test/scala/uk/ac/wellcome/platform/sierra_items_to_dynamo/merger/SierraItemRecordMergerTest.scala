@@ -1,111 +1,128 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.merger
 
-import java.time.Instant
-
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
-class SierraItemRecordMergerTest extends FunSpec with Matchers {
+class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
 
   it("combines the bibIds in the final result") {
-    val existingRecord =
-      sierraItemRecord(
-        bibIds = List("1", "2", "3"),
-        modifiedDate = "2001-01-01T01:01:01Z")
-    val updatedRecord =
-      sierraItemRecord(
-        bibIds = List("1", "2", "3", "4", "5"),
-        modifiedDate = "2002-01-01T01:01:01Z")
+    val bibIds = createSierraRecordNumberStrings(count = 5)
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
+      bibIds = bibIds.slice(0, 3)
+    )
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = bibIds
+    )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.bibIds shouldBe List("1", "2", "3", "4", "5")
+    mergedRecord.bibIds shouldBe bibIds
     mergedRecord.unlinkedBibIds shouldBe List()
   }
 
   it("records unlinked bibIds") {
-    val existingRecord =
-      sierraItemRecord(
-        bibIds = List("1", "2", "3"),
-        modifiedDate = "2001-01-01T01:01:01Z")
-    val updatedRecord = sierraItemRecord(
-      bibIds = List("3", "4", "5"),
-      modifiedDate = "2002-01-01T01:01:01Z")
+    val bibIds = createSierraRecordNumberStrings(count = 5)
+
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
+      bibIds = bibIds.slice(0, 3)
+    )
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = bibIds.slice(2, 5)
+    )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.bibIds shouldBe List("3", "4", "5")
-    mergedRecord.unlinkedBibIds shouldBe List("1", "2")
+    mergedRecord.bibIds shouldBe bibIds.slice(2, 5)
+    mergedRecord.unlinkedBibIds shouldBe bibIds.slice(0, 2)
   }
 
   it("preserves existing unlinked bibIds") {
-    val existingRecord =
-      sierraItemRecord(
-        bibIds = List("1", "2", "3"),
-        unlinkedBibIds = List("4", "5"),
-        modifiedDate = "2001-01-01T01:01:01Z")
-    val updatedRecord = sierraItemRecord(
-      bibIds = List("1", "2", "3"),
-      modifiedDate = "2002-01-01T01:01:01Z")
+    val bibIds = createSierraRecordNumberStrings(count = 5)
+
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
+      bibIds = bibIds.slice(0, 3),
+      unlinkedBibIds = bibIds.slice(3, 5)
+    )
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = existingRecord.bibIds
+    )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.unlinkedBibIds shouldBe List("4", "5")
+    mergedRecord.unlinkedBibIds shouldBe existingRecord.unlinkedBibIds
   }
 
   it("does not duplicate unlinked bibIds") {
     // This would be an unusual scenario to arise, but check we handle it anyway!
-    val existingRecord =
-      sierraItemRecord(
-        bibIds = List("1", "2", "3"),
-        unlinkedBibIds = List("3"),
-        modifiedDate = "2001-01-01T01:01:01Z")
-    val updatedRecord = sierraItemRecord(
-      bibIds = List("1", "2"),
-      modifiedDate = "2002-01-01T01:01:01Z")
+    val bibIds = createSierraRecordNumberStrings(count = 3)
+
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
+      bibIds = bibIds,
+      unlinkedBibIds = List(bibIds(2))
+    )
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = bibIds.slice(0, 2)
+    )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.bibIds shouldBe List("1", "2")
-    mergedRecord.unlinkedBibIds shouldBe List("3")
+    mergedRecord.bibIds shouldBe bibIds.slice(0, 2)
+    mergedRecord.unlinkedBibIds shouldBe List(bibIds(2))
   }
 
   it("removes an unlinked bibId if it appears on a new record") {
-    val existingRecord =
-      sierraItemRecord(
-        bibIds = List(),
-        unlinkedBibIds = List("1", "2", "3"),
-        modifiedDate = "2001-01-01T01:01:01Z")
-    val updatedRecord = sierraItemRecord(
-      bibIds = List("1", "2"),
-      modifiedDate = "2002-01-01T01:01:01Z")
+    val bibIds = createSierraRecordNumberStrings(count = 3)
+
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
+      bibIds = List(),
+      unlinkedBibIds = bibIds
+    )
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = bibIds.slice(0, 2)
+    )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.bibIds shouldBe List("1", "2")
-    mergedRecord.unlinkedBibIds shouldBe List("3")
+    mergedRecord.bibIds shouldBe bibIds.slice(0, 2)
+    mergedRecord.unlinkedBibIds shouldBe List(bibIds(2))
   }
 
   it("returns the existing record unchanged if the update has an older date") {
-    val existingRecord = sierraItemRecord(
-      bibIds = List("1", "2", "3"),
-      modifiedDate = "2017-01-01T00:00:00Z",
-      version = 3
+    val bibIds = createSierraRecordNumberStrings(count = 5)
+
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = newerDate,
+      bibIds = bibIds.slice(0, 3)
     )
-    val updatedRecord = sierraItemRecord(
-      bibIds = List("1", "2", "3", "4", "5"),
-      modifiedDate = "2010-01-01T00:00:00Z"
+    val updatedRecord = createSierraItemRecordWith(
+      id = existingRecord.id,
+      modifiedDate = newerDate,
+      bibIds = bibIds
     )
 
     val mergedRecord =
@@ -115,37 +132,17 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers {
   }
 
   it("carries across the version from the existing record") {
-    val existingRecord = sierraItemRecord(
-      modifiedDate = "2001-01-01T00:00:00Z",
+    val existingRecord = createSierraItemRecordWith(
+      modifiedDate = olderDate,
       version = 10
     )
-    val updatedRecord = sierraItemRecord(
-      modifiedDate = "2009-09-09T00:00:00Z",
+    val updatedRecord = createSierraItemRecordWith(
+      modifiedDate = newerDate,
       version = 2
     )
 
     val mergedRecord =
       SierraItemRecordMerger.mergeItems(existingRecord, updatedRecord)
     mergedRecord.version shouldBe existingRecord.version
-  }
-
-  private def sierraItemRecord(bibIds: List[String] = List(),
-                               unlinkedBibIds: List[String] = List(),
-                               modifiedDate: String,
-                               version: Int = 1): SierraItemRecord = {
-    SierraItemRecord(
-      id = s"i111",
-      modifiedDate = Instant.parse(modifiedDate),
-      data = s"""
-           |{
-           |  "id": "i111",
-           |  "updatedDate": "$modifiedDate",
-           |  "comment": "Legacy line of lamentable leopards",
-           |  "bibIds": ${toJson(bibIds).get}
-           |}""".stripMargin,
-      bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds,
-      version = version
-    )
   }
 }
