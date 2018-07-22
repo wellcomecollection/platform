@@ -63,7 +63,7 @@ class SierraTransformableTransformerTest
     )
   }
 
-  it("should extract information from items") {
+  it("extracts information from items") {
     val modifiedDate = Instant.now
     val bibId = "6262626"
     val itemId = "6363636"
@@ -83,6 +83,12 @@ class SierraTransformableTransformerTest
           | }
           |}""".stripMargin
 
+    val itemRecord = createSierraItemRecordWith(
+      id = itemId,
+      data = itemData,
+      bibIds = List(bibId)
+    )
+
     val transformable = SierraTransformable(
       sourceId = bibId,
       maybeBibData = Some(
@@ -90,14 +96,7 @@ class SierraTransformableTransformerTest
           id = bibId,
           data = bibData,
           modifiedDate = modifiedDate)),
-      itemData = Map(
-        itemId -> SierraItemRecord(
-          id = itemId,
-          data = itemData,
-          modifiedDate = modifiedDate,
-          bibIds = List(bibId),
-          unlinkedBibIds = Nil,
-          version = 1))
+      itemData = Map(itemRecord.id -> itemRecord)
     )
 
     val work = transformToWork(transformable)
