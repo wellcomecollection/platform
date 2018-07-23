@@ -546,7 +546,9 @@ class SierraItemMergerUpdaterServiceTest
       withTypeVHS[SierraTransformable, SourceMetadata, Assertion](bucket, table) {
         brokenStore =>
           withSierraUpdaterService(brokenStore) { brokenService =>
-            val itemRecord = createSierraItemRecord
+            val itemRecord = createSierraItemRecordWith(
+              bibIds = List(createSierraRecordNumberString)
+            )
 
             whenReady(brokenService.update(itemRecord).failed) { ex =>
               ex shouldBe a[RuntimeException]
