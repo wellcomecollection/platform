@@ -2,8 +2,15 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType, PhysicalLocation}
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLocation}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  LocationType,
+  PhysicalLocation
+}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraItemData,
+  SierraItemLocation
+}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {

@@ -25,8 +25,8 @@ trait IdentifiersUtil {
   def createSierraSourceIdentifier = createSierraSourceIdentifierWith()
 
   def createSierraSourceIdentifierWith(
-                                        value: String = randomAlphanumeric(length = 10),
-                                        ontologyType: String = "Work"): SourceIdentifier =
+    value: String = randomAlphanumeric(length = 10),
+    ontologyType: String = "Work"): SourceIdentifier =
     SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       value = value,

@@ -123,11 +123,10 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         Identifiable(
           sourceIdentifier = sourceIdentifier,
           agent = Item(
-            locations = List(
-              DigitalLocation(
-                url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
-                license = None,
-                locationType = LocationType("iiif-image"))))
+            locations = List(DigitalLocation(
+              url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
+              license = None,
+              locationType = LocationType("iiif-image"))))
         ))
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedItems
     }
@@ -135,7 +134,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("returns no DigitalItems if the work is not an eBook") {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
-        materialType = Some(createSierraMaterialTypeWith(code = "x", value = "book"))
+        materialType =
+          Some(createSierraMaterialTypeWith(code = "x", value = "book"))
       )
 
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List.empty

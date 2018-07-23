@@ -45,14 +45,15 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     createSierraItemRecordWith(
       id = data.id,
       data = toJson(data).get
-  )
-  
+    )
+
   def createSierraMaterialTypeWith(code: String = randomAlphanumeric(1),
                                    value: String = randomAlphanumeric(5)) = {
     SierraMaterialType(code, value)
   }
 
-  def createSierraMaterialType: SierraMaterialType = createSierraMaterialTypeWith()
+  def createSierraMaterialType: SierraMaterialType =
+    createSierraMaterialTypeWith()
 
   def createSierraEbookMaterialType: SierraMaterialType =
     createSierraMaterialTypeWith(code = "v", value = "E-books")

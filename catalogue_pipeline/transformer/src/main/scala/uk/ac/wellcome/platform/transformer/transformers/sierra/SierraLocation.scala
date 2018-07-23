@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLocation}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraItemData,
+  SierraItemLocation
+}
 
 trait SierraLocation {
   def getPhysicalLocation(itemData: SierraItemData): Option[PhysicalLocation] =
@@ -33,7 +36,8 @@ trait SierraLocation {
       )
     } else {
       throw GracefulFailureException(
-        new RuntimeException("id required by DigitalLocation has not been provided"))
+        new RuntimeException(
+          "id required by DigitalLocation has not been provided"))
     }
   }
 }
