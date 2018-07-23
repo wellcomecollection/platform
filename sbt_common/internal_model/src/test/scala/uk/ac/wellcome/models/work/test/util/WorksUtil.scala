@@ -14,6 +14,13 @@ trait WorksUtil extends ItemsUtil {
       )
     )
 
+  def createUnidentifiedRedirectedWorkWith(redirect: IdentifiableRedirect): UnidentifiedRedirectedWork =
+    UnidentifiedRedirectedWork(
+      sourceIdentifier = createSourceIdentifier,
+      version = 1,
+      redirect = redirect
+    )
+
   def createIdentifiedRedirectedWork: IdentifiedRedirectedWork =
     createIdentifiedRedirectedWorkWith()
 
@@ -65,6 +72,7 @@ trait WorksUtil extends ItemsUtil {
     mergeCandidates: List[MergeCandidate] = List(),
     description: Option[String] = None,
     lettering: Option[String] = None,
+    workType: Option[WorkType] = None,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
     production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = List(),
     items: List[Identifiable[Item]] = List()
@@ -74,7 +82,7 @@ trait WorksUtil extends ItemsUtil {
       otherIdentifiers = otherIdentifiers,
       mergeCandidates = mergeCandidates,
       title = title,
-      workType = None,
+      workType = workType,
       description = description,
       physicalDescription = None,
       extent = None,
@@ -92,6 +100,11 @@ trait WorksUtil extends ItemsUtil {
     )
 
   def createUnidentifiedWork: UnidentifiedWork = createUnidentifiedWorkWith()
+
+  def createUnidentifiedWorks(count: Int): Seq[UnidentifiedWork] =
+    (1 to count).map { _ =>
+      createUnidentifiedWork
+    }
 
   def createIdentifiedWorkWith(
     canonicalId: String = createCanonicalId,

@@ -3,7 +3,7 @@ package uk.ac.wellcome.monitoring.test.fixtures
 import akka.actor.ActorSystem
 import grizzled.slf4j.Logging
 import org.mockito.Matchers.{any, anyString, endsWith}
-import org.mockito.Mockito.{never, times, verify, when}
+import org.mockito.Mockito.{times, verify, when}
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.mockito.MockitoSugar
@@ -17,6 +17,8 @@ trait MetricsSenderFixture
     with MockitoSugar
     with CloudWatch
     with Akka {
+
+  val QUEUE_RETRIES = 3
 
   def withMetricsSender[R](actorSystem: ActorSystem) =
     fixture[MetricsSender, R](
@@ -44,18 +46,20 @@ trait MetricsSenderFixture
           invocation.callRealMethod().asInstanceOf[Future[Unit]]
         }
       })
-
       metricsSender
     }
   )
 
-  def assertFailureMetricNotIncremented(mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, never())
-      .incrementCount(endsWith("_ProcessMessage_failure"))
+  def assertSuccessMetricIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, times(1)).incrementCount(endsWith("_ProcessMessage_success"))
   }
 
   def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(3))
-      .incrementCount(endsWith("_ProcessMessage_failure"))
+    verify(mockMetricsSender, times(QUEUE_RETRIES)).incrementCount(endsWith("_ProcessMessage_failure"))
   }
+
+  def assertGracefulFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, times(QUEUE_RETRIES)).incrementCount(endsWith("_gracefulFailure"))
+  }
+
 }

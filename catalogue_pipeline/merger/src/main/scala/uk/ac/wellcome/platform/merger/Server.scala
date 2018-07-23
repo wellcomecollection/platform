@@ -20,7 +20,7 @@ import uk.ac.wellcome.finatra.storage.{
 import uk.ac.wellcome.platform.merger.modules.{
   MergerWorkerModule,
   RecorderWorkEntryModule,
-  TransformedBaseWorkModule
+  BaseWorkModule
 }
 
 class Server extends HttpServer {
@@ -38,7 +38,7 @@ class Server extends HttpServer {
     SNSClientModule,
     MessageConfigModule,
     RecorderWorkEntryModule,
-    TransformedBaseWorkModule
+    BaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {
     router

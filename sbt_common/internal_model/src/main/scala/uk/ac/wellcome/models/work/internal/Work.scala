@@ -11,7 +11,7 @@ sealed trait IdentifiedBaseWork extends BaseWork {
 sealed trait TransformedBaseWork extends BaseWork
 
 /** A representation of a work in our ontology */
-trait Work extends BaseWork with MultipleSourceIdentifiers {
+sealed trait Work extends BaseWork with MultipleSourceIdentifiers {
   val sourceIdentifier: SourceIdentifier
   val otherIdentifiers: List[SourceIdentifier]
   val mergeCandidates: List[MergeCandidate]
@@ -88,7 +88,7 @@ case class IdentifiedWork(
     extends Work
     with IdentifiedBaseWork
 
-trait InvisibleWork extends BaseWork
+sealed trait InvisibleWork extends BaseWork
 
 case class UnidentifiedInvisibleWork(
   sourceIdentifier: SourceIdentifier,
@@ -103,7 +103,7 @@ case class IdentifiedInvisibleWork(sourceIdentifier: SourceIdentifier,
     extends InvisibleWork
     with IdentifiedBaseWork
 
-trait RedirectedWork extends BaseWork {
+sealed trait RedirectedWork extends BaseWork {
   val redirect: Redirect
 }
 
