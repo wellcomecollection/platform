@@ -585,8 +585,7 @@ class SierraTransformableTransformerTest
     )
 
     val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibRecord = Some(bibRecord)
+      bibRecord = bibRecord
     )
 
     transformToWork(sierraTransformable)
