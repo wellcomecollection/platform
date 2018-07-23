@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal.{
   Identifiable,
   IdentifierType,
@@ -24,8 +23,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         item2.id -> createSierraItemRecordWith(item2)
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
+      val transformable = createSierraTransformableWith(
         itemRecords = itemData
       )
 
@@ -45,8 +43,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         )
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
+      val transformable = createSierraTransformableWith(
         itemRecords = itemData
       )
 
@@ -104,8 +101,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         item2.id -> createSierraItemRecordWith(item2)
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
+      val transformable = createSierraTransformableWith(
         itemRecords = itemData
       )
 

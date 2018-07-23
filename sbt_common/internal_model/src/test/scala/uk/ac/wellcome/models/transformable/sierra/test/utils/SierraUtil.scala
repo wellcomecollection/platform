@@ -105,9 +105,13 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 
   def createSierraTransformableWith(
-    sourceId: String = createSierraRecordNumberString
+    sourceId: String = createSierraRecordNumberString,
+    itemRecords: Map[String, SierraItemRecord] = Map()
   ): SierraTransformable =
-    SierraTransformable(sourceId = sourceId)
+    SierraTransformable(
+      sourceId = sourceId,
+      itemRecords = itemRecords
+    )
 
   def createSierraTransformable: SierraTransformable =
     createSierraTransformableWith()
