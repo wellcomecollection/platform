@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "wiretap" {
 
 data "aws_iam_policy_document" "allow_s3_access" {
   statement {
-    action = ["s3:*"]
+    actions = ["s3:*"]
 
     resources = [
       "${aws_s3_bucket.wiretap.arn}/*",
@@ -34,7 +34,14 @@ data "aws_iam_policy_document" "allow_s3_access" {
 
 resource "aws_iam_role_policy" "lambda_gatling_to_cloudwatch_put_metric" {
   role   = "${module.wiretap.role_name}"
-  policy = "${var.allow_cloudwatch_push_metrics_json}"
+  policy = "${data.aws_iam_policy_document.allow_s3_access.json}"
+}
+
+module "trigger0" {
+  source               = "git::https://github.com/wellcometrust/terraform.git//lambda/trigger_sns?ref=v1.0.0"
+  lambda_function_name = "${module.wiretap.function_name}"
+  lambda_function_arn  = "${module.wiretap.arn}"
+  sns_trigger_arn      = "arn:aws:sns:eu-west-1:760097843905:reindex_requests"
 }
 
 module "trigger1" {
