@@ -1,11 +1,13 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import java.time.Instant
-
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{
+  Identifiable,
+  IdentifierType,
+  Item,
+  SourceIdentifier
+}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
@@ -18,8 +20,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val item2 = createSierraItemData
 
       val itemData = Map(
-        item1.id -> createSierraItemRecordWith(id = item1.id, data = item1),
-        item2.id -> createSierraItemRecordWith(id = item2.id, data = item2)
+        item1.id -> createSierraItemRecordWith(item1),
+        item2.id -> createSierraItemRecordWith(item2)
       )
 
       val transformable = SierraTransformable(
@@ -33,15 +35,13 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("ignores items it can't parse as JSON") {
       val item = createSierraItemData
 
-      val itemId = createSierraRecordNumberString
+      val brokenItemId = createSierraRecordNumberString
 
       val itemData = Map(
-        item.id -> createSierraItemRecordWith(id = item.id, data = item),
-        itemId -> SierraItemRecord(
-          id = itemId,
-          data = "<xml?>This is not a real 'JSON' string",
-          modifiedDate = Instant.now,
-          bibIds = List()
+        item.id -> createSierraItemRecordWith(item),
+        brokenItemId -> createSierraItemRecordWith(
+          id = brokenItemId,
+          data = "<xml?>This is not a real 'JSON' string"
         )
       )
 
@@ -100,8 +100,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val item2 = createSierraItemDataWith(deleted = false)
 
       val itemData = Map(
-        item1.id -> createSierraItemRecordWith(id = item1.id, data = item1),
-        item2.id -> createSierraItemRecordWith(id = item2.id, data = item2)
+        item1.id -> createSierraItemRecordWith(item1),
+        item2.id -> createSierraItemRecordWith(item2)
       )
 
       val transformable = SierraTransformable(
