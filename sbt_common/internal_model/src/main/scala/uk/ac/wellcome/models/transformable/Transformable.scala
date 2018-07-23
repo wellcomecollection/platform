@@ -30,5 +30,8 @@ case class SierraTransformable(
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sierraId = bibRecord.id, maybeBibRecord = Some(bibRecord))
+    SierraTransformable(
+      sierraId = bibRecord.id,
+      maybeBibRecord = Some(bibRecord)
+    )
 }

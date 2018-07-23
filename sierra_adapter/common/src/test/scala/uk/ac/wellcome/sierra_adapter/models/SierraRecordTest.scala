@@ -12,7 +12,7 @@ class SierraRecordTest extends FunSpec with Matchers with SierraRecordUtil {
   describe("toItemRecord") {
     it("return a successful try for valid item json") {
       val itemId = createSierraRecordNumber
-      val bibId = createSierraRecordNumberString
+      val bibId = createSierraRecordNumber
       val data = s"""
         |{
         |  "id": "$itemId",
@@ -26,7 +26,7 @@ class SierraRecordTest extends FunSpec with Matchers with SierraRecordUtil {
 
       sierraRecord.toItemRecord shouldBe Success(
         SierraItemRecord(
-          id = itemId.withoutCheckDigit,
+          id = itemId,
           data = data,
           modifiedDate = sierraRecord.modifiedDate,
           bibIds = List(bibId)))

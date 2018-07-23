@@ -34,7 +34,7 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = createSierraRecordNumberString
+          val id = createSierraRecordNumber
           val updatedDate = "2013-12-13T12:43:16Z"
           val jsonString = s"""
                |{
@@ -68,13 +68,13 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = createSierraRecordNumberString
+          val id = createSierraRecordNumber
           val updatedDate = "2014-04-14T14:14:14Z"
           val jsonString = s"""
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
-          | "bibIds": ${toJson(createSierraRecordNumberStrings(count = 4)).get}
+          | "bibIds": ${toJson(createSierraRecordNumbers(count = 4)).get}
           |}
         """.stripMargin
 
@@ -103,7 +103,7 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = createSierraRecordNumberString
+          val id = createSierraRecordNumber
           val deletedDate = "2014-01-31"
           val jsonString = s"""{
             |  "id" : "$id",

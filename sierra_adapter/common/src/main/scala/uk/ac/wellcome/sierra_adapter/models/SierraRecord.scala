@@ -34,6 +34,7 @@ case class SierraRecord(
         id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
-        bibIds = bibIds)
+        bibIds = bibIds.map { SierraRecordNumber }
+      )
     }
 }

@@ -39,10 +39,8 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraRecordNumber: SierraRecordNumber =
     SierraRecordNumber(createSierraRecordNumberString)
 
-  def createSierraRecordNumberStrings(count: Int): List[String] =
-    (1 to count).map { _ =>
-      createSierraRecordNumberString
-    }.toList
+  def createSierraRecordNumbers(count: Int): List[SierraRecordNumber] =
+    (1 to count).map { _ => createSierraRecordNumber }.toList
 
   def createSierraBibRecordWith(
     id: SierraRecordNumber = createSierraRecordNumber,
