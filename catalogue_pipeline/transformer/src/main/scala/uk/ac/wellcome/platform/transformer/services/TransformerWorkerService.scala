@@ -18,7 +18,7 @@ class TransformerWorkerService @Inject()(
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =
-    messageReceiver.receiveMessage(message).map(_ => ())
+    messageReceiver.receiveMessage(message)
 
   def stop() = system.terminate()
 }
