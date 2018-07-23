@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
 class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
@@ -12,7 +11,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
     val result = ItemLinker.linkItemRecord(sierraTransformable, record)
 
     result.itemRecords shouldBe Map(record.id -> record)
@@ -25,9 +24,9 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemRecords = Map(itemRecord.id -> itemRecord)
+      itemRecords = List(itemRecord)
     )
 
     val newerRecord = itemRecord.copy(
@@ -48,9 +47,9 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemRecords = Map(itemRecord.id -> itemRecord)
+      itemRecords = List(itemRecord)
     )
 
     val oldRecord = itemRecord.copy(
@@ -70,7 +69,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
     val result1 = ItemLinker.linkItemRecord(sierraTransformable, record1)
     val result2 = ItemLinker.linkItemRecord(result1, record2)
 
@@ -87,7 +86,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List()
     )
 
-    val sierraTransformable = SierraTransformable(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
 
     val caught = intercept[RuntimeException] {
       ItemLinker.linkItemRecord(sierraTransformable, record)
