@@ -10,9 +10,19 @@ trait SierraRecordUtil extends SierraUtil {
     id: String,
     data: String,
     modifiedDate: String): SierraRecord =
-    SierraRecord(
+    createSierraRecordWith(
       id = id,
       data = data,
       modifiedDate = Instant.parse(modifiedDate)
+    )
+
+  def createSierraRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String,
+    modifiedDate: Instant = Instant.now): SierraRecord =
+    SierraRecord(
+      id = id,
+      data = data,
+      modifiedDate = modifiedDate
     )
 }
