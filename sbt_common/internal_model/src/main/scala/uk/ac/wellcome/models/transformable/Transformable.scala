@@ -23,7 +23,7 @@ case class SierraTransformable(
   sierraId: SierraRecordNumber,
   sourceName: String = "sierra",
   maybeBibRecord: Option[SierraBibRecord] = None,
-  itemRecords: Map[String, SierraItemRecord] = Map()
+  itemRecords: Map[SierraRecordNumber, SierraItemRecord] = Map()
 ) extends Transformable {
   val sourceId = sierraId.withoutCheckDigit
 }
