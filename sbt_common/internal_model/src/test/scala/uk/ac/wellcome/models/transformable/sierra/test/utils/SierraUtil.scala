@@ -45,7 +45,7 @@ trait SierraUtil extends IdentifiersUtil {
     }.toList
 
   def createSierraBibRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraRecordNumber = createSierraRecordNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now): SierraBibRecord = {
     val recordData = if (data == "") {
@@ -62,7 +62,7 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraRecordNumber = createSierraRecordNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[String] = List(),

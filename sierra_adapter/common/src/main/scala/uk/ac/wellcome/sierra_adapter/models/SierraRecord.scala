@@ -14,7 +14,7 @@ case class SierraRecord(
   modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
     SierraBibRecord(
-      id = this.id.withoutCheckDigit,
+      id = this.id,
       data = this.data,
       modifiedDate = this.modifiedDate)
 
@@ -31,7 +31,7 @@ case class SierraRecord(
       }.toList
     } yield {
       SierraItemRecord(
-        id = this.id.withoutCheckDigit,
+        id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
         bibIds = bibIds)
