@@ -26,14 +26,10 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
       """.stripMargin
 
     val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibRecord = Some(
-        createSierraBibRecordWith(
-          id = id,
-          data = data
-        )
-      ),
-      itemRecords = Map()
+      bibRecord = createSierraBibRecordWith(
+        id = id,
+        data = data
+      )
     )
 
     JsonUtil.toJson(sierraTransformable).get
