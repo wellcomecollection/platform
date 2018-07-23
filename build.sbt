@@ -180,7 +180,6 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
 
 lazy val archiver = doServiceSetup(project, "archive/archiver")
   .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(storage % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.archiverDependencies)
 
 lazy val root = (project in file("."))

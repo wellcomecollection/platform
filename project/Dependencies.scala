@@ -47,8 +47,6 @@ object Dependencies {
     val scalaGraphVersion = "1.12.5"
   }
 
-  val archiverDependencies = Seq()
-
   // External Library dependency groups
   val akkaDependencies: Seq[ModuleID] = Seq(
     "com.typesafe.akka" %% "akka-actor" % versions.akka,
@@ -176,4 +174,9 @@ object Dependencies {
     "io.circe" %% "circe-optics" % versions.circeVersion,
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
+
+  val archiverDependencies = Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+  ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary
+
 }
