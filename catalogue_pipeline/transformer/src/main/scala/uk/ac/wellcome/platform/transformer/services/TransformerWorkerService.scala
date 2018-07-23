@@ -7,13 +7,13 @@ import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.transformer.receive.NotificationMessageReceiver
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class TransformerWorkerService @Inject()(
   system: ActorSystem,
   messageReceiver: NotificationMessageReceiver,
   sqsStream: SQSStream[NotificationMessage]
-)(implicit ec: ExecutionContext) {
+) {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
