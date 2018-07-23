@@ -21,8 +21,6 @@ import uk.ac.wellcome.models.transformable.{
   Transformable
 }
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
   TransformedBaseWork,
   UnidentifiedWork
 }
