@@ -23,10 +23,7 @@ object DisplayLocationV1 {
         locationType = digitalLocation.locationType.id,
         url = digitalLocation.url,
         credit = digitalLocation.credit,
-        license = digitalLocation.license match {
-          case Some(license) => Some(DisplayLicenseV1(license))
-          case None          => None
-        }
+        license = digitalLocation.license.map(DisplayLicenseV1(_))
       )
     case l: PhysicalLocation =>
       DisplayPhysicalLocationV1(

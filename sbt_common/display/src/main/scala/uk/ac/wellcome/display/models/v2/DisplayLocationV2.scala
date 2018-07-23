@@ -23,10 +23,7 @@ object DisplayLocationV2 {
         locationType = DisplayLocationType(l.locationType),
         url = l.url,
         credit = l.credit,
-        license = l.license match {
-          case Some(license) => Some(DisplayLicenseV2(license))
-          case None          => None
-        }
+        license = l.license.map(DisplayLicenseV2(_))
       )
     case l: PhysicalLocation =>
       DisplayPhysicalLocationV2(
