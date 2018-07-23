@@ -93,6 +93,8 @@ module "cache_cleaner_task" {
     MAX_AGE        = "${var.ebs_cache_cleaner_daemon_max_age_in_days}"
     MAX_SIZE       = "${var.ebs_cache_cleaner_daemon_max_size_in_gb}G"
   }
+
+  env_vars_length = 3
 }
 
 module "cache_cleaner_service" {
