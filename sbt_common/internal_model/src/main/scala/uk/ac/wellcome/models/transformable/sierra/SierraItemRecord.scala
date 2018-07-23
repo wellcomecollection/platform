@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.transformable.sierra
 import java.time.Instant
 
 case class SierraItemRecord(
-  id: String,
+  id: SierraRecordNumber,
   data: String,
   modifiedDate: Instant,
   bibIds: List[String],
