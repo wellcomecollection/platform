@@ -92,12 +92,12 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 
   def createSierraTransformableWith(
-    sourceId: String = createSierraRecordNumberString,
+    sierraId: SierraRecordNumber = createSierraRecordNumber,
     maybeBibRecord: Option[SierraBibRecord] = None,
     itemRecords: List[SierraItemRecord] = List()
   ): SierraTransformable =
     SierraTransformable(
-      sourceId = sourceId,
+      sierraId = sierraId,
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords.map { record: SierraItemRecord =>
         record.id -> record
