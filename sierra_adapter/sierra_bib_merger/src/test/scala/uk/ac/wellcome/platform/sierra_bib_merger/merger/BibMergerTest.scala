@@ -17,7 +17,8 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
 
     it("only merges bib records with matching ids") {
       val bibRecord = createSierraBibRecord
-      val transformable = SierraTransformable(sourceId = createSierraRecordNumberString)
+      val transformable =
+        SierraTransformable(sourceId = createSierraRecordNumberString)
 
       val caught = intercept[RuntimeException] {
         BibMerger.mergeBibRecord(transformable, bibRecord)
