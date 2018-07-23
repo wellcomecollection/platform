@@ -7,6 +7,7 @@ import uk.ac.wellcome.models.work.internal.{
   Item,
   SourceIdentifier
 }
+import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
@@ -16,7 +17,9 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
   describe("extractItemData") {
     it("parses instances of SierraItemData") {
       val itemData = (1 to 2).map { _ => createSierraItemData }
-      val itemRecords = itemData.map { createSierraItemRecordWith }.toList
+      val itemRecords = itemData
+        .map { data: SierraItemData => createSierraItemRecordWith(data) }
+        .toList
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
