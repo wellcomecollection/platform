@@ -169,7 +169,7 @@ class DynamoInserterTest
         whenReady(futureUnit) { _ =>
           val actualRecord: SierraItemRecord = Scanamo
             .get[SierraItemRecord](dynamoDbClient)(table.name)('id -> oldRecord.id)
-            .get.get
+            .get.right.get
 
           actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(1))
         }
