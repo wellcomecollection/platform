@@ -109,7 +109,6 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val id = "3000003"
               val oldBibRecord = createSierraBibRecordWith(
                 modifiedDate = olderDate
               )
