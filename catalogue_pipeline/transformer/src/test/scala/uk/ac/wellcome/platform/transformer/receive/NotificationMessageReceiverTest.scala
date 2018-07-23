@@ -112,7 +112,7 @@ class NotificationMessageReceiverTest
     }
   }
 
-  it("receives a message and add the version to the transformed work") {
+  it("receives a message and adds the version to the transformed work") {
     val id = "5005005"
     val title = "A pot of possums"
     val lastModifiedDate = Instant.now()
@@ -133,17 +133,6 @@ class NotificationMessageReceiverTest
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
-            val sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-system-number"),
-              ontologyType = "Work",
-              value = "b50050059"
-            )
-            val sierraIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-identifier"),
-              ontologyType = "Work",
-              value = id
-            )
-
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
               works.size should be >= 1
@@ -151,13 +140,7 @@ class NotificationMessageReceiverTest
               works.map { actualWork =>
                 actualWork shouldBe a[UnidentifiedWork]
                 val unidentifiedWork = actualWork.asInstanceOf[UnidentifiedWork]
-
-                unidentifiedWork.title shouldBe title
-                unidentifiedWork.sourceIdentifier shouldBe sourceIdentifier
                 unidentifiedWork.version shouldBe version
-                unidentifiedWork.identifiers shouldBe List(
-                  sourceIdentifier,
-                  sierraIdentifier)
               }
             }
           }
