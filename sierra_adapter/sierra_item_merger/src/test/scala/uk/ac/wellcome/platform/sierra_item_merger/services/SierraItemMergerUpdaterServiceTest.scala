@@ -189,7 +189,7 @@ class SierraItemMergerUpdaterServiceTest
 
             whenReady(f1) { _ =>
               val newItemRecord = itemRecord.copy(
-                data = """{"data": "newer"}"""
+                data = """{"data": "newer"}""",
                 modifiedDate = newerDate
               )
 
