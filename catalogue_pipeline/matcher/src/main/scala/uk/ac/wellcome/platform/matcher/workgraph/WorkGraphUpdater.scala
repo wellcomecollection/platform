@@ -4,11 +4,7 @@ import grizzled.slf4j.Logging
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{
-  VersionConflictException,
-  WorkGraph,
-  WorkUpdate
-}
+import uk.ac.wellcome.platform.matcher.models.{VersionExpectedConflictException, VersionUnexpectedConflictException, WorkGraph, WorkUpdate}
 
 import scala.collection.immutable.Iterable
 import scala.util.hashing.MurmurHash3
@@ -16,18 +12,21 @@ import scala.util.hashing.MurmurHash3
 object WorkGraphUpdater extends Logging {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
 
-    val existingVersion =
-      existingGraph.nodes.find(_.id == workUpdate.workId) match {
-        case Some(lw) => lw.version
-        case None     => 0
-      }
-    if (existingVersion >= workUpdate.version) {
-      val versionConflictMessage =
-        s"${workUpdate.workId} v${workUpdate.version} is not newer than existing work v$existingVersion"
-      debug(versionConflictMessage)
-      throw VersionConflictException(versionConflictMessage)
-    } else {
-      doUpdate(workUpdate, existingGraph)
+    val maybeExistingNode =
+      existingGraph.nodes.find(_.id == workUpdate.workId)
+
+    maybeExistingNode match {
+      case Some(WorkNode(_, existingVersion, _, _)) if existingVersion > workUpdate.version =>
+        val versionConflictMessage =
+          s"${workUpdate.workId} v${workUpdate.version} is not newer than existing work v$existingVersion"
+        debug(versionConflictMessage)
+        throw VersionExpectedConflictException(versionConflictMessage)
+      case Some(WorkNode(_, existingVersion, linkedIds, _)) if existingVersion == workUpdate.version && workUpdate.referencedWorkIds != linkedIds.toSet =>
+        val versionConflictMessage =
+          s"${workUpdate.workId} v${workUpdate.version} is exists with different content!"
+        error(versionConflictMessage)
+        throw VersionUnexpectedConflictException(versionConflictMessage)
+      case _ => doUpdate(workUpdate, existingGraph)
     }
   }
 
