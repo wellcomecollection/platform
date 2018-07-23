@@ -64,7 +64,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
       SierraItemRecordMerger.mergeItems(
         existingRecord = existingRecord,
         updatedRecord = updatedRecord)
-    mergedRecord.unlinkedBibIds shouldBe existingRecord.unlinkedBibIds
+    mergedRecord.unlinkedBibIds should contain theSameElementsAs existingRecord.unlinkedBibIds
   }
 
   it("does not duplicate unlinked bibIds") {

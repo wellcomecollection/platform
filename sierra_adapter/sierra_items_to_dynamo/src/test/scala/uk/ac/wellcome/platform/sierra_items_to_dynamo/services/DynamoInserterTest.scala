@@ -85,7 +85,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> oldRecord.id) shouldBe Some(Right(newRecord.copy(version = 2)))
+            'id -> oldRecord.id) shouldBe Some(Right(newRecord.copy(version = newRecord.version + 1)))
         }
       }
     }
@@ -159,7 +159,9 @@ class DynamoInserterTest
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
-        val newRecord = oldRecord.copy(
+        val newRecord = createSierraItemRecordWith(
+          id = oldRecord.id,
+          modifiedDate = newerDate,
           bibIds = List(bibIds(1), bibIds(2), bibIds(3)),
           unlinkedBibIds = List()
         )
@@ -171,7 +173,7 @@ class DynamoInserterTest
             .get[SierraItemRecord](dynamoDbClient)(table.name)('id -> oldRecord.id)
             .get.right.get
 
-          actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(1))
+          actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(0))
         }
       }
     }
@@ -179,7 +181,8 @@ class DynamoInserterTest
 
   it("fails if a dao returns an error when updating an item") {
     val record = createSierraItemRecordWith(
-      modifiedDate = olderDate
+      modifiedDate = olderDate,
+      bibIds = List(createSierraRecordNumberString)
     )
 
     val mockedDao = mock[VersionedDao]
