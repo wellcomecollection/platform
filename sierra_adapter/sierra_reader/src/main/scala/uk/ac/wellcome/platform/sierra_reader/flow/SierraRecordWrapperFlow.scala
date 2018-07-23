@@ -8,6 +8,7 @@ import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 
 object SierraRecordWrapperFlow extends Logging {
@@ -26,7 +27,7 @@ object SierraRecordWrapperFlow extends Logging {
     }
 
     SierraRecord(
-      id = getId(json),
+      id = SierraRecordNumber(getId(json)),
       data = json.noSpaces,
       modifiedDate = modifiedDate
     )
