@@ -5,7 +5,8 @@ import java.time.Instant
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
-  SierraItemRecord
+  SierraItemRecord,
+  SierraRecordNumber
 }
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
@@ -34,6 +35,9 @@ trait SierraUtil extends IdentifiersUtil {
 
   def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
+
+  def createSierraRecordNumber: SierraRecordNumber =
+    SierraRecordNumber(createSierraRecordNumberString)
 
   def createSierraRecordNumberStrings(count: Int): List[String] =
     (1 to count).map { _ =>

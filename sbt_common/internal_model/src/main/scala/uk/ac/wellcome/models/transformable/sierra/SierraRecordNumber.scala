@@ -9,6 +9,8 @@ case class SierraRecordNumber(s: String) {
     s"Not a 7-digit Sierra record number: $s"
   )
 
+  override def toString: String = withoutCheckDigit
+
   /** Returns the ID without the check digit or prefix. */
   def withoutCheckDigit: String = s
 
