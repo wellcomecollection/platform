@@ -498,13 +498,13 @@ class SierraItemMergerUpdaterServiceTest
               ifExisting = (t, m) => (t, m))
 
             val itemRecord = createSierraItemRecordWith(
-              bibIds = List(bibId)
+              bibIds = List(transformable.sourceId)
             )
 
             whenReady(f1) { _ =>
               whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                 val expectedTransformable = createSierraTransformableWith(
-                  sourceId = bibId,
+                  sourceId = transformable.sourceId,
                   itemRecords = List(itemRecord)
                 )
 
