@@ -31,7 +31,9 @@ trait SierraUtil {
     randomNumeric take 7 mkString
 
   def createSierraRecordNumberStrings(count: Int): List[String] =
-    (1 to count).map { _ => createSierraRecordNumberString }.toList
+    (1 to count).map { _ =>
+      createSierraRecordNumberString
+    }.toList
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,

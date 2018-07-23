@@ -89,8 +89,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
         val record2 = SierraRecord(
           id = itemRecord.id,
-          data =
-            s"""
+          data = s"""
                |{
                |  "id": "${itemRecord.id}",
                |  "bibIds": ${toJson(bibIds2).get},
@@ -116,7 +115,8 @@ class SierraItemsToDynamoWorkerServiceTest
           Scanamo.scan[SierraItemRecord](dynamoDbClient)(table.name) should have size 1
 
           val scanamoResult =
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)('id -> itemRecord.id)
+            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
+              'id -> itemRecord.id)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(

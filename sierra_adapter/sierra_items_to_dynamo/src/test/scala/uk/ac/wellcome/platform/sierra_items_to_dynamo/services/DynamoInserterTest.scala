@@ -11,7 +11,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.type_classes.{IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 
 import scala.concurrent.Future
@@ -85,7 +89,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> oldRecord.id) shouldBe Some(Right(newRecord.copy(version = newRecord.version + 1)))
+            'id -> oldRecord.id) shouldBe Some(
+            Right(newRecord.copy(version = newRecord.version + 1)))
         }
       }
     }
@@ -113,7 +118,8 @@ class DynamoInserterTest
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> oldRecord.id) shouldBe Some(
-            Right(newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2)))))
+            Right(
+              newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2)))))
         }
       }
     }
@@ -141,7 +147,8 @@ class DynamoInserterTest
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
             'id -> oldRecord.id) shouldBe Some(
-            Right(newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))))
+            Right(
+              newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))))
         }
       }
     }
@@ -170,8 +177,11 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           val actualRecord: SierraItemRecord = Scanamo
-            .get[SierraItemRecord](dynamoDbClient)(table.name)('id -> oldRecord.id)
-            .get.right.get
+            .get[SierraItemRecord](dynamoDbClient)(table.name)(
+              'id -> oldRecord.id)
+            .get
+            .right
+            .get
 
           actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(0))
         }
@@ -191,9 +201,11 @@ class DynamoInserterTest
     when(
       mockedDao.getRecord[SierraItemRecord](any[String])(
         any[DynamoFormat[SierraItemRecord]]))
-      .thenReturn(Future.successful(Some(
-        record.copy(modifiedDate = newerDate)
-      )))
+      .thenReturn(
+        Future.successful(
+          Some(
+            record.copy(modifiedDate = newerDate)
+          )))
 
     when(
       mockedDao.updateRecord(any[SierraItemRecord])(
