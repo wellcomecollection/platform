@@ -3,11 +3,12 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 import java.time.Instant
 
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
 
-trait SierraUtil {
+trait SierraUtil extends IdentifiersUtil {
 
   // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
   // a record with a newer version, or vice versa.  Provide two dates here
@@ -40,7 +41,7 @@ trait SierraUtil {
     data: String = "",
     modifiedDate: Instant = Instant.now): SierraBibRecord = {
     val recordData = if (data == "") {
-      s"""{"id": "$id"}"""
+      s"""{"id": "$id", "title": "${randomAlphanumeric(50)}"}"""
     } else data
 
     SierraBibRecord(
