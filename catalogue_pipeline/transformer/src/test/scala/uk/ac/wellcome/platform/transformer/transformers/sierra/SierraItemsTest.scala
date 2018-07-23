@@ -2,6 +2,8 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
+import uk.ac.wellcome.models.work.internal.{Identifiable, IdentifierType, Item, SourceIdentifier}
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -72,13 +74,17 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it("uses the full Sierra system number as the source identifier") {
-      val sourceIdentifier = createSierraSourceIdentifierWith(
-        ontologyType = "Item",
-        value = "i50000056"
-      )
-      val item = createSierraItemDataWith(id = "5000005")
+      val itemData = createSierraItemData
 
-      val transformedItem = transformer.transformItemData(item)
+      val sourceIdentifier = SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = itemData.sierraId.withCheckDigit(
+          recordType = SierraRecordTypes.items
+        )
+      )
+
+      val transformedItem = transformer.transformItemData(itemData)
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
     }
   }
