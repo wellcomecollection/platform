@@ -9,15 +9,18 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraRecordWrapperFlowTest
     extends FunSpec
     with Akka
     with ScalaFutures
     with ExtendedPatience
-    with Matchers {
+    with Matchers
+    with SierraRecordUtil {
 
   private def withRecordWrapperFlow(actorSystem: ActorSystem)(
     testWith: TestWith[Flow[Json, SierraRecord, NotUsed], Assertion]) = {
@@ -30,20 +33,22 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "100001"
+          val id = createSierraRecordNumberString
           val updatedDate = "2013-12-13T12:43:16Z"
-          val json = parse(s"""
-          |{
-          | "id": "$id",
-          | "updatedDate": "$updatedDate"
-          |}
-        """.stripMargin).right.get
+          val jsonString = s"""
+               |{
+               | "id": "$id",
+               | "updatedDate": "$updatedDate"
+               |}
+            """.stripMargin
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
+            data = jsonString,
             modifiedDate = updatedDate
           )
+
+          val json = parse(jsonString).right.get
 
           val futureRecord = Source
             .single(json)
@@ -62,21 +67,23 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "400004"
+          val id = createSierraRecordNumberString
           val updatedDate = "2014-04-14T14:14:14Z"
-          val json = parse(s"""
+          val jsonString = s"""
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
-          | "bibIds": ["4", "44", "444", "4444"]
+          | "bibIds": ${toJson(createSierraRecordNumberStrings(count = 4)).get}
           |}
-        """.stripMargin).right.get
+        """.stripMargin
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
+            data = jsonString,
             modifiedDate = updatedDate
           )
+
+          val json = parse(jsonString).right.get
 
           val futureRecord = Source
             .single(json)
@@ -95,19 +102,21 @@ class SierraRecordWrapperFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem) { wrapperFlow =>
-          val id = "1357947"
+          val id = createSierraRecordNumberString
           val deletedDate = "2014-01-31"
-          val json = parse(s"""{
-                            |  "id" : "$id",
-                            |  "deletedDate" : "$deletedDate",
-                            |  "deleted" : true
-                            |}""".stripMargin).right.get
+          val jsonString = s"""{
+            |  "id" : "$id",
+            |  "deletedDate" : "$deletedDate",
+            |  "deleted" : true
+            |}""".stripMargin
 
-          val expectedRecord = SierraRecord(
+          val expectedRecord = createSierraRecordWith(
             id = id,
-            data = json.noSpaces,
+            data = jsonString,
             modifiedDate = s"${deletedDate}T00:00:00Z"
           )
+
+          val json = parse(jsonString).right.get
 
           val futureRecord = Source
             .single(json)
