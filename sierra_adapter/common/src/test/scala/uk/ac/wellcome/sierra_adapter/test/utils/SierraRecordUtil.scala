@@ -17,11 +17,16 @@ trait SierraRecordUtil extends SierraUtil {
 
   def createSierraRecordWith(
     id: String = createSierraRecordNumberString,
-    data: String,
-    modifiedDate: Instant = Instant.now): SierraRecord =
+    data: String = "",
+    modifiedDate: Instant = Instant.now): SierraRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id"}"""
+    } else data
+
     SierraRecord(
       id = id,
-      data = data,
+      data = recordData,
       modifiedDate = modifiedDate
     )
+  }
 }
