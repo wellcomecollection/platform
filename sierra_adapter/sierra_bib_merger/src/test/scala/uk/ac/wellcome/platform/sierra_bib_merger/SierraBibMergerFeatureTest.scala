@@ -6,7 +6,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -24,44 +24,12 @@ class SierraBibMergerFeatureTest
     with ScalaFutures
     with SQS
     with fixtures.Server
-    with LocalVersionedHybridStore {
-
-  def bibRecordString(id: String,
-                      updatedDate: String,
-                      title: String = "Lehrbuch und Atlas der Gastroskopie") =
-    s"""
-       |{
-       |      "id": "$id",
-       |      "updatedDate": "$updatedDate",
-       |      "createdDate": "1999-11-01T16:36:51Z",
-       |      "deleted": false,
-       |      "suppressed": false,
-       |      "lang": {
-       |        "code": "ger",
-       |        "name": "German"
-       |      },
-       |      "title": "$title",
-       |      "author": "Schindler, Rudolf, 1888-",
-       |      "materialType": {
-       |        "code": "a",
-       |        "value": "Books"
-       |      },
-       |      "bibLevel": {
-       |        "code": "m",
-       |        "value": "MONOGRAPH"
-       |      },
-       |      "publishYear": 1923,
-       |      "catalogDate": "1999-01-01",
-       |      "country": {
-       |        "code": "gw ",
-       |        "name": "Germany"
-       |      }
-       |    }
-    """.stripMargin
+    with LocalVersionedHybridStore
+    with SierraUtil {
 
   implicit val encoder = Encoder[SierraTransformable]
 
-  it("should store a bib in the hybrid store") {
+  it("stores a bib in the hybrid store") {
     withLocalSqsQueue { queue =>
       withLocalS3Bucket { bucket =>
         withLocalDynamoDbTable { table =>
@@ -70,28 +38,19 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val id = "1000001"
-              val record = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  updatedDate = "2001-01-01T01:01:01Z",
-                  title = "One ocelot on our oval"
-                ),
-                modifiedDate = "2001-01-01T01:01:01Z"
-              )
+              val bibRecord = createSierraBibRecord
 
-              sendNotificationToSQS(queue = queue, message = record)
+              sendNotificationToSQS(queue = queue, message = bibRecord)
 
               val expectedSierraTransformable =
-                SierraTransformable(bibRecord = record)
+                SierraTransformable(bibRecord = bibRecord)
 
               eventually {
                 assertStored[SierraTransformable](
                   bucket,
                   table,
                   id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                  bibRecord = expectedSierraTransformable)
               }
             }
           }
@@ -109,49 +68,30 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val id1 = "1000001"
-              val record1 = SierraBibRecord(
-                id = id1,
-                data = bibRecordString(
-                  id = id1,
-                  updatedDate = "2001-01-01T01:01:01Z",
-                  title = "The first ferret of four"
-                ),
-                modifiedDate = "2001-01-01T01:01:01Z"
-              )
-
+              val record1 = createSierraBibRecord
               sendNotificationToSQS(queue = queue, message = record1)
 
-              val expectedSierraTransformable1 =
+              val expectedTransformable1 =
                 SierraTransformable(bibRecord = record1)
 
-              val id2 = "2000002"
-              val record2 = SierraBibRecord(
-                id = id2,
-                data = bibRecordString(
-                  id = id2,
-                  updatedDate = "2002-02-02T02:02:02Z",
-                  title = "The second swan of a set"
-                ),
-                modifiedDate = "2002-02-02T02:02:02Z"
-              )
+              val record2 = createSierraBibRecord
 
               sendNotificationToSQS(queue = queue, message = record2)
 
-              val expectedSierraTransformable2 =
+              val expectedTransformable2 =
                 SierraTransformable(bibRecord = record2)
 
               eventually {
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  id = expectedSierraTransformable1.id,
-                  record = expectedSierraTransformable1)
+                  id = expectedTransformable1.id,
+                  record = expectedTransformable1)
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  id = expectedSierraTransformable2.id,
-                  record = expectedSierraTransformable2)
+                  id = expectedTransformable2.id,
+                  record = expectedTransformable2)
               }
             }
           }
@@ -170,47 +110,34 @@ class SierraBibMergerFeatureTest
               bucket,
               table) { hybridStore =>
               val id = "3000003"
-              val oldBibRecord = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  updatedDate = "2003-03-03T03:03:03Z",
-                  title = "Old orangutans outside an office"
-                ),
-                modifiedDate = "2003-03-03T03:03:03Z"
+              val oldBibRecord = createSierraBibRecordWith(
+                modifiedDate = olderDate
               )
 
-              val oldRecord = SierraTransformable(bibRecord = oldBibRecord)
+              val oldTransformable = SierraTransformable(bibRecord = oldBibRecord)
 
-              val newTitle = "A number of new narwhals near Newmarket"
-              val newUpdatedDate = "2004-04-04T04:04:04Z"
-              val record = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  updatedDate = newUpdatedDate,
-                  title = newTitle
-                ),
-                modifiedDate = newUpdatedDate
+              val newBibRecord = createSierraBibRecordWith(
+                id = oldBibRecord.id,
+                modifiedDate = newerDate
               )
 
               hybridStore
-                .updateRecord(oldRecord.id)(
-                  (oldRecord, SourceMetadata(oldRecord.sourceName)))((t, m) =>
+                .updateRecord(oldTransformable.id)(
+                  (oldTransformable, SourceMetadata(oldTransformable.sourceName)))((t, m) =>
                   (t, m))
                 .map { _ =>
-                  sendNotificationToSQS(queue = queue, message = record)
+                  sendNotificationToSQS(queue = queue, message = newBibRecord)
                 }
 
-              val expectedSierraTransformable =
-                SierraTransformable(bibRecord = record)
+              val expectedTransformable =
+                SierraTransformable(bibRecord = newBibRecord)
 
               eventually {
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                  id = expectedTransformable.id,
+                  newBibRecord = expectedTransformable)
               }
             }
           }
@@ -228,39 +155,25 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val id = "6000006"
-              val newBibRecord = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  updatedDate = "2006-06-06T06:06:06Z",
-                  title = "A presence of pristine porpoises"
-                ),
-                modifiedDate = "2006-06-06T06:06:06Z"
+              val newBibRecord = createSierraBibRecordWith(
+                modifiedDate = newerDate
               )
 
-              val expectedSierraTransformable =
+              val expectedTransformable =
                 SierraTransformable(bibRecord = newBibRecord)
 
-              val oldTitle = "A small selection of sad shellfish"
-              val oldUpdatedDate = "2001-01-01T01:01:01Z"
-              val record = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  updatedDate = oldUpdatedDate,
-                  title = oldTitle
-                ),
-                modifiedDate = oldUpdatedDate
+              val oldBibRecord = createSierraBibRecordWith(
+                id = newBibRecord.id,
+                modifiedDate = olderDate
               )
 
               hybridStore
-                .updateRecord(expectedSierraTransformable.id)((
-                  expectedSierraTransformable,
-                  SourceMetadata(expectedSierraTransformable.sourceName)))(
+                .updateRecord(expectedTransformable.id)((
+                  expectedTransformable,
+                  SourceMetadata(expectedTransformable.sourceName)))(
                   (t, m) => (t, m))
                 .map { _ =>
-                  sendNotificationToSQS(queue = queue, message = record)
+                  sendNotificationToSQS(queue = queue, message = oldBibRecord)
                 }
 
               // Blocking in Scala is generally a bad idea; we do it here so there's
@@ -270,8 +183,8 @@ class SierraBibMergerFeatureTest
               assertStored[SierraTransformable](
                 bucket,
                 table,
-                id = expectedSierraTransformable.id,
-                record = expectedSierraTransformable)
+                id = expectedTransformable.id,
+                record = expectedTransformable)
             }
           }
         }
@@ -288,39 +201,29 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Unit](
               bucket,
               table) { hybridStore =>
-              val id = "7000007"
-              val newRecord = SierraTransformable(sourceId = id)
+              val id = createSierraRecordNumberString
+              val transformable = SierraTransformable(sourceId = id)
 
-              val title = "Inside an inquisitive igloo of ice imps"
-              val updatedDate = "2007-07-07T07:07:07Z"
-              val record = SierraBibRecord(
-                id = id,
-                data = bibRecordString(
-                  id = id,
-                  title = title,
-                  updatedDate = updatedDate
-                ),
-                modifiedDate = updatedDate
-              )
+              val bibRecord = createSierraBibRecordWith(id = id)
 
               val future =
-                hybridStore.updateRecord(newRecord.id)(
-                  (newRecord, SourceMetadata(newRecord.sourceName)))((t, m) =>
+                hybridStore.updateRecord(transformable.id)(
+                  (transformable, SourceMetadata(transformable.sourceName)))((t, m) =>
                   (t, m))
 
               future.map { _ =>
-                sendNotificationToSQS(queue = queue, message = record)
+                sendNotificationToSQS(queue = queue, message = bibRecord)
               }
 
               val expectedSierraTransformable =
-                SierraTransformable(bibRecord = record)
+                SierraTransformable(bibRecord = bibRecord)
 
               eventually {
                 assertStored[SierraTransformable](
                   bucket,
                   table,
                   id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                  bibRecord = expectedSierraTransformable)
               }
             }
           }
