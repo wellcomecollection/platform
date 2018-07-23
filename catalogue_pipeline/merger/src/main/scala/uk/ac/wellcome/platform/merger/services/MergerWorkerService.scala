@@ -38,7 +38,8 @@ class MergerWorkerService @Inject()(
       _ <- sendWorks(works)
     } yield ()
 
-  private def mergeIfAllWorksDefined(maybeWorkEntries: List[Option[RecorderWorkEntry]]) = Future {
+  private def mergeIfAllWorksDefined(
+    maybeWorkEntries: List[Option[RecorderWorkEntry]]) = Future {
     val workEntries = maybeWorkEntries.flatten
     val works = workEntries.map(_.work).collect {
       case unidentifiedWork: UnidentifiedWork => unidentifiedWork
@@ -50,20 +51,23 @@ class MergerWorkerService @Inject()(
     }
   }
 
-  private def getFromVHS(matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
+  private def getFromVHS(
+    matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
     val worksIdentifiers = getWorksIdentifiers(matcherResult)
     for {
       maybeWorkEntries <- Future.sequence(worksIdentifiers.toList.map {
-        workId => getRecorderEntryForIdentifier(workId)
+        workId =>
+          getRecorderEntryForIdentifier(workId)
       })
     } yield maybeWorkEntries
   }
 
   private def sendWorks(mergedWorks: Seq[BaseWork]) = {
     Future
-      .sequence(mergedWorks.map (
-        messageWriter.write(_, "merged-work")
-      ))
+      .sequence(
+        mergedWorks.map(
+          messageWriter.write(_, "merged-work")
+        ))
   }
 
   private def getWorksIdentifiers(

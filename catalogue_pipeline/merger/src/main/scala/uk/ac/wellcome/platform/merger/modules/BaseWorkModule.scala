@@ -12,10 +12,11 @@ import scala.concurrent.ExecutionContext
 object BaseWorkModule extends TwitterModule {
   @Provides
   @Singleton
-  def provideBaseWorkStore(
-    injector: Injector): ObjectStore[BaseWork] = {
-    implicit val storageBackend: S3StorageBackend = injector.instance[S3StorageBackend]
-    implicit val executionContext: ExecutionContext = injector.instance[ExecutionContext]
+  def provideBaseWorkStore(injector: Injector): ObjectStore[BaseWork] = {
+    implicit val storageBackend: S3StorageBackend =
+      injector.instance[S3StorageBackend]
+    implicit val executionContext: ExecutionContext =
+      injector.instance[ExecutionContext]
 
     ObjectStore[BaseWork]
   }

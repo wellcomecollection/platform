@@ -38,39 +38,41 @@ class MergerWorkerServiceTest
     with MergerTestUtils {
   case class TestObject(something: String)
 
-  it("reads matcher result messages, retrieves the works from vhs and sends them to sns") {
-    withMergerWorkerServiceFixtures { case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-      val recorderWorkEntry1 = createRecorderWorkEntryWith(version = 1)
-      val recorderWorkEntry2 = createRecorderWorkEntryWith(version = 1)
-      val recorderWorkEntry3 = createRecorderWorkEntryWith(version = 1)
+  it(
+    "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
+    withMergerWorkerServiceFixtures {
+      case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
+        val recorderWorkEntry1 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry2 = createRecorderWorkEntryWith(version = 1)
+        val recorderWorkEntry3 = createRecorderWorkEntryWith(version = 1)
 
-      val matcherResult = matcherResultWith(
-        Set(
-          Set(recorderWorkEntry3),
-          Set(recorderWorkEntry1, recorderWorkEntry2)))
+        val matcherResult = matcherResultWith(
+          Set(
+            Set(recorderWorkEntry3),
+            Set(recorderWorkEntry1, recorderWorkEntry2)))
 
-      whenReady(
-        storeInVHS(
-          vhs,
-          List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) { _ =>
-          sendNotificationToSQS(
-            queue = queue,
-            message = matcherResult
-          )
+        whenReady(
+          storeInVHS(
+            vhs,
+            List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) {
+          _ =>
+            sendNotificationToSQS(
+              queue = queue,
+              message = matcherResult
+            )
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
+            eventually {
+              assertQueueEmpty(queue)
+              assertQueueEmpty(dlq)
 
-            val worksSent = getMessages[BaseWork](topic)
-            worksSent should contain only (
-              recorderWorkEntry1.work,
+              val worksSent = getMessages[BaseWork](topic)
+              worksSent should contain only (recorderWorkEntry1.work,
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
 
-            assertSuccessMetricIncremented(metricsSender)
-          }
-      }
+              assertSuccessMetricIncremented(metricsSender)
+            }
+        }
     }
   }
 
@@ -189,7 +191,8 @@ class MergerWorkerServiceTest
   }
 
   it("fails if the message sent is not a matcher result") {
-    withMergerWorkerServiceFixtures { case (_, QueuePair(queue, dlq), _, metricsSender) =>
+    withMergerWorkerServiceFixtures {
+      case (_, QueuePair(queue, dlq), _, metricsSender) =>
         sendNotificationToSQS(
           queue = queue,
           message = TestObject("not-a-matcher-result")
@@ -214,34 +217,36 @@ class MergerWorkerServiceTest
     withLocalS3Bucket { storageBucket =>
       withLocalS3Bucket { messageBucket =>
         withLocalDynamoDbTable { table =>
-          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](storageBucket, table) { vhs =>
-            withActorSystem { actorSystem =>
-              withLocalSqsQueueAndDlq { case queuePair @ QueuePair(queue, dlq) =>
-                withLocalSnsTopic { topic =>
-                  withMockMetricSender { metricsSender =>
-                    withSQSStream[NotificationMessage, R](
-                      actorSystem,
-                      queue,
-                      metricsSender) { sqsStream =>
-                      withMessageWriter[BaseWork, R](
-                        messageBucket,
-                        topic) { snsWriter =>
-                        withMerger { merger =>
-                          withMergerWorkerService(
-                            actorSystem,
-                            sqsStream,
-                            vhs,
-                            merger,
-                            snsWriter) { _ =>
-                            testWith((vhs, queuePair, topic, metricsSender))
+          withTypeVHS[RecorderWorkEntry, EmptyMetadata, R](storageBucket, table) {
+            vhs =>
+              withActorSystem { actorSystem =>
+                withLocalSqsQueueAndDlq {
+                  case queuePair @ QueuePair(queue, dlq) =>
+                    withLocalSnsTopic { topic =>
+                      withMockMetricSender { metricsSender =>
+                        withSQSStream[NotificationMessage, R](
+                          actorSystem,
+                          queue,
+                          metricsSender) { sqsStream =>
+                          withMessageWriter[BaseWork, R](messageBucket, topic) {
+                            snsWriter =>
+                              withMerger { merger =>
+                                withMergerWorkerService(
+                                  actorSystem,
+                                  sqsStream,
+                                  vhs,
+                                  merger,
+                                  snsWriter) { _ =>
+                                  testWith(
+                                    (vhs, queuePair, topic, metricsSender))
+                                }
+                              }
                           }
                         }
                       }
                     }
-                  }
                 }
               }
-            }
           }
         }
       }
@@ -258,6 +263,11 @@ class MergerWorkerServiceTest
     messageWriter: MessageWriter[BaseWork])(
     testWith: TestWith[MergerWorkerService, R]) = {
     testWith(
-      new MergerWorkerService(actorSystem, sqsStream, vhs, merger, messageWriter))
+      new MergerWorkerService(
+        actorSystem,
+        sqsStream,
+        vhs,
+        merger,
+        messageWriter))
   }
 }

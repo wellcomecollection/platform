@@ -18,9 +18,9 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.merger.modules.{
+  BaseWorkModule,
   MergerWorkerModule,
-  RecorderWorkEntryModule,
-  BaseWorkModule
+  RecorderWorkEntryModule
 }
 
 class Server extends HttpServer {

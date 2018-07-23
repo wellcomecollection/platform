@@ -19,11 +19,10 @@ trait ItemsUtil extends IdentifiersUtil {
       createItem()
     }.toList
 
-
   def createIdentifiableItemWith(
-                  sourceIdentifier: SourceIdentifier = createSourceIdentifier,
-                  locations: List[Location] = List(defaultLocation)
-                ): Identifiable[Item] =
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    locations: List[Location] = List(defaultLocation)
+  ): Identifiable[Item] =
     Identifiable(
       sourceIdentifier = sourceIdentifier,
       agent = Item(locations = locations)
@@ -31,23 +30,26 @@ trait ItemsUtil extends IdentifiersUtil {
 
   def createPhysicalLocation = createPhysicalLocationWith()
 
-  def createPhysicalLocationWith(locationType: LocationType = createStoresLocationType,
+  def createPhysicalLocationWith(locationType: LocationType =
+                                   createStoresLocationType,
                                  label: String = "locationLabel") =
     PhysicalLocation(locationType, label)
 
   def createDigitalLocation = createDigitalLocationWith()
 
-  def createDigitalLocationWith(locationType: LocationType = LocationType("iiif-image"),
-                                url: String = defaultLocationUrl,
-                                license: License = License_CCBY) = DigitalLocation(
+  def createDigitalLocationWith(
+    locationType: LocationType = LocationType("iiif-image"),
+    url: String = defaultLocationUrl,
+    license: License = License_CCBY) = DigitalLocation(
     locationType = locationType,
     url = url,
-    license =license
+    license = license
   )
 
   private def defaultLocation = createDigitalLocationWith()
 
-  private def defaultLocationUrl = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
+  private def defaultLocationUrl =
+    "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
 
   def createImageLocationType = LocationType("iiif-image")
 

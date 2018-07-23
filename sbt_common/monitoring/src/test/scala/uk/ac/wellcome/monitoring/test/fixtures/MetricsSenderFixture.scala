@@ -51,15 +51,19 @@ trait MetricsSenderFixture
   )
 
   def assertSuccessMetricIncremented(mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(1)).incrementCount(endsWith("_ProcessMessage_success"))
+    verify(mockMetricsSender, times(1))
+      .incrementCount(endsWith("_ProcessMessage_success"))
   }
 
   def assertFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(QUEUE_RETRIES)).incrementCount(endsWith("_ProcessMessage_failure"))
+    verify(mockMetricsSender, times(QUEUE_RETRIES))
+      .incrementCount(endsWith("_ProcessMessage_failure"))
   }
 
-  def assertGracefulFailureMetricIncremented(mockMetricsSender: MetricsSender) = {
-    verify(mockMetricsSender, times(QUEUE_RETRIES)).incrementCount(endsWith("_gracefulFailure"))
+  def assertGracefulFailureMetricIncremented(
+    mockMetricsSender: MetricsSender) = {
+    verify(mockMetricsSender, times(QUEUE_RETRIES))
+      .incrementCount(endsWith("_gracefulFailure"))
   }
 
 }

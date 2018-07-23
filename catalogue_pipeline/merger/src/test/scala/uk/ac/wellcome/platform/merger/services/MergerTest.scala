@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.MergerTestUtils
 import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 
-class MergerTest extends FunSpec with MergerTestUtils with  MergerFixtures {
+class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private val merger = new Merger()
 
@@ -23,14 +23,14 @@ class MergerTest extends FunSpec with MergerTestUtils with  MergerFixtures {
 
   it("merges a physical and digital work that reference each other") {
     val physicalWork = createUnidentifiedWorkWith(
-      items =  List(createIdentifiableItemWith(
-        locations = List(createPhysicalLocation)))
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
     )
 
     val digitalWork = createUnidentifiedWorkWith(
       workType = Some(WorkType("v", "E-books")),
-      items = List(createIdentifiableItemWith(
-        locations = List(createDigitalLocation)))
+      items = List(
+        createIdentifiableItemWith(locations = List(createDigitalLocation)))
     )
 
     val expectedMergedWork =

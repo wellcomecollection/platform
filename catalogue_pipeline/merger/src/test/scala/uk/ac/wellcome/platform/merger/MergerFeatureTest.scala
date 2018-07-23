@@ -27,29 +27,33 @@ class MergerFeatureTest
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
           withLocalDynamoDbTable { table =>
-            withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](storageBucket, table) { vhs =>
-              withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-                withServer(
-                  queue = queue,
-                  topic = topic,
-                  storageBucket = storageBucket,
-                  messageBucket = messagesBucket,
-                  table = table) { _ =>
-                  val recorderWorkEntry = createRecorderWorkEntryWith(version = 1)
+            withTypeVHS[RecorderWorkEntry, EmptyMetadata, Assertion](
+              storageBucket,
+              table) { vhs =>
+              withLocalSqsQueueAndDlq {
+                case QueuePair(queue, dlq) =>
+                  withServer(
+                    queue = queue,
+                    topic = topic,
+                    storageBucket = storageBucket,
+                    messageBucket = messagesBucket,
+                    table = table) { _ =>
+                    val recorderWorkEntry =
+                      createRecorderWorkEntryWith(version = 1)
 
-                  whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
+                    whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
+                      val matcherResult =
+                        matcherResultWith(Set(Set(recorderWorkEntry)))
+                      sendNotificationToSQS(queue, matcherResult)
 
-                    val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
-                    sendNotificationToSQS(queue, matcherResult)
-
-                    eventually {
-                      assertQueueEmpty(queue)
-                      assertQueueEmpty(dlq)
-                      val worksSent = getMessages[TransformedBaseWork](topic)
-                      worksSent should contain only recorderWorkEntry.work
+                      eventually {
+                        assertQueueEmpty(queue)
+                        assertQueueEmpty(dlq)
+                        val worksSent = getMessages[TransformedBaseWork](topic)
+                        worksSent should contain only recorderWorkEntry.work
+                      }
                     }
                   }
-                }
               }
             }
           }

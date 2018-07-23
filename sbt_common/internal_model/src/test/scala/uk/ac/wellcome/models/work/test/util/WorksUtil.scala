@@ -14,7 +14,8 @@ trait WorksUtil extends ItemsUtil {
       )
     )
 
-  def createUnidentifiedRedirectedWorkWith(redirect: IdentifiableRedirect): UnidentifiedRedirectedWork =
+  def createUnidentifiedRedirectedWorkWith(
+    redirect: IdentifiableRedirect): UnidentifiedRedirectedWork =
     UnidentifiedRedirectedWork(
       sourceIdentifier = createSourceIdentifier,
       version = 1,
