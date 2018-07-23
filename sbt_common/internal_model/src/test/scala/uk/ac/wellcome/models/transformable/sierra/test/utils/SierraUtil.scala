@@ -2,6 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
+import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
@@ -102,4 +103,12 @@ trait SierraUtil extends IdentifiersUtil {
   }
 
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
+
+  def createSierraTransformableWith(
+    sourceId: String = createSierraRecordNumberString
+  ): SierraTransformable =
+    SierraTransformable(sourceId = sourceId)
+
+  def createSierraTransformable: SierraTransformable =
+    createSierraTransformableWith()
 }
