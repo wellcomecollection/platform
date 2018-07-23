@@ -595,7 +595,7 @@ class SierraTransformableTransformerTest
     maybeBibRecord: Option[SierraBibRecord],
     itemRecords: Map[String, SierraItemRecord] = Map()) = {
     val sierraTransformable = SierraTransformable(
-      sourceId = createSierraRecordNumberString,
+      sourceId = "0102010",
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords
     )
