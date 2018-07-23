@@ -1,10 +1,8 @@
 package uk.ac.wellcome.platform.transformer.utils
 
 import com.amazonaws.services.s3.AmazonS3
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
@@ -15,27 +13,6 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 trait TransformableMessageUtils extends SierraUtil with SQS {
-  def createValidEmptySierraBibNotificationMessage(
-    id: String,
-    s3Client: AmazonS3,
-    bucket: Bucket
-  ): NotificationMessage = {
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
-      maybeBibRecord = None,
-      itemRecords = Map[String, SierraItemRecord]()
-    )
-
-    hybridRecordNotificationMessage(
-      message = JsonUtil.toJson(sierraTransformable).get,
-      sourceName = "sierra",
-      version = 1,
-      s3Client = s3Client,
-      bucket = bucket
-    )
-  }
-
   def createValidSierraTransformableJsonWith(id: String =
                                                createSierraRecordNumberString,
                                              title: String): String = {
