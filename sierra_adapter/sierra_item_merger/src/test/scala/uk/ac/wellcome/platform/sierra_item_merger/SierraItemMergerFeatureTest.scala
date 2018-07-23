@@ -42,7 +42,7 @@ class SierraItemMergerFeatureTest
 
               val expectedSierraTransformable = SierraTransformable(
                 sourceId = bibId,
-                itemData = Map(record.id -> record)
+                itemRecords = Map(record.id -> record)
               )
 
               eventually {
@@ -85,12 +85,12 @@ class SierraItemMergerFeatureTest
               eventually {
                 val expectedSierraTransformable1 = SierraTransformable(
                   sourceId = bibId1,
-                  itemData = Map(record1.id -> record1)
+                  itemRecords = Map(record1.id -> record1)
                 )
 
                 val expectedSierraTransformable2 = SierraTransformable(
                   sourceId = bibId2,
-                  itemData = Map(record2.id -> record2)
+                  itemRecords = Map(record2.id -> record2)
                 )
 
                 assertStored[SierraTransformable](

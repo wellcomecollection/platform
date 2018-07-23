@@ -24,7 +24,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
     val sierraTransformable = SierraTransformable(
       sourceId = id,
       maybeBibRecord = None,
-      itemData = Map[String, SierraItemRecord]()
+      itemRecords = Map[String, SierraItemRecord]()
     )
 
     hybridRecordNotificationMessage(
@@ -56,7 +56,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
           data = data
         )
       ),
-      itemData = Map()
+      itemRecords = Map()
     )
 
     JsonUtil.toJson(sierraTransformable).get

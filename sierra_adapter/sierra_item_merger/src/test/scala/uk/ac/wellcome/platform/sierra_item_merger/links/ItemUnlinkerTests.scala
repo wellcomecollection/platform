@@ -22,11 +22,11 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
     val sierraTransformable = SierraTransformable(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = Map(record.id -> record)
     )
 
     val expectedSierraTransformable = sierraTransformable.copy(
-      itemData = Map.empty
+      itemRecords = Map.empty
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, unlinkedItemRecord) shouldBe expectedSierraTransformable
@@ -48,7 +48,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
     val sierraTransformable = SierraTransformable(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = Map(record.id -> record)
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, previouslyUnlinkedRecord) shouldBe sierraTransformable
@@ -72,7 +72,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
     val sierraTransformable = SierraTransformable(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = Map(record.id -> record)
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, outOfDateUnlinkedRecord) shouldBe sierraTransformable
@@ -94,7 +94,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
     val sierraTransformable = SierraTransformable(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = Map(record.id -> record)
     )
 
     val caught = intercept[RuntimeException] {
