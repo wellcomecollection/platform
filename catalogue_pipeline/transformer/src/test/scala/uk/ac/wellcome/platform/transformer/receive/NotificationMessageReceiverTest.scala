@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import java.time.Instant
-
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -14,11 +12,9 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
-  SierraTransformable,
-  Transformable
+  SierraTransformable
 }
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
@@ -200,17 +196,9 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val id = "1001001"
-    val sierraTransformable: Transformable =
-      SierraTransformable(
-        sourceId = id,
-        bibData = JsonUtil
-          .toJson(
-            SierraBibRecord(
-              id = id,
-              data = s"""{"id": "$id", "title": "A title"}""",
-              modifiedDate = Instant.now))
-          .get)
+    val sierraTransformable = SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
