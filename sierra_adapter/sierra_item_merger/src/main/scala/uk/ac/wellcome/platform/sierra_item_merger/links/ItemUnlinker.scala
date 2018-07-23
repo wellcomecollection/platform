@@ -12,7 +12,7 @@ object ItemUnlinker {
         s"Non-matching bib id ${sierraTransformable.sourceId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
-    val itemData: Map[String, SierraItemRecord] =
+    val itemRecords: Map[String, SierraItemRecord] =
       sierraTransformable.itemRecords
         .filterNot {
           case (id, currentItemRecord) => {
@@ -26,6 +26,6 @@ object ItemUnlinker {
           }
         }
 
-    sierraTransformable.copy(itemRecords = itemData)
+    sierraTransformable.copy(itemRecords = itemRecords)
   }
 }
