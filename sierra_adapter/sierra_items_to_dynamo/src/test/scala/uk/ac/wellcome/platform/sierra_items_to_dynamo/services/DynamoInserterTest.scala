@@ -168,7 +168,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           val actualRecord: SierraItemRecord = Scanamo
-            .get[SierraItemRecord](dynamoDbClient)(table.name)('id -> s"$id")
+            .get[SierraItemRecord](dynamoDbClient)(table.name)('id -> oldRecord.id)
             .get.get
 
           actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(1))
@@ -233,7 +233,6 @@ class DynamoInserterTest
       modifiedDate = olderDate
     )
 
-    val newUpdatedDate = "2014-12-13T12:43:16Z"
     val newRecord = createSierraItemRecordWith(
       id = record.id,
       modifiedDate = newerDate

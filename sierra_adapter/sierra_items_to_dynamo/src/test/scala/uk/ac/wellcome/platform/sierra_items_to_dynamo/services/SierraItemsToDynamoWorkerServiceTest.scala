@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
-import java.time.Instant
-
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.mockito.Mockito.{never, verify}
@@ -20,7 +18,6 @@ import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.storage.dynamo._
 
