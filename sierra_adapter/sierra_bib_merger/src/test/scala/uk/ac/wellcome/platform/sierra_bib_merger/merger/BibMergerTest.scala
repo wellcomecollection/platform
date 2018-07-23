@@ -12,7 +12,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
       val transformable = SierraTransformable(sourceId = bibRecord.id)
 
       val newTransformable = BibMerger.mergeBibRecord(transformable, bibRecord)
-      newTransformable.maybeBibData.get shouldEqual bibRecord
+      newTransformable.maybeBibRecord.get shouldEqual bibRecord
     }
 
     it("only merges bib records with matching ids") {
@@ -39,7 +39,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
 
       val transformable = SierraTransformable(
         sourceId = oldBibRecord.id,
-        maybeBibData = Some(newBibRecord)
+        maybeBibRecord = Some(newBibRecord)
       )
 
       val result = BibMerger.mergeBibRecord(transformable, oldBibRecord)
@@ -61,7 +61,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
       )
 
       val result = BibMerger.mergeBibRecord(transformable, newBibRecord)
-      result.maybeBibData.get shouldBe newBibRecord
+      result.maybeBibRecord.get shouldBe newBibRecord
     }
   }
 }

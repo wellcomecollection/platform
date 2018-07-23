@@ -23,7 +23,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = None,
+      maybeBibRecord = None,
       itemData = Map[String, SierraItemRecord]()
     )
 
@@ -50,13 +50,13 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = Some(
+      maybeBibRecord = Some(
         createSierraBibRecordWith(
           id = id,
           data = data
         )
       ),
-      itemData = Map[String, SierraItemRecord]()
+      itemData = Map()
     )
 
     JsonUtil.toJson(sierraTransformable).get

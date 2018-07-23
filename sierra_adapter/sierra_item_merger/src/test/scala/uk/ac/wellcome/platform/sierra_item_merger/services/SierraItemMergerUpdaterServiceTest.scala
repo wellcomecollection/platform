@@ -52,7 +52,7 @@ class SierraItemMergerUpdaterServiceTest
               val expectedSierraTransformable =
                 SierraTransformable(
                   sourceId = bibId,
-                  maybeBibData = None,
+                  maybeBibRecord = None,
                   itemData = Map(
                     newItemRecord.id -> newItemRecord
                   ))
@@ -132,7 +132,7 @@ class SierraItemMergerUpdaterServiceTest
                   val expectedNewSierraTransformable =
                     SierraTransformable(
                       sourceId = bibIdNotExisting,
-                      maybeBibData = None,
+                      maybeBibRecord = None,
                       itemData = Map(itemRecord.id -> itemRecord)
                     )
 
