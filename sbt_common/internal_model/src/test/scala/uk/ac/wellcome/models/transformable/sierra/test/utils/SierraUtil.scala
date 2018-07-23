@@ -56,6 +56,23 @@ trait SierraUtil extends IdentifiersUtil {
 
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
+  def createSierraBibRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String = "",
+    modifiedDate: Instant = Instant.now): SierraBibRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id"}"""
+    } else data
+
+    SierraBibRecord(
+      id = id,
+      data = recordData,
+      modifiedDate = modifiedDate
+    )
+  }
+
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
+
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
     data: String = "",
