@@ -5,26 +5,20 @@ import java.util.Date
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{
-  ActorMaterializer,
-  OverflowStrategy,
-  QueueOfferResult,
-  ThrottleMode
-}
+import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
                               actorSystem: ActorSystem,
-                              metricsConfig: MetricsConfig)
+                              metricsConfig: MetricsConfig)(implicit executionContext: ExecutionContext)
     extends Logging {
 
   implicit val system = actorSystem
