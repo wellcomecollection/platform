@@ -14,7 +14,7 @@ import grizzled.slf4j.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.dynamo.DynamoNonFatalException
+import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 import uk.ac.wellcome.utils.JsonUtil.fromJson
 
 import scala.concurrent.Future
@@ -104,7 +104,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
     exception match {
       case exception: GracefulFailureException =>
         logger.warn(s"Graceful failure: ${exception.getMessage}")
-      case exception: DynamoNonFatalException =>
+      case exception: DynamoNonFatalError =>
         logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(

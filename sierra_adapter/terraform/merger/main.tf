@@ -3,7 +3,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_merger_service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
 
   service_name       = "sierra_${local.resource_type_singular}_merger"
   task_desired_count = "0"
@@ -30,6 +30,8 @@ module "sierra_merger_service" {
     dynamo_table_name = "${var.merged_dynamo_table_name}"
     bucket_name       = "${var.bucket_name}"
   }
+
+  env_vars_length = 4
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"

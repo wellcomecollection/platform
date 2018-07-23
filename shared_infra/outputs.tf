@@ -42,14 +42,6 @@ output "cloudfront_logs_bucket_domain_name" {
   value = "${aws_s3_bucket.cloudfront_logs.bucket_domain_name}"
 }
 
-output "travis_ci_id" {
-  value = "${aws_iam_access_key.travis_ci.id}"
-}
-
-output "travis_ci_encrypted_secret" {
-  value = "${aws_iam_access_key.travis_ci.encrypted_secret}"
-}
-
 output "catalogue_private_subnets" {
   value = ["${module.catalogue_vpc.private_subnets}"]
 }
@@ -64,4 +56,8 @@ output "catalogue_vpc_id" {
 
 output "catalogue_ssh_controlled_ingress_sg" {
   value = "${module.bastion.ssh_controlled_ingress_sg}"
+}
+
+output "infra_bucket_arn" {
+  value = "${aws_s3_bucket.platform_infra.arn}"
 }

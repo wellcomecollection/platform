@@ -19,6 +19,10 @@ shared_infra/.releases
 # Files which are encrypted before they're sent to Travis
 secrets
 secrets.zip
+id_rsa
+id_rsa.pub
+config
+credentials
 
 ### Gatling ###
 /gatling/results/*

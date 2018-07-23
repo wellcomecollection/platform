@@ -1,11 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraData
-import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraTitleTest extends FunSpec with Matchers with SierraData {
+class SierraTitleTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("passes through the title from the bib record") {
     val title = "Tickling a tiny turtle in Tenerife"
@@ -16,12 +15,7 @@ class SierraTitleTest extends FunSpec with Matchers with SierraData {
   }
 
   it("throws a ShouldNotTransform exception if bibData has no title") {
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = None,
-      deleted = false,
-      suppressed = false
-    )
+    val bibData = createSierraBibDataWith(title = None)
     intercept[ShouldNotTransformException] {
       transformer.getTitle(bibData = bibData)
     }
@@ -33,14 +27,7 @@ class SierraTitleTest extends FunSpec with Matchers with SierraData {
     bibDataTitle: String,
     expectedTitle: String
   ) = {
-
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = Some(bibDataTitle),
-      deleted = false,
-      suppressed = false
-    )
-
+    val bibData = createSierraBibDataWith(title = Some(bibDataTitle))
     transformer.getTitle(bibData = bibData) shouldBe expectedTitle
   }
 }

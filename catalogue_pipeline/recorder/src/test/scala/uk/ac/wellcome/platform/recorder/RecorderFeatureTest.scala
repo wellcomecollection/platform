@@ -5,7 +5,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -39,11 +39,14 @@ class RecorderFeatureTest
                 queue = queue,
                 obj = work)
 
+              val workEntry = RecorderWorkEntry(work)
+
               eventually {
                 assertStored[RecorderWorkEntry](
                   bucket,
                   table,
-                  RecorderWorkEntry(work))
+                  id = workEntry.id,
+                  record = workEntry)
               }
             }
           }

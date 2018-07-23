@@ -3,7 +3,7 @@ data "aws_ecs_cluster" "cluster" {
 }
 
 module "sierra_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.0.0"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
 
   service_name       = "${local.service_name}"
   task_desired_count = "0"
@@ -48,6 +48,8 @@ module "sierra_reader_service" {
 
     batch_size = 50
   }
+
+  env_vars_length = 9
 
   launch_type = "FARGATE"
 }

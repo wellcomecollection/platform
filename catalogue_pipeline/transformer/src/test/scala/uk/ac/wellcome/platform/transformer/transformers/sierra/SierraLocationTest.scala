@@ -1,51 +1,39 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLocation}
+import uk.ac.wellcome.models.work.internal.{LocationType, PhysicalLocation}
+import uk.ac.wellcome.platform.transformer.source.SierraItemLocation
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraLocationTest extends FunSpec with Matchers {
+class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
 
   private val transformer = new SierraLocation {}
 
   describe("Physical locations") {
-    it("extracts location from item data") {
-      val locationTypeCode = "sgmed"
-      val locationType = LocationType("sgmed")
-      val label = "A museum of mermaids"
-      val itemData = SierraItemData(
-        id = "i1234567",
-        location = Some(SierraItemLocation(locationTypeCode, label))
-      )
-
+  it("extracts location from item data") {
+    val locationTypeCode = "sgmed"
+    val locationType = LocationType("sgmed")
+    val label = "A museum of mermaids"
+    val itemData = createSierraItemDataWith(
+      location = Some(SierraItemLocation(locationTypeCode, label))
+    )
       val expectedLocation = PhysicalLocation(locationType, label)
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe Some(expectedLocation)
     }
 
-    it("returns None if the location field only contains empty strings") {
-      val itemData = SierraItemData(
-        id = "i1234567",
-        location = Some(SierraItemLocation("", ""))
-      )
+  it("returns None if the location field only contains empty strings") {
+    val itemData = createSierraItemDataWith(
+      location = Some(SierraItemLocation("", ""))
+    )
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
     }
 
-    it("returns None if the location field only contains the string 'none'") {
-      val itemData = SierraItemData(
-        id = "i1234567",
-        location = Some(SierraItemLocation("none", "none"))
-      )
-
-      transformer.getPhysicalLocation(itemData = itemData) shouldBe None
-    }
-
-    it("returns None if there is no location in the item data") {
-      val itemData = SierraItemData(
-        id = "i1234567"
-      )
-
+  it("returns None if the location field only contains the string 'none'") {
+    val itemData = createSierraItemDataWith(
+      location = Some(SierraItemLocation("none", "none"))
+    )
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
     }
   }

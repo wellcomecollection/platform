@@ -7,15 +7,12 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraBibData,
   VarField
 }
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraSubjectsTest extends FunSpec with Matchers {
+class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("returns zero subjects if there are none") {
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = Some("A pack of published puffins in Paris"),
-      varFields = List()
-    )
+    val bibData = createSierraBibDataWith(varFields = List())
     assertExtractsSubjects(bibData, List())
   }
 
@@ -139,9 +136,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
   }
 
   it("returns subjects for multiple 650 tags with different subfields") {
-    val bibData = SierraBibData(
-      id = "b1234567",
-      title = Some("A pack of published puffins in Paris"),
+    val bibData = createSierraBibDataWith(
       varFields = List(
         VarField(
           fieldTag = "p",
@@ -234,9 +229,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
   }
 
   it(s"gets identifiers from subfield $$0") {
-    val bibData = SierraBibData(
-      id = "b8911791",
-      title = Some("Impish iguanas inside igloos"),
+    val bibData = createSierraBibDataWith(
       varFields = List(
         VarField(
           fieldTag = "p",
@@ -297,9 +290,7 @@ class SierraSubjectsTest extends FunSpec with Matchers {
   }
 
   private def bibData(marcTag: String, marcSubfields: List[MarcSubfield]) = {
-    SierraBibData(
-      id = "b1234567",
-      title = Some("A pack of published puffins in Paris"),
+    createSierraBibDataWith(
       varFields = List(
         VarField(
           fieldTag = "p",

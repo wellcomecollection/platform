@@ -4,7 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.Indexable
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.http.HttpClient
-import com.sksamuel.elastic4s.http.bulk.BulkResponse
+import com.sksamuel.elastic4s.http.bulk.{BulkResponse, BulkResponseItem}
 import com.twitter.inject.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
@@ -59,9 +59,21 @@ class WorkIndexer @Inject()(
       }
   }
 
-  private def filterVersionConflictErrors(bulkResponse: BulkResponse) = {
-    bulkResponse.failures.filterNot(bulkResponseItem =>
-      bulkResponseItem.error.exists(bulkError =>
-        bulkError.`type`.contains("version_conflict_engine_exception")))
+  private def filterVersionConflictErrors(
+    bulkResponse: BulkResponse): Seq[BulkResponseItem] = {
+    bulkResponse.failures.filterNot { bulkResponseItem =>
+      // This error is returned by Elasticsearch when we try to PUT a document
+      // with a lower version than the existing version.
+      val alreadyIndexedWorkHasHigherVersion = bulkResponseItem.error
+        .exists(bulkError =>
+          bulkError.`type`.contains("version_conflict_engine_exception"))
+
+      if (alreadyIndexedWorkHasHigherVersion) {
+        info(
+          s"Skipping ${bulkResponseItem.id} because already indexed work has a higher version (${bulkResponseItem.error}")
+      }
+
+      alreadyIndexedWorkHasHigherVersion
+    }
   }
 }

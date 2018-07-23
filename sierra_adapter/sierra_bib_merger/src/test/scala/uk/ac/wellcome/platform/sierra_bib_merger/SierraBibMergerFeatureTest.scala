@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.test.fixtures.LocalVersionedHybridStore
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -90,7 +90,8 @@ class SierraBibMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable)
+                  id = expectedSierraTransformable.id,
+                  record = expectedSierraTransformable)
               }
             }
           }
@@ -144,11 +145,13 @@ class SierraBibMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable1)
+                  id = expectedSierraTransformable1.id,
+                  record = expectedSierraTransformable1)
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable2)
+                  id = expectedSierraTransformable2.id,
+                  record = expectedSierraTransformable2)
               }
             }
           }
@@ -206,7 +209,8 @@ class SierraBibMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable)
+                  id = expectedSierraTransformable.id,
+                  record = expectedSierraTransformable)
               }
             }
           }
@@ -266,7 +270,8 @@ class SierraBibMergerFeatureTest
               assertStored[SierraTransformable](
                 bucket,
                 table,
-                expectedSierraTransformable)
+                id = expectedSierraTransformable.id,
+                record = expectedSierraTransformable)
             }
           }
         }
@@ -314,7 +319,8 @@ class SierraBibMergerFeatureTest
                 assertStored[SierraTransformable](
                   bucket,
                   table,
-                  expectedSierraTransformable)
+                  id = expectedSierraTransformable.id,
+                  record = expectedSierraTransformable)
               }
             }
           }
