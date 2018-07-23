@@ -3,13 +3,10 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
+import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
-class SierraProductionTest extends FunSpec with Matchers {
+class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("returns an empty list if neither 260 nor 264 are present") {
     transformToProduction(varFields = List()) shouldBe List()
@@ -428,11 +425,7 @@ class SierraProductionTest extends FunSpec with Matchers {
   }
 
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
-    val bibData = SierraBibData(
-      id = "p1000001",
-      title = Some("Practical production of poisonous panthers"),
-      varFields = varFields
-    )
+    val bibData = createSierraBibDataWith(varFields = varFields)
 
     intercept[GracefulFailureException] {
       transformer.getProduction(bibData)
@@ -441,12 +434,7 @@ class SierraProductionTest extends FunSpec with Matchers {
 
   private def transformToProduction(varFields: List[VarField])
     : List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = {
-    val bibData = SierraBibData(
-      id = "p1000001",
-      title = Some("Practical production of poisonous panthers"),
-      varFields = varFields
-    )
-
+    val bibData = createSierraBibDataWith(varFields = varFields)
     transformer.getProduction(bibData)
   }
 
