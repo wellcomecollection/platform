@@ -21,10 +21,7 @@ class SierraTransformableTransformerTest
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
-    val id = createSierraRecordNumberString
-
-    val sierraTransformable = SierraTransformable(
-      sourceId = id,
+    val sierraTransformable = createSierraTransformableWith(
       maybeBibRecord = Some(createSierraBibRecordWith(id = id)),
       itemRecords = Map(
         "5151515" -> createSierraItemRecordWith(id = "5151515"),
@@ -75,7 +72,7 @@ class SierraTransformableTransformerTest
 
     val bibRecord = createSierraBibRecordWith(id = bibId)
 
-    val transformable = SierraTransformable(
+    val transformable = createSierraTransformableWith(
       sourceId = bibId,
       maybeBibRecord = Some(bibRecord),
       itemRecords = Map(itemRecord.id -> itemRecord)
@@ -594,7 +591,7 @@ class SierraTransformableTransformerTest
   private def assertTransformReturnsInvisibleWork(
     maybeBibRecord: Option[SierraBibRecord],
     itemRecords: Map[String, SierraItemRecord] = Map()) = {
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = "0102010",
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords
