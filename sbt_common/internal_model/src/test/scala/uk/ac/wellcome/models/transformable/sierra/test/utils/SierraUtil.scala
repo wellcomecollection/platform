@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
@@ -34,6 +34,23 @@ trait SierraUtil {
     (1 to count).map { _ =>
       createSierraRecordNumberString
     }.toList
+
+  def createSierraBibRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String = "",
+    modifiedDate: Instant = Instant.now): SierraBibRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id"}"""
+    } else data
+
+    SierraBibRecord(
+      id = id,
+      data = recordData,
+      modifiedDate = modifiedDate
+    )
+  }
+
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
