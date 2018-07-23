@@ -50,7 +50,7 @@ class SierraBibMergerFeatureTest
                   bucket,
                   table,
                   id = expectedSierraTransformable.id,
-                  bibRecord = expectedSierraTransformable)
+                  record = expectedSierraTransformable)
               }
             }
           }
@@ -140,7 +140,7 @@ class SierraBibMergerFeatureTest
                   bucket,
                   table,
                   id = expectedTransformable.id,
-                  newBibRecord = expectedTransformable)
+                  record = expectedTransformable)
               }
             }
           }
@@ -226,7 +226,7 @@ class SierraBibMergerFeatureTest
                   bucket,
                   table,
                   id = expectedSierraTransformable.id,
-                  bibRecord = expectedSierraTransformable)
+                  record = expectedSierraTransformable)
               }
             }
           }
