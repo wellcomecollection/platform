@@ -2,7 +2,11 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.models.work.internal.{DigitalLocation, Location, PhysicalLocation}
+import uk.ac.wellcome.models.work.internal.{
+  DigitalLocation,
+  Location,
+  PhysicalLocation
+}
 
 @ApiModel(
   value = "Location",
@@ -21,7 +25,7 @@ object DisplayLocationV1 {
         credit = digitalLocation.credit,
         license = digitalLocation.license match {
           case Some(license) => Some(DisplayLicenseV1(license))
-          case None => None
+          case None          => None
         }
       )
     case l: PhysicalLocation =>

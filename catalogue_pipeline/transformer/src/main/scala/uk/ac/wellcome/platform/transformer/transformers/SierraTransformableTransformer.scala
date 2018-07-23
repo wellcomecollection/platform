@@ -70,7 +70,9 @@ class SierraTransformableTransformer
                   dimensions = getDimensions(sierraBibData),
                   items =
                     getPhysicalItems(sierraTransformable) ++
-                    getDigitalItems(sourceIdentifier.copy(ontologyType = "Item"), sierraBibData),
+                      getDigitalItems(
+                        sourceIdentifier.copy(ontologyType = "Item"),
+                        sierraBibData),
                   version = version
                 )
               } else {

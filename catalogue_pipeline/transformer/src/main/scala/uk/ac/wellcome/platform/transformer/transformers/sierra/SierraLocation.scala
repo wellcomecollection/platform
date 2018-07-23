@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{SierraItemData, SierraItemLocation}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraItemData,
+  SierraItemLocation
+}
 
 trait SierraLocation {
   def getPhysicalLocation(itemData: SierraItemData): Option[PhysicalLocation] =
@@ -23,16 +26,16 @@ trait SierraLocation {
       case None => None
     }
 
-
   def getDigitalLocation(identifier: String): DigitalLocation = {
-    if(!identifier.isEmpty) {
+    if (!identifier.isEmpty) {
       DigitalLocation(
         url = s"https://wellcomelibrary.org/iiif/$identifier/manifest",
         license = None,
         locationType = LocationType("iiif-image")
       )
     } else {
-      throw new RuntimeException("id required by DigitalLocation has not been provided")
+      throw new RuntimeException(
+        "id required by DigitalLocation has not been provided")
     }
   }
 }

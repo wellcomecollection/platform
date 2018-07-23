@@ -53,7 +53,8 @@ class DisplayLocationsV1SerialisationTest
       items = List(createItem(locations = List(digitalLocation)))
     )
 
-    val displayWork = DisplayWorkV1(work, includes = WorksIncludes(items = true))
+    val displayWork =
+      DisplayWorkV1(work, includes = WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -82,7 +83,8 @@ class DisplayLocationsV1SerialisationTest
       items = List(createItem(locations = List(digitalLocation)))
     )
 
-    val displayWork = DisplayWorkV1(work, includes = WorksIncludes(items = true))
+    val displayWork =
+      DisplayWorkV1(work, includes = WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
 

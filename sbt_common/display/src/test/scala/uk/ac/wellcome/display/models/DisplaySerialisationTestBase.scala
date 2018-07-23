@@ -17,12 +17,15 @@ trait DisplaySerialisationTestBase { this: Suite =>
          """
     }
 
-  def optionalObject[T](fieldName: String, formatter: T => String, maybeObjectValue: Option[T], firstField: Boolean = false) =
+  def optionalObject[T](fieldName: String,
+                        formatter: T => String,
+                        maybeObjectValue: Option[T],
+                        firstField: Boolean = false) =
     maybeObjectValue match {
       case None => ""
       case Some(o) =>
         s"""
-           ${if(!firstField)","}"$fieldName": ${formatter(o)}
+           ${if (!firstField) ","}"$fieldName": ${formatter(o)}
          """
     }
 

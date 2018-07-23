@@ -27,7 +27,8 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
         displayLocation.asInstanceOf[DisplayDigitalLocationV1]
       displayDigitalLocation.locationType shouldBe locationType.id
       displayDigitalLocation.url shouldBe thumbnailUrl
-      displayDigitalLocation.license shouldBe Some(DisplayLicenseV1(internalLocation.license.get))
+      displayDigitalLocation.license shouldBe Some(
+        DisplayLicenseV1(internalLocation.license.get))
       displayDigitalLocation.ontologyType shouldBe "DigitalLocation"
     }
 

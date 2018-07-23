@@ -161,12 +161,16 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
           ))
       )
 
-      val expectedLocations = List(Identifiable(
-        sourceIdentifier = sourceIdentifier,
-        agent = Item(locations = List(DigitalLocation(
-          url = s"https://wellcomelibrary.org/iiif/$id/manifest",
-          license = None,
-          locationType = LocationType("iiif-image"))))))
+      val expectedLocations = List(
+        Identifiable(
+          sourceIdentifier = sourceIdentifier,
+          agent = Item(
+            locations = List(
+              DigitalLocation(
+                url = s"https://wellcomelibrary.org/iiif/$id/manifest",
+                license = None,
+                locationType = LocationType("iiif-image"))))
+        ))
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedLocations
     }
 
