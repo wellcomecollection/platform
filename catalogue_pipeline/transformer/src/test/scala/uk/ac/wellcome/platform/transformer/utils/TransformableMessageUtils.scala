@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import java.time.Instant
-
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
