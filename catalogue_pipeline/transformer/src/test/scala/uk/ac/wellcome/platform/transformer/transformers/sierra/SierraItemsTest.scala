@@ -15,39 +15,31 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
   describe("extractItemData") {
     it("parses instances of SierraItemData") {
-      val item1 = createSierraItemData
-      val item2 = createSierraItemData
-
-      val itemData = Map(
-        item1.id -> createSierraItemRecordWith(item1),
-        item2.id -> createSierraItemRecordWith(item2)
-      )
+      val itemData = (1 to 2).map { _ => createSierraItemData }
+      val itemRecords = itemData.map { createSierraItemRecordWith }.toList
 
       val transformable = createSierraTransformableWith(
-        itemRecords = itemData
+        itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(item1, item2)
+      transformer.extractItemData(transformable) shouldBe itemData
     }
 
     it("ignores items it can't parse as JSON") {
-      val item = createSierraItemData
+      val itemData = createSierraItemData
 
-      val brokenItemId = createSierraRecordNumberString
-
-      val itemData = Map(
-        item.id -> createSierraItemRecordWith(item),
-        brokenItemId -> createSierraItemRecordWith(
-          id = brokenItemId,
+      val itemRecords = List(
+        createSierraItemRecordWith(itemData),
+        createSierraItemRecordWith(
           data = "<xml?>This is not a real 'JSON' string"
         )
       )
 
       val transformable = createSierraTransformableWith(
-        itemRecords = itemData
+        itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(item)
+      transformer.extractItemData(transformable) shouldBe List(itemData)
     }
   }
 
@@ -96,13 +88,11 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val item1 = createSierraItemDataWith(deleted = true)
       val item2 = createSierraItemDataWith(deleted = false)
 
-      val itemData = Map(
-        item1.id -> createSierraItemRecordWith(item1),
-        item2.id -> createSierraItemRecordWith(item2)
-      )
-
       val transformable = createSierraTransformableWith(
-        itemRecords = itemData
+        itemRecords = List(
+          createSierraItemRecordWith(item1),
+          createSierraItemRecordWith(item2)
+        )
       )
 
       transformer.getItems(transformable) should have size 1
