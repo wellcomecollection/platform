@@ -191,8 +191,7 @@ class DynamoInserterTest
 
   it("fails if a dao returns an error when updating an item") {
     val record = createSierraItemRecordWith(
-      modifiedDate = olderDate,
-      bibIds = List(createSierraRecordNumberString)
+      modifiedDate = newerDate
     )
 
     val mockedDao = mock[VersionedDao]
@@ -204,7 +203,10 @@ class DynamoInserterTest
       .thenReturn(
         Future.successful(
           Some(
-            record.copy(modifiedDate = newerDate)
+            createSierraItemRecordWith(
+              id = record.id,
+              modifiedDate = olderDate
+            )
           )))
 
     when(
