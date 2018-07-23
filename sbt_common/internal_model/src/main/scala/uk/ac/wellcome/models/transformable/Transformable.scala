@@ -35,11 +35,6 @@ case class SierraTransformable(
 ) extends Transformable
 
 object SierraTransformable {
-  def apply(sourceId: String, bibData: String): SierraTransformable = {
-    val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(sourceId = sourceId, maybeBibData = Some(bibRecord))
-  }
-
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
     SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
 }
