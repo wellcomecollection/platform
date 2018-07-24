@@ -32,12 +32,14 @@ class SierraItemsToDynamoFeatureTest
           val bibId = createSierraRecordNumberString
           val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
 
+          val sierraRecord = createSierraRecordWith(
+            id = itemId,
+            data = data
+          )
+
           sendNotificationToSQS(
             queue = queue,
-            message = createSierraRecordWith(
-              id = itemId,
-              data = data
-            )
+            message = sierraRecord
           )
 
           eventually {
@@ -50,10 +52,11 @@ class SierraItemsToDynamoFeatureTest
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(
               SierraItemRecord(
-                itemId,
-                data,
-                modifiedDate,
-                List(bibId),
+                id = itemId,
+                data = sierraRecord.data,
+                modifiedDate = sierraRecord.modifiedDate,
+                bibIds = List(bibId),
+                unlinkedBibIds = List(),
                 version = 1))
           }
         }
