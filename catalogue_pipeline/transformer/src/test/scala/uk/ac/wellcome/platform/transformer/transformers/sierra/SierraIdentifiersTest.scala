@@ -15,7 +15,7 @@ class SierraIdentifiersTest extends FunSpec with Matchers with SierraDataUtil {
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",
-        value = bibData.sierraId.withoutCheckDigit
+        value = bibData.id.withoutCheckDigit
       )
     )
   }
