@@ -9,7 +9,9 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.Future
 import scala.util.Success
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MessageWriterTest
     extends FunSpec
@@ -88,6 +90,27 @@ class MessageWriterTest
 
         whenReady(eventualAttempt.failed) { _ =>
           listMessagesReceivedFromSNS(topic) should be('empty)
+        }
+      }
+    }
+  }
+
+  it("gives distinct s3 keys when sending the same message twice") {
+    withLocalSnsTopic { topic =>
+      withLocalS3Bucket { bucket =>
+        withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
+          val eventualAttempt1 = messageWriter.write(message, subject)
+          Thread.sleep(2)
+          val eventualAttempt2 = messageWriter.write(message, subject)
+
+          whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) { _ =>
+            val messages = listMessagesReceivedFromSNS(topic)
+            messages should have size (2)
+
+            val pointers = messages.map (message => fromJson[MessagePointer](message.message))
+
+            pointers.distinct should have size 2
+          }
         }
       }
     }

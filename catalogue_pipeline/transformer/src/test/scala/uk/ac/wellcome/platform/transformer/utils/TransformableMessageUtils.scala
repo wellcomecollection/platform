@@ -3,10 +3,7 @@ package uk.ac.wellcome.platform.transformer.utils
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable
-}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
@@ -54,7 +51,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
                                       s3Client: AmazonS3,
                                       bucket: Bucket) = {
 
-    val key = "testSource/1/testId/dshg548.json"
+    val key = s"testSource/1/testId/${randomAlphanumeric(10)}.json"
     s3Client.putObject(bucket.name, key, message)
 
     val hybridRecord = HybridRecord(
