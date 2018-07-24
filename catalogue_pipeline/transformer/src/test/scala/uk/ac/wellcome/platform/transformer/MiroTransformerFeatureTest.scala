@@ -12,7 +12,7 @@ import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class MiroTransformerFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with SQS
     with SNS
@@ -88,14 +88,12 @@ class MiroTransformerFeatureTest
               topic)
 
             withServer(flags) { _ =>
-
               val miroHybridRecordMessage1 =
                 hybridRecordNotificationMessage(
                   message = createValidMiroTransformableJson(
                     MiroID = "L0011975",
                     MiroCollection = "images-L",
-                    data =
-                      """
+                    data = """
                       {
                           "image_cleared": "Y",
                           "image_copyright_cleared": "Y",

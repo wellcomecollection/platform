@@ -103,13 +103,15 @@ class MessageWriterTest
           Thread.sleep(2)
           val eventualAttempt2 = messageWriter.write(message, subject)
 
-          whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) { _ =>
-            val messages = listMessagesReceivedFromSNS(topic)
-            messages should have size (2)
+          whenReady(Future.sequence(List(eventualAttempt1, eventualAttempt2))) {
+            _ =>
+              val messages = listMessagesReceivedFromSNS(topic)
+              messages should have size (2)
 
-            val pointers = messages.map (message => fromJson[MessagePointer](message.message))
+              val pointers = messages.map(message =>
+                fromJson[MessagePointer](message.message))
 
-            pointers.distinct should have size 2
+              pointers.distinct should have size 2
           }
         }
       }
