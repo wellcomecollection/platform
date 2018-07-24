@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.links
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
 class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
@@ -20,13 +19,13 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = List(record)
     )
 
     val expectedSierraTransformable = sierraTransformable.copy(
-      itemData = Map.empty
+      itemRecords = Map.empty
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, unlinkedItemRecord) shouldBe expectedSierraTransformable
@@ -46,9 +45,9 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = List(record)
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, previouslyUnlinkedRecord) shouldBe sierraTransformable
@@ -70,9 +69,9 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List(bibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = List(record)
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, outOfDateUnlinkedRecord) shouldBe sierraTransformable
@@ -92,9 +91,9 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List(unrelatedBibId)
     )
 
-    val sierraTransformable = SierraTransformable(
+    val sierraTransformable = createSierraTransformableWith(
       sourceId = bibId,
-      itemData = Map(record.id -> record)
+      itemRecords = List(record)
     )
 
     val caught = intercept[RuntimeException] {
