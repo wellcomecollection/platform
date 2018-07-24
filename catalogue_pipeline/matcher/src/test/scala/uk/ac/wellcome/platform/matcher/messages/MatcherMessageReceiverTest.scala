@@ -7,7 +7,11 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
@@ -319,10 +323,10 @@ class MatcherMessageReceiverTest
 
   it("does not match an existing version with different information") {
     withLocalSnsTopic { topic =>
-      withLocalSqsQueueAndDlq { case QueuePair(queue, dlq) =>
-        withLocalS3Bucket { storageBucket =>
-          withMatcherMessageReceiver(queue, storageBucket, topic) {
-            _ =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withLocalS3Bucket { storageBucket =>
+            withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
               val workAv2 = createUnidentifiedWorkWith(
                 sourceIdentifier = aIdentifier,
                 version = 2
@@ -350,8 +354,8 @@ class MatcherMessageReceiverTest
                 assertQueueEmpty(queue)
                 assertQueueHasSize(dlq, 1)
               }
+            }
           }
-        }
       }
     }
   }
