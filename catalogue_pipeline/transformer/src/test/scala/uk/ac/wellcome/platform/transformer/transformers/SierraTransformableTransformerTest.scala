@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber, SierraRecordTypes}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
@@ -211,7 +210,7 @@ class SierraTransformableTransformerTest
   }
 
   it("makes deleted works invisible") {
-    val id = "1789871"
+    val id = createSierraRecordNumber
     val title = "Hi Diddle Dee Dee"
     val data =
       s"""
