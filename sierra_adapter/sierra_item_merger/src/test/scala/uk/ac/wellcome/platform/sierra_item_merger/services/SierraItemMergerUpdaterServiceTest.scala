@@ -133,10 +133,11 @@ class SierraItemMergerUpdaterServiceTest
                     id = expectedNewSierraTransformable.id,
                     record = expectedNewSierraTransformable)
 
-                  val expectedUpdatedSierraTransformable = createSierraTransformableWith(
-                    sourceId = oldTransformable.id,
-                    itemRecords = List(itemRecord, otherItemRecord)
-                  )
+                  val expectedUpdatedSierraTransformable =
+                    createSierraTransformableWith(
+                      sourceId = oldTransformable.id,
+                      itemRecords = List(itemRecord, otherItemRecord)
+                    )
 
                   assertStored[SierraTransformable](
                     bucket,
@@ -176,8 +177,10 @@ class SierraItemMergerUpdaterServiceTest
               itemRecords = List(itemRecord)
             )
 
-            val f1 = hybridStore.updateRecord(oldTransformable.id)(ifNotExisting =
-              (oldTransformable, SourceMetadata(oldTransformable.sourceName)))(ifExisting =
+            val f1 = hybridStore.updateRecord(oldTransformable.id)(
+              ifNotExisting = (
+                oldTransformable,
+                SourceMetadata(oldTransformable.sourceName)))(ifExisting =
               (t, m) => (t, m))
 
             whenReady(f1) { _ =>

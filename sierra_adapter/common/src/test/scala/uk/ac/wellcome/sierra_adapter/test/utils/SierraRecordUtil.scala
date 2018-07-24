@@ -6,10 +6,9 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 
 trait SierraRecordUtil extends SierraUtil {
-  def createSierraRecordWith(
-    id: String,
-    data: String,
-    modifiedDate: String): SierraRecord =
+  def createSierraRecordWith(id: String,
+                             data: String,
+                             modifiedDate: String): SierraRecord =
     createSierraRecordWith(
       id = id,
       data = data,

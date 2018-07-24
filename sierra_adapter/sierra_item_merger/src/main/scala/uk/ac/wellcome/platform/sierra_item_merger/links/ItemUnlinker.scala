@@ -12,18 +12,19 @@ object ItemUnlinker {
         s"Non-matching bib id ${sierraTransformable.sourceId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
-    val itemData: Map[String, SierraItemRecord] = sierraTransformable.itemRecords
-      .filterNot {
-        case (id, currentItemRecord) => {
-          val matchesCurrentItemRecord = id == itemRecord.id
+    val itemData: Map[String, SierraItemRecord] =
+      sierraTransformable.itemRecords
+        .filterNot {
+          case (id, currentItemRecord) => {
+            val matchesCurrentItemRecord = id == itemRecord.id
 
-          val modifiedAfter = itemRecord.modifiedDate.isAfter(
-            currentItemRecord.modifiedDate
-          )
+            val modifiedAfter = itemRecord.modifiedDate.isAfter(
+              currentItemRecord.modifiedDate
+            )
 
-          matchesCurrentItemRecord && modifiedAfter
+            matchesCurrentItemRecord && modifiedAfter
+          }
         }
-      }
 
     sierraTransformable.copy(itemRecords = itemData)
   }

@@ -112,9 +112,9 @@ trait SierraUtil extends IdentifiersUtil {
     SierraTransformable(
       sourceId = sourceId,
       maybeBibRecord = maybeBibRecord,
-      itemRecords = itemRecords
-        .map { record: SierraItemRecord => record.id -> record }
-        .toMap
+      itemRecords = itemRecords.map { record: SierraItemRecord =>
+        record.id -> record
+      }.toMap
     )
 
   def createSierraTransformable: SierraTransformable =
