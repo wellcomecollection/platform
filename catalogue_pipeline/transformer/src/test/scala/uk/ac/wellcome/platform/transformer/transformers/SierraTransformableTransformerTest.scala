@@ -86,14 +86,14 @@ class SierraTransformableTransformerTest
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Item",
-      value = "i63636360"
+      value = itemId.withCheckDigit(SierraRecordTypes.items)
     )
 
     val expectedOtherIdentifiers = List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
-        value = itemId.withCheckDigit(SierraRecordTypes.items)
+        value = itemId.withoutCheckDigit
       )
     )
 
