@@ -1,14 +1,8 @@
 package uk.ac.wellcome.models.transformable
 
-import io.circe.{Decoder, Encoder, HCursor, Json}
-import io.circe.syntax._
+import io.circe._
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord,
-  SierraRecordNumber
-}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
 
 sealed trait Transformable extends Sourced
 
@@ -42,27 +36,10 @@ object SierraTransformable {
   // [[SierraRecordNumber]] in our case class, but JSON only supports string
   // keys, we need to turn the ID into a string when storing as JSON.
   //
-  implicit val itemRecordsDecoder: Decoder[Map[SierraRecordNumber, SierraItemRecord]] =
-    Decoder.instance[Map[SierraRecordNumber, SierraItemRecord]] { cursor: HCursor =>
-      cursor
-        .as[Map[String, SierraItemRecord]]
-        .map { itemRecordsByString: Map[String, SierraItemRecord] =>
-          itemRecordsByString
-            .map {
-              case (id: String, itemRecord: SierraItemRecord) =>
-                SierraRecordNumber(id) -> itemRecord
-            }
-        }
-    }
+  // This is based on the "Custom key types" section of the Circe docs:
+  // https://circe.github.io/circe/codecs/custom-codecs.html#custom-key-types
+  //
+  implicit val keyEncoder: KeyEncoder[SierraRecordNumber] = (key: SierraRecordNumber) => key.withoutCheckDigit
 
-  implicit val itemRecordsEncoder: Encoder[Map[SierraRecordNumber, SierraItemRecord]] =
-    Encoder.instance[Map[SierraRecordNumber, SierraItemRecord]] {
-      itemRecords: Map[SierraRecordNumber, SierraItemRecord] =>
-        Json.fromFields(
-          itemRecords.map {
-            case (id: SierraRecordNumber, itemRecord: SierraItemRecord) =>
-              id.withoutCheckDigit -> itemRecord.asJson
-          }
-        )
-    }
+  implicit val keyDecoder: KeyDecoder[SierraRecordNumber] = (key: String) => Some(SierraRecordNumber(key))
 }
