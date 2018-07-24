@@ -205,7 +205,7 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
           WorkNode("B", 0, List(), hashed_AB))
     }
 
-    it("doesn't an update for the same version if the work is different from the one stored") {
+    it("doesn't process an update for the same version if the work is different from the one stored") {
       val existingVersion = 2
       val updateVersion = 2
 

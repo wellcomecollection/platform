@@ -23,7 +23,7 @@ object WorkGraphUpdater extends Logging {
         throw VersionExpectedConflictException(versionConflictMessage)
       case Some(WorkNode(_, existingVersion, linkedIds, _)) if existingVersion == workUpdate.version && workUpdate.referencedWorkIds != linkedIds.toSet =>
         val versionConflictMessage =
-          s"${workUpdate.workId} v${workUpdate.version} is exists with different content!"
+          s"${workUpdate.workId} v${workUpdate.version} exists with different content!"
         error(versionConflictMessage)
         throw VersionUnexpectedConflictException(versionConflictMessage)
       case _ => doUpdate(workUpdate, existingGraph)
