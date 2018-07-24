@@ -41,7 +41,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> record.id.withoutCheckDigit) shouldBe Some(Right(record.copy(version = 1)))
+            'id -> record.id.withoutCheckDigit) shouldBe Some(
+            Right(record.copy(version = 1)))
         }
       }
     }
@@ -64,7 +65,8 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(Right(newRecord))
+            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(
+            Right(newRecord))
         }
       }
     }

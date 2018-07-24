@@ -27,6 +27,8 @@ case class SierraItemLocation(code: String, name: String)
 case object SierraItemData {
   implicit val decodeSierraRecordNumber: Decoder[SierraRecordNumber] =
     Decoder.decodeString.emap { str =>
-      Either.catchNonFatal(SierraRecordNumber(str)).leftMap(t => "SierraRecordNumber")
+      Either
+        .catchNonFatal(SierraRecordNumber(str))
+        .leftMap(t => "SierraRecordNumber")
     }
 }

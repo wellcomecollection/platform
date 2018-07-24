@@ -172,24 +172,23 @@ class NotificationMessageReceiverTest
       withLocalS3Bucket { bucket =>
         val message = createMessageWith(bucket = bucket)
 
-        withNotificationMessageReceiver(
-          Topic("does-not-exist"),
-          bucket) { recordReceiver =>
-          val future = recordReceiver.receiveMessage(message)
+        withNotificationMessageReceiver(Topic("does-not-exist"), bucket) {
+          recordReceiver =>
+            val future = recordReceiver.receiveMessage(message)
 
-          whenReady(future.failed) { x =>
-            x.getMessage should be("Failed publishing message")
-          }
+            whenReady(future.failed) { x =>
+              x.getMessage should be("Failed publishing message")
+            }
         }
       }
     }
   }
 
-  private def createMessageWith(
-    message: String = toJson(createSierraTransformable).get,
-    sourceName: String = "sierra",
-    bucket: Bucket,
-    version: Int = 1): NotificationMessage =
+  private def createMessageWith(message: String = toJson(
+                                  createSierraTransformable).get,
+                                sourceName: String = "sierra",
+                                bucket: Bucket,
+                                version: Int = 1): NotificationMessage =
     hybridRecordNotificationMessage(
       message = toJson(createSierraTransformable).get,
       sourceName = sourceName,

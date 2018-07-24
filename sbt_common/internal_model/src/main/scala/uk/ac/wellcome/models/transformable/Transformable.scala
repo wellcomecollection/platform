@@ -2,7 +2,11 @@ package uk.ac.wellcome.models.transformable
 
 import io.circe._
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber
+}
 
 sealed trait Transformable extends Sourced
 
@@ -35,7 +39,9 @@ object SierraTransformable {
   // This is based on the "Custom key types" section of the Circe docs:
   // https://circe.github.io/circe/codecs/custom-codecs.html#custom-key-types
   //
-  implicit val keyEncoder: KeyEncoder[SierraRecordNumber] = (key: SierraRecordNumber) => key.withoutCheckDigit
+  implicit val keyEncoder: KeyEncoder[SierraRecordNumber] =
+    (key: SierraRecordNumber) => key.withoutCheckDigit
 
-  implicit val keyDecoder: KeyDecoder[SierraRecordNumber] = (key: String) => Some(SierraRecordNumber(key))
+  implicit val keyDecoder: KeyDecoder[SierraRecordNumber] = (key: String) =>
+    Some(SierraRecordNumber(key))
 }

@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.transformer.source
 import cats.syntax.either._
 import io.circe.Decoder
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
-import uk.ac.wellcome.platform.transformer.source.sierra.{Country => SierraCountry, Language => SierraLanguage}
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Country => SierraCountry,
+  Language => SierraLanguage
+}
 
 case class SierraBibData(
   id: SierraRecordNumber,
@@ -30,6 +33,8 @@ case class SierraBibData(
 case object SierraBibData {
   implicit val decodeSierraRecordNumber: Decoder[SierraRecordNumber] =
     Decoder.decodeString.emap { str =>
-      Either.catchNonFatal(SierraRecordNumber(str)).leftMap(t => "SierraRecordNumber")
+      Either
+        .catchNonFatal(SierraRecordNumber(str))
+        .leftMap(t => "SierraRecordNumber")
     }
 }

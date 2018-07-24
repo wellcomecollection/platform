@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber, SierraRecordTypes}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber,
+  SierraRecordTypes
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -19,7 +24,9 @@ class SierraTransformableTransformerTest
 
   it("performs a transformation on a work with items") {
     val itemRecords = (1 to 2)
-      .map { _ => createSierraItemRecord }
+      .map { _ =>
+        createSierraItemRecord
+      }
       .sortBy { _.id.withoutCheckDigit }
       .toList
 
@@ -520,7 +527,8 @@ class SierraTransformableTransformerTest
 
   it("extracts merge candidates from 776 subfield $$w") {
     val id = createSierraRecordNumber
-    val mergeCandidateBibNumber = createSierraRecordNumber.withCheckDigit(SierraRecordTypes.bibs)
+    val mergeCandidateBibNumber =
+      createSierraRecordNumber.withCheckDigit(SierraRecordTypes.bibs)
     val data =
       s"""
          | {
@@ -601,7 +609,8 @@ class SierraTransformableTransformerTest
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = sierraTransformable.sierraId.withCheckDigit(SierraRecordTypes.bibs)
+        value =
+          sierraTransformable.sierraId.withCheckDigit(SierraRecordTypes.bibs)
       ),
       version = 1
     )

@@ -5,7 +5,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  IdentifierType,
+  SourceIdentifier,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
@@ -59,7 +63,8 @@ class SierraTransformerFeatureTest
                 val sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
-                  value = sierraTransformable.sierraId.withCheckDigit(SierraRecordTypes.bibs)
+                  value = sierraTransformable.sierraId.withCheckDigit(
+                    SierraRecordTypes.bibs)
                 )
 
                 val sierraIdentifier = SourceIdentifier(

@@ -17,13 +17,13 @@ object ItemUnlinker {
         case (id, currentItemRecord) => {
           val matchesCurrentItemRecord = id == itemRecord.id
 
-            val modifiedAfter = itemRecord.modifiedDate.isAfter(
-              currentItemRecord.modifiedDate
-            )
+          val modifiedAfter = itemRecord.modifiedDate.isAfter(
+            currentItemRecord.modifiedDate
+          )
 
-            matchesCurrentItemRecord && modifiedAfter
-          }
+          matchesCurrentItemRecord && modifiedAfter
         }
+      }
 
     sierraTransformable.copy(itemRecords = itemRecords)
   }

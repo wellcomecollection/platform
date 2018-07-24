@@ -4,14 +4,17 @@ import java.time.Instant
 
 import io.circe.optics.JsonPath.root
 import io.circe.parser._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord,
+  SierraRecordNumber
+}
 
 import scala.util.Try
 
-case class SierraRecord(
-  id: SierraRecordNumber,
-  data: String,
-  modifiedDate: Instant) {
+case class SierraRecord(id: SierraRecordNumber,
+                        data: String,
+                        modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
     SierraBibRecord(
       id = this.id,
