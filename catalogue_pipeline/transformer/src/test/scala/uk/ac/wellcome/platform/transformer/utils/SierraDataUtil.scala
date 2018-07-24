@@ -22,11 +22,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
       title = title,
       lang = lang,
       materialType = materialType,
-      varFields = varFields,
-      deleted = false,
-      suppressed = false,
-      country = None,
-      fixedFields = Map()
+      varFields = varFields
     )
 
   def createSierraBibData: SierraBibData = createSierraBibDataWith()
