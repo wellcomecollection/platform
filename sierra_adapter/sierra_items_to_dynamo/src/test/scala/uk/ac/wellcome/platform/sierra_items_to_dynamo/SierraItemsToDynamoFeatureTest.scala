@@ -29,7 +29,7 @@ class SierraItemsToDynamoFeatureTest
 
         withServer(flags) { server =>
           val itemId = createSierraRecordNumber
-          val bibId = createSierraRecordNumberString
+          val bibId = createSierraRecordNumber
           val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
 
           val sierraRecord = createSierraRecordWith(
@@ -47,7 +47,7 @@ class SierraItemsToDynamoFeatureTest
 
             val scanamoResult =
               Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-                'id -> itemId)
+                'id -> itemId.withoutCheckDigit)
 
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(

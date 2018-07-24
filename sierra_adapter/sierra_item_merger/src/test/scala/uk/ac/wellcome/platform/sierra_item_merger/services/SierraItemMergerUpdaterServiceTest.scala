@@ -488,9 +488,9 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraRecordNumber
             val transformable = createSierraTransformableWith(
-              sourceId = bibId
+              sierraId = bibId
             )
 
             val f1 = hybridStore.updateRecord(transformable.id)(ifNotExisting =
