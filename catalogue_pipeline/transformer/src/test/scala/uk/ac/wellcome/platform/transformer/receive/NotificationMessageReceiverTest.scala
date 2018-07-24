@@ -9,7 +9,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
-import uk.ac.wellcome.messaging.sns.SNSConfig
+import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.MiroTransformable
@@ -75,10 +75,7 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sqsMessage = hybridRecordNotificationMessage(
-            message = toJson(createSierraTransformable).get,
-            sourceName = "sierra",
-            s3Client = s3Client,
+          val sqsMessage = createMessageWith(
             bucket = bucket
           )
 
@@ -105,12 +102,9 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val sierraMessage = hybridRecordNotificationMessage(
-            message = toJson(createSierraTransformable).get,
-            sourceName = "sierra",
-            version = version,
-            s3Client = s3Client,
-            bucket = bucket
+          val sierraMessage = createMessageWith(
+            bucket = bucket,
+            version = version
           )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
@@ -136,13 +130,10 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val invalidSqsMessage =
-            hybridRecordNotificationMessage(
-              message = "not a json string",
-              sourceName = "miro",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+          val invalidSqsMessage = createMessageWith(
+            message = "not a json string",
+            bucket = bucket
+          )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
@@ -166,13 +157,11 @@ class NotificationMessageReceiverTest
             data = "not a json string"
           )
 
-          val failingSqsMessage =
-            hybridRecordNotificationMessage(
-              message = toJson(miroTransformable).get,
-              sourceName = "miro",
-              s3Client = s3Client,
-              bucket = bucket
-            )
+          val failingSqsMessage = createMessageWith(
+            message = toJson(miroTransformable).get,
+            sourceName = "miro",
+            bucket = bucket
+          )
 
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
@@ -191,13 +180,7 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val message = hybridRecordNotificationMessage(
-            message = JsonUtil.toJson(createSierraTransformable).get,
-            sourceName = "sierra",
-            version = 1,
-            s3Client = s3Client,
-            bucket = bucket
-          )
+          val message = createMessageWith(bucket = bucket)
 
           withNotificationMessageReceiver(
             topic,
@@ -213,6 +196,19 @@ class NotificationMessageReceiverTest
       }
     }
   }
+
+  private def createMessageWith(
+    message: String = toJson(createSierraTransformable).get,
+    sourceName: String = "sierra",
+    bucket: Bucket,
+    version: Int = 1): NotificationMessage =
+    hybridRecordNotificationMessage(
+      message = toJson(createSierraTransformable).get,
+      sourceName = sourceName,
+      version = version,
+      s3Client = s3Client,
+      bucket = bucket
+    )
 
   private def mockSnsClientFailPublishMessage = {
     val mockSNSClient = mock[AmazonSNS]
