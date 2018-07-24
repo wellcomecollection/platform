@@ -45,8 +45,7 @@ class NotificationMessageReceiverTest
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
-    bucket: Bucket,
-    maybeSnsClient: Option[AmazonSNS] = None
+    bucket: Bucket
   )(testWith: TestWith[NotificationMessageReceiver, R]) = {
     val s3Config = S3Config(bucket.name)
 
@@ -58,7 +57,7 @@ class NotificationMessageReceiverTest
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
         messageConfig = messageConfig,
-        snsClient = maybeSnsClient.getOrElse(snsClient),
+        snsClient = snsClient,
         s3Client = s3Client
       )
 
@@ -177,20 +176,17 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    withLocalSnsTopic { topic =>
-      withLocalSqsQueue { _ =>
-        withLocalS3Bucket { bucket =>
-          val message = createMessageWith(bucket = bucket)
+    withLocalSqsQueue { _ =>
+      withLocalS3Bucket { bucket =>
+        val message = createMessageWith(bucket = bucket)
 
-          withNotificationMessageReceiver(
-            topic,
-            bucket,
-            Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(message)
+        withNotificationMessageReceiver(
+          Topic("does-not-exist"),
+          bucket) { recordReceiver =>
+          val future = recordReceiver.receiveMessage(message)
 
-            whenReady(future.failed) { x =>
-              x.getMessage should be("Failed publishing message")
-            }
+          whenReady(future.failed) { x =>
+            x.getMessage should be("Failed publishing message")
           }
         }
       }
