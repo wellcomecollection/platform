@@ -6,6 +6,7 @@ import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
 }
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 
