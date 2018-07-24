@@ -2,7 +2,7 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
-    val storage = "1.2.0"
+    val storage = "1.5.0"
   }
 
   val storageLibrary: Seq[ModuleID] = Seq(
