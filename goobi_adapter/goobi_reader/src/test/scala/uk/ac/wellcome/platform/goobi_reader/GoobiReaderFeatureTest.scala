@@ -14,7 +14,8 @@ class GoobiReaderFeatureTest
     with Eventually
     with Matchers
     with ExtendedPatience
-    with GoobiReaderFixtures with Inside{
+    with GoobiReaderFixtures
+    with Inside {
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
 
   it("gets an S3 notification and puts the new record in VHS") {

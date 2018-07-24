@@ -37,7 +37,8 @@ class GoobiReaderWorkerServiceTest
     with MockitoSugar
     with GoobiReaderFixtures
     with Messaging
-    with SQS with Inside{
+    with SQS
+    with Inside {
 
   private val id = "mets-0001"
   private val goobiS3Prefix = "goobi"
@@ -229,18 +230,19 @@ class GoobiReaderWorkerServiceTest
     }
   }
 
-  private def assertRecordStored( id: String,
-                                  version: Int,
+  private def assertRecordStored(id: String,
+                                 version: Int,
                                  expectedMetadata: GoobiRecordMetadata,
                                  expectedContents: String,
                                  table: Table,
                                  bucket: Bucket) = {
 
-    inside(getHybridRecord(table, id)) { case HybridRecord(actualId, actualVersion,s3Key) =>
-      actualId shouldBe id
-      actualVersion shouldBe version
+    inside(getHybridRecord(table, id)) {
+      case HybridRecord(actualId, actualVersion, s3Key) =>
+        actualId shouldBe id
+        actualVersion shouldBe version
         getRecordMetadata[GoobiRecordMetadata](table, id) shouldBe expectedMetadata
-      getContentFromS3(bucket, s3Key) shouldBe expectedContents
+        getContentFromS3(bucket, s3Key) shouldBe expectedContents
     }
   }
 
