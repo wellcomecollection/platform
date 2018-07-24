@@ -135,7 +135,7 @@ class SierraItemMergerUpdaterServiceTest
 
                   val expectedUpdatedSierraTransformable =
                     createSierraTransformableWith(
-                      sourceId = oldTransformable.id,
+                      sourceId = oldTransformable.sourceId,
                       itemRecords = List(itemRecord, otherItemRecord)
                     )
 
