@@ -23,8 +23,6 @@ case class SierraTransformable(
   itemRecords: Map[SierraRecordNumber, SierraItemRecord] = Map()
 ) extends Transformable {
   override val sourceId: String = sierraId.withoutCheckDigit
-
-  override val id: String = s"$sourceName/${sierraId.withoutCheckDigit}"
 }
 
 object SierraTransformable {
