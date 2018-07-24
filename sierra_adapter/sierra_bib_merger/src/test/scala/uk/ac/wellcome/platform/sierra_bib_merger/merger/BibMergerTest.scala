@@ -23,7 +23,7 @@ class BibMergerTest extends FunSpec with Matchers with SierraUtil {
       val caught = intercept[RuntimeException] {
         BibMerger.mergeBibRecord(transformable, bibRecord)
       }
-      caught.getMessage shouldEqual s"Non-matching bib ids ${bibRecord.id} != ${transformable.id}"
+      caught.getMessage shouldEqual s"Non-matching bib ids ${bibRecord.id} != ${transformable.sourceId}"
     }
 
     it(
