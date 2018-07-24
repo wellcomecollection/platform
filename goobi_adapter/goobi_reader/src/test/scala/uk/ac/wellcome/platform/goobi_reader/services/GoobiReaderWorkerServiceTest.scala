@@ -8,7 +8,7 @@ import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatest.FunSpec
+import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -37,7 +37,7 @@ class GoobiReaderWorkerServiceTest
     with MockitoSugar
     with GoobiReaderFixtures
     with Messaging
-    with SQS {
+    with SQS with Inside{
 
   private val id = "mets-0001"
   private val goobiS3Prefix = "goobi"
@@ -45,8 +45,6 @@ class GoobiReaderWorkerServiceTest
   private val contents = "muddling the machinations of morose METS"
   private val updatedContents = "Updated contents"
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
-  private val contentsStorageKey = s"$goobiS3Prefix/10/$id/cd92f8d3"
-  private val updatedContentsStorageKey = s"$goobiS3Prefix/10/$id/536b51f7"
 
   it("processes a notification") {
     withGoobiReaderWorkerService(s3Client) {
@@ -59,17 +57,13 @@ class GoobiReaderWorkerServiceTest
         )
 
         eventually {
-          val expectedRecord = HybridRecord(
+          assertRecordStored(
             id = id,
             version = 1,
-            s3key = contentsStorageKey
-          )
-          assertRecordStored(
-            expectedRecord,
-            GoobiRecordMetadata(eventTime),
-            contents,
-            table,
-            bucket)
+            expectedMetadata = GoobiRecordMetadata(eventTime),
+            expectedContents = contents,
+            table = table,
+            bucket = bucket)
         }
     }
   }
@@ -88,19 +82,14 @@ class GoobiReaderWorkerServiceTest
         )
 
         eventually {
-          val contentsStorageKey = s"$goobiS3Prefix/kr/$id work/cd92f8d3"
 
-          val expectedRecord = HybridRecord(
+          assertRecordStored(
             id = s"$id work",
             version = 1,
-            s3key = contentsStorageKey
-          )
-          assertRecordStored(
-            expectedRecord,
-            GoobiRecordMetadata(eventTime),
-            contents,
-            table,
-            bucket)
+            expectedMetadata = GoobiRecordMetadata(eventTime),
+            expectedContents = contents,
+            table = table,
+            bucket = bucket)
         }
     }
   }
@@ -113,18 +102,14 @@ class GoobiReaderWorkerServiceTest
           ifNotExisting = (contentStream, GoobiRecordMetadata(eventTime)))(
           ifExisting = (t, m) => (t, m))
         eventually {
-          val expectedRecord = HybridRecord(
-            id = id,
-            version = 1,
-            s3key = contentsStorageKey
-          )
           val expectedMetadata = GoobiRecordMetadata(eventTime)
           assertRecordStored(
-            expectedRecord,
-            expectedMetadata,
-            contents,
-            table,
-            bucket)
+            id = id,
+            version = 1,
+            expectedMetadata = expectedMetadata,
+            expectedContents = contents,
+            table = table,
+            bucket = bucket)
         }
 
         s3Client.putObject(bucket.name, sourceKey, contents)
@@ -137,14 +122,11 @@ class GoobiReaderWorkerServiceTest
         )
 
         eventually {
-          val expectedRecord = HybridRecord(
-            id = id,
-            version = 1,
-            s3key = contentsStorageKey
-          )
+
           val expectedMetadata = GoobiRecordMetadata(eventTime)
           assertRecordStored(
-            expectedRecord,
+            id = id,
+            version = 1,
             expectedMetadata,
             contents,
             table,
@@ -161,13 +143,10 @@ class GoobiReaderWorkerServiceTest
           ifNotExisting = (contentStream, GoobiRecordMetadata(eventTime)))(
           ifExisting = (t, m) => (t, m))
         eventually {
-          val expectedRecord = HybridRecord(
+
+          assertRecordStored(
             id = id,
             version = 1,
-            s3key = contentsStorageKey
-          )
-          assertRecordStored(
-            expectedRecord,
             GoobiRecordMetadata(eventTime),
             contents,
             table,
@@ -183,14 +162,10 @@ class GoobiReaderWorkerServiceTest
         )
 
         eventually {
-          val expectedRecord = HybridRecord(
-            id = id,
-            version = 2,
-            s3key = updatedContentsStorageKey
-          )
           val expectedMetadata = GoobiRecordMetadata(newerEventTime)
           assertRecordStored(
-            expectedRecord,
+            id = id,
+            version = 2,
             expectedMetadata,
             updatedContents,
             table,
@@ -254,15 +229,19 @@ class GoobiReaderWorkerServiceTest
     }
   }
 
-  private def assertRecordStored(expectedRecord: HybridRecord,
+  private def assertRecordStored( id: String,
+                                  version: Int,
                                  expectedMetadata: GoobiRecordMetadata,
                                  expectedContents: String,
                                  table: Table,
                                  bucket: Bucket) = {
-    val id = expectedRecord.id
-    getHybridRecord(table, id) shouldBe expectedRecord
-    getRecordMetadata[GoobiRecordMetadata](table, id).toString shouldBe expectedMetadata.toString
-    getContentFromS3(bucket, getHybridRecord(table, id).s3key) shouldBe expectedContents
+
+    inside(getHybridRecord(table, id)) { case HybridRecord(actualId, actualVersion,s3Key) =>
+      actualId shouldBe id
+      actualVersion shouldBe version
+        getRecordMetadata[GoobiRecordMetadata](table, id) shouldBe expectedMetadata
+      getContentFromS3(bucket, s3Key) shouldBe expectedContents
+    }
   }
 
   private def assertMessageSentToDlq(queue: Queue, dlq: Queue) = {
