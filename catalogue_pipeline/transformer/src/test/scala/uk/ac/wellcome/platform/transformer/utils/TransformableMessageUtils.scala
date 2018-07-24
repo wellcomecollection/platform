@@ -1,14 +1,10 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import java.time.Instant
-
 import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
@@ -18,7 +14,7 @@ import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-trait TransformableMessageUtils extends SQS {
+trait TransformableMessageUtils extends SierraUtil with SQS {
   def createValidEmptySierraBibNotificationMessage(
     id: String,
     s3Client: AmazonS3,
@@ -40,9 +36,9 @@ trait TransformableMessageUtils extends SQS {
     )
   }
 
-  def createValidSierraTransformableJson(id: String,
-                                         title: String,
-                                         lastModifiedDate: Instant): String = {
+  def createValidSierraTransformableJsonWith(id: String =
+                                               createSierraRecordNumberString,
+                                             title: String): String = {
     val data =
       s"""
          |{
@@ -54,7 +50,12 @@ trait TransformableMessageUtils extends SQS {
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData = Some(SierraBibRecord(id, data, lastModifiedDate)),
+      maybeBibData = Some(
+        createSierraBibRecordWith(
+          id = id,
+          data = data
+        )
+      ),
       itemData = Map[String, SierraItemRecord]()
     )
 

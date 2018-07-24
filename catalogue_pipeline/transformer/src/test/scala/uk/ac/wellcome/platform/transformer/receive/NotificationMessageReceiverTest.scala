@@ -1,7 +1,5 @@
 package uk.ac.wellcome.platform.transformer.receive
 
-import java.time.Instant
-
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
 import org.mockito.Matchers.any
@@ -14,15 +12,11 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
-  SierraTransformable,
-  Transformable
+  SierraTransformable
 }
 import uk.ac.wellcome.models.work.internal.{
-  IdentifierType,
-  SourceIdentifier,
   TransformedBaseWork,
   UnidentifiedWork
 }
@@ -84,10 +78,8 @@ class NotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
-            message = createValidSierraTransformableJson(
-              id = "1234567",
-              title = "A calming breeze on the sea",
-              lastModifiedDate = Instant.now
+            message = createValidSierraTransformableJsonWith(
+              title = "A calming breeze on the sea"
             ),
             sourceName = "sierra",
             version = 1,
@@ -112,18 +104,15 @@ class NotificationMessageReceiverTest
     }
   }
 
-  it("receives a message and add the version to the transformed work") {
-    val id = "5005005"
+  it("receives a message and adds the version to the transformed work") {
     val title = "A pot of possums"
-    val lastModifiedDate = Instant.now()
     val version = 5
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message =
-              createValidSierraTransformableJson(id, title, lastModifiedDate),
+            message = createValidSierraTransformableJsonWith(title = title),
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
@@ -133,17 +122,6 @@ class NotificationMessageReceiverTest
           withNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
-            val sourceIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-system-number"),
-              ontologyType = "Work",
-              value = "b50050059"
-            )
-            val sierraIdentifier = SourceIdentifier(
-              identifierType = IdentifierType("sierra-identifier"),
-              ontologyType = "Work",
-              value = id
-            )
-
             whenReady(future) { _ =>
               val works = getMessages[TransformedBaseWork](topic)
               works.size should be >= 1
@@ -151,13 +129,7 @@ class NotificationMessageReceiverTest
               works.map { actualWork =>
                 actualWork shouldBe a[UnidentifiedWork]
                 val unidentifiedWork = actualWork.asInstanceOf[UnidentifiedWork]
-
-                unidentifiedWork.title shouldBe title
-                unidentifiedWork.sourceIdentifier shouldBe sourceIdentifier
                 unidentifiedWork.version shouldBe version
-                unidentifiedWork.identifiers shouldBe List(
-                  sourceIdentifier,
-                  sierraIdentifier)
               }
             }
           }
@@ -223,17 +195,9 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val id = "1001001"
-    val sierraTransformable: Transformable =
-      SierraTransformable(
-        sourceId = id,
-        bibData = JsonUtil
-          .toJson(
-            SierraBibRecord(
-              id = id,
-              data = s"""{"id": "$id", "title": "A title"}""",
-              modifiedDate = Instant.now))
-          .get)
+    val sierraTransformable = SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>

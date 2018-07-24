@@ -1,8 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import java.time.Instant
-import java.time.Instant.now
-
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
@@ -24,21 +21,11 @@ class SierraTransformableTransformerTest
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
-    val id = "5757575"
-    val title = "A morning mixture of molasses and muesli"
-    val data =
-      s"""
-         |{
-         | "id": "$id",
-         | "title": "$title",
-         | "varFields": []
-         |}
-        """.stripMargin
+    val id = createSierraRecordNumberString
 
     val sierraTransformable = SierraTransformable(
       sourceId = id,
-      maybeBibData =
-        Some(SierraBibRecord(id = id, data = data, modifiedDate = now())),
+      maybeBibData = Some(createSierraBibRecordWith(id = id)),
       itemData = Map(
         "5151515" -> createSierraItemRecordWith(id = "5151515"),
         "5252525" -> createSierraItemRecordWith(id = "5252525")
@@ -67,16 +54,10 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts information from items") {
-    val modifiedDate = Instant.now
-    val bibId = "6262626"
+    val bibId = createSierraRecordNumberString
     val itemId = "6363636"
     val locationType = LocationType("sgmed")
     val locationLabel = "A museum of mermaids"
-    val bibData =
-      s"""{
-            "id": "$bibId",
-            "title": "a title"
-          }"""
     val itemData =
       s"""{
           |"id": "$itemId",
@@ -92,13 +73,11 @@ class SierraTransformableTransformerTest
       bibIds = List(bibId)
     )
 
+    val bibRecord = createSierraBibRecordWith(id = bibId)
+
     val transformable = SierraTransformable(
       sourceId = bibId,
-      maybeBibData = Some(
-        SierraBibRecord(
-          id = bibId,
-          data = bibData,
-          modifiedDate = modifiedDate)),
+      maybeBibData = Some(bibRecord),
       itemData = Map(itemRecord.id -> itemRecord)
     )
 
@@ -579,7 +558,7 @@ class SierraTransformableTransformerTest
   }
 
   it("returns an InvisibleWork if bibData has no title") {
-    val id = "2141444"
+    val id = createSierraRecordNumberString
     val bibData =
       s"""
         |{
@@ -588,10 +567,9 @@ class SierraTransformableTransformerTest
         | "suppressed": false
         |}
       """.stripMargin
-    val bibRecord = SierraBibRecord(
+    val bibRecord = createSierraBibRecordWith(
       id = id,
-      data = bibData,
-      modifiedDate = now()
+      data = bibData
     )
 
     assertTransformReturnsInvisibleWork(
@@ -601,10 +579,9 @@ class SierraTransformableTransformerTest
 
   private def transformDataToWork(id: String,
                                   data: String): TransformedBaseWork = {
-    val bibRecord = SierraBibRecord(
+    val bibRecord = createSierraBibRecordWith(
       id = id,
-      data = data,
-      modifiedDate = now()
+      data = data
     )
 
     val sierraTransformable = SierraTransformable(
