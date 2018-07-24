@@ -2,10 +2,7 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{
   SierraBibData,
