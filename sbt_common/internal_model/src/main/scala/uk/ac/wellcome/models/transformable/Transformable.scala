@@ -12,10 +12,6 @@ case class MiroTransformable(sourceId: String,
                              data: String)
     extends Transformable
 
-/** Represents a row in the DynamoDB database of "merged" Sierra records;
-  * that is, records that contain data for both bibs and
-  * their associated items.
-  */
 case class SierraTransformable(
   sierraId: SierraRecordNumber,
   sourceName: String = "sierra",
