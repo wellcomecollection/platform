@@ -103,5 +103,7 @@ trait SierraUtil extends IdentifiersUtil {
     )
 
   def createSierraTransformable: SierraTransformable =
-    createSierraTransformableWith()
+    SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 }
