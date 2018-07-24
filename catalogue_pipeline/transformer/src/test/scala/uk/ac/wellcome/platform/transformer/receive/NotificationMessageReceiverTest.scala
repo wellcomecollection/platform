@@ -16,6 +16,7 @@ import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
 }
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
