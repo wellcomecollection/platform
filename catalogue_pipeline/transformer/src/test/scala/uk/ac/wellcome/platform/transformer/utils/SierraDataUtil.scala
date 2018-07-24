@@ -28,12 +28,11 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibData: SierraBibData = createSierraBibDataWith()
 
   def createSierraItemDataWith(
-    id: String = createSierraRecordNumberString,
     deleted: Boolean = false,
     location: Option[SierraItemLocation] = None
   ): SierraItemData =
     SierraItemData(
-      id = id,
+      id = createSierraRecordNumber,
       deleted = deleted,
       location = location
     )

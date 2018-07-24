@@ -47,18 +47,16 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
   describe("transformItemData") {
     it("creates both forms of the Sierra ID in 'identifiers'") {
-      val item = createSierraItemDataWith(
-        id = "4000004"
-      )
+      val item = createSierraItemData
 
       val sourceIdentifier1 = createSierraSourceIdentifierWith(
         ontologyType = "Item",
-        value = "i40000047")
-
+        value = item.id.withCheckDigit(SierraRecordTypes.items)
+      )
       val sourceIdentifier2 = SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
-        value = "4000004"
+        value = item.id.withoutCheckDigit
       )
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
