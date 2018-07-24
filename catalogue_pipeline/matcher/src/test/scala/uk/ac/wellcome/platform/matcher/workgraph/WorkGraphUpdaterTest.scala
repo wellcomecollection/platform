@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.matcher.workgraph
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.matcher.WorkNode
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
-import uk.ac.wellcome.platform.matcher.models.{WorkGraph, WorkUpdate}
+import uk.ac.wellcome.platform.matcher.models._
 
 class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
 
@@ -155,6 +155,73 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
         WorkNode("B", 2, List("C"), hashed_ABC),
         WorkNode("C", 2, List("A"), hashed_ABC)
       )
+    }
+  }
+
+  describe("Update version") {
+    it("processes an update for a newer version") {
+      val existingVersion = 1
+      val updateVersion = 2
+      WorkGraphUpdater
+        .update(
+          workUpdate = WorkUpdate("A", updateVersion, Set("B")),
+          existingGraph =
+            WorkGraph(Set(WorkNode("A", existingVersion, Nil, "A")))
+        )
+        .nodes should contain theSameElementsAs
+        List(
+          WorkNode("A", 2, List("B"), hashed_AB),
+          WorkNode("B", 0, List(), hashed_AB))
+    }
+
+    it("doesn't process an update for a lower version") {
+      val existingVersion = 3
+      val updateVersion = 1
+
+      intercept[VersionExpectedConflictException] {
+        WorkGraphUpdater
+          .update(
+            workUpdate = WorkUpdate("A", updateVersion, Set("B")),
+            existingGraph =
+              WorkGraph(Set(WorkNode("A", existingVersion, Nil, "A")))
+          )
+      }
+    }
+
+    it(
+      "processes an update for the same version if it's the same as the one stored") {
+      val existingVersion = 2
+      val updateVersion = 2
+
+      WorkGraphUpdater
+        .update(
+          workUpdate = WorkUpdate("A", updateVersion, Set("B")),
+          existingGraph = WorkGraph(
+            Set(
+              WorkNode("A", existingVersion, List("B"), hashed_AB),
+              WorkNode("B", 0, List(), hashed_AB)))
+        )
+        .nodes should contain theSameElementsAs
+        List(
+          WorkNode("A", 2, List("B"), hashed_AB),
+          WorkNode("B", 0, List(), hashed_AB))
+    }
+
+    it(
+      "doesn't process an update for the same version if the work is different from the one stored") {
+      val existingVersion = 2
+      val updateVersion = 2
+
+      intercept[VersionUnexpectedConflictException] {
+        WorkGraphUpdater
+          .update(
+            workUpdate = WorkUpdate("A", updateVersion, Set("A")),
+            existingGraph = WorkGraph(
+              Set(
+                WorkNode("A", existingVersion, List("B"), hashed_AB),
+                WorkNode("B", 0, List(), hashed_AB)))
+          )
+      }
     }
   }
 
