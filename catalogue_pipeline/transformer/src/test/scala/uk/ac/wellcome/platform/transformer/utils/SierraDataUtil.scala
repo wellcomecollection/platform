@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import io.circe.Encoder
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
@@ -38,6 +39,14 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     )
 
   def createSierraItemData: SierraItemData = createSierraItemDataWith()
+
+  // Based on https://circe.github.io/circe/codecs/custom-codecs.html
+  //
+  // This ensures that toJson(data) below stores the ID as {"id": "1234"}, and
+  // not {"id": {"s": "1234"}}.
+  //
+  implicit val encodeSierraRecordNumber: Encoder[SierraRecordNumber] =
+    Encoder.encodeString.contramap[SierraRecordNumber] { _.withoutCheckDigit }
 
   def createSierraItemRecordWith(data: SierraItemData): SierraItemRecord =
     createSierraItemRecordWith(
