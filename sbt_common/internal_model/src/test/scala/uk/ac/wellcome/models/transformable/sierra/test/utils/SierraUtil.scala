@@ -2,12 +2,17 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
+import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.Random
 
-trait SierraUtil {
+trait SierraUtil extends IdentifiersUtil {
 
   // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
   // a record with a newer version, or vice versa.  Provide two dates here
@@ -34,6 +39,23 @@ trait SierraUtil {
     (1 to count).map { _ =>
       createSierraRecordNumberString
     }.toList
+
+  def createSierraBibRecordWith(
+    id: String = createSierraRecordNumberString,
+    data: String = "",
+    modifiedDate: Instant = Instant.now): SierraBibRecord = {
+    val recordData = if (data == "") {
+      s"""{"id": "$id", "title": "${randomAlphanumeric(50)}"}"""
+    } else data
+
+    SierraBibRecord(
+      id = id,
+      data = recordData,
+      modifiedDate = modifiedDate
+    )
+  }
+
+  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
@@ -64,4 +86,20 @@ trait SierraUtil {
   }
 
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
+
+  def createSierraTransformableWith(
+    sourceId: String = createSierraRecordNumberString,
+    maybeBibRecord: Option[SierraBibRecord] = None,
+    itemRecords: List[SierraItemRecord] = List()
+  ): SierraTransformable =
+    SierraTransformable(
+      sourceId = sourceId,
+      maybeBibRecord = maybeBibRecord,
+      itemRecords = itemRecords.map { record: SierraItemRecord =>
+        record.id -> record
+      }.toMap
+    )
+
+  def createSierraTransformable: SierraTransformable =
+    createSierraTransformableWith()
 }
