@@ -190,7 +190,7 @@ class NotificationMessageReceiverTest
                                 bucket: Bucket,
                                 version: Int = 1): NotificationMessage =
     hybridRecordNotificationMessage(
-      message = toJson(createSierraTransformable).get,
+      message = message,
       sourceName = sourceName,
       version = version,
       s3Client = s3Client,
