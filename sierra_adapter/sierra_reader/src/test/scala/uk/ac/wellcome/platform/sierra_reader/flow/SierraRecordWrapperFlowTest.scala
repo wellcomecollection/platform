@@ -155,7 +155,8 @@ class SierraRecordWrapperFlowTest
     }
   }
 
-  private def assertSierraRecordsAreEqual(x: SierraRecord, y: SierraRecord): Assertion = {
+  private def assertSierraRecordsAreEqual(x: SierraRecord,
+                                          y: SierraRecord): Assertion = {
     x.id shouldBe x.id
     assertJsonStringsAreEqual(x.data, y.data)
     x.modifiedDate shouldBe y.modifiedDate
