@@ -74,11 +74,12 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and sends it to SNS client") {
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val transformable = createSierraTransformable
+          val transformable = SierraTransformable(
+            bibRecord = createSierraBibRecord
+          )
 
           val sqsMessage = hybridRecordNotificationMessage(
             message = toJson(transformable).get,
@@ -110,8 +111,12 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
+          val transformable = SierraTransformable(
+            bibRecord = createSierraBibRecord
+          )
+
           val sierraMessage = hybridRecordNotificationMessage(
-            message = toJson(createSierraTransformable).get,
+            message = toJson(transformable).get,
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
