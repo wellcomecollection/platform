@@ -79,7 +79,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = itemData.sierraId.withCheckDigit(
+        value = itemData.id.withCheckDigit(
           recordType = SierraRecordTypes.items
         )
       )

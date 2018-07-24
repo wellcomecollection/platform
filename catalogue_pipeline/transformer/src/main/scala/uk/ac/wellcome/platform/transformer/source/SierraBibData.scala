@@ -27,7 +27,7 @@ case class SierraBibData(
   *     import uk.ac.wellcome.platform.transformer.source.SierraBibData._
   *
   */
-case object SierraRecordNumber {
+case object SierraBibData {
   implicit val decodeSierraRecordNumber: Decoder[SierraRecordNumber] =
     Decoder.decodeString.emap { str =>
       Either.catchNonFatal(SierraRecordNumber(str)).leftMap(t => "SierraRecordNumber")
