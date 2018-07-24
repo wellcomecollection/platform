@@ -12,18 +12,21 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibDataWith(
-    id: String = createSierraRecordNumberString,
     title: Option[String] = Some(randomAlphanumeric(25)),
     lang: Option[SierraLanguage] = None,
     materialType: Option[SierraMaterialType] = None,
     varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
-      id = id,
+      id = createSierraRecordNumber,
       title = title,
       lang = lang,
       materialType = materialType,
-      varFields = varFields
+      varFields = varFields,
+      deleted = false,
+      suppressed = false,
+      country = None,
+      fixedFields = Map()
     )
 
   def createSierraBibData: SierraBibData = createSierraBibDataWith()
