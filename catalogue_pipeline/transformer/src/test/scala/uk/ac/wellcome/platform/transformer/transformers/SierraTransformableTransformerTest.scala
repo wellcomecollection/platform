@@ -22,7 +22,7 @@ class SierraTransformableTransformerTest
 
   it("performs a transformation on a work with items") {
     val sierraTransformable = createSierraTransformableWith(
-      maybeBibRecord = Some(createSierraBibRecordWith(id = id)),
+      maybeBibRecord = Some(createSierraBibRecord),
       itemRecords = List(
         createSierraItemRecordWith(id = "5151515"),
         createSierraItemRecordWith(id = "5252525")
