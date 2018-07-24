@@ -12,10 +12,7 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable
-}
+import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
@@ -78,12 +75,8 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val transformable = SierraTransformable(
-            bibRecord = createSierraBibRecord
-          )
-
           val sqsMessage = hybridRecordNotificationMessage(
-            message = toJson(transformable).get,
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
             s3Client = s3Client,
             bucket = bucket
@@ -112,12 +105,8 @@ class NotificationMessageReceiverTest
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
-          val transformable = SierraTransformable(
-            bibRecord = createSierraBibRecord
-          )
-
           val sierraMessage = hybridRecordNotificationMessage(
-            message = toJson(transformable).get,
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
@@ -199,15 +188,11 @@ class NotificationMessageReceiverTest
   }
 
   it("fails if it's unable to publish the work") {
-    val sierraTransformable = SierraTransformable(
-      bibRecord = createSierraBibRecord
-    )
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val message = hybridRecordNotificationMessage(
-            message = JsonUtil.toJson(sierraTransformable).get,
+            message = JsonUtil.toJson(createSierraTransformable).get,
             sourceName = "sierra",
             version = 1,
             s3Client = s3Client,
