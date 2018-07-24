@@ -42,11 +42,11 @@ class NotificationMessageReceiver @Inject()(
       sourceMetadata <- Future.fromTry(
         fromJson[SourceMetadata](message.Message))
       transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
-      cleanRecord <- Future.fromTry(
+      work <- Future.fromTry(
         transformTransformable(transformableRecord, hybridRecord.version))
-      publishResult <- publishMessage(cleanRecord)
+      publishResult <- publishMessage(work)
       _ = debug(
-        s"Published work: ${cleanRecord.sourceIdentifier} with message $publishResult")
+        s"Published work: ${work.sourceIdentifier} with message $publishResult")
     } yield publishResult
 
     futurePublishAttempt
