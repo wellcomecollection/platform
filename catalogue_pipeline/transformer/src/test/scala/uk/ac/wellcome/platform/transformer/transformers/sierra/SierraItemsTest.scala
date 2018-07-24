@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
