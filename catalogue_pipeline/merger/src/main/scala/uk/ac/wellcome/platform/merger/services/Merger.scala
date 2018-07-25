@@ -30,7 +30,7 @@ class Merger extends Logging {
   }
 
   private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
-    info(s"Merging physicalWork ${physicalWork.sourceIdentifier.value} and digitalWork ${digitalWork.sourceIdentifier.value}} work pair.")
+    info(s"Merging physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value}) work pair.")
     Some(
       List(
         mergePhysicalWithDigitalWork(physicalWork, digitalWork),

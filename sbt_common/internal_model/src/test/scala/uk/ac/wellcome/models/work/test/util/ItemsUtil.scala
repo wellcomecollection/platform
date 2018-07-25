@@ -43,7 +43,7 @@ trait ItemsUtil extends IdentifiersUtil {
     license: License = License_CCBY) = DigitalLocation(
     locationType = locationType,
     url = url,
-    license = license
+    license = Some(license)
   )
 
   private def defaultLocation = createDigitalLocationWith()
