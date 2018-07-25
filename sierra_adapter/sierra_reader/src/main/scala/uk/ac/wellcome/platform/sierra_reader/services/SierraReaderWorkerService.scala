@@ -8,17 +8,18 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  WindowStatus
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.{
-  WindowManager,
-  WindowStatus
-}
+import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
