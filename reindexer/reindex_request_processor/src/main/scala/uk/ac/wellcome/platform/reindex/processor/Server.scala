@@ -13,10 +13,7 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{DynamoClientModule, DynamoConfigModule}
-import uk.ac.wellcome.platform.reindex.processor.modules.{
-  ExecutionContextModule,
-  ReindexerWorkerModule
-}
+import uk.ac.wellcome.platform.reindex.processor.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
 
@@ -31,7 +28,6 @@ class Server extends HttpServer {
     SQSClientModule,
     DynamoConfigModule,
     DynamoClientModule,
-    ExecutionContextModule,
     ReindexerWorkerModule
   )
 
