@@ -54,7 +54,7 @@ trait TransformableMessageUtils extends SierraUtil with SQS {
                                       s3Client: AmazonS3,
                                       bucket: Bucket) = {
 
-    val key = "testSource/1/testId/dshg548.json"
+    val key = s"testSource/1/testId/${randomAlphanumeric(10)}.json"
     s3Client.putObject(bucket.name, key, message)
 
     val hybridRecord = HybridRecord(

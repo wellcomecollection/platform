@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.goobi_reader
 import java.time.Instant
 
 import org.scalatest.concurrent.Eventually
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -14,7 +14,8 @@ class GoobiReaderFeatureTest
     with Eventually
     with Matchers
     with ExtendedPatience
-    with GoobiReaderFixtures {
+    with GoobiReaderFixtures
+    with Inside {
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")
 
   it("gets an S3 notification and puts the new record in VHS") {
@@ -34,17 +35,14 @@ class GoobiReaderFeatureTest
 
           withServer(goobiReaderLocalFlags(queue, bucket, table)) { _ =>
             eventually {
-              val expectedRecord = HybridRecord(
-                id = id,
-                version = 1,
-                s3key = "goobi/10/mets-0001/cd92f8d3"
-              )
-
               val hybridRecord: HybridRecord = getHybridRecord(table, id)
-              hybridRecord shouldBe expectedRecord
-
-              val s3contents = getContentFromS3(bucket, hybridRecord.s3key)
-              s3contents shouldBe contents
+              inside(hybridRecord) {
+                case HybridRecord(actualId, actualVersion, s3Key) =>
+                  actualId shouldBe id
+                  actualVersion shouldBe 1
+                  val s3contents = getContentFromS3(bucket, s3Key)
+                  s3contents shouldBe contents
+              }
             }
           }
         }

@@ -72,4 +72,96 @@ class MiroTransformerFeatureTest
       }
     }
   }
+
+  // This is based on a specific bug that we found where different records
+  // were written to the same s3 key because of the hashing algorithm clashing
+  it("sends different messages for different miro records") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueue { queue =>
+        withLocalS3Bucket { storageBucket =>
+          withLocalS3Bucket { messageBucket =>
+            val flags: Map[String, String] = Map(
+              "aws.metrics.namespace" -> "sierra-transformer"
+            ) ++ s3LocalFlags(storageBucket) ++
+              sqsLocalFlags(queue) ++ messageWriterLocalFlags(
+              messageBucket,
+              topic)
+
+            withServer(flags) { _ =>
+              val miroHybridRecordMessage1 =
+                hybridRecordNotificationMessage(
+                  message = createValidMiroTransformableJson(
+                    MiroID = "L0011975",
+                    MiroCollection = "images-L",
+                    data = """
+                      {
+                          "image_cleared": "Y",
+                          "image_copyright_cleared": "Y",
+                          "image_credit_line": "Wellcome Library, London",
+                          "image_image_desc": "Antonio Dionisi",
+                          "image_innopac_id": "12917175",
+                          "image_library_dept": "General Collections",
+                          "image_no_calc": "L0011975",
+                          "image_phys_format": "Book",
+                          "image_tech_file_size": [
+                              "5247788"
+                          ],
+                          "image_title": "Antonio Dionisi",
+                          "image_use_restrictions": "CC-BY"
+                      }
+                    """
+                  ),
+                  sourceName = "miro",
+                  s3Client = s3Client,
+                  bucket = storageBucket
+                )
+              val miroHybridRecordMessage2 =
+                hybridRecordNotificationMessage(
+                  message = createValidMiroTransformableJson(
+                    MiroID = "L0023034",
+                    MiroCollection = "images-L",
+                    data =
+                      """
+                      {
+                          "image_cleared": "Y",
+                          "image_copyright_cleared": "Y",
+                          "image_image_desc": "Use of the guillotine",
+                          "image_innopac_id": "12074536",
+                          "image_keywords": [
+                              "Surgery"
+                          ],
+                          "image_library_dept": "General Collections",
+                          "image_no_calc": "L0023034",
+                          "image_tech_file_size": [
+                              "5710662"
+                          ],
+                          "image_title": "Greenfield Sluder, Tonsillectomy..., use of guillotine",
+                          "image_use_restrictions": "CC-BY"
+                      }
+                    """
+                  ),
+                  sourceName = "miro",
+                  s3Client = s3Client,
+                  bucket = storageBucket
+                )
+              sqsClient.sendMessage(
+                queue.url,
+                JsonUtil.toJson(miroHybridRecordMessage1).get
+              )
+
+              sqsClient.sendMessage(
+                queue.url,
+                JsonUtil.toJson(miroHybridRecordMessage2).get
+              )
+
+              eventually {
+                val works = getMessages[UnidentifiedWork](topic)
+                works.distinct.length shouldBe 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -36,7 +36,8 @@ class MessageWriter[T] @Inject()(
 
   private def getKeyPrefix(): String = {
     val topicName = messageConfig.snsConfig.topicArn.split(":").last
-    s"$topicName/${dateFormat.format(new Date())}"
+    val currentTime = new Date()
+    s"$topicName/${dateFormat.format(currentTime)}/${currentTime.getTime.toString}"
   }
 
   def write(message: T, subject: String): Future[Unit] = {

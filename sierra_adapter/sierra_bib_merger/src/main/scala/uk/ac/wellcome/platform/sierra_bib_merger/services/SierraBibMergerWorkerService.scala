@@ -5,7 +5,6 @@ import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
-import uk.ac.wellcome.storage.GlobalExecutionContext
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,9 +13,7 @@ class SierraBibMergerWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-) {
-
-  implicit val ec: ExecutionContext = GlobalExecutionContext.context
+)(implicit executionContext: ExecutionContext) {
 
   sqsStream.foreach(this.getClass.getSimpleName, process)
 
