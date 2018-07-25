@@ -15,11 +15,15 @@ variable "aws_region" {
 variable "vhs_goobi_tablename" {}
 variable "vhs_goobi_bucketname" {}
 variable "vhs_goobi_full_access_policy" {}
+
 variable "service_name" {
   default = "goobi_reader"
 }
+
 variable "container_image" {}
+
 variable "subnets" {
-  type ="list"
+  type = "list"
 }
+
 variable "namespace" {}

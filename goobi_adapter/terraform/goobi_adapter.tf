@@ -1,5 +1,5 @@
 module "goobi_adapter" {
-  source                 = "./goobi_adapter"
+  source    = "./goobi_adapter"
   namespace = "goobi_adapter"
 
   goobi_mets_queue_name  = "goobi_mets"
@@ -17,5 +17,5 @@ module "goobi_adapter" {
   vhs_goobi_full_access_policy = "${local.vhs_goobi_full_access_policy}"
 
   container_image = "${local.goobi_reader_container_image}"
-  subnets = "${local.private_subnets}"
+  subnets         = "${local.private_subnets}"
 }

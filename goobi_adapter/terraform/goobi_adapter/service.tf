@@ -1,6 +1,6 @@
 module "goobi_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
-  service_name   = "${var.service_name}"
+  source       = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  service_name = "${var.service_name}"
 
   task_desired_count = "0"
 
@@ -28,12 +28,11 @@ module "goobi_reader_service" {
 
   max_capacity = 15
 
-  ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
+  ecs_cluster_id = "${aws_ecs_cluster.cluster.id}"
 
-  subnets    = "${var.subnets}"
+  subnets = "${var.subnets}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
 
   launch_type = "FARGATE"
-
 }
