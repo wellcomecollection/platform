@@ -5,6 +5,7 @@ import com.gu.scanamo.syntax._
 import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
+import scala.concurrent.ExecutionContext.Implicits.global
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
