@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.JsonUtil
@@ -59,8 +60,10 @@ class WindowManager @Inject()(
         info(s"Found latest ID in S3: $triedMaybeLastId")
         val triedStatus = triedMaybeLastId
           .map {
-            case Some(id) =>
-              WindowStatus(id = Some(id), offset = offset + 1)
+            case Some(id) => WindowStatus(
+              id = Some(incrementSierraRecordNumber(id)),
+              offset = offset + 1
+            )
             case None =>
               throw GracefulFailureException(
                 new RuntimeException("Json did not contain an id"))
@@ -84,5 +87,10 @@ class WindowManager @Inject()(
       .replaceAll("\\]", "")
       .replaceAll(":", "-")
       .replaceAll(",", "__")
+
+  def incrementSierraRecordNumber(id: String): SierraRecordNumber =
+    SierraRecordNumber(
+      (id.toInt + 1).toString
+    )
 
 }
