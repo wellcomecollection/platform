@@ -7,9 +7,16 @@ import io.circe.ParsingFailure
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.transformers.{MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.platform.transformer.transformers.{
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
@@ -38,7 +45,8 @@ class NotificationMessageReceiver @Inject()(
       cleanRecord <- Future.fromTry(
         transformTransformable(transformableRecord, hybridRecord.version))
       publishResult <- publishMessage(cleanRecord)
-      _ = debug(s"Published work: ${cleanRecord.sourceIdentifier} with message $publishResult")
+      _ = debug(
+        s"Published work: ${cleanRecord.sourceIdentifier} with message $publishResult")
     } yield publishResult
 
     futurePublishAttempt
@@ -89,7 +97,8 @@ class NotificationMessageReceiver @Inject()(
     }
   }
 
-  private def publishMessage(work: TransformedBaseWork): Future[PublishAttempt] =
+  private def publishMessage(
+    work: TransformedBaseWork): Future[PublishAttempt] =
     messageWriter.write(
       message = work,
       subject = s"source: ${this.getClass.getSimpleName}.publishMessage"

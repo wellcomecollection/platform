@@ -5,7 +5,12 @@ import java.util.Date
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source, SourceQueueWithComplete}
-import akka.stream.{ActorMaterializer, OverflowStrategy, QueueOfferResult, ThrottleMode}
+import akka.stream.{
+  ActorMaterializer,
+  OverflowStrategy,
+  QueueOfferResult,
+  ThrottleMode
+}
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
@@ -57,7 +62,8 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
       .to(sink)
       .run()
 
-  def count[T](metricName: String, f: Future[T])(implicit ec: ExecutionContext): Future[T] = {
+  def count[T](metricName: String, f: Future[T])(
+    implicit ec: ExecutionContext): Future[T] = {
     f.onComplete {
       case Success(_) => incrementCount(s"${metricName}_success")
       case Failure(_: GracefulFailureException) =>

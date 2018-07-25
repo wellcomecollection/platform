@@ -12,10 +12,11 @@ trait TransformableTransformer[T <: Transformable] extends Logging {
 
   def transform(transformable: Transformable,
                 version: Int): Try[TransformedBaseWork] =
-      transformable match {
-        case t if transformForType.isDefinedAt((t, version)) =>
-          transformForType((t, version))
-        case _ =>
-          Failure(new RuntimeException(s"$transformable is not of the right type"))
-      }
+    transformable match {
+      case t if transformForType.isDefinedAt((t, version)) =>
+        transformForType((t, version))
+      case _ =>
+        Failure(
+          new RuntimeException(s"$transformable is not of the right type"))
+    }
 }
