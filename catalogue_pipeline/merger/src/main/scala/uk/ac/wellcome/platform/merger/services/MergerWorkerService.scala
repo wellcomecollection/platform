@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.merger.services
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.message.MessageWriter
@@ -8,7 +8,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.TransformedBaseWork
+import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -23,7 +23,8 @@ class MergerWorkerService @Inject()(
   vhs: VersionedHybridStore[RecorderWorkEntry,
                             EmptyMetadata,
                             ObjectStore[RecorderWorkEntry]],
-  messageWriter: MessageWriter[TransformedBaseWork]
+  merger: Merger,
+  messageWriter: MessageWriter[BaseWork]
 )(implicit context: ExecutionContext)
     extends Logging {
 
@@ -33,11 +34,22 @@ class MergerWorkerService @Inject()(
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
       maybeWorkEntries <- getFromVHS(matcherResult)
-      maybeWorks = maybeWorkEntries.map { maybeWorkEntry =>
-        maybeWorkEntry.map(_.work)
-      }
-      _ <- sendWorks(maybeWorks)
+      works <- mergeIfAllWorksDefined(maybeWorkEntries)
+      _ <- sendWorks(works)
     } yield ()
+
+  private def mergeIfAllWorksDefined(
+    maybeWorkEntries: List[Option[RecorderWorkEntry]]) = Future {
+    val workEntries = maybeWorkEntries.flatten
+    val works = workEntries.map(_.work).collect {
+      case unidentifiedWork: UnidentifiedWork => unidentifiedWork
+    }
+    if (works.size == maybeWorkEntries.size) {
+      merger.merge(works)
+    } else {
+      workEntries.map(_.work)
+    }
+  }
 
   private def getFromVHS(
     matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] = {
@@ -50,12 +62,12 @@ class MergerWorkerService @Inject()(
     } yield maybeWorkEntries
   }
 
-  private def sendWorks(maybeWorks: Seq[Option[TransformedBaseWork]]) = {
+  private def sendWorks(mergedWorks: Seq[BaseWork]) = {
     Future
-      .sequence(maybeWorks.collect {
-        case Some(work) =>
-          messageWriter.write(work, "merged-work").map(_ => ())
-      })
+      .sequence(
+        mergedWorks.map(
+          messageWriter.write(_, "merged-work")
+        ))
   }
 
   private def getWorksIdentifiers(
@@ -86,5 +98,5 @@ class MergerWorkerService @Inject()(
     }
   }
 
-  def stop() = system.terminate()
+  def stop(): Future[Terminated] = system.terminate()
 }

@@ -1,14 +1,8 @@
 package uk.ac.wellcome.models.work.test.util
 
-import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.work.internal.{DigitalLocation, _}
 
 trait ItemsUtil extends IdentifiersUtil {
-  private def defaultLocation = DigitalLocation(
-    locationType = LocationType("iiif-image"),
-    url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
-    license = Some(License_CCBY)
-  )
-
   def createItem(
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
@@ -24,4 +18,40 @@ trait ItemsUtil extends IdentifiersUtil {
     (1 to count).map { _ =>
       createItem()
     }.toList
+
+  def createIdentifiableItemWith(
+    sourceIdentifier: SourceIdentifier = createSourceIdentifier,
+    locations: List[Location] = List(defaultLocation)
+  ): Identifiable[Item] =
+    Identifiable(
+      sourceIdentifier = sourceIdentifier,
+      agent = Item(locations = locations)
+    )
+
+  def createPhysicalLocation = createPhysicalLocationWith()
+
+  def createPhysicalLocationWith(locationType: LocationType =
+                                   createStoresLocationType,
+                                 label: String = "locationLabel") =
+    PhysicalLocation(locationType, label)
+
+  def createDigitalLocation = createDigitalLocationWith()
+
+  def createDigitalLocationWith(
+    locationType: LocationType = LocationType("iiif-image"),
+    url: String = defaultLocationUrl,
+    license: License = License_CCBY) = DigitalLocation(
+    locationType = locationType,
+    url = url,
+    license = Some(license)
+  )
+
+  private def defaultLocation = createDigitalLocationWith()
+
+  private def defaultLocationUrl =
+    "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
+
+  def createImageLocationType = LocationType("iiif-image")
+
+  def createStoresLocationType = LocationType("sgmed")
 }

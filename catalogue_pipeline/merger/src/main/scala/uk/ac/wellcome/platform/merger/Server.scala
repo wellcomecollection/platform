@@ -18,9 +18,9 @@ import uk.ac.wellcome.finatra.storage.{
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.merger.modules.{
+  BaseWorkModule,
   MergerWorkerModule,
-  RecorderWorkEntryModule,
-  TransformedBaseWorkModule
+  RecorderWorkEntryModule
 }
 
 class Server extends HttpServer {
@@ -38,7 +38,7 @@ class Server extends HttpServer {
     SNSClientModule,
     MessageConfigModule,
     RecorderWorkEntryModule,
-    TransformedBaseWorkModule
+    BaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {
     router
