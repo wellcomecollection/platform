@@ -6,7 +6,7 @@ trait ItemsUtil extends IdentifiersUtil {
   private def defaultLocation = DigitalLocation(
     locationType = LocationType("iiif-image"),
     url = "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json",
-    license = License_CCBY
+    license = Some(License_CCBY)
   )
 
   def createItem(

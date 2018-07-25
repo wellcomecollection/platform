@@ -266,7 +266,7 @@ class MiroTransformableTransformerTest
 
     val expectedDigitalLocation = DigitalLocation(
       url = "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
-      license = License_CCBY,
+      license = Some(License_CCBY),
       credit = Some("Ezra Feilden"),
       locationType = LocationType("iiif-image")
     )

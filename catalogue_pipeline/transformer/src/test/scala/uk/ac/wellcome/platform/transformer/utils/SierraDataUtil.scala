@@ -4,6 +4,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
+
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Language => SierraLanguage
 }
@@ -45,4 +46,15 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
       id = data.id,
       data = toJson(data).get
     )
+
+  def createSierraMaterialTypeWith(code: String = randomAlphanumeric(1),
+                                   value: String = randomAlphanumeric(5)) = {
+    SierraMaterialType(code, value)
+  }
+
+  def createSierraMaterialType: SierraMaterialType =
+    createSierraMaterialTypeWith()
+
+  def createSierraEbookMaterialType: SierraMaterialType =
+    createSierraMaterialTypeWith(code = "v", value = "E-books")
 }

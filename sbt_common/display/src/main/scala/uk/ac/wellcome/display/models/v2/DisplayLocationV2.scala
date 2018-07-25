@@ -23,7 +23,7 @@ object DisplayLocationV2 {
         locationType = DisplayLocationType(l.locationType),
         url = l.url,
         credit = l.credit,
-        license = DisplayLicenseV2(l.license)
+        license = l.license.map(DisplayLicenseV2(_))
       )
     case l: PhysicalLocation =>
       DisplayPhysicalLocationV2(
@@ -52,7 +52,7 @@ case class DisplayDigitalLocationV2(
   @ApiModelProperty(
     value =
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
-  ) license: DisplayLicenseV2
+  ) license: Option[DisplayLicenseV2] = None
 ) extends DisplayLocationV2 {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "DigitalLocation"

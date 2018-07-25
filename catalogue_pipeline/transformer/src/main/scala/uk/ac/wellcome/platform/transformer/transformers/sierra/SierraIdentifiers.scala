@@ -11,7 +11,7 @@ trait SierraIdentifiers {
   //
   //    -   "sierra-system-number" for the full record type (incl. prefix and
   //        check digit)
-  //    -   "sierra-identifier" for the 7-digit interal ID
+  //    -   "sierra-identifier" for the 7-digit internal ID
   //
   //    Adding other identifiers is out-of-scope for now.
   //

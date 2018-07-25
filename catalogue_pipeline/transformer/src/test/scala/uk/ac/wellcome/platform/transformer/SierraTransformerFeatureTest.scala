@@ -41,7 +41,6 @@ class SierraTransformerFeatureTest
                   title = title
                 ),
                 sourceName = "sierra",
-                version = 1,
                 s3Client = s3Client,
                 bucket = storageBucket
               )
