@@ -11,7 +11,7 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 
-import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
+import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(
   id: String,

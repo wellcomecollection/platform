@@ -6,12 +6,13 @@ import org.scalacheck.Shrink
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.prop.PropertyChecks
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
-import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 import org.scalacheck.ScalacheckShapeless._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class WorksIndexTest
     extends FunSpec
