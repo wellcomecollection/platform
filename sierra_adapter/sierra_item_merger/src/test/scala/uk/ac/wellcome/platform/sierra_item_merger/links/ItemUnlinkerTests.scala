@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it("removes the item if it already exists") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraRecordNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),
@@ -20,7 +20,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(record)
     )
 
@@ -33,7 +33,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it(
     "returns the original record when merging an unlinked record which is already absent") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraRecordNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),
@@ -46,7 +46,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(record)
     )
 
@@ -55,7 +55,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it(
     "returns the original record when merging an unlinked record which has linked more recently") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraRecordNumber
 
     val record = createSierraItemRecordWith(
       modifiedDate = newerDate,
@@ -70,7 +70,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(record)
     )
 
@@ -78,8 +78,8 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
   }
 
   it("should only unlink item records with matching bib IDs") {
-    val bibId = createSierraRecordNumberString
-    val unrelatedBibId = createSierraRecordNumberString
+    val bibId = createSierraRecordNumber
+    val unrelatedBibId = createSierraRecordNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),
@@ -92,7 +92,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(record)
     )
 
