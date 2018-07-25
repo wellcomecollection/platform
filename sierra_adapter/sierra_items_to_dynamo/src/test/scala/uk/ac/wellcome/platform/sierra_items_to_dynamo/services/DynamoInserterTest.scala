@@ -17,6 +17,7 @@ import uk.ac.wellcome.storage.type_classes.{
   VersionUpdater
 }
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.DynamoInserter._
 
 import scala.concurrent.Future
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -32,7 +33,7 @@ class DynamoInserterTest
     with ExtendedPatience
     with SierraUtil {
 
-  it("ingests a json item into DynamoDB") {
+  it("inserts an item record into DynamoDB") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
         val record = createSierraItemRecord
@@ -148,7 +149,7 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> oldRecord.id) shouldBe Some(
+            'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
             Right(
               newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))))
         }
