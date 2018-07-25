@@ -12,7 +12,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import uk.ac.wellcome.test.fixtures.Akka
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
