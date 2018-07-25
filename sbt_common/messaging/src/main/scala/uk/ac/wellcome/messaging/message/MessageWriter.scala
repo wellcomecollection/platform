@@ -9,11 +9,10 @@ import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class MessageWriterConfig(
   snsConfig: SNSConfig,
@@ -24,7 +23,7 @@ class MessageWriter[T] @Inject()(
   messageConfig: MessageWriterConfig,
   snsClient: AmazonSNS,
   s3Client: AmazonS3
-)(implicit objectStore: ObjectStore[T])
+)(implicit objectStore: ObjectStore[T], ec: ExecutionContext)
     extends Logging {
 
   private val sns = new SNSWriter(
