@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.syntax._
 import uk.ac.wellcome.models.transformable.sierra.{SierraItemRecord, SierraRecordNumber}
-import uk.ac.wellcome.storage.dynamo.UpdateExpressionGenerator
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.type_classes.IdGetter
 
 object dynamo {
