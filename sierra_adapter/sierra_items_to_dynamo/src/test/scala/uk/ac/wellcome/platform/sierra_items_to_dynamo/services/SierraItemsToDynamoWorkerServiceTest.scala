@@ -53,7 +53,7 @@ class SierraItemsToDynamoWorkerServiceTest
                       system = actorSystem,
                       sqsStream = sqsStream,
                       dynamoInserter = dynamoInserter
-                    )
+                    )(actorSystem.dispatcher)
 
                   testWith(
                     (
