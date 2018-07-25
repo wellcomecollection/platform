@@ -29,7 +29,7 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work1, work2, work3)
 
-        withElasticSearchService(indexName = indexName, itemType = itemType) {
+        withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             val searchResultFuture = searchService.simpleStringQueryResults(
               queryString = "Aegean",
@@ -56,7 +56,7 @@ class ElasticsearchServiceTest
 
         insertIntoElasticsearch(indexName, itemType, work)
 
-        withElasticSearchService(indexName = indexName, itemType = itemType) {
+        withElasticsearchService(indexName = indexName, itemType = itemType) {
           searchService =>
             val searchResultFuture: Future[GetResponse] =
               searchService.findResultById(
@@ -188,7 +188,7 @@ class ElasticsearchServiceTest
     from: Int,
     expectedWorks: List[IdentifiedBaseWork]
   ) = {
-    withElasticSearchService(indexName = indexName, itemType = itemType) {
+    withElasticsearchService(indexName = indexName, itemType = itemType) {
       searchService =>
         val searchResultFuture = searchService.listResults(
           sortByField = "canonicalId",
