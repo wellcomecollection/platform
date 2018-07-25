@@ -33,13 +33,15 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
     merger.merge(works) should contain theSameElementsAs works
   }
 
-  it("merging  more than one physical work with a single digital work does not change them") {
+  it(
+    "merging  more than one physical work with a single digital work does not change them") {
     val works = List.fill(3)(createPhysicalWork) :+ createDigitalWork
 
     merger.merge(works) should contain theSameElementsAs works
   }
 
-  it("merging a single physical work with multiple digital works does not change them") {
+  it(
+    "merging a single physical work with multiple digital works does not change them") {
     val works = List(createPhysicalWork) ++ List.fill(3)(createDigitalWork)
 
     merger.merge(works) should contain theSameElementsAs works

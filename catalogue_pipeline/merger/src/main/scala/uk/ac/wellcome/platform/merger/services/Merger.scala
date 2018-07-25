@@ -18,25 +18,33 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalAndDigitalWorks(physicalWorks: Seq[UnidentifiedWork], digitalWorks: Seq[UnidentifiedWork]) = {
+  private def mergePhysicalAndDigitalWorks(
+    physicalWorks: Seq[UnidentifiedWork],
+    digitalWorks: Seq[UnidentifiedWork]) = {
     (physicalWorks, digitalWorks) match {
       // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
       // However, it may be prudent to add extra checks before making the merge here.
       case (List(physicalWork), List(digitalWork)) =>
-        mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork, digitalWork)
+        mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
+          physicalWork,
+          digitalWork)
       case _ =>
         None
     }
   }
 
-  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
-    info(s"Merging physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value}) work pair.")
+  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
+    physicalWork: UnidentifiedWork,
+    digitalWork: UnidentifiedWork) = {
+    info(
+      s"Merging physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value}) work pair.")
     Some(
       List(
         mergePhysicalWithDigitalWork(physicalWork, digitalWork),
         redirectWork(
           workToRedirect = digitalWork,
-          redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)))
+          redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
+      ))
   }
 
   private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
