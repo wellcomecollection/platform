@@ -16,8 +16,8 @@ import uk.ac.wellcome.storage.type_classes.{
   VersionGetter,
   VersionUpdater
 }
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.services.DynamoInserter._
 
 import scala.concurrent.Future
 import uk.ac.wellcome.test.utils.ExtendedPatience
