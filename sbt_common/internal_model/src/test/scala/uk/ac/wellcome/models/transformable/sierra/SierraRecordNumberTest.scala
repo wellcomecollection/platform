@@ -20,42 +20,32 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
       forAll(testCases) {
         (sierraId: String, recordType: String, expectedId: String) =>
           val sierraRecordType = recordType match {
-            case "bibs"  => SierraRecordTypes.bibs
+            case "bibs" => SierraRecordTypes.bibs
             case "items" => SierraRecordTypes.items
           }
 
           SierraRecordNumber(sierraId).withCheckDigit(sierraRecordType) shouldBe expectedId
       }
     }
+  }
 
-    it("throws an error if passed a Sierra ID which is non-numeric") {
-      val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit(
-          "abcdefg",
-          recordType = SierraRecordTypes.bibs)
-      }
+  it("throws an error if passed a Sierra ID which is non-numeric") {
+    assertStringFailsValidation("abcdefg")
+  }
 
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got abcdefg"
+  it("throws an error if passed a Sierra ID which is too short") {
+    assertStringFailsValidation("123")
+  }
+
+  it("throws an error if passed a Sierra ID which is too long") {
+    assertStringFailsValidation("12345678")
+  }
+
+  private def assertStringFailsValidation(s: String) = {
+    val caught = intercept[IllegalArgumentException] {
+      SierraRecordNumber(s)
     }
 
-    it("throws an error if passed a Sierra ID which is too short") {
-      val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit(
-          "123",
-          recordType = SierraRecordTypes.bibs)
-      }
-
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 123"
-    }
-
-    it("throws an error if passed a Sierra ID which is too long") {
-      val caught = intercept[RuntimeException] {
-        SierraRecordNumbers.addCheckDigit(
-          "12345678",
-          recordType = SierraRecordTypes.bibs)
-      }
-
-      caught.getMessage shouldEqual "Expected 7-digit numeric ID, got 12345678"
-    }
+    caught.getMessage shouldEqual s"requirement failed: Not a 7-digit Sierra record number: $s"
   }
 }
