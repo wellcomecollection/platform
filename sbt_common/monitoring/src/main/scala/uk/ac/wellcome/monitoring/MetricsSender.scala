@@ -23,7 +23,7 @@ import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
                               actorSystem: ActorSystem,
-                              metricsConfig: MetricsConfig)(implicit ec: ExecutionContext)
+                              metricsConfig: MetricsConfig)
     extends Logging {
 
   implicit val system = actorSystem
