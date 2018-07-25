@@ -18,33 +18,30 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalAndDigitalWorks(
-    physicalWorks: Seq[UnidentifiedWork],
-    digitalWorks: Seq[UnidentifiedWork]) = {
+  private def mergePhysicalAndDigitalWorks(physicalWorks: Seq[UnidentifiedWork], digitalWorks: Seq[UnidentifiedWork]) = {
     (physicalWorks, digitalWorks) match {
       // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
       // However, it may be prudent to add extra checks before making the merge here.
       case (List(physicalWork), List(digitalWork)) =>
-        mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
-          physicalWork,
-          digitalWork)
+          mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork, digitalWork)
       case _ =>
         None
     }
   }
 
-  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
-    physicalWork: UnidentifiedWork,
-    digitalWork: UnidentifiedWork) = {
-    info(
-      s"Merging physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value}) work pair.")
-    Some(
-      List(
-        mergePhysicalWithDigitalWork(physicalWork, digitalWork),
-        redirectWork(
-          workToRedirect = digitalWork,
-          redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
-      ))
+  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
+    if (physicalWork.items.size == 1 && digitalWork.items.size == 1) {
+      info(s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
+      Some(
+        List(
+          mergePhysicalWithDigitalWork(physicalWork, digitalWork),
+          redirectWork(
+            workToRedirect = digitalWork,
+            redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)))
+    } else {
+      debug(s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} as there are multiple items")
+      None
+    }
   }
 
   private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
@@ -67,4 +64,13 @@ class Merger extends Logging {
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
   }
+
+
+  def describeWorkPair(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) =
+    s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
+
+  def describeWorkPairWithItems(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) =
+    s"physical (id=${physicalWork.sourceIdentifier.value}, itemsCount=${physicalWork.items.size}) and " +
+      s"digital (id=${digitalWork.sourceIdentifier.value}, itemsCount=${digitalWork.items.size}) work"
+
 }

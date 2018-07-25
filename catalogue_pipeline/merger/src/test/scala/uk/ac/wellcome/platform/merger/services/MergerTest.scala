@@ -9,42 +9,28 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private val merger = new Merger()
 
-  it("returns a single physical work") {
-    val work = createPhysicalWork
-
-    merger.merge(List(work)) should contain only work
+  it("does not merge a single physical work") {
+    assertDoesNotMerge(List(createPhysicalWork))
   }
 
-  it("returns a single digital work") {
-    val work = createDigitalWork
-
-    merger.merge(List(work)) should contain only work
+  it("does not merge a single digital work") {
+    assertDoesNotMerge(List(createDigitalWork))
   }
 
-  it("merging multiple physical works does not change them") {
-    val works = List.fill(3)(createPhysicalWork)
-
-    merger.merge(works) should contain theSameElementsAs works
+  it("does not merge multiple physical works") {
+    assertDoesNotMerge(List.fill(3)(createPhysicalWork))
   }
 
-  it("merging multiple digital works does not change them") {
-    val works = List.fill(3)(createDigitalWork)
-
-    merger.merge(works) should contain theSameElementsAs works
+  it("does not merge multiple digital works") {
+    assertDoesNotMerge(List.fill(3)(createDigitalWork))
   }
 
-  it(
-    "merging  more than one physical work with a single digital work does not change them") {
-    val works = List.fill(3)(createPhysicalWork) :+ createDigitalWork
-
-    merger.merge(works) should contain theSameElementsAs works
+  it("does not merge multiple physical works with a single digital work") {
+    assertDoesNotMerge(List.fill(3)(createPhysicalWork) :+ createDigitalWork)
   }
 
-  it(
-    "merging a single physical work with multiple digital works does not change them") {
-    val works = List(createPhysicalWork) ++ List.fill(3)(createDigitalWork)
-
-    merger.merge(works) should contain theSameElementsAs works
+  it("does not merge a single physical work with multiple digital works") {
+    assertDoesNotMerge(List(createPhysicalWork) ++ List.fill(3)(createDigitalWork))
   }
 
   it("merges a physical and digital work") {
@@ -63,6 +49,30 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
       contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
   }
 
+  it("does not merge a physical work having multiple items with a digital work") {
+    val works = List(
+      createPhysicalWork.copy(items = List(
+          createIdentifiableItemWith(locations = List(createPhysicalLocation)),
+          createIdentifiableItemWith(locations = List(createPhysicalLocation)))),
+      createDigitalWork
+    )
+
+    assertDoesNotMerge(works)
+  }
+
+  it("does not merge a physical work with a digital work having multiple items") {
+    val works = List(
+      createPhysicalWork,
+      createDigitalWork.copy(items =
+        List(
+          createIdentifiableItemWith(locations = List(createDigitalLocation)),
+          createIdentifiableItemWith(locations = List(createDigitalLocation)))
+      )
+    )
+
+    assertDoesNotMerge(works)
+  }
+
   private def createDigitalWork = {
     createUnidentifiedWorkWith(
       workType = Some(WorkType("v", "E-books")),
@@ -76,5 +86,9 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
       items = List(
         createIdentifiableItemWith(locations = List(createPhysicalLocation)))
     )
+  }
+
+  private def assertDoesNotMerge(works: List[UnidentifiedWork]) = {
+    merger.merge(works) should contain theSameElementsAs works
   }
 }
