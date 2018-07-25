@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WorkMatcher @Inject()(
   workGraphStore: WorkGraphStore,
-  lockingService: DynamoLockingService)(implicit context: ExecutionContext)
+  lockingService: DynamoLockingService)(implicit ec: ExecutionContext)
     extends Logging {
 
   type FutureMatched = Future[Set[MatchedIdentifiers]]

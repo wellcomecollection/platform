@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoRowLockDao @Inject()(
   dynamoDBClient: AmazonDynamoDB,
-  config: DynamoLockingServiceConfig)(implicit context: ExecutionContext)
+  config: DynamoLockingServiceConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   implicit val instantLongFormat: AnyRef with DynamoFormat[Instant] =

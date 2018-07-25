@@ -13,7 +13,7 @@ class SierraItemsToDynamoWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   dynamoInserter: DynamoInserter
-)(implicit executionContext: ExecutionContext) {
+)(implicit ec: ExecutionContext) {
 
   sqsStream.foreach(this.getClass.getSimpleName, process)
 
