@@ -204,7 +204,9 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Unit](
               bucket,
               table) { hybridStore =>
-              val transformable = createSierraTransformable
+              val transformable = createSierraTransformableWith(
+                maybeBibRecord = None
+              )
 
               val bibRecord =
                 createSierraBibRecordWith(id = transformable.sierraId)
