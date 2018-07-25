@@ -15,7 +15,6 @@ import uk.ac.wellcome.models.work.internal.{
   UnidentifiedWork
 }
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.platform.transformer.source.SierraBibData._
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -177,7 +176,7 @@ class NotificationMessageReceiverTest
             val future = recordReceiver.receiveMessage(message)
 
             whenReady(future.failed) { x =>
-              x.getMessage should be("Failed publishing message")
+              x.getMessage should contain("Unknown topic: does-not-exist")
             }
         }
       }
