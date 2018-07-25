@@ -18,21 +18,30 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalAndDigitalWorks(
-    physicalWorks: Seq[UnidentifiedWork],
-    digitalWorks: Seq[UnidentifiedWork]) = {
-    if (physicalWorks.size == 1 && digitalWorks.size == 1) {
+  private def mergePhysicalAndDigitalWorks(physicalWorks: Seq[UnidentifiedWork], digitalWorks: Seq[UnidentifiedWork]) = {
+    (physicalWorks, digitalWorks) match {
       // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
       // However, it may be prudent to add extra checks before making the merge here.
-      val physicalWork = physicalWorks.head
-      val digitalWork = digitalWorks.head
-      Some(
-        List(
-          mergePhysicalWithDigitalWork(physicalWork, digitalWork),
-          redirectWork(digitalWork, physicalWork.sourceIdentifier)))
-    } else {
-      None
+      case (List(physicalWork), List(digitalWork)) =>
+        mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork, digitalWork)
+      case _ =>
+        None
     }
+  }
+
+  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(physicalWork: UnidentifiedWork, digitalWork: UnidentifiedWork) = {
+    info(s"Merging physicalWork ${physicalWork.sourceIdentifier.value} and digitalWork ${digitalWork.sourceIdentifier.value}} work pair.")
+    Some(
+      List(
+        mergePhysicalWithDigitalWork(physicalWork, digitalWork),
+        redirectWork(
+          workToRedirect = digitalWork,
+          redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)))
+  }
+
+  private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
+                                           digitalWork: UnidentifiedWork) = {
+    physicalWork.copy(items = physicalWork.items ++ digitalWork.items)
   }
 
   private def redirectWork(workToRedirect: UnidentifiedWork,
@@ -50,10 +59,4 @@ class Merger extends Logging {
       case Some(t) => t.id == "v" && t.label == "E-books"
     }
   }
-
-  private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
-                                           digitalWork: UnidentifiedWork) = {
-    physicalWork.copy(items = physicalWork.items ++ digitalWork.items)
-  }
-
 }

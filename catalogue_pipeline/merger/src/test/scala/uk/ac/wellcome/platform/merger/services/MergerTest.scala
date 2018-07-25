@@ -9,29 +9,45 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private val merger = new Merger()
 
-  it("returns a single work") {
-    val work = createUnidentifiedWork
+  it("returns a single physical work") {
+    val work = createPhysicalWork
 
     merger.merge(List(work)) should contain only work
   }
 
-  it("only physical works are unchanged") {
-    val works = createUnidentifiedWorks(3)
+  it("returns a single digital work") {
+    val work = createDigitalWork
+
+    merger.merge(List(work)) should contain only work
+  }
+
+  it("merging multiple physical works does not change them") {
+    val works = List.fill(3)(createPhysicalWork)
 
     merger.merge(works) should contain theSameElementsAs works
   }
 
-  it("merges a physical and digital work that reference each other") {
-    val physicalWork = createUnidentifiedWorkWith(
-      items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
-    )
+  it("merging multiple digital works does not change them") {
+    val works = List.fill(3)(createDigitalWork)
 
-    val digitalWork = createUnidentifiedWorkWith(
-      workType = Some(WorkType("v", "E-books")),
-      items = List(
-        createIdentifiableItemWith(locations = List(createDigitalLocation)))
-    )
+    merger.merge(works) should contain theSameElementsAs works
+  }
+
+  it("merging  more than one physical work with a single digital work does not change them") {
+    val works = List.fill(3)(createPhysicalWork) :+ createDigitalWork
+
+    merger.merge(works) should contain theSameElementsAs works
+  }
+
+  it("merging a single physical work with multiple digital works does not change them") {
+    val works = List(createPhysicalWork) ++ List.fill(3)(createDigitalWork)
+
+    merger.merge(works) should contain theSameElementsAs works
+  }
+
+  it("merges a physical and digital work") {
+    val physicalWork = createPhysicalWork
+    val digitalWork = createDigitalWork
 
     val expectedMergedWork =
       physicalWork.copy(items = physicalWork.items ++ digitalWork.items)
@@ -43,5 +59,20 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
     merger.merge(List(physicalWork, digitalWork)) should
       contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
+  }
+
+  private def createDigitalWork = {
+    createUnidentifiedWorkWith(
+      workType = Some(WorkType("v", "E-books")),
+      items = List(
+        createIdentifiableItemWith(locations = List(createDigitalLocation)))
+    )
+  }
+
+  private def createPhysicalWork = {
+    createUnidentifiedWorkWith(
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
+    )
   }
 }
