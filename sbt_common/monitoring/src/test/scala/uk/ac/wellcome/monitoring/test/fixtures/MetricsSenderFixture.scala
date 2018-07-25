@@ -10,7 +10,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import uk.ac.wellcome.test.fixtures._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait MetricsSenderFixture
     extends Logging
@@ -33,12 +33,11 @@ trait MetricsSenderFixture
   def withMockMetricSender[R] = fixture[MetricsSender, R](
     create = {
       val metricsSender = mock[MetricsSender]
-
       when(
         metricsSender.count(
           anyString(),
           any[Future[Unit]]()
-        )
+        )(any[ExecutionContext])
       ).thenAnswer(new Answer[Future[Unit]] {
         override def answer(invocation: InvocationOnMock): Future[Unit] = {
           invocation.callRealMethod().asInstanceOf[Future[Unit]]

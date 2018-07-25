@@ -17,7 +17,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MessageStreamTest
     extends FunSpec
@@ -73,7 +73,8 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())
+            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())(
+              any[ExecutionContext])
         }
     }
   }

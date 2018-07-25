@@ -23,7 +23,7 @@ class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)
     }.map { publishResult =>
         debug(
           s"Published message $message to ${snsConfig.topicArn} (${publishResult.getMessageId})")
-        PublishAttempt(Right(publishResult.getMessageId))
+        PublishAttempt(Right(message))
       }
       .recover {
         case e: Throwable =>

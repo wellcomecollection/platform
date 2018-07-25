@@ -16,9 +16,8 @@ import com.amazonaws.services.cloudwatch.model._
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
@@ -63,7 +62,8 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
       .to(sink)
       .run()
 
-  def count[T](metricName: String, f: Future[T]): Future[T] = {
+  def count[T](metricName: String, f: Future[T])(
+    implicit ec: ExecutionContext): Future[T] = {
     f.onComplete {
       case Success(_) => incrementCount(s"${metricName}_success")
       case Failure(_: GracefulFailureException) =>
