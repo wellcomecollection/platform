@@ -92,7 +92,7 @@ class SierraItemsToDynamoWorkerServiceTest
           data = s"""
                |{
                |  "id": "${itemRecord.id}",
-               |  "bibIds": ${toJson(bibIds2).get},
+               |  "bibIds": ${toJson(bibIds2.map { _.withoutCheckDigit }).get},
                |  "updatedDate": "${newerDate.toString}"
                |}
              """.stripMargin,
