@@ -26,7 +26,8 @@ class SierraItemMergerUpdaterService @Inject()(
   def update(itemRecord: SierraItemRecord): Future[Unit] = {
 
     val mergeUpdateFutures = itemRecord.bibIds.map { bibId =>
-      versionedHybridStore.updateRecord(Sourced.id(sourceName, bibId.withoutCheckDigit))(
+      versionedHybridStore.updateRecord(
+        Sourced.id(sourceName, bibId.withoutCheckDigit))(
         ifNotExisting = (
           SierraTransformable(
             sierraId = bibId,

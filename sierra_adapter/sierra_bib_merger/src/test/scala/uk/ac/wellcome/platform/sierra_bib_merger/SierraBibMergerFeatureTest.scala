@@ -206,7 +206,8 @@ class SierraBibMergerFeatureTest
               table) { hybridStore =>
               val transformable = createSierraTransformable
 
-              val bibRecord = createSierraBibRecordWith(id = transformable.sierraId)
+              val bibRecord =
+                createSierraBibRecordWith(id = transformable.sierraId)
 
               val future =
                 hybridStore.updateRecord(transformable.id)(
