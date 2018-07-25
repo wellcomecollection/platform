@@ -9,7 +9,6 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraMaterialType
 }
-import uk.ac.wellcome.platform.transformer.source.SierraItemData._
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success}
@@ -17,6 +16,8 @@ import scala.util.{Failure, Success}
 trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
     sierraTransformable: SierraTransformable): List[SierraItemData] = {
+    implicit val recordNumberDecoder = SierraItemData.sierraRecordNumberDecoder
+
     sierraTransformable.itemRecords.values
       .map { _.data }
       .map { jsonString =>

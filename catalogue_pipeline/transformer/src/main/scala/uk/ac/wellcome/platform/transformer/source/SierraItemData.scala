@@ -15,17 +15,13 @@ case class SierraItemData(
 case class SierraItemLocation(code: String, name: String)
 
 /** A Circe decoder that allows unpacking the ID as an instance of
-  * [[SierraRecordNumber]].  This is based the example Instant decoder
+  * [[SierraRecordNumber]].  This is based on the example Instant decoder
   * described in the Circe docs.
   * See: https://circe.github.io/circe/codecs/custom-codecs.html
   *
-  * To use this implicit, add the following import to a file:
-  *
-  *     import uk.ac.wellcome.platform.transformer.source.SierraItemData._
-  *
   */
 case object SierraItemData {
-  implicit val decodeSierraRecordNumber: Decoder[SierraRecordNumber] =
+  implicit val sierraRecordNumberDecoder: Decoder[SierraRecordNumber] =
     Decoder.decodeString.emap { str =>
       Either
         .catchNonFatal(SierraRecordNumber(str))
