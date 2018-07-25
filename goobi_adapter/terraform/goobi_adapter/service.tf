@@ -1,40 +1,39 @@
-locals {
-  service_name = "goobi_reader"
-}
-
 module "goobi_reader_service" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
-  name   = "${local.service_name}"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  service_name   = "${var.service_name}"
 
-  ecr_repository_url = "${var.ecr_repository_url}"
-  release_id         = "${var.release_id}"
+  task_desired_count = "0"
+
+  container_image = "${var.container_image}"
 
   source_queue_name = "${module.goobi_mets_queue.name}"
   source_queue_arn  = "${module.goobi_mets_queue.arn}"
 
   env_vars = {
     goobi_mets_queue_url = "${module.goobi_mets_queue.id}"
-    metrics_namespace    = "${local.service_name}"
+    metrics_namespace    = "${var.service_name}"
     vhs_goobi_tablename  = "${var.vhs_goobi_tablename}"
     vhs_goobi_bucketname = "${var.vhs_goobi_bucketname}"
   }
 
+  env_vars_length = 4
+
   cpu    = 512
   memory = 2048
 
-  cluster_name = "${var.cluster_name}"
+  ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
 
-  vpc_id = "${var.vpc_id}"
-
-  alb_cloudwatch_id          = "${var.alb_cloudwatch_id}"
-  alb_listener_https_arn     = "${var.alb_listener_https_arn}"
-  alb_listener_http_arn      = "${var.alb_listener_http_arn}"
-  alb_server_error_alarm_arn = "${var.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${var.alb_client_error_alarm_arn}"
-
-  enable_alb_alarm = false
+  aws_region = "${var.aws_region}"
+  vpc_id     = "${var.vpc_id}"
 
   max_capacity = 15
 
-  log_retention_in_days = 30
+  ecs_cluster_id  = "${aws_ecs_cluster.cluster.id}"
+
+  subnets    = "${var.subnets}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+
+  launch_type = "FARGATE"
+
 }
