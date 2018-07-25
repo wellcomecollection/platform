@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
 
 class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
                               actorSystem: ActorSystem,
-                              metricsConfig: MetricsConfig)(implicit executionContext: ExecutionContext)
+                              metricsConfig: MetricsConfig)
     extends Logging {
 
   implicit val system = actorSystem
@@ -57,7 +57,7 @@ class MetricsSender @Inject()(amazonCloudWatch: AmazonCloudWatch,
       .to(sink)
       .run()
 
-  def count[T](metricName: String, f: Future[T]): Future[T] = {
+  def count[T](metricName: String, f: Future[T])(implicit ec: ExecutionContext): Future[T] = {
     f.onComplete {
       case Success(_) => incrementCount(s"${metricName}_success")
       case Failure(_: GracefulFailureException) =>

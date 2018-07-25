@@ -28,7 +28,7 @@ class SNSWriterTest
         messages should have size (1)
         messages.head.message shouldBe message
         messages.head.subject shouldBe subject
-        publishAttempt.id should be(Right(messages.head.messageId))
+        publishAttempt.id should be(Right(messages.head.message))
       }
     }
   }
