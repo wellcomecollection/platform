@@ -8,26 +8,18 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{
-  ApiConfig,
-  DisplayError,
-  DisplayResultList,
-  Error
-}
+import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, DisplayResultList, Error}
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{
-  ResultListResponse,
-  ResultResponse
-}
+import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
-import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 
 abstract class WorksController(apiConfig: ApiConfig,
                                indexName: String,
-                               worksService: WorksService)
+                               worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
 
