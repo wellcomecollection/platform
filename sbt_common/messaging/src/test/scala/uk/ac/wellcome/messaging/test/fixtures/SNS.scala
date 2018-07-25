@@ -1,7 +1,7 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns.AmazonSNS
-import io.circe.{Decoder, Json, ParsingFailure, yaml}
+import io.circe.{yaml, Decoder, Json, ParsingFailure}
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
