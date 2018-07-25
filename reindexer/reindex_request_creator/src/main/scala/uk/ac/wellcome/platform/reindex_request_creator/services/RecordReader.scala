@@ -23,7 +23,8 @@ import scala.util.Try
 class RecordReader @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexJob")

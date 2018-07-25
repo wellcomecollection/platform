@@ -7,7 +7,8 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class NotificationSender @Inject()(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
+class NotificationSender @Inject()(snsWriter: SNSWriter)(
+  implicit ec: ExecutionContext) {
   def sendNotifications(recordIds: List[String],
                         desiredVersion: Int): Future[List[Unit]] = {
     Future.sequence {

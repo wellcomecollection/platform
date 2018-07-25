@@ -5,11 +5,12 @@ import com.amazonaws.services.sns.model.PublishRequest
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 
-import scala.concurrent.{ExecutionContext, Future, blocking}
+import scala.concurrent.{blocking, ExecutionContext, Future}
 
 case class PublishAttempt(id: Either[Throwable, String])
 
-class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)(implicit ec: ExecutionContext)
+class SNSWriter @Inject()(snsClient: AmazonSNS, snsConfig: SNSConfig)(
+  implicit ec: ExecutionContext)
     extends Logging {
 
   def writeMessage(message: String, subject: String): Future[PublishAttempt] =

@@ -11,8 +11,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 @Singleton
-class WorksService @Inject()(apiConfig: ApiConfig,
-                             searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
+class WorksService @Inject()(
+  apiConfig: ApiConfig,
+  searchService: ElasticsearchService)(implicit ec: ExecutionContext) {
 
   def findWorkById(canonicalId: String,
                    indexName: String): Future[Option[IdentifiedBaseWork]] =

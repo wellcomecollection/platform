@@ -15,12 +15,13 @@ import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MessageStream[T] @Inject()(
-  actorSystem: ActorSystem,
-  sqsClient: AmazonSQSAsync,
-  s3Client: AmazonS3,
-  messageReaderConfig: MessageReaderConfig,
-  metricsSender: MetricsSender)(implicit objectStore: ObjectStore[T], ec: ExecutionContext) {
+class MessageStream[T] @Inject()(actorSystem: ActorSystem,
+                                 sqsClient: AmazonSQSAsync,
+                                 s3Client: AmazonS3,
+                                 messageReaderConfig: MessageReaderConfig,
+                                 metricsSender: MetricsSender)(
+  implicit objectStore: ObjectStore[T],
+  ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,

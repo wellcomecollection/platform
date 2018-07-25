@@ -8,7 +8,10 @@ import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import grizzled.slf4j.Logging
 
-class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(implicit val ec: ExecutionContext)
+import scala.concurrent.ExecutionContext
+
+class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
+  implicit val ec: ExecutionContext)
     extends ElasticsearchIndex
     with Logging {
 

@@ -11,7 +11,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ManagementController @Inject()(
   elasticClient: HttpClient
-)(implicit ec: ExecutionContext) extends Controller {
+)(implicit ec: ExecutionContext)
+    extends Controller {
 
   get("/management/healthcheck") { request: Request =>
     response.ok.json(Map("message" -> "ok"))
