@@ -100,6 +100,7 @@ class MessageWriterTest
       withLocalS3Bucket { bucket =>
         withExampleObjectMessageWriter(bucket, topic) { messageWriter =>
           val eventualAttempt1 = messageWriter.write(message, subject)
+          // Wait before sending the next message to increase likelihood they get processed at different timestamps
           Thread.sleep(2)
           val eventualAttempt2 = messageWriter.write(message, subject)
 

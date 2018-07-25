@@ -153,10 +153,10 @@ class MiroTransformerFeatureTest
                 queue.url,
                 JsonUtil.toJson(miroHybridRecordMessage2).get
               )
+
               eventually {
                 val works = getMessages[UnidentifiedWork](topic)
-                works.distinct.length shouldBe >=(2)
-
+                works.distinct.length shouldBe 2
               }
             }
           }
