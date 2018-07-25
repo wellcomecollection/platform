@@ -176,7 +176,7 @@ class NotificationMessageReceiverTest
             val future = recordReceiver.receiveMessage(message)
 
             whenReady(future.failed) { x =>
-              x.getMessage should contain("Unknown topic: does-not-exist")
+              x.getMessage should include("Unknown topic: does-not-exist")
             }
         }
       }
