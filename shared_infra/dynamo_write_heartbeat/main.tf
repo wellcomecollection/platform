@@ -8,7 +8,7 @@ module "lambda_dynamo_write_heartbeat" {
   memory_size = 128
 
   environment_variables = {
-    HEARTBEAT_CONFIG = "${var.heartbeat_json_config.rendered}"
+    HEARTBEAT_CONFIG = "${data.template_file.config}"
   }
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
@@ -16,6 +16,10 @@ module "lambda_dynamo_write_heartbeat" {
   s3_key          = "lambdas/shared_infra/dynamo_write_heartbeat.zip"
 
   log_retention_in_days = 30
+}
+
+data "template_file" "config" {
+  template = "${jsonencode(var.heartbeat_config)}"
 }
 
 resource "aws_cloudwatch_event_rule" "dynamo_heartbeat_scheduler_rule" {

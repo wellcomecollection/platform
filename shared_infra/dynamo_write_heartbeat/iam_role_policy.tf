@@ -1,12 +1,12 @@
 data "template_file" "table_names" {
-  count    = "${length(var.heartbeat_json_config)}"
-  template = "${lookup(var.heartbeat_json_config[count.index], "table_name")}"
+  count = "${length(var.heartbeat_config)}"
+  template = "${lookup(var.heartbeat_config[count.index], "table_name")}"
 }
 
 data "aws_iam_policy_document" "allow_dynamodb_delete_item" {
   statement {
     actions = [
-      "dynamodb:DeleteItem",
+      "dynamodb:UpdateItem",
     ]
 
     resources = [
