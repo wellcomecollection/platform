@@ -60,10 +60,11 @@ class WindowManager @Inject()(
         info(s"Found latest ID in S3: $triedMaybeLastId")
         val triedStatus = triedMaybeLastId
           .map {
-            case Some(id) => WindowStatus(
-              id = Some(incrementSierraRecordNumber(id)),
-              offset = offset + 1
-            )
+            case Some(id) =>
+              WindowStatus(
+                id = Some(incrementSierraRecordNumber(id)),
+                offset = offset + 1
+              )
             case None =>
               throw GracefulFailureException(
                 new RuntimeException("Json did not contain an id"))

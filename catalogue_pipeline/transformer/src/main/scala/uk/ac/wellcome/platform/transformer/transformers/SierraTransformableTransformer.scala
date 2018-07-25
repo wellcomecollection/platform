@@ -35,7 +35,8 @@ class SierraTransformableTransformer
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = sierraTransformable.sierraId.withCheckDigit(SierraRecordTypes.bibs)
+        value =
+          sierraTransformable.sierraId.withCheckDigit(SierraRecordTypes.bibs)
       )
 
       sierraTransformable.maybeBibRecord

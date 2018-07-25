@@ -20,7 +20,7 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
       forAll(testCases) {
         (sierraId: String, recordType: String, expectedId: String) =>
           val sierraRecordType = recordType match {
-            case "bibs" => SierraRecordTypes.bibs
+            case "bibs"  => SierraRecordTypes.bibs
             case "items" => SierraRecordTypes.items
           }
 
