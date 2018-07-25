@@ -1,13 +1,13 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
-import com.amazonaws.services.sns._
-import io.circe._
-import io.circe.yaml
+import com.amazonaws.services.sns.AmazonSNS
+import io.circe.{Decoder, Json, ParsingFailure, yaml}
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
 object SNS {
