@@ -3,9 +3,9 @@ package uk.ac.wellcome.models.transformable.sierra
 import org.scalatest.{FunSpec, Matchers}
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-class SierraRecordNumbersTest extends FunSpec with Matchers {
+class SierraRecordNumberTest extends FunSpec with Matchers {
 
-  describe("addCheckDigit") {
+  describe("withCheckDigit") {
     val testCases = Table(
       // Example from the Sierra docs
       ("1024364", "bibs", "b10243641"),
@@ -24,9 +24,7 @@ class SierraRecordNumbersTest extends FunSpec with Matchers {
             case "items" => SierraRecordTypes.items
           }
 
-          SierraRecordNumbers.addCheckDigit(
-            sierraId,
-            recordType = sierraRecordType) shouldBe expectedId
+          SierraRecordNumber(sierraId).withCheckDigit(sierraRecordType) shouldBe expectedId
       }
     }
 
