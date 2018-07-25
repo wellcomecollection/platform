@@ -9,15 +9,14 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraMaterialType
 }
+import uk.ac.wellcome.platform.transformer.source.SierraBibData._
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
-    sierraTransformable: SierraTransformable): List[SierraItemData] = {
-    implicit val recordNumberDecoder = SierraItemData.sierraRecordNumberDecoder
-
+    sierraTransformable: SierraTransformable): List[SierraItemData] =
     sierraTransformable.itemRecords.values
       .map { _.data }
       .map { jsonString =>
@@ -31,8 +30,6 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
       .flatten
-  }
-
   def transformItemData(sierraItemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform ${sierraItemData.id}")
     Identifiable(
