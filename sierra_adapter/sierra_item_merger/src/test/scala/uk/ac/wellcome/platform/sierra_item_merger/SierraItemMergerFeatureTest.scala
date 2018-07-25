@@ -4,6 +4,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
