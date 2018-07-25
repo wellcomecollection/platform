@@ -1,6 +1,6 @@
 package uk.ac.wellcome.models.transformable
 
-import io.circe._
+import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
