@@ -7,7 +7,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNS
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.messaging.sns.{SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.{PublishAttempt, SNSConfig, SNSWriter}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.storage.{KeyPrefix, ObjectStore}
@@ -39,16 +39,17 @@ class MessageWriter[T] @Inject()(
     s"$topicName/${dateFormat.format(new Date())}"
   }
 
-  def write(message: T, subject: String): Future[Unit] = {
+  def write(message: T, subject: String): Future[PublishAttempt] = {
     for {
       location <- objectStore.put(messageConfig.s3Config.bucketName)(
         message,
         keyPrefix = KeyPrefix(getKeyPrefix())
       )
+      _ = debug(s"Successfully stored message $message in location: $location")
       pointer <- Future.fromTry(toJson(MessagePointer(location)))
       publishAttempt <- sns.writeMessage(pointer, subject)
       _ = debug(publishAttempt)
-    } yield ()
+    } yield publishAttempt
 
   }
 }

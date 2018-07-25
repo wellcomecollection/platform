@@ -17,4 +17,10 @@
   <root level="${log_level:-INFO}">
     <appender-ref ref="STDOUT" />
   </root>
+
+  <!-- reduce external logging -->
+  <logger name="org.apache.http" level="ERROR"/>
+  <logger name="io.netty" level="ERROR"/>
+  <logger name="com.twitter" level="WARN"/>
+  <logger name="com.amazonaws" level="WARN"/>
 </included>

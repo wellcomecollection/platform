@@ -15,9 +15,10 @@ module "transformer" {
     metrics_namespace    = "${var.namespace}_transformer"
     storage_bucket_name  = "${var.vhs_sourcedata_bucket_name}"
     message_bucket_name  = "${var.messages_bucket}"
+    log_level = "DEBUG"
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   container_image   = "${var.transformer_container_image}"
   source_queue_name = "${module.transformer_queue.name}"
@@ -70,9 +71,10 @@ module "matcher" {
     dynamo_index            = "${var.matcher_graph_table_index}"
     dynamo_lock_table       = "${aws_dynamodb_table.matcher_lock_table.id}"
     dynamo_lock_table_index = "${var.matcher_lock_table_index}"
+    log_level = "DEBUG"
   }
 
-  env_vars_length = 8
+  env_vars_length = 9
 
   container_image   = "${var.matcher_container_image}"
   source_queue_name = "${module.matcher_queue.name}"
