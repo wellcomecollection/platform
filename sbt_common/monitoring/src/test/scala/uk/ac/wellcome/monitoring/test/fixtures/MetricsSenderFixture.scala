@@ -10,6 +10,7 @@ import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 import uk.ac.wellcome.test.fixtures._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 trait MetricsSenderFixture

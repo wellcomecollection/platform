@@ -16,6 +16,7 @@ import uk.ac.wellcome.monitoring.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Future, Promise}
 
 class MetricsSenderTest
