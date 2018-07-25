@@ -34,7 +34,7 @@ class IngestorWorkerServiceTest
     with S3
     with WorkIndexerFixtures
     with WorksUtil
-    with CustomElasticSearchMapping {
+    with CustomElasticsearchMapping {
 
   val itemType = "work"
 

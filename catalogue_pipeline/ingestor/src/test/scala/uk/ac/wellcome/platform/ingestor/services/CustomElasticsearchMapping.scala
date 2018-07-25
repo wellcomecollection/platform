@@ -14,7 +14,7 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
 
-trait CustomElasticSearchMapping {
+trait CustomElasticsearchMapping {
 
   class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)
       extends ElasticsearchIndex {
