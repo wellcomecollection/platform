@@ -18,7 +18,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
       val internalLocation = DigitalLocation(
         locationType = locationType,
         url = thumbnailUrl,
-        license = License_CCBY
+        license = Some(License_CCBY)
       )
       val displayLocation = DisplayLocationV1(internalLocation)
 
@@ -27,8 +27,8 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
         displayLocation.asInstanceOf[DisplayDigitalLocationV1]
       displayDigitalLocation.locationType shouldBe locationType.id
       displayDigitalLocation.url shouldBe thumbnailUrl
-      displayDigitalLocation.license shouldBe DisplayLicenseV1(
-        internalLocation.license)
+      displayDigitalLocation.license shouldBe Some(
+        DisplayLicenseV1(internalLocation.license.get))
       displayDigitalLocation.ontologyType shouldBe "DigitalLocation"
     }
 
@@ -37,7 +37,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
         locationType = LocationType("thumbnail-image"),
         url = "",
         credit = Some("Science Museum, Wellcome"),
-        license = License_CCBY
+        license = Some(License_CCBY)
       )
       val displayLocation = DisplayLocationV1(location)
 
@@ -61,5 +61,20 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
         locationType = locationType.id,
         locationLabel)
     }
+  }
+
+  describe("DisplayDigitalLocationV1") {
+    it("should create a DisplayDigitalLocationV1 from a DigitalLocation") {
+      val locationType = LocationType("iiif-image")
+      val url = "https://wellcomelibrary.org/iiif/b2201508/manifest"
+
+      val digitalLocation = DigitalLocation(url, locationType)
+
+      DisplayLocationV1(digitalLocation) shouldBe DisplayDigitalLocationV1(
+        locationType = locationType.id,
+        url = url
+      )
+    }
+
   }
 }

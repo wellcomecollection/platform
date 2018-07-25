@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.flow
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDate, ZoneOffset}
+import java.time.{Instant, LocalDate, ZoneOffset}
 
 import akka.NotUsed
 import akka.stream.scaladsl.Flow
@@ -19,23 +19,20 @@ object SierraRecordWrapperFlow extends Logging {
   private def createSierraRecord(json: Json): SierraRecord = {
     logger.debug(s"Creating record from ${json.noSpaces}")
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
-    maybeUpdatedDate match {
-      case Some(updatedDate) =>
-        SierraRecord(
-          id = getId(json),
-          data = json.noSpaces,
-          modifiedDate = updatedDate
-        )
-      case None =>
-        SierraRecord(
-          id = getId(json),
-          data = json.noSpaces,
-          modifiedDate = getDeletedDateTimeAtStartOfDay(json)
-        )
+
+    val modifiedDate = maybeUpdatedDate match {
+      case Some(updatedDate) => Instant.parse(updatedDate)
+      case None              => getDeletedDateTimeAtStartOfDay(json)
     }
+
+    SierraRecord(
+      id = getId(json),
+      data = json.noSpaces,
+      modifiedDate = modifiedDate
+    )
   }
 
-  private def getDeletedDateTimeAtStartOfDay(json: Json) = {
+  private def getDeletedDateTimeAtStartOfDay(json: Json): Instant = {
     val formatter = DateTimeFormatter.ISO_DATE
     LocalDate
       .parse(root.deletedDate.string.getOption(json).get, formatter)

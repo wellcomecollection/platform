@@ -6,6 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -316,6 +317,45 @@ class MatcherMessageReceiverTest
               }
           }
         }
+      }
+    }
+  }
+
+  it("does not match an existing version with different information") {
+    withLocalSnsTopic { topic =>
+      withLocalSqsQueueAndDlq {
+        case QueuePair(queue, dlq) =>
+          withLocalS3Bucket { storageBucket =>
+            withMatcherMessageReceiver(queue, storageBucket, topic) { _ =>
+              val workAv2 = createUnidentifiedWorkWith(
+                sourceIdentifier = aIdentifier,
+                version = 2
+              )
+
+              val expectedMatchedWorkAv2 = MatcherResult(
+                Set(MatchedIdentifiers(
+                  Set(WorkIdentifier("sierra-system-number/A", 2)))))
+
+              processAndAssertMatchedWorkIs(
+                workAv2,
+                expectedMatchedWorkAv2,
+                queue,
+                storageBucket,
+                topic)
+
+              // Work V1 is sent but not matched
+              val differentWorkAv2 = createUnidentifiedWorkWith(
+                sourceIdentifier = aIdentifier,
+                mergeCandidates = List(MergeCandidate(bIdentifier)),
+                version = 2)
+
+              sendSQS(queue, storageBucket, differentWorkAv2)
+              eventually {
+                assertQueueEmpty(queue)
+                assertQueueHasSize(dlq, 1)
+              }
+            }
+          }
       }
     }
   }

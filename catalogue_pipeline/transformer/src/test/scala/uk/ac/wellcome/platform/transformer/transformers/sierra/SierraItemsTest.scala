@@ -1,18 +1,9 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import java.time.Instant
-
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.models.work.internal.{
-  Identifiable,
-  IdentifierType,
-  Item,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
@@ -20,58 +11,35 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
   describe("extractItemData") {
     it("parses instances of SierraItemData") {
-      val item1 = createSierraItemData
-      val item2 = createSierraItemData
+      val itemData = (1 to 2).map { _ =>
+        createSierraItemData
+      }
+      val itemRecords = itemData.map { data: SierraItemData =>
+        createSierraItemRecordWith(data)
+      }.toList
 
-      val itemData = Map(
-        item1.id -> SierraItemRecord(
-          id = item1.id,
-          data = toJson(item1).get,
-          modifiedDate = Instant.now,
-          bibIds = List()
-        ),
-        item2.id -> SierraItemRecord(
-          id = item2.id,
-          data = toJson(item2).get,
-          modifiedDate = Instant.now,
-          bibIds = List()
-        )
+      val transformable = createSierraTransformableWith(
+        itemRecords = itemRecords
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
-        itemData = itemData
-      )
-
-      transformer.extractItemData(transformable) shouldBe List(item1, item2)
+      transformer.extractItemData(transformable) shouldBe itemData
     }
 
     it("ignores items it can't parse as JSON") {
-      val item = createSierraItemData
+      val itemData = createSierraItemData
 
-      val itemId = createSierraRecordNumberString
-
-      val itemData = Map(
-        item.id -> SierraItemRecord(
-          id = item.id,
-          data = toJson(item).get,
-          modifiedDate = Instant.now,
-          bibIds = List()
-        ),
-        itemId -> SierraItemRecord(
-          id = itemId,
-          data = "<xml?>This is not a real 'JSON' string",
-          modifiedDate = Instant.now,
-          bibIds = List()
+      val itemRecords = List(
+        createSierraItemRecordWith(itemData),
+        createSierraItemRecordWith(
+          data = "<xml?>This is not a real 'JSON' string"
         )
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
-        itemData = itemData
+      val transformable = createSierraTransformableWith(
+        itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(item)
+      transformer.extractItemData(transformable) shouldBe List(itemData)
     }
   }
 
@@ -81,11 +49,10 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         id = "4000004"
       )
 
-      val sourceIdentifier1 = SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
+      val sourceIdentifier1 = createSierraSourceIdentifierWith(
         ontologyType = "Item",
-        value = "i40000047"
-      )
+        value = "i40000047")
+
       val sourceIdentifier2 = SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
@@ -93,22 +60,23 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       )
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
+
       val transformedItem = transformer.transformItemData(item)
+
       transformedItem shouldBe Identifiable(
         sourceIdentifier = sourceIdentifier1,
         otherIdentifiers = List(sourceIdentifier2),
         agent = Item(locations = List()))
+
       transformedItem.identifiers shouldBe expectedIdentifiers
     }
 
     it("uses the full Sierra system number as the source identifier") {
-      val item = createSierraItemDataWith(id = "5000005")
-
-      val sourceIdentifier = SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
+      val sourceIdentifier = createSierraSourceIdentifierWith(
         ontologyType = "Item",
         value = "i50000056"
       )
+      val item = createSierraItemDataWith(id = "5000005")
 
       val transformedItem = transformer.transformItemData(item)
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
@@ -120,27 +88,43 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val item1 = createSierraItemDataWith(deleted = true)
       val item2 = createSierraItemDataWith(deleted = false)
 
-      val itemData = Map(
-        item1.id -> SierraItemRecord(
-          id = item1.id,
-          data = toJson(item1).get,
-          modifiedDate = Instant.now,
-          bibIds = List()
-        ),
-        item2.id -> SierraItemRecord(
-          id = item2.id,
-          data = toJson(item2).get,
-          modifiedDate = Instant.now,
-          bibIds = List()
+      val transformable = createSierraTransformableWith(
+        itemRecords = List(
+          createSierraItemRecordWith(item1),
+          createSierraItemRecordWith(item2)
         )
       )
 
-      val transformable = SierraTransformable(
-        sourceId = createSierraRecordNumberString,
-        itemData = itemData
+      transformer.getPhysicalItems(transformable) should have size 1
+    }
+
+    it("creates an DigitalLocation within items for an e-book record") {
+      val sourceIdentifier = createSierraSourceIdentifier
+
+      val bibData = createSierraBibDataWith(
+        materialType = Some(createSierraEbookMaterialType)
       )
 
-      transformer.getItems(transformable) should have size 1
+      val expectedItems = List(
+        Identifiable(
+          sourceIdentifier = sourceIdentifier,
+          agent = Item(
+            locations = List(DigitalLocation(
+              url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
+              license = None,
+              locationType = LocationType("iiif-image"))))
+        ))
+      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedItems
+    }
+
+    it("returns no DigitalItems if the work is not an eBook") {
+      val sourceIdentifier = createSierraSourceIdentifier
+      val bibData = createSierraBibDataWith(
+        materialType =
+          Some(createSierraMaterialTypeWith(code = "x", value = "book"))
+      )
+
+      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List.empty
     }
   }
 }

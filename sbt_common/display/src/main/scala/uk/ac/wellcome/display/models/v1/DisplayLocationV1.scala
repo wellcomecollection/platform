@@ -18,12 +18,12 @@ sealed trait DisplayLocationV1
 
 object DisplayLocationV1 {
   def apply(location: Location): DisplayLocationV1 = location match {
-    case l: DigitalLocation =>
+    case digitalLocation: DigitalLocation =>
       DisplayDigitalLocationV1(
-        locationType = l.locationType.id,
-        url = l.url,
-        credit = l.credit,
-        license = DisplayLicenseV1(l.license)
+        locationType = digitalLocation.locationType.id,
+        url = digitalLocation.url,
+        credit = digitalLocation.credit,
+        license = digitalLocation.license.map(DisplayLicenseV1(_))
       )
     case l: PhysicalLocation =>
       DisplayPhysicalLocationV1(
@@ -52,7 +52,7 @@ case class DisplayDigitalLocationV1(
   @ApiModelProperty(
     value =
       "The specific license under which the work in question is released to the public - for example, one of the forms of Creative Commons - if it is a precise license to which a link can be made."
-  ) license: DisplayLicenseV1
+  ) license: Option[DisplayLicenseV1] = None
 ) extends DisplayLocationV1 {
   @ApiModelProperty(readOnly = true, value = "A type of thing")
   @JsonProperty("type") val ontologyType: String = "DigitalLocation"

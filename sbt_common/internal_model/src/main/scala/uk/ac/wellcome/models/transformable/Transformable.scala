@@ -5,7 +5,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.utils.JsonUtil._
 
 sealed trait Transformable extends Sourced
 
@@ -30,22 +29,13 @@ case class MiroTransformable(sourceId: String,
 case class SierraTransformable(
   sourceId: String,
   sourceName: String = "sierra",
-  maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map()
+  maybeBibRecord: Option[SierraBibRecord] = None,
+  itemRecords: Map[String, SierraItemRecord] = Map()
 ) extends Transformable
 
 object SierraTransformable {
-  def apply(sourceId: String, bibData: String): SierraTransformable = {
-    val bibRecord = fromJson[SierraBibRecord](bibData).get
-    SierraTransformable(sourceId = sourceId, maybeBibData = Some(bibRecord))
-  }
-
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
-
-  def apply(sourceId: String,
-            itemRecord: SierraItemRecord): SierraTransformable =
     SierraTransformable(
-      sourceId = sourceId,
-      itemData = Map(itemRecord.id -> itemRecord))
+      sourceId = bibRecord.id,
+      maybeBibRecord = Some(bibRecord))
 }

@@ -494,7 +494,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
             DigitalLocation(
               locationType = LocationType("thumbnail-image"),
               url = "https://iiif.example.org/1234/default.jpg",
-              license = License_CCBY
+              license = Some(License_CCBY)
             ))
         )
         insertIntoElasticsearch(indexNameV1, itemType, work)

@@ -8,8 +8,29 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 trait DisplaySerialisationTestBase { this: Suite =>
 
-  def items(its: List[Identified[Item]]) =
-    its
+  def optionalString(fieldName: String, maybeStringValue: Option[String]) =
+    maybeStringValue match {
+      case None => ""
+      case Some(p) =>
+        s"""
+           "$fieldName": "$p"
+         """
+    }
+
+  def optionalObject[T](fieldName: String,
+                        formatter: T => String,
+                        maybeObjectValue: Option[T],
+                        firstField: Boolean = false) =
+    maybeObjectValue match {
+      case None => ""
+      case Some(o) =>
+        s"""
+           ${if (!firstField) ","}"$fieldName": ${formatter(o)}
+         """
+    }
+
+  def items(identifiedItems: List[Identified[Item]]) =
+    identifiedItems
       .map { it =>
         s"""{
           "id": "${it.canonicalId}",
@@ -28,17 +49,18 @@ trait DisplaySerialisationTestBase { this: Suite =>
       }
       .mkString(",")
 
-  def location(loc: Location) = loc match {
-    case l: DigitalLocation  => digitalLocation(l)
-    case l: PhysicalLocation => physicalLocation(l)
-  }
+  def location(loc: Location) =
+    loc match {
+      case l: DigitalLocation  => digitalLocation(l)
+      case l: PhysicalLocation => physicalLocation(l)
+    }
 
-  def digitalLocation(loc: DigitalLocation) =
+  def digitalLocation(digitalLocation: DigitalLocation) =
     s"""{
-      "type": "${loc.ontologyType}",
-      "locationType": ${locationType(loc.locationType)},
-      "url": "${loc.url}",
-      "license": ${license(loc.license)}
+      "type": "${digitalLocation.ontologyType}",
+      "locationType": ${locationType(digitalLocation.locationType)},
+      "url": "${digitalLocation.url}"
+      ${optionalObject("license", license, digitalLocation.license)}
     }"""
 
   def physicalLocation(loc: PhysicalLocation) =
@@ -108,26 +130,17 @@ trait DisplaySerialisationTestBase { this: Suite =>
       }"""
   }
 
-  def optionalString(fieldName: String, maybeValue: Option[String]) =
-    maybeValue match {
-      case None => ""
-      case Some(p) =>
-        s"""
-           "$fieldName": "$p"
-         """
-    }
-
   def period(p: Period) =
     s"""{
       "type": "Period",
       "label": "${p.label}"
     }"""
 
-  def concept(con: AbstractConcept) =
+  def concept(concept: AbstractConcept) =
     s"""
     {
-      "type": "${con.ontologyType}",
-      "label": "${con.label}"
+      "type": "${concept.ontologyType}",
+      "label": "${concept.label}"
     }
     """
 

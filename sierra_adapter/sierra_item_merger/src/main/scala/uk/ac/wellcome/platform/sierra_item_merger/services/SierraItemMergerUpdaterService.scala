@@ -30,7 +30,7 @@ class SierraItemMergerUpdaterService @Inject()(
         ifNotExisting = (
           SierraTransformable(
             sourceId = bibId,
-            itemData = Map(itemRecord.id -> itemRecord)),
+            itemRecords = Map(itemRecord.id -> itemRecord)),
           SourceMetadata(sourceName)))(
         ifExisting = (existingSierraTransformable, _) => {
           (

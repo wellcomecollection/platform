@@ -1,40 +1,41 @@
 package uk.ac.wellcome.sierra_adapter.models
 
-import java.time.Instant
-
 import io.circe.ParsingFailure
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
 
 import scala.util.{Failure, Success}
 
-class SierraRecordTest extends FunSpec with Matchers {
-  val modifiedDate = Instant.now()
+class SierraRecordTest extends FunSpec with Matchers with SierraRecordUtil {
+
   describe("toItemRecord") {
     it("return a successful try for valid item json") {
-      val id = "i12345"
-      val bibId = "b54321"
-      val data =
-        s"""{
-            "id": "$id",
-            "bibIds" : ["$bibId"]
-            }"""
-      val sierraRecord =
-        SierraRecord(id = id, data = data, modifiedDate = modifiedDate)
+      val itemId = createSierraRecordNumberString
+      val bibId = createSierraRecordNumberString
+      val data = s"""
+        |{
+        |  "id": "$itemId",
+        |  "bibIds" : ["$bibId"]
+        |}
+        |""".stripMargin
+      val sierraRecord = createSierraRecordWith(
+        id = itemId,
+        data = data
+      )
 
       sierraRecord.toItemRecord shouldBe Success(
         SierraItemRecord(
-          id = id,
+          id = itemId,
           data = data,
-          modifiedDate = modifiedDate,
+          modifiedDate = sierraRecord.modifiedDate,
           bibIds = List(bibId)))
     }
 
     it("return a failure for an invalid json") {
-      val sierraRecord = SierraRecord(
-        id = "i12345",
-        data = "not a json string",
-        modifiedDate = modifiedDate)
+      val sierraRecord = createSierraRecordWith(
+        data = "not a json string"
+      )
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
@@ -42,8 +43,9 @@ class SierraRecordTest extends FunSpec with Matchers {
     }
 
     it("return a failure if the json is valid but contains no bibIds") {
-      val sierraRecord =
-        SierraRecord(id = "i12345", data = "{}", modifiedDate = modifiedDate)
+      val sierraRecord = createSierraRecordWith(
+        data = "{}"
+      )
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
@@ -51,10 +53,9 @@ class SierraRecordTest extends FunSpec with Matchers {
     }
 
     it("return a failure if bibIds is a list of non strings") {
-      val sierraRecord = SierraRecord(
-        id = "i12345",
-        data = """{"bibIds":[1,2,3]}""",
-        modifiedDate = modifiedDate)
+      val sierraRecord = createSierraRecordWith(
+        data = """{"bibIds":[1,2,3]}"""
+      )
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
@@ -62,15 +63,13 @@ class SierraRecordTest extends FunSpec with Matchers {
     }
 
     it("return a failure if bibIds is not a list") {
-      val sierraRecord = SierraRecord(
-        id = "i12345",
-        data = """{"bibIds":"blah"}""",
-        modifiedDate = modifiedDate)
+      val sierraRecord = createSierraRecordWith(
+        data = """{"bibIds":"blah"}"""
+      )
 
       val triedItemRecord = sierraRecord.toItemRecord
       triedItemRecord shouldBe a[Failure[_]]
       triedItemRecord.failed.get shouldBe a[IllegalArgumentException]
     }
   }
-
 }

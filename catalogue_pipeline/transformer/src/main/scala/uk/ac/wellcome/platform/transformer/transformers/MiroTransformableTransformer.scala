@@ -190,7 +190,7 @@ class MiroTransformableTransformer
     DigitalLocation(
       locationType = LocationType("thumbnail-image"),
       url = buildImageApiURL(miroId, "thumbnail"),
-      license = chooseLicense(miroId, miroData.useRestrictions)
+      license = Some(chooseLicense(miroId, miroData.useRestrictions))
     )
   }
 
@@ -208,7 +208,7 @@ class MiroTransformableTransformer
               locationType = LocationType("iiif-image"),
               url = buildImageApiURL(miroId, "info"),
               credit = getCredit(miroId = miroId, miroData = miroData),
-              license = chooseLicense(miroId, miroData.useRestrictions)
+              license = Some(chooseLicense(miroId, miroData.useRestrictions))
             )
           )
         )

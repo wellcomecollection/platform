@@ -1,13 +1,14 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal.{LocationType, PhysicalLocation}
+import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraItemLocation
 }
 
 trait SierraLocation {
-  def getLocation(itemData: SierraItemData): Option[PhysicalLocation] =
+  def getPhysicalLocation(itemData: SierraItemData): Option[PhysicalLocation] =
     itemData.location match {
       // We've seen records where the "location" field is populated in
       // the JSON, but the code and name are both empty strings or "none".
@@ -25,4 +26,19 @@ trait SierraLocation {
         )
       case None => None
     }
+
+  def getDigitalLocation(identifier: String): DigitalLocation = {
+    // This is a defensive check, it may not be needed an identifier should always be present.
+    if (!identifier.isEmpty) {
+      DigitalLocation(
+        url = s"https://wellcomelibrary.org/iiif/$identifier/manifest",
+        license = None,
+        locationType = LocationType("iiif-image")
+      )
+    } else {
+      throw GracefulFailureException(
+        new RuntimeException(
+          "id required by DigitalLocation has not been provided"))
+    }
+  }
 }

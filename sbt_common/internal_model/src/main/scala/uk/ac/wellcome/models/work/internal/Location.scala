@@ -6,8 +6,8 @@ sealed trait Location {
 
 case class DigitalLocation(
   url: String,
-  license: License,
   locationType: LocationType,
+  license: Option[License] = None,
   credit: Option[String] = None,
   ontologyType: String = "DigitalLocation"
 ) extends Location
