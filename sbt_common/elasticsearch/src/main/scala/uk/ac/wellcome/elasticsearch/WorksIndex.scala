@@ -9,7 +9,7 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import grizzled.slf4j.Logging
 
 class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)
-    extends ElasticSearchIndex
+    extends ElasticsearchIndex
     with Logging {
 
   val rootIndexType = elasticConfig.documentType

@@ -11,7 +11,7 @@ import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 
 import scala.concurrent.Future
 
-trait ElasticSearchIndex extends Logging {
+trait ElasticsearchIndex extends Logging {
   val httpClient: HttpClient
   val mappingDefinition: MappingDefinition
 
