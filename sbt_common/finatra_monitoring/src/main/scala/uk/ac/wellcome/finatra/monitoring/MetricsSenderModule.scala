@@ -7,8 +7,6 @@ import com.twitter.inject.TwitterModule
 import uk.ac.wellcome.finatra.akka.AkkaModule
 import uk.ac.wellcome.monitoring.{MetricsConfig, MetricsSender}
 
-import scala.concurrent.ExecutionContext
-
 object MetricsSenderModule extends TwitterModule {
   override val modules = Seq(
     AkkaModule,
@@ -20,10 +18,10 @@ object MetricsSenderModule extends TwitterModule {
   @Singleton
   def providesMetricsSender(amazonCloudWatch: AmazonCloudWatch,
                             actorSystem: ActorSystem,
-                            metricsConfig: MetricsConfig, executionContext: ExecutionContext) =
+                            metricsConfig: MetricsConfig) =
     new MetricsSender(
       amazonCloudWatch = amazonCloudWatch,
       actorSystem = actorSystem,
       metricsConfig = metricsConfig
-    )(executionContext)
+    )
 }
