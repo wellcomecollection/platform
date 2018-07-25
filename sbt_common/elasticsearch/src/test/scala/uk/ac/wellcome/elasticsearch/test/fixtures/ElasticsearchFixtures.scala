@@ -16,6 +16,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Random
 
 trait ElasticsearchFixtures

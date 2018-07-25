@@ -11,6 +11,7 @@ import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class TestObject(
@@ -43,21 +44,21 @@ class ElasticsearchIndexTest
   val testType = "thing"
 
   object TestIndex extends ElasticsearchIndex {
-
-    override val httpClient: HttpClient = elasticClient
-    override val mappingDefinition = mapping(testType)
+    val httpClient: HttpClient = elasticClient
+    val mappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
         textField("description"),
         booleanField("visible")
       )
+
+    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
   }
 
   object CompatibleTestIndex extends ElasticsearchIndex {
-
-    override val httpClient = elasticClient
-    override val mappingDefinition = mapping(testType)
+    val httpClient = elasticClient
+    val mappingDefinition = mapping(testType)
       .dynamic(DynamicMapping.Strict)
       .as(
         keywordField("id"),
@@ -65,6 +66,8 @@ class ElasticsearchIndexTest
         intField("count"),
         booleanField("visible")
       )
+
+    implicit val ec: ExecutionContext = ExecutionContext.Implicits.global
   }
 
   it("creates an index into which doc of the expected type can be put") {
