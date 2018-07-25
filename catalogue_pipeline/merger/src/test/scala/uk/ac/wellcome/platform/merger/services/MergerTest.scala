@@ -30,7 +30,8 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   }
 
   it("does not merge a single physical work with multiple digital works") {
-    assertDoesNotMerge(List(createPhysicalWork) ++ List.fill(3)(createDigitalWork))
+    assertDoesNotMerge(
+      List(createPhysicalWork) ++ List.fill(3)(createDigitalWork))
   }
 
   it("merges a physical and digital work") {
@@ -52,8 +53,8 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   it("does not merge a physical work having multiple items with a digital work") {
     val works = List(
       createPhysicalWork.copy(items = List(
-          createIdentifiableItemWith(locations = List(createPhysicalLocation)),
-          createIdentifiableItemWith(locations = List(createPhysicalLocation)))),
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)),
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)))),
       createDigitalWork
     )
 
@@ -63,11 +64,10 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   it("does not merge a physical work with a digital work having multiple items") {
     val works = List(
       createPhysicalWork,
-      createDigitalWork.copy(items =
-        List(
+      createDigitalWork.copy(
+        items = List(
           createIdentifiableItemWith(locations = List(createDigitalLocation)),
-          createIdentifiableItemWith(locations = List(createDigitalLocation)))
-      )
+          createIdentifiableItemWith(locations = List(createDigitalLocation))))
     )
 
     assertDoesNotMerge(works)
