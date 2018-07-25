@@ -15,7 +15,6 @@ class SierraItemMergerWorkerService @Inject()(
   sierraItemMergerUpdaterService: SierraItemMergerUpdaterService
 )(implicit executionContext: ExecutionContext) {
 
-
   sqsStream.foreach(this.getClass.getSimpleName, process)
 
   private def process(message: NotificationMessage): Future[Unit] =
