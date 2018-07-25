@@ -3,12 +3,11 @@ package uk.ac.wellcome.platform.reindex_request_creator.services
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.reindexer.ReindexRequest
-import uk.ac.wellcome.platform.reindex_request_creator.GlobalExecutionContext.context
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class NotificationSender @Inject()(snsWriter: SNSWriter) {
+class NotificationSender @Inject()(snsWriter: SNSWriter)(implicit ec: ExecutionContext) {
   def sendNotifications(recordIds: List[String],
                         desiredVersion: Int): Future[List[Unit]] = {
     Future.sequence {

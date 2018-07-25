@@ -9,11 +9,10 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.reindexer.ReindexableRecord
-import uk.ac.wellcome.platform.reindex_request_creator.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 /** Find IDs for records in the SourceData table that need reindexing.
@@ -24,7 +23,7 @@ import scala.util.Try
 class RecordReader @Inject()(
   dynamoDbClient: AmazonDynamoDB,
   dynamoConfig: DynamoConfig
-) extends Logging {
+)(implicit ec: ExecutionContext) extends Logging {
 
   def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
