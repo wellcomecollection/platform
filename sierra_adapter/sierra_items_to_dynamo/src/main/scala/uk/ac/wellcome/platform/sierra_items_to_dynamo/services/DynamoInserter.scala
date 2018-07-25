@@ -4,11 +4,15 @@ import com.google.inject.Inject
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.type_classes.IdGetter
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoInserter @Inject()(versionedDao: VersionedDao)(
   implicit ec: ExecutionContext) {
+
+  implicit val idGetter: IdGetter[SierraItemRecord] =
+    (record: SierraItemRecord) => record.id.withoutCheckDigit
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] = {
     versionedDao
