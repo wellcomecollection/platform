@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.source
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.platform.transformer.source.SierraBibData._
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraBibDataTest extends FunSpec with Matchers with SierraUtil {
@@ -40,6 +39,8 @@ class SierraBibDataTest extends FunSpec with Matchers with SierraUtil {
          |  "varFields": []
          |}
        """.stripMargin
+
+    implicit val recordNumberDecoder = SierraBibData.sierraRecordNumberDecoder
 
     val bibData = fromJson[SierraBibData](jsonString).get
     bibData.id shouldBe id
