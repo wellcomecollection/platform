@@ -11,7 +11,7 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import scala.concurrent.Future
 
 @Singleton
-class ElasticSearchService @Inject()(elasticClient: HttpClient,
+class ElasticsearchService @Inject()(elasticClient: HttpClient,
                                      elasticConfig: ElasticConfig) {
 
   val documentType: String = elasticConfig.documentType
