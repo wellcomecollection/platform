@@ -6,7 +6,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -20,7 +20,7 @@ class SierraItemsToDynamoFeatureTest
     with Matchers
     with Eventually
     with ExtendedPatience
-    with SierraRecordUtil {
+    with SierraUtil {
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { table =>
@@ -32,7 +32,7 @@ class SierraItemsToDynamoFeatureTest
           val bibId = createSierraRecordNumberString
           val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
 
-          val sierraRecord = createSierraRecordWith(
+          val sierraRecord = createSierraItemRecordWith(
             id = itemId,
             data = data
           )

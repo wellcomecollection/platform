@@ -59,6 +59,16 @@ trait SierraUtil extends IdentifiersUtil {
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
+    data: String,
+    modifiedDate: Instant = Instant.npw
+  ): SierraItemRecord = SierraItemRecord(
+    id = id,
+    data = data,
+    modifiedDate = modifiedDate
+  )
+
+  def createSierraItemRecordWith(
+    id: String = createSierraRecordNumberString,
     data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[String] = List(),
