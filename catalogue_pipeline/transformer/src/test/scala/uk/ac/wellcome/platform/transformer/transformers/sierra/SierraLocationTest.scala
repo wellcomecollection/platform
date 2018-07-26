@@ -61,7 +61,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
       val expectedLocation = DigitalLocation(
         url = "https://wellcomelibrary.org/iiif/b2201508/manifest",
         license = None,
-        locationType = LocationType("iiif-image")
+        locationType = LocationType("iiif-presentation")
       )
       transformer.getDigitalLocation(id) shouldBe expectedLocation
     }

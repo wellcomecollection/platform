@@ -28,12 +28,12 @@ trait SierraLocation {
     }
 
   def getDigitalLocation(identifier: String): DigitalLocation = {
-    // This is a defensive check, it may not be needed an identifier should always be present.
+    // This is a defensive check, it may not be needed since an identifier should always be present.
     if (!identifier.isEmpty) {
       DigitalLocation(
         url = s"https://wellcomelibrary.org/iiif/$identifier/manifest",
         license = None,
-        locationType = LocationType("iiif-image")
+        locationType = LocationType("iiif-presentation")
       )
     } else {
       throw GracefulFailureException(

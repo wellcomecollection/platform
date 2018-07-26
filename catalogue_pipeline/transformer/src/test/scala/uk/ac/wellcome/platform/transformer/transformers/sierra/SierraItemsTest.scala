@@ -112,7 +112,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
             locations = List(DigitalLocation(
               url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
               license = None,
-              locationType = LocationType("iiif-image"))))
+              locationType = LocationType("iiif-presentation"))))
         ))
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedItems
     }
