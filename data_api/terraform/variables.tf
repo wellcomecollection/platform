@@ -32,3 +32,6 @@ variable "es_config_snapshot" {
     doc_type = "work"
   }
 }
+variable "namespace" {
+  default = "sierra_adapter"
+}

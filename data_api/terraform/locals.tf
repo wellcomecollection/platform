@@ -7,8 +7,6 @@ locals {
   dlq_alarm_arn              = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
   terminal_failure_alarm_arn = "${data.terraform_remote_state.shared_infra.terminal_failure_alarm_arn}"
 
-  alb_server_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${data.terraform_remote_state.shared_infra.alb_client_error_alarm_arn}"
-
-  bucket_alb_logs_id = "${data.terraform_remote_state.shared_infra.bucket_alb_logs_id}"
+  vpc_id                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
+  private_subnets             = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
 }
