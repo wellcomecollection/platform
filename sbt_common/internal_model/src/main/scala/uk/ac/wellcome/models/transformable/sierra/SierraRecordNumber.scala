@@ -1,5 +1,8 @@
 package uk.ac.wellcome.models.transformable.sierra
 
+import cats.syntax.either._
+import io.circe.Decoder
+
 /** Represents the seven-digit IDs that are used to identify resources
   * in Sierra.
   *
@@ -69,4 +72,16 @@ class SierraRecordNumber(s: String) {
 object SierraRecordNumber {
   def apply(s: String): SierraRecordNumber =
     new SierraRecordNumber(s)
+
+  /** A Circe decoder that allows unpacking the ID as an instance of
+    * [[SierraRecordNumber]].  This is based on the example Instant decoder
+    * described in the Circe docs.
+    * See: https://circe.github.io/circe/codecs/custom-codecs.html
+    */
+  implicit val decoder: Decoder[SierraRecordNumber] =
+    Decoder.decodeString.emap { str =>
+      Either
+        .catchNonFatal(SierraRecordNumber(str))
+        .leftMap(t => "SierraRecordNumber")
+    }
 }

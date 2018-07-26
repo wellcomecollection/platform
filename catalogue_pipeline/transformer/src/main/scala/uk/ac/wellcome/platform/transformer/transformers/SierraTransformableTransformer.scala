@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.transformer.transformers
 import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
-import uk.ac.wellcome.platform.transformer.source.SierraBibData._
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
 import uk.ac.wellcome.utils.JsonUtil._
 
