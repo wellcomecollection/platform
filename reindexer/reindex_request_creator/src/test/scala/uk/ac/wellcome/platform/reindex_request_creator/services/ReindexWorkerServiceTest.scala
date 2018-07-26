@@ -18,6 +18,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class ReindexWorkerServiceTest
     extends FunSpec
     with Matchers

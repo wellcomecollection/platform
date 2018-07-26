@@ -13,6 +13,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 class RecordReaderTest
     extends FunSpec
     with ScalaFutures
