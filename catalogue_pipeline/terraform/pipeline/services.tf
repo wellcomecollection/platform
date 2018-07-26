@@ -127,7 +127,7 @@ module "id_minter" {
     queue_url           = "${module.id_minter_queue.id}"
     topic_arn           = "${module.es_ingest_topic.arn}"
     sqs_max_messages    = 10
-    max_connections = 8
+    max_connections     = 8
   }
 
   env_vars_length   = 10

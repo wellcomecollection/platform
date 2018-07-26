@@ -7,7 +7,9 @@ import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
 
 object MysqlModule extends TwitterModule {
   override val modules = Seq(RDSClientConfigModule)
-  val maxSize = flag[Int]("aws.rds.maxConnections", "Maximum number of connections to the database")
+  val maxSize = flag[Int](
+    "aws.rds.maxConnections",
+    "Maximum number of connections to the database")
 
   @Provides
   def providesDB(rdsClientConfig: RDSClientConfig): DB = {
