@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord,
   SierraRecordNumber
 }
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber._
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
 

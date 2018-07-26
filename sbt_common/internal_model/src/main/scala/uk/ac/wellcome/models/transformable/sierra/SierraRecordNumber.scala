@@ -67,6 +67,14 @@ class SierraRecordNumber(s: String) {
       .sum % 11
     if (remainder == 10) "x" else remainder.toString
   }
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: SierraRecordNumber => that.withoutCheckDigit == this.withoutCheckDigit
+      case _ => false
+    }
+
+  override def hashCode: Int = this.withoutCheckDigit.hashCode
 }
 
 object SierraRecordNumber {
