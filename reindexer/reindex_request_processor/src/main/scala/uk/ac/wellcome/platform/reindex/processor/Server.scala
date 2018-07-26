@@ -8,7 +8,7 @@ import com.twitter.finatra.http.filters.{
   TraceIdMDCFilter
 }
 import com.twitter.finatra.http.routing.HttpRouter
-import uk.ac.wellcome.finatra.akka.AkkaModule
+import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
@@ -23,6 +23,7 @@ class Server extends HttpServer {
 
   override val modules = Seq(
     AkkaModule,
+    ExecutionContextModule,
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
