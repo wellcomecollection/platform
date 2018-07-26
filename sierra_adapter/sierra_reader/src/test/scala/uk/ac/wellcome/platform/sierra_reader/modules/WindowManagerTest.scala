@@ -55,7 +55,10 @@ class WindowManagerTest
     }
   }
 
-  it("finds the ID if there is a window in progress") {
+  // This test isn't actually testing the correct behaviour (see issue 2422:
+  // https://github.com/wellcometrust/platform/issues/2422); it's due to be
+  // replaced when we fix this behaviour.
+  ignore("finds the ID if there is a window in progress") {
     withLocalS3Bucket { bucket =>
       withWindowManager(bucket) { windowManager =>
         val prefix = windowManager.buildWindowShard("[2013,2014]")
