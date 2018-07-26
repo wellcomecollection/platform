@@ -10,9 +10,10 @@ import uk.ac.wellcome.platform.api.services.WorksService
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class V2WorksController @Inject()(apiConfig: ApiConfig,
-                                  elasticConfig: ElasticConfig,
-                                  worksService: WorksService)(implicit ec: ExecutionContext)
+class V2WorksController @Inject()(
+  apiConfig: ApiConfig,
+  elasticConfig: ElasticConfig,
+  worksService: WorksService)(implicit ec: ExecutionContext)
     extends WorksController(
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV2name,

@@ -99,25 +99,26 @@ trait MatcherFixtures
       withActorSystem { actorSystem =>
         withMockMetricSender { metricsSender =>
           withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-              withWorkGraphStore(graphTable) { workGraphStore =>
-                withWorkMatcher(workGraphStore, lockTable, metricsSender) {
-                  workMatcher =>
-                    withSQSStream[NotificationMessage, R](
-                      actorSystem,
-                      queue,
-                      metricsSender) { sqsStream =>
-                      val matcherMessageReceiver = new MatcherMessageReceiver(
-                        sqsStream,
-                        snsWriter,
-                        objectStore,
-                        storageS3Config,
+            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
+              graphTable =>
+                withWorkGraphStore(graphTable) { workGraphStore =>
+                  withWorkMatcher(workGraphStore, lockTable, metricsSender) {
+                    workMatcher =>
+                      withSQSStream[NotificationMessage, R](
                         actorSystem,
-                        workMatcher)
-                      testWith(matcherMessageReceiver)
-                    }
+                        queue,
+                        metricsSender) { sqsStream =>
+                        val matcherMessageReceiver = new MatcherMessageReceiver(
+                          sqsStream,
+                          snsWriter,
+                          objectStore,
+                          storageS3Config,
+                          actorSystem,
+                          workMatcher)
+                        testWith(matcherMessageReceiver)
+                      }
+                  }
                 }
-              }
             }
           }
         }
