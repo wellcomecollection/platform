@@ -8,7 +8,7 @@ import org.scalatest.{Matchers, Suite}
 import uk.ac.wellcome.elasticsearch.{
   ElasticClientBuilder,
   ElasticConfig,
-  ElasticSearchIndex,
+  ElasticsearchIndex,
   WorksIndex
 }
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
@@ -69,7 +69,7 @@ trait ElasticsearchFixtures
   }
 
   def withLocalElasticsearchIndex[R](
-    index: ElasticSearchIndex,
+    index: ElasticsearchIndex,
     indexName: String)(testWith: TestWith[String, R]): R = {
 
     index.create(indexName).await

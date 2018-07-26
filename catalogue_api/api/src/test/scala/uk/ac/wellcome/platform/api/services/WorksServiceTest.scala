@@ -20,7 +20,7 @@ class WorksServiceTest
 
   it("gets records in Elasticsearch") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val works = createIdentifiedWorks(count = 2)
@@ -39,7 +39,7 @@ class WorksServiceTest
 
   it("gets a DisplayWork by id") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val work = createIdentifiedWork
@@ -63,7 +63,7 @@ class WorksServiceTest
 
   it("only finds results that match a query if doing a full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val workDodo = createIdentifiedWorkWith(
@@ -100,7 +100,7 @@ class WorksServiceTest
 
   it("returns a future of None if it cannot get a record by id") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val recordsFuture = worksService.findWorkById(
@@ -118,7 +118,7 @@ class WorksServiceTest
 
   it("returns 0 pages when no results are available") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val displayWorksFuture =
@@ -134,7 +134,7 @@ class WorksServiceTest
 
   it("returns an empty result set when asked for a page that does not exist") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val works = createIdentifiedWorks(count = 3)
@@ -158,7 +158,7 @@ class WorksServiceTest
   it(
     "doesn't throw an exception if passed an invalid query string for full-text search") {
     withLocalElasticsearchIndex(itemType = itemType) { indexName =>
-      withElasticSearchService(indexName = indexName, itemType = itemType) {
+      withElasticsearchService(indexName = indexName, itemType = itemType) {
         searchService =>
           withWorksService(searchService) { worksService =>
             val workEmu = createIdentifiedWorkWith(

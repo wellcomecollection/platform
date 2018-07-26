@@ -31,7 +31,7 @@ case class BadTestObject(
   weight: Int
 )
 
-class ElasticSearchIndexTest
+class ElasticsearchIndexTest
     extends FunSpec
     with ElasticsearchFixtures
     with ScalaFutures
@@ -42,7 +42,7 @@ class ElasticSearchIndexTest
 
   val testType = "thing"
 
-  object TestIndex extends ElasticSearchIndex {
+  object TestIndex extends ElasticsearchIndex {
 
     override val httpClient: HttpClient = elasticClient
     override val mappingDefinition = mapping(testType)
@@ -54,7 +54,7 @@ class ElasticSearchIndexTest
       )
   }
 
-  object CompatibleTestIndex extends ElasticSearchIndex {
+  object CompatibleTestIndex extends ElasticsearchIndex {
 
     override val httpClient = elasticClient
     override val mappingDefinition = mapping(testType)

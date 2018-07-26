@@ -18,7 +18,7 @@ class WorkIndexerTest
     with ElasticsearchFixtures
     with WorksUtil
     with WorkIndexerFixtures
-    with CustomElasticSearchMapping {
+    with CustomElasticsearchMapping {
 
   val esType = "work"
 

@@ -12,12 +12,12 @@ import com.sksamuel.elastic4s.http.ElasticDsl.{
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
-import uk.ac.wellcome.elasticsearch.ElasticSearchIndex
+import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
 
-trait CustomElasticSearchMapping {
+trait CustomElasticsearchMapping {
 
   class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)
-      extends ElasticSearchIndex {
+      extends ElasticsearchIndex {
     override val httpClient: HttpClient = elasticClient
 
     def sourceIdentifierFields = Seq(
