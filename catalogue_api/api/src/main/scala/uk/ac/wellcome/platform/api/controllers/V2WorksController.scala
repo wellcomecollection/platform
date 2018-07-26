@@ -7,10 +7,12 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.services.WorksService
 
+import scala.concurrent.ExecutionContext
+
 @Singleton
 class V2WorksController @Inject()(apiConfig: ApiConfig,
                                   elasticConfig: ElasticConfig,
-                                  worksService: WorksService)
+                                  worksService: WorksService)(implicit ec: ExecutionContext)
     extends WorksController(
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV2name,
