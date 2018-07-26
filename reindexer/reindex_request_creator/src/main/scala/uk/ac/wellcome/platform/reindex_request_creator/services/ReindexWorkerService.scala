@@ -4,18 +4,17 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex_request_creator.GlobalExecutionContext.context
 import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReindexWorkerService @Inject()(
   readerService: RecordReader,
   notificationService: NotificationSender,
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage]
-) {
+)(implicit ec: ExecutionContext) {
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)
 
   private def processMessage(message: NotificationMessage): Future[Unit] =

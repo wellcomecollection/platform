@@ -20,14 +20,15 @@ import uk.ac.wellcome.platform.api.responses.{
   ResultResponse
 }
 import uk.ac.wellcome.platform.api.services.WorksService
-import uk.ac.wellcome.platform.api.GlobalExecutionContext.context
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class WorksController(apiConfig: ApiConfig,
-                               indexName: String,
-                               worksService: WorksService)
+abstract class WorksController(
+  apiConfig: ApiConfig,
+  indexName: String,
+  worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
 

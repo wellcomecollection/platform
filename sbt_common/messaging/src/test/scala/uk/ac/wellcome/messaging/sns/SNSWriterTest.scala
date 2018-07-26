@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.sns
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 
 class SNSWriterTest
     extends FunSpec
@@ -11,37 +12,35 @@ class SNSWriterTest
     with SNS
     with IntegrationPatience {
 
-  it(
-    "should send a message with subject to the SNS client and return a publish attempt with the id of the request") {
+  it("sends a message to SNS and returns a PublishAttempt") {
     withLocalSnsTopic { topic =>
-      val snsConfig = SNSConfig(topic.arn)
-      val snsWriter = new SNSWriter(snsClient, snsConfig)
-      val message = "sns-writer-test-message"
-      val subject = "sns-writer-test-subject"
-      val futurePublishAttempt = snsWriter.writeMessage(
-        message = message,
-        subject = subject
-      )
+      withSNSWriter(topic) { snsWriter =>
+        val message = "sns-writer-test-message"
+        val subject = "sns-writer-test-subject"
+        val futurePublishAttempt = snsWriter.writeMessage(
+          message = message,
+          subject = subject
+        )
 
-      whenReady(futurePublishAttempt) { publishAttempt =>
-        val messages = listMessagesReceivedFromSNS(topic)
-        messages should have size (1)
-        messages.head.message shouldBe message
-        messages.head.subject shouldBe subject
-        publishAttempt.id should be(Right(messages.head.message))
+        whenReady(futurePublishAttempt) { publishAttempt =>
+          val messages = listMessagesReceivedFromSNS(topic)
+          messages should have size 1
+          messages.head.message shouldBe message
+          messages.head.subject shouldBe subject
+          publishAttempt.id should be(Right(messages.head.message))
+        }
       }
     }
   }
 
-  it("should return a failed future if it fails to publish the message") {
-    val snsWriter =
-      new SNSWriter(snsClient, SNSConfig("not a valid topic"))
+  it("returns a failed Future if it fails to publish the message") {
+    withSNSWriter(Topic("does-not-exist")) { snsWriter =>
+      val futurePublishAttempt =
+        snsWriter.writeMessage(message = "someMessage", subject = "subject")
 
-    val futurePublishAttempt =
-      snsWriter.writeMessage(message = "someMessage", subject = "subject")
-
-    whenReady(futurePublishAttempt.failed) { exception =>
-      exception.getMessage should not be (empty)
+      whenReady(futurePublishAttempt.failed) { exception =>
+        exception.getMessage should not be empty
+      }
     }
   }
 }

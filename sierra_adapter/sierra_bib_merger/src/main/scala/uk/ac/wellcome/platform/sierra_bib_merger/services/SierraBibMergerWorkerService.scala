@@ -13,7 +13,7 @@ class SierraBibMergerWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   sierraBibMergerUpdaterService: SierraBibMergerUpdaterService
-)(implicit executionContext: ExecutionContext) {
+)(implicit ec: ExecutionContext) {
 
   sqsStream.foreach(this.getClass.getSimpleName, process)
 

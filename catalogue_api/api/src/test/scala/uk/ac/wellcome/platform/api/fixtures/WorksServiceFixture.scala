@@ -5,6 +5,8 @@ import uk.ac.wellcome.platform.api.services.{ElasticsearchService, WorksService}
 import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.test.fixtures.TestWith
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 trait WorksServiceFixture { this: Suite =>
   def withWorksService(searchService: ElasticsearchService)(
     testWith: TestWith[WorksService, Assertion]) = {

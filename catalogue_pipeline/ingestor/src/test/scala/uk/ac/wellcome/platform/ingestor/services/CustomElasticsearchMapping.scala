@@ -14,11 +14,14 @@ import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
 import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
 
+import scala.concurrent.ExecutionContext
+
 trait CustomElasticsearchMapping {
 
-  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)
+  class SubsetOfFieldsWorksIndex(elasticClient: HttpClient, esType: String)(
+    implicit val ec: ExecutionContext)
       extends ElasticsearchIndex {
-    override val httpClient: HttpClient = elasticClient
+    val httpClient: HttpClient = elasticClient
 
     def sourceIdentifierFields = Seq(
       keywordField("ontologyType"),

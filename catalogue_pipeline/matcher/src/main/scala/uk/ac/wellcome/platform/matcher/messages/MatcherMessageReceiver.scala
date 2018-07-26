@@ -13,7 +13,7 @@ import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.utils.JsonUtil._
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class MatcherMessageReceiver @Inject()(
   messageStream: SQSStream[NotificationMessage],
@@ -21,10 +21,8 @@ class MatcherMessageReceiver @Inject()(
   s3TypeStore: ObjectStore[RecorderWorkEntry],
   storageS3Config: S3Config,
   actorSystem: ActorSystem,
-  workMatcher: WorkMatcher)
+  workMatcher: WorkMatcher)(implicit ec: ExecutionContext)
     extends Logging {
-
-  implicit val context: ExecutionContextExecutor = actorSystem.dispatcher
 
   messageStream.foreach(this.getClass.getSimpleName, processMessage)
 

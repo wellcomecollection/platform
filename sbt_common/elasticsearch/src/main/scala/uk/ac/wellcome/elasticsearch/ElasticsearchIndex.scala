@@ -7,13 +7,13 @@ import com.sksamuel.elastic4s.mappings.MappingDefinition
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import grizzled.slf4j.Logging
 import org.elasticsearch.client.ResponseException
-import uk.ac.wellcome.elasticsearch.GlobalExecutionContext.context
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ElasticsearchIndex extends Logging {
   val httpClient: HttpClient
   val mappingDefinition: MappingDefinition
+  implicit val ec: ExecutionContext
 
   def create(indexName: String): Future[Unit] =
     httpClient

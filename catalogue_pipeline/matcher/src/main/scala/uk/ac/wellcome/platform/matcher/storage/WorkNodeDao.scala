@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class WorkNodeDao @Inject()(
   dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig)(implicit context: ExecutionContext)
+  dynamoConfig: DynamoConfig)(implicit ec: ExecutionContext)
     extends Logging {
 
   private val index = dynamoConfig.index

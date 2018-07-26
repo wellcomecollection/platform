@@ -25,7 +25,7 @@ class MergerWorkerService @Inject()(
                             ObjectStore[RecorderWorkEntry]],
   merger: Merger,
   messageWriter: MessageWriter[BaseWork]
-)(implicit context: ExecutionContext)
+)(implicit ec: ExecutionContext)
     extends Logging {
 
   sqsStream.foreach(this.getClass.getSimpleName, processMessage)

@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class DynamoLockingService @Inject()(
   dynamoRowLockDao: DynamoRowLockDao,
-  metricsSender: MetricsSender)(implicit context: ExecutionContext)
+  metricsSender: MetricsSender)(implicit ec: ExecutionContext)
     extends Logging {
 
   private val failedLockMetricName: String = "WorkMatcher_FailedLock"

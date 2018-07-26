@@ -7,21 +7,21 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import uk.ac.wellcome.messaging.GlobalExecutionContext.context
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.utils.JsonUtil.{fromJson, _}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class MessageStream[T] @Inject()(
-  actorSystem: ActorSystem,
-  sqsClient: AmazonSQSAsync,
-  s3Client: AmazonS3,
-  messageReaderConfig: MessageReaderConfig,
-  metricsSender: MetricsSender)(implicit objectStore: ObjectStore[T]) {
+class MessageStream[T] @Inject()(actorSystem: ActorSystem,
+                                 sqsClient: AmazonSQSAsync,
+                                 s3Client: AmazonS3,
+                                 messageReaderConfig: MessageReaderConfig,
+                                 metricsSender: MetricsSender)(
+  implicit objectStore: ObjectStore[T],
+  ec: ExecutionContext) {
 
   private val sqsStream = new SQSStream[NotificationMessage](
     actorSystem = actorSystem,

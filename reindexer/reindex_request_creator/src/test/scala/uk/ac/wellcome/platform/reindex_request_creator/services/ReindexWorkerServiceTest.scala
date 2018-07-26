@@ -4,7 +4,7 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -17,6 +17,8 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.utils.JsonUtil._
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ReindexWorkerServiceTest
     extends FunSpec
@@ -47,24 +49,23 @@ class ReindexWorkerServiceTest
                 )
               )
 
-              val notificationService = new NotificationSender(
-                snsWriter = new SNSWriter(
-                  snsClient = snsClient,
-                  snsConfig = SNSConfig(topicArn = topic.arn)
+              withSNSWriter(topic) { snsWriter =>
+                val notificationService = new NotificationSender(
+                  snsWriter = snsWriter
                 )
-              )
 
-              val workerService = new ReindexWorkerService(
-                readerService = readerService,
-                notificationService = notificationService,
-                sqsStream = sqsStream,
-                system = actorSystem
-              )
+                val workerService = new ReindexWorkerService(
+                  readerService = readerService,
+                  notificationService = notificationService,
+                  sqsStream = sqsStream,
+                  system = actorSystem
+                )
 
-              try {
-                testWith((workerService, queuePair))
-              } finally {
-                workerService.stop()
+                try {
+                  testWith((workerService, queuePair))
+                } finally {
+                  workerService.stop()
+                }
               }
             }
         }
@@ -163,37 +164,36 @@ class ReindexWorkerServiceTest
                 )
               )
 
-              val notificationService = new NotificationSender(
-                snsWriter = new SNSWriter(
-                  snsClient = snsClient,
-                  snsConfig = SNSConfig(topicArn = "doesnotexist")
+              withSNSWriter(Topic("does-not-exist")) { snsWriter =>
+                val notificationService = new NotificationSender(
+                  snsWriter = snsWriter
                 )
-              )
 
-              new ReindexWorkerService(
-                readerService = readerService,
-                notificationService = notificationService,
-                system = actorSystem,
-                sqsStream = sqsStream
-              )
+                new ReindexWorkerService(
+                  readerService = readerService,
+                  notificationService = notificationService,
+                  system = actorSystem,
+                  sqsStream = sqsStream
+                )
 
-              val reindexJob = ReindexJob(
-                shardId = "sierra/444",
-                desiredVersion = 4
-              )
+                val reindexJob = ReindexJob(
+                  shardId = "sierra/444",
+                  desiredVersion = 4
+                )
 
-              val sqsMessage = NotificationMessage(
-                Subject = "",
-                Message = toJson(reindexJob).get,
-                TopicArn = "topic",
-                MessageId = "message"
-              )
+                val sqsMessage = NotificationMessage(
+                  Subject = "",
+                  Message = toJson(reindexJob).get,
+                  TopicArn = "topic",
+                  MessageId = "message"
+                )
 
-              sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+                sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
-              eventually {
-                assertQueueEmpty(queue)
-                assertQueueHasSize(dlq, 1)
+                eventually {
+                  assertQueueEmpty(queue)
+                  assertQueueHasSize(dlq, 1)
+                }
               }
             }
         }

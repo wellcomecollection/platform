@@ -5,7 +5,7 @@ import java.time.Instant
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig, SNSWriter}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
@@ -95,30 +95,30 @@ trait MatcherFixtures
     topic: Topic)(testWith: TestWith[MatcherMessageReceiver, R])(
     implicit objectStore: ObjectStore[RecorderWorkEntry]): R = {
     val storageS3Config = S3Config(storageBucket.name)
-    val snsWriter =
-      new SNSWriter(snsClient, SNSConfig(topic.arn))
-
-    withActorSystem { actorSystem =>
-      withMockMetricSender { metricsSender =>
-        withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
-          withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
-            withWorkGraphStore(graphTable) { workGraphStore =>
-              withWorkMatcher(workGraphStore, lockTable, metricsSender) {
-                workMatcher =>
-                  withSQSStream[NotificationMessage, R](
-                    actorSystem,
-                    queue,
-                    metricsSender) { sqsStream =>
-                    val matcherMessageReceiver = new MatcherMessageReceiver(
-                      sqsStream,
-                      snsWriter,
-                      objectStore,
-                      storageS3Config,
-                      actorSystem,
-                      workMatcher)
-                    testWith(matcherMessageReceiver)
+    withSNSWriter(topic) { snsWriter =>
+      withActorSystem { actorSystem =>
+        withMockMetricSender { metricsSender =>
+          withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
+            withSpecifiedLocalDynamoDbTable(createWorkGraphTable) {
+              graphTable =>
+                withWorkGraphStore(graphTable) { workGraphStore =>
+                  withWorkMatcher(workGraphStore, lockTable, metricsSender) {
+                    workMatcher =>
+                      withSQSStream[NotificationMessage, R](
+                        actorSystem,
+                        queue,
+                        metricsSender) { sqsStream =>
+                        val matcherMessageReceiver = new MatcherMessageReceiver(
+                          sqsStream,
+                          snsWriter,
+                          objectStore,
+                          storageS3Config,
+                          actorSystem,
+                          workMatcher)
+                        testWith(matcherMessageReceiver)
+                      }
                   }
-              }
+                }
             }
           }
         }
