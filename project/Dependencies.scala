@@ -144,14 +144,11 @@ object Dependencies {
   ) ++ akkaDependencies ++ guiceDependencies
 
   val internalModelDependencies = dynamoDependencies ++ Seq(
-    "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
-  )
-
-  // Application specific dependency groups
-  val sierraAdapterCommonDependencies = Seq(
+    "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv,
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
+  // Application specific dependency groups
   val idminterDependencies = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
