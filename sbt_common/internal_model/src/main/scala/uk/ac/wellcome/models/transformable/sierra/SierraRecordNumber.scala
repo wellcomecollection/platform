@@ -44,8 +44,6 @@ case class SierraRecordNumber(s: String) {
     *     after the division is the check digit.  If the remainder is 10,
     *     the letter x is used as the check digit.
     *
-    * This method does no error checking, and assumes it is passed a 7-digit
-    * Sierra ID.
     */
   private def getCheckDigit: String = {
     val remainder = s.reverse
