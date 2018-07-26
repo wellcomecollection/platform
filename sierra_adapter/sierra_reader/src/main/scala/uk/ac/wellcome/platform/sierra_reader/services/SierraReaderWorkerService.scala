@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
+import java.time.Instant
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
@@ -18,6 +20,7 @@ import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.{
   WindowManager,
@@ -84,10 +87,11 @@ class SierraReaderWorkerService @Inject()(
       resourceType = sierraConfig.resourceType.toString,
       params)
 
-    val createRecord = sierraConfig.resourceType match {
-      case SierraResourceTypes.bibs => SierraBibRecord.apply
-      case SierraResourceTypes.items => SierraItemRecord.apply
-    }
+    val createRecord: (String, String, Instant) => AbstractSierraRecord =
+      sierraConfig.resourceType match {
+        case SierraResourceTypes.bibs  => SierraBibRecord.apply
+        case SierraResourceTypes.items => SierraItemRecord.apply
+      }
 
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow(createRecord))
