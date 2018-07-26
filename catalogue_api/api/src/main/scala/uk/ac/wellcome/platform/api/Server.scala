@@ -9,6 +9,7 @@ import com.twitter.finatra.http.filters.{
 }
 import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.display.modules.DisplayJacksonModule
+import uk.ac.wellcome.finatra.akka.ExecutionContextModule
 import uk.ac.wellcome.finatra.elasticsearch.{
   ElasticClientModule,
   ElasticConfigModule
@@ -28,7 +29,8 @@ class Server extends HttpServer {
   override val modules = Seq(
     ApiConfigModule,
     ElasticClientModule,
-    ElasticConfigModule
+    ElasticConfigModule,
+    ExecutionContextModule
   )
 
   override def jacksonModule = DisplayJacksonModule
