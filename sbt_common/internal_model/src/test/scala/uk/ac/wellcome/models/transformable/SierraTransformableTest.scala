@@ -30,6 +30,9 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraUtil {
 
     transformable.itemRecords(itemRecords.head.id) shouldBe itemRecords.head
 
+    // The first one should work by identity (the ID is the same object
+    // as the key).  Check it also works with a record number which is equal
+    // but not identical.
     val recordNumber = SierraRecordNumber(itemRecords.head.id.withoutCheckDigit)
     transformable.itemRecords(recordNumber) shouldBe itemRecords.head
   }
