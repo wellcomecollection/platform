@@ -17,7 +17,11 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig, SierraResourceTypes}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  SierraResourceTypes
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
