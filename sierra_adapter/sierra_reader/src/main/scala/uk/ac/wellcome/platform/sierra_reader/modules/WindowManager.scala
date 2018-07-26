@@ -7,9 +7,8 @@ import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.SierraConfig
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.utils.JsonUtil
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -53,7 +52,7 @@ class WindowManager @Inject()(
         val lastBody = IOUtils.toString(
           s3client.getObject(s3Config.bucketName, key).getObjectContent)
         val triedMaybeLastId =
-          JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
+          fromJson[List[AbstractSierraRecord]](lastBody).map { r =>
             r.map { _.id }.sorted.lastOption
           }
 
