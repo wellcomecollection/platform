@@ -5,7 +5,12 @@ import org.apache.commons.codec.digest.DigestUtils
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{VersionExpectedConflictException, VersionUnexpectedConflictException, WorkGraph, WorkUpdate}
+import uk.ac.wellcome.platform.matcher.models.{
+  VersionExpectedConflictException,
+  VersionUnexpectedConflictException,
+  WorkGraph,
+  WorkUpdate
+}
 
 import scala.collection.immutable.Iterable
 
