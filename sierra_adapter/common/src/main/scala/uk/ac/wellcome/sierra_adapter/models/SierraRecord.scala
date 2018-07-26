@@ -12,12 +12,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
 import scala.util.Try
 
 case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
-  def toBibRecord: SierraBibRecord =
-    SierraBibRecord(
-      id = this.id,
-      data = this.data,
-      modifiedDate = this.modifiedDate)
-
   def toItemRecord: Try[SierraItemRecord] =
     for {
       json <- parse(this.data).toTry
