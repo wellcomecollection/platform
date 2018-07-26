@@ -30,11 +30,10 @@ class SierraItemsToDynamoFeatureTest
         withServer(flags) { server =>
           val itemId = createSierraRecordNumberString
           val bibId = createSierraRecordNumberString
-          val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
 
           val sierraRecord = createSierraItemRecordWith(
             id = itemId,
-            data = data
+            bibIds = List(bibId)
           )
 
           sendNotificationToSQS(

@@ -88,14 +88,8 @@ class SierraItemsToDynamoWorkerServiceTest
 
         val record2 = createSierraItemRecordWith(
           id = itemRecord.id,
-          data = s"""
-               |{
-               |  "id": "${itemRecord.id}",
-               |  "bibIds": ${toJson(bibIds2).get},
-               |  "updatedDate": "${newerDate.toString}"
-               |}
-             """.stripMargin,
-          modifiedDate = newerDate
+          modifiedDate = newerDate,
+          bibIds = bibIds2
         )
 
         sendNotificationToSQS(queue = queue, message = record2)
@@ -105,7 +99,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
         val expectedRecord = SierraItemRecordMerger.mergeItems(
           existingRecord = itemRecord,
-          updatedRecord = record2.toItemRecord.get
+          updatedRecord = record2
         )
 
         val expectedData = expectedRecord.data
