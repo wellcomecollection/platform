@@ -2,12 +2,24 @@ package uk.ac.wellcome.models.transformable.sierra
 
 /** Represents the seven-digit IDs that are used to identify resources
   * in Sierra.
+  *
+  * Implementation note: this is deliberately a class, not a case class,
+  * for two reasons:
+  *
+  *  1. It makes the [[s]] field private -- callers have to use the methods
+  *     [[withCheckDigit()]] and [[withoutCheckDigit()]].
+  *  2. It forces callers to consistently load the Circe decoder/encoder,
+  *     rather than relying on automatic case class derivations.  We _need_
+  *     to use the custom decoder when getting bib data from the Sierra API,
+  *     and then it would be good to be consistent internally.
+  *
   */
-case class SierraRecordNumber(s: String) {
-  require(
-    """^[0-9]{7}$""".r.unapplySeq(s) isDefined,
-    s"Not a 7-digit Sierra record number: $s"
-  )
+class SierraRecordNumber(s: String) {
+  if ("""^[0-9]{7}$""".r.unapplySeq(s) isEmpty) {
+    throw new IllegalArgumentException(
+      s"requirement failed: Not a 7-digit Sierra record number: $s"
+    )
+  }
 
   override def toString: String = withoutCheckDigit
 
@@ -52,4 +64,9 @@ case class SierraRecordNumber(s: String) {
       .sum % 11
     if (remainder == 10) "x" else remainder.toString
   }
+}
+
+object SierraRecordNumber {
+  def apply(s: String): SierraRecordNumber =
+    new SierraRecordNumber(s)
 }
