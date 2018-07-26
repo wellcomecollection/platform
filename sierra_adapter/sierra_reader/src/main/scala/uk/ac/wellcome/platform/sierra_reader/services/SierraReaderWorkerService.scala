@@ -2,10 +2,8 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import java.time.Instant
 
-import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Source
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
