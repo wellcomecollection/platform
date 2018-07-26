@@ -21,9 +21,16 @@ import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  AbstractSierraRecord,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
+import uk.ac.wellcome.platform.sierra_reader.modules.{
+  WindowManager,
+  WindowStatus
+}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
