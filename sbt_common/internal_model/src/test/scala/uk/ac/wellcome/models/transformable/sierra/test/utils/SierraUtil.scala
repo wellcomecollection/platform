@@ -61,7 +61,7 @@ trait SierraUtil extends IdentifiersUtil {
     id: String = createSierraRecordNumberString,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String],
+    bibIds: List[String] = List(),
     unlinkedBibIds: List[String] = List(),
     version: Int = 0
   ): SierraItemRecord = {

@@ -6,11 +6,8 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.platform.sierra_reader.models.{
-  SierraConfig,
-  SierraResourceTypes
-}
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -67,7 +64,7 @@ class WindowManagerTest
         s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
         val record =
-          SierraRecord(
+          SierraBibRecord(
             id = "b1794165",
             data = "{}",
             modifiedDate = Instant.now())
