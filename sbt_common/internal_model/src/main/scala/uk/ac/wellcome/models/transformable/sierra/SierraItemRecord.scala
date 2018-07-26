@@ -20,9 +20,9 @@ case object SierraItemRecord {
     data: String,
     modifiedDate: Instant
   ): SierraItemRecord = {
-    val json = parse(this.data) match {
-      case Success(json) => json
-      case Err(e) =>
+    val json = parse(data) match {
+      case Right(json) => json
+      case Left(e) =>
         throw new IllegalArgumentException(s"Non-JSON data: <<$data>> ($e)")
     }
 
@@ -35,18 +35,13 @@ case object SierraItemRecord {
     val bibIds = bibIdsJsonSeq
       .map { json =>
         json.asString.getOrElse(
-          throw new IllegalArgumentException("Found non string in bibIds: <<$data>>"))
+          throw new IllegalArgumentException(s"Found non string in bibIds: <<$data>>"))
       }.toList
 
-    bibIdsJsonSeq = root.bibIds.arr
-      .getOption(json)
-      .getOrElse(throw new IllegalArgumentException(
-        "JSON data did not contain bibIds: <<$data>>"))
-
     SierraItemRecord(
-      id = this.id,
-      data = this.data,
-      modifiedDate = this.modifiedDate,
+      id = id,
+      data = data,
+      modifiedDate = modifiedDate,
       bibIds = bibIds
     )
   }
