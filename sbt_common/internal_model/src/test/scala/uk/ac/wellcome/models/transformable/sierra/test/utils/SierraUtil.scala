@@ -55,12 +55,13 @@ trait SierraUtil extends IdentifiersUtil {
     )
   }
 
-  def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
+  def createSierraBibRecord: SierraBibRecord =
+    createSierraBibRecordWith(bibIds = List())
 
   def createSierraItemRecordWith(
     id: String = createSierraRecordNumberString,
     data: String,
-    modifiedDate: Instant = Instant.npw
+    modifiedDate: Instant = Instant.now
   ): SierraItemRecord = SierraItemRecord(
     id = id,
     data = data,
@@ -71,7 +72,7 @@ trait SierraUtil extends IdentifiersUtil {
     id: String = createSierraRecordNumberString,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String] = List(),
+    bibIds: List[String],
     unlinkedBibIds: List[String] = List(),
     version: Int = 0
   ): SierraItemRecord = {

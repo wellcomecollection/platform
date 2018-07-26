@@ -5,6 +5,18 @@ import uk.ac.wellcome.utils.JsonUtil._
 import java.time.Instant
 import scala.util.{Failure, Success}
 
+sealed trait AbstractSierraRecord {
+  val id: String
+  val data: String
+  val modifiedDate: Instant
+}
+
+case class SierraBibRecord(
+  id: String,
+  data: String,
+  modifiedDate: Instant
+) extends AbstractSierraRecord
+
 case class SierraItemRecord(
   id: String,
   data: String,
