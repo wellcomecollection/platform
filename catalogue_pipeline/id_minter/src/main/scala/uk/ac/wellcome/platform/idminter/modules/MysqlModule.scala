@@ -2,11 +2,14 @@ package uk.ac.wellcome.platform.idminter.modules
 
 import com.google.inject.Provides
 import com.twitter.inject.TwitterModule
-import scalikejdbc.{ConnectionPool, DB}
+import scalikejdbc.{ConnectionPool, ConnectionPoolSettings, DB}
 import uk.ac.wellcome.platform.idminter.models.RDSClientConfig
 
 object MysqlModule extends TwitterModule {
   override val modules = Seq(RDSClientConfigModule)
+  val maxSize = flag[Int](
+    "aws.rds.maxConnections",
+    "Maximum number of connections to the database")
 
   @Provides
   def providesDB(rdsClientConfig: RDSClientConfig): DB = {
@@ -14,7 +17,8 @@ object MysqlModule extends TwitterModule {
     ConnectionPool.singleton(
       s"jdbc:mysql://${rdsClientConfig.host}:${rdsClientConfig.port}",
       user = rdsClientConfig.username,
-      password = rdsClientConfig.password
+      password = rdsClientConfig.password,
+      settings = ConnectionPoolSettings(maxSize = maxSize())
     )
     DB.connect()
   }

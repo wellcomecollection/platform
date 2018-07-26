@@ -86,7 +86,8 @@ trait IdentifiersDatabase
     "aws.rds.host" -> host,
     "aws.rds.port" -> port,
     "aws.rds.userName" -> username,
-    "aws.rds.password" -> password
+    "aws.rds.password" -> password,
+    "aws.rds.maxConnections" -> "8"
   )
 
   def identifiersLocalDbFlags(identifiersTableConfig: IdentifiersTableConfig) =

@@ -127,12 +127,19 @@ module "id_minter" {
     queue_url           = "${module.id_minter_queue.id}"
     topic_arn           = "${module.es_ingest_topic.arn}"
     sqs_max_messages    = 10
+    max_connections     = 8
   }
 
-  env_vars_length   = 9
+  env_vars_length   = 10
   container_image   = "${var.id_minter_container_image}"
   source_queue_name = "${module.id_minter_queue.name}"
   source_queue_arn  = "${module.id_minter_queue.arn}"
+
+  // Our RDS instance allows a maximum of 45 concurrent connections.
+  // The maximum number of concurrent connection is determined by
+  // max_connections * max_capacity so we always need to set those
+  // two values in a way that their product doesn't exceed 45
+  max_capacity = 5
 
   security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
 }
