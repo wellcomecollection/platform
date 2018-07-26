@@ -2,8 +2,14 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
+    val monitoring = "1.0.0"
     val storage = "1.5.0"
   }
+
+  val monitoringLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.storage,
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.storage % "test" classifier "tests"
+  )
 
   val storageLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" % "storage_2.12" % versions.storage,
@@ -137,11 +143,9 @@ object Dependencies {
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
-  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
+  val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
 
-  val commonMonitoringDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
-  ) ++ akkaDependencies ++ guiceDependencies
+  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
   val internalModelDependencies = dynamoDependencies ++ Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
