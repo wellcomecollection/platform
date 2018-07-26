@@ -43,6 +43,7 @@ lazy val elasticsearch = doSharedLibrarySetup(project, "sbt_common/elasticsearch
   .settings(libraryDependencies ++= Dependencies.commonElasticsearchDependencies)
 
 lazy val messaging = doSharedLibrarySetup(project, "sbt_common/messaging")
+  .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.commonMessagingDependencies)
 
 lazy val finatra_akka = doSharedLibrarySetup(project, "sbt_common/finatra_akka")
