@@ -7,8 +7,8 @@ object WellcomeDependencies {
   }
 
   val monitoringLibrary: Seq[ModuleID] = Seq(
-    "uk.ac.wellcome" % "monitoring_2.12" % versions.storage,
-    "uk.ac.wellcome" % "monitoring_2.12" % versions.storage % "test" classifier "tests"
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring,
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring % "test" classifier "tests"
   )
 
   val storageLibrary: Seq[ModuleID] = Seq(
