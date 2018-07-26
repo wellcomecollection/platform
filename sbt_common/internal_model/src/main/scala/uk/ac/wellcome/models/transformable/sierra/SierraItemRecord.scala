@@ -1,9 +1,9 @@
 package uk.ac.wellcome.models.transformable.sierra
 
-import io.circe.optics.JsonPath.root
-import io.circe.parser._
+import uk.ac.wellcome.utils.JsonUtil._
 
 import java.time.Instant
+import scala.util.{Failure, Success}
 
 case class SierraItemRecord(
   id: String,
@@ -15,28 +15,23 @@ case class SierraItemRecord(
 ) extends AbstractSierraRecord
 
 case object SierraItemRecord {
+
+  /** This apply method is for parsing JSON bodies that come from the
+    * Sierra API.
+    */
   def apply(
     id: String,
     data: String,
     modifiedDate: Instant
   ): SierraItemRecord = {
-    val json = parse(data) match {
-      case Right(json) => json
-      case Left(e) =>
-        throw new IllegalArgumentException(s"Non-JSON data: <<$data>> ($e)")
+
+    case class SierraAPIData(bibIds: List[String])
+
+    val bibIds = fromJson[SierraAPIData](data) match {
+      case Success(apiData) => apiData.bibIds
+      case Failure(e) =>
+        throw new IllegalArgumentException(s"Error parsing bibIds from JSON <<$data>> ($e)")
     }
-
-    val bibIdsJsonSeq = root
-      .bibIds.arr
-      .getOption(json)
-      .getOrElse(
-        throw new IllegalArgumentException(s"JSON data did not contain bibIds: <<$data>>"))
-
-    val bibIds = bibIdsJsonSeq
-      .map { json =>
-        json.asString.getOrElse(
-          throw new IllegalArgumentException(s"Found non string in bibIds: <<$data>>"))
-      }.toList
 
     SierraItemRecord(
       id = id,
