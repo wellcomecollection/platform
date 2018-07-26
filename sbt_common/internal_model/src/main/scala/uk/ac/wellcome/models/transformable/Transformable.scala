@@ -27,15 +27,15 @@ case class MiroTransformable(sourceId: String,
   *
   */
 case class SierraTransformable(
-  sourceId: String,
-  sourceName: String = "sierra",
-  maybeBibRecord: Option[SierraBibRecord] = None,
-  itemRecords: Map[String, SierraItemRecord] = Map()
+                                sourceId: String,
+                                sourceName: String = "sierra",
+                                maybeBibData: Option[SierraBibRecord] = None,
+                                itemRecords: Map[String, SierraItemRecord] = Map()
 ) extends Transformable
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
     SierraTransformable(
       sourceId = bibRecord.id,
-      maybeBibRecord = Some(bibRecord))
+      maybeBibData = Some(bibRecord))
 }

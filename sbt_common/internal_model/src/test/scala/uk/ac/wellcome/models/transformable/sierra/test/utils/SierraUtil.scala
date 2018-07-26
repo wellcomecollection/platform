@@ -94,7 +94,7 @@ trait SierraUtil extends IdentifiersUtil {
   ): SierraTransformable =
     SierraTransformable(
       sourceId = sourceId,
-      maybeBibRecord = maybeBibRecord,
+      maybeBibData = maybeBibRecord,
       itemRecords = itemRecords.map { record: SierraItemRecord =>
         record.id -> record
       }.toMap
