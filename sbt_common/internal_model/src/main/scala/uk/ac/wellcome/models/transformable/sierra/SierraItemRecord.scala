@@ -1,21 +1,10 @@
 package uk.ac.wellcome.models.transformable.sierra
 
+import java.time.Instant
+
 import uk.ac.wellcome.utils.JsonUtil._
 
-import java.time.Instant
 import scala.util.{Failure, Success}
-
-sealed trait AbstractSierraRecord {
-  val id: String
-  val data: String
-  val modifiedDate: Instant
-}
-
-case class SierraBibRecord(
-  id: String,
-  data: String,
-  modifiedDate: Instant
-) extends AbstractSierraRecord
 
 case class SierraItemRecord(
   id: String,
@@ -36,8 +25,7 @@ case object SierraItemRecord {
   def apply(
     id: String,
     data: String,
-    modifiedDate: Instant
-  ): SierraItemRecord = {
+    modifiedDate: Instant): SierraItemRecord = {
     val bibIds = fromJson[SierraAPIData](data) match {
       case Success(apiData) => apiData.bibIds
       case Failure(e) =>
