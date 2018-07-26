@@ -70,7 +70,8 @@ class SierraRecordNumber(s: String) {
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: SierraRecordNumber => that.withoutCheckDigit == this.withoutCheckDigit
+      case that: SierraRecordNumber =>
+        that.withoutCheckDigit == this.withoutCheckDigit
       case _ => false
     }
 

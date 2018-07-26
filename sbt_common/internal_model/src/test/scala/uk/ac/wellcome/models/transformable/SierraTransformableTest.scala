@@ -23,7 +23,9 @@ class SierraTransformableTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("allows looking up items by ID") {
-    val itemRecords = (0 to 3).map { _ => createSierraItemRecord}.toList
+    val itemRecords = (0 to 3).map { _ =>
+      createSierraItemRecord
+    }.toList
     val transformable = createSierraTransformableWith(
       itemRecords = itemRecords
     )

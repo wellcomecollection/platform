@@ -6,7 +6,11 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
-class SierraBibRecordTest extends FunSpec with Matchers with JsonTestUtil with SierraUtil {
+class SierraBibRecordTest
+    extends FunSpec
+    with Matchers
+    with JsonTestUtil
+    with SierraUtil {
 
   it("can cast a SierraBibRecord to JSON and back again") {
     val originalRecord = createSierraBibRecord

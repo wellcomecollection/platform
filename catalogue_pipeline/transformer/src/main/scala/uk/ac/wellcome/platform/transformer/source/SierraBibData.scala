@@ -17,4 +17,3 @@ case class SierraBibData(
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 )
-
