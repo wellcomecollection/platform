@@ -12,7 +12,7 @@ import com.sksamuel.elastic4s.http.ElasticDsl.{
 import com.sksamuel.elastic4s.http.HttpClient
 import com.sksamuel.elastic4s.mappings.dynamictemplate.DynamicMapping
 import com.sksamuel.elastic4s.mappings.{FieldDefinition, MappingDefinition}
-import uk.ac.wellcome.Elasticsearch.ElasticsearchIndex
+import uk.ac.wellcome.elasticsearch.ElasticsearchIndex
 
 import scala.concurrent.ExecutionContext
 
