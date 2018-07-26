@@ -12,7 +12,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
 import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 import uk.ac.wellcome.storage.ObjectStore
