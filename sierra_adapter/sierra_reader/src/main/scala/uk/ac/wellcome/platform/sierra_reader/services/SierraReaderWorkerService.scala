@@ -2,12 +2,15 @@ package uk.ac.wellcome.platform.sierra_reader.services
 
 import java.time.Instant
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Source
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
 import uk.ac.wellcome.platform.sierra_reader.models.{
@@ -22,10 +25,7 @@ import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.platform.sierra_reader.modules.{
-  WindowManager,
-  WindowStatus
-}
+import uk.ac.wellcome.platform.sierra_reader.modules.{WindowManager, WindowStatus}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -96,7 +96,7 @@ class SierraReaderWorkerService @Inject()(
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow(createRecord))
       .grouped(readerConfig.batchSize)
-      .map(recordBatch => recordBatch.asJson)
+      .map(recordBatch => toJson(recordBatch))
       .zipWithIndex
       .runWith(s3sink)
 
@@ -110,4 +110,10 @@ class SierraReaderWorkerService @Inject()(
         "")
     }
   }
+
+  private def toJson(records: Seq[AbstractSierraRecord]): Json =
+    sierraConfig.resourceType match {
+      case SierraResourceTypes.bibs  => records.asInstanceOf[Seq[SierraBibRecord]].asJson
+      case SierraResourceTypes.items => records.asInstanceOf[Seq[SierraItemRecord]].asJson
+    }
 }

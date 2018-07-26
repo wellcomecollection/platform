@@ -38,7 +38,6 @@ object SierraRecordWrapperFlow extends Logging {
       .toInstant(ZoneOffset.UTC)
   }
 
-  private def getId(json: Json) = {
+  private def getId(json: Json) =
     root.id.string.getOption(json).get
-  }
 }
