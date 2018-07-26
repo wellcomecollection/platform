@@ -85,8 +85,7 @@ trait SierraUtil extends IdentifiersUtil {
     )
   }
 
-  def createSierraItemRecord: SierraItemRecord =
-    createSierraItemRecordWith(bibIds = List())
+  def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 
   def createSierraTransformableWith(
     sourceId: String = createSierraRecordNumberString,
