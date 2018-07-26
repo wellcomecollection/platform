@@ -8,7 +8,11 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  SierraResourceTypes
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
 import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
@@ -80,8 +84,13 @@ class SierraReaderWorkerService @Inject()(
       resourceType = sierraConfig.resourceType.toString,
       params)
 
+    val createRecord = sierraConfig.resourceType match {
+      case SierraResourceTypes.bibs => SierraBibRecord.apply
+      case SierraResourceTypes.items => SierraItemRecord.apply
+    }
+
     val outcome = sierraSource
-      .via(SierraRecordWrapperFlow())
+      .via(SierraRecordWrapperFlow(createRecord))
       .grouped(readerConfig.batchSize)
       .map(recordBatch => recordBatch.asJson)
       .zipWithIndex

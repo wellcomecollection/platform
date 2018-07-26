@@ -8,28 +8,26 @@ import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
 
 object SierraRecordWrapperFlow extends Logging {
-  def apply(): Flow[Json, SierraRecord, NotUsed] =
+  def apply[T <: AbstractSierraRecord](
+    createRecord: (String, String, Instant) => T): Flow[Json, T, NotUsed] =
     Flow.fromFunction({ json =>
-      createSierraRecord(json)
+      val id = getId(json)
+      val data = json.noSpaces
+      val modifiedDate = getModifiedDate(json)
+
+      createRecord(id, data, modifiedDate)
     })
 
-  private def createSierraRecord(json: Json): SierraRecord = {
-    logger.debug(s"Creating record from ${json.noSpaces}")
+  private def getModifiedDate(json: Json): Instant = {
     val maybeUpdatedDate = root.updatedDate.string.getOption(json)
 
-    val modifiedDate = maybeUpdatedDate match {
+    maybeUpdatedDate match {
       case Some(updatedDate) => Instant.parse(updatedDate)
       case None              => getDeletedDateTimeAtStartOfDay(json)
     }
-
-    SierraRecord(
-      id = getId(json),
-      data = json.noSpaces,
-      modifiedDate = modifiedDate
-    )
   }
 
   private def getDeletedDateTimeAtStartOfDay(json: Json): Instant = {
