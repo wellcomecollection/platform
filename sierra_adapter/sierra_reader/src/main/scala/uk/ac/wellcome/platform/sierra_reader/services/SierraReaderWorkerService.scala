@@ -87,8 +87,8 @@ class SierraReaderWorkerService @Inject()(
       .zipWithIndex
       .runWith(s3sink)
 
-    // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
-    // were never successfully completed.
+    // This serves as a marker that the window is complete, so we can audit
+    // our S3 bucket to see which windows were never successfully completed.
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
