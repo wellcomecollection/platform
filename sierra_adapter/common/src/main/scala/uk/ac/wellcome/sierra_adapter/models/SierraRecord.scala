@@ -6,12 +6,15 @@ import io.circe.optics.JsonPath.root
 import io.circe.parser._
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
-  SierraItemRecord
+  SierraItemRecord,
+  SierraRecordNumber
 }
 
 import scala.util.Try
 
-case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
+case class SierraRecord(id: SierraRecordNumber,
+                        data: String,
+                        modifiedDate: Instant) {
   def toBibRecord: SierraBibRecord =
     SierraBibRecord(
       id = this.id,
@@ -34,6 +37,9 @@ case class SierraRecord(id: String, data: String, modifiedDate: Instant) {
         id = this.id,
         data = this.data,
         modifiedDate = this.modifiedDate,
-        bibIds = bibIds)
+        bibIds = bibIds.map { s: String =>
+          SierraRecordNumber(s)
+        }
+      )
     }
 }

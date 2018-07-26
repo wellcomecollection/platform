@@ -11,6 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
@@ -73,7 +74,7 @@ class SierraItemsToDynamoWorkerServiceTest
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
-        val bibIds = createSierraRecordNumberStrings(count = 5)
+        val bibIds = createSierraRecordNumbers(count = 5)
 
         val bibIds1 = List(bibIds(0), bibIds(1), bibIds(2))
 
@@ -91,7 +92,7 @@ class SierraItemsToDynamoWorkerServiceTest
           data = s"""
                |{
                |  "id": "${itemRecord.id}",
-               |  "bibIds": ${toJson(bibIds2).get},
+               |  "bibIds": ${toJson(bibIds2.map { _.withoutCheckDigit }).get},
                |  "updatedDate": "${newerDate.toString}"
                |}
              """.stripMargin,
@@ -115,7 +116,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
           val scanamoResult =
             Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> itemRecord.id)
+              'id -> itemRecord.id.withoutCheckDigit)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(

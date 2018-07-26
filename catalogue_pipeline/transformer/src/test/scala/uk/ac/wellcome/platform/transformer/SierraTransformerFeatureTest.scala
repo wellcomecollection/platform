@@ -3,6 +3,8 @@ package uk.ac.wellcome.platform.transformer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordTypes
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
@@ -27,19 +29,15 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "1001001"
-    val title = "A pot of possums"
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messagingBucket =>
+            val sierraTransformable = createSierraTransformable
+
             val sierraHybridRecordMessage =
               hybridRecordNotificationMessage(
-                message = createValidSierraTransformableJsonWith(
-                  id = id,
-                  title = title
-                ),
+                message = toJson(sierraTransformable).get,
                 sourceName = "sierra",
                 s3Client = s3Client,
                 bucket = storageBucket
@@ -65,13 +63,14 @@ class SierraTransformerFeatureTest
                 val sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
-                  value = "b10010014"
+                  value = sierraTransformable.sierraId.withCheckDigit(
+                    SierraRecordTypes.bibs)
                 )
 
                 val sierraIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-identifier"),
                   ontologyType = "Work",
-                  value = id
+                  value = sierraTransformable.sierraId.withoutCheckDigit
                 )
 
                 val works = getMessages[UnidentifiedWork](topic)
@@ -79,7 +78,6 @@ class SierraTransformerFeatureTest
 
                 works.map { actualWork =>
                   actualWork.sourceIdentifier shouldBe sourceIdentifier
-                  actualWork.title shouldBe title
                   actualWork.identifiers shouldBe List(
                     sourceIdentifier,
                     sierraIdentifier)

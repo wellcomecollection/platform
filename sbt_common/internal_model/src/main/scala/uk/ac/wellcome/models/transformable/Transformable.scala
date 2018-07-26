@@ -1,9 +1,11 @@
 package uk.ac.wellcome.models.transformable
 
+import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.Sourced
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
-  SierraItemRecord
+  SierraItemRecord,
+  SierraRecordNumber
 }
 
 sealed trait Transformable extends Sourced
@@ -14,28 +16,32 @@ case class MiroTransformable(sourceId: String,
                              data: String)
     extends Transformable
 
-/** Represents a row in the DynamoDB database of "merged" Sierra records;
-  * that is, records that contain data for both bibs and
-  * their associated items.
-  *
-  * Fields:
-  *
-  *   - `id`: the ID of the associated bib record
-  *   - `maybeBibData`: data from the associated bib.  This may be None if
-  *     we've received an item but haven't had the bib yet.
-  *   - `itemData`: a map from item IDs to item records
-  *
-  */
 case class SierraTransformable(
-  sourceId: String,
+  sierraId: SierraRecordNumber,
   sourceName: String = "sierra",
   maybeBibRecord: Option[SierraBibRecord] = None,
-  itemRecords: Map[String, SierraItemRecord] = Map()
-) extends Transformable
+  itemRecords: Map[SierraRecordNumber, SierraItemRecord] = Map()
+) extends Transformable {
+  override val sourceId: String = sierraId.withoutCheckDigit
+}
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
     SierraTransformable(
-      sourceId = bibRecord.id,
-      maybeBibRecord = Some(bibRecord))
+      sierraId = bibRecord.id,
+      maybeBibRecord = Some(bibRecord)
+    )
+
+  // Because the [[SierraTransformable.itemRecords]] field is keyed by
+  // [[SierraRecordNumber]] in our case class, but JSON only supports string
+  // keys, we need to turn the ID into a string when storing as JSON.
+  //
+  // This is based on the "Custom key types" section of the Circe docs:
+  // https://circe.github.io/circe/codecs/custom-codecs.html#custom-key-types
+  //
+  implicit val keyEncoder: KeyEncoder[SierraRecordNumber] =
+    (key: SierraRecordNumber) => key.withoutCheckDigit
+
+  implicit val keyDecoder: KeyDecoder[SierraRecordNumber] = (key: String) =>
+    Some(SierraRecordNumber(key))
 }

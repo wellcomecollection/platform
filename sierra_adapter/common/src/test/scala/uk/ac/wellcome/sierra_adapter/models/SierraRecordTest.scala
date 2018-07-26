@@ -11,8 +11,8 @@ class SierraRecordTest extends FunSpec with Matchers with SierraRecordUtil {
 
   describe("toItemRecord") {
     it("return a successful try for valid item json") {
-      val itemId = createSierraRecordNumberString
-      val bibId = createSierraRecordNumberString
+      val itemId = createSierraRecordNumber
+      val bibId = createSierraRecordNumber
       val data = s"""
         |{
         |  "id": "$itemId",

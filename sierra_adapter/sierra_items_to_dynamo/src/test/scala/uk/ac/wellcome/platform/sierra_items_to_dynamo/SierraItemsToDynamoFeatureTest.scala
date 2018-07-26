@@ -6,6 +6,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo.dynamo._
 import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -28,8 +29,8 @@ class SierraItemsToDynamoFeatureTest
         val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
 
         withServer(flags) { server =>
-          val itemId = createSierraRecordNumberString
-          val bibId = createSierraRecordNumberString
+          val itemId = createSierraRecordNumber
+          val bibId = createSierraRecordNumber
           val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
 
           val sierraRecord = createSierraRecordWith(
@@ -47,7 +48,7 @@ class SierraItemsToDynamoFeatureTest
 
             val scanamoResult =
               Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-                'id -> itemId)
+                'id -> itemId.withoutCheckDigit)
 
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(

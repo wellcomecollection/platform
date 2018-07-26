@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.transformer.source
 
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Country => SierraCountry,
   Language => SierraLanguage
 }
 
 case class SierraBibData(
-  id: String,
+  id: SierraRecordNumber,
   title: Option[String] = None,
   deleted: Boolean = false,
   suppressed: Boolean = false,

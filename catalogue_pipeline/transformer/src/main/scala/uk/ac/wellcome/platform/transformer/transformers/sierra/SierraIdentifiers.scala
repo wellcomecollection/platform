@@ -20,7 +20,7 @@ trait SierraIdentifiers {
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",
-        value = bibData.id
+        value = bibData.id.withoutCheckDigit
       )
     )
 }

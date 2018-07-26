@@ -21,7 +21,7 @@
   <logger name="ch.qos.logback" level="WARN"/>
   <logger name="com.amazonaws" level="INFO"/>
   <logger name="com.sksamuel.elastic4s" level="INFO"/>
-  <logger name="com.twitter" level="INFO"/>
+  <logger name="com.twitter" level="WARN"/>
   <logger name="io.netty" level="INFO"/>
   <logger name="org.apache.http" level="INFO"/>
   <logger name="org.elasticsearch.client.RestClient" level="INFO"/>

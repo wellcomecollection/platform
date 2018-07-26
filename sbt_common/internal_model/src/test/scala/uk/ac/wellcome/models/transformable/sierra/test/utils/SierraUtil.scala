@@ -5,8 +5,10 @@ import java.time.Instant
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
-  SierraItemRecord
+  SierraItemRecord,
+  SierraRecordNumber
 }
+import uk.ac.wellcome.models.transformable.sierra.SierraRecordNumber._
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -32,16 +34,19 @@ trait SierraUtil extends IdentifiersUtil {
     Stream continually nextDigit
   }
 
-  def createSierraRecordNumberString: String =
+  private def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
 
-  def createSierraRecordNumberStrings(count: Int): List[String] =
+  def createSierraRecordNumber: SierraRecordNumber =
+    SierraRecordNumber(createSierraRecordNumberString)
+
+  def createSierraRecordNumbers(count: Int): List[SierraRecordNumber] =
     (1 to count).map { _ =>
-      createSierraRecordNumberString
+      createSierraRecordNumber
     }.toList
 
   def createSierraBibRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraRecordNumber = createSierraRecordNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now): SierraBibRecord = {
     val recordData = if (data == "") {
@@ -58,11 +63,11 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraRecordNumber = createSierraRecordNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String] = List(),
-    unlinkedBibIds: List[String] = List(),
+    bibIds: List[SierraRecordNumber] = List(),
+    unlinkedBibIds: List[SierraRecordNumber] = List(),
     version: Int = 0
   ): SierraItemRecord = {
     val recordData = if (data == "") {
@@ -88,12 +93,12 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraItemRecord: SierraItemRecord = createSierraItemRecordWith()
 
   def createSierraTransformableWith(
-    sourceId: String = createSierraRecordNumberString,
+    sierraId: SierraRecordNumber = createSierraRecordNumber,
     maybeBibRecord: Option[SierraBibRecord] = None,
     itemRecords: List[SierraItemRecord] = List()
   ): SierraTransformable =
     SierraTransformable(
-      sourceId = sourceId,
+      sierraId = sierraId,
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords.map { record: SierraItemRecord =>
         record.id -> record
@@ -101,5 +106,7 @@ trait SierraUtil extends IdentifiersUtil {
     )
 
   def createSierraTransformable: SierraTransformable =
-    createSierraTransformableWith()
+    SierraTransformable(
+      bibRecord = createSierraBibRecord
+    )
 }
