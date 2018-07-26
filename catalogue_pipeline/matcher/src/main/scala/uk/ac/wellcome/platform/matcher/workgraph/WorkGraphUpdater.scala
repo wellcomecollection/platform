@@ -1,18 +1,13 @@
 package uk.ac.wellcome.platform.matcher.workgraph
 
 import grizzled.slf4j.Logging
+import org.apache.commons.codec.digest.DigestUtils
 import scalax.collection.Graph
 import scalax.collection.GraphPredef._
 import uk.ac.wellcome.models.matcher.WorkNode
-import uk.ac.wellcome.platform.matcher.models.{
-  VersionExpectedConflictException,
-  VersionUnexpectedConflictException,
-  WorkGraph,
-  WorkUpdate
-}
+import uk.ac.wellcome.platform.matcher.models.{VersionExpectedConflictException, VersionUnexpectedConflictException, WorkGraph, WorkUpdate}
 
 import scala.collection.immutable.Iterable
-import scala.util.hashing.MurmurHash3
 
 object WorkGraphUpdater extends Logging {
   def update(workUpdate: WorkUpdate, existingGraph: WorkGraph): WorkGraph = {
@@ -68,18 +63,16 @@ object WorkGraphUpdater extends Logging {
               node.value,
               nodeVersions.getOrElse(node.value, 0),
               adjacentNodeIds(node),
-              componentIdentifierHash(nodeIds))
+              componentIdentifier(nodeIds))
           })
         })
         .toSet
     )
   }
 
-  def componentIdentifierHash(nodeIds: List[String]) = {
+  def componentIdentifier(nodeIds: List[String]) = {
     val componentIdentifier = nodeIds.sorted.mkString("+")
-    MurmurHash3
-      .stringHash(componentIdentifier, MurmurHash3.stringSeed)
-      .toHexString
+    DigestUtils.sha256Hex(componentIdentifier)
   }
 
   private def allNodes(linkedWork: WorkNode) = {

@@ -13,12 +13,12 @@ class WorkGraphUpdaterTest extends FunSpec with Matchers with MatcherFixtures {
   // works comprised of linked works are identified by compound id together with their linked works.
   // A+B:(A->B, B) means compound work with id "A+B" is made of work A linked to B and work B.
 
-  private val hashed_A = "217b21f3" // ciHash("A")
-  private val hashed_B = "4d7e95ff" // ciHash("B")
-  private val hashed_C = "8171cb29" // ciHash("C")
-  private val hashed_AB = "2f2f1575" // ciHash("A+B")
-  private val hashed_ABC = "45e72cb2" // ciHash("A+B+C")
-  private val hashed_ABCD = "73200083" // ciHash("A+B+C+D")
+  private val hashed_A    = "559aead08264d5795d3909718cdd05abd49572e84fe55590eef31a88a08fdffd" // ciHash("A")
+  private val hashed_B    = "df7e70e5021544f4834bbee64a9e3789febc4be81470df629cad6ddb03320a5c" // ciHash("B")
+  private val hashed_C    = "6b23c0d5f35d1b11f9b683f0b0a617355deb11277d91ae091d399c655b87940d" // ciHash("C")
+  private val hashed_AB   = "ca5b7e1c5b0ddba53ac5a73e3c49e9bb896a6f488ce4d605d24a6debedcc901d" // ciHash("A+B")
+  private val hashed_ABC  = "fe153f639ec1439fad84263be471b79485d2356a52871798a68d221596f06cef" // ciHash("A+B+C")
+  private val hashed_ABCD = "317c89a844216f56119b9ffa835390fe92e75a2c13f7d29026327bf3318560bd" // ciHash("A+B+C+D")
 
   describe("Adding links without existing works") {
     it("updating nothing with A gives A:A") {
