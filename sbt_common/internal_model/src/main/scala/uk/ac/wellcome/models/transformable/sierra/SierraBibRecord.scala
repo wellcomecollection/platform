@@ -6,4 +6,4 @@ case class SierraBibRecord(
   id: String,
   data: String,
   modifiedDate: Instant
-)
+) extends AbstractSierraRecord

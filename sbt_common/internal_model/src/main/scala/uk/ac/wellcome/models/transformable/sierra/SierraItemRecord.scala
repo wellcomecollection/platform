@@ -9,4 +9,4 @@ case class SierraItemRecord(
   bibIds: List[String],
   unlinkedBibIds: List[String] = List(),
   version: Int = 0
-)
+) extends AbstractSierraRecord
