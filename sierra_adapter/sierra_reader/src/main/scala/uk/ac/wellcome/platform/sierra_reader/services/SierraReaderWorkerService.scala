@@ -85,12 +85,6 @@ class SierraReaderWorkerService @Inject()(
       resourceType = sierraConfig.resourceType.toString,
       params)
 
-    val createRecord: (String, String, Instant) => AbstractSierraRecord =
-      sierraConfig.resourceType match {
-        case SierraResourceTypes.bibs  => SierraBibRecord.apply
-        case SierraResourceTypes.items => SierraItemRecord.apply
-      }
-
     val outcome = sierraSource
       .via(SierraRecordWrapperFlow(createRecord))
       .grouped(readerConfig.batchSize)
@@ -108,6 +102,12 @@ class SierraReaderWorkerService @Inject()(
         "")
     }
   }
+
+  private def createRecord: (String, String, Instant) => AbstractSierraRecord =
+    sierraConfig.resourceType match {
+      case SierraResourceTypes.bibs  => SierraBibRecord.apply
+      case SierraResourceTypes.items => SierraItemRecord.apply
+    }
 
   private def toJson(records: Seq[AbstractSierraRecord]): Json =
     sierraConfig.resourceType match {
