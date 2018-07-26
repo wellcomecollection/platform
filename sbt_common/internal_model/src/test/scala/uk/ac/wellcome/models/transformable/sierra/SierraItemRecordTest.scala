@@ -62,7 +62,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
   it("throws an exception when bibIds is not a list") {
     val data = """{"bibIds":"blah"}"""
     assertCreatingFromDataFails(
-      data = data
+      data = data,
       expectedMessage = s"Found non string in bibIds: <<$data>>"
     )
   }
