@@ -16,6 +16,8 @@ case class SierraItemRecord(
 
 case object SierraItemRecord {
 
+  private case class SierraAPIData(bibIds: List[String])
+
   /** This apply method is for parsing JSON bodies that come from the
     * Sierra API.
     */
@@ -24,9 +26,6 @@ case object SierraItemRecord {
     data: String,
     modifiedDate: Instant
   ): SierraItemRecord = {
-
-    case class SierraAPIData(bibIds: List[String])
-
     val bibIds = fromJson[SierraAPIData](data) match {
       case Success(apiData) => apiData.bibIds
       case Failure(e) =>
