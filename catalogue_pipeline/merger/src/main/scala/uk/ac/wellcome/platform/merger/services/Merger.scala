@@ -54,11 +54,9 @@ class Merger extends Logging {
 
   private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
                                            digitalWork: UnidentifiedWork) = {
-    physicalWork.copy(items = List(
-      physicalWork.items.head.copy(
-        agent = physicalWork.items.head.agent.copy(
-          locations =
-            physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations))))
+    physicalWork.copy(items = List(physicalWork.items.head.copy(
+      agent = physicalWork.items.head.agent.copy(locations =
+        physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations))))
   }
 
   private def redirectWork(workToRedirect: UnidentifiedWork,

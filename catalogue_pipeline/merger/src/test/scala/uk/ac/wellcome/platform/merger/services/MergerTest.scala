@@ -39,12 +39,10 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
     val digitalWork = createDigitalWork
 
     val expectedMergedWork = physicalWork.copy(
-      items = List(
-        Identifiable(
-          sourceIdentifier =
-            physicalWork.items.head.sourceIdentifier,
-          agent =
-            Item(locations = physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations)
+      items = List(Identifiable(
+        sourceIdentifier = physicalWork.items.head.sourceIdentifier,
+        agent = Item(
+          locations = physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations)
       )))
 
     val expectedRedirectedWork = UnidentifiedRedirectedWork(
@@ -81,7 +79,8 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private def createDigitalWork = {
     createUnidentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType="miro-image-number"),
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number"),
       workType = Some(WorkType("v", "E-books")),
       items = List(
         createIdentifiableItemWith(locations = List(createDigitalLocation)))
@@ -90,7 +89,8 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private def createPhysicalWork = {
     createUnidentifiedWorkWith(
-      sourceIdentifier = createSourceIdentifierWith(identifierType="sierra-system-number"),
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
       items = List(
         createIdentifiableItemWith(locations = List(createPhysicalLocation)))
     )
