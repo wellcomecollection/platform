@@ -118,7 +118,9 @@ class SierraReaderWorkerService @Inject()(
 
   private def toJson(records: Seq[AbstractSierraRecord]): Json =
     sierraConfig.resourceType match {
-      case SierraResourceTypes.bibs  => records.asInstanceOf[Seq[SierraBibRecord]].asJson
-      case SierraResourceTypes.items => records.asInstanceOf[Seq[SierraItemRecord]].asJson
+      case SierraResourceTypes.bibs =>
+        records.asInstanceOf[Seq[SierraBibRecord]].asJson
+      case SierraResourceTypes.items =>
+        records.asInstanceOf[Seq[SierraItemRecord]].asJson
     }
 }

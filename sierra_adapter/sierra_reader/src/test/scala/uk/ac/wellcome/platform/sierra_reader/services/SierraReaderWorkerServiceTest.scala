@@ -16,7 +16,10 @@ import org.scalatest.compatible.Assertion
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
   SierraConfig,
@@ -210,10 +213,12 @@ class SierraReaderWorkerServiceTest
     }
   }
 
-  private def getBibRecordsFromS3(bucket: Bucket, key: String): List[SierraBibRecord] =
+  private def getBibRecordsFromS3(bucket: Bucket,
+                                  key: String): List[SierraBibRecord] =
     getObjectFromS3[List[SierraBibRecord]](bucket, key)
 
-  private def getItemRecordsFromS3(bucket: Bucket, key: String): List[SierraItemRecord] =
+  private def getItemRecordsFromS3(bucket: Bucket,
+                                   key: String): List[SierraItemRecord] =
     getObjectFromS3[List[SierraItemRecord]](bucket, key)
 
   it(

@@ -22,14 +22,14 @@ case object SierraItemRecord {
   /** This apply method is for parsing JSON bodies that come from the
     * Sierra API.
     */
-  def apply(
-    id: String,
-    data: String,
-    modifiedDate: Instant): SierraItemRecord = {
+  def apply(id: String,
+            data: String,
+            modifiedDate: Instant): SierraItemRecord = {
     val bibIds = fromJson[SierraAPIData](data) match {
       case Success(apiData) => apiData.bibIds
       case Failure(e) =>
-        throw new IllegalArgumentException(s"Error parsing bibIds from JSON <<$data>> ($e)")
+        throw new IllegalArgumentException(
+          s"Error parsing bibIds from JSON <<$data>> ($e)")
     }
 
     SierraItemRecord(

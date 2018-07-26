@@ -94,8 +94,10 @@ class WindowManager @Inject()(
 
     fromJson[List[Identified]](s3contents) match {
       case Success(ids) => ids.map { _.id }.sorted.lastOption
-      case Failure(_) => throw GracefulFailureException(
-        new RuntimeException(s"S3 contents <<$s3contents> could not be parsed as JSON"))
+      case Failure(_) =>
+        throw GracefulFailureException(
+          new RuntimeException(
+            s"S3 contents <<$s3contents> could not be parsed as JSON"))
     }
   }
 }
