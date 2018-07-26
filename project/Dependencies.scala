@@ -152,7 +152,6 @@ object Dependencies {
     "io.circe" %% "circe-optics" % versions.circeVersion
   )
 
-  // Application specific dependency groups
   val idminterDependencies = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
