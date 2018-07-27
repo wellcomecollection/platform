@@ -15,14 +15,14 @@ object BibMerger {
         s"Non-matching bib ids ${sierraBibRecord.id} != ${sierraTransformable.sourceId}")
     }
 
-    val isNewerData = sierraTransformable.maybeBibData match {
+    val isNewerData = sierraTransformable.maybeBibRecord match {
       case Some(bibData) =>
         sierraBibRecord.modifiedDate.isAfter(bibData.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      sierraTransformable.copy(maybeBibData = Some(sierraBibRecord))
+      sierraTransformable.copy(maybeBibRecord = Some(sierraBibRecord))
     } else {
       sierraTransformable
     }

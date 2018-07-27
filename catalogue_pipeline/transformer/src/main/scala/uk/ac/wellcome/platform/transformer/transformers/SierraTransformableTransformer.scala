@@ -44,7 +44,7 @@ class SierraTransformableTransformer
         )
       )
 
-      sierraTransformable.maybeBibData
+      sierraTransformable.maybeBibRecord
         .map { bibRecord =>
           debug(s"Attempting to transform ${bibRecord.id}")
 
