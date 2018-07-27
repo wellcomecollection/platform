@@ -59,7 +59,7 @@ trait SierraItems extends Logging with SierraLocation {
   }
 
   def getPhysicalItems(
-    sierraTransformable: SierraTransformable): List[Identifiable[Item]] = {
+    sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
     extractItemData(sierraTransformable)
       .filterNot {
         case (_: String, sierraItemData: SierraItemData) =>
@@ -72,7 +72,7 @@ trait SierraItems extends Logging with SierraLocation {
             sierraItemData = sierraItemData
           )
       }
-  }
+      .toList
 
   def getDigitalItem(sourceIdentifier: SourceIdentifier): Identifiable[Item] = {
     Identifiable(
