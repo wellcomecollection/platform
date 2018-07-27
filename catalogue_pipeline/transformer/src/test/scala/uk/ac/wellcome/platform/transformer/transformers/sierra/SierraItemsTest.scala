@@ -15,21 +15,26 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         createSierraItemData
       }
       val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(data)
+        createSierraItemRecordWith(
+          id = createSierraRecordNumberString,
+          data = data)
       }.toList
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe itemData
+      transformer
+        .extractItemData(transformable)
+        .values should contain theSameElementsAs itemData
     }
 
     it("ignores items it can't parse as JSON") {
       val itemData = createSierraItemData
+      val itemId = createSierraRecordNumberString
 
       val itemRecords = List(
-        createSierraItemRecordWith(itemData),
+        createSierraItemRecordWith(id = itemId, data = itemData),
         createSierraItemRecordWith(
           data = "<xml?>This is not a real 'JSON' string"
         )
@@ -39,15 +44,15 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(itemData)
+      transformer.extractItemData(transformable) shouldBe Map(
+        itemId -> itemData
+      )
     }
   }
 
   describe("transformItemData") {
     it("creates both forms of the Sierra ID in 'identifiers'") {
-      val item = createSierraItemDataWith(
-        id = "4000004"
-      )
+      val item = createSierraItemData
 
       val sourceIdentifier1 = createSierraSourceIdentifierWith(
         ontologyType = "Item",
@@ -61,7 +66,10 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
 
-      val transformedItem = transformer.transformItemData(item)
+      val transformedItem = transformer.transformItemData(
+        itemId = "4000004",
+        itemData = item
+      )
 
       transformedItem shouldBe Identifiable(
         sourceIdentifier = sourceIdentifier1,
@@ -76,9 +84,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         ontologyType = "Item",
         value = "i50000056"
       )
-      val item = createSierraItemDataWith(id = "5000005")
+      val sierraItemData = createSierraItemData
 
-      val transformedItem = transformer.transformItemData(item)
+      val transformedItem = transformer.transformItemData(
+        itemId = "5000005",
+        itemData = sierraItemData
+      )
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
     }
   }
@@ -90,8 +101,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = createSierraTransformableWith(
         itemRecords = List(
-          createSierraItemRecordWith(item1),
-          createSierraItemRecordWith(item2)
+          createSierraItemRecordWith(
+            id = createSierraRecordNumberString,
+            data = item1),
+          createSierraItemRecordWith(
+            id = createSierraRecordNumberString,
+            data = item2)
         )
       )
 

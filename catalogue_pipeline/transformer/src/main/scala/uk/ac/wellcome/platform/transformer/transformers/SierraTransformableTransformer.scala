@@ -34,25 +34,26 @@ class SierraTransformableTransformer
   override def transformForType
     : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
+      val sierraId = sierraTransformable.sourceId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
         value = SierraRecordNumbers.addCheckDigit(
-          sierraTransformable.sourceId,
+          sierraId = sierraId,
           recordType = SierraRecordTypes.bibs
         )
       )
 
       sierraTransformable.maybeBibData
-        .map { bibData =>
-          debug(s"Attempting to transform ${bibData.id}")
+        .map { bibRecord =>
+          debug(s"Attempting to transform ${bibRecord.id}")
 
-          fromJson[SierraBibData](bibData.data)
+          fromJson[SierraBibData](bibRecord.data)
             .map { sierraBibData =>
               if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
                   sourceIdentifier = sourceIdentifier,
-                  otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                  otherIdentifiers = getOtherIdentifiers(sierraId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
                   title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
@@ -77,13 +78,13 @@ class SierraTransformableTransformer
                 )
               } else {
                 throw new ShouldNotTransformException(
-                  s"Sierra record ${bibData.id} is either deleted or suppressed!"
+                  s"Sierra record ${bibRecord.id} is either deleted or suppressed!"
                 )
               }
             }
             .recover {
               case e: ShouldNotTransformException =>
-                info(s"Should not transform: ${e.getMessage}")
+                info(s"Should not transform $sierraId: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version

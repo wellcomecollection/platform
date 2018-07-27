@@ -16,9 +16,10 @@ class SierraTitleTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("throws a ShouldNotTransform exception if bibData has no title") {
     val bibData = createSierraBibDataWith(title = None)
-    intercept[ShouldNotTransformException] {
+    val caught = intercept[ShouldNotTransformException] {
       transformer.getTitle(bibData = bibData)
     }
+    caught.getMessage shouldBe "Sierra record has no title!"
   }
 
   val transformer = new Object with SierraTitle

@@ -6,7 +6,6 @@ import uk.ac.wellcome.platform.transformer.source.sierra.{
 }
 
 case class SierraBibData(
-  id: String,
   title: Option[String] = None,
   deleted: Boolean = false,
   suppressed: Boolean = false,
