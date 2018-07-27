@@ -25,7 +25,7 @@ class Merger extends Logging {
       // As the works are supplied by the matcher these are trusted to refer to the same work without verification.
       // However, it may be prudent to add extra checks before making the merge here.
       case (List(physicalWork), List(digitalWork)) =>
-        mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
+        mergeAndRedirectWork(
           physicalWork,
           digitalWork)
       case _ =>
@@ -33,14 +33,14 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalWorkWithDigitalAndRedirectDigitalWork(
+  private def mergeAndRedirectWork(
     physicalWork: UnidentifiedWork,
     digitalWork: UnidentifiedWork) = {
     if (physicalWork.items.size == 1 && digitalWork.items.size == 1) {
       info(s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
       Some(
         List(
-          mergePhysicalWithDigitalWork(physicalWork, digitalWork),
+          mergePhysicalAndDigitalWorkItems(physicalWork, digitalWork),
           redirectWork(
             workToRedirect = digitalWork,
             redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
@@ -52,11 +52,15 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalWithDigitalWork(physicalWork: UnidentifiedWork,
-                                           digitalWork: UnidentifiedWork) = {
-    physicalWork.copy(items = List(physicalWork.items.head.copy(
-      agent = physicalWork.items.head.agent.copy(locations =
-        physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations))))
+  private def mergePhysicalAndDigitalWorkItems(physicalWork: UnidentifiedWork,
+                                               digitalWork: UnidentifiedWork) = {
+    val mergedItem = (physicalWork.items, digitalWork.items) match {
+      case (List(physicalItem), List(digitalItem)) =>
+        physicalItem.copy(agent = physicalItem.agent.copy(
+          locations = physicalItem.agent.locations ++ digitalItem.agent.locations))
+      case _ => throw new IllegalArgumentException(s"Cannot merge, physical and digital works must both have a single item (physicalWork:${physicalWork.sourceIdentifier}, digitalWork:${digitalWork.sourceIdentifier}")
+    }
+    physicalWork.copy(items = List(mergedItem))
   }
 
   private def redirectWork(workToRedirect: UnidentifiedWork,
@@ -75,12 +79,12 @@ class Merger extends Logging {
     }
   }
 
-  def describeWorkPair(physicalWork: UnidentifiedWork,
-                       digitalWork: UnidentifiedWork) =
+  private def describeWorkPair(physicalWork: UnidentifiedWork,
+                               digitalWork: UnidentifiedWork) =
     s"physical (id=${physicalWork.sourceIdentifier.value}) and digital (id=${digitalWork.sourceIdentifier.value})"
 
-  def describeWorkPairWithItems(physicalWork: UnidentifiedWork,
-                                digitalWork: UnidentifiedWork) =
+  private def describeWorkPairWithItems(physicalWork: UnidentifiedWork,
+                                        digitalWork: UnidentifiedWork) =
     s"physical (id=${physicalWork.sourceIdentifier.value}, itemsCount=${physicalWork.items.size}) and " +
       s"digital (id=${digitalWork.sourceIdentifier.value}, itemsCount=${digitalWork.items.size}) work"
 
