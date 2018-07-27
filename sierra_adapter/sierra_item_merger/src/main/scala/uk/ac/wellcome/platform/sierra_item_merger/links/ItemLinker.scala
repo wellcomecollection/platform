@@ -25,15 +25,15 @@ object ItemLinker {
     //    just received?  If the existing data is older, we need to merge the
     //    new record.
     //
-    val isNewerData = sierraTransformable.itemRecords.get(itemRecord.id) match {
+    val isNewerData = sierraTransformable.itemData.get(itemRecord.id) match {
       case Some(existing) =>
         itemRecord.modifiedDate.isAfter(existing.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      val itemData = sierraTransformable.itemRecords + (itemRecord.id -> itemRecord)
-      sierraTransformable.copy(itemRecords = itemData)
+      val itemData = sierraTransformable.itemData + (itemRecord.id -> itemRecord)
+      sierraTransformable.copy(itemData = itemData)
     } else {
       sierraTransformable
     }

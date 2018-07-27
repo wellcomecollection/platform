@@ -191,7 +191,7 @@ class SierraItemMergerUpdaterServiceTest
 
               whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
                 val expectedSierraRecord = oldTransformable.copy(
-                  itemRecords = Map(itemRecord.id -> newItemRecord)
+                  itemData = Map(itemRecord.id -> newItemRecord)
                 )
 
                 assertStored[SierraTransformable](
@@ -255,7 +255,7 @@ class SierraItemMergerUpdaterServiceTest
 
             whenReady(unlinkItemRecordFuture) { _ =>
               val expectedSierraRecord1 = sierraTransformable1.copy(
-                itemRecords = Map.empty
+                itemData = Map.empty
               )
 
               val expectedItemData = Map(
@@ -266,7 +266,7 @@ class SierraItemMergerUpdaterServiceTest
                 )
               )
               val expectedSierraRecord2 = sierraTransformable2.copy(
-                itemRecords = expectedItemData
+                itemData = expectedItemData
               )
 
               assertStored[SierraTransformable](
@@ -335,13 +335,13 @@ class SierraItemMergerUpdaterServiceTest
             whenReady(Future.sequence(List(f1, f2))) { _ =>
               whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
                 val expectedSierraRecord1 = sierraTransformable1.copy(
-                  itemRecords = Map.empty
+                  itemData = Map.empty
                 )
 
                 // In this situation the item was already linked to sierraTransformable2
                 // but the modified date is updated in line with the item update
                 val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemRecords = expectedItemData
+                  itemData = expectedItemData
                 )
 
                 assertStored[SierraTransformable](
@@ -418,7 +418,7 @@ class SierraItemMergerUpdaterServiceTest
                 // time we've seen the link so it is valid for that bib.
                 val expectedSierraRecord1 = sierraTransformable1
                 val expectedSierraRecord2 = sierraTransformable2.copy(
-                  itemRecords = expectedItemRecords
+                  itemData = expectedItemRecords
                 )
 
                 assertStored[SierraTransformable](

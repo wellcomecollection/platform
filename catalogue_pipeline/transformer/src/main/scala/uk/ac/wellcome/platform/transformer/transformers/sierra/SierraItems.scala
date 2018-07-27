@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
 trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
     sierraTransformable: SierraTransformable): List[SierraItemData] = {
-    sierraTransformable.itemRecords.values
+    sierraTransformable.itemData.values
       .map { _.data }
       .map { jsonString =>
         fromJson[SierraItemData](jsonString) match {

@@ -25,7 +25,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     )
 
     val expectedSierraTransformable = sierraTransformable.copy(
-      itemRecords = Map.empty
+      itemData = Map.empty
     )
 
     ItemUnlinker.unlinkItemRecord(sierraTransformable, unlinkedItemRecord) shouldBe expectedSierraTransformable
