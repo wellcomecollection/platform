@@ -65,7 +65,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .incrementCount("test-stream_ProcessMessage_success")
+            .countSuccess("test-stream_ProcessMessage")
         }
     }
   }
@@ -109,7 +109,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(3))
-            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
+            .countFailure(metricName = "test-stream_ProcessMessage")
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -165,7 +165,7 @@ class SQSStreamTest
             assertQueueEmpty(dlq)
 
             verify(metricsSender, times(2))
-              .incrementCount("test-stream_ProcessMessage_success")
+              .countSuccess("test-stream_ProcessMessage")
           }
       }
     }
@@ -186,7 +186,7 @@ class SQSStreamTest
             assertQueueHasSize(dlq, 1)
 
             verify(metricsSender, times(3))
-              .incrementCount("test-stream_ProcessMessage_failure")
+              .countFailure("test-stream_ProcessMessage")
           }
       }
     }
