@@ -6,14 +6,15 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it("removes the item if it already exists") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),
       unlinkedBibIds = List()
     )
 
-    val unlinkedItemRecord = record.copy(
+    val unlinkedItemRecord = createSierraItemRecordWith(
+      id = record.id,
       bibIds = List(),
       modifiedDate = record.modifiedDate.plusSeconds(1),
       unlinkedBibIds = List(bibId)
@@ -33,7 +34,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it(
     "returns the original record when merging an unlinked record which is already absent") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),
@@ -55,7 +56,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
 
   it(
     "returns the original record when merging an unlinked record which has linked more recently") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
 
     val record = createSierraItemRecordWith(
       modifiedDate = newerDate,
@@ -78,8 +79,8 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
   }
 
   it("should only unlink item records with matching bib IDs") {
-    val bibId = createSierraRecordNumberString
-    val unrelatedBibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
+    val unrelatedBibId = createSierraBibNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(bibId),

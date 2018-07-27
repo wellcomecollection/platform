@@ -76,7 +76,7 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraItemRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraItemNumber
             val updatedDate = "2014-04-14T14:14:14Z"
             val jsonString = s"""
           |{

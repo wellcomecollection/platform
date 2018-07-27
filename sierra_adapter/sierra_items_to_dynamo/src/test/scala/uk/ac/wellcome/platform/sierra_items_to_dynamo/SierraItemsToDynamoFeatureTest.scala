@@ -28,7 +28,7 @@ class SierraItemsToDynamoFeatureTest
         val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
 
         withServer(flags) { server =>
-          val itemId = createSierraRecordNumberString
+          val itemId = createSierraItemNumber
           val bibId = createSierraRecordNumberString
 
           val sierraRecord = createSierraItemRecordWith(

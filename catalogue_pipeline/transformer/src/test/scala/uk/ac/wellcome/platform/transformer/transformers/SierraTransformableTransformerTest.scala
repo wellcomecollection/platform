@@ -18,48 +18,51 @@ class SierraTransformableTransformerTest
   val transformer = new SierraTransformableTransformer
 
   it("performs a transformation on a work with items") {
+    val itemRecords = List(
+      createSierraItemRecord,
+      createSierraItemRecord
+    )
+
     val sierraTransformable = createSierraTransformableWith(
       maybeBibRecord = Some(createSierraBibRecord),
-      itemRecords = List(
-        createSierraItemRecordWith(id = "5151515"),
-        createSierraItemRecordWith(id = "5252525")
-      )
+      itemRecords = itemRecords
     )
+
+    val expectedIdentifiers = itemRecords.map { record =>
+      SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = record.id.withCheckDigit
+      )
+    }
 
     val work = transformToWork(sierraTransformable)
 
-    val sourceIdentifier1 =
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        "i51515155")
-    val sourceIdentifier2 =
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        "i52525259")
-
     work shouldBe a[UnidentifiedWork]
 
-    work.asInstanceOf[UnidentifiedWork].items.map { _.sourceIdentifier } shouldBe List(
-      sourceIdentifier1,
-      sourceIdentifier2
-    )
+    val actualIdentifiers = work
+      .asInstanceOf[UnidentifiedWork]
+      .items
+      .map { _.sourceIdentifier }
+
+    actualIdentifiers should contain theSameElementsAs  expectedIdentifiers
   }
 
   it("extracts information from items") {
     val bibId = createSierraBibNumber
-    val itemId = "6363636"
+    val itemId = createSierraItemNumber
     val locationType = LocationType("sgmed")
     val locationLabel = "A museum of mermaids"
     val itemData =
-      s"""{
-          |"id": "$itemId",
-          |"location": {
-          |   "code": "${locationType.id}",
-          |   "name": "$locationLabel"
-          | }
-          |}""".stripMargin
+      s"""
+         |{
+         |  "id": "$itemId",
+         |  "location": {
+         |    "code": "${locationType.id}",
+         |    "name": "$locationLabel"
+         |  }
+         |}
+         |""".stripMargin
 
     val itemRecord = createSierraItemRecordWith(
       id = itemId,
@@ -83,14 +86,14 @@ class SierraTransformableTransformerTest
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Item",
-      value = "i63636360"
+      value = itemId.withCheckDigit
     )
 
     val expectedOtherIdentifiers = List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
-        value = itemId
+        value = itemId.withoutCheckDigit
       )
     )
 

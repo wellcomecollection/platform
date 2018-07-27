@@ -61,11 +61,11 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraBibRecord: SierraBibRecord = createSierraBibRecordWith()
 
   def createSierraItemRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraItemNumber = createSierraItemNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now,
-    bibIds: List[String] = List(),
-    unlinkedBibIds: List[String] = List(),
+    bibIds: List[SierraBibNumber] = List(),
+    unlinkedBibIds: List[SierraBibNumber] = List(),
     version: Int = 0
   ): SierraItemRecord = {
     val recordData = if (data == "") {

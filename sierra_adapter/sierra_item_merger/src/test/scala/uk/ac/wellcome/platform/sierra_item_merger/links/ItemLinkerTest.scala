@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
 
   it("adds the item if it doesn't exist already") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
     val record = createSierraItemRecordWith(
       bibIds = List(bibId)
     )
@@ -18,7 +18,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("updates itemData when merging item records with newer data") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
     val itemRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
       bibIds = List(bibId)
@@ -41,7 +41,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("returns itself when merging item records with stale data") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
     val itemRecord = createSierraItemRecordWith(
       modifiedDate = newerDate,
       bibIds = List(bibId)
@@ -61,7 +61,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("supports adding multiple items to a merged record") {
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
     val record1 = createSierraItemRecordWith(
       bibIds = List(bibId)
     )
@@ -78,8 +78,8 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("only merges item records with matching bib IDs") {
-    val bibId = createSierraRecordNumberString
-    val unrelatedBibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
+    val unrelatedBibId = createSierraBibNumber
 
     val record = createSierraItemRecordWith(
       bibIds = List(unrelatedBibId),

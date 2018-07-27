@@ -16,9 +16,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         createSierraItemData
       }
       val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(
-          id = createSierraRecordNumberString,
-          data = data)
+        createSierraItemRecordWith(data = data)
       }.toList
 
       val transformable = createSierraTransformableWith(
@@ -32,13 +30,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
     it("throws an error if it gets some item data that isn't JSON") {
       val itemData = createSierraItemData
-      val itemId = createSierraRecordNumberString
-      val itemIdBad = createSierraRecordNumberString
+      val itemIdBad = createSierraItemNumber
 
       val notAJsonString = "<xml?>This is not a real 'JSON' string"
 
       val itemRecords = List(
-        createSierraItemRecordWith(id = itemId, data = itemData),
+        createSierraItemRecordWith(data = itemData),
         createSierraItemRecordWith(id = itemIdBad, data = notAJsonString)
       )
 
@@ -105,12 +102,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = createSierraTransformableWith(
         itemRecords = List(
-          createSierraItemRecordWith(
-            id = createSierraRecordNumberString,
-            data = item1),
-          createSierraItemRecordWith(
-            id = createSierraRecordNumberString,
-            data = item2)
+          createSierraItemRecordWith(data = item1),
+          createSierraItemRecordWith(data = item2)
         )
       )
 

@@ -32,7 +32,7 @@ class SierraItemMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val bibId = createSierraRecordNumberString
+              val bibId = createSierraBibNumber
 
               val record = createSierraItemRecordWith(
                 bibIds = List(bibId)
@@ -68,14 +68,14 @@ class SierraItemMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val bibId1 = createSierraRecordNumberString
+              val bibId1 = createSierraBibNumber
               val record1 = createSierraItemRecordWith(
                 bibIds = List(bibId1)
               )
 
               sendNotificationToSQS(queue = queue, message = record1)
 
-              val bibId2 = createSierraRecordNumberString
+              val bibId2 = createSierraBibNumber
               val record2 = createSierraItemRecordWith(
                 bibIds = List(bibId2)
               )

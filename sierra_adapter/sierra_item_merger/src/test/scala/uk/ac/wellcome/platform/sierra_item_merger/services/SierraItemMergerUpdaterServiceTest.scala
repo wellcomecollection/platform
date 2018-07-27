@@ -43,7 +43,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
             val newItemRecord = createSierraItemRecordWith(
               bibIds = List(bibId)
             )
@@ -74,9 +74,9 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibIdNotExisting = createSierraRecordNumberString
-            val bibIdWithOldData = createSierraRecordNumberString
-            val bibIdWithNewerData = createSierraRecordNumberString
+            val bibIdNotExisting = createSierraBibNumber
+            val bibIdWithOldData = createSierraBibNumber
+            val bibIdWithNewerData = createSierraBibNumber
 
             val bibIds = List(
               bibIdNotExisting,
@@ -165,7 +165,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               modifiedDate = olderDate,
@@ -214,8 +214,8 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
@@ -293,8 +293,8 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
@@ -369,8 +369,8 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
@@ -446,7 +446,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               modifiedDate = newerDate,
@@ -488,7 +488,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
             val transformable = createSierraTransformableWith(
               sourceId = bibId
             )
@@ -528,7 +528,7 @@ class SierraItemMergerUpdaterServiceTest
         brokenStore =>
           withSierraUpdaterService(brokenStore) { brokenService =>
             val itemRecord = createSierraItemRecordWith(
-              bibIds = List(createSierraRecordNumberString)
+              bibIds = List(createSierraBibNumber)
             )
 
             whenReady(brokenService.update(itemRecord).failed) { ex =>
