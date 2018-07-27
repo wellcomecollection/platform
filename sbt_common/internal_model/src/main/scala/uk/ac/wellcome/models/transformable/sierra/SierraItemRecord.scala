@@ -7,11 +7,11 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.{Failure, Success}
 
 case class SierraItemRecord(
-  id: String,
+  id: SierraItemNumber,
   data: String,
   modifiedDate: Instant,
-  bibIds: List[String],
-  unlinkedBibIds: List[String] = List(),
+  bibIds: List[SierraBibNumber],
+  unlinkedBibIds: List[SierraBibNumber] = List(),
   version: Int = 0
 ) extends AbstractSierraRecord
 
@@ -33,10 +33,10 @@ case object SierraItemRecord {
     }
 
     SierraItemRecord(
-      id = id,
+      id = SierraItemNumber(id),
       data = data,
       modifiedDate = modifiedDate,
-      bibIds = bibIds
+      bibIds = bibIds.map { SierraBibNumber }
     )
   }
 }
