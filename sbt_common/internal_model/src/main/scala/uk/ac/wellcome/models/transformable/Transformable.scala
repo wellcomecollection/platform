@@ -1,10 +1,7 @@
 package uk.ac.wellcome.models.transformable
 
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemNumber, SierraItemRecord}
 
 sealed trait Transformable extends Sourced
 
@@ -27,13 +24,15 @@ case class MiroTransformable(sourceId: String,
   *
   */
 case class SierraTransformable(
-  sourceId: String,
+  sierraId: SierraBibNumber,
   sourceName: String = "sierra",
   maybeBibData: Option[SierraBibRecord] = None,
-  itemData: Map[String, SierraItemRecord] = Map()
-) extends Transformable
+  itemData: Map[SierraItemNumber, SierraItemRecord] = Map()
+) extends Transformable {
+
+}
 
 object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sourceId = bibRecord.id, maybeBibData = Some(bibRecord))
+    SierraTransformable(sierraId = bibRecord.id, maybeBibData = Some(bibRecord))
 }
