@@ -38,7 +38,7 @@ trait ItemsUtil extends IdentifiersUtil {
   def createDigitalLocation = createDigitalLocationWith()
 
   def createDigitalLocationWith(
-    locationType: LocationType = LocationType("iiif-image"),
+    locationType: LocationType = createPresentationLocationType,
     url: String = defaultLocationUrl,
     license: License = License_CCBY) = DigitalLocation(
     locationType = locationType,
@@ -52,6 +52,8 @@ trait ItemsUtil extends IdentifiersUtil {
     "https://iiif.wellcomecollection.org/image/M0000001.jpg/info.json"
 
   def createImageLocationType = LocationType("iiif-image")
+
+  def createPresentationLocationType = LocationType("iiif-presentation")
 
   def createStoresLocationType = LocationType("sgmed")
 }
