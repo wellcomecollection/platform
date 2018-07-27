@@ -178,7 +178,8 @@ trait SQS extends Matchers {
     implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson(message).get)
 
-  def sendMessage[T](queue: Queue, obj: T)(implicit encoder: Encoder[T]): SendMessageResult =
+  def sendMessage[T](queue: Queue, obj: T)(
+    implicit encoder: Encoder[T]): SendMessageResult =
     sendMessage(queue = queue, body = toJson(obj).get)
 
   def sendMessage(queue: Queue, body: String): SendMessageResult =
