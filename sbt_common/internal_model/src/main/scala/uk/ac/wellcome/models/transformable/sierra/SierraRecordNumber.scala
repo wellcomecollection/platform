@@ -1,5 +1,9 @@
 package uk.ac.wellcome.models.transformable.sierra
 
+object SierraRecordTypes extends Enumeration {
+  val bibs, items = Value
+}
+
 sealed trait SierraRecordNumber {
   val recordNumber: String
   val recordType: SierraRecordTypes.Value
