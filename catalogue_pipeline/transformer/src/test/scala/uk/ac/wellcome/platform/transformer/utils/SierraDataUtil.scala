@@ -37,7 +37,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraItemData: SierraItemData = createSierraItemDataWith()
 
-  def createSierraItemRecordWith(id: String = createSierraRecordNumberString,
+  def createSierraItemRecordWith(id: String,
                                  data: SierraItemData): SierraItemRecord =
     createSierraItemRecordWith(
       id = id,
