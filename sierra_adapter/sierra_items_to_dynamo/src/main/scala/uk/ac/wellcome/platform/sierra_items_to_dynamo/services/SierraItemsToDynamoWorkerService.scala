@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,8 +19,8 @@ class SierraItemsToDynamoWorkerService @Inject()(
 
   private def process(message: NotificationMessage): Future[Unit] =
     for {
-      record <- Future.fromTry(fromJson[SierraRecord](message.Message))
-      _ <- dynamoInserter.insertIntoDynamo(record.toItemRecord.get)
+      record <- Future.fromTry(fromJson[SierraItemRecord](message.Message))
+      _ <- dynamoInserter.insertIntoDynamo(record)
     } yield ()
 
   def stop() = system.terminate()
