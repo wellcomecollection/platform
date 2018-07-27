@@ -27,21 +27,20 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibData: SierraBibData = createSierraBibDataWith()
 
   def createSierraItemDataWith(
-    id: String = createSierraRecordNumberString,
     deleted: Boolean = false,
     location: Option[SierraItemLocation] = None
   ): SierraItemData =
     SierraItemData(
-      id = id,
       deleted = deleted,
       location = location
     )
 
   def createSierraItemData: SierraItemData = createSierraItemDataWith()
 
-  def createSierraItemRecordWith(data: SierraItemData): SierraItemRecord =
+  def createSierraItemRecordWith(id: String = createSierraRecordNumberString,
+                                 data: SierraItemData): SierraItemRecord =
     createSierraItemRecordWith(
-      id = data.id,
+      id = id,
       data = toJson(data).get
     )
 

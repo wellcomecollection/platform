@@ -47,8 +47,8 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it("returns None if there is no location in the item data") {
-      val itemData = SierraItemData(
-        id = "i1234567"
+      val itemData = createSierraItemDataWith(
+        location = None
       )
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
