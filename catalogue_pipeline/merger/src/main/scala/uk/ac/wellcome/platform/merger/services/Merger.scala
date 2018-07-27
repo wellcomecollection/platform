@@ -31,31 +31,32 @@ class Merger extends Logging {
     }
   }
 
-  private def mergeAndRedirectWork(
-    physicalWork: UnidentifiedWork,
-    digitalWork: UnidentifiedWork) = {
+  private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
+                                   digitalWork: UnidentifiedWork) = {
     (physicalWork.items, digitalWork.items) match {
       case (List(physicalItem), List(digitalItem)) =>
-      info(s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
-      Some(
-        List(
-          physicalWork.copy(
-            otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
-            items = mergePhysicalAndDigitalItems(physicalItem, digitalItem)),
-          redirectWork(
-            workToRedirect = digitalWork,
-            redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
-        ))
+        info(
+          s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
+        Some(
+          List(
+            physicalWork.copy(
+              otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
+              items = mergePhysicalAndDigitalItems(physicalItem, digitalItem)),
+            redirectWork(
+              workToRedirect = digitalWork,
+              redirectTargetSourceIdentifier = physicalWork.sourceIdentifier)
+          ))
       case _ =>
-      debug(
-        s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} as there are multiple items")
-      None
+        debug(
+          s"Not merging physical ${describeWorkPairWithItems(physicalWork, digitalWork)} as there are multiple items")
+        None
     }
   }
 
-  private def mergePhysicalAndDigitalItems(physicalItem: Identifiable[Item], digitalItem: Identifiable[Item]) = {
+  private def mergePhysicalAndDigitalItems(physicalItem: Identifiable[Item],
+                                           digitalItem: Identifiable[Item]) = {
     List(physicalItem.copy(agent = physicalItem.agent.copy(
-          locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
+      locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
   }
 
   private def redirectWork(workToRedirect: UnidentifiedWork,
