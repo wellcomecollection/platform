@@ -22,7 +22,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe itemData
+      transformer.extractItemData(transformable).values shouldBe itemData
     }
 
     it("ignores items it can't parse as JSON") {
@@ -39,7 +39,9 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(itemData)
+      transformer.extractItemData(transformable) shouldBe Map(
+        itemData.id -> itemData
+      )
     }
   }
 
