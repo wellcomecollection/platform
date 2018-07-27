@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.reindex_request_creator
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
@@ -59,14 +58,10 @@ class ReindexRequestCreatorFeatureTest
       desiredVersion = desiredVersion
     )
 
-    val sqsMessage = NotificationMessage(
-      Subject = "",
-      Message = toJson(reindexJob).get,
-      TopicArn = "topic",
-      MessageId = "message"
+    sendNotificationToSQS(
+      queue = queue,
+      message = reindexJob
     )
-
-    sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
     testRecords.map { record =>
       ReindexRequest(
