@@ -75,9 +75,8 @@ object WorkGraphUpdater extends Logging {
     )
   }
 
-  def componentIdentifier(nodeIds: List[String]) = {
-    val componentIdentifier = nodeIds.sorted.mkString("+")
-    DigestUtils.sha256Hex(componentIdentifier)
+  private def componentIdentifier(nodeIds: List[String]) = {
+    DigestUtils.sha256Hex(nodeIds.sorted.mkString("+"))
   }
 
   private def allNodes(linkedWork: WorkNode) = {
