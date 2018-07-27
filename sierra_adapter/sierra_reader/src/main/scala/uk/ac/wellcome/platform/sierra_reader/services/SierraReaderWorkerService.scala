@@ -57,8 +57,9 @@ class SierraReaderWorkerService @Inject()(
 
   def processMessage(notificationMessage: NotificationMessage): Future[Unit] =
     for {
-      messageString <- Future(notificationMessage.Message)
-      window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
+      window <- Future.fromTry(
+        WindowExtractor.extractWindow(notificationMessage.Message)
+      )
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
