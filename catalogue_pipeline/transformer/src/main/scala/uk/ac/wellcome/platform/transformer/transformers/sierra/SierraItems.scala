@@ -61,8 +61,11 @@ trait SierraItems extends Logging with SierraLocation {
   def getPhysicalItems(
     sierraTransformable: SierraTransformable): List[Identifiable[Item]] = {
     extractItemData(sierraTransformable)
+      .filterNot {
+        case (_: String, sierraItemData: SierraItemData) =>
+          sierraItemData.deleted
+      }
       .values
-      .filterNot { _.deleted }
       .map(transformItemData)
   }
 
