@@ -10,11 +10,7 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{
-  AbstractSierraRecord,
-  SierraBibRecord,
-  SierraItemRecord
-}
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord, SierraRecordNumber}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -29,9 +25,9 @@ class SierraRecordWrapperFlowTest
     with JsonTestUtil
     with SierraUtil {
 
-  private def withRecordWrapperFlow[T <: AbstractSierraRecord](
+  private def withRecordWrapperFlow[R <: SierraRecordNumber, T <: AbstractSierraRecord](
     actorSystem: ActorSystem,
-    createRecord: (String, String, Instant) => T)(
+    createRecord: (R, String, Instant) => T)(
     testWith: TestWith[Flow[Json, T, NotUsed], Assertion]) = {
     val wrapperFlow = SierraRecordWrapperFlow(
       createRecord = createRecord
@@ -45,7 +41,7 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraBibNumber
             val updatedDate = "2013-12-13T12:43:16Z"
             val jsonString = s"""
                |{
@@ -116,7 +112,7 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraBibNumber
             val deletedDate = "2014-01-31"
             val jsonString = s"""{
             |  "id" : "$id",
@@ -124,7 +120,7 @@ class SierraRecordWrapperFlowTest
             |  "deleted" : true
             |}""".stripMargin
 
-            val expectedRecord = createSierraItemRecordWith(
+            val expectedRecord = createSierraBibRecordWith(
               id = id,
               data = jsonString,
               modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")

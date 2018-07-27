@@ -8,11 +8,11 @@ import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraRecordNumber}
 
 object SierraRecordWrapperFlow extends Logging {
-  def apply[T <: AbstractSierraRecord](
-    createRecord: (String, String, Instant) => T): Flow[Json, T, NotUsed] =
+  def apply[R <: SierraRecordNumber, T <: AbstractSierraRecord](
+    createRecord: (R, String, Instant) => T): Flow[Json, T, NotUsed] =
     Flow.fromFunction({ json =>
       val id = getId(json)
       val data = json.noSpaces
