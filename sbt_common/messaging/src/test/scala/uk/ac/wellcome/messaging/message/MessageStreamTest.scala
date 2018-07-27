@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 import akka.stream.QueueOfferResult
 import akka.stream.scaladsl.Flow
-import org.mockito.Matchers.{any, endsWith, eq => equalTo}
+import org.mockito.Matchers.{endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -17,7 +17,7 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class MessageStreamTest
     extends FunSpec
@@ -60,8 +60,8 @@ class MessageStreamTest
   }
 
   it("increments *_ProcessMessage metric when successful") {
-    withMessageStreamFixtures[ExampleObject, Future[Unit]] {
-      case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
+    withMessageStreamFixtures[ExampleObject, Future[QueueOfferResult]] {
+      case (bucket, messageStream, QueuePair(queue, _), metricsSender) =>
         val exampleObject = ExampleObject("some value")
 
         sendMessage(bucket, queue, exampleObject)
@@ -73,8 +73,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .countSuccess(equalTo("test-stream_ProcessMessage"))(
-              any[ExecutionContext])
+            .countSuccess(equalTo("test-stream_ProcessMessage"))
         }
     }
   }
