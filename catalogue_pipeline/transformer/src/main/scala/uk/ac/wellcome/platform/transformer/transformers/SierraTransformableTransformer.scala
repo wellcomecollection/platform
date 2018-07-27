@@ -45,17 +45,17 @@ class SierraTransformableTransformer
       )
 
       sierraTransformable.maybeBibData
-        .map { bibData =>
-          debug(s"Attempting to transform ${bibData.id}")
+        .map { bibRecord =>
+          debug(s"Attempting to transform ${bibRecord.id}")
 
-          fromJson[SierraBibData](bibData.data)
+          fromJson[SierraBibData](bibRecord.data)
             .map { sierraBibData =>
               if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
                   sourceIdentifier = sourceIdentifier,
                   otherIdentifiers = getOtherIdentifiers(sierraId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
-                  title = getTitle(bibData = sierraBibData),
+                  title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
                   description = getDescription(sierraBibData),
                   physicalDescription = getPhysicalDescription(sierraBibData),
@@ -78,7 +78,7 @@ class SierraTransformableTransformer
                 )
               } else {
                 throw new ShouldNotTransformException(
-                  s"Sierra record ${bibData.id} is either deleted or suppressed!"
+                  s"Sierra record ${bibRecord.id} is either deleted or suppressed!"
                 )
               }
             }
