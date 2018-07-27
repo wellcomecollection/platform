@@ -34,14 +34,11 @@ class SierraTransformableTransformer
   override def transformForType
     : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
-      val sierraId = sierraTransformable.sourceId
+      val bibId = sierraTransformable.sierraId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraId = sierraId,
-          recordType = SierraRecordTypes.bibs
-        )
+        value = bibId.withCheckDigit
       )
 
       sierraTransformable.maybeBibRecord
@@ -53,7 +50,7 @@ class SierraTransformableTransformer
               if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
                   sourceIdentifier = sourceIdentifier,
-                  otherIdentifiers = getOtherIdentifiers(sierraId),
+                  otherIdentifiers = getOtherIdentifiers(bibId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
                   title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
@@ -84,7 +81,7 @@ class SierraTransformableTransformer
             }
             .recover {
               case e: ShouldNotTransformException =>
-                info(s"Should not transform $sierraId: ${e.getMessage}")
+                info(s"Should not transform $bibId: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version

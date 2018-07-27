@@ -3,23 +3,16 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.{SierraItemNumber, SierraRecordNumbers, SierraRecordTypes}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraBibData,
-  SierraItemData,
-  SierraMaterialType
-}
+import uk.ac.wellcome.platform.transformer.source.{SierraBibData, SierraItemData, SierraMaterialType}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraLocation {
   def extractItemData(
-    sierraTransformable: SierraTransformable): Map[String, SierraItemData] =
+    sierraTransformable: SierraTransformable): Map[SierraItemNumber, SierraItemData] =
     sierraTransformable.itemRecords
       .map { case (id, itemRecord) => (id, itemRecord.data) }
       .map {
@@ -34,23 +27,20 @@ trait SierraItems extends Logging with SierraLocation {
           }
       }
 
-  def transformItemData(itemId: String,
+  def transformItemData(itemId: SierraItemNumber,
                         itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraId = itemId,
-          recordType = SierraRecordTypes.items
-        )
+        value = itemId.withCheckDigit
       ),
       otherIdentifiers = List(
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
-          value = itemId
+          value = itemId.withoutCheckDigit
         )
       ),
       agent = Item(
@@ -63,10 +53,10 @@ trait SierraItems extends Logging with SierraLocation {
     sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
     extractItemData(sierraTransformable)
       .filterNot {
-        case (_: String, itemData: SierraItemData) => itemData.deleted
+        case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted
       }
       .map {
-        case (itemId: String, itemData: SierraItemData) =>
+        case (itemId: SierraItemNumber, itemData: SierraItemData) =>
           transformItemData(
             itemId = itemId,
             itemData = itemData
