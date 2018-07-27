@@ -34,7 +34,8 @@ trait SierraItems extends Logging with SierraLocation {
       .flatten
       .toMap
 
-  def transformItemData(itemId: String, itemData: SierraItemData): Identifiable[Item] = {
+  def transformItemData(itemId: String,
+                        itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(

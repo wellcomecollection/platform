@@ -15,14 +15,18 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         createSierraItemData
       }
       val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(id = createSierraRecordNumberString, data = data)
+        createSierraItemRecordWith(
+          id = createSierraRecordNumberString,
+          data = data)
       }.toList
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable).values should contain theSameElementsAs itemData
+      transformer
+        .extractItemData(transformable)
+        .values should contain theSameElementsAs itemData
     }
 
     it("ignores items it can't parse as JSON") {
@@ -63,7 +67,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
 
       val transformedItem = transformer.transformItemData(
-        itemId = "4000004", itemData = item
+        itemId = "4000004",
+        itemData = item
       )
 
       transformedItem shouldBe Identifiable(
@@ -82,7 +87,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val sierraItemData = createSierraItemData
 
       val transformedItem = transformer.transformItemData(
-        itemId = "5000005", itemData = sierraItemData
+        itemId = "5000005",
+        itemData = sierraItemData
       )
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
     }
@@ -95,8 +101,12 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = createSierraTransformableWith(
         itemRecords = List(
-          createSierraItemRecordWith(id = createSierraRecordNumberString, data = item1),
-          createSierraItemRecordWith(id = createSierraRecordNumberString, data = item2)
+          createSierraItemRecordWith(
+            id = createSierraRecordNumberString,
+            data = item1),
+          createSierraItemRecordWith(
+            id = createSierraRecordNumberString,
+            data = item2)
         )
       )
 
