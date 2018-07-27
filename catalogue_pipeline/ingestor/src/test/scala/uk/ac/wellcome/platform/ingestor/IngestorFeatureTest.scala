@@ -9,6 +9,8 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
+import scala.collection.JavaConverters._
+
 class IngestorFeatureTest
     extends FunSpec
     with Matchers
@@ -81,7 +83,24 @@ class IngestorFeatureTest
                 body = "not a json string -- this will fail parsing"
               )
 
-              assertQueueHasSize(queue, size = 1)
+              // After a message is read, it stays invisible for 1 second and then it gets sent again.		               assertQueueHasSize(queue, size = 1)
+              // So we wait for longer than the visibility timeout and then we assert that it has become
+              // invisible again, which means that the ingestor picked it up again,
+              // and so it wasn't deleted as part of the first run.
+              // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+              Thread.sleep(2000)
+
+              eventually {
+                sqsClient
+                  .getQueueAttributes(
+                    queue.url,
+                    List("ApproximateNumberOfMessagesNotVisible").asJava
+                  )
+                  .getAttributes
+                  .get(
+                    "ApproximateNumberOfMessagesNotVisible"
+                  ) shouldBe "1"
+              }
             }
           }
         }
