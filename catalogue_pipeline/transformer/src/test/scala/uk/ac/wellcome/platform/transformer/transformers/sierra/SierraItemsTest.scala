@@ -15,7 +15,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         createSierraItemData
       }
       val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(id = = createSierraRecordNumberString, data = data)
+        createSierraItemRecordWith(id = createSierraRecordNumberString, data = data)
       }.toList
 
       val transformable = createSierraTransformableWith(
