@@ -12,18 +12,6 @@ case class MiroTransformable(sourceId: String,
   val sourceName = "miro"
 }
 
-/** Represents a row in the DynamoDB database of "merged" Sierra records;
-  * that is, records that contain data for both bibs and
-  * their associated items.
-  *
-  * Fields:
-  *
-  *   - `id`: the ID of the associated bib record
-  *   - `maybeBibData`: data from the associated bib.  This may be None if
-  *     we've received an item but haven't had the bib yet.
-  *   - `itemData`: a map from item IDs to item records
-  *
-  */
 case class SierraTransformable(
   sierraId: SierraBibNumber,
   maybeBibRecord: Option[SierraBibRecord] = None,
