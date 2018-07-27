@@ -6,10 +6,11 @@ import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRec
 sealed trait Transformable extends Sourced
 
 case class MiroTransformable(sourceId: String,
-                             sourceName: String = "miro",
                              MiroCollection: String,
                              data: String)
-    extends Transformable
+    extends Transformable {
+  val sourceName = "miro"
+}
 
 /** Represents a row in the DynamoDB database of "merged" Sierra records;
   * that is, records that contain data for both bibs and
@@ -25,11 +26,11 @@ case class MiroTransformable(sourceId: String,
   */
 case class SierraTransformable(
   sierraId: SierraBibNumber,
-  sourceName: String = "sierra",
   maybeBibRecord: Option[SierraBibRecord] = None,
   itemRecords: Map[SierraItemNumber, SierraItemRecord] = Map()
 ) extends Transformable {
-
+  val sourceId: String = sierraId.withoutCheckDigit
+  val sourceName = "sierra"
 }
 
 object SierraTransformable {
