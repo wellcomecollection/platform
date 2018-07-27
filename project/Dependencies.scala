@@ -2,7 +2,7 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
-    val monitoring = "1.0.1"
+    val monitoring = "1.1.0"
     val storage = "1.5.0"
   }
 

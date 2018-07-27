@@ -73,7 +73,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .count(equalTo("test-stream_ProcessMessage"), any[Future[Unit]]())(
+            .countSuccess(equalTo("test-stream_ProcessMessage"))(
               any[ExecutionContext])
         }
     }
