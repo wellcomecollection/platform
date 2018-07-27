@@ -126,7 +126,7 @@ class MessageStreamTest
 
         eventually {
           verify(metricsSender, times(3))
-            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
+            .countFailure(metricName = "test-stream_ProcessMessage")
 
           received shouldBe empty
 
@@ -192,7 +192,7 @@ class MessageStreamTest
             assertQueueEmpty(queue)
             assertQueueEmpty(dlq)
             verify(metricsSender, times(2))
-              .incrementCount("test-stream_ProcessMessage_success")
+              .countSuccess("test-stream_ProcessMessage")
           }
       }
     }
@@ -214,7 +214,7 @@ class MessageStreamTest
             assertQueueHasSize(dlq, 1)
 
             verify(metricsSender, times(3))
-              .incrementCount("test-stream_ProcessMessage_failure")
+              .countFailure("test-stream_ProcessMessage")
           }
       }
     }
