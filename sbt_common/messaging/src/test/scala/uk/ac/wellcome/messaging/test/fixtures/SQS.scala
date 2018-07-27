@@ -178,6 +178,9 @@ trait SQS extends Matchers {
     implicit encoder: Encoder[T]): SendMessageResult =
     sendNotificationToSQS(queue = queue, body = toJson(message).get)
 
+  def sendMessage(queue: Queue, body: String): SendMessageResult =
+    sqsClient.sendMessage(queue.url, body)
+
   def noMessagesAreWaitingIn(queue: Queue) = {
     // No messages in flight
     sqsClient
