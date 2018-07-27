@@ -55,7 +55,7 @@ class SierraTransformableTransformer
                   sourceIdentifier = sourceIdentifier,
                   otherIdentifiers = getOtherIdentifiers(sierraId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
-                  title = getTitle(bibId = sierraId, bibData = sierraBibData),
+                  title = getTitle(bibData = sierraBibData),
                   workType = getWorkType(sierraBibData),
                   description = getDescription(sierraBibData),
                   physicalDescription = getPhysicalDescription(sierraBibData),
@@ -84,7 +84,7 @@ class SierraTransformableTransformer
             }
             .recover {
               case e: ShouldNotTransformException =>
-                info(s"Should not transform: ${e.getMessage}")
+                info(s"Should not transform $sierraId: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version
