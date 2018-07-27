@@ -33,5 +33,5 @@ variable "es_config_snapshot" {
   }
 }
 variable "namespace" {
-  default = "sierra_adapter"
+  default = "data_api"
 }
