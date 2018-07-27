@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-object Main {
+object Main extends App {
   val s3Client = AmazonS3ClientBuilder.standard.build()
   implicit val storageBackend = new S3StorageBackend(s3Client)
 
