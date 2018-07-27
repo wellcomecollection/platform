@@ -7,10 +7,7 @@ import uk.ac.wellcome.models.work.internal.{
   LocationType,
   PhysicalLocation
 }
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraItemData,
-  SierraItemLocation
-}
+import uk.ac.wellcome.platform.transformer.source.SierraItemLocation
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
