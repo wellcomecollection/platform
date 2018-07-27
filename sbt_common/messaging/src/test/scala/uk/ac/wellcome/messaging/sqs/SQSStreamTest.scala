@@ -73,10 +73,7 @@ class SQSStreamTest
   it("fails gracefully when the object cannot be deserialised") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), metricsSender) =>
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -123,10 +120,10 @@ class SQSStreamTest
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
         sendExampleObjects(queue = queue, start = 1)
-        sqsClient.sendMessage(queue.url, "not valid json")
+        sendInvalidJSONto(queue)
 
         sendExampleObjects(queue = queue, start = 2)
-        sqsClient.sendMessage(queue.url, "another not valid json")
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -198,10 +195,10 @@ class SQSStreamTest
       withSQSStreamFixtures {
         case (messageStream, QueuePair(queue, dlq), _) =>
           sendExampleObjects(queue = queue, start = 1)
-          sqsClient.sendMessage(queue.url, "not valid json")
+          sendInvalidJSONto(queue)
 
           sendExampleObjects(queue = queue, start = 2)
-          sqsClient.sendMessage(queue.url, "another not valid json")
+          sendInvalidJSONto(queue)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
           messageStream.runStream(
@@ -232,11 +229,8 @@ class SQSStreamTest
 
   private def sendExampleObjects(queue: Queue, start: Int = 1, count: Int = 1) =
     createExampleObjects(start = start, count = count).map { exampleObject =>
-      sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
+      sendMessage(queue = queue, obj = exampleObject)
     }
-
-  private def sendMessage(queue: Queue, obj: ExampleObject) =
-    sqsClient.sendMessage(queue.url, toJson(obj).get)
 
   def withSQSStreamFixtures[R](
     testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender),

@@ -82,10 +82,7 @@ class MessageStreamTest
   it("fails gracefully when NotificationMessage cannot be deserialised") {
     withMessageStreamFixtures[ExampleObject, Assertion] {
       case (bucket, messageStream, QueuePair(queue, dlq), metricsSender) =>
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -146,18 +143,10 @@ class MessageStreamTest
         val exampleObject1 = ExampleObject("some value 1")
         val exampleObject2 = ExampleObject("some value 2")
 
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
-
+        sendInvalidJSONto(queue)
         sendMessage(bucket, queue, exampleObject1)
 
-        sqsClient.sendMessage(
-          queue.url,
-          "another not valid json"
-        )
-
+        sendInvalidJSONto(queue)
         sendMessage(bucket, queue, exampleObject2)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -237,18 +226,10 @@ class MessageStreamTest
           val exampleObject1 = ExampleObject("some value 1")
           val exampleObject2 = ExampleObject("some value 2")
 
-          sqsClient.sendMessage(
-            queue.url,
-            "not valid json"
-          )
-
+          sendInvalidJSONto(queue)
           sendMessage(bucket, queue, exampleObject1)
 
-          sqsClient.sendMessage(
-            queue.url,
-            "another not valid json"
-          )
-
+          sendInvalidJSONto(queue)
           sendMessage(bucket, queue, exampleObject2)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
