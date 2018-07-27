@@ -23,6 +23,15 @@ from asg_utils import discover_asg, set_asg_size
 
 
 def update_desired_capacity_for_scheduled_action(client, scaling_group_name, scheduled_action_name, desired_capacity):
+    """Updates the desired capacity for a scheduled action.
+
+    Keyword arguments:
+    client -- boto3 autoscaling client
+    scaling_group_name -- name of the autoscaling group to modify
+    scheduled_action_name -- name of the scheduled action to modify
+    desired_capacity -- desired capacity of scheduled action
+    """
+
     action_str = (
         "Setting desired capacity of ScheduledAction {scheduled_action_name} to {desired_capacity}."
     ).format(
@@ -41,6 +50,13 @@ def update_desired_capacity_for_scheduled_action(client, scaling_group_name, sch
 
 
 def get_status(client, tag_name, scheduled_action_name):
+    """Gets the status of an autoscaling group.
+
+    Keyword arguments:
+    client -- boto3 autoscaling client
+    tag_name -- tags used to identify autoscaling group
+    scheduled_action_name -- name of the scheduled action to get status for
+    """
     scaling_group = discover_asg(asg_client=client, tag_name=tag_name)
 
     desired_capacity = scaling_group['DesiredCapacity']
@@ -63,6 +79,11 @@ def get_status(client, tag_name, scheduled_action_name):
 
 
 def print_status(status):
+    """Prints the status of an autoscaling group.
+
+    Keyword arguments:
+    status -- status as returned from the get_status function
+    """
     instance_str = (
         'The desired size of autoscaling group "{name}" is {desired}.\n\nThere are currently {count} running.\n'
     ).format(
@@ -88,10 +109,8 @@ if __name__ == '__main__':
     scheduled_action_name = 'ensure_down'
 
     client = boto3.client('autoscaling')
-
     scaling_group_name = discover_asg(asg_client=client, tag_name=tag_name)['AutoScalingGroupName']
 
-    # Starting or stopping
     if args['--start']:
         set_asg_size(
             asg_client=client,
