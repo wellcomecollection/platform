@@ -63,7 +63,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
 
       val transformedItem = transformer.transformItemData(
-        sierraItemId = "4000004", sierraItemData = item
+        itemId = "4000004", itemData = item
       )
 
       transformedItem shouldBe Identifiable(
@@ -82,7 +82,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val sierraItemData = createSierraItemData
 
       val transformedItem = transformer.transformItemData(
-        sierraItemId = "5000005", sierraItemData = sierraItemData
+        itemId = "5000005", itemData = sierraItemData
       )
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
     }

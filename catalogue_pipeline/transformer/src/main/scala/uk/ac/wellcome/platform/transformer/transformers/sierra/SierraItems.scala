@@ -34,14 +34,14 @@ trait SierraItems extends Logging with SierraLocation {
       .flatten
       .toMap
 
-  def transformItemData(sierraItemId: String, sierraItemData: SierraItemData): Identifiable[Item] = {
-    debug(s"Attempting to transform $sierraItemId")
+  def transformItemData(itemId: String, itemData: SierraItemData): Identifiable[Item] = {
+    debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
         value = SierraRecordNumbers.addCheckDigit(
-          sierraId = sierraItemId,
+          sierraId = itemId,
           recordType = SierraRecordTypes.items
         )
       ),
@@ -49,11 +49,11 @@ trait SierraItems extends Logging with SierraLocation {
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
-          value = sierraItemId
+          value = itemId
         )
       ),
       agent = Item(
-        locations = getPhysicalLocation(sierraItemData).toList
+        locations = getPhysicalLocation(itemData).toList
       )
     )
   }
@@ -62,14 +62,13 @@ trait SierraItems extends Logging with SierraLocation {
     sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
     extractItemData(sierraTransformable)
       .filterNot {
-        case (_: String, sierraItemData: SierraItemData) =>
-          sierraItemData.deleted
+        case (_: String, itemData: SierraItemData) => itemData.deleted
       }
       .map {
-        case (sierraItemId: String, sierraItemData: SierraItemData) =>
+        case (itemId: String, itemData: SierraItemData) =>
           transformItemData(
-            sierraItemId = sierraItemId,
-            sierraItemData = sierraItemData
+            itemId = itemId,
+            itemData = itemData
           )
       }
       .toList
