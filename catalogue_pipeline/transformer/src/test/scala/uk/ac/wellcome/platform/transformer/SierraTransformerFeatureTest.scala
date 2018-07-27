@@ -45,9 +45,9 @@ class SierraTransformerFeatureTest
                 bucket = storageBucket
               )
 
-            sqsClient.sendMessage(
-              queue.url,
-              JsonUtil.toJson(sierraHybridRecordMessage).get
+            sendMessage(
+              queue = queue,
+              obj = sierraHybridRecordMessage
             )
 
             val flags: Map[String, String] = Map(

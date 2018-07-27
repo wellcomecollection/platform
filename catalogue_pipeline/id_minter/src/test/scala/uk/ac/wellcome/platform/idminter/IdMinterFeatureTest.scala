@@ -150,9 +150,7 @@ class IdMinterFeatureTest
                 messagingLocalFlags(bucket, topic, queue)
 
             withServer(flags) { _ =>
-              sqsClient.sendMessage(
-                queue.url,
-                "Not a valid JSON string or UnidentifiedWork")
+              sendInvalidJSONto(queue)
 
               val work = createUnidentifiedWork
 

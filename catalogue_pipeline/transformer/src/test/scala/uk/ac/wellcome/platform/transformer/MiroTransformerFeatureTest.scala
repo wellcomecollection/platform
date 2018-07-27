@@ -8,7 +8,6 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.transformers.MiroTransformableWrapper
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class MiroTransformerFeatureTest
@@ -44,9 +43,9 @@ class MiroTransformerFeatureTest
                 bucket = storageBucket
               )
 
-            sqsClient.sendMessage(
-              queue.url,
-              JsonUtil.toJson(miroHybridRecordMessage).get
+            sendMessage(
+              queue = queue,
+              obj = miroHybridRecordMessage
             )
 
             val flags: Map[String, String] = Map(
@@ -144,15 +143,9 @@ class MiroTransformerFeatureTest
                   s3Client = s3Client,
                   bucket = storageBucket
                 )
-              sqsClient.sendMessage(
-                queue.url,
-                JsonUtil.toJson(miroHybridRecordMessage1).get
-              )
 
-              sqsClient.sendMessage(
-                queue.url,
-                JsonUtil.toJson(miroHybridRecordMessage2).get
-              )
+              sendMessage(queue = queue, obj = miroHybridRecordMessage1)
+              sendMessage(queue = queue, obj = miroHybridRecordMessage2)
 
               eventually {
                 val works = getMessages[UnidentifiedWork](topic)

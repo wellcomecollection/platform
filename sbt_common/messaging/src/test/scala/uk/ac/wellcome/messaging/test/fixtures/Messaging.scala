@@ -199,6 +199,6 @@ trait Messaging
       location = ObjectLocation(namespace = bucket.name, key = s3key)
     )
 
-    sqsClient.sendMessage(queue.url, notificationJson)
+    sendMessage(queue = queue, body = notificationJson)
   }
 }

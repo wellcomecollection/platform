@@ -51,10 +51,7 @@ class MatcherFeatureTest
                       s3Client = s3Client,
                       bucket = storageBucket
                     )
-                  sqsClient.sendMessage(
-                    queue.url,
-                    toJson(workSqsMessage).get
-                  )
+                  sendMessage(queue = queue, obj = workSqsMessage)
 
                   eventually {
                     val snsMessages = listMessagesReceivedFromSNS(topic)
@@ -116,9 +113,7 @@ class MatcherFeatureTest
                       s3Client = s3Client,
                       bucket = storageBucket)
 
-                  sqsClient.sendMessage(
-                    queuePair.queue.url,
-                    toJson(workSqsMessage).get)
+                  sendMessage(queue = queuePair.queue, obj = workSqsMessage)
 
                   eventually {
                     noMessagesAreWaitingIn(queuePair.queue)
