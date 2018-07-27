@@ -201,7 +201,7 @@ class MergerWorkerServiceTest
         eventually {
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
-          assertGracefulFailureMetricIncremented(metricsSender)
+          assertRecognisedFailureMetricIncremented(metricsSender)
         }
     }
   }
