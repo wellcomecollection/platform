@@ -12,9 +12,9 @@ object ItemLinker {
     */
   def linkItemRecord(sierraTransformable: SierraTransformable,
                      itemRecord: SierraItemRecord): SierraTransformable = {
-    if (!itemRecord.bibIds.contains(sierraTransformable.sourceId)) {
+    if (!itemRecord.bibIds.contains(sierraTransformable.sierraId)) {
       throw new RuntimeException(
-        s"Non-matching bib id ${sierraTransformable.sourceId} in item bib ${itemRecord.bibIds}")
+        s"Non-matching bib id ${sierraTransformable.sierraId} in item bib ${itemRecord.bibIds}")
     }
 
     // We can decide whether to insert the new data in two steps:

@@ -41,7 +41,7 @@ class SierraItemMergerFeatureTest
               sendNotificationToSQS(queue = queue, message = record)
 
               val expectedSierraTransformable = createSierraTransformableWith(
-                sourceId = bibId,
+                sierraId = bibId,
                 itemRecords = List(record)
               )
 
@@ -85,13 +85,13 @@ class SierraItemMergerFeatureTest
               eventually {
                 val expectedSierraTransformable1 =
                   createSierraTransformableWith(
-                    sourceId = bibId1,
+                    sierraId = bibId1,
                     itemRecords = List(record1)
                   )
 
                 val expectedSierraTransformable2 =
                   createSierraTransformableWith(
-                    sourceId = bibId2,
+                    sierraId = bibId2,
                     itemRecords = List(record2)
                   )
 

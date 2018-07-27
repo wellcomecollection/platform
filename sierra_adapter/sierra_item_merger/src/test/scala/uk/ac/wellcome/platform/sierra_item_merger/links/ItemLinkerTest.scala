@@ -11,7 +11,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sierraId = bibId)
     val result = ItemLinker.linkItemRecord(sierraTransformable, record)
 
     result.itemRecords shouldBe Map(record.id -> record)
@@ -25,7 +25,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(itemRecord)
     )
 
@@ -48,7 +48,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
     )
 
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       itemRecords = List(itemRecord)
     )
 
@@ -69,7 +69,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       bibIds = List(bibId)
     )
 
-    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sierraId = bibId)
     val result1 = ItemLinker.linkItemRecord(sierraTransformable, record1)
     val result2 = ItemLinker.linkItemRecord(result1, record2)
 
@@ -86,7 +86,7 @@ class ItemLinkerTest extends FunSpec with Matchers with SierraUtil {
       unlinkedBibIds = List()
     )
 
-    val sierraTransformable = createSierraTransformableWith(sourceId = bibId)
+    val sierraTransformable = createSierraTransformableWith(sierraId = bibId)
 
     val caught = intercept[RuntimeException] {
       ItemLinker.linkItemRecord(sierraTransformable, record)
