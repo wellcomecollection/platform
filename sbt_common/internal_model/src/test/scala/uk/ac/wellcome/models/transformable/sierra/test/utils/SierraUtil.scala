@@ -40,11 +40,11 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraBibNumber: SierraBibNumber =
     SierraBibNumber(createSierraRecordNumberString)
 
-  def createSierraItemNumber: SierraBibNumber =
+  def createSierraItemNumber: SierraItemNumber =
     SierraItemNumber(createSierraRecordNumberString)
 
   def createSierraBibRecordWith(
-    id: String = createSierraRecordNumberString,
+    id: SierraBibNumber = createSierraBibNumber,
     data: String = "",
     modifiedDate: Instant = Instant.now): SierraBibRecord = {
     val recordData = if (data == "") {

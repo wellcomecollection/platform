@@ -26,7 +26,7 @@ class SierraTransformerFeatureTest
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "1001001"
+    val id = createSierraBibNumber
     val title = "A pot of possums"
 
     withLocalSnsTopic { topic =>
