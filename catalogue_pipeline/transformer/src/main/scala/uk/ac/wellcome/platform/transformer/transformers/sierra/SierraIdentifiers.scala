@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 
 trait SierraIdentifiers {
