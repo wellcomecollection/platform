@@ -52,13 +52,13 @@ class DynamoInserterTest
       withDynamoInserter(table) { dynamoInserter =>
         val newRecord = createSierraItemRecordWith(
           modifiedDate = newerDate,
-          bibIds = List(createSierraRecordNumberString)
+          bibIds = List(createSierraBibNumber)
         )
         Scanamo.put(dynamoDbClient)(table.name)(newRecord)
 
         val oldRecord = newRecord.copy(
           modifiedDate = olderDate,
-          bibIds = List(createSierraRecordNumberString)
+          bibIds = List(createSierraBibNumber)
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
@@ -75,14 +75,14 @@ class DynamoInserterTest
       withDynamoInserter(table) { dynamoInserter =>
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
-          bibIds = List(createSierraRecordNumberString)
+          bibIds = List(createSierraBibNumber)
         )
         Scanamo.put(dynamoDbClient)(table.name)(oldRecord)
 
         val newRecord = createSierraItemRecordWith(
           id = oldRecord.id,
           modifiedDate = newerDate,
-          bibIds = oldRecord.bibIds ++ List(createSierraRecordNumberString)
+          bibIds = oldRecord.bibIds ++ List(createSierraBibNumber)
         )
 
         val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)

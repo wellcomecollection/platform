@@ -29,7 +29,7 @@ class SierraItemsToDynamoFeatureTest
 
         withServer(flags) { server =>
           val itemId = createSierraItemNumber
-          val bibId = createSierraRecordNumberString
+          val bibId = createSierraBibNumber
 
           val sierraRecord = createSierraItemRecordWith(
             id = itemId,
