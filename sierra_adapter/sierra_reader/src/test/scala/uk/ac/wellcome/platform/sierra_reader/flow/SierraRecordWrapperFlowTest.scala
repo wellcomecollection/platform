@@ -82,7 +82,7 @@ class SierraRecordWrapperFlowTest
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
-          | "bibIds": ${toJson(createSierraRecordNumberStrings(count = 4)).get}
+          | "bibIds": ${toJson(createSierraBibNumbers(count = 4)).get}
           |}
         """.stripMargin
 

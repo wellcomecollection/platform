@@ -99,7 +99,7 @@ class DynamoInserterTest
   it("records unlinked bibIds") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val bibIds = createSierraRecordNumberStrings(count = 3)
+        val bibIds = createSierraBibNumbers(count = 3)
 
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
@@ -128,7 +128,7 @@ class DynamoInserterTest
   it("adds new bibIds and records unlinked bibIds in the same update") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val bibIds = createSierraRecordNumberStrings(count = 4)
+        val bibIds = createSierraBibNumbers(count = 4)
 
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,
@@ -157,7 +157,7 @@ class DynamoInserterTest
   it("preserves existing unlinked bibIds in DynamoDB") {
     withLocalDynamoDbTable { table =>
       withDynamoInserter(table) { dynamoInserter =>
-        val bibIds = createSierraRecordNumberStrings(count = 5)
+        val bibIds = createSierraBibNumbers(count = 5)
 
         val oldRecord = createSierraItemRecordWith(
           modifiedDate = olderDate,

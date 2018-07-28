@@ -73,7 +73,7 @@ class SierraItemsToDynamoWorkerServiceTest
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     withSierraWorkerService {
       case (_, QueuePair(queue, _), table, _) =>
-        val bibIds = createSierraRecordNumberStrings(count = 5)
+        val bibIds = createSierraBibNumbers(count = 5)
 
         val bibIds1 = List(bibIds(0), bibIds(1), bibIds(2))
 

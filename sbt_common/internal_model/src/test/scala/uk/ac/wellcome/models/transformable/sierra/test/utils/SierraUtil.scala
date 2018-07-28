@@ -32,13 +32,11 @@ trait SierraUtil extends IdentifiersUtil {
   def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
 
-  def createSierraRecordNumberStrings(count: Int): List[String] =
-    (1 to count).map { _ =>
-      createSierraRecordNumberString
-    }.toList
-
   def createSierraBibNumber: SierraBibNumber =
     SierraBibNumber(createSierraRecordNumberString)
+
+  def createSierraBibNumbers(count: Int): List[SierraBibNumber] =
+    (1 to count).map { _ => createSierraBibNumber }.toList
 
   def createSierraItemNumber: SierraItemNumber =
     SierraItemNumber(createSierraRecordNumberString)
