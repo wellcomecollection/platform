@@ -38,6 +38,8 @@ class MergerWorkerServiceTest
     with MergerTestUtils {
   case class TestObject(something: String)
 
+  import org.mockito.Mockito._
+
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
     withMergerWorkerServiceFixtures {
@@ -70,7 +72,8 @@ class MergerWorkerServiceTest
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
 
-              assertSuccessMetricIncremented(metricsSender)
+              verify(metricsSender, times(1))
+                .countSuccess(any[String])
             }
         }
     }
@@ -98,7 +101,8 @@ class MergerWorkerServiceTest
             val worksSent = getMessages[BaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
 
-            assertSuccessMetricIncremented(metricsSender)
+            verify(metricsSender, times(1))
+              .countSuccess(any[String])
           }
         }
     }
@@ -121,7 +125,8 @@ class MergerWorkerServiceTest
           assertQueueHasSize(dlq, 1)
           listMessagesReceivedFromSNS(topic) shouldBe empty
 
-          assertFailureMetricIncremented(metricsSender)
+          verify(metricsSender, times(3))
+            .countFailure(any[String])
         }
     }
   }
@@ -184,7 +189,8 @@ class MergerWorkerServiceTest
             val worksSent = getMessages[BaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
 
-            assertSuccessMetricIncremented(metricsSender)
+            verify(metricsSender, times(1))
+              .countSuccess(any[String])
           }
         }
     }
@@ -201,7 +207,8 @@ class MergerWorkerServiceTest
         eventually {
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
-          assertRecognisedFailureMetricIncremented(metricsSender)
+          verify(metricsSender, times(3))
+            .countRecognisedFailure(any[String])
         }
     }
   }
