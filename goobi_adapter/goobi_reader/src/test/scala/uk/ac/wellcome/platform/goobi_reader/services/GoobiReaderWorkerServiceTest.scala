@@ -7,7 +7,7 @@ import java.time.temporal.ChronoUnit
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3Client}
 import com.gu.scanamo.Scanamo
 import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Mockito.{never, times, verify, when}
 import org.scalatest.{FunSpec, Inside}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -177,7 +177,7 @@ class GoobiReaderWorkerServiceTest
 
   it("fails gracefully if Json cannot be parsed") {
     withGoobiReaderWorkerService(s3Client) {
-      case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
+      case (bucket, QueuePair(queue, dlq), metricsSender, table, _) =>
         sendNotificationToSQS(
           queue = queue,
           body = "NotJson"
@@ -186,14 +186,15 @@ class GoobiReaderWorkerServiceTest
         eventually {
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
-          assertFailureMetricNotIncremented(mockMetricsSender)
+          verify(metricsSender, never())
+            .countRecognisedFailure(any[String])
         }
     }
   }
 
   it("does not fail gracefully if content cannot be fetched") {
     withGoobiReaderWorkerService(s3Client) {
-      case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
+      case (bucket, QueuePair(queue, dlq), metricsSender, table, _) =>
         val sourceKey = "NotThere.xml"
 
         sendNotificationToSQS(
@@ -204,7 +205,8 @@ class GoobiReaderWorkerServiceTest
         eventually {
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
-          assertFailureMetricIncremented(mockMetricsSender)
+          verify(metricsSender, times(3))
+            .countRecognisedFailure(any[String])
         }
     }
   }
@@ -215,7 +217,7 @@ class GoobiReaderWorkerServiceTest
     when(mockClient.getObject(any[String], any[String]))
       .thenThrow(expectedException)
     withGoobiReaderWorkerService(mockClient) {
-      case (bucket, QueuePair(queue, dlq), mockMetricsSender, table, _) =>
+      case (bucket, QueuePair(queue, dlq), metricsSender, table, _) =>
         val sourceKey = "any.xml"
         sendNotificationToSQS(
           queue = queue,
@@ -225,7 +227,8 @@ class GoobiReaderWorkerServiceTest
         eventually {
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
-          assertFailureMetricIncremented(mockMetricsSender)
+          verify(metricsSender, times(3))
+            .countRecognisedFailure(any[String])
         }
     }
   }
