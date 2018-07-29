@@ -39,10 +39,10 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
       data = toJson(data).get
     )
 
-  def createSierraMaterialTypeWith(code: String = randomAlphanumeric(1),
-                                   value: String = randomAlphanumeric(5)) = {
+  def createSierraMaterialTypeWith(
+    code: String = randomAlphanumeric(1),
+    value: String = randomAlphanumeric(5)): SierraMaterialType =
     SierraMaterialType(code, value)
-  }
 
   def createSierraMaterialType: SierraMaterialType =
     createSierraMaterialTypeWith()
