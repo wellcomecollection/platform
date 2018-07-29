@@ -10,7 +10,7 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -25,9 +25,9 @@ class SierraRecordWrapperFlowTest
     with JsonTestUtil
     with SierraUtil {
 
-  private def withRecordWrapperFlow[R <: SierraRecordNumber, T <: AbstractSierraRecord](
+  private def withRecordWrapperFlow[T <: AbstractSierraRecord](
     actorSystem: ActorSystem,
-    createRecord: (R, String, Instant) => T)(
+    createRecord: (String, String, Instant) => T)(
     testWith: TestWith[Flow[Json, T, NotUsed], Assertion]) = {
     val wrapperFlow = SierraRecordWrapperFlow(
       createRecord = createRecord
