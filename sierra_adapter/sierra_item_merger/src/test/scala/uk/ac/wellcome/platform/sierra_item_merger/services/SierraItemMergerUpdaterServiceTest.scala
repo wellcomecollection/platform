@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
+import io.circe.KeyEncoder
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -25,6 +26,8 @@ class SierraItemMergerUpdaterServiceTest
     with LocalVersionedHybridStore
     with SQS
     with SierraUtil {
+
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,
