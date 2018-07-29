@@ -17,7 +17,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("creates a SierraItemRecord from valid item JSON") {
-    val itemId = createSierraItemNumber
+    val itemId = createSierraRecordNumberString
     val bibId = createSierraBibNumber
     val data = s"""
        |{
@@ -72,7 +72,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
   ) {
     val caught = intercept[IllegalArgumentException] {
       SierraItemRecord(
-        id = createSierraItemNumber,
+        id = createSierraRecordNumberString,
         data = data,
         modifiedDate = Instant.now
       )

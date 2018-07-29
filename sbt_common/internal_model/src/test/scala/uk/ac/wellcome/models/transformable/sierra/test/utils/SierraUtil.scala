@@ -29,7 +29,7 @@ trait SierraUtil extends IdentifiersUtil {
     Stream continually nextDigit
   }
 
-  private def createSierraRecordNumberString: String =
+  def createSierraRecordNumberString: String =
     randomNumeric take 7 mkString
 
   def createSierraBibNumber: SierraBibNumber =
