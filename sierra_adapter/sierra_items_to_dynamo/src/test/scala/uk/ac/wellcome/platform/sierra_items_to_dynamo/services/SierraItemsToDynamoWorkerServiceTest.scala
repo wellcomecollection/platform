@@ -12,6 +12,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -109,7 +110,7 @@ class SierraItemsToDynamoWorkerServiceTest
 
           val scanamoResult =
             Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> itemRecord.id)
+              'id -> itemRecord.id.withoutCheckDigit)
 
           scanamoResult shouldBe defined
           scanamoResult.get shouldBe Right(
