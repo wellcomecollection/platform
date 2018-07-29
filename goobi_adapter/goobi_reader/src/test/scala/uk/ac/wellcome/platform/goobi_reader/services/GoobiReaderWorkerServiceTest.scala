@@ -206,7 +206,7 @@ class GoobiReaderWorkerServiceTest
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
           verify(metricsSender, times(3))
-            .countRecognisedFailure(any[String])
+            .countFailure(any[String])
         }
     }
   }
@@ -228,7 +228,7 @@ class GoobiReaderWorkerServiceTest
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
           verify(metricsSender, times(3))
-            .countRecognisedFailure(any[String])
+            .countFailure(any[String])
         }
     }
   }
