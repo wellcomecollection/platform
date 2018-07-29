@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo
+package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.syntax._
