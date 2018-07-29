@@ -8,7 +8,7 @@ import akka.stream.scaladsl.Flow
 import com.twitter.inject.Logging
 import io.circe.Json
 import io.circe.optics.JsonPath.root
-import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraRecordNumber}
+import uk.ac.wellcome.models.transformable.sierra.AbstractSierraRecord
 
 object SierraRecordWrapperFlow extends Logging {
   def apply[T <: AbstractSierraRecord](

@@ -12,7 +12,7 @@ class DynamoInserter @Inject()(versionedDao: VersionedDao)(
   implicit ec: ExecutionContext) {
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] = {
-    versionedDao.getRecord[SierraItemRecord](record.id).flatMap {
+    versionedDao.getRecord[SierraItemRecord](record.id.withoutCheckDigit).flatMap {
       case Some(existingRecord) =>
         val mergedRecord = SierraItemRecordMerger
           .mergeItems(existingRecord = existingRecord, updatedRecord = record)
