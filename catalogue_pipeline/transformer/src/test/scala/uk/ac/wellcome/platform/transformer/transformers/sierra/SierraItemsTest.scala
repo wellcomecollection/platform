@@ -85,7 +85,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val itemId = createSierraItemNumber
       val sourceIdentifier = createSierraSourceIdentifierWith(
         ontologyType = "Item",
-        value = itemId.withoutCheckDigit
+        value = itemId.withCheckDigit
       )
       val sierraItemData = createSierraItemData
 
