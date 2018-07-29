@@ -54,9 +54,6 @@ class NotificationMessageReceiverTest
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
 
-    // Required for MessageWriter
-    implicit val storageBackend = new S3StorageBackend(s3Client)
-
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
         messageConfig = messageConfig,
@@ -82,7 +79,6 @@ class NotificationMessageReceiverTest
               title = "A calming breeze on the sea"
             ),
             sourceName = "sierra",
-            version = 1,
             s3Client = s3Client,
             bucket = bucket
           )
@@ -146,7 +142,6 @@ class NotificationMessageReceiverTest
             hybridRecordNotificationMessage(
               message = "not a json string",
               sourceName = "miro",
-              version = 1,
               s3Client = s3Client,
               bucket = bucket
             )
@@ -205,7 +200,6 @@ class NotificationMessageReceiverTest
           val message = hybridRecordNotificationMessage(
             message = JsonUtil.toJson(sierraTransformable).get,
             sourceName = "sierra",
-            version = 1,
             s3Client = s3Client,
             bucket = bucket
           )
