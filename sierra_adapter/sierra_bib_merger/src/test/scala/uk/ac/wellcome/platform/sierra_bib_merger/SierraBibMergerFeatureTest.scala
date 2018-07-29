@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
-import io.circe.KeyEncoder
+import io.circe.{KeyDecoder, KeyEncoder}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -29,6 +29,7 @@ class SierraBibMergerFeatureTest
     with SierraUtil {
 
   implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
 
   it("stores a bib in the hybrid store") {
     withLocalSqsQueue { queue =>

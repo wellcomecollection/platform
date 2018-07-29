@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import io.circe.KeyEncoder
+import io.circe.{KeyDecoder, KeyEncoder}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
@@ -28,6 +28,7 @@ class SierraItemMergerUpdaterServiceTest
     with SierraUtil {
 
   implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,

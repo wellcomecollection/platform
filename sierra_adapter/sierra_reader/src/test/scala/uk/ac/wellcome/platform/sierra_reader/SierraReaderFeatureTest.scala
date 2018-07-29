@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.sierra_reader
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 

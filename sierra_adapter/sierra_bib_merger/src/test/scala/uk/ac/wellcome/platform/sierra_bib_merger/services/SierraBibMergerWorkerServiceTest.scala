@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
-import io.circe.KeyEncoder
+import io.circe.{KeyDecoder, KeyEncoder}
 import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -33,6 +33,7 @@ class SierraBibMergerWorkerServiceTest
     with ExtendedPatience {
 
   implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {

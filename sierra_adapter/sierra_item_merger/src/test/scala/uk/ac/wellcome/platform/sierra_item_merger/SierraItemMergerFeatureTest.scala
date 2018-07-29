@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
-import io.circe.KeyEncoder
+import io.circe.{KeyDecoder, KeyEncoder}
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
@@ -26,6 +26,7 @@ class SierraItemMergerFeatureTest
     with SierraUtil {
 
   implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
