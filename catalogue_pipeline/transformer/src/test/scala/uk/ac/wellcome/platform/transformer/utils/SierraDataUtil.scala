@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import io.circe.Encoder
+import io.circe.syntax._
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
@@ -34,10 +36,16 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraItemData: SierraItemData = createSierraItemDataWith()
 
-  def createSierraItemRecordWith(data: SierraItemData): SierraItemRecord =
+  def createSierraItemRecordWith(data: SierraItemData): SierraItemRecord = {
+    // This encoder ensures that bib numbers are encoded as strings, not
+    // dicts -- the same as the responses we get from the Sierra API.
+    implicit val encodeBibNumber: Encoder[SierraBibNumber] =
+      (bibId: SierraBibNumber) => bibId.withoutCheckDigit.asJson
+
     createSierraItemRecordWith(
       data = toJson(data).get
     )
+  }
 
   def createSierraMaterialTypeWith(
     code: String = randomAlphanumeric(1),
