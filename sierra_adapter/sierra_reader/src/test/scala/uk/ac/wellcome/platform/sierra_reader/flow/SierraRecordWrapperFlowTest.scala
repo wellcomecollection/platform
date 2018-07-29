@@ -78,11 +78,17 @@ class SierraRecordWrapperFlowTest
           wrapperFlow =>
             val id = createSierraItemNumber
             val updatedDate = "2014-04-14T14:14:14Z"
+
+            // We need to encode the bib IDs as strings, _not_ as typed
+            // objects -- the format needs to map what we get from the
+            // Sierra API.
+            //
+            val bibIds = (1 to 4).map { _ => createSierraRecordNumberString }
             val jsonString = s"""
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
-          | "bibIds": ${toJson(createSierraBibNumbers(count = 4)).get}
+          | "bibIds": ${toJson(bibIds).get}
           |}
         """.stripMargin
 
