@@ -14,9 +14,9 @@ trait WorkIndexerFixtures extends Akka { this: Suite =>
     testWith(workIndexer)
   }
 
-  def withWorkIndexerFixtures[R](esType: String, elasticClient: HttpClient)(
+  def withWorkIndexerFixtures[R](elasticClient: HttpClient)(
     testWith: TestWith[WorkIndexer, R]): R = {
-    withActorSystem { actorSystem =>
+    withActorSystem { _ =>
       withWorkIndexer(elasticClient = elasticClient) { workIndexer =>
         testWith(workIndexer)
       }
