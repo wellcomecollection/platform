@@ -32,7 +32,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
       modifiedDate = Instant.now
     )
 
-    result.id shouldBe itemId
+    result.id shouldBe SierraItemNumber(itemId)
     result.data shouldBe data
     result.bibIds shouldBe List(bibId)
   }
