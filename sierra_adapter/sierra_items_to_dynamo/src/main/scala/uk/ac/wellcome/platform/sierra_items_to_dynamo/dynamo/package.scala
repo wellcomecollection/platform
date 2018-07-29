@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemRe
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.type_classes.IdGetter
 
-object dynamo {
+package object dynamo {
   implicit val recordNumberFormat =
     DynamoFormat
       .coercedXmap[SierraBibNumber, String, IllegalArgumentException](
