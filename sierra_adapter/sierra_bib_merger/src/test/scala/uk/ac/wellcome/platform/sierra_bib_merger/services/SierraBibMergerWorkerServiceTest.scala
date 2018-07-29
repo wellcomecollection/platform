@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger.services
 
+import io.circe.KeyEncoder
 import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -8,7 +9,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
@@ -30,6 +31,8 @@ class SierraBibMergerWorkerServiceTest
     with S3
     with LocalVersionedHybridStore
     with ExtendedPatience {
+
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {

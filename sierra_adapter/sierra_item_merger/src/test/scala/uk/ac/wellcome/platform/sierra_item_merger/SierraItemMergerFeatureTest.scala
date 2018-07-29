@@ -1,10 +1,11 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
+import io.circe.KeyEncoder
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -23,6 +24,8 @@ class SierraItemMergerFeatureTest
     with S3
     with LocalVersionedHybridStore
     with SierraUtil {
+
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
