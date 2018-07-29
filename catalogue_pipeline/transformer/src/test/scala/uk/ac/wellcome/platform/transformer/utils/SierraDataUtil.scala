@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import uk.ac.wellcome.models.transformable.sierra.{SierraItemNumber, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._

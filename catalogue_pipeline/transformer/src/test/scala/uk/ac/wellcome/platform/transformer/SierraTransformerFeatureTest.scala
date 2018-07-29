@@ -64,13 +64,13 @@ class SierraTransformerFeatureTest
                 val sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
-                  value = "b10010014"
+                  value = id.withCheckDigit
                 )
 
                 val sierraIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-identifier"),
                   ontologyType = "Work",
-                  value = id
+                  value = id.withoutCheckDigit
                 )
 
                 val works = getMessages[UnidentifiedWork](topic)

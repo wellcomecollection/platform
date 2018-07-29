@@ -592,7 +592,7 @@ class SierraTransformableTransformerTest
     val id = createSierraBibNumber
 
     val sierraTransformable = createSierraTransformableWith(
-      sierraId = id.withoutCheckDigit,
+      sierraId = id,
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords
     )
