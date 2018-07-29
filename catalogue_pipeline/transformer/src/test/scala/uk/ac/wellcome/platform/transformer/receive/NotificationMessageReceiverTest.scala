@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.receive
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
-import io.circe.KeyEncoder
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -14,7 +13,6 @@ import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
-import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
@@ -39,8 +37,6 @@ class NotificationMessageReceiverTest
     with MockitoSugar
     with ScalaFutures
     with TransformableMessageUtils {
-
-  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
