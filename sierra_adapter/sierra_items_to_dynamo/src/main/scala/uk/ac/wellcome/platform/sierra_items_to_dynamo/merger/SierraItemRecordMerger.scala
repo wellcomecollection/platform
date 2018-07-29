@@ -37,11 +37,11 @@ object SierraItemRecordMerger {
     }
   }
 
-  private def addList(x: List[String], y: List[String]): List[String] = {
+  private def addList[T](x: List[T], y: List[T]): List[T] = {
     (x.toSet ++ y.toSet).toList
   }
 
-  private def subList(x: List[String], y: List[String]): List[String] = {
+  private def subList[T](x: List[T], y: List[T]): List[T] = {
     (x.toSet -- y.toSet).toList
   }
 }
