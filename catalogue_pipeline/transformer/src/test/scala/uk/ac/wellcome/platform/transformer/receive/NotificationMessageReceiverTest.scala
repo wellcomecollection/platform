@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.transformer.receive
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
+import io.circe.KeyEncoder
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -12,6 +13,8 @@ import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.storage.s3.S3Config
@@ -36,7 +39,10 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
+    with SierraUtil
     with TransformableMessageUtils {
+
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
@@ -68,9 +74,7 @@ class NotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
-            message = createValidSierraTransformableJsonWith(
-              title = "A calming breeze on the sea"
-            ),
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
             s3Client = s3Client,
             bucket = bucket
@@ -94,14 +98,13 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and adds the version to the transformed work") {
-    val title = "A pot of possums"
     val version = 5
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message = createValidSierraTransformableJsonWith(title = title),
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
