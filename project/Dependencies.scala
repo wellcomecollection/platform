@@ -148,10 +148,6 @@ object Dependencies {
   )
 
   // Application specific dependency groups
-  val sierraAdapterCommonDependencies = Seq(
-    "io.circe" %% "circe-optics" % versions.circeVersion
-  )
-
   val idminterDependencies = Seq(
     "org.scalikejdbc" %% "scalikejdbc" % "3.0.0",
     "mysql" % "mysql-connector-java" % "6.0.6",
@@ -165,6 +161,7 @@ object Dependencies {
   )
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
+    "io.circe" %% "circe-optics" % versions.circeVersion,
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
 }

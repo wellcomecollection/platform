@@ -17,7 +17,6 @@ import uk.ac.wellcome.platform.sierra_reader.models.{
   SierraResourceTypes
 }
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
