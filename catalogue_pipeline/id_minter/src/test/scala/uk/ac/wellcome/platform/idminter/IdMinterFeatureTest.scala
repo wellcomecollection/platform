@@ -164,12 +164,29 @@ class IdMinterFeatureTest
                 val snsMessages = listMessagesReceivedFromSNS(topic)
                 snsMessages.size should be >= 1
 
-                assertQueueHasSize(queue, size = 1)
+                assertMessageIsNotDeleted(queue)
               }
             }
           }
         }
       }
     }
+  }
+
+  private def assertMessageIsNotDeleted(queue: Queue): Unit = {
+    // After a message is read, it stays invisible for 1 second and then it gets sent again.
+    // So we wait for longer than the visibility timeout and then we assert that it has become
+    // invisible again, which means that the id_minter picked it up again,
+    // and so it wasn't deleted as part of the first run.
+    // TODO Write this test using dead letter queues once https://github.com/adamw/elasticmq/issues/69 is closed
+    Thread.sleep(2000)
+
+    sqsClient
+      .getQueueAttributes(
+        queue.url,
+        List("ApproximateNumberOfMessagesNotVisible").asJava
+      )
+      .getAttributes
+      .get("ApproximateNumberOfMessagesNotVisible") shouldBe "1"
   }
 }
