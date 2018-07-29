@@ -22,7 +22,7 @@ case object SierraItemRecord {
   /** This apply method is for parsing JSON bodies that come from the
     * Sierra API.
     */
-  def apply(id: SierraItemNumber,
+  def apply(id: String,
             data: String,
             modifiedDate: Instant): SierraItemRecord = {
     val bibIds = fromJson[SierraAPIData](data) match {
@@ -33,7 +33,7 @@ case object SierraItemRecord {
     }
 
     SierraItemRecord(
-      id = id,
+      id = SierraItemNumber(id),
       data = data,
       modifiedDate = modifiedDate,
       bibIds = bibIds.map { SierraBibNumber }
