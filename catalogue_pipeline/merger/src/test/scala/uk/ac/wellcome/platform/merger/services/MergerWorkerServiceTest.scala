@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.merger.services
 import akka.actor.ActorSystem
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -35,7 +36,8 @@ class MergerWorkerServiceTest
     with SNS
     with Messaging
     with MergerFixtures
-    with MergerTestUtils {
+    with MergerTestUtils
+    with MockitoSugar {
   case class TestObject(something: String)
 
   import org.mockito.Mockito._
