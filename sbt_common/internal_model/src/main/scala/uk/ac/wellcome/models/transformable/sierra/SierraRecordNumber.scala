@@ -4,9 +4,8 @@ object SierraRecordTypes extends Enumeration {
   val bibs, items = Value
 }
 
-sealed trait SierraRecordNumber {
+trait SierraRecordNumber {
   val recordNumber: String
-  val recordType: Option[SierraRecordTypes.Value]
 
   if ("""^[0-9]{7}$""".r.unapplySeq(recordNumber) isEmpty) {
     throw new IllegalArgumentException(
@@ -18,12 +17,16 @@ sealed trait SierraRecordNumber {
 
   /** Returns the ID without the check digit or prefix. */
   def withoutCheckDigit: String = recordNumber
+}
+
+sealed trait SierraTypedRecordNumber extends SierraRecordNumber {
+  val recordType: SierraRecordTypes.Value
 
   /** Returns the ID with the check digit and prefix. */
   def withCheckDigit: String = {
     val prefix = recordType match {
-      case Some(SierraRecordTypes.bibs)  => "b"
-      case Some(SierraRecordTypes.items) => "i"
+      case SierraRecordTypes.bibs  => "b"
+      case SierraRecordTypes.items => "i"
       case _ =>
         throw new RuntimeException(
           s"Received unrecognised record type: $recordType"
@@ -63,10 +66,10 @@ case class UntypedSierraRecordNumber(recordNumber: String) extends SierraRecordN
   val recordType = None
 }
 
-case class SierraBibNumber(recordNumber: String) extends SierraRecordNumber {
-  val recordType = Some(SierraRecordTypes.bibs)
+case class SierraBibNumber(recordNumber: String) extends SierraTypedRecordNumber {
+  val recordType = SierraRecordTypes.bibs
 }
 
-case class SierraItemNumber(recordNumber: String) extends SierraRecordNumber {
-  val recordType = Some(SierraRecordTypes.items)
+case class SierraItemNumber(recordNumber: String) extends SierraTypedRecordNumber {
+  val recordType = SierraRecordTypes.items
 }
