@@ -3,19 +3,19 @@ package uk.ac.wellcome.platform.archiver
 import java.io.InputStream
 import java.util.zip.ZipFile
 
-import akka.event.Logging
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
-import akka.stream.scaladsl.{Broadcast, GraphDSL, RunnableGraph, Sink, StreamConverters}
-import akka.stream.{ActorMaterializer, Attributes, ClosedShape}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Source, StreamConverters}
+import akka.stream.{ActorMaterializer, ClosedShape}
 import akka.util.ByteString
+import com.amazonaws.services.s3.AmazonS3
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.storage.{ObjectLocation, StorageBackend}
+import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 
-class VerifiedBagUploader[T <: StorageBackend](s3Client: S3Client, config: BagUploaderConfig)(
+class VerifiedBagUploader(amazonS3: AmazonS3, s3Client: S3Client, config: BagUploaderConfig)(
   implicit
     executionContext: ExecutionContext,
     materializer: ActorMaterializer
@@ -70,22 +70,18 @@ class VerifiedBagUploader[T <: StorageBackend](s3Client: S3Client, config: BagUp
 
       // download
 
-//      val verifySink2 = Sink.head[Try[String]]
+      val verifySink2 = Sink.head[Try[String]]
 
       info(s"${uploadLocation.namespace}, ${uploadLocation.key}")
 
-      val (s3Source, _) = s3Client.download(uploadLocation.namespace, uploadLocation.key)
-      val logS3Source = s3Source.log("foop").withAttributes(Attributes.logLevels(onElement = Logging.DebugLevel))
 
-//      val downloadAndVerify = RunnableGraph.fromGraph(GraphDSL.create(verifySink2) { implicit builder => (cSink) =>
-//        import GraphDSL.Implicits._
-//
-//        val digestCalculator = new DigestCalculator("MD5", checksum)
-//
-//        logS3Source ~> digestCalculator ~> cSink
-//
-//        ClosedShape
-//      })
+      val downloadVerifier = Flow[ObjectLocation].flatMapConcat((uploadLocation) => {
+        val (source, _) = s3Client.download(uploadLocation.namespace, uploadLocation.key)
+
+        source
+      }).via(new DigestCalculator("MD5", checksum))
+
+
 
       val (futureResult, futureVerification) = uploadAndVerify.run()
 
@@ -97,12 +93,9 @@ class VerifiedBagUploader[T <: StorageBackend](s3Client: S3Client, config: BagUp
         if verification.isSuccess
         _ = info(s"Verified file contents in zip for ${result.key}")
 
-        foo <- logS3Source.map(_.utf8String).runWith(Sink.head)
-        _ = info(foo)
-
-//        downloadVerification <- downloadAndVerify.run()
-//        if downloadVerification.isSuccess
-//        _ = info(s"Verified file contents in storage for ${result.key}.")
+        downloadVerification <- Source.single(uploadLocation).via(downloadVerifier).runWith(verifySink2)
+        if downloadVerification.isSuccess
+        _ = info(s"Verified file contents in storage for ${result.key}.")
 
       } yield result
 
