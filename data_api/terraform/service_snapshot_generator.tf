@@ -8,14 +8,12 @@ data "template_file" "es_cluster_host_snapshot" {
 }
 
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform-modules.git//sqs_autoscaling_service?ref=v10.3.0"
-  name   = "snapshot_generator"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  service_name       = "snapshot_generator"
+  task_desired_count = "0"
 
   source_queue_name = "${module.snapshot_generator_queue.name}"
   source_queue_arn  = "${module.snapshot_generator_queue.arn}"
-
-  ecr_repository_url = "${module.ecr_repository_snapshot_generator.repository_url}"
-  release_id         = "${var.release_ids["snapshot_generator"]}"
 
   env_vars = {
     queue_url         = "${module.snapshot_generator_queue.id}"
@@ -31,23 +29,27 @@ module "snapshot_generator" {
     metrics_namespace = "snapshot_generator"
   }
 
-  memory = 3072
+  env_vars_length = 11
+
+  memory = 4096
   cpu    = 2048
 
-  cluster_name = "${module.data_api_cluster.cluster_name}"
-  vpc_id       = "${module.vpc_data_api.vpc_id}"
-
-  alb_cloudwatch_id          = "${module.data_api_cluster.alb_cloudwatch_id}"
-  alb_listener_https_arn     = "${module.data_api_cluster.alb_listener_https_arn}"
-  alb_listener_http_arn      = "${module.data_api_cluster.alb_listener_http_arn}"
-  alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
-  alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-
-  enable_alb_alarm = false
+  vpc_id = "${local.vpc_id}"
 
   max_capacity = 2
 
   scale_down_period_in_minutes = 30
 
-  log_retention_in_days = 30
+  container_image = "${module.ecr_repository_snapshot_generator.repository_url}:${var.release_ids["snapshot_generator"]}"
+
+  ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"
+  ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
+
+  aws_region = "${var.aws_region}"
+  vpc_id     = "${local.vpc_id}"
+  subnets    = "${local.private_subnets}"
+
+  namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+
+  launch_type = "FARGATE"
 }
