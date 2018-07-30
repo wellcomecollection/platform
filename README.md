@@ -35,6 +35,8 @@ Code for the platform is split across multiple repositories:
 The bulk of our code is written in Scala.
 To reduce build times in the main repo, we've pushed out some of our libraries into external repositories:
 
+*   [wellcometrust/scala-monitoring][monitoring] provides wrappers for sending CloudWatch metrics.
+
 *   [wellcometrust/scala-storage][storage] provides wrappers around S3 and DynamoDB, including our "Versioned Hybrid Store" for storing large objects.
 
 *   [wellcometrust/sierra-streams-source][sierrastreams] is a Scala library that provides Akka Streams from objects in a [Sierra API][sierra].
@@ -44,5 +46,6 @@ To reduce build times in the main repo, we've pushed out some of our libraries i
 [dockerfiles]: https://github.com/wellcometrust/dockerfiles
 [terraformmods]: https://github.com/wellcometrust/terraform-modules
 [sierrastreams]: https://github.com/wellcometrust/sierra-streams-source
+[monitoring]: https://github.com/wellcometrust/scala-monitoring
 [storage]: https://github.com/wellcometrust/scala-storage
 [sierra]: https://techdocs.iii.com/sierraapi/Default.htm
