@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
@@ -29,24 +30,26 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         .values should contain theSameElementsAs itemData
     }
 
-    it("ignores items it can't parse as JSON") {
+    it("throws an error if it gets some item data that isn't JSON") {
       val itemData = createSierraItemData
       val itemId = createSierraRecordNumberString
 
+      val notAJsonString = "<xml?>This is not a real 'JSON' string"
+
       val itemRecords = List(
         createSierraItemRecordWith(id = itemId, data = itemData),
-        createSierraItemRecordWith(
-          data = "<xml?>This is not a real 'JSON' string"
-        )
+        createSierraItemRecordWith(data = notAJsonString)
       )
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe Map(
-        itemId -> itemData
-      )
+      val caught = intercept[GracefulFailureException] {
+        transformer.extractItemData(transformable)
+      }
+
+      caught.getMessage shouldBe s"Unable to parse item data as JSON: <<$notAJsonString>>"
     }
   }
 
