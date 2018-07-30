@@ -2,7 +2,6 @@ package uk.ac.wellcome.models.transformable.sierra.test.utils
 
 import java.time.Instant
 
-import io.circe.{Decoder, Encoder, KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemNumber, SierraItemRecord}
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
@@ -11,12 +10,6 @@ import uk.ac.wellcome.utils.JsonUtil._
 import scala.util.Random
 
 trait SierraUtil extends IdentifiersUtil {
-
-  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
-  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
-
-  implicit val sierraTransformableEncoder: Encoder[SierraTransformable] = Encoder[SierraTransformable]
-  implicit val sierraTransformableDecoder: Decoder[SierraTransformable] = Decoder[SierraTransformable]
 
   // A lot of Sierra tests (e.g. mergers) check the behaviour when merging
   // a record with a newer version, or vice versa.  Provide two dates here
@@ -97,7 +90,7 @@ trait SierraUtil extends IdentifiersUtil {
 
   def createSierraTransformableWith(
     sierraId: SierraBibNumber = createSierraBibNumber,
-    maybeBibRecord: Option[SierraBibRecord] = None,
+    maybeBibRecord: Option[SierraBibRecord] = Some(createSierraBibRecord),
     itemRecords: List[SierraItemRecord] = List()
   ): SierraTransformable =
     SierraTransformable(
