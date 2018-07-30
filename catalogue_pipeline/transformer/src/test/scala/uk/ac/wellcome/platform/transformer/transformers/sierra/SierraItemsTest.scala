@@ -33,12 +33,13 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("throws an error if it gets some item data that isn't JSON") {
       val itemData = createSierraItemData
       val itemId = createSierraRecordNumberString
+      val itemIdBad = createSierraRecordNumberString
 
       val notAJsonString = "<xml?>This is not a real 'JSON' string"
 
       val itemRecords = List(
         createSierraItemRecordWith(id = itemId, data = itemData),
-        createSierraItemRecordWith(data = notAJsonString)
+        createSierraItemRecordWith(id = itemIdBad, data = notAJsonString)
       )
 
       val transformable = createSierraTransformableWith(
@@ -49,7 +50,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         transformer.extractItemData(transformable)
       }
 
-      caught.getMessage shouldBe s"Unable to parse item data as JSON: <<$notAJsonString>>"
+      caught.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
     }
   }
 

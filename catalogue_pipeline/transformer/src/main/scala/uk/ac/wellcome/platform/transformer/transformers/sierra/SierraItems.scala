@@ -28,11 +28,10 @@ trait SierraItems extends Logging with SierraLocation {
             case Success(data) => id -> data
             case Failure(_) =>
               throw GracefulFailureException(new RuntimeException(
-                s"Unable to parse item data as JSON: <<$jsonString>>"
+                s"Unable to parse item data for $id as JSON: <<$jsonString>>"
               ))
           }
       }
-      .toMap
 
   def transformItemData(itemId: String,
                         itemData: SierraItemData): Identifiable[Item] = {
