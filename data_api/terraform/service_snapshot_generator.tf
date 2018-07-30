@@ -8,7 +8,7 @@ data "template_file" "es_cluster_host_snapshot" {
 }
 
 module "snapshot_generator" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
+  source             = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/sqs_scaling?ref=v11.4.1"
   service_name       = "snapshot_generator"
   task_desired_count = "0"
 
@@ -34,7 +34,7 @@ module "snapshot_generator" {
   memory = 4096
   cpu    = 2048
 
-  vpc_id       = "${local.vpc_id}"
+  vpc_id = "${local.vpc_id}"
 
   max_capacity = 2
 
