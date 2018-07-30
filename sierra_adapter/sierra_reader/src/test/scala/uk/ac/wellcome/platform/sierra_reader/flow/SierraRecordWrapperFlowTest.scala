@@ -45,7 +45,7 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraBibNumber
             val updatedDate = "2013-12-13T12:43:16Z"
             val jsonString = s"""
                |{
@@ -80,13 +80,21 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraItemRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraItemNumber
             val updatedDate = "2014-04-14T14:14:14Z"
+
+            // We need to encode the bib IDs as strings, _not_ as typed
+            // objects -- the format needs to map what we get from the
+            // Sierra API.
+            //
+            val bibIds = (1 to 4).map { _ =>
+              createSierraRecordNumberString
+            }
             val jsonString = s"""
           |{
           | "id": "$id",
           | "updatedDate": "$updatedDate",
-          | "bibIds": ${toJson(createSierraRecordNumberStrings(count = 4)).get}
+          | "bibIds": ${toJson(bibIds).get}
           |}
         """.stripMargin
 
@@ -116,7 +124,7 @@ class SierraRecordWrapperFlowTest
       withMaterializer(actorSystem) { materializer =>
         withRecordWrapperFlow(actorSystem, SierraBibRecord.apply) {
           wrapperFlow =>
-            val id = createSierraRecordNumberString
+            val id = createSierraBibNumber
             val deletedDate = "2014-01-31"
             val jsonString = s"""{
             |  "id" : "$id",
@@ -124,7 +132,7 @@ class SierraRecordWrapperFlowTest
             |  "deleted" : true
             |}""".stripMargin
 
-            val expectedRecord = createSierraItemRecordWith(
+            val expectedRecord = createSierraBibRecordWith(
               id = id,
               data = jsonString,
               modifiedDate = Instant.parse(s"${deletedDate}T00:00:00Z")

@@ -7,17 +7,17 @@ import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 class SierraIdentifiersTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("passes through the main identifier from the bib record") {
-    val sierraId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
 
     val expectedIdentifiers = List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",
-        value = sierraId
+        value = bibId.withoutCheckDigit
       )
     )
 
-    transformer.getOtherIdentifiers(sierraId) shouldBe expectedIdentifiers
+    transformer.getOtherIdentifiers(bibId) shouldBe expectedIdentifiers
   }
 
   val transformer = new Object with SierraIdentifiers

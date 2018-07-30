@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
+import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
 import uk.ac.wellcome.models.work.internal.{IdentifierType, SourceIdentifier}
 
 trait SierraIdentifiers {
@@ -14,12 +15,12 @@ trait SierraIdentifiers {
   //
   //    Adding other identifiers is out-of-scope for now.
   //
-  def getOtherIdentifiers(sierraId: String): List[SourceIdentifier] =
+  def getOtherIdentifiers(bibId: SierraBibNumber): List[SourceIdentifier] =
     List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Work",
-        value = sierraId
+        value = bibId.withoutCheckDigit
       )
     )
 }

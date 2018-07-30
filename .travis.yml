@@ -126,8 +126,7 @@ jobs:
         - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - stage: test
-      env: TASK=api-test
+    - env: TASK=api-test
     # (not under active development)
     # - env: TASK=api_docs-build
 
