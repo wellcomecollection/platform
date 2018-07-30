@@ -6,6 +6,7 @@ import com.twitter.inject.Logging
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -90,10 +91,13 @@ class WindowManager @Inject()(
   // so we know what to ask the Sierra API for next.
   //
   private def getLastId(s3contents: String): Option[String] = {
-    case class Identified(id: String)
+    case class Identified(id: UntypedSierraRecordNumber)
 
     fromJson[List[Identified]](s3contents) match {
-      case Success(ids) => ids.map { _.id }.sorted.lastOption
+      case Success(ids) => ids
+        .map { _.id.withoutCheckDigit }
+        .sorted
+        .lastOption
       case Failure(_) =>
         throw GracefulFailureException(
           new RuntimeException(
