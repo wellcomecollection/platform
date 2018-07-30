@@ -1,7 +1,7 @@
 module "shard_generator_lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
 
-  name      = "reindex_shard_generator"
+  name      = "reindex_shard_generator_${var.vhs_table_name}"
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/reindexer/reindex_shard_generator.zip"
 
