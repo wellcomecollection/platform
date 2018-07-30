@@ -6,11 +6,9 @@ import akka.stream.stage._
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.util.ByteString
 
-import scala.util.{Failure, Success, Try}
-
-class DigestCalculator(algorithm: String, checksum: String) extends GraphStage[FlowShape[ByteString, Try[String]]] {
+class DigestCalculator(algorithm: String, checksum: String) extends GraphStage[FlowShape[ByteString, ByteString]] {
   val in = Inlet[ByteString]("DigestCalculator.in")
-  val out = Outlet[Try[String]]("DigestCalculator.out")
+  val out = Outlet[ByteString]("DigestCalculator.out")
 
   override val shape = FlowShape(in, out)
 
@@ -23,9 +21,11 @@ class DigestCalculator(algorithm: String, checksum: String) extends GraphStage[F
 
     setHandler(in, new InHandler {
       override def onPush(): Unit = {
-        val chunk: ByteString = grab(in)
+        val chunk = grab(in)
+
         digest.update(chunk.toArray)
-        pull(in)
+
+        push(out, chunk)
       }
 
       override def onUpstreamFinish(): Unit = {
@@ -37,21 +37,12 @@ class DigestCalculator(algorithm: String, checksum: String) extends GraphStage[F
             _ + _
           }.mkString
 
+        if(streamDigest != checksum) fail(out, new RuntimeException(s"Checksum not matched!"))
 
-        val checksumVerification = verifyChecksum(streamDigest, checksum)
+        digest.reset()
 
-        emit(out, checksumVerification)
         completeStage()
       }
     })
   }
-
-  private def verifyChecksum(expected: String, actual: String) =
-    if (expected != actual) {
-      Failure(new RuntimeException(
-        s"Checksum validation failed! Expected $expected, got $actual."
-      ))
-    } else {
-      Success((actual))
-    }
 }
