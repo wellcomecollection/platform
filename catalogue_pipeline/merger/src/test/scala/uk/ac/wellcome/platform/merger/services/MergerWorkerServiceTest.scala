@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
+import org.mockito.Matchers.any
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
