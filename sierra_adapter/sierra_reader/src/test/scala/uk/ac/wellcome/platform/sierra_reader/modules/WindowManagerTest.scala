@@ -1,12 +1,10 @@
 package uk.ac.wellcome.platform.sierra_reader.modules
 
-import java.time.Instant
-
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord}
+import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.storage.s3.S3Config
