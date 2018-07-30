@@ -33,7 +33,8 @@ trait SierraProduction {
       case (Nil, Nil)           => List()
       case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
       case (Nil, marc264fields) => getProductionFrom264Fields(marc264fields)
-      case (marc260fields, marc264fields) => getProductionFromBothFields(marc260fields, marc264fields)
+      case (marc260fields, marc264fields) =>
+        getProductionFromBothFields(marc260fields, marc264fields)
     }
   }
 
@@ -151,9 +152,8 @@ trait SierraProduction {
     * In general, this is a cataloguing error, but sometimes we can do
     * something more sensible depending on if/how they're duplicated.
     */
-  private def getProductionFromBothFields(
-    marc260fields: List[VarField],
-    marc264fields: List[VarField]) = {
+  private def getProductionFromBothFields(marc260fields: List[VarField],
+                                          marc264fields: List[VarField]) = {
 
     // We've seen cases where the 264 field only has the following subfields:
     //
@@ -162,21 +162,20 @@ trait SierraProduction {
     // or similar, and the 260 field is populated.  In that case, we can
     // discard the 264 and just use the 260 fields.
     if (marc264fields.length == 1 &&
-      marc264fields.head.subfields.length == 1 &&
-      marc264fields.head.subfields.head.tag == "c" &&
-      marc264fields.head.subfields.head.content.matches("^©\\d+$")
-    ) {
+        marc264fields.head.subfields.length == 1 &&
+        marc264fields.head.subfields.head.tag == "c" &&
+        marc264fields.head.subfields.head.content.matches("^©\\d+$")) {
       getProductionFrom260Fields(marc260fields)
     }
 
     // We've also seen cases where the 260 and 264 field are both present,
     // and they have matching subfields!  We use the 260 field as it's not
     // going to throw an exception about unrecognised second indicator.
-    else if (marc260fields.map { _.subfields } == marc264fields.map { _.subfields }) {
+    else if (marc260fields.map { _.subfields } == marc264fields.map {
+               _.subfields
+             }) {
       getProductionFrom260Fields(marc260fields)
-    }
-
-    else {
+    } else {
       throw GracefulFailureException(
         new RuntimeException(
           "Record has both 260 and 264 fields; this is a cataloguing error."

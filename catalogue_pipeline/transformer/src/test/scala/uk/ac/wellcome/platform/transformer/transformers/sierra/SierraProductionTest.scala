@@ -384,7 +384,8 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   }
 
   describe("Both MARC field 260 and 264") {
-    it("uses field 260 if field 264 only contains a copyright statement in subfield c") {
+    it(
+      "uses field 260 if field 264 only contains a copyright statement in subfield c") {
       val varFields = List(
         VarField(
           marcTag = Some("260"),
