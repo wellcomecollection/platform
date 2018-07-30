@@ -146,10 +146,12 @@ trait SierraProduction {
         )
       }
 
-  // In general, it's a cataloguing error for a bib record to have both
-  // 260 and 264 fields.  Sometimes we can detect the duplicate data, and
-  // still get a useful result.
-  //
+  /** Populate the production data if both 260 and 264 are present.
+    *
+    * In general, this is a cataloguing error, but sometimes we can do
+    * something more sensible depending on if/how they're duplicated.
+    *
+    */
   private def getProductionFromBothFields(
     marc260fields: List[VarField],
     marc264fields: List[VarField]) = {
