@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "sierra_table" {
-  name             = "SierraData_items"
+  name             = "sierra-items"
   read_capacity    = 1
   write_capacity   = 1
   hash_key         = "id"
