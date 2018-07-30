@@ -1,13 +1,14 @@
-data "aws_s3_bucket" "storage_manifests" {
-  name = "${var.storage_manifest_bucket}"
-}
+resource "aws_lambda_permission" "archive_asset_lookup_apigw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = "${module.lambda_archive_asset_lookup.function_name}"
+  principal     = "apigateway.amazonaws.com"
 
-data "aws_dynamodb_table" "storage_manifest" {
-  name = "${var.storage_manifest_dynamo_table_name}"
+  source_arn = "${aws_api_gateway_deployment.test.execution_arn}/*/*"
 }
 
 module "lambda_archive_asset_lookup" {
-  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v10.2.2"
+  source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
   name        = "archive_asset_lookup_${var.name}"
   module_name = "archive_asset_lookup"
