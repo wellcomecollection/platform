@@ -84,3 +84,12 @@ variable "es_cluster_credentials" {
 variable "es_config" {
   type = "map"
 }
+variable "alb_cloudwatch_id" {
+}
+variable "alb_server_error_alarm_arn" {
+}
+
+variable "alb_client_error_alarm_arn" {
+}
+variable "enable_alb_alarm" {
+}
