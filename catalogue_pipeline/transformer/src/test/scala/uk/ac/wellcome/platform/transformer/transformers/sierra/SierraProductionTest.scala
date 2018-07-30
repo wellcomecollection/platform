@@ -417,6 +417,40 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
 
       transformToProduction(varFields) shouldBe expectedProductions
     }
+
+    it("returns correctly if 260 and 264 contain the same subfields") {
+      val subfields = List(
+        MarcSubfield(tag = "a", content = "London"),
+        MarcSubfield(tag = "b", content = "Wellcome Trust"),
+        MarcSubfield(tag = "c", content = "1992")
+      )
+
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = subfields
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = subfields
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("London")),
+          agents = List(
+            Unidentifiable(Agent("Wellcome Trust"))
+          ),
+          dates = List(Period("1992")),
+          function = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
   }
 
   // Test helpers

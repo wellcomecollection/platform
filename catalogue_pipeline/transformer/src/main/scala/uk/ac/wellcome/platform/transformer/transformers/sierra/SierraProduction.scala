@@ -168,6 +168,13 @@ trait SierraProduction {
       getProductionFrom260Fields(marc260fields)
     }
 
+    // We've also seen cases where the 260 and 264 field are both present,
+    // and they have matching subfields!  We use the 260 field as it's not
+    // going to throw an exception about unrecognised second indicator.
+    else if (marc260fields.map { _.subfields } == marc264fields.map { _.subfields }) {
+      getProductionFrom260Fields(marc260fields)
+    }
+
     else {
       throw GracefulFailureException(
         new RuntimeException(
