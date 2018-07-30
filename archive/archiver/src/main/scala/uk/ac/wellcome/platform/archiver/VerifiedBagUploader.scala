@@ -4,8 +4,9 @@ import java.io.InputStream
 import java.util.zip.ZipFile
 
 import akka.NotUsed
+import akka.http.scaladsl.model.Uri
 import akka.stream.ActorMaterializer
-import akka.stream.alpakka.s3.scaladsl.S3Client
+import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Sink, Source, StreamConverters}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
@@ -37,7 +38,7 @@ class VerifiedBagUploader(amazonS3: AmazonS3, s3Client: S3Client, config: BagUpl
                                zipFile: ZipFile, bagName: String,
                                uploadNamespace: String
                              ) = {
-    
+
     val verifiedUploads = digestLocations.map { case BagDigestItem(checksum, bagLocation) => {
 
       val uploadLocation: ObjectLocation = ObjectLocation(
@@ -59,12 +60,33 @@ class VerifiedBagUploader(amazonS3: AmazonS3, s3Client: S3Client, config: BagUpl
         })
       })
 
-      val verified = for {
-        uploadResult <- extract.via(verify).runWith(Source.single(bagLocation), upload)._2
-        downloadResult <- download.via(verify).runWith(Source.single(uploadLocation), Sink.ignore)._2
-      } yield (uploadResult, downloadResult)
+      val resultToLocation = Flow[Future[MultipartUploadResult]].flatMapConcat((result) => {
+        Source.fromFuture(result).map {
+          case MultipartUploadResult(location: Uri, bucket: String, key: String, etag: String) =>
+            ObjectLocation(bucket, key)
+        }
+      })
 
-      verified.recoverWith {
+      val uploadVerification = Flow[ObjectLocation].map((bagLocation) => {
+        val (_, uploadResult) = extract.via(verify).runWith(Source.single(bagLocation), upload)
+
+        uploadResult
+      })
+
+      val downloadVerification = Flow[ObjectLocation].map((uploadLocation) => {
+        val (_, downloadResult) = download.via(verify).runWith(Source.single(uploadLocation), Sink.ignore)
+
+        downloadResult
+      })
+
+      val (_, result) = Flow[ObjectLocation].flatMapConcat(bagLocation => {
+        Source.single(bagLocation)
+          .via(uploadVerification)
+          .via(resultToLocation)
+          .via(downloadVerification)
+      }).runWith(Source.single(bagLocation), Sink.ignore)
+
+      result.recoverWith {
         case e => Future.failed(BagUploaderError(e, bagLocation, uploadLocation))
       }
     }}
