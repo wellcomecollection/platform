@@ -150,7 +150,6 @@ trait SierraProduction {
     *
     * In general, this is a cataloguing error, but sometimes we can do
     * something more sensible depending on if/how they're duplicated.
-    *
     */
   private def getProductionFromBothFields(
     marc260fields: List[VarField],
