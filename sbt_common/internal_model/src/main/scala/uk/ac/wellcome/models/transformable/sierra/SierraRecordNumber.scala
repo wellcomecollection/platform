@@ -62,12 +62,15 @@ sealed trait SierraTypedRecordNumber extends SierraRecordNumber {
   }
 }
 
-case class UntypedSierraRecordNumber(recordNumber: String) extends SierraRecordNumber
+case class UntypedSierraRecordNumber(recordNumber: String)
+    extends SierraRecordNumber
 
-case class SierraBibNumber(recordNumber: String) extends SierraTypedRecordNumber {
+case class SierraBibNumber(recordNumber: String)
+    extends SierraTypedRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.bibs
 }
 
-case class SierraItemNumber(recordNumber: String) extends SierraTypedRecordNumber {
+case class SierraItemNumber(recordNumber: String)
+    extends SierraTypedRecordNumber {
   val recordType: SierraRecordTypes.Value = SierraRecordTypes.items
 }

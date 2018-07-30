@@ -14,8 +14,6 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-
-
 class WindowManager @Inject()(
   s3client: AmazonS3,
   s3Config: S3Config,
@@ -90,10 +88,11 @@ class WindowManager @Inject()(
     case class Identified(id: UntypedSierraRecordNumber)
 
     fromJson[List[Identified]](s3contents) match {
-      case Success(ids) => ids
-        .map { _.id.withoutCheckDigit }
-        .sorted
-        .lastOption
+      case Success(ids) =>
+        ids
+          .map { _.id.withoutCheckDigit }
+          .sorted
+          .lastOption
       case Failure(_) =>
         throw GracefulFailureException(
           new RuntimeException(
