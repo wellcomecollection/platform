@@ -81,7 +81,7 @@ class WindowManagerTest
         val result = windowManager.getCurrentStatus("[2013,2014]")
 
         whenReady(result) {
-          _ shouldBe WindowStatus(id = Some("1794166"), offset = 2)
+          _ shouldBe WindowStatus(id = "1794166", offset = 2)
         }
       }
     }

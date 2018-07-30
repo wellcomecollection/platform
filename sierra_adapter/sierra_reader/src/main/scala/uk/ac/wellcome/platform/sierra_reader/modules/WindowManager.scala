@@ -63,7 +63,7 @@ class WindowManager @Inject()(
             val unprefixedId = id.substring(1)
 
             val newId = (unprefixedId.toInt + 1).toString
-            WindowStatus(id = Some(newId), offset = offset + 1)
+            WindowStatus(id = newId, offset = offset + 1)
           case None =>
             throw GracefulFailureException(
               new RuntimeException(s"JSON <<$lastBody>> did not contain an id"))
