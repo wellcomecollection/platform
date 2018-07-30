@@ -1,6 +1,8 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
-import com.gu.scanamo.Scanamo
+import java.time.Instant
+
+import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -8,13 +10,14 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
+import uk.ac.wellcome.storage.{dynamo => storageDynamo}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -31,6 +34,12 @@ class SierraItemsToDynamoWorkerServiceTest
     with MetricsSenderFixture
     with ScalaFutures
     with SierraUtil {
+
+  implicit val recordNumberFormat: DynamoFormat[SierraBibNumber] =
+    sierraItemRecordDynamo.recordNumberFormat
+
+  implicit val instantFormat: DynamoFormat[Instant] =
+    storageDynamo.instantLongFormat
 
   def withSierraWorkerService[R](
     testWith: TestWith[(SierraItemsToDynamoWorkerService,

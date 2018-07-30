@@ -1,5 +1,7 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
+import java.time.Instant
+
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.gu.scanamo.syntax._
 import org.scalatest.concurrent.Eventually
@@ -8,6 +10,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemRecord}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.{dynamo => sierraItemRecordDynamo}
+import uk.ac.wellcome.storage.{dynamo => storageDynamo}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -24,6 +27,9 @@ class SierraItemsToDynamoFeatureTest
 
   implicit val recordNumberFormat: DynamoFormat[SierraBibNumber] =
     sierraItemRecordDynamo.recordNumberFormat
+
+  implicit val instantFormat: DynamoFormat[Instant] =
+    storageDynamo.instantLongFormat
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { table =>
