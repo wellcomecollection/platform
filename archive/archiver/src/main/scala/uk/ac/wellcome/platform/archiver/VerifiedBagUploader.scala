@@ -49,12 +49,11 @@ class VerifiedBagUploader(config: BagUploaderConfig)(
       val uploadVerification = UploadVerificationFlow(zipFile, uploadLocation, checksum)
       val downloadVerification = DownloadVerificationFlow(checksum)
 
-      val (_, result) = Flow[ObjectLocation].flatMapConcat(bagLocation => {
-        Source.single(bagLocation)
+      val result = Source.single(bagLocation)
           .via(uploadVerification)
           .via(resultToLocation)
           .via(downloadVerification)
-      }).runWith(Source.single(bagLocation), Sink.ignore)
+          .runWith(Sink.ignore)
 
       result.recoverWith {
         case e => Future.failed(BagUploaderError(e, bagLocation))
