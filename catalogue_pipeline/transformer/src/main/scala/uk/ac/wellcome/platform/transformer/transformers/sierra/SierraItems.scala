@@ -27,9 +27,10 @@ trait SierraItems extends Logging with SierraLocation {
           fromJson[SierraItemData](jsonString) match {
             case Success(data) => id -> data
             case Failure(_) =>
-              throw GracefulFailureException(new RuntimeException(
-                s"Unable to parse item data for $id as JSON: <<$jsonString>>"
-              ))
+              throw GracefulFailureException(
+                new RuntimeException(
+                  s"Unable to parse item data for $id as JSON: <<$jsonString>>"
+                ))
           }
       }
 
