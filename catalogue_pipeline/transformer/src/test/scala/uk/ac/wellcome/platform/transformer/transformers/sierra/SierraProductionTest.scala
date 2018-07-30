@@ -383,6 +383,42 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
     }
   }
 
+  describe("Both MARC field 260 and 264") {
+    it("uses field 260 if field 264 only contains a copyright statement in subfield c") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "San Francisco"),
+            MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers"),
+            MarcSubfield(tag = "c", content = "2004")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "c", content = "©2004")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("San Francisco")),
+          agents = List(
+            Unidentifiable(Agent("Morgan Kaufmann Publishers"))
+          ),
+          dates = List(Period("2004")),
+          function = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+  }
+
   // Test helpers
 
   private def transform260ToProduction(subfields: List[MarcSubfield]) = {
