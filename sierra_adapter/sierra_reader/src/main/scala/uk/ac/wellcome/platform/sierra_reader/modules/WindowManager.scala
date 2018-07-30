@@ -59,11 +59,7 @@ class WindowManager @Inject()(
 
         maybeLastId match {
           case Some(id) =>
-            // The Sierra IDs we store in S3 are prefixed with "b" or "i".
-            // Remove the first character
-            val unprefixedId = id.substring(1)
-
-            val newId = (unprefixedId.toInt + 1).toString
+            val newId = (id.toInt + 1).toString
             WindowStatus(id = newId, offset = offset + 1)
           case None =>
             throw GracefulFailureException(
