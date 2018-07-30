@@ -7,6 +7,7 @@ import settings
 from boto3.dynamodb.conditions import Key
 from urllib.parse import urlparse
 
+
 def lambda_handler(event, context):
 
     # setup logging and AWS clients
