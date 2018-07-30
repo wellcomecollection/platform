@@ -4,7 +4,7 @@ import logging
 import boto3
 import botocore
 import settings
-from boto3.dynamodb.conditions import Key, Attr
+from boto3.dynamodb.conditions import Key
 
 
 def lambda_handler(event, context):
