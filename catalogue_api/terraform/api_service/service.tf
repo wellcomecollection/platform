@@ -31,7 +31,7 @@ module "service" {
 
   enable_alb_alarm = "${local.is_prod_api ? 1 : 0}"
 
-  desired_count                      = "${local.is_prod_api ? 3 : 1}"
+  desired_count                      = "${local.is_prod_api ? 3 : 0}"
   deployment_minimum_healthy_percent = "${local.is_prod_api ? 50 : 0}"
   deployment_maximum_percent         = "200"
 
