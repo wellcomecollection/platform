@@ -186,7 +186,7 @@ class GoobiReaderWorkerServiceTest
         eventually {
           assertMessageSentToDlq(queue, dlq)
           assertUpdateNotSaved(bucket, table)
-          verify(metricsSender, never())
+          verify(metricsSender, times(3))
             .countRecognisedFailure(any[String])
         }
     }
