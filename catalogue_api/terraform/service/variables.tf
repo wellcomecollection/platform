@@ -84,6 +84,11 @@ variable "es_cluster_credentials" {
 variable "es_config" {
   type = "map"
 }
+
+variable "deployment_minimum_healthy_percent" {
+  default = "50"
+}
+
 variable "alb_cloudwatch_id" {
 }
 variable "alb_server_error_alarm_arn" {

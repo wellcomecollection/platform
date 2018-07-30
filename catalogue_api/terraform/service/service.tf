@@ -59,7 +59,7 @@ module "service" {
     "${aws_security_group.service_egress_security_group.id}",
   ]
 
-  deployment_minimum_healthy_percent = "50"
+  deployment_minimum_healthy_percent = "${var.deployment_minimum_healthy_percent}"
   deployment_maximum_percent         = "200"
 
   ecs_cluster_id = "${var.cluster_id}"
@@ -78,10 +78,6 @@ module "service" {
   task_definition_arn = "${module.task.task_definition_arn}"
 
   healthcheck_path = "${var.healthcheck_path}"
-  loadbalancer_cloudwatch_id   = "${var.alb_cloudwatch_id}"
-  server_error_alarm_topic_arn = "${var.alb_server_error_alarm_arn}"
-  client_error_alarm_topic_arn = "${var.alb_client_error_alarm_arn}"
-  enable_alb_alarm = "${var.enable_alb_alarm}"
 
   launch_type = "FARGATE"
 }
