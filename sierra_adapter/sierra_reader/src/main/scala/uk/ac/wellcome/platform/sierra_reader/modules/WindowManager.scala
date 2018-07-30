@@ -4,7 +4,7 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import org.apache.commons.io.IOUtils
-import uk.ac.wellcome.platform.sierra_reader.models.SierraConfig
+import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.utils.JsonUtil._
@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-case class WindowStatus(id: Option[String], offset: Int)
+
 
 class WindowManager @Inject()(
   s3client: AmazonS3,
