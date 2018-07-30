@@ -1,8 +1,10 @@
 package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
+import org.mockito.Matchers.any
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mockito.MockitoSugar
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
@@ -12,7 +14,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
 import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 import uk.ac.wellcome.storage.ObjectStore
@@ -35,8 +37,11 @@ class MergerWorkerServiceTest
     with SNS
     with Messaging
     with MergerFixtures
-    with MergerTestUtils {
+    with MergerTestUtils
+    with MockitoSugar {
   case class TestObject(something: String)
+
+  import org.mockito.Mockito._
 
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
@@ -70,7 +75,8 @@ class MergerWorkerServiceTest
               recorderWorkEntry2.work,
               recorderWorkEntry3.work)
 
-              assertSuccessMetricIncremented(metricsSender)
+              verify(metricsSender, times(1))
+                .countSuccess(any[String])
             }
         }
     }
@@ -98,7 +104,8 @@ class MergerWorkerServiceTest
             val worksSent = getMessages[BaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
 
-            assertSuccessMetricIncremented(metricsSender)
+            verify(metricsSender, times(1))
+              .countSuccess(any[String])
           }
         }
     }
@@ -121,7 +128,8 @@ class MergerWorkerServiceTest
           assertQueueHasSize(dlq, 1)
           listMessagesReceivedFromSNS(topic) shouldBe empty
 
-          assertFailureMetricIncremented(metricsSender)
+          verify(metricsSender, times(3))
+            .countFailure(any[String])
         }
     }
   }
@@ -184,7 +192,8 @@ class MergerWorkerServiceTest
             val worksSent = getMessages[BaseWork](topic)
             worksSent should contain only recorderWorkEntry.work
 
-            assertSuccessMetricIncremented(metricsSender)
+            verify(metricsSender, times(1))
+              .countSuccess(any[String])
           }
         }
     }
@@ -201,7 +210,8 @@ class MergerWorkerServiceTest
         eventually {
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, 1)
-          assertGracefulFailureMetricIncremented(metricsSender)
+          verify(metricsSender, times(3))
+            .countRecognisedFailure(any[String])
         }
     }
   }

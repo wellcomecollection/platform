@@ -18,8 +18,8 @@ module "catalogue_pipeline" {
   messages_bucket            = "${aws_s3_bucket.messages.id}"
   infra_bucket               = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-07-26-merging"
-  index_v2 = "v2-2018-07-26-merging"
+  index_v1 = "v1-2018-07-30-merging"
+  index_v2 = "v2-2018-07-30-merging"
 
   identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"

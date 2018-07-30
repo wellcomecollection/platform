@@ -4,6 +4,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -32,7 +33,7 @@ class SierraItemMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val bibId = createSierraRecordNumberString
+              val bibId = createSierraBibNumber
 
               val record = createSierraItemRecordWith(
                 bibIds = List(bibId)
@@ -41,7 +42,8 @@ class SierraItemMergerFeatureTest
               sendNotificationToSQS(queue = queue, message = record)
 
               val expectedSierraTransformable = createSierraTransformableWith(
-                sourceId = bibId,
+                sierraId = bibId,
+                maybeBibRecord = None,
                 itemRecords = List(record)
               )
 
@@ -68,14 +70,14 @@ class SierraItemMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
-              val bibId1 = createSierraRecordNumberString
+              val bibId1 = createSierraBibNumber
               val record1 = createSierraItemRecordWith(
                 bibIds = List(bibId1)
               )
 
               sendNotificationToSQS(queue = queue, message = record1)
 
-              val bibId2 = createSierraRecordNumberString
+              val bibId2 = createSierraBibNumber
               val record2 = createSierraItemRecordWith(
                 bibIds = List(bibId2)
               )
@@ -85,13 +87,15 @@ class SierraItemMergerFeatureTest
               eventually {
                 val expectedSierraTransformable1 =
                   createSierraTransformableWith(
-                    sourceId = bibId1,
+                    sierraId = bibId1,
+                    maybeBibRecord = None,
                     itemRecords = List(record1)
                   )
 
                 val expectedSierraTransformable2 =
                   createSierraTransformableWith(
-                    sourceId = bibId2,
+                    sierraId = bibId2,
+                    maybeBibRecord = None,
                     itemRecords = List(record2)
                   )
 

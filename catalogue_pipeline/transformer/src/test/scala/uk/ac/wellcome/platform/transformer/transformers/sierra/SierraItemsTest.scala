@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
@@ -15,53 +16,62 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         createSierraItemData
       }
       val itemRecords = itemData.map { data: SierraItemData =>
-        createSierraItemRecordWith(data)
+        createSierraItemRecordWith(data = data)
       }.toList
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe itemData
+      transformer
+        .extractItemData(transformable)
+        .values should contain theSameElementsAs itemData
     }
 
-    it("ignores items it can't parse as JSON") {
+    it("throws an error if it gets some item data that isn't JSON") {
       val itemData = createSierraItemData
+      val itemIdBad = createSierraItemNumber
+
+      val notAJsonString = "<xml?>This is not a real 'JSON' string"
 
       val itemRecords = List(
-        createSierraItemRecordWith(itemData),
-        createSierraItemRecordWith(
-          data = "<xml?>This is not a real 'JSON' string"
-        )
+        createSierraItemRecordWith(data = itemData),
+        createSierraItemRecordWith(id = itemIdBad, data = notAJsonString)
       )
 
       val transformable = createSierraTransformableWith(
         itemRecords = itemRecords
       )
 
-      transformer.extractItemData(transformable) shouldBe List(itemData)
+      val caught = intercept[GracefulFailureException] {
+        transformer.extractItemData(transformable)
+      }
+
+      caught.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
     }
   }
 
   describe("transformItemData") {
     it("creates both forms of the Sierra ID in 'identifiers'") {
-      val item = createSierraItemDataWith(
-        id = "4000004"
-      )
+      val item = createSierraItemData
+      val itemId = createSierraItemNumber
 
       val sourceIdentifier1 = createSierraSourceIdentifierWith(
         ontologyType = "Item",
-        value = "i40000047")
+        value = itemId.withCheckDigit)
 
       val sourceIdentifier2 = SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
-        value = "4000004"
+        value = itemId.withoutCheckDigit
       )
 
       val expectedIdentifiers = List(sourceIdentifier1, sourceIdentifier2)
 
-      val transformedItem = transformer.transformItemData(item)
+      val transformedItem = transformer.transformItemData(
+        itemId = itemId,
+        itemData = item
+      )
 
       transformedItem shouldBe Identifiable(
         sourceIdentifier = sourceIdentifier1,
@@ -72,13 +82,17 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it("uses the full Sierra system number as the source identifier") {
+      val itemId = createSierraItemNumber
       val sourceIdentifier = createSierraSourceIdentifierWith(
         ontologyType = "Item",
-        value = "i50000056"
+        value = itemId.withCheckDigit
       )
-      val item = createSierraItemDataWith(id = "5000005")
+      val sierraItemData = createSierraItemData
 
-      val transformedItem = transformer.transformItemData(item)
+      val transformedItem = transformer.transformItemData(
+        itemId = itemId,
+        itemData = sierraItemData
+      )
       transformedItem.sourceIdentifier shouldBe sourceIdentifier
     }
   }
@@ -90,8 +104,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
 
       val transformable = createSierraTransformableWith(
         itemRecords = List(
-          createSierraItemRecordWith(item1),
-          createSierraItemRecordWith(item2)
+          createSierraItemRecordWith(data = item1),
+          createSierraItemRecordWith(data = item2)
         )
       )
 
@@ -112,7 +126,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
             locations = List(DigitalLocation(
               url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
               license = None,
-              locationType = LocationType("iiif-image"))))
+              locationType = LocationType("iiif-presentation"))))
         ))
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedItems
     }

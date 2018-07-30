@@ -7,10 +7,7 @@ import uk.ac.wellcome.models.work.internal.{
   LocationType,
   PhysicalLocation
 }
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraItemData,
-  SierraItemLocation
-}
+import uk.ac.wellcome.platform.transformer.source.SierraItemLocation
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
@@ -47,8 +44,8 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it("returns None if there is no location in the item data") {
-      val itemData = SierraItemData(
-        id = "i1234567"
+      val itemData = createSierraItemDataWith(
+        location = None
       )
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
@@ -61,7 +58,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
       val expectedLocation = DigitalLocation(
         url = "https://wellcomelibrary.org/iiif/b2201508/manifest",
         license = None,
-        locationType = LocationType("iiif-image")
+        locationType = LocationType("iiif-presentation")
       )
       transformer.getDigitalLocation(id) shouldBe expectedLocation
     }

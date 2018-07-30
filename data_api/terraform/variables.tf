@@ -32,3 +32,7 @@ variable "es_config_snapshot" {
     doc_type = "work"
   }
 }
+
+variable "namespace" {
+  default = "data_api"
+}

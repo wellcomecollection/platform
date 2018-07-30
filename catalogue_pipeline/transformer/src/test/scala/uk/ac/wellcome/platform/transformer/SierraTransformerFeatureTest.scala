@@ -3,6 +3,9 @@ package uk.ac.wellcome.platform.transformer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal.{
   IdentifierType,
   SourceIdentifier,
@@ -11,7 +14,6 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.utils.JsonUtil
 import uk.ac.wellcome.utils.JsonUtil._
 
 class SierraTransformerFeatureTest
@@ -24,30 +26,44 @@ class SierraTransformerFeatureTest
     with fixtures.Server
     with Eventually
     with ExtendedPatience
+    with SierraUtil
     with TransformableMessageUtils {
 
   it("transforms sierra records and publishes the result to the given topic") {
-    val id = "1001001"
+    val id = createSierraBibNumber
     val title = "A pot of possums"
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { queue =>
         withLocalS3Bucket { storageBucket =>
           withLocalS3Bucket { messagingBucket =>
+            val data =
+              s"""
+                 |{
+                 | "id": "$id",
+                 | "title": "$title",
+                 | "varFields": []
+                 |}
+                  """.stripMargin
+
+            val sierraTransformable = SierraTransformable(
+              bibRecord = createSierraBibRecordWith(
+                id = id,
+                data = data
+              )
+            )
+
             val sierraHybridRecordMessage =
               hybridRecordNotificationMessage(
-                message = createValidSierraTransformableJsonWith(
-                  id = id,
-                  title = title
-                ),
+                message = toJson(sierraTransformable).get,
                 sourceName = "sierra",
                 s3Client = s3Client,
                 bucket = storageBucket
               )
 
-            sqsClient.sendMessage(
-              queue.url,
-              JsonUtil.toJson(sierraHybridRecordMessage).get
+            sendMessage(
+              queue = queue,
+              obj = sierraHybridRecordMessage
             )
 
             val flags: Map[String, String] = Map(
@@ -65,13 +81,13 @@ class SierraTransformerFeatureTest
                 val sourceIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-system-number"),
                   ontologyType = "Work",
-                  value = "b10010014"
+                  value = id.withCheckDigit
                 )
 
                 val sierraIdentifier = SourceIdentifier(
                   identifierType = IdentifierType("sierra-identifier"),
                   ontologyType = "Work",
-                  value = id
+                  value = id.withoutCheckDigit
                 )
 
                 val works = getMessages[UnidentifiedWork](topic)

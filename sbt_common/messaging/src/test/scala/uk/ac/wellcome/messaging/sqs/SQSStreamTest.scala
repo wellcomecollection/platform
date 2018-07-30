@@ -10,7 +10,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
@@ -65,7 +65,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .incrementCount("test-stream_ProcessMessage_success")
+            .countSuccess("test-stream_ProcessMessage")
         }
     }
   }
@@ -73,10 +73,7 @@ class SQSStreamTest
   it("fails gracefully when the object cannot be deserialised") {
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), metricsSender) =>
-        sqsClient.sendMessage(
-          queue.url,
-          "not valid json"
-        )
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
@@ -112,7 +109,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(3))
-            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
+            .countFailure(metricName = "test-stream_ProcessMessage")
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -123,10 +120,10 @@ class SQSStreamTest
     withSQSStreamFixtures {
       case (messageStream, QueuePair(queue, dlq), _) =>
         sendExampleObjects(queue = queue, start = 1)
-        sqsClient.sendMessage(queue.url, "not valid json")
+        sendInvalidJSONto(queue)
 
         sendExampleObjects(queue = queue, start = 2)
-        sqsClient.sendMessage(queue.url, "another not valid json")
+        sendInvalidJSONto(queue)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
         messageStream.foreach(
@@ -168,7 +165,7 @@ class SQSStreamTest
             assertQueueEmpty(dlq)
 
             verify(metricsSender, times(2))
-              .incrementCount("test-stream_ProcessMessage_success")
+              .countSuccess("test-stream_ProcessMessage")
           }
       }
     }
@@ -189,7 +186,7 @@ class SQSStreamTest
             assertQueueHasSize(dlq, 1)
 
             verify(metricsSender, times(3))
-              .incrementCount("test-stream_ProcessMessage_failure")
+              .countFailure("test-stream_ProcessMessage")
           }
       }
     }
@@ -198,10 +195,10 @@ class SQSStreamTest
       withSQSStreamFixtures {
         case (messageStream, QueuePair(queue, dlq), _) =>
           sendExampleObjects(queue = queue, start = 1)
-          sqsClient.sendMessage(queue.url, "not valid json")
+          sendInvalidJSONto(queue)
 
           sendExampleObjects(queue = queue, start = 2)
-          sqsClient.sendMessage(queue.url, "another not valid json")
+          sendInvalidJSONto(queue)
 
           val received = new ConcurrentLinkedQueue[ExampleObject]()
           messageStream.runStream(
@@ -232,11 +229,8 @@ class SQSStreamTest
 
   private def sendExampleObjects(queue: Queue, start: Int = 1, count: Int = 1) =
     createExampleObjects(start = start, count = count).map { exampleObject =>
-      sqsClient.sendMessage(queue.url, toJson(exampleObject).get)
+      sendMessage(queue = queue, obj = exampleObject)
     }
-
-  private def sendMessage(queue: Queue, obj: ExampleObject) =
-    sqsClient.sendMessage(queue.url, toJson(obj).get)
 
   def withSQSStreamFixtures[R](
     testWith: TestWith[(SQSStream[ExampleObject], QueuePair, MetricsSender),

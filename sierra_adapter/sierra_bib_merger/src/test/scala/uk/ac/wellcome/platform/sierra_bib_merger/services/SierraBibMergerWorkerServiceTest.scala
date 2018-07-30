@@ -8,8 +8,10 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
@@ -28,7 +30,8 @@ class SierraBibMergerWorkerServiceTest
     with Akka
     with S3
     with LocalVersionedHybridStore
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraUtil {
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {

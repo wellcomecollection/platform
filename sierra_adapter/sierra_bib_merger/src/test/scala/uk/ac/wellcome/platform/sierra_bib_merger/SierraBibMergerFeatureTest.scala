@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
-import io.circe.Encoder
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -26,8 +26,6 @@ class SierraBibMergerFeatureTest
     with fixtures.Server
     with LocalVersionedHybridStore
     with SierraUtil {
-
-  implicit val encoder = Encoder[SierraTransformable]
 
   it("stores a bib in the hybrid store") {
     withLocalSqsQueue { queue =>
@@ -203,9 +201,12 @@ class SierraBibMergerFeatureTest
             withTypeVHS[SierraTransformable, SourceMetadata, Unit](
               bucket,
               table) { hybridStore =>
-              val transformable = createSierraTransformable
+              val transformable = createSierraTransformableWith(
+                maybeBibRecord = None
+              )
 
-              val bibRecord = createSierraBibRecordWith(id = transformable.id)
+              val bibRecord =
+                createSierraBibRecordWith(id = transformable.sierraId)
 
               val future =
                 hybridStore.updateRecord(transformable.id)(

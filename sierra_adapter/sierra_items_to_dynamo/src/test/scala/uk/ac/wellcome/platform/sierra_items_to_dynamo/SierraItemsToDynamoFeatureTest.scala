@@ -6,11 +6,12 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
-import uk.ac.wellcome.sierra_adapter.test.utils.SierraRecordUtil
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo._
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.storage.dynamo._
 
 class SierraItemsToDynamoFeatureTest
     extends FunSpec
@@ -20,7 +21,7 @@ class SierraItemsToDynamoFeatureTest
     with Matchers
     with Eventually
     with ExtendedPatience
-    with SierraRecordUtil {
+    with SierraUtil {
 
   it("reads items from Sierra and adds them to DynamoDB") {
     withLocalDynamoDbTable { table =>
@@ -28,13 +29,12 @@ class SierraItemsToDynamoFeatureTest
         val flags = sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)
 
         withServer(flags) { server =>
-          val itemId = createSierraRecordNumberString
-          val bibId = createSierraRecordNumberString
-          val data = s"""{"id": "$itemId", "bibIds": ["$bibId"]}"""
+          val itemId = createSierraItemNumber
+          val bibId = createSierraBibNumber
 
-          val sierraRecord = createSierraRecordWith(
+          val sierraRecord = createSierraItemRecordWith(
             id = itemId,
-            data = data
+            bibIds = List(bibId)
           )
 
           sendNotificationToSQS(
@@ -47,7 +47,7 @@ class SierraItemsToDynamoFeatureTest
 
             val scanamoResult =
               Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-                'id -> itemId)
+                'id -> itemId.withoutCheckDigit)
 
             scanamoResult shouldBe defined
             scanamoResult.get shouldBe Right(

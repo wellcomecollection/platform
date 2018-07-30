@@ -1,4 +1,4 @@
-package uk.ac.wellcome.sierra_adapter.services
+package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException

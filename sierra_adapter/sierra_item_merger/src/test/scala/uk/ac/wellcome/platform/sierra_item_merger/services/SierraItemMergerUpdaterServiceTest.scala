@@ -4,6 +4,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -43,7 +44,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
             val newItemRecord = createSierraItemRecordWith(
               bibIds = List(bibId)
             )
@@ -51,7 +52,8 @@ class SierraItemMergerUpdaterServiceTest
             whenReady(sierraUpdaterService.update(newItemRecord)) { _ =>
               val expectedSierraTransformable =
                 createSierraTransformableWith(
-                  sourceId = bibId,
+                  sierraId = bibId,
+                  maybeBibRecord = None,
                   itemRecords = List(newItemRecord)
                 )
 
@@ -74,9 +76,9 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibIdNotExisting = createSierraRecordNumberString
-            val bibIdWithOldData = createSierraRecordNumberString
-            val bibIdWithNewerData = createSierraRecordNumberString
+            val bibIdNotExisting = createSierraBibNumber
+            val bibIdWithOldData = createSierraBibNumber
+            val bibIdWithNewerData = createSierraBibNumber
 
             val bibIds = List(
               bibIdNotExisting,
@@ -93,7 +95,8 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val oldTransformable = createSierraTransformableWith(
-              sourceId = bibIdWithOldData,
+              sierraId = bibIdWithOldData,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord, otherItemRecord)
             )
 
@@ -108,7 +111,8 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val newTransformable = createSierraTransformableWith(
-              sourceId = bibIdWithNewerData,
+              sierraId = bibIdWithNewerData,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord, anotherItemRecord)
             )
 
@@ -123,7 +127,8 @@ class SierraItemMergerUpdaterServiceTest
                 whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                   val expectedNewSierraTransformable =
                     createSierraTransformableWith(
-                      sourceId = bibIdNotExisting,
+                      sierraId = bibIdNotExisting,
+                      maybeBibRecord = None,
                       itemRecords = List(itemRecord)
                     )
 
@@ -135,7 +140,8 @@ class SierraItemMergerUpdaterServiceTest
 
                   val expectedUpdatedSierraTransformable =
                     createSierraTransformableWith(
-                      sourceId = oldTransformable.sourceId,
+                      sierraId = oldTransformable.sierraId,
+                      maybeBibRecord = None,
                       itemRecords = List(itemRecord, otherItemRecord)
                     )
 
@@ -165,7 +171,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               modifiedDate = olderDate,
@@ -173,7 +179,8 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val oldTransformable = createSierraTransformableWith(
-              sourceId = bibId,
+              sierraId = bibId,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
@@ -214,20 +221,22 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
             )
 
             val sierraTransformable1 = createSierraTransformableWith(
-              sourceId = bibId1,
+              sierraId = bibId1,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
             val sierraTransformable2 = createSierraTransformableWith(
-              sourceId = bibId2
+              sierraId = bibId2,
+              maybeBibRecord = None
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
@@ -293,20 +302,22 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
             )
 
             val sierraTransformable1 = createSierraTransformableWith(
-              sourceId = bibId1,
+              sierraId = bibId1,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
             val sierraTransformable2 = createSierraTransformableWith(
-              sourceId = bibId2,
+              sierraId = bibId2,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
@@ -369,20 +380,22 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId1 = createSierraRecordNumberString
-            val bibId2 = createSierraRecordNumberString
+            val bibId1 = createSierraBibNumber
+            val bibId2 = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               bibIds = List(bibId1)
             )
 
             val sierraTransformable1 = createSierraTransformableWith(
-              sourceId = bibId1,
+              sierraId = bibId1,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
             val sierraTransformable2 = createSierraTransformableWith(
-              sourceId = bibId2
+              sierraId = bibId2,
+              maybeBibRecord = None
             )
 
             val f1 = hybridStore.updateRecord(sierraTransformable1.id)(
@@ -446,7 +459,7 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
 
             val itemRecord = createSierraItemRecordWith(
               modifiedDate = newerDate,
@@ -454,7 +467,8 @@ class SierraItemMergerUpdaterServiceTest
             )
 
             val transformable = createSierraTransformableWith(
-              sourceId = bibId,
+              sierraId = bibId,
+              maybeBibRecord = None,
               itemRecords = List(itemRecord)
             )
 
@@ -488,9 +502,10 @@ class SierraItemMergerUpdaterServiceTest
           bucket,
           table) { hybridStore =>
           withSierraUpdaterService(hybridStore) { sierraUpdaterService =>
-            val bibId = createSierraRecordNumberString
+            val bibId = createSierraBibNumber
             val transformable = createSierraTransformableWith(
-              sourceId = bibId
+              sierraId = bibId,
+              maybeBibRecord = None
             )
 
             val f1 = hybridStore.updateRecord(transformable.id)(ifNotExisting =
@@ -504,7 +519,8 @@ class SierraItemMergerUpdaterServiceTest
             whenReady(f1) { _ =>
               whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                 val expectedTransformable = createSierraTransformableWith(
-                  sourceId = bibId,
+                  sierraId = bibId,
+                  maybeBibRecord = None,
                   itemRecords = List(itemRecord)
                 )
 
@@ -528,7 +544,7 @@ class SierraItemMergerUpdaterServiceTest
         brokenStore =>
           withSierraUpdaterService(brokenStore) { brokenService =>
             val itemRecord = createSierraItemRecordWith(
-              bibIds = List(createSierraRecordNumberString)
+              bibIds = List(createSierraBibNumber)
             )
 
             whenReady(brokenService.update(itemRecord).failed) { ex =>

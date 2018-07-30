@@ -76,7 +76,7 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
 
     val srcWithLogging: Source[(Message, Delete.type), NotUsed] = src
       .map { m =>
-        metricsSender.count(metricName, Future.successful(()))
+        metricsSender.countSuccess(metricName)
         debug(s"Deleting message ${m.getMessageId}")
         (m, MessageAction.Delete)
       }
@@ -93,9 +93,13 @@ class SQSStream[T] @Inject()(actorSystem: ActorSystem,
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
   private def decider(metricName: String): Supervision.Decider = {
+    case e: GracefulFailureException =>
+      logException(e)
+      metricsSender.countRecognisedFailure(metricName)
+      Supervision.resume
     case e: Exception =>
       logException(e)
-      metricsSender.count(metricName, Future.failed(e))
+      metricsSender.countFailure(metricName)
       Supervision.Resume
     case _ => Supervision.Stop
   }

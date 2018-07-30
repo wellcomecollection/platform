@@ -38,16 +38,23 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
     val physicalWork = createPhysicalWork
     val digitalWork = createDigitalWork
 
-    val expectedMergedWork =
-      physicalWork.copy(items = physicalWork.items ++ digitalWork.items)
+    val actualMergedWorks = merger.merge(List(physicalWork, digitalWork))
 
-    val expectedRedirectedWork = UnidentifiedRedirectedWork(
+    actualMergedWorks.size shouldBe 2
+
+    val actualMergedWork = actualMergedWorks.head
+
+    val expectedItems = List(
+      physicalWork.items.head.copy(agent = physicalWork.items.head.agent.copy(
+        locations = physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations)))
+    actualMergedWork shouldBe physicalWork.copy(
+      otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
+      items = expectedItems)
+
+    actualMergedWorks.last shouldBe UnidentifiedRedirectedWork(
       sourceIdentifier = digitalWork.sourceIdentifier,
       version = digitalWork.version,
-      redirect = IdentifiableRedirect(expectedMergedWork.sourceIdentifier))
-
-    merger.merge(List(physicalWork, digitalWork)) should
-      contain theSameElementsAs List(expectedMergedWork, expectedRedirectedWork)
+      redirect = IdentifiableRedirect(physicalWork.sourceIdentifier))
   }
 
   it("does not merge a physical work having multiple items with a digital work") {
@@ -75,6 +82,10 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private def createDigitalWork = {
     createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number"),
+      otherIdentifiers = List(
+        createSourceIdentifierWith(identifierType = "miro-library-reference")),
       workType = Some(WorkType("v", "E-books")),
       items = List(
         createIdentifiableItemWith(locations = List(createDigitalLocation)))
@@ -83,6 +94,10 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
   private def createPhysicalWork = {
     createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+      otherIdentifiers =
+        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
       items = List(
         createIdentifiableItemWith(locations = List(createPhysicalLocation)))
     )

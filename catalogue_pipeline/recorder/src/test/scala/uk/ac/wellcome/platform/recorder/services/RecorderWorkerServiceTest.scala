@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket

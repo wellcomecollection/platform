@@ -1,9 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
@@ -34,25 +30,23 @@ class SierraTransformableTransformer
   override def transformForType
     : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
+      val bibId = sierraTransformable.sierraId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraTransformable.sourceId,
-          recordType = SierraRecordTypes.bibs
-        )
+        value = bibId.withCheckDigit
       )
 
       sierraTransformable.maybeBibRecord
-        .map { bibData =>
-          debug(s"Attempting to transform ${bibData.id}")
+        .map { bibRecord =>
+          debug(s"Attempting to transform ${bibRecord.id}")
 
-          fromJson[SierraBibData](bibData.data)
+          fromJson[SierraBibData](bibRecord.data)
             .map { sierraBibData =>
               if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
                   sourceIdentifier = sourceIdentifier,
-                  otherIdentifiers = getOtherIdentifiers(sierraBibData),
+                  otherIdentifiers = getOtherIdentifiers(bibId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
                   title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
@@ -77,13 +71,13 @@ class SierraTransformableTransformer
                 )
               } else {
                 throw new ShouldNotTransformException(
-                  s"Sierra record ${bibData.id} is either deleted or suppressed!"
+                  s"Sierra record ${bibRecord.id} is either deleted or suppressed!"
                 )
               }
             }
             .recover {
               case e: ShouldNotTransformException =>
-                info(s"Should not transform: ${e.getMessage}")
+                info(s"Should not transform $bibId: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version
@@ -95,7 +89,7 @@ class SierraTransformableTransformer
         // the item data so far, we don't have enough to build a Work to show
         // in the API, so we return an InvisibleWork.
         .getOrElse {
-          debug(s"No bib data for ${sierraTransformable.sourceId}, so skipping")
+          debug(s"No bib data for ${sierraTransformable.sierraId}, so skipping")
           Success(
             UnidentifiedInvisibleWork(
               sourceIdentifier = sourceIdentifier,

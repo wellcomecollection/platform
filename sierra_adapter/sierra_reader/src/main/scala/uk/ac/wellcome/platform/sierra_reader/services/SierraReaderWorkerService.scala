@@ -1,19 +1,30 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
+import java.time.Instant
+
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.google.inject.Inject
 import com.twitter.inject.Logging
+import io.circe.Json
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.platform.sierra_reader.flow.SierraRecordWrapperFlow
-import uk.ac.wellcome.platform.sierra_reader.models.{ReaderConfig, SierraConfig}
+import uk.ac.wellcome.platform.sierra_reader.models.{
+  ReaderConfig,
+  SierraConfig,
+  SierraResourceTypes
+}
 import uk.ac.wellcome.sierra.{SierraSource, ThrottleRate}
-import uk.ac.wellcome.sierra_adapter.services.WindowExtractor
 import uk.ac.wellcome.storage.s3.S3Config
 import io.circe.syntax._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
+import uk.ac.wellcome.models.transformable.sierra.{
+  AbstractSierraRecord,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.{
   WindowManager,
@@ -43,10 +54,11 @@ class SierraReaderWorkerService @Inject()(
     process = processMessage
   )
 
-  def processMessage(norificationMessage: NotificationMessage): Future[Unit] =
+  def processMessage(notificationMessage: NotificationMessage): Future[Unit] =
     for {
-      messageString <- Future(norificationMessage.Message)
-      window <- Future.fromTry(WindowExtractor.extractWindow(messageString))
+      window <- Future.fromTry(
+        WindowExtractor.extractWindow(notificationMessage.Message)
+      )
       windowStatus <- windowManager.getCurrentStatus(window = window)
       _ <- runSierraStream(window = window, windowStatus = windowStatus)
     } yield ()
@@ -81,14 +93,14 @@ class SierraReaderWorkerService @Inject()(
       params)
 
     val outcome = sierraSource
-      .via(SierraRecordWrapperFlow())
+      .via(SierraRecordWrapperFlow(createRecord))
       .grouped(readerConfig.batchSize)
-      .map(recordBatch => recordBatch.asJson)
+      .map(recordBatch => toJson(recordBatch))
       .zipWithIndex
       .runWith(s3sink)
 
-    // This serves as a marker that the window is complete, so we can audit our S3 bucket to see which windows
-    // were never successfully completed.
+    // This serves as a marker that the window is complete, so we can audit
+    // our S3 bucket to see which windows were never successfully completed.
     outcome.map { _ =>
       s3client.putObject(
         s3Config.bucketName,
@@ -97,4 +109,18 @@ class SierraReaderWorkerService @Inject()(
         "")
     }
   }
+
+  private def createRecord: (String, String, Instant) => AbstractSierraRecord =
+    sierraConfig.resourceType match {
+      case SierraResourceTypes.bibs  => SierraBibRecord.apply
+      case SierraResourceTypes.items => SierraItemRecord.apply
+    }
+
+  private def toJson(records: Seq[AbstractSierraRecord]): Json =
+    sierraConfig.resourceType match {
+      case SierraResourceTypes.bibs =>
+        records.asInstanceOf[Seq[SierraBibRecord]].asJson
+      case SierraResourceTypes.items =>
+        records.asInstanceOf[Seq[SierraItemRecord]].asJson
+    }
 }

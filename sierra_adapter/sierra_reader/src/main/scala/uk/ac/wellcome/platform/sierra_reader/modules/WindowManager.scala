@@ -5,14 +5,13 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.SierraConfig
-import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.utils.JsonUtil
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 case class WindowStatus(id: Option[String], offset: Int)
 
@@ -52,28 +51,23 @@ class WindowManager @Inject()(
 
         val lastBody = IOUtils.toString(
           s3client.getObject(s3Config.bucketName, key).getObjectContent)
-        val triedMaybeLastId =
-          JsonUtil.fromJson[List[SierraRecord]](lastBody).map { r =>
-            r.map { _.id }.sorted.lastOption
-          }
 
-        info(s"Found latest ID in S3: $triedMaybeLastId")
-        val triedStatus = triedMaybeLastId
-          .map {
-            case Some(id) =>
-              // The Sierra IDs we store in S3 are prefixed with "b" or "i".
-              // Remove the first character
-              val unprefixedId = id.substring(1)
+        val maybeLastId = getLastId(lastBody)
 
-              val newId = (unprefixedId.toInt + 1).toString
-              WindowStatus(id = Some(newId), offset = offset + 1)
-            case None =>
-              throw GracefulFailureException(
-                new RuntimeException("Json did not contain an id"))
-          }
+        info(s"Found latest ID in S3: $maybeLastId")
 
-        // Let it throw the exception if it's a failure
-        triedStatus.get
+        maybeLastId match {
+          case Some(id) =>
+            // The Sierra IDs we store in S3 are prefixed with "b" or "i".
+            // Remove the first character
+            val unprefixedId = id.substring(1)
+
+            val newId = (unprefixedId.toInt + 1).toString
+            WindowStatus(id = Some(newId), offset = offset + 1)
+          case None =>
+            throw GracefulFailureException(
+              new RuntimeException(s"JSON <<$lastBody>> did not contain an id"))
+        }
       }
       case None => WindowStatus(id = None, offset = 0)
     }
@@ -91,4 +85,19 @@ class WindowManager @Inject()(
       .replaceAll(":", "-")
       .replaceAll(",", "__")
 
+  // The contents of our S3 files should be an array of either SierraBibRecord
+  // or SierraItemRecord; we want to get the last ID of the current contents
+  // so we know what to ask the Sierra API for next.
+  //
+  private def getLastId(s3contents: String): Option[String] = {
+    case class Identified(id: String)
+
+    fromJson[List[Identified]](s3contents) match {
+      case Success(ids) => ids.map { _.id }.sorted.lastOption
+      case Failure(_) =>
+        throw GracefulFailureException(
+          new RuntimeException(
+            s"S3 contents <<$s3contents> could not be parsed as JSON"))
+    }
+  }
 }

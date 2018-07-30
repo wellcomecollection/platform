@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex_request_creator.TestRecord
 import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -99,14 +99,11 @@ class ReindexWorkerServiceTest
                 desiredVersion = reindexJob.desiredVersion
               )
             )
-            val sqsMessage = NotificationMessage(
-              Subject = "",
-              Message = toJson(reindexJob).get,
-              TopicArn = "topic",
-              MessageId = "message"
-            )
 
-            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
+            sendNotificationToSQS(
+              queue = queue,
+              message = reindexJob
+            )
 
             eventually {
               val actualRecords: Seq[ReindexRequest] =
@@ -129,14 +126,10 @@ class ReindexWorkerServiceTest
       withLocalSnsTopic { topic =>
         withReindexWorkerService(table, topic) {
           case (_, QueuePair(queue, dlq)) =>
-            val sqsMessage = NotificationMessage(
-              Subject = "",
-              Message = "<xml>What is JSON.</xl?>",
-              TopicArn = "topic",
-              MessageId = "message-id"
+            sendNotificationToSQS(
+              queue = queue,
+              body = "<xml>What is JSON.</xl?>"
             )
-
-            sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
             eventually {
               assertQueueEmpty(queue)
@@ -181,14 +174,10 @@ class ReindexWorkerServiceTest
                   desiredVersion = 4
                 )
 
-                val sqsMessage = NotificationMessage(
-                  Subject = "",
-                  Message = toJson(reindexJob).get,
-                  TopicArn = "topic",
-                  MessageId = "message"
+                sendNotificationToSQS(
+                  queue = queue,
+                  message = reindexJob
                 )
-
-                sqsClient.sendMessage(queue.url, toJson(sqsMessage).get)
 
                 eventually {
                   assertQueueEmpty(queue)

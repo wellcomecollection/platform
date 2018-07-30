@@ -16,7 +16,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
@@ -199,6 +199,6 @@ trait Messaging
       location = ObjectLocation(namespace = bucket.name, key = s3key)
     )
 
-    sqsClient.sendMessage(queue.url, notificationJson)
+    sendMessage(queue = queue, body = notificationJson)
   }
 }

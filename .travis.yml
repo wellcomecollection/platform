@@ -51,7 +51,6 @@ cache:
     - sbt_common/finatra_storage/target
     - sbt_common/internal_model/target
     - sbt_common/messaging/target
-    - sbt_common/monitoring/target
 
     - sierra_adapter/common/target
     - sierra_adapter/sierra_reader/target
@@ -94,7 +93,6 @@ jobs:
     - stage: sbt-common-test
       env: TASK=elasticsearch-test
     - env: TASK=messaging-test
-    - env: TASK=monitoring-test
     - env: TASK=internal_model-test
     - env: TASK=display-test
 
@@ -128,8 +126,7 @@ jobs:
         - TASK=travis-lambda-test
 
     # Catalogue API stack
-    - stage: test
-      env: TASK=api-test
+    - env: TASK=api-test
     # (not under active development)
     # - env: TASK=api_docs-build
 
@@ -152,7 +149,6 @@ jobs:
     - env: TASK=goobi_reader-test
 
     # Sierra adapter stack
-    - env: TASK=sierra_adapter_common-test
     - env: TASK=sierra_reader-test
     - env: TASK=sierra_items_to_dynamo-test
     - env: TASK=sierra_bib_merger-test

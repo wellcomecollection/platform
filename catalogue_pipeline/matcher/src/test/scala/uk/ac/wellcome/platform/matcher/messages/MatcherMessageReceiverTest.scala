@@ -396,10 +396,8 @@ class MatcherMessageReceiverTest
         s3Client = s3Client,
         bucket = storageBucket
       )
-    sqsClient.sendMessage(
-      queue.url,
-      toJson(workSqsMessage).get
-    )
+
+    sendMessage(queue = queue, obj = workSqsMessage)
   }
 
   private def hybridRecordNotificationMessage(message: String,

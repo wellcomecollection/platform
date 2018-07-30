@@ -83,7 +83,7 @@ class IngestorFeatureTest
                 body = "not a json string -- this will fail parsing"
               )
 
-              // After a message is read, it stays invisible for 1 second and then it gets sent again.
+              // After a message is read, it stays invisible for 1 second and then it gets sent again.		               assertQueueHasSize(queue, size = 1)
               // So we wait for longer than the visibility timeout and then we assert that it has become
               // invisible again, which means that the ingestor picked it up again,
               // and so it wasn't deleted as part of the first run.

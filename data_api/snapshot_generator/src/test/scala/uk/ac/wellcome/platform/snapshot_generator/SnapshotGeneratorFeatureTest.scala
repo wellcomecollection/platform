@@ -13,7 +13,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.monitoring.test.fixtures.CloudWatch
+import uk.ac.wellcome.monitoring.fixtures.CloudWatch
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
 import uk.ac.wellcome.platform.snapshot_generator.models.{
   CompletedSnapshotJob,

@@ -1,5 +1,6 @@
 ThumbnailImage,thumbnail-image,Thumbnail Image
-IIIFImage,iiif-image,IIIF image
+IIIFImage,iiif-image,IIIF Image API
+IIIFPresentation,iiif-presentation,IIIF Presentation API
 2,acqi,Info Service acquisitions
 3,acql,Wellcome Library
 4,admi,administration

@@ -7,17 +7,19 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.utils.JsonUtil._
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
-import uk.ac.wellcome.sierra_adapter.models.SierraRecord
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-
 import org.scalatest.compatible.Assertion
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
   SierraConfig,
@@ -111,9 +113,9 @@ class SierraReaderWorkerServiceTest
         // there are 29 bib updates in the sierra wiremock so we expect 3 files
         listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
-        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
-        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 9
+        getBibRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 10
+        getBibRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 10
+        getBibRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 9
       }
     }
   }
@@ -144,15 +146,18 @@ class SierraReaderWorkerServiceTest
         // There are 157 item records in the Sierra wiremock so we expect 4 files
         listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
-        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
-        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
-        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
-        getRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
+        getItemRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 50
+        getItemRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 50
+        getItemRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
+        getItemRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
       }
     }
   }
 
-  it("resumes a window if it finds an in-progress set of records") {
+  // This test isn't actually testing the correct behaviour (see issue 2422:
+  // https://github.com/wellcometrust/platform/issues/2422); it's due to be
+  // replaced when we fix this behaviour.
+  ignore("resumes a window if it finds an in-progress set of records") {
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
       resourceType = SierraResourceTypes.items
@@ -169,7 +174,8 @@ class SierraReaderWorkerServiceTest
           |  {
           |    "id": "i1794165",
           |    "modifiedDate": "2013-12-10T17:16:35Z",
-          |    "data": "{}"
+          |    "data": "{}",
+          |    "bibIds": [],
           |  }
           |]
         """.stripMargin
@@ -197,19 +203,23 @@ class SierraReaderWorkerServiceTest
         listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
 
         // These two files were pre-populated -- we check the reader hasn't overwritten these
-        getRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0
-        getRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 1
+        getItemRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0
+        getItemRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 1
 
         // We check the reader has filled these in correctly
-        getRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
-        getRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
+        getItemRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
+        getItemRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
       }
     }
   }
 
-  private def getRecordsFromS3(bucket: Bucket,
-                               key: String): List[SierraRecord] =
-    getObjectFromS3[List[SierraRecord]](bucket, key)
+  private def getBibRecordsFromS3(bucket: Bucket,
+                                  key: String): List[SierraBibRecord] =
+    getObjectFromS3[List[SierraBibRecord]](bucket, key)
+
+  private def getItemRecordsFromS3(bucket: Bucket,
+                                   key: String): List[SierraItemRecord] =
+    getObjectFromS3[List[SierraItemRecord]](bucket, key)
 
   it(
     "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
