@@ -14,6 +14,9 @@ WORKING_DIRECTORY = os.getenv("WORKING_DIRECTORY")
 # Assumes same credentials for reading METS and writing bags
 DROP_BUCKET_NAME = os.getenv("DROP_BUCKET_NAME")
 
+CURRENT_PRESERVATION_BUCKET = os.getenv("CURRENT_PRESERVATION_BUCKET")
+DLCS_SOURCE_BUCKET = os.getenv("DLCS_SOURCE_BUCKET")
+
 AWS_PUBLIC_KEY = os.getenv("AWS_PUBLIC_KEY")
 AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
 AWS_REGION = os.getenv("AWS_REGION")
@@ -21,7 +24,7 @@ AWS_REGION = os.getenv("AWS_REGION")
 # for determining the origin of an object
 DLCS_ENTRY = os.getenv("DLCS_ENTRY")
 DLCS_API_KEY = os.getenv("DLCS_API_KEY")
-DLCS_SECRET = os.getenv("DLCS_SECRET")
+DLCS_API_SECRET = os.getenv("DLCS_API_SECRET")
 DLCS_CUSTOMER_ID = os.getenv("DLCS_CUSTOMER_ID")
 DLCS_SPACE = os.getenv("DLCS_SPACE")
 
