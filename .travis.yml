@@ -109,44 +109,44 @@ jobs:
     # isn't significantly longer than a Scala test.
     #
     - stage: test
-      # env:
-      #   - TRAVIS_LAMBDAS="snapshot_scheduler \
-      #     reindex_shard_generator \
-      #     sierra_window_generator \
-      #     s3_demultiplexer \
-      #     drain_ecs_container_instance \
-      #     dynamo_to_sns \
-      #     ecs_ec2_instance_tagger \
-      #     run_ecs_task \
-      #     gatling_to_cloudwatch \
-      #     notify_old_deploys \
-      #     post_to_slack \
-      #     service_deployment_status \
-      #     update_service_list"
-      #   - TASK=travis-lambda-test
+      env:
+        - TRAVIS_LAMBDAS="snapshot_scheduler \
+          reindex_shard_generator \
+          sierra_window_generator \
+          s3_demultiplexer \
+          drain_ecs_container_instance \
+          dynamo_to_sns \
+          ecs_ec2_instance_tagger \
+          run_ecs_task \
+          gatling_to_cloudwatch \
+          notify_old_deploys \
+          post_to_slack \
+          service_deployment_status \
+          update_service_list"
+        - TASK=travis-lambda-test
 
     # Catalogue API stack
-    # - env: TASK=api-test
+    - env: TASK=api-test
     # (not under active development)
     # - env: TASK=api_docs-build
 
     # Catalogue pipeline stack
     - env: TASK=transformer-test
-    # - env: TASK=ingestor-test
-    # - env: TASK=recorder-test
-    # - env: TASK=matcher-test
-    # - env: TASK=merger-test
-    # - env: TASK=id_minter-test
-    #
-    # # Data API stack
-    # - env: TASK=snapshot_generator-test
-    #
-    # # Reindexer stack
-    # - env: TASK=reindex_request_creator-test
-    # - env: TASK=reindex_request_processor-test
-    #
-    # # Goobi adapter stack
-    # - env: TASK=goobi_reader-test
+    - env: TASK=ingestor-test
+    - env: TASK=recorder-test
+    - env: TASK=matcher-test
+    - env: TASK=merger-test
+    - env: TASK=id_minter-test
+
+    # Data API stack
+    - env: TASK=snapshot_generator-test
+
+    # Reindexer stack
+    - env: TASK=reindex_request_creator-test
+    - env: TASK=reindex_request_processor-test
+
+    # Goobi adapter stack
+    - env: TASK=goobi_reader-test
 
     # Sierra adapter stack
     - env: TASK=sierra_reader-test
