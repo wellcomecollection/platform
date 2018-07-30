@@ -2,7 +2,6 @@ package uk.ac.wellcome.platform.transformer.receive
 
 import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.PublishRequest
-import io.circe.KeyEncoder
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
@@ -41,8 +40,6 @@ class NotificationMessageReceiverTest
     with ScalaFutures
     with SierraUtil
     with TransformableMessageUtils {
-
-  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
 
   def withNotificationMessageReceiver[R](
     topic: Topic,
