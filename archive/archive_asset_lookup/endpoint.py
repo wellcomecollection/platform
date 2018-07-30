@@ -5,7 +5,7 @@ import boto3
 import botocore
 import settings
 from boto3.dynamodb.conditions import Key
-
+from urllib.parse import urlparse
 
 def lambda_handler(event, context):
 
@@ -58,10 +58,14 @@ def lambda_handler(event, context):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
+    parsed_s3_url = urlparse(data['s3'])
+    storage_manifest_bucket = parsed_s3_url.netloc
+    storage_manifest_key = parsed_s3_url.path.lstrip('/')
+
     # attempt to download the content pointed to by the table into the file
     try:
-        s3.Bucket(settings.BUCKET_NAME) \
-            .download_file(data['s3'], temp_file.name)
+        s3.Bucket(storage_manifest_bucket) \
+            .download_file(storage_manifest_key, temp_file.name)
     except botocore.exceptions.ClientError as e:
         # check for 404 or something worse
         if e.response['Error']['Code'] == "404":

@@ -53,7 +53,7 @@ class TestLambda(unittest.TestCase):
                     'S': identifier
                 },
                 's3': {
-                    'S': identifier
+                    'S': 's3://{}/{}'.format(settings.BUCKET_NAME, identifier)
                 }
             }
         )
