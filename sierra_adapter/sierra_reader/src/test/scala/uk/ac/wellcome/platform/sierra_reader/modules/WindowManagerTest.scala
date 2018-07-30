@@ -4,12 +4,15 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.transformable.sierra.SierraBibNumber
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -18,7 +21,8 @@ class WindowManagerTest
     with Matchers
     with S3
     with ScalaFutures
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraUtil {
 
   private def withWindowManager(bucket: Bucket)(
     testWith: TestWith[WindowManager, Assertion]) = {
@@ -62,21 +66,14 @@ class WindowManagerTest
         // We pre-populate S3 with files as if they'd come from a prior run of the reader.
         s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
-        val record =
-          """
-            |[
-            |  {
-            |    "id": "1794165",
-            |    "data":"{\"id\": \"1794165\", \"title\": \"fyxpptx0nc3gep3yvloxcmpvrvfkcvau690g3sgg1qvh2u7keo\"}",
-            |    "modifiedDate":"2018-07-30T11:13:42.549Z"
-            |  }
-            |]
-            |""".stripMargin
+        val record = createSierraBibRecordWith(
+          id = SierraBibNumber("1794165")
+        )
 
         s3Client.putObject(
           bucket.name,
           s"$prefix/0001.json",
-          record
+          toJson(List(record)).get
         )
 
         val result = windowManager.getCurrentStatus("[2013,2014]")
