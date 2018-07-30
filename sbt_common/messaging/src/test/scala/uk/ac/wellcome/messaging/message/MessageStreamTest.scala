@@ -6,15 +6,13 @@ import akka.stream.QueueOfferResult
 import akka.stream.scaladsl.Flow
 import org.mockito.Matchers.{endsWith, eq => equalTo}
 import org.mockito.Mockito.{never, times, verify}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.test.fixtures.Akka
-import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -23,9 +21,8 @@ class MessageStreamTest
     extends FunSpec
     with Matchers
     with Messaging
-    with Akka
     with ScalaFutures
-    with ExtendedPatience
+    with IntegrationPatience
     with MetricsSenderFixture {
 
   def process(list: ConcurrentLinkedQueue[ExampleObject])(o: ExampleObject) = {

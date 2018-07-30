@@ -1,19 +1,18 @@
-package uk.ac.wellcome.messaging.test.fixtures
+package uk.ac.wellcome.messaging.fixtures
 
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
 import io.circe.Encoder
 import org.scalatest.Matchers
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs._
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
-import uk.ac.wellcome.json.JsonUtil._
 
 object SQS {
 

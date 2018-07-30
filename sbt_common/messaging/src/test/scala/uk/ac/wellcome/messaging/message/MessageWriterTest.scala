@@ -2,12 +2,12 @@ package uk.ac.wellcome.messaging.message
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
 import scala.concurrent.Future
 import scala.util.Success

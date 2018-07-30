@@ -2,14 +2,12 @@ package uk.ac.wellcome.messaging.message
 
 import java.util.concurrent.ConcurrentLinkedDeque
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.messaging.fixtures._
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
@@ -19,7 +17,7 @@ class MessagingIntegrationTest
     with Matchers
     with Messaging
     with Eventually
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   val message = ExampleObject("A message sent in the MessagingIntegrationTest")
   val subject = "message-integration-test-subject"
@@ -57,7 +55,7 @@ class MessagingIntegrationTest
 
   def withLocalStackMessageStreamFixtures[R](
     testWith: TestWith[(Queue, Bucket, MessageStream[ExampleObject]), R]) = {
-    withActorSystem { actorSystem =>
+    withMessagingActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalS3Bucket { bucket =>
           withLocalStackSqsQueue { queue =>
