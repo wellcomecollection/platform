@@ -10,7 +10,11 @@ import io.circe.parser._
 import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.{AbstractSierraRecord, SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  AbstractSierraRecord,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
@@ -83,7 +87,9 @@ class SierraRecordWrapperFlowTest
             // objects -- the format needs to map what we get from the
             // Sierra API.
             //
-            val bibIds = (1 to 4).map { _ => createSierraRecordNumberString }
+            val bibIds = (1 to 4).map { _ =>
+              createSierraRecordNumberString
+            }
             val jsonString = s"""
           |{
           | "id": "$id",

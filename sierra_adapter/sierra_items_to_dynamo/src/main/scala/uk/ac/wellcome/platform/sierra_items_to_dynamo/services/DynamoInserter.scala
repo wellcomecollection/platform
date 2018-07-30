@@ -27,4 +27,3 @@ class DynamoInserter @Inject()(versionedDao: VersionedDao)(
       }
   }
 }
-

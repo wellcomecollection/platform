@@ -22,7 +22,8 @@ class SierraBibMergerUpdaterService @Inject()(
 
     val sourceName = "sierra"
 
-    versionedHybridStore.updateRecord(Sourced.id(sourceName, bibRecord.id.withoutCheckDigit))(
+    versionedHybridStore.updateRecord(
+      Sourced.id(sourceName, bibRecord.id.withoutCheckDigit))(
       (SierraTransformable(bibRecord), SourceMetadata(sourceName)))(
       (existingSierraTransformable, existingMetadata) => {
         (

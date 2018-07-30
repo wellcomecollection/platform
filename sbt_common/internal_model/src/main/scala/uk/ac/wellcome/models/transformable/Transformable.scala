@@ -2,7 +2,12 @@ package uk.ac.wellcome.models.transformable
 
 import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.Sourced
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemNumber, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraBibRecord,
+  SierraItemNumber,
+  SierraItemRecord
+}
 
 sealed trait Transformable extends Sourced
 
@@ -24,7 +29,9 @@ case class SierraTransformable(
 
 case object SierraTransformable {
   def apply(bibRecord: SierraBibRecord): SierraTransformable =
-    SierraTransformable(sierraId = bibRecord.id, maybeBibRecord = Some(bibRecord))
+    SierraTransformable(
+      sierraId = bibRecord.id,
+      maybeBibRecord = Some(bibRecord))
 
   // Because the [[SierraTransformable.itemRecords]] field is keyed by
   // [[SierraItemNumber]] in our case class, but JSON only supports string

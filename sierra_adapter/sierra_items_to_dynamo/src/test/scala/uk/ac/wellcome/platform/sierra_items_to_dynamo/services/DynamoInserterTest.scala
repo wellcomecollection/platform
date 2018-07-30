@@ -11,7 +11,11 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo._
-import uk.ac.wellcome.storage.type_classes.{IdGetter, VersionGetter, VersionUpdater}
+import uk.ac.wellcome.storage.type_classes.{
+  IdGetter,
+  VersionGetter,
+  VersionUpdater
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.storage.dynamo._
 
@@ -38,7 +42,8 @@ class DynamoInserterTest
 
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> record.id.withoutCheckDigit) shouldBe Some(Right(record.copy(version = 1)))
+            'id -> record.id.withoutCheckDigit) shouldBe Some(
+            Right(record.copy(version = 1)))
         }
       }
     }
@@ -61,7 +66,8 @@ class DynamoInserterTest
         val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
         whenReady(futureUnit) { _ =>
           Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(Right(newRecord))
+            'id -> newRecord.id.withoutCheckDigit) shouldBe Some(
+            Right(newRecord))
         }
       }
     }

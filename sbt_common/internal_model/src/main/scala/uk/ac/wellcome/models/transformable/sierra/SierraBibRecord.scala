@@ -9,10 +9,7 @@ case class SierraBibRecord(
 ) extends AbstractSierraRecord
 
 case object SierraBibRecord {
-  def apply(
-    id: String,
-    data: String,
-    modifiedDate: Instant): SierraBibRecord =
+  def apply(id: String, data: String, modifiedDate: Instant): SierraBibRecord =
     SierraBibRecord(
       id = SierraBibNumber(id),
       data = data,

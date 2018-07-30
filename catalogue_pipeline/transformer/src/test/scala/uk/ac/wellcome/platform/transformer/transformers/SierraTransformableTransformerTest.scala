@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.transformer.transformers
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
+  SierraBibRecord,
+  SierraItemRecord
+}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -45,7 +49,7 @@ class SierraTransformableTransformerTest
       .items
       .map { _.sourceIdentifier }
 
-    actualIdentifiers should contain theSameElementsAs  expectedIdentifiers
+    actualIdentifiers should contain theSameElementsAs expectedIdentifiers
   }
 
   it("extracts information from items") {

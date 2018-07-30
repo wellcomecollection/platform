@@ -5,14 +5,18 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{SierraBibData, SierraItemData, SierraMaterialType}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraBibData,
+  SierraItemData,
+  SierraMaterialType
+}
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraLocation {
-  def extractItemData(
-    sierraTransformable: SierraTransformable): Map[SierraItemNumber, SierraItemData] =
+  def extractItemData(sierraTransformable: SierraTransformable)
+    : Map[SierraItemNumber, SierraItemData] =
     sierraTransformable.itemRecords
       .map { case (id, itemRecord) => (id, itemRecord.data) }
       .map {

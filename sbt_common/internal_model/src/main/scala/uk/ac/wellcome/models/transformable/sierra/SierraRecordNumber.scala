@@ -22,7 +22,7 @@ sealed trait SierraRecordNumber {
   /** Returns the ID with the check digit and prefix. */
   def withCheckDigit: String = {
     val prefix = recordType match {
-      case SierraRecordTypes.bibs => "b"
+      case SierraRecordTypes.bibs  => "b"
       case SierraRecordTypes.items => "i"
       case _ =>
         throw new RuntimeException(

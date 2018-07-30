@@ -4,7 +4,10 @@ import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable
+}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.utils.JsonUtil._
@@ -22,8 +25,10 @@ object TransformablesModule extends TwitterModule {
     ObjectStore[MiroTransformable]
   }
 
-  implicit val keyDecoder: KeyDecoder[SierraItemNumber] = SierraTransformable.keyDecoder
-  implicit val keyEncoder: KeyEncoder[SierraItemNumber] = SierraTransformable.keyEncoder
+  implicit val keyDecoder: KeyDecoder[SierraItemNumber] =
+    SierraTransformable.keyDecoder
+  implicit val keyEncoder: KeyEncoder[SierraItemNumber] =
+    SierraTransformable.keyEncoder
 
   @Provides
   @Singleton
