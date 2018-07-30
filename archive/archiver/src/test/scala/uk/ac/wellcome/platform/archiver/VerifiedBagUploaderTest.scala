@@ -22,8 +22,10 @@ class VerifiedBagUploaderTest
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
+        implicit val _ = s3AkkaClient
+
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
-        val uploader = new VerifiedBagUploader(s3Client, s3AkkaClient, bagUploaderConfig)
+        val uploader = new VerifiedBagUploader(bagUploaderConfig)
 
         val bagName = randomAlphanumeric()
         val zipFile = createBagItZip(bagName, 1)
@@ -40,8 +42,10 @@ class VerifiedBagUploaderTest
   it("fails when verifying and uploading an invalid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
+        implicit val _ = s3AkkaClient
+
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
-        val uploader = new VerifiedBagUploader(s3Client, s3AkkaClient, bagUploaderConfig)
+        val uploader = new VerifiedBagUploader(bagUploaderConfig)
 
         val bagName = randomAlphanumeric()
         val zipFile = createBagItZip(bagName, 1, false)
