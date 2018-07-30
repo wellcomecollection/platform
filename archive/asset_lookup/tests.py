@@ -26,18 +26,18 @@ class TestLambda(unittest.TestCase):
             TableName=settings.TABLE_NAME,
             KeySchema=[
                 {
-                  'AttributeName': 'identifier',
-                  'KeyType': 'HASH'
+                    'AttributeName': 'identifier',
+                    'KeyType': 'HASH'
                 }
             ],
             AttributeDefinitions=[
                 {
-                  'AttributeName': 'identifier',
-                  'AttributeType': 'S'
+                    'AttributeName': 'identifier',
+                    'AttributeType': 'S'
                 },
                 {
-                  'AttributeName': 's3',
-                  'AttributeType': 'S'
+                    'AttributeName': 's3',
+                    'AttributeType': 'S'
                 }
             ],
             ProvisionedThroughput={
