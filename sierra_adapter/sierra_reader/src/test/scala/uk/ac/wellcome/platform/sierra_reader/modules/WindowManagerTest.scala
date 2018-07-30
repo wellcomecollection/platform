@@ -6,7 +6,8 @@ import org.scalatest.compatible.Assertion
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.models.transformable.sierra.SierraBibRecord
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraBibRecord}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, SierraResourceTypes, WindowStatus}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
@@ -22,7 +23,8 @@ class WindowManagerTest
     with Matchers
     with S3
     with ScalaFutures
-    with ExtendedPatience {
+    with ExtendedPatience
+    with SierraUtil {
 
   private def withWindowManager(bucket: Bucket)(
     testWith: TestWith[WindowManager, Assertion]) = {
@@ -58,7 +60,7 @@ class WindowManagerTest
   // This test isn't actually testing the correct behaviour (see issue 2422:
   // https://github.com/wellcometrust/platform/issues/2422); it's due to be
   // replaced when we fix this behaviour.
-  ignore("finds the ID if there is a window in progress") {
+  it("finds the ID if there is a window in progress") {
     withLocalS3Bucket { bucket =>
       withWindowManager(bucket) { windowManager =>
         val prefix = windowManager.buildWindowShard("[2013,2014]")
@@ -66,11 +68,9 @@ class WindowManagerTest
         // We pre-populate S3 with files as if they'd come from a prior run of the reader.
         s3Client.putObject(bucket.name, s"$prefix/0000.json", "[]")
 
-        val record =
-          SierraBibRecord(
-            id = "b1794165",
-            data = "{}",
-            modifiedDate = Instant.now())
+        val record = createSierraBibRecordWith(
+          id = SierraBibNumber("1794165")
+        )
 
         s3Client.putObject(
           bucket.name,
