@@ -11,10 +11,8 @@ def lambda_handler(event, context):
 
     # setup logging and AWS clients
     logger = logging.getLogger()
-    dynamodb = boto3.resource('dynamodb',
-        region_name=settings.AWS_REGION)
-    s3 = boto3.resource('s3',
-        region_name=settings.AWS_REGION)
+    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_REGION)
+    s3 = boto3.resource('s3', region_name=settings.AWS_REGION)
 
     logger.info('got event{}'.format(event))
 
@@ -30,7 +28,7 @@ def lambda_handler(event, context):
     table = dynamodb.Table(settings.TABLE_NAME)
 
     response = table.query(
-        KeyConditionExpression = Key('identifier').eq(identifier)
+        KeyConditionExpression=Key('identifier').eq(identifier)
     )
 
     data_items = response['Items']
@@ -42,8 +40,8 @@ def lambda_handler(event, context):
 
     # we are just expecting to use a single row
     if len(data_items) > 1:
-      logger.info('multiple results for identifier')
-      return "multiple results for identifier"
+        logger.info('multiple results for identifier')
+        return "multiple results for identifier"
 
     # should just have a single item
     data = data_items[0]
@@ -57,7 +55,7 @@ def lambda_handler(event, context):
     # the file is created and requested not to be deleted, then we close it
     # so it can be written to without lock interference.
 
-    temp_file = tempfile.NamedTemporaryFile(delete = False)
+    temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
     # attempt to download the content pointed to by the table into the file
