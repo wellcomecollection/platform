@@ -4,6 +4,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.SourceMetadata
@@ -42,6 +43,7 @@ class SierraItemMergerFeatureTest
 
               val expectedSierraTransformable = createSierraTransformableWith(
                 sierraId = bibId,
+                maybeBibRecord = None,
                 itemRecords = List(record)
               )
 
@@ -86,12 +88,14 @@ class SierraItemMergerFeatureTest
                 val expectedSierraTransformable1 =
                   createSierraTransformableWith(
                     sierraId = bibId1,
+                    maybeBibRecord = None,
                     itemRecords = List(record1)
                   )
 
                 val expectedSierraTransformable2 =
                   createSierraTransformableWith(
                     sierraId = bibId2,
+                    maybeBibRecord = None,
                     itemRecords = List(record2)
                   )
 
