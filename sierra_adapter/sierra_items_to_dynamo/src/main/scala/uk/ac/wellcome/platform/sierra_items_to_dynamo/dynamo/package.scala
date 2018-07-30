@@ -2,15 +2,23 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import com.gu.scanamo.DynamoFormat
 import com.gu.scanamo.syntax._
-import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemRecord}
+import uk.ac.wellcome.models.transformable.sierra.{SierraBibNumber, SierraItemNumber, SierraItemRecord}
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.type_classes.IdGetter
 
 package object dynamo {
-  implicit val recordNumberFormat =
+  implicit val bibNumberFormat: DynamoFormat[SierraBibNumber] =
     DynamoFormat
       .coercedXmap[SierraBibNumber, String, IllegalArgumentException](
       SierraBibNumber
+    )(
+      _.withoutCheckDigit
+    )
+
+  implicit val itemNumberFormat: DynamoFormat[SierraItemNumber] =
+    DynamoFormat
+      .coercedXmap[SierraItemNumber, String, IllegalArgumentException](
+      SierraItemNumber
     )(
       _.withoutCheckDigit
     )
