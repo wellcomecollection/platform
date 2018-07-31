@@ -17,6 +17,7 @@ class MiroTransformableTransformer
     with MiroLicenses
     with MiroSubjects
     with MiroTransformableUtils
+    with MiroWorkType
     with Logging {
   // TODO this class is too big as the different test classes would suggest. Split it.
 
@@ -50,7 +51,7 @@ class MiroTransformableTransformer
             getOtherIdentifiers(miroData, miroTransformable.sourceId),
           mergeCandidates = List(),
           title = title,
-          workType = None,
+          workType = getWorkType,
           description = description,
           physicalDescription = None,
           extent = None,
