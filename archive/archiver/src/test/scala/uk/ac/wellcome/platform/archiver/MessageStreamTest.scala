@@ -47,7 +47,6 @@ class MessageStreamTest
           assertQueueEmpty(dlq)
         }
     }
-
   }
 
   def withMessageStreamFixtures[R](

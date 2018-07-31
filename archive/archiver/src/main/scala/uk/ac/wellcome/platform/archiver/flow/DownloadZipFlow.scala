@@ -11,7 +11,7 @@ import akka.stream.scaladsl.{FileIO, Flow, Source}
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 
 object DownloadZipFlow {
@@ -21,6 +21,7 @@ object DownloadZipFlow {
     Flow[ObjectLocation].flatMapConcat((objectLocation) => {
       val downloadStream = s3Client.download(objectLocation.namespace, objectLocation.key)._1
 
+      // TODO: Use File.createTempFile
       val fileName = randomUUID().toString
       val path = FileSystems.getDefault.getPath(tmpDir, fileName)
 
@@ -32,11 +33,10 @@ object DownloadZipFlow {
         .map(_.status)
         .map {
           case Success(_) => new ZipFile(path.toFile)
-          case _ => throw new RuntimeException(
-            s"Failed downloading bag on ingest: $objectLocation")
-        })
+          case Failure(e) => throw e
+        }
+      )
     })
-
   }
 }
 

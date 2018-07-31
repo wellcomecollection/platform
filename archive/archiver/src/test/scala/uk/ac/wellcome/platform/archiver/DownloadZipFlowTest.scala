@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.archiver
 
 import java.io.File
+import java.util.zip.ZipFile
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
@@ -11,8 +12,8 @@ import uk.ac.wellcome.platform.archiver.flow.DownloadZipFlow
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.collection.JavaConverters._
+import scala.concurrent.Future
 
 class DownloadZipFlowTest
   extends FunSpec
@@ -42,7 +43,7 @@ class DownloadZipFlowTest
 
         val objectLocation = ObjectLocation(storageBucket.name, fileName)
 
-        val download = downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
+        val download: Future[ZipFile] = downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
 
         whenReady(download) { downloadedZipFile =>
           zipFile.entries.asScala.toList.map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList.map(_.toString)
@@ -51,5 +52,4 @@ class DownloadZipFlowTest
       }
     }
   }
-
 }

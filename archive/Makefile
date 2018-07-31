@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= archive
 
-SBT_APPS    =
+SBT_APPS    = archiver
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 

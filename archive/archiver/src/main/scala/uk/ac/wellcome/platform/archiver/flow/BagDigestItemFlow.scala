@@ -10,7 +10,9 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 object BagDigestItemFlow {
 
-  def apply(config: BagUploaderConfig, bagName: String, zipFile: ZipFile): Flow[ObjectLocation, BagDigestItem, NotUsed] = {
+  def apply(config: BagUploaderConfig, bagName: String, zipFile: ZipFile):
+  Flow[ObjectLocation, BagDigestItem, NotUsed] = {
+
     val framingDelimiter = Framing.delimiter(
       ByteString("\n"),
       maximumFrameLength = 1024,

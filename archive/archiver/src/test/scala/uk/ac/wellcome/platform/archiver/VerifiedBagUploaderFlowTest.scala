@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 
-class VerifiedBagUploaderTest
+class VerifiedBagUploaderFlowTest
   extends FunSpec
     with Matchers
     with ScalaFutures
