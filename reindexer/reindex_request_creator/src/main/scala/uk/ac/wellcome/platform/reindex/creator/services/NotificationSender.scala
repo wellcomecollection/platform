@@ -29,7 +29,8 @@ class NotificationSender @Inject()(snsWriter: SNSWriter)(
                                          desiredVersion: Int): Future[Unit] = {
     val request = ReindexRequest(
       id = recordId,
-      desiredVersion = desiredVersion
+      desiredVersion = desiredVersion,
+      tableName = dynamoConfig.table
     )
 
     for {
