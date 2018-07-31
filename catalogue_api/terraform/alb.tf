@@ -1,15 +1,16 @@
-module "api_alb" {
-  source  = "git::https://github.com/wellcometrust/terraform.git//ecs_alb?ref=v1.0.0"
-  name    = "api"
-  subnets = ["${module.vpc_api.subnets}"]
+module "load_balancer" {
+  source = "load_balancer"
 
-  loadbalancer_security_groups = [
-    "${module.api_cluster_asg.loadbalancer_sg_https_id}",
-    "${module.api_cluster_asg.loadbalancer_sg_http_id}",
+  name = "${local.namespace}"
+
+  vpc_id         = "${local.vpc_id}"
+  public_subnets = "${local.public_subnets}"
+
+  default_target_group_arn = "${module.api_romulus_delta.target_group_arn}"
+  certificate_domain       = "api.wellcomecollection.org"
+
+  service_lb_security_group_ids = [
+    "${module.api_romulus_delta.service_lb_security_group_id}",
+    "${module.api_remus_delta.service_lb_security_group_id}",
   ]
-
-  certificate_domain = "api.wellcomecollection.org"
-  vpc_id             = "${module.vpc_api.vpc_id}"
-
-  alb_access_log_bucket = "${local.bucket_alb_logs_id}"
 }

@@ -3,5 +3,5 @@ output "rds_access_security_group_id" {
 }
 
 output "cluster_name" {
-  value = "${var.namespace}"
+  value = "${aws_ecs_cluster.cluster.name}"
 }
