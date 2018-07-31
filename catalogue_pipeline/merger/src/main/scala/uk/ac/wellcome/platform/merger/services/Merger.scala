@@ -34,7 +34,7 @@ class Merger extends Logging {
   private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                                    digitalWork: UnidentifiedWork) = {
     (physicalWork.items, digitalWork.items) match {
-      case (List(physicalItem), List(digitalItem)) =>
+      case (List(physicalItem: Identifiable[Item]), List(digitalItem: Unidentifiable[Item])) =>
         info(
           s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
         Some(
@@ -54,7 +54,7 @@ class Merger extends Logging {
   }
 
   private def mergePhysicalAndDigitalItems(physicalItem: Identifiable[Item],
-                                           digitalItem: Identifiable[Item]) = {
+                                           digitalItem: Unidentifiable[Item]) = {
     List(physicalItem.copy(agent = physicalItem.agent.copy(
       locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
   }

@@ -21,7 +21,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
   it("correctly parses items on a work") {
     val work = createIdentifiedWorkWith(
-      items = createItems(count = 1)
+      items = createIdentifiedItems(count = 1)
     )
 
     val displayWork = DisplayWorkV2(
@@ -222,7 +222,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           roles = List()
         )
       ),
-      items = createItems(count = 1),
+      items = createIdentifiedItems(count = 1),
       subjects = List(
         Subject(
           label = "Beryllium-Boron Bonding",

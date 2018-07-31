@@ -92,7 +92,7 @@ class ApiV1WorksTest extends ApiV1WorksTestBase {
     withV1Api {
       case (apiPrefix, indexNameV1, _, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(
-          items = createItems(count = 1)
+          items = createIdentifiedItems(count = 1)
         )
 
         insertIntoElasticsearch(indexNameV1, itemType, work)
