@@ -237,6 +237,7 @@ class MiroTransformableTransformerTest
 
   it("returns an InvisibleWork for images from contributor GUS") {
     assertTransformReturnsInvisibleWork(
+      miroId = "B0009891",
       data = buildJSONForWork("""
         "image_source_code": "GUS"
       """)
@@ -281,7 +282,7 @@ class MiroTransformableTransformerTest
 
   private def assertTransformReturnsInvisibleWork(data: String) = {
     val miroTransformable = MiroTransformable(
-      sourceId = "G0000001",
+      sourceId = miroId,
       MiroCollection = "TestCollection",
       data = data
     )
