@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.SNSWriter
 import uk.ac.wellcome.models.reindexer.ReindexRequest
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}

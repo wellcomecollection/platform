@@ -1,6 +1,6 @@
-package uk.ac.wellcome.platform.creator.fixtures
+package uk.ac.wellcome.platform.reindex.creator.fixtures
 
-import uk.ac.wellcome.platform.creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 
