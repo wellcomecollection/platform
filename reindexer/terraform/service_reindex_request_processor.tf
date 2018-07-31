@@ -11,7 +11,7 @@ module "reindex_request_processor" {
   memory          = 2048
 
   env_vars = {
-    dynamo_table_name         = "${local.vhs_table_name}"
+    dynamo_table_name         = "${local.vhs_sourcedata_table_name}"
     reindex_requests_queue_id = "${module.reindex_requests_queue.id}"
     metrics_namespace         = "reindex_request_processor"
   }
@@ -40,5 +40,5 @@ resource "aws_iam_role_policy" "reindex_processor_task_cloudwatch_metric" {
 
 resource "aws_iam_role_policy" "reindex_processor_allow_table_access" {
   role   = "${module.reindex_request_processor.task_role_name}"
-  policy = "${local.vhs_full_access_policy}"
+  policy = "${local.vhs_sourcedata_full_access_policy}"
 }
