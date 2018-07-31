@@ -10,11 +10,9 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
-import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex_request.creator.TestRecord
+import uk.ac.wellcome.platform.reindex_request.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
@@ -95,7 +93,8 @@ class ReindexRequestCreatorWorkerTest
             val expectedRecords = Seq(
               ReindexRequest(
                 id = testRecord.id,
-                desiredVersion = reindexJob.desiredVersion
+                desiredVersion = reindexJob.desiredVersion,
+                tableName = table.name
               )
             )
 

@@ -18,13 +18,9 @@ trait ReindexFixtures {
     desiredVersion = desiredVersion
   )
 
-  def createReindexJobWith(
-    dynamoConfig: DynamoConfig,
-    shardId: String = "sierra/123",
-    desiredVersion: Int = 5
-  ): ReindexJob = ReindexJob(
+  def createReindexJobWith(dynamoConfig: DynamoConfig): ReindexJob = ReindexJob(
     dynamoConfig = dynamoConfig,
-    shardId = shardId,
-    desiredVersion = desiredVersion
+    shardId = "sierra/123",
+    desiredVersion = 5
   )
 }
