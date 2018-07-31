@@ -2,8 +2,10 @@ package uk.ac.wellcome.platform.archiver
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Sink
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 
@@ -24,12 +26,12 @@ class VerifiedBagUploaderTest
         implicit val _ = s3AkkaClient
 
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
-        val uploader = new VerifiedBagUploader(bagUploaderConfig)
-
         val bagName = randomAlphanumeric()
         val zipFile = createBagItZip(bagName, 1)
 
-        val verification = uploader.verify(zipFile, bagName)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
+
+        val verification = uploader.runWith(Sink.ignore)
 
         whenReady(verification) { _ =>
           // Do nothing
@@ -44,12 +46,12 @@ class VerifiedBagUploaderTest
         implicit val _ = s3AkkaClient
 
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
-        val uploader = new VerifiedBagUploader(bagUploaderConfig)
-
         val bagName = randomAlphanumeric()
         val zipFile = createBagItZip(bagName, 1, false)
 
-        val verification = uploader.verify(zipFile, bagName)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
+
+        val verification = uploader.runWith(Sink.ignore)
 
         whenReady(verification.failed) { e =>
           println(e)

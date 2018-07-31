@@ -176,7 +176,7 @@ object Dependencies {
   )
 
   val archiverDependencies = Seq(
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3,
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary
 
 }
