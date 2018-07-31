@@ -1,8 +1,3 @@
-module "ecr_repository_nginx_api" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "nginx_api"
-}
-
 module "ecr_repository_nginx_api-delta" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
   name   = "nginx_api-delta"
