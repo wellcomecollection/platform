@@ -173,7 +173,10 @@ class ReindexRequestProcessorWorkerTest
             queue,
             metricsSender) { sqsStream =>
             val workerService =
-              new ReindexRequestProcessorWorker(versionedDao, sqsStream, actorSystem)
+              new ReindexRequestProcessorWorker(
+                versionedDao,
+                sqsStream,
+                actorSystem)
 
             try {
               testWith(workerService)
