@@ -27,7 +27,11 @@ class ReindexProcessorFeatureTest
 
             givenTableHasItem(record, table)
 
-            val reindexRequest = ReindexRequest(id = id, desiredVersion = 11)
+            val reindexRequest = ReindexRequest(
+              id = id,
+              tableName = table.name,
+              desiredVersion = 11
+            )
 
             sendNotificationToSQS(queue, reindexRequest)
 

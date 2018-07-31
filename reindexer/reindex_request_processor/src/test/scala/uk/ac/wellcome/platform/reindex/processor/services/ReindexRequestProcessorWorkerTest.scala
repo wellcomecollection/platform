@@ -37,7 +37,11 @@ class ReindexRequestProcessorWorkerTest
       case QueuePair(queue, dlq) =>
         withLocalDynamoDbTable { table =>
           withReindexWorkerService(table, queue) { _ =>
-            val reindexRequest = ReindexRequest("unknownId", 1)
+            val reindexRequest = ReindexRequest(
+              "unknownId",
+              desiredVersion = 1,
+              tableName = table.name
+            )
             sendNotificationToSQS(queue, reindexRequest)
 
             eventually {
@@ -62,7 +66,12 @@ class ReindexRequestProcessorWorkerTest
           val updatedReindexVersion = 2
           sendNotificationToSQS(
             queue,
-            ReindexRequest(id, updatedReindexVersion))
+            ReindexRequest(
+              id = id,
+              desiredVersion = updatedReindexVersion,
+              tableName = table.name
+            )
+          )
 
           eventually {
             assertTableOnlyHasItem(
@@ -91,7 +100,12 @@ class ReindexRequestProcessorWorkerTest
           val updatedReindexVersion = 1
           sendNotificationToSQS(
             queue,
-            ReindexRequest(id, updatedReindexVersion))
+            ReindexRequest(
+              id = id,
+              tableName = table.name,
+              desiredVersion = updatedReindexVersion
+            )
+          )
 
           eventually {
             assertQueueEmpty(queue)
@@ -107,7 +121,11 @@ class ReindexRequestProcessorWorkerTest
       case QueuePair(queue, dlq) =>
         val badTable = Table("table", "index")
         withReindexWorkerService(badTable, queue) { _ =>
-          val reindexRequest = ReindexRequest("unknownId", 1)
+          val reindexRequest = ReindexRequest(
+            id = "unknownId",
+            tableName = badTable.name,
+            desiredVersion = 1
+          )
           sendNotificationToSQS(queue, reindexRequest)
 
           eventually {
@@ -143,7 +161,12 @@ class ReindexRequestProcessorWorkerTest
           val updatedReindexVersion = 102
           sendNotificationToSQS(
             queue,
-            ReindexRequest(id, updatedReindexVersion))
+            ReindexRequest(
+              id = id,
+              tableName = table.name,
+              desiredVersion = updatedReindexVersion
+            )
+          )
 
           eventually {
             assertQueueEmpty(queue)
@@ -167,22 +190,20 @@ class ReindexRequestProcessorWorkerTest
     testWith: TestWith[ReindexRequestProcessorWorker, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withVersionedDao(table) { versionedDao =>
-          withSQSStream[NotificationMessage, R](
-            actorSystem,
-            queue,
-            metricsSender) { sqsStream =>
-            val workerService =
-              new ReindexRequestProcessorWorker(
-                versionedDao,
-                sqsStream,
-                actorSystem)
+        withSQSStream[NotificationMessage, R](
+          actorSystem,
+          queue,
+          metricsSender) { sqsStream =>
+          val workerService = new ReindexRequestProcessorWorker(
+            dynamoDbClient = dynamoDbClient,
+            sqsStream = sqsStream,
+            system = actorSystem
+          )
 
-            try {
-              testWith(workerService)
-            } finally {
-              workerService.stop()
-            }
+          try {
+            testWith(workerService)
+          } finally {
+            workerService.stop()
           }
         }
       }

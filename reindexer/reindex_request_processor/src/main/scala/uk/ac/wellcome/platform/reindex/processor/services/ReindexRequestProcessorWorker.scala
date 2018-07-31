@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.reindex.processor.services
 
 import akka.actor.{ActorSystem, Terminated}
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -12,7 +13,7 @@ import uk.ac.wellcome.json.JsonUtil._
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
 class ReindexRequestProcessorWorker @Inject()(
-  versionedDao: VersionedDao,
+  dynamoDbClient: AmazonDynamoDB,
   sqsStream: SQSStream[NotificationMessage],
   system: ActorSystem)
     extends Logging {
@@ -25,12 +26,14 @@ class ReindexRequestProcessorWorker @Inject()(
     for {
       reindexRequest <- Future.fromTry(
         fromJson[ReindexRequest](message.Message))
+      versionedDao = createVersionedDaoFor(reindexRequest)
       maybeReindexableRecord <- versionedDao.getRecord[ReindexableRecord](
         reindexRequest.id)
-      _ <- updateRecord(reindexRequest, maybeReindexableRecord)
+      _ <- updateRecord(versionedDao, reindexRequest, maybeReindexableRecord)
     } yield ()
 
   private def updateRecord(
+    versionedDao: VersionedDao,
     reindexRequest: ReindexRequest,
     maybeReindexableRecord: Option[ReindexableRecord]) = {
     maybeReindexableRecord match {
@@ -47,6 +50,15 @@ class ReindexRequestProcessorWorker @Inject()(
           s"VersionedDao has no record for $reindexRequest")
     }
   }
+
+  private def createVersionedDaoFor(reindexRequest: ReindexRequest): VersionedDao =
+    new VersionedDao(
+      dynamoDbClient = dynamoDbClient,
+      dynamoConfig = DynamoConfig(
+        table = reindexRequest.tableName,
+        maybeIndex = None
+      )
+    )
 
   def stop(): Future[Terminated] = system.terminate()
 }
