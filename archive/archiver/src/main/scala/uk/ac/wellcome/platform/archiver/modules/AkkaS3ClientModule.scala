@@ -8,13 +8,8 @@ import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider,
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archiver.models.AppConfig
 
-case class AppConfig(
-  awsS3AccessKey: String = "",
-  awsS3SecretKey: String = "",
-  awsS3Region: String = "eu-west-1",
-  awsS3Endpoint: String = ""
-)
 
 object AkkaS3ClientModule extends AbstractModule with Logging {
   def akkaS3Settings(credentialsProvider: AWSCredentialsProvider,
@@ -33,11 +28,11 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
   @Provides
   def providesAkkaS3Client(actorSystem: ActorSystem, appConfig: AppConfig): S3Client =
     buildAkkaS3Client(
-      region = appConfig.awsS3Region,
       actorSystem = actorSystem,
-      endpoint = appConfig.awsS3Region,
-      accessKey = appConfig.awsS3AccessKey,
-      secretKey = appConfig.awsS3SecretKey
+      region = appConfig.awsS3Region.toOption.get,
+      endpoint = appConfig.awsS3Region.toOption.get,
+      accessKey = appConfig.awsS3AccessKey.toOption.get,
+      secretKey = appConfig.awsS3SecretKey.toOption.get
     )
 
   def buildAkkaS3Client(region: String,
