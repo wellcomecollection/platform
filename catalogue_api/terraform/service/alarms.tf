@@ -3,7 +3,7 @@ locals {
 }
 
 module "alb_alarms" {
-  source           = "git::https://github.com/wellcometrust/terraform.git//cloudwatch/prebuilt/alb_alarms?ref=load-balanced-alarms"
+  source           = "git::https://github.com/wellcometrust/terraform.git//cloudwatch/prebuilt/alb_alarms?ref=v11.6.0"
   enable_alb_alarm = "${var.enable_alb_alarm}"
 
   service_name                 = "${var.name}"

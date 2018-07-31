@@ -49,7 +49,7 @@ module "task" {
 }
 
 module "service" {
-  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=load-balanced-alarms"
+  source = "git::https://github.com/wellcometrust/terraform.git//ecs/modules/service/prebuilt/load_balanced?ref=v11.6.0"
 
   service_name       = "${var.name}"
   task_desired_count = "${var.task_desired_count}"
