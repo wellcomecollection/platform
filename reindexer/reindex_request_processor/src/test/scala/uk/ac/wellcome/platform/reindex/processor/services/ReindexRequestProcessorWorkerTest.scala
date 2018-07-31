@@ -13,7 +13,7 @@ import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
-class ReindexWorkerServiceTest
+class ReindexRequestProcessorWorkerTest
     extends FunSpec
     with Akka
     with LocalDynamoDbVersioned
@@ -164,7 +164,7 @@ class ReindexWorkerServiceTest
   }
 
   private def withReindexWorkerService[R](table: Table, queue: Queue)(
-    testWith: TestWith[ReindexWorkerService, R]) = {
+    testWith: TestWith[ReindexRequestProcessorWorker, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withVersionedDao(table) { versionedDao =>
@@ -173,7 +173,7 @@ class ReindexWorkerServiceTest
             queue,
             metricsSender) { sqsStream =>
             val workerService =
-              new ReindexWorkerService(versionedDao, sqsStream, actorSystem)
+              new ReindexRequestProcessorWorker(versionedDao, sqsStream, actorSystem)
 
             try {
               testWith(workerService)

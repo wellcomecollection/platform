@@ -9,7 +9,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReindexWorkerService @Inject()(
+class ReindexRequestCreatorWorker @Inject()(
   readerService: RecordReader,
   notificationService: NotificationSender,
   system: ActorSystem,

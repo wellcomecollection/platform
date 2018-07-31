@@ -20,7 +20,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReindexWorkerServiceTest
+class ReindexRequestCreatorWorkerTest
     extends FunSpec
     with Matchers
     with MockitoSugar
@@ -32,7 +32,7 @@ class ReindexWorkerServiceTest
     with ScalaFutures {
 
   def withReindexWorkerService(table: Table, topic: Topic)(
-    testWith: TestWith[(ReindexWorkerService, QueuePair), Assertion]) = {
+    testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
@@ -54,7 +54,7 @@ class ReindexWorkerServiceTest
                   snsWriter = snsWriter
                 )
 
-                val workerService = new ReindexWorkerService(
+                val workerService = new ReindexRequestCreatorWorker(
                   readerService = readerService,
                   notificationService = notificationService,
                   sqsStream = sqsStream,
@@ -162,7 +162,7 @@ class ReindexWorkerServiceTest
                   snsWriter = snsWriter
                 )
 
-                new ReindexWorkerService(
+                new ReindexRequestCreatorWorker(
                   readerService = readerService,
                   notificationService = notificationService,
                   system = actorSystem,
