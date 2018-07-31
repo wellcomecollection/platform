@@ -12,6 +12,6 @@ trait MiroWorkType {
   def getWorkType: Option[WorkType] =
     Some(WorkType(
       id = "q",
-      label = "Digital Images"
+      label = "Digital images"
     ))
 }
