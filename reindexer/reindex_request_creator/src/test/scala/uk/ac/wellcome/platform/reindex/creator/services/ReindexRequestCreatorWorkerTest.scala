@@ -79,6 +79,10 @@ class ReindexRequestCreatorWorkerTest
         withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = ReindexJob(
+              dynamoConfig = DynamoConfig(
+                table = table.name,
+                index = table.index
+              ),
               shardId = "sierra/123",
               desiredVersion = 6
             )
@@ -170,6 +174,10 @@ class ReindexRequestCreatorWorkerTest
                 )
 
                 val reindexJob = ReindexJob(
+                  dynamoConfig = DynamoConfig(
+                    table = "doesnotexist",
+                    index = "whatindex?"
+                  ),
                   shardId = "sierra/444",
                   desiredVersion = 4
                 )

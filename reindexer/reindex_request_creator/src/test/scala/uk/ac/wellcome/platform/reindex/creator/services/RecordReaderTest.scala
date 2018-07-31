@@ -34,7 +34,11 @@ class RecordReaderTest
     reindexVersion = currentVersion
   )
 
-  val exampleReindexJob = ReindexJob(
+  def exampleReindexJob(table: Table) = ReindexJob(
+    dynamoConfig = DynamoConfig(
+      table = table.name,
+      index = table.index,
+    ),
     shardId = "sierra/000",
     desiredVersion = 2
   )
@@ -62,6 +66,10 @@ class RecordReaderTest
         val expectedRecordIds = List(olderRecord.id)
 
         val reindexJob = ReindexJob(
+          dynamoConfig = DynamoConfig(
+            table = table.name,
+            index = table.index,
+          ),
           shardId = shardName,
           desiredVersion = desiredVersion
         )
@@ -89,6 +97,10 @@ class RecordReaderTest
         )
 
         val reindexJob = ReindexJob(
+          dynamoConfig = DynamoConfig(
+            table = table.name,
+            index = table.index
+          ),
           shardId = shardName,
           desiredVersion = desiredVersion
         )
@@ -111,9 +123,10 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexRecordReaderService(Table("does-not-exist", "no-such-index")) {
+    val table = Table("does-not-exist", "no-such-index")
+    withReindexRecordReaderService(table) {
       service =>
-        val future = service.findRecordsForReindexing(exampleReindexJob)
+        val future = service.findRecordsForReindexing(exampleReindexJob(table))
         whenReady(future.failed) {
           _ shouldBe a[ResourceNotFoundException]
         }
@@ -129,7 +142,13 @@ class RecordReaderTest
       )
     )
 
-    val future = service.findRecordsForReindexing(exampleReindexJob)
+    val reindexJob = ReindexJob(
+      dynamoConfig = DynamoConfig(table = "mytable", maybeIndex = None),
+      shardId = "example/123",
+      desiredVersion = 1
+    )
+
+    val future = service.findRecordsForReindexing(reindexJob)
     whenReady(future.failed) {
       _ shouldBe a[ConfigurationException]
     }
