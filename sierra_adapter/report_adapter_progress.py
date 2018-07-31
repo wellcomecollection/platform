@@ -48,7 +48,13 @@ def get_matching_s3_keys(bucket, prefix=''):
         # The S3 API response is a large blob of metadata.
         # 'Contents' contains information about the listed objects.
         resp = s3.list_objects_v2(**kwargs)
-        for obj in resp['Contents']:
+
+        try:
+            contents = resp['Contents']
+        except KeyError:
+            contents = []
+
+        for obj in contents:
             yield obj['Key']
 
         # The S3 API is paginated, returning up to 1000 keys at a time.
