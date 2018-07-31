@@ -89,12 +89,10 @@ variable "deployment_minimum_healthy_percent" {
   default = "50"
 }
 
-variable "alb_cloudwatch_id" {
-}
-variable "alb_server_error_alarm_arn" {
-}
+variable "alb_cloudwatch_id" {}
 
-variable "alb_client_error_alarm_arn" {
-}
-variable "enable_alb_alarm" {
-}
+variable "alb_server_error_alarm_arn" {}
+
+variable "alb_client_error_alarm_arn" {}
+
+variable "enable_alb_alarm" {}

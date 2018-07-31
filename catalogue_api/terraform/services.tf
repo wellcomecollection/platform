@@ -23,10 +23,10 @@ locals {
   remus_hostname   = "${local.remus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
   romulus_hostname = "${local.romulus_is_prod == "true" ? var.api_prod_host : var.api_stage_host}"
 
-  remus_task_number = "${local.remus_is_prod == "true" ? 3 : 1}"
-  romulus_task_number ="${local.romulus_is_prod == "true" ? 3 : 1}"
+  remus_task_number   = "${local.remus_is_prod == "true" ? 3 : 1}"
+  romulus_task_number = "${local.romulus_is_prod == "true" ? 3 : 1}"
 
-  remus_enable_alb_alarm = "${local.remus_is_prod == "true" ? 1 : 0}"
+  remus_enable_alb_alarm   = "${local.remus_is_prod == "true" ? 1 : 0}"
   romulus_enable_alb_alarm = "${local.romulus_is_prod == "true" ? 1 : 0}"
 }
 
@@ -51,11 +51,11 @@ module "api_romulus_delta" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
   es_config              = "${var.es_config_romulus}"
 
-  task_desired_count = "${local.romulus_task_number}"
-  enable_alb_alarm = "${local.romulus_enable_alb_alarm}"
+  task_desired_count         = "${local.romulus_task_number}"
+  enable_alb_alarm           = "${local.romulus_enable_alb_alarm}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-  alb_cloudwatch_id = "${module.load_balancer.cloudwatch_id}"
+  alb_cloudwatch_id          = "${module.load_balancer.cloudwatch_id}"
 }
 
 module "api_remus_delta" {
@@ -79,9 +79,9 @@ module "api_remus_delta" {
   es_cluster_credentials = "${var.es_cluster_credentials}"
   es_config              = "${var.es_config_remus}"
 
-  task_desired_count = "${local.remus_task_number}"
-  alb_cloudwatch_id = "${module.load_balancer.cloudwatch_id}"
+  task_desired_count         = "${local.remus_task_number}"
+  alb_cloudwatch_id          = "${module.load_balancer.cloudwatch_id}"
   alb_server_error_alarm_arn = "${local.alb_server_error_alarm_arn}"
   alb_client_error_alarm_arn = "${local.alb_client_error_alarm_arn}"
-  enable_alb_alarm = "${local.remus_enable_alb_alarm}"
+  enable_alb_alarm           = "${local.remus_enable_alb_alarm}"
 }
