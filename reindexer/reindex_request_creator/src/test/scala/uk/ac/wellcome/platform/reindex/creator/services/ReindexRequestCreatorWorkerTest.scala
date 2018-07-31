@@ -11,6 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
@@ -27,6 +28,7 @@ class ReindexRequestCreatorWorkerTest
     with Akka
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
+    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
@@ -78,11 +80,8 @@ class ReindexRequestCreatorWorkerTest
       withLocalSnsTopic { topic =>
         withReindexWorkerService(table, topic) {
           case (service, QueuePair(queue, dlq)) =>
-            val reindexJob = ReindexJob(
-              dynamoConfig = DynamoConfig(
-                table = table.name,
-                index = table.index
-              ),
+            val reindexJob = createReindexJobWith(
+              table = table,
               shardId = "sierra/123",
               desiredVersion = 6
             )
@@ -173,13 +172,11 @@ class ReindexRequestCreatorWorkerTest
                   sqsStream = sqsStream
                 )
 
-                val reindexJob = ReindexJob(
+                val reindexJob = createReindexJobWith(
                   dynamoConfig = DynamoConfig(
                     table = "doesnotexist",
                     index = "whatindex?"
-                  ),
-                  shardId = "sierra/444",
-                  desiredVersion = 4
+                  )
                 )
 
                 sendNotificationToSQS(

@@ -6,7 +6,7 @@ import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -20,7 +20,8 @@ class RecordReaderTest
     with ScalaFutures
     with Matchers
     with LocalDynamoDbVersioned
-    with ExtendedPatience {
+    with ExtendedPatience
+    with ReindexFixtures {
 
   val shardName = "shard"
   val currentVersion = 1
@@ -32,15 +33,6 @@ class RecordReaderTest
     someData = "A ghastly gharial ganking a green golem.",
     reindexShard = shardName,
     reindexVersion = currentVersion
-  )
-
-  def exampleReindexJob(table: Table) = ReindexJob(
-    dynamoConfig = DynamoConfig(
-      table = table.name,
-      index = table.index,
-    ),
-    shardId = "sierra/000",
-    desiredVersion = 2
   )
 
   it("only selects records with an out-of-date reindex version") {
@@ -65,11 +57,8 @@ class RecordReaderTest
 
         val expectedRecordIds = List(olderRecord.id)
 
-        val reindexJob = ReindexJob(
-          dynamoConfig = DynamoConfig(
-            table = table.name,
-            index = table.index,
-          ),
+        val reindexJob = createReindexJobWith(
+          table = table,
           shardId = shardName,
           desiredVersion = desiredVersion
         )
@@ -96,11 +85,8 @@ class RecordReaderTest
           exampleRecord.copy(id = "id4", reindexShard = "not_the_same_shard")
         )
 
-        val reindexJob = ReindexJob(
-          dynamoConfig = DynamoConfig(
-            table = table.name,
-            index = table.index
-          ),
+        val reindexJob = createReindexJobWith(
+          table = table,
           shardId = shardName,
           desiredVersion = desiredVersion
         )
@@ -126,7 +112,7 @@ class RecordReaderTest
     val table = Table("does-not-exist", "no-such-index")
     withReindexRecordReaderService(table) {
       service =>
-        val future = service.findRecordsForReindexing(exampleReindexJob(table))
+        val future = service.findRecordsForReindexing(createReindexJobWith(table))
         whenReady(future.failed) {
           _ shouldBe a[ResourceNotFoundException]
         }
@@ -142,10 +128,11 @@ class RecordReaderTest
       )
     )
 
-    val reindexJob = ReindexJob(
-      dynamoConfig = DynamoConfig(table = "mytable", maybeIndex = None),
-      shardId = "example/123",
-      desiredVersion = 1
+    val reindexJob = createReindexJobWith(
+      dynamoConfig = DynamoConfig(
+        table = "mytable",
+        maybeIndex = None
+      )
     )
 
     val future = service.findRecordsForReindexing(reindexJob)
