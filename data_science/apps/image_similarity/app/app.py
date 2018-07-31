@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect, send_from_directory
+from flask import Flask, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 import numpy as np
