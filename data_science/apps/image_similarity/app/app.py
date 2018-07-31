@@ -62,10 +62,11 @@ class feature_similarity(Resource):
                         'response': feature_similarity_dict[query_id]})
 
 
+
 # Define endpoints
-api.add_resource(palette, '/api/palette/<string:query_id>')
-api.add_resource(palette_similarity, '/api/palette_similarity/<string:query_id>')
-api.add_resource(feature_similarity, '/api/feature_similarity/<string:query_id>')
+api.add_resource(palette, '/image_similarity/api/palette/<string:query_id>')
+api.add_resource(palette_similarity, '/image_similarity/api/palette_similarity/<string:query_id>')
+api.add_resource(feature_similarity, '/image_similarity/api/feature_similarity/<string:query_id>')
 
 
 if __name__ == '__main__':
