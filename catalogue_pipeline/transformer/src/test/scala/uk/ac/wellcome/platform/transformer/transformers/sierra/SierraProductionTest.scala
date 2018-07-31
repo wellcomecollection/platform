@@ -12,27 +12,6 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
     transformToProduction(varFields = List()) shouldBe List()
   }
 
-  it("throws an error if both 260 and 264 are present") {
-    transformVarFieldsAndAssertIsError(
-      varFields = List(
-        VarField(
-          marcTag = Some("260"),
-          fieldTag = "p",
-          subfields = List(
-            MarcSubfield(tag = "a", content = "Paris")
-          )
-        ),
-        VarField(
-          marcTag = Some("264"),
-          fieldTag = "p",
-          subfields = List(
-            MarcSubfield(tag = "a", content = "London")
-          )
-        )
-      )
-    )
-  }
-
   // Examples are taken from the MARC spec for field 260.
   // https://www.loc.gov/marc/bibliographic/bd260.html
 
@@ -396,6 +375,27 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   }
 
   describe("Both MARC field 260 and 264") {
+    it("throws an error if both 260 and 264 are present") {
+      transformVarFieldsAndAssertIsError(
+        varFields = List(
+          VarField(
+            marcTag = Some("260"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "Paris")
+            )
+          ),
+          VarField(
+            marcTag = Some("264"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "London")
+            )
+          )
+        )
+      )
+    }
+
     it(
       "uses field 260 if field 264 only contains a copyright statement in subfield c") {
       val varFields = List(
