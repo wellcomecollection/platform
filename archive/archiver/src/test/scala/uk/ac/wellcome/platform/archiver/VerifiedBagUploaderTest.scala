@@ -4,8 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 
 class VerifiedBagUploaderTest

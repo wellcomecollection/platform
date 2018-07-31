@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archiver
+package uk.ac.wellcome.platform.archiver.modules
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
