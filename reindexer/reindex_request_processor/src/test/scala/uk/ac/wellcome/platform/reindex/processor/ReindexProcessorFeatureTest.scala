@@ -19,7 +19,7 @@ class ReindexProcessorFeatureTest
   it("processes a ReindexRequest") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
-        withServer(sqsLocalFlags(queue) ++ dynamoDbLocalEndpointFlags(table)) {
+        withServer(sqsLocalFlags(queue) ++ dynamoClientLocalFlags) {
           _ =>
             val id = "sierra/1234567"
             val record =
