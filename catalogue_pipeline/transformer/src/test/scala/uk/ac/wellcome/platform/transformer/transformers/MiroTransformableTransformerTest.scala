@@ -280,7 +280,8 @@ class MiroTransformableTransformerTest
     work.workType.get.label shouldBe "Digital images"
   }
 
-  private def assertTransformReturnsInvisibleWork(data: String) = {
+  private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
+                                                  data: String) = {
     val miroTransformable = MiroTransformable(
       sourceId = miroId,
       MiroCollection = "TestCollection",
