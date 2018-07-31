@@ -35,7 +35,7 @@ feature_similarity_dict = dict(zip(image_ids_features, feature_values))
 class palette(Resource):
     def get(self, query_id):
         '''
-        return the colour palette of the query image as a numpy array of shape 
+        return the colour palette of the query image as a numpy array of shape
         (5, 3), corresponding to 5 3-channel (RGB) colours
         '''
         return jsonify({'request': query_id,
