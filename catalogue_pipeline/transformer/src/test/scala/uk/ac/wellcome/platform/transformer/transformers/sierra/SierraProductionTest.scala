@@ -15,8 +15,20 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   it("throws an error if both 260 and 264 are present") {
     transformVarFieldsAndAssertIsError(
       varFields = List(
-        VarField(marcTag = Some("260"), fieldTag = "a"),
-        VarField(marcTag = Some("264"), fieldTag = "a")
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "Paris")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "London")
+          )
+        )
       )
     )
   }
