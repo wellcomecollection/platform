@@ -150,7 +150,7 @@ trait SierraProduction {
   private def marc264OnlyContainsCopyright(marc264fields: List[VarField]): Boolean =
     marc264fields match {
       case List(
-        VarField(_, _, Some("260"), _, _, , List(MarcSubfield("c", content)))) =>
+        VarField(_, _, Some("264"), _, _, List(MarcSubfield("c", content)))) =>
         content.matches("^©\\d{4}$")
       case _ => false
     }
