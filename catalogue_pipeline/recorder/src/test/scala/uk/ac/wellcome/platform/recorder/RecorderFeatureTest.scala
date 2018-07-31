@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.recorder
 
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.Messaging
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil

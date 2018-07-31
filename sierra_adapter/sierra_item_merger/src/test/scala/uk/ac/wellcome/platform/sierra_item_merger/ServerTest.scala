@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_item_merger
 
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
 class ServerTest
