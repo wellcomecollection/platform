@@ -56,7 +56,7 @@ case class UnidentifiedWork(
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[Identifiable[Item]],
+  items: List[MaybeDisplayable[Item]],
   version: Int,
   ontologyType: String = "Work",
   identifiedType: String = classOf[IdentifiedWork].getSimpleName)
@@ -82,7 +82,7 @@ case class IdentifiedWork(
   production: List[ProductionEvent[Displayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[Identified[Item]],
+  items: List[Displayable[Item]],
   version: Int,
   ontologyType: String = "Work")
     extends Work

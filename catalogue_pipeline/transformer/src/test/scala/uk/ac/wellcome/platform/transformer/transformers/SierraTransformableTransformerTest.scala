@@ -21,7 +21,7 @@ class SierraTransformableTransformerTest
     with WorksUtil {
   val transformer = new SierraTransformableTransformer
 
-  it("performs a transformation on a work with items") {
+  it("performs a transformation on a work with physical items") {
     val itemRecords = List(
       createSierraItemRecord,
       createSierraItemRecord
@@ -47,7 +47,7 @@ class SierraTransformableTransformerTest
     val actualIdentifiers = work
       .asInstanceOf[UnidentifiedWork]
       .items
-      .map { _.sourceIdentifier }
+      .map { _.asInstanceOf[Identifiable[Item]].sourceIdentifier }
 
     actualIdentifiers should contain theSameElementsAs expectedIdentifiers
   }

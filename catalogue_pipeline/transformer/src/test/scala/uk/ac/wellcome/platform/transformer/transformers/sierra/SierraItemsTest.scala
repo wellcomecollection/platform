@@ -120,8 +120,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       )
 
       val expectedItems = List(
-        Identifiable(
-          sourceIdentifier = sourceIdentifier,
+        Unidentifiable(
           agent = Item(
             locations = List(DigitalLocation(
               url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
