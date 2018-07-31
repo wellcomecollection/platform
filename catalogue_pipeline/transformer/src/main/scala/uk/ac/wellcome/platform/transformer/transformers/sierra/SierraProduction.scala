@@ -147,6 +147,14 @@ trait SierraProduction {
         )
       }
 
+  private def marc264OnlyContainsCopyright(marc264fields: List[VarField]): Boolean =
+    marc264fields match {
+      case List(
+        VarField(_, _, Some("260"), _, _, , List(MarcSubfield("c", content)))) =>
+        content.matches("^©\\d{4}$")
+      case _ => false
+    }
+
   /** Populate the production data if both 260 and 264 are present.
     *
     * In general, this is a cataloguing error, but sometimes we can do
@@ -161,21 +169,22 @@ trait SierraProduction {
     //
     // or similar, and the 260 field is populated.  In that case, we can
     // discard the 264 and just use the 260 fields.
-    if (marc264fields.length == 1 &&
-        marc264fields.head.subfields.length == 1 &&
-        marc264fields.head.subfields.head.tag == "c" &&
-        marc264fields.head.subfields.head.content.matches("^©\\d+$")) {
+    if (marc264OnlyContainsCopyright(marc264fields)) {
       getProductionFrom260Fields(marc260fields)
     }
 
     // We've also seen cases where the 260 and 264 field are both present,
     // and they have matching subfields!  We use the 260 field as it's not
     // going to throw an exception about unrecognised second indicator.
-    else if (marc260fields.map { _.subfields } == marc264fields.map {
-               _.subfields
-             }) {
+    else if (
+      marc260fields.map { _.subfields } ==
+        marc264fields.map { _.subfields }) {
       getProductionFrom260Fields(marc260fields)
-    } else {
+    }
+
+    // Otherwise this is some sort of cataloguing error.  This is fairly
+    // rare, so let it bubble on to a DLQ.
+    else {
       throw GracefulFailureException(
         new RuntimeException(
           "Record has both 260 and 264 fields; this is a cataloguing error."
