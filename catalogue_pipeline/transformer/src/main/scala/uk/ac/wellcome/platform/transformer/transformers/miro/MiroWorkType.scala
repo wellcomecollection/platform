@@ -10,8 +10,9 @@ trait MiroWorkType {
     * when we sort out work types properly, but it'll do for now.
     */
   def getWorkType: Option[WorkType] =
-    Some(WorkType(
-      id = "q",
-      label = "Digital images"
-    ))
+    Some(
+      WorkType(
+        id = "q",
+        label = "Digital images"
+      ))
 }
