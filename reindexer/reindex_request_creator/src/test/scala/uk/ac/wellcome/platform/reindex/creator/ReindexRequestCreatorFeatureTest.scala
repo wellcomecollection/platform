@@ -67,7 +67,8 @@ class ReindexRequestCreatorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoClientLocalFlags ++ sqsLocalFlags(queue)
+          val flags = snsLocalFlags(topic) ++ dynamoClientLocalFlags ++ sqsLocalFlags(
+            queue)
 
           withServer(flags) { _ =>
             val reindexJob = createReindexJobWith(

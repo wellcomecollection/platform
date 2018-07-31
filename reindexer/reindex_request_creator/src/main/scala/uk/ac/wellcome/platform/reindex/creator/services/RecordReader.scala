@@ -19,7 +19,8 @@ import scala.util.Try
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(implicit ec: ExecutionContext)
+class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
+  implicit ec: ExecutionContext)
     extends Logging {
 
   def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {

@@ -109,13 +109,12 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    withReindexRecordReaderService {
-      service =>
-        val future = service.findRecordsForReindexing(
-          createReindexJobWith(Table("does-not-exist", "no-such-index")))
-        whenReady(future.failed) {
-          _ shouldBe a[ResourceNotFoundException]
-        }
+    withReindexRecordReaderService { service =>
+      val future = service.findRecordsForReindexing(
+        createReindexJobWith(Table("does-not-exist", "no-such-index")))
+      whenReady(future.failed) {
+        _ shouldBe a[ResourceNotFoundException]
+      }
     }
   }
 

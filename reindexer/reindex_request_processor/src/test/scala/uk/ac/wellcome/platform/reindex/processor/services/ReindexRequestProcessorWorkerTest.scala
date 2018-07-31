@@ -190,21 +190,19 @@ class ReindexRequestProcessorWorkerTest
     testWith: TestWith[ReindexRequestProcessorWorker, R]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
-        withSQSStream[NotificationMessage, R](
-          actorSystem,
-          queue,
-          metricsSender) { sqsStream =>
-          val workerService = new ReindexRequestProcessorWorker(
-            dynamoDbClient = dynamoDbClient,
-            sqsStream = sqsStream,
-            system = actorSystem
-          )
+        withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
+          sqsStream =>
+            val workerService = new ReindexRequestProcessorWorker(
+              dynamoDbClient = dynamoDbClient,
+              sqsStream = sqsStream,
+              system = actorSystem
+            )
 
-          try {
-            testWith(workerService)
-          } finally {
-            workerService.stop()
-          }
+            try {
+              testWith(workerService)
+            } finally {
+              workerService.stop()
+            }
         }
       }
     }

@@ -51,7 +51,8 @@ class ReindexRequestProcessorWorker @Inject()(
     }
   }
 
-  private def createVersionedDaoFor(reindexRequest: ReindexRequest): VersionedDao =
+  private def createVersionedDaoFor(
+    reindexRequest: ReindexRequest): VersionedDao =
     new VersionedDao(
       dynamoDbClient = dynamoDbClient,
       dynamoConfig = DynamoConfig(

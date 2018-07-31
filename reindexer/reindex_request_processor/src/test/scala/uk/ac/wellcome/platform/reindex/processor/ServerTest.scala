@@ -14,12 +14,11 @@ class ServerTest
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
-        withServer(sqsLocalFlags(queue) ++ dynamoClientLocalFlags) {
-          server =>
-            server.httpGet(
-              path = "/management/healthcheck",
-              andExpect = Ok,
-              withJsonBody = """{"message": "ok"}""")
+        withServer(sqsLocalFlags(queue) ++ dynamoClientLocalFlags) { server =>
+          server.httpGet(
+            path = "/management/healthcheck",
+            andExpect = Ok,
+            withJsonBody = """{"message": "ok"}""")
         }
       }
     }
