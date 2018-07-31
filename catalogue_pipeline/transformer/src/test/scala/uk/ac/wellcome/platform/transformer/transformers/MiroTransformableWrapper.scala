@@ -26,7 +26,7 @@ trait MiroTransformableWrapper
       }"""
 
   def transformWork(
-    data: String,
+    data: String = "",
     MiroID: String = "M0000001",
     MiroCollection: String = "TestCollection"
   ): UnidentifiedWork = {

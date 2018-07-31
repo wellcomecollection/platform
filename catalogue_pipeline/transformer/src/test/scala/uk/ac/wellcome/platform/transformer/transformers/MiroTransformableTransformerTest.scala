@@ -273,6 +273,12 @@ class MiroTransformableTransformerTest
     work.items.head.agent.locations shouldBe List(expectedDigitalLocation)
   }
 
+  it("sets the WorkType as 'Digital Images'") {
+    val work = transformWork()
+    work.workType.isDefined shouldBe true
+    work.workType.get.label shouldBe "Digital Images"
+  }
+
   private def assertTransformReturnsInvisibleWork(data: String) = {
     val miroTransformable = MiroTransformable(
       sourceId = "G0000001",
