@@ -5,6 +5,8 @@ module "shard_generator_lambda" {
   s3_bucket = "${var.infra_bucket}"
   s3_key    = "lambdas/reindexer/reindex_shard_generator.zip"
 
+  module_name = "reindex_shard_generator"
+
   description = "Generate reindexShards for items in the ${var.vhs_table_name} table"
 
   timeout = 60
