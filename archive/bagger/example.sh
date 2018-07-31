@@ -18,5 +18,6 @@ export DLCS_SPACE='99'
 # DDS credentials
 export DDS_API_KEY='xxxx'
 export DDS_API_SECRET='xxxx'
+export DDS_ASSET_PREFIX='...'
 
 python bagger.py $1

@@ -4,6 +4,7 @@ import shutil
 import logging
 import xml.etree.ElementTree as ET
 import boto3
+from botocore.exceptions import ClientError
 import bagit
 import requests
 import settings
@@ -12,20 +13,36 @@ import dlcs
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-# digiflow is made up
+# premis is the addition
 namespaces = {
     'mets': 'http://www.loc.gov/METS/',
     'mods': 'http://www.loc.gov/mods/v3',
     'tessella': 'http://www.tessella.com/transfer',
     'dv': 'http://dfg-viewer.de/',
     'xlink': 'http://www.w3.org/1999/xlink',
-    'digiflow': 'http://wellcomecollection.org/ns/digiflow'
+    'premis': 'http://www.loc.gov/premis/v3'
+}
+
+# to be added to...
+pronom = {
+    "JP2 (JPEG 2000 part 1)": "x-fmt/392"
+}
+
+# map of tessella names to premis names
+# also, presence in here means we want it in new version
+significant_props = {
+    "Image Width": "ImageWidth",
+    "Image Height": "ImageHeight"
 }
 
 for prefix, namespace in namespaces.items():
     ET.register_namespace(prefix, namespace)
 
 boto_session = None
+
+# keep track of these to ensure no collisions in Multiple Manifestations
+ALTO_KEYS = set()
+OBJECT_KEYS = set()
 
 
 def main():
@@ -89,7 +106,7 @@ def main():
         # files match this order
 
         logging.info("writing new anchor file to bag")
-        tree.write(root_mets_file, encoding="utf-8")
+        tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
         # then go through the linked files _0001 etc
         for rel_path in manifestation_relative_paths:
             full_path = bag_info["mets_partial_path"] + rel_path[0]
@@ -106,11 +123,12 @@ def main():
             parts = rel_path[0].split("/")
             manifestation_file = os.path.join(bag_info["directory"], *parts)
             logging.info("writing manifestation to bag: " + manifestation_file)
-            mf_tree.write(manifestation_file, encoding="utf-8")
+            mf_tree.write(manifestation_file, encoding="utf-8",
+                          xml_declaration=True)
 
     elif mets.is_manifestation(struct_type):
         process_manifestation(root, bag_info)
-        tree.write(root_mets_file, encoding="utf-8")
+        tree.write(root_mets_file, encoding="utf-8", xml_declaration=True)
 
     else:
         raise ValueError("Unknown struct type: " + struct_type)
@@ -149,7 +167,7 @@ def ensure_file_pointers(struct_div):
 def process_manifestation(root, bag_info):
 
     # lots of validation work to do in all of these!!!
-    remodel_deliverable_unit(root)
+    remove_deliverable_unit(root)
     remodel_file_technical_metadata(root)
     remodel_file_section(root)
     assets, alto = get_physical_file_maps(root)
@@ -221,22 +239,57 @@ def dispatch_bag(bag_info):
     logging.info("upload completed")
 
 
-def remodel_deliverable_unit(root):
+def remove_deliverable_unit(root):
     logging.info("Looking at DeliverableUnit")
     x_path = ".//mets:xmlData[tessella:DeliverableUnit]"
     du_xmldata = root.findall(x_path, namespaces)
     if len(du_xmldata) != 1:
         raise KeyError("Expecting one DeliverableUnit XML block")
 
-    # Where does the PurposeName come from?
-    # the ID comes from Preservica (?) and can be dropped?
-    new_deliverablue_unit = make_child_with_whitespace(
-        du_xmldata[0], get_expanded_form("digiflow", "DeliverableUnit"))
-    purpose_name_element = make_child_with_whitespace(
-        new_deliverablue_unit, get_expanded_form("digiflow", "PurposeName"))
-    purpose_name_element.text = du_xmldata[0][0].find(
-        "tessella:PurposeName", namespaces).text
-    remove_first_child(du_xmldata[0])
+    # We need to remove the AMD for the DeliverableUnit, then renumber
+    # the AMD to start at _0001
+    
+    # <mets:amdSec ID="AMD">
+    #   <mets:techMD ID="AMD_0001">        <== remove this...
+    #     <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml">
+    #       <mets:xmlData>
+    #         <tessella:DeliverableUnit>   <== having found this
+
+    amd_sec = root.find("./mets:amdSec[@ID='AMD']", namespaces)
+    # assume the first tech_md is the deliverable unit - if it isn't,
+    # this is an unusual METS so we should bail out at this point anyway
+    du = amd_sec[0].find("./mets:mdWrap/mets:xmlData/[tessella:DeliverableUnit]", namespaces)
+    assert du is not None, "The first techMD is not the deliverable unit"
+    amd_sec.remove(amd_sec[0]) 
+
+    counter = 1
+    ignore = ["RIGHTS", "DIGIPROV"]
+    for tech_md in amd_sec:
+        old_id = tech_md.get("ID")
+        if old_id in ignore:
+            continue
+        new_id = "AMD_" + str(counter).zfill(4)
+        tech_md.set("ID", new_id)
+        refs = root.findall(".//mets:div[@ADMID='{0}']".format(old_id), namespaces)
+        assert len(refs) == 1, "Expected 1 AMD ref for {0}, got {1}".format(old_id, len(refs))
+        refs[0].set("ADMID", new_id)
+        counter = counter + 1
+
+
+def add_premis_identifier(premis_file, p_type, value):
+    oid = make_child_with_whitespace(premis_file, get_expanded_form("premis", "objectIdentifier"))
+    p_type_el = make_child_with_whitespace(oid, get_expanded_form("premis", "objectIdentifierType"))
+    p_type_el.text = p_type
+    value_el = make_child_with_whitespace(oid, get_expanded_form("premis", "objectIdentifierValue"))
+    value_el.text = value
+
+
+def add_premis_significant_prop(premis_file, p_type, value):
+    oid = make_child_with_whitespace(premis_file, get_expanded_form("premis", "significantProperties"))
+    p_type_el = make_child_with_whitespace(oid, get_expanded_form("premis", "significantPropertiesType"))
+    p_type_el.text = p_type
+    value_el = make_child_with_whitespace(oid, get_expanded_form("premis", "significantPropertiesValue"))
+    value_el.text = value
 
 
 def remodel_file_technical_metadata(root):
@@ -245,50 +298,64 @@ def remodel_file_technical_metadata(root):
     tessella_file_xmldata = root.findall(x_path, namespaces)
     for xmldata in tessella_file_xmldata:
         tessella_file = xmldata[0]
-        new_file = make_child_with_whitespace(
-            xmldata, get_expanded_form("digiflow", "File"))
-        carried_over_properties = [
-            "FileName",
-            "Folder",
-            "FormatName",
-            "FileSize",
-            "Checksum",
-            "ChecksumAlgorithmRef"
-        ]
-        for prop in carried_over_properties:
-            copy_simple_value_child(tessella_file, "tessella:" + prop,
-                                    new_file, get_expanded_form("digiflow", prop))
-        # we'll remove this one later
-        copy_simple_value_child(
-            tessella_file, "tessella:ID", new_file,
-            get_expanded_form("digiflow", "preservicaGuid"))
+        premis_file = make_child_with_whitespace(
+            xmldata, get_expanded_form("premis", "object"))
 
-        remove_first_child(xmldata)
+        premis_file.set("xsi:type", "premis:file")
+        # These v3 schemas conflict with the v2 asserted in the exsiting METS,
+        # but fix that later
+        premis_file.set("xsi:schemaLocation", "http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd")
+        premis_file.set("version", "3.0")
+        
+        file_name = tessella_file.find("tessella:FileName", namespaces).text
+        add_premis_identifier(premis_file, "local", file_name)
+        checksum = tessella_file.find("tessella:ID", namespaces).text
+        add_premis_identifier(premis_file, "uuid", checksum)
+
         file_properties = tessella_file.findall(
-            "tessella:FileProperty", namespaces)
-        to_copy = ["Image Height", "Image Width"]  # more to come
+            "tessella:FileProperty", namespaces)        
+        to_copy = significant_props.keys()
         for file_property in file_properties:
             name = file_property.find(
                 "tessella:FilePropertyName", namespaces).text.strip()
             if name in to_copy:
                 value = file_property.find(
                     "tessella:Value", namespaces).text.strip()
-                new_prop = make_child_with_whitespace(
-                    new_file, get_expanded_form("digiflow", "FileProperty"))
-                make_child_with_whitespace(
-                    new_prop, get_expanded_form("digiflow", "FilePropertyName")).text = name
-                make_child_with_whitespace(
-                    new_prop, get_expanded_form("digiflow", "Value")).text = value
+                premis_name = significant_props[name]
+                add_premis_significant_prop(premis_file, premis_name, value)
+
+        characteristics = make_child_with_whitespace(premis_file, get_expanded_form("premis", "objectCharacteristics"))
+        composition_level = make_child_with_whitespace(characteristics, get_expanded_form("premis", "compositionLevel"))
+        composition_level.text = 0 # ??
+        fixity =  make_child_with_whitespace(characteristics, get_expanded_form("premis", "fixity"))
+        algorithm = make_child_with_whitespace(fixity, get_expanded_form("premis", "messageDigestAlgorithm"))
+        algorithm.text = tessella_file.find("tessella:ChecksumAlgorithmRef", namespaces).text
+        messageDigest = make_child_with_whitespace(fixity, get_expanded_form("premis", "messageDigest"))
+        messageDigest.text = tessella_file.find("tessella:Checksum", namespaces).text
+        file_size = make_child_with_whitespace(characteristics, get_expanded_form("premis", "size"))
+        file_size.text = tessella_file.find("tessella:FileSize", namespaces).text
+        p_format = make_child_with_whitespace(characteristics, get_expanded_form("premis", "format"))
+        format_designation = make_child_with_whitespace(p_format, get_expanded_form("premis", "formatDesignation"))
+        format_name = make_child_with_whitespace(format_designation, get_expanded_form("premis", "formatName"))
+        format_name.text = tessella_file.find("tessella:FormatName", namespaces).text
+        format_registry = make_child_with_whitespace(p_format, get_expanded_form("premis", "formatRegistry"))
+        format_registry_name = make_child_with_whitespace(format_registry, get_expanded_form("premis", "formatRegistryName"))
+        format_registry_name.text = "PRONOM" # assume this is always used
+        format_registry_key = make_child_with_whitespace(format_registry, get_expanded_form("premis", "formatRegistryKey"))
+        format_registry_key.text = pronom[format_name.text] # allow this to raise error!
+
+        
+        remove_first_child(xmldata)
 
 
 def remodel_file_section(root):
     logging.info("transforming file section")
     sdb_file_group = root.find(
         "./mets:fileSec/mets:fileGrp[@USE='SDB']", namespaces)
-    sdb_file_group.set('USE', 'BAGGER')
+    sdb_file_group.set('USE', 'OBJECTS')
     for sdb_file in sdb_file_group:
         sdb_file_id = sdb_file.get("ID")
-        bag_file_id = sdb_file_id.replace("_SDB", "_BAG")
+        bag_file_id = sdb_file_id.replace("_SDB", "_OBJECTS")
         if sdb_file_id == bag_file_id:
             # OK, but what is the strategy here...?
             # This will be OK for experiments
@@ -320,25 +387,14 @@ def collect_alto(root, bag_info, alto):
         source_bucket = s3.Bucket(settings.METS_BUCKET_NAME)
 
     for file_element in alto_file_group:
-        locator = file_element[0]
-        current_location = locator.get(get_expanded_form("xlink", "href"))
-        # for now, preserve the folder names in the current METS
-        desired_relative_location = "alto/{0}".format(current_location)
-        locator.set(get_expanded_form("xlink", "href"),
-                    desired_relative_location)
-        logging.info("updated ALTO path in METS to " +
-                     desired_relative_location)
-        alto_path_parts = desired_relative_location.split("/")
-        # the local temp assembly area
-        destination = os.path.join(bag_info["directory"], *alto_path_parts)
-        ensure_directory(destination)
+        current_location, destination = get_flattened_destination(
+            file_element, ALTO_KEYS, "alto", bag_info)
 
         if settings.METS_FILESYSTEM_ROOT:
             # Not likely to be used much, only for running against Windows file share
-            partial_path_parts = bag_info["mets_partial_path"].split(
-                get_separator()) + alto_path_parts
+
             source = os.path.join(
-                settings.METS_FILESYSTEM_ROOT, *partial_path_parts)
+                settings.METS_FILESYSTEM_ROOT, bag_info["mets_partial_path"], current_location)
             logging.info("Copying alto from {0} to {1}".format(
                 source, destination))
             shutil.copyfile(source, destination)
@@ -349,6 +405,23 @@ def collect_alto(root, bag_info, alto):
             source_bucket.download_file(source, destination)
 
 
+def get_flattened_destination(file_element, keys, folder, bag_info):
+    locator = file_element[0]
+    current_location = locator.get(get_expanded_form("xlink", "href"))
+    # we want to flatten the multiple manifestation directory structure
+    # so that all the ALTOs/objects are in the same directory
+    file_name = current_location.split("/")[-1]
+    keys.add(file_name)  # let this raise error if duplicate
+    desired_relative_location = "{0}/{1}".format(folder, file_name)
+    locator.set(get_expanded_form("xlink", "href"),
+                desired_relative_location)
+    logging.info("updated path in METS to " + desired_relative_location)
+    # the local temp assembly area
+    destination = os.path.join(bag_info["directory"], folder, file_name)
+    ensure_directory(destination)
+    return current_location, destination
+
+
 def collect_assets(root, bag_info, assets):
 
     logging.info("Collecting assets for " + bag_info["b_number"])
@@ -357,29 +430,21 @@ def collect_assets(root, bag_info, assets):
     chunk_size = 1024*1024
 
     asset_file_group = root.find(
-        "./mets:fileSec/mets:fileGrp[@USE='BAGGER']", namespaces)
+        "./mets:fileSec/mets:fileGrp[@USE='OBJECTS']", namespaces)
     for file_element in asset_file_group:
-        locator = file_element[0]
-        current_location = locator.get(get_expanded_form("xlink", "href"))
-        desired_relative_location = "objects/{0}".format(current_location)
-        locator.set(get_expanded_form("xlink", "href"),
-                    desired_relative_location)
-        logging.info("updated asset path in METS to " +
-                     desired_relative_location)
-        asset_path_parts = desired_relative_location.split("/")
-        # the local temp assembly area
-        destination = os.path.join(bag_info["directory"], *asset_path_parts)
-        ensure_directory(destination)
-
+        current_location, destination = get_flattened_destination(
+            file_element, OBJECT_KEYS, "objects", bag_info)
+        # current_location is not used for objects - they're not where
+        # the METS says they are! They are in Preservica instead.
+        # but, when bagged, they _will_ be where the METS says they are.
         summary = assets[file_element.get("ID")]
         tech_md = summary["tech_md"]
-        checksum_1 = file_element.get("CHECKSUM")
-        checksum_2 = tech_md["Checksum"]
-        assert checksum_1 == checksum_2, "Checksums don't match"
-        preservica_guid = tech_md["preservicaGuid"]
+        checksum = file_element.get("CHECKSUM")
+        file_element.attrib.pop("CHECKSUM") # don't need it now
+        pres_uuid = tech_md["uuid"]
         logging.info(
-            "Need to determine where to get {0} from.".format(preservica_guid))
-        image_info = dlcs.get_image(preservica_guid)
+            "Need to determine where to get {0} from.".format(pres_uuid))
+        image_info = dlcs.get_image(pres_uuid)
         origin = image_info["origin"]
         logging.info("DLCS reports origin " + origin)
         # if the origin is wellcomelibrary.org, the object is LIKELY to be in the DLCS's
@@ -387,26 +452,42 @@ def collect_assets(root, bag_info, assets):
         # origin (using the creds) if for whatever reason it isn't in the DLCS bucket.
         origin_info = analyse_origin(origin)
         bucket_name = origin_info["bucket_name"]
+        asset_downloaded = False
         if bucket_name is not None:
             source_bucket = s3.Bucket(bucket_name)
             bucket_key = origin_info["bucket_key"]
             logging.info("Downloading object from bucket {0}/{1} to {2}".format(
                 bucket_name, bucket_key, destination))
-            source_bucket.download_file(bucket_key, destination)
+            try:
+                source_bucket.download_file(bucket_key, destination)
+                asset_downloaded = True
+            except ClientError as ce:
+                alt_key = origin_info["alt_key"]
+                if ce.response['Error']['Code'] == 'NoSuchKey' and alt_key is not None:
+                    logging.info("key {0} not found, trying alternate key: {1}".format(
+                        bucket_key, alt_key))
+                    source_bucket.download_file(alt_key, destination)
+                    asset_downloaded = True
+                    # allow error to throw
 
-        elif origin_info["web_url"] is not None:
+        web_url = origin_info["web_url"]
+        if not asset_downloaded and web_url is not None:
+            # This will probably fail, if the DLCS hasn't got it.
+            # But worth a try,
             user, password = settings.DDS_API_KEY, settings.DDS_API_SECRET
-            resp = requests.get(origin_info["web_url"], auth=(user, password), stream=True)
+            # This is horribly slow, why?
+            resp = requests.get(origin_info["web_url"], auth=(
+                user, password), stream=True)
             if resp.status_code == 200:
                 with open(destination, 'wb') as f:
                     for chunk in resp.iter_content(chunk_size):
                         f.write(chunk)
+                asset_downloaded = True
 
+        assert asset_downloaded, "Couldn't fetch asset"
 
-        else:
-            logging.error("No asset present!")
-
-        logging.info("doing checksums on " + destination)
+        logging.info("TODO: doing checksums on " + destination)
+        logging.info("validate " + checksum)
 
 
 def analyse_origin(origin):
@@ -418,16 +499,22 @@ def analyse_origin(origin):
     origin_info = {
         "bucket_name": None,
         "bucket_key": None,
+        "alt_key": None,
         "web_url": None
     }
-    if origin.startswith("https://wellcomelibrary.org"):
+    if origin.startswith(settings.DDS_ASSET_PREFIX):
+        guid = origin.split("/")[-1]
         # TODO: check if file is in settings.DLCS_SOURCE_BUCKET
         # if so, return that bucket's details
         # for testing this for now I will make it fetch from wl.org regardless,
         # as if for some reason it isn't in the storage bucket
         origin_info["web_url"] = origin
-        # origin_info["bucket_name"] = foo 
-        # origin_info["bucket_key"] = bar ... must check it's actually there
+        origin_info["bucket_name"] = settings.DLCS_SOURCE_BUCKET
+        origin_info["bucket_key"] = "{0}/{1}/{2}".format(
+            settings.DLCS_CUSTOMER_ID, settings.DLCS_SPACE, guid)
+        # messy, a small %age of DLCS JP2s have a file extension
+        origin_info["alt_key"] = origin_info["bucket_key"] + ".jp2"
+
         return origin_info
 
     parts = origin.split("/")
@@ -451,18 +538,17 @@ def get_physical_file_maps(root):
     logging.info("{0} tech mds to process".format(len(amds)))
     for tech_md in amds:
         adm_id = tech_md.get("ID")
-        dg_file = tech_md.find(".//digiflow:File", namespaces)
-        if dg_file is None:
-            logging.info("No digiflow:File element for " + adm_id)
+        premis_object = tech_md.find(".//premis:object", namespaces)
+        if premis_object is None:
+            logging.info("No premis:object element for " + adm_id)
 
         else:
             adm_id = tech_md.get("ID")
             logging.info("adding " + adm_id + " to map")
+            uuid_el = premis_object.find("./premis:objectIdentifier[premis:objectIdentifierType='uuid']", namespaces)
+            uuid_value = uuid_el.find("./premis:objectIdentifierValue", namespaces).text
             tech_file_infos[tech_md.get("ID")] = {
-                "preservicaGuid": dg_file.find("digiflow:preservicaGuid", namespaces).text,
-                "FileName": dg_file.find("digiflow:FileName", namespaces).text,
-                "Checksum": dg_file.find("digiflow:Checksum", namespaces).text,
-                "ChecksumAlgorithmRef": dg_file.find("digiflow:ChecksumAlgorithmRef", namespaces).text
+                "uuid": uuid_value
             }  # add more props if we need them
 
     assets = {}
@@ -487,12 +573,13 @@ def get_physical_file_maps(root):
                 file_id = fptr.get("FILEID")
                 content_ids = fptr.get("CONTENTIDS")
 
-                if file_id.endswith("_BAG") and content_ids is not None:
+
+                if file_id.endswith("_OBJECTS") and content_ids is not None:
                     # sanity check
-                    assert tech_md["preservicaGuid"] == content_ids, "Preservica GUID mismatch"
-                    summary["preservica_guid"] = content_ids
+                    assert tech_md["uuid"] == content_ids, "Preservica GUID mismatch"
                     summary["asset_file_id"] = file_id
                     assets[file_id] = summary
+                    fptr.attrib.pop("CONTENTIDS")
 
                 elif file_id.endswith("_ALTO"):
                     summary["alto_file_id"] = file_id
