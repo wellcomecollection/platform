@@ -147,10 +147,17 @@ trait SierraProduction {
         )
       }
 
-  private def marc264OnlyContainsCopyright(marc264fields: List[VarField]): Boolean =
+  private def marc264OnlyContainsCopyright(
+    marc264fields: List[VarField]): Boolean =
     marc264fields match {
       case List(
-        VarField(_, _, Some("264"), _, _, List(MarcSubfield("c", content)))) =>
+          VarField(
+            _,
+            _,
+            Some("264"),
+            _,
+            _,
+            List(MarcSubfield("c", content)))) =>
         content.matches("^©\\d{4}$")
       case _ => false
     }
@@ -176,9 +183,8 @@ trait SierraProduction {
     // We've also seen cases where the 260 and 264 field are both present,
     // and they have matching subfields!  We use the 260 field as it's not
     // going to throw an exception about unrecognised second indicator.
-    else if (
-      marc260fields.map { _.subfields } ==
-        marc264fields.map { _.subfields }) {
+    else if (marc260fields.map { _.subfields } ==
+               marc264fields.map { _.subfields }) {
       getProductionFrom260Fields(marc260fields)
     }
 
