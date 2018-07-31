@@ -1,12 +1,12 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import com.gu.scanamo.Scanamo
 import javax.naming.ConfigurationException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec, Matchers}
-import uk.ac.wellcome.platform.reindex_request_creator.TestRecord
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.TestRecord
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned

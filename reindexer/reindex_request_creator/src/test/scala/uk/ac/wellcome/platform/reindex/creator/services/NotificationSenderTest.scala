@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.sns.model.AmazonSNSException
 import org.scalatest.concurrent.ScalaFutures

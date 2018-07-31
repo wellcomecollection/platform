@@ -1,8 +1,8 @@
-package uk.ac.wellcome.platform.reindex_request_creator.modules
+package uk.ac.wellcome.platform.reindex.creator.modules
 
 import akka.actor.ActorSystem
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.reindex_request_creator.services.ReindexWorkerService
+import uk.ac.wellcome.platform.reindex.creator.services.ReindexWorkerService
 
 object ReindexerWorkerModule extends TwitterModule {
 
