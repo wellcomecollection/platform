@@ -13,7 +13,7 @@ module "reindex_request_creator" {
   memory = 2048
 
   env_vars = {
-    dynamo_table_name          = "${local.vhs_table_name}"
+    dynamo_table_name          = "${local.vhs_sourcedata_table_name}"
     reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
     reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
     metrics_namespace          = "reindex_request_creator"
@@ -42,7 +42,7 @@ resource "aws_iam_role_policy" "reindexer_reindexer_task_cloudwatch_metric" {
 
 resource "aws_iam_role_policy" "reindexer_allow_table_access" {
   role   = "${module.reindex_request_creator.task_role_name}"
-  policy = "${local.vhs_full_access_policy}"
+  policy = "${local.vhs_sourcedata_full_access_policy}"
 }
 
 resource "aws_iam_role_policy" "reindex_creator_publish_requests" {
