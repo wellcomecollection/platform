@@ -44,11 +44,7 @@ class ReindexRequestCreatorWorkerTest
               queue,
               metricsSender) { sqsStream =>
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(
-                  table = table.name,
-                  index = table.index
-                )
+                dynamoDbClient = dynamoDbClient
               )
 
               withSNSWriter(topic) { snsWriter =>
@@ -78,7 +74,7 @@ class ReindexRequestCreatorWorkerTest
   it("successfully completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
+        withReindexWorkerService(topic) {
           case (service, QueuePair(queue, dlq)) =>
             val reindexJob = createReindexJobWith(
               table = table,
@@ -127,7 +123,7 @@ class ReindexRequestCreatorWorkerTest
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
+        withReindexWorkerService(topic) {
           case (_, QueuePair(queue, dlq)) =>
             sendNotificationToSQS(
               queue = queue,
@@ -153,11 +149,7 @@ class ReindexRequestCreatorWorkerTest
               queue,
               metricsSender) { sqsStream =>
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(
-                  table = "doesnotexist",
-                  index = "whatindex?"
-                )
+                dynamoDbClient = dynamoDbClient
               )
 
               withSNSWriter(Topic("does-not-exist")) { snsWriter =>

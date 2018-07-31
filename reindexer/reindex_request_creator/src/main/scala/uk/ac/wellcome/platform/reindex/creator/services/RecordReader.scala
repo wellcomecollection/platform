@@ -10,7 +10,6 @@ import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.reindexer.ReindexableRecord
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
-import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -20,20 +19,17 @@ import scala.util.Try
   * This class should only be doing reading -- deciding how to act on records
   * that need reindexing is the responsibility of another class.
   */
-class RecordReader @Inject()(
-  dynamoDbClient: AmazonDynamoDB,
-  dynamoConfig: DynamoConfig
-)(implicit ec: ExecutionContext)
+class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(implicit ec: ExecutionContext)
     extends Logging {
 
   def findRecordsForReindexing(reindexJob: ReindexJob): Future[List[String]] = {
     debug(s"Finding records that need reindexing for $reindexJob")
 
-    val table = Table[ReindexableRecord](dynamoConfig.table)
+    val table = Table[ReindexableRecord](reindexJob.dynamoConfig.table)
 
     for {
       index: SecondaryIndex[ReindexableRecord] <- Future.fromTry(Try {
-        table.index(indexName = dynamoConfig.index)
+        table.index(indexName = reindexJob.dynamoConfig.index)
       })
 
       // We start by querying DynamoDB for every record in the reindex shard

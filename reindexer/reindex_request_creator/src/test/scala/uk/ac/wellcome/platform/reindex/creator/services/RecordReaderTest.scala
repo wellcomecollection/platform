@@ -37,7 +37,7 @@ class RecordReaderTest
 
   it("only selects records with an out-of-date reindex version") {
     withLocalDynamoDbTable { table =>
-      withReindexRecordReaderService(table) { service =>
+      withReindexRecordReaderService { service =>
         val newerRecord = exampleRecord.copy(
           id = "id1",
           reindexVersion = desiredVersion + 1
@@ -74,7 +74,7 @@ class RecordReaderTest
 
   it("sends notifications for records in the specified shard") {
     withLocalDynamoDbTable { table =>
-      withReindexRecordReaderService(table) { service =>
+      withReindexRecordReaderService { service =>
         val inShardRecords = List(
           exampleRecord.copy(id = "id1"),
           exampleRecord.copy(id = "id2")
@@ -109,10 +109,10 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if there's a DynamoDB error") {
-    val table = Table("does-not-exist", "no-such-index")
-    withReindexRecordReaderService(table) {
+    withReindexRecordReaderService {
       service =>
-        val future = service.findRecordsForReindexing(createReindexJobWith(table))
+        val future = service.findRecordsForReindexing(
+          createReindexJobWith(Table("does-not-exist", "no-such-index")))
         whenReady(future.failed) {
           _ shouldBe a[ResourceNotFoundException]
         }
@@ -120,13 +120,7 @@ class RecordReaderTest
   }
 
   it("returns a failed Future if you don't specify a DynamoDB index") {
-    val service = new RecordReader(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(
-        table = "mytable",
-        maybeIndex = None
-      )
-    )
+    val service = new RecordReader(dynamoDbClient = dynamoDbClient)
 
     val reindexJob = createReindexJobWith(
       dynamoConfig = DynamoConfig(
@@ -141,15 +135,9 @@ class RecordReaderTest
     }
   }
 
-  private def withReindexRecordReaderService(table: Table)(
+  private def withReindexRecordReaderService(
     testWith: TestWith[RecordReader, Assertion]) = {
-    val service = new RecordReader(
-      dynamoDbClient = dynamoDbClient,
-      dynamoConfig = DynamoConfig(
-        table = table.name,
-        index = table.index
-      )
-    )
+    val service = new RecordReader(dynamoDbClient = dynamoDbClient)
 
     testWith(service)
   }
