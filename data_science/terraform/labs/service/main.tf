@@ -44,7 +44,7 @@ module "service" {
   subnets = "${var.subnets}"
 
   namespace_id     = "${var.service_discovery_namespace}"
-  healthcheck_path = "/${var.namespace}/index.html"
+  healthcheck_path = "${var.health_check_path}"
 
   launch_type = "FARGATE"
 }

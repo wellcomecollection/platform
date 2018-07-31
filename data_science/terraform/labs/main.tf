@@ -20,6 +20,7 @@ module "palette_service" {
 
   service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
+  health_check_path            = "/palette/index.html"
 }
 
 module "image_similarity_service" {
@@ -35,4 +36,5 @@ module "image_similarity_service" {
 
   service_discovery_namespace  = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   service_lb_security_group_id = "${aws_security_group.service_lb_security_group.id}"
+  health_check_path            = "/image_similarity/health_check"
 }

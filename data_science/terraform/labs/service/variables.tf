@@ -26,3 +26,5 @@ variable "service_discovery_namespace" {
 variable "aws_region" {
   default = "eu-west-1"
 }
+
+variable "health_check_path" {}
