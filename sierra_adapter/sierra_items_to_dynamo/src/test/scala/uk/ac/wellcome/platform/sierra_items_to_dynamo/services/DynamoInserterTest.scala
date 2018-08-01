@@ -6,9 +6,9 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -19,7 +19,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class DynamoInserterTest
     extends FunSpec
     with Matchers
-    with DynamoInserterFixture
+    with LocalVersionedHybridStore
     with ScalaFutures
     with MockitoSugar
     with ExtendedPatience
@@ -28,7 +28,8 @@ class DynamoInserterTest
   it("inserts an ItemRecord into the VHS") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withDynamoInserter(table, bucket) { dynamoInserter =>
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) { versionedHybridStore =>
+          val dynamoInserter = new DynamoInserter(versionedHybridStore = versionedHybridStore)
           val record = createSierraItemRecord
 
           val futureUnit = dynamoInserter.insertIntoDynamo(record)
