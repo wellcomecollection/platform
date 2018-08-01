@@ -9,6 +9,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -179,7 +180,7 @@ class NotificationMessageReceiverTest
               recordReceiver.receiveMessage(failingSqsMessage)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[GracefulFailureException]
+              x shouldBe a[JsonDecodingError]
             }
           }
         }
