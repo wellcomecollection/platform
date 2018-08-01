@@ -31,7 +31,7 @@ class ReindexRequestCreatorWorkerTest
     with SQS
     with ScalaFutures {
 
-  def withReindexWorkerService(table: Table, topic: Topic)(
+  def withReindexWorkerService(topic: Topic)(
     testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
