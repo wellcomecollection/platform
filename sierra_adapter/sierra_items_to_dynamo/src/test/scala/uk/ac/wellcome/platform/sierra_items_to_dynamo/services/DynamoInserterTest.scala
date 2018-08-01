@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
@@ -60,6 +61,7 @@ class DynamoInserterTest
           insertRecord(newRecord, versionedHybridStore = versionedHybridStore)
 
           val oldRecord = createSierraItemRecordWith(
+            id = newRecord.id,
             modifiedDate = olderDate,
             bibIds = List(createSierraBibNumber)
           )
@@ -141,7 +143,7 @@ class DynamoInserterTest
               bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2)))
+              record = newRecord.copy(unlinkedBibIds = List(bibIds(2)))
             )
           }
         }
@@ -177,7 +179,7 @@ class DynamoInserterTest
               bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))
+              record = newRecord.copy(unlinkedBibIds = List(bibIds(0)))
             )
           }
         }
@@ -243,13 +245,13 @@ class DynamoInserterTest
       objectStore = ObjectStore[SierraItemRecord],
       dynamoDbClient = dynamoDbClient
     )
-    val expectedException = new RuntimeException("AAAAAARGH!")
 
     val dynamoInserter = new DynamoInserter(mockedVhs)
 
     val futureUnit = dynamoInserter.insertIntoDynamo(record)
     whenReady(futureUnit.failed) { ex =>
-      ex shouldBe expectedException
+      ex shouldBe a[ResourceNotFoundException]
+      ex.getMessage should startWith("Cannot do operations on a non-existent table")
     }
   }
 
