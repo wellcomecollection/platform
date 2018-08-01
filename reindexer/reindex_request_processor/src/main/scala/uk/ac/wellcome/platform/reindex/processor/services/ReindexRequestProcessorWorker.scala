@@ -7,7 +7,7 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 

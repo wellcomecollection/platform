@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.transformer.transformers.miro
 
 import java.io.InputStream
 
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
-import uk.ac.wellcome.utils.JsonUtil.toMap
 
 import scala.io.Source
 

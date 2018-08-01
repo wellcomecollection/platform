@@ -15,7 +15,7 @@ import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
-import uk.ac.wellcome.utils.JsonUtil.fromJson
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.Future
 

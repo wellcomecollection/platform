@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.test.utils.JsonTestUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
 

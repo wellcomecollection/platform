@@ -5,8 +5,8 @@ import com.twitter.inject.Logging
 import io.circe.optics.JsonPath.root
 import io.circe.optics.JsonTraversalPath
 import io.circe._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, Future}

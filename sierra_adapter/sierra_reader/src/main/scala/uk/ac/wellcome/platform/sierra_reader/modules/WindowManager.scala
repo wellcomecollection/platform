@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}

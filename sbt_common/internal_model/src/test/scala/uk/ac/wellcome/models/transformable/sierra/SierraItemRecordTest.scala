@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import java.time.Instant
 

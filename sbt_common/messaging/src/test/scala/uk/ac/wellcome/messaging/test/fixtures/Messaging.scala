@@ -25,7 +25,7 @@ import uk.ac.wellcome.test.fixtures._
 
 import scala.concurrent.duration._
 import scala.util.{Random, Success}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

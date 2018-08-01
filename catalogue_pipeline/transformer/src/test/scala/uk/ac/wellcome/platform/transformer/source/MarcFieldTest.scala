@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.source
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.test.utils.JsonTestUtil
 
 class MarcFieldTest extends FunSpec with Matchers with JsonTestUtil {

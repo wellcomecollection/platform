@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.transformable.sierra
 
 import java.time.Instant
 
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.{Failure, Success}
 

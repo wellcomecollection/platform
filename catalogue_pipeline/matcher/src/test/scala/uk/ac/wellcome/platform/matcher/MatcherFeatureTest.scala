@@ -17,7 +17,7 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class MatcherFeatureTest
     extends FunSpec
