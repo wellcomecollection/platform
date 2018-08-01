@@ -59,7 +59,7 @@ class DynamoInserterTest
             modifiedDate = newerDate,
             bibIds = List(createSierraBibNumber)
           )
-          insertRecord(newRecord, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(newRecord, versionedHybridStore = versionedHybridStore)
 
           val oldRecord = createSierraItemRecordWith(
             id = newRecord.id,
@@ -93,7 +93,7 @@ class DynamoInserterTest
             modifiedDate = olderDate,
             bibIds = List(createSierraBibNumber)
           )
-          insertRecord(oldRecord, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
 
           val newRecord = createSierraItemRecordWith(
             id = oldRecord.id,
@@ -129,7 +129,7 @@ class DynamoInserterTest
             modifiedDate = olderDate,
             bibIds = bibIds
           )
-          insertRecord(oldRecord, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
 
           val newRecord = createSierraItemRecordWith(
             id = oldRecord.id,
@@ -165,7 +165,7 @@ class DynamoInserterTest
             modifiedDate = olderDate,
             bibIds = List(bibIds(0), bibIds(1), bibIds(2))
           )
-          insertRecord(oldRecord, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
 
           val newRecord = createSierraItemRecordWith(
             id = oldRecord.id,
@@ -202,7 +202,7 @@ class DynamoInserterTest
             bibIds = List(bibIds(0), bibIds(1), bibIds(2)),
             unlinkedBibIds = List(bibIds(4))
           )
-          insertRecord(oldRecord, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
 
           val newRecord = createSierraItemRecordWith(
             id = oldRecord.id,
@@ -256,47 +256,22 @@ class DynamoInserterTest
     }
   }
 
-  def storeSingleRecord[T, Metadata](
-                                      versionedHybridStore: VersionedHybridStore[T, Metadata, ObjectStore[T]],
-                                      id: String,
-                                      record: T,
-                                      metadata: Metadata
-                                    ): Assertion = {
-    val putFuture = versionedHybridStore.updateRecord(id = id)(
-      ifNotExisting = (record, metadata)
+  def storeSingleRecord(
+    itemRecord: SierraItemRecord,
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]]
+  ): Assertion = {
+    val putFuture = versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
+      ifNotExisting = (itemRecord, EmptyMetadata())
     )(
       ifExisting = (existingRecord, existingMetadata) =>
         throw new RuntimeException(s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
     )
 
     whenReady(putFuture) { _ =>
-      val getFuture = versionedHybridStore.getRecord(id = id)
+      val getFuture = versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
       whenReady(getFuture) { result =>
-        result.get shouldBe record
+        result.get shouldBe itemRecord
       }
     }
-  }
-
-  def storeSingleRecord[T](
-                            versionedHybridStore: VersionedHybridStore[T, EmptyMetadata, ObjectStore[T]],
-                            id: String,
-                            record: T,
-                          ): Assertion = storeSingleRecord[T, EmptyMetadata](
-    versionedHybridStore = versionedHybridStore,
-    id = id,
-    record = record,
-    metadata = EmptyMetadata()
-  )
-
-  private def insertRecord(
-    itemRecord: SierraItemRecord,
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
-                                               EmptyMetadata,
-                                               ObjectStore[SierraItemRecord]]) = {
-    storeSingleRecord(
-      versionedHybridStore = versionedHybridStore,
-      id = itemRecord.id.withoutCheckDigit,
-      record = itemRecord
-    )
   }
 }

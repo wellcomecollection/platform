@@ -11,7 +11,6 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.sierra_items_to_dynamo.dynamo._
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.merger.SierraItemRecordMerger
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -55,24 +54,15 @@ class SierraItemsToDynamoWorkerServiceTest
       bibIds = bibIds2
     )
 
-    val expectedBibIds = List(bibIds(2), bibIds(3), bibIds(4))
-    val expectedUnlinkedBibIds = List(bibIds(0), bibIds(1))
-
     val expectedRecord = SierraItemRecordMerger.mergeItems(
       existingRecord = record1,
       updatedRecord = record2
     )
 
-    val expectedData = expectedRecord.data
-
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
         withItemRecordVHS(table, bucket) { versionedHybridStore =>
-          storeSingleRecord(
-            versionedHybridStore = versionedHybridStore,
-            id = record1.id.withoutCheckDigit,
-            record = record1
-          )
+          storeSingleRecord(record1, versionedHybridStore = versionedHybridStore)
 
           withLocalSqsQueue { queue =>
             withActorSystem { actorSystem =>
@@ -103,7 +93,7 @@ class SierraItemsToDynamoWorkerServiceTest
         withItemRecordVHS(table, bucket) { versionedHybridStore =>
           withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
             withActorSystem { actorSystem =>
-              withMetricsSender(actorSystem) { metricsSender =>
+              withMockMetricSender { metricsSender =>
                 withSierraWorkerService(versionedHybridStore, queue, actorSystem, metricsSender) { _ =>
                   val body =
                     """
@@ -129,37 +119,24 @@ class SierraItemsToDynamoWorkerServiceTest
     }
   }
 
-  def storeSingleRecord[T, Metadata](
-                                      versionedHybridStore: VersionedHybridStore[T, Metadata, ObjectStore[T]],
-                                      id: String,
-                                      record: T,
-                                      metadata: Metadata
-                                    ): Assertion = {
-    val putFuture = versionedHybridStore.updateRecord(id = id)(
-      ifNotExisting = (record, metadata)
+  def storeSingleRecord(
+    itemRecord: SierraItemRecord,
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]]
+  ): Assertion = {
+    val putFuture = versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
+      ifNotExisting = (itemRecord, EmptyMetadata())
     )(
       ifExisting = (existingRecord, existingMetadata) =>
         throw new RuntimeException(s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
     )
 
     whenReady(putFuture) { _ =>
-      val getFuture = versionedHybridStore.getRecord(id = id)
+      val getFuture = versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
       whenReady(getFuture) { result =>
-        result.get shouldBe record
+        result.get shouldBe itemRecord
       }
     }
   }
-
-  def storeSingleRecord[T](
-                            versionedHybridStore: VersionedHybridStore[T, EmptyMetadata, ObjectStore[T]],
-                            id: String,
-                            record: T,
-                          ): Assertion = storeSingleRecord[T, EmptyMetadata](
-    versionedHybridStore = versionedHybridStore,
-    id = id,
-    record = record,
-    metadata = EmptyMetadata()
-  )
 
   private def withSierraWorkerService[R](
     versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]],
