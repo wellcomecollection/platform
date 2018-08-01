@@ -29,9 +29,9 @@ trait DisplaySerialisationTestBase { this: Suite =>
          """
     }
 
-  def items(identifiedItems: List[Identified[Item]]) =
+  def items(identifiedItems: List[Displayable[Item]]) =
     identifiedItems
-      .map { it =>
+      .collect { case it: Identified[Item]  =>
         s"""{
           "id": "${it.canonicalId}",
           "type": "${it.agent.ontologyType}",
