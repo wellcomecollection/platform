@@ -255,25 +255,47 @@ class DynamoInserterTest
     }
   }
 
-  private def insertRecord(
-    itemRecord: SierraItemRecord,
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
-                                               EmptyMetadata,
-                                               ObjectStore[SierraItemRecord]]) = {
-    val putFuture = versionedHybridStore.updateRecord(
-      id = itemRecord.id.withoutCheckDigit
-    )(
-      ifNotExisting = (itemRecord, EmptyMetadata())
+  def storeSingleRecord[T, Metadata](
+                                      versionedHybridStore: VersionedHybridStore[T, Metadata, ObjectStore[T]],
+                                      id: String,
+                                      record: T,
+                                      metadata: Metadata
+                                    ): Assertion = {
+    val putFuture = versionedHybridStore.updateRecord(id = id)(
+      ifNotExisting = (record, metadata)
     )(
       ifExisting = (existingRecord, existingMetadata) =>
         throw new RuntimeException(s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
     )
 
     whenReady(putFuture) { _ =>
-      val getFuture = versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
+      val getFuture = versionedHybridStore.getRecord(id = id)
       whenReady(getFuture) { result =>
-        result.get shouldBe itemRecord
+        result.get shouldBe record
       }
     }
+  }
+
+  def storeSingleRecord[T](
+                            versionedHybridStore: VersionedHybridStore[T, EmptyMetadata, ObjectStore[T]],
+                            id: String,
+                            record: T,
+                          ): Assertion = storeSingleRecord[T, EmptyMetadata](
+    versionedHybridStore = versionedHybridStore,
+    id = id,
+    record = record,
+    metadata = EmptyMetadata()
+  )
+
+  private def insertRecord(
+    itemRecord: SierraItemRecord,
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]]) = {
+    storeSingleRecord(
+      versionedHybridStore = versionedHybridStore,
+      id = itemRecord.id.withoutCheckDigit,
+      record = itemRecord
+    )
   }
 }
