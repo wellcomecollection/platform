@@ -33,11 +33,8 @@ trait SierraProduction {
       case (Nil, Nil)           => List()
       case (marc260fields, Nil) => getProductionFrom260Fields(marc260fields)
       case (Nil, marc264fields) => getProductionFrom264Fields(marc264fields)
-      case (_, _) =>
-        throw new GracefulFailureException(
-          new RuntimeException(
-            "Record has both 260 and 264 fields; this is a cataloguing error."
-          ))
+      case (marc260fields, marc264fields) =>
+        getProductionFromBothFields(marc260fields, marc264fields)
     }
   }
 
@@ -149,6 +146,57 @@ trait SierraProduction {
           function = productionFunction
         )
       }
+
+  private def marc264OnlyContainsCopyright(
+    marc264fields: List[VarField]): Boolean =
+    marc264fields match {
+      case List(
+          VarField(
+            _,
+            _,
+            Some("264"),
+            _,
+            _,
+            List(MarcSubfield("c", content)))) =>
+        content.matches("^©\\d{4}$")
+      case _ => false
+    }
+
+  /** Populate the production data if both 260 and 264 are present.
+    *
+    * In general, this is a cataloguing error, but sometimes we can do
+    * something more sensible depending on if/how they're duplicated.
+    */
+  private def getProductionFromBothFields(marc260fields: List[VarField],
+                                          marc264fields: List[VarField]) = {
+
+    // We've seen cases where the 264 field only has the following subfields:
+    //
+    //      [('tag', 'c'), ('content', '©2012')]
+    //
+    // or similar, and the 260 field is populated.  In that case, we can
+    // discard the 264 and just use the 260 fields.
+    if (marc264OnlyContainsCopyright(marc264fields)) {
+      getProductionFrom260Fields(marc260fields)
+    }
+
+    // We've also seen cases where the 260 and 264 field are both present,
+    // and they have matching subfields!  We use the 260 field as it's not
+    // going to throw an exception about unrecognised second indicator.
+    else if (marc260fields.map { _.subfields } ==
+               marc264fields.map { _.subfields }) {
+      getProductionFrom260Fields(marc260fields)
+    }
+
+    // Otherwise this is some sort of cataloguing error.  This is fairly
+    // rare, so let it bubble on to a DLQ.
+    else {
+      throw GracefulFailureException(
+        new RuntimeException(
+          "Record has both 260 and 264 fields; this is a cataloguing error."
+        ))
+    }
+  }
 
   private def placesFromSubfields(vf: VarField,
                                   subfieldTag: String): List[Place] =

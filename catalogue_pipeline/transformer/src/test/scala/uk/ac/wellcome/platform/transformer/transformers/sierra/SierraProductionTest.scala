@@ -12,15 +12,6 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
     transformToProduction(varFields = List()) shouldBe List()
   }
 
-  it("throws an error if both 260 and 264 are present") {
-    transformVarFieldsAndAssertIsError(
-      varFields = List(
-        VarField(marcTag = Some("260"), fieldTag = "a"),
-        VarField(marcTag = Some("264"), fieldTag = "a")
-      )
-    )
-  }
-
   // Examples are taken from the MARC spec for field 260.
   // https://www.loc.gov/marc/bibliographic/bd260.html
 
@@ -376,6 +367,98 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
           agents = List(Unidentifiable(Agent("U.S. G.P.O."))),
           dates = List(Period("1981-")),
           function = Some(Concept("Distribution"))
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+  }
+
+  describe("Both MARC field 260 and 264") {
+    it("throws an error if both 260 and 264 are present") {
+      transformVarFieldsAndAssertIsError(
+        varFields = List(
+          VarField(
+            marcTag = Some("260"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "Paris")
+            )
+          ),
+          VarField(
+            marcTag = Some("264"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "London")
+            )
+          )
+        )
+      )
+    }
+
+    it(
+      "uses field 260 if field 264 only contains a copyright statement in subfield c") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "San Francisco"),
+            MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers"),
+            MarcSubfield(tag = "c", content = "2004")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "c", content = "©2004")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("San Francisco")),
+          agents = List(
+            Unidentifiable(Agent("Morgan Kaufmann Publishers"))
+          ),
+          dates = List(Period("2004")),
+          function = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+
+    it("returns correctly if 260 and 264 contain the same subfields") {
+      val subfields = List(
+        MarcSubfield(tag = "a", content = "London"),
+        MarcSubfield(tag = "b", content = "Wellcome Trust"),
+        MarcSubfield(tag = "c", content = "1992")
+      )
+
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = subfields
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = subfields
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("London")),
+          agents = List(
+            Unidentifiable(Agent("Wellcome Trust"))
+          ),
+          dates = List(Period("1992")),
+          function = None
         )
       )
 
