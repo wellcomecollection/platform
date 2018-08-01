@@ -37,7 +37,6 @@ package object dynamo {
         set('bibIds -> record.bibIds) and
           set('data -> record.data) and
           set('modifiedDate -> record.modifiedDate) and
-          set('unlinkedBibIds -> record.unlinkedBibIds) and
-          set('version -> record.version)
+          set('unlinkedBibIds -> record.unlinkedBibIds)
     )
 }

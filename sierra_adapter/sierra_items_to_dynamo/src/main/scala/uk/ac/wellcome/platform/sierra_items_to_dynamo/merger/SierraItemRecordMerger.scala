@@ -9,8 +9,7 @@ object SierraItemRecordMerger {
     if (existingRecord.modifiedDate.isBefore(updatedRecord.modifiedDate)) {
 
       updatedRecord.copy(
-        // We always carry across the version from the existing record.
-        version = existingRecord.version,
+
         // Let's suppose we have
         //
         //    oldRecord = (linked = {1, 2, 3}, unlinked = {4, 5})

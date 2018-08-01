@@ -70,8 +70,7 @@ trait SierraUtil extends IdentifiersUtil {
     data: String = "",
     modifiedDate: Instant = Instant.now,
     bibIds: List[SierraBibNumber] = List(),
-    unlinkedBibIds: List[SierraBibNumber] = List(),
-    version: Int = 0
+    unlinkedBibIds: List[SierraBibNumber] = List()
   ): SierraItemRecord = {
     val recordData = if (data == "") {
       s"""
@@ -88,8 +87,7 @@ trait SierraUtil extends IdentifiersUtil {
       data = recordData,
       modifiedDate = modifiedDate,
       bibIds = bibIds,
-      unlinkedBibIds = unlinkedBibIds,
-      version = version
+      unlinkedBibIds = unlinkedBibIds
     )
   }
 
