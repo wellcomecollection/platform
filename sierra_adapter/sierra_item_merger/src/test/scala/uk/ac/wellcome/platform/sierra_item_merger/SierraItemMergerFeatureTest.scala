@@ -147,8 +147,6 @@ class SierraItemMergerFeatureTest
       version = 1
     )
 
-    val notification = createNotificationMessageWith(hybridRecord)
-
-    sendNotificationToSQS(queue = queue, message = notification)
+    sendNotificationToSQS(queue = queue, message = hybridRecord)
   }
 }
