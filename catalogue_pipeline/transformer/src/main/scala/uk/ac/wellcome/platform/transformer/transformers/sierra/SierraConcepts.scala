@@ -55,16 +55,13 @@ trait SierraConcepts extends MarcUtils {
       .distinct
 
     identifierSubfieldContents match {
-      case Seq() => Unidentifiable(agent = concept)
       case Seq(subfieldContent) =>
         maybeAddIdentifier[T](
           concept = concept,
           varField = varField,
           identifierSubfieldContent = subfieldContent
         )
-      case _ =>
-        throw new RuntimeException(
-          s"Too many identifiers fields: $identifierSubfields")
+      case _ => Unidentifiable(agent = concept)
     }
   }
 
