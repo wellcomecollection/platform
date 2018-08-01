@@ -71,6 +71,8 @@ class ReindexRequestCreatorFeatureTest
             queue)
 
           withServer(flags) { _ =>
+            val expectedRecords = createReindexableData(queue, table)
+
             val reindexJob = createReindexJobWith(
               table = table,
               shardId = shardName,
@@ -81,9 +83,6 @@ class ReindexRequestCreatorFeatureTest
               queue = queue,
               message = reindexJob
             )
-
-            val expectedRecords =
-              createReindexableData(queue, table)
 
             eventually {
               val actualRecords: Seq[ReindexRequest] =
