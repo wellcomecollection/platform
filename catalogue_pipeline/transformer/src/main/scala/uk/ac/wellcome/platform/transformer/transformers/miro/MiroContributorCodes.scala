@@ -51,16 +51,28 @@ trait MiroContributorCodes {
     // use lowercased versions, so we cast everything to ALL CAPS just in case.
     val creditCode = code.toUpperCase()
 
-    // We had a request to remove records from contributor GUS from
+    // We had a request to remove nine records from contributor GUS from
     // the API after we'd done the initial sort of the Miro data.
     // We removed them from Elasticsearch by hand, but we don't want
     // them to reappear on reindex.
     //
     // Until we can move them to Tandem Vault or Cold Store, we'll throw
     // them away at this point.
-    if (creditCode == "GUS") {
+    val gusMiroIds = List(
+      "B0009891",
+      "B0009897",
+      "B0009886",
+      "B0009893",
+      "B0009887",
+      "B0009895",
+      "B0009884",
+      "B0009890",
+      "B0009888"
+    )
+
+    if (creditCode == "GUS" && gusMiroIds.contains(miroId)) {
       throw new ShouldNotTransformException(
-        s"Image $miroId has contributor code GUS, which should not be sent to the pipeline"
+        s"Image $miroId from contributor GUS should not be sent to the pipeline"
       )
     }
 
