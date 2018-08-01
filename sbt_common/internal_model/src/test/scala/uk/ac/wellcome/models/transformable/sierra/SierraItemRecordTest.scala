@@ -1,8 +1,8 @@
 package uk.ac.wellcome.models.transformable.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 
 import java.time.Instant
 
@@ -78,6 +78,6 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
       )
     }
 
-    caught.getMessage shouldBe s"Error parsing bibIds from JSON <<$data>> (uk.ac.wellcome.exceptions.GracefulFailureException: $expectedMessage)"
+    caught.getMessage shouldBe s"Error parsing bibIds from JSON <<$data>> (uk.ac.wellcome.json.exceptions.JsonDecodingError: $expectedMessage)"
   }
 }
