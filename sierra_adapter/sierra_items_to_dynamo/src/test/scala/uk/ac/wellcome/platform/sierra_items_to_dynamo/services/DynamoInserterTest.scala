@@ -26,7 +26,7 @@ class DynamoInserterTest
     with ExtendedPatience
     with SierraUtil {
 
-  it("ingests a json item into DynamoDB") {
+  it("inserts an ItemRecord into the VHS") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
         withDynamoInserter(table, bucket) { dynamoInserter =>
@@ -132,7 +132,7 @@ class DynamoInserterTest
               bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2))
+              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2)))
             )
           }
         }
@@ -165,7 +165,7 @@ class DynamoInserterTest
               bucket = bucket,
               table = table,
               id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0))
+              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))
             )
           }
         }
