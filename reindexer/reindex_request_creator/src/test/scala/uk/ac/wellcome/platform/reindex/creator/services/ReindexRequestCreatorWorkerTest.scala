@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
@@ -10,8 +10,8 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.reindex_request_creator.TestRecord
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.TestRecord
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
@@ -20,7 +20,7 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ReindexWorkerServiceTest
+class ReindexRequestCreatorWorkerTest
     extends FunSpec
     with Matchers
     with MockitoSugar
@@ -32,7 +32,7 @@ class ReindexWorkerServiceTest
     with ScalaFutures {
 
   def withReindexWorkerService(table: Table, topic: Topic)(
-    testWith: TestWith[(ReindexWorkerService, QueuePair), Assertion]) = {
+    testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
         withLocalSqsQueueAndDlq {
@@ -54,7 +54,7 @@ class ReindexWorkerServiceTest
                   snsWriter = snsWriter
                 )
 
-                val workerService = new ReindexWorkerService(
+                val workerService = new ReindexRequestCreatorWorker(
                   readerService = readerService,
                   notificationService = notificationService,
                   sqsStream = sqsStream,
@@ -162,7 +162,7 @@ class ReindexWorkerServiceTest
                   snsWriter = snsWriter
                 )
 
-                new ReindexWorkerService(
+                new ReindexRequestCreatorWorker(
                   readerService = readerService,
                   notificationService = notificationService,
                   system = actorSystem,

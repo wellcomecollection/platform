@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator
+package uk.ac.wellcome.platform.reindex.creator
 
 import com.twitter.finagle.http.{Request, Response}
 import com.twitter.finatra.http.HttpServer
@@ -22,13 +22,13 @@ import uk.ac.wellcome.finatra.storage.{
   DynamoConfigModule,
   S3ClientModule
 }
-import uk.ac.wellcome.platform.reindex_request_creator.modules.ReindexerWorkerModule
+import uk.ac.wellcome.platform.reindex.creator.modules.ReindexerWorkerModule
 
 object ServerMain extends Server
 
 class Server extends HttpServer {
   override val name =
-    "uk.ac.wellcome.platform.reindex_request_creator ReindexRequestCreator"
+    "uk.ac.wellcome.platform.reindex.creator ReindexRequestCreator"
 
   override val modules = Seq(
     ExecutionContextModule,

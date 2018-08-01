@@ -1,15 +1,15 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import akka.actor.ActorSystem
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReindexWorkerService @Inject()(
+class ReindexRequestCreatorWorker @Inject()(
   readerService: RecordReader,
   notificationService: NotificationSender,
   system: ActorSystem,

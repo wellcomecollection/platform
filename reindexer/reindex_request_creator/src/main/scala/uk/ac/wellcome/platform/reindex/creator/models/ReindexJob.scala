@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.models
+package uk.ac.wellcome.platform.reindex.creator.models
 
 /** A request to identify all the shards in the table that need reindexing.
   *

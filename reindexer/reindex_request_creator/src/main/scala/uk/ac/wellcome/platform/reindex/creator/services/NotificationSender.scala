@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.google.inject.Inject
 import uk.ac.wellcome.messaging.sns.SNSWriter

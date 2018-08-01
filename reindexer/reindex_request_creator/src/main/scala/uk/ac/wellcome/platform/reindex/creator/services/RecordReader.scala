@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.reindex_request_creator.services
+package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.google.inject.Inject
@@ -9,7 +9,7 @@ import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.reindexer.ReindexableRecord
-import uk.ac.wellcome.platform.reindex_request_creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}

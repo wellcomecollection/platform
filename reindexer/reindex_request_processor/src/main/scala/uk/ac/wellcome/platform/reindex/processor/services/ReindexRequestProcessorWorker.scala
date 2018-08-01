@@ -11,9 +11,10 @@ import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
-class ReindexWorkerService @Inject()(versionedDao: VersionedDao,
-                                     sqsStream: SQSStream[NotificationMessage],
-                                     system: ActorSystem)
+class ReindexRequestProcessorWorker @Inject()(
+  versionedDao: VersionedDao,
+  sqsStream: SQSStream[NotificationMessage],
+  system: ActorSystem)
     extends Logging {
 
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
