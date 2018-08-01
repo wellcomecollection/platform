@@ -2,8 +2,6 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo.services
 
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
@@ -12,9 +10,10 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
-
+import uk.ac.wellcome.storage.s3.S3Config
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -36,9 +35,12 @@ class DynamoInserterTest
           val futureUnit = dynamoInserter.insertIntoDynamo(record)
 
           whenReady(futureUnit) { _ =>
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> record.id.withoutCheckDigit) shouldBe Some(
-              Right(record.copy(version = 1)))
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = record.id.withoutCheckDigit,
+              record = record
+            )
           }
         }
       }
@@ -62,9 +64,12 @@ class DynamoInserterTest
 
           val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
           whenReady(futureUnit) { _ =>
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> newRecord.id.withoutCheckDigit) shouldBe Some(
-              Right(newRecord))
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = oldRecord.id.withoutCheckDigit,
+              record = newRecord
+            )
           }
         }
       }
@@ -90,9 +95,12 @@ class DynamoInserterTest
           val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
           whenReady(futureUnit) { _ =>
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
-              Right(newRecord.copy(version = newRecord.version + 1)))
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = oldRecord.id.withoutCheckDigit,
+              record = newRecord
+            )
           }
         }
       }
@@ -120,10 +128,12 @@ class DynamoInserterTest
           val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
           whenReady(futureUnit) { _ =>
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
-              Right(
-                newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2)))))
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = oldRecord.id.withoutCheckDigit,
+              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(2))
+            )
           }
         }
       }
@@ -151,12 +161,13 @@ class DynamoInserterTest
           val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
 
           whenReady(futureUnit) { _ =>
-            Scanamo.get[SierraItemRecord](dynamoDbClient)(table.name)(
-              'id -> oldRecord.id.withoutCheckDigit) shouldBe Some(
-              Right(
-                newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0)))))
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = oldRecord.id.withoutCheckDigit,
+              record = newRecord.copy(version = 1, unlinkedBibIds = List(bibIds(0))
+            )
           }
-
         }
       }
     }
@@ -205,16 +216,19 @@ class DynamoInserterTest
       modifiedDate = newerDate
     )
 
-    val mockedVhs = mock[VersionedHybridStore[
+    val mockedVhs = new VersionedHybridStore[
       SierraItemRecord,
       EmptyMetadata,
-      ObjectStore[SierraItemRecord]]]
+      ObjectStore[SierraItemRecord]](
+      vhsConfig = VHSConfig(
+        dynamoConfig = DynamoConfig(table = "doesnotexist", maybeIndex = None),
+        s3Config = S3Config(bucketName = "nosuchbucket"),
+        globalS3Prefix = ""
+      ),
+      objectStore = ObjectStore[SierraItemRecord],
+      dynamoDbClient = dynamoDbClient
+    )
     val expectedException = new RuntimeException("AAAAAARGH!")
-
-    when(
-      mockedVhs.updateRecord(any[String])(any[(SierraItemRecord, EmptyMetadata)])(
-        any[(SierraItemRecord, EmptyMetadata) => (SierraItemRecord, EmptyMetadata)])
-      .thenThrow(expectedException)
 
     val dynamoInserter = new DynamoInserter(mockedVhs)
 

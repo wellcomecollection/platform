@@ -41,30 +41,32 @@ class SierraItemsToDynamoWorkerServiceTest
                        R]): Unit = {
     withActorSystem { actorSystem =>
       withLocalDynamoDbTable { table =>
-        withDynamoInserter(table) { dynamoInserter =>
-          withLocalSqsQueueAndDlq {
-            case queuePair @ QueuePair(queue, dlq) =>
-              withMockMetricSender { metricsSender =>
-                withSQSStream[NotificationMessage, R](
-                  actorSystem,
-                  queue,
-                  metricsSender) { sqsStream =>
-                  val sierraItemsToDynamoWorkerService =
-                    new SierraItemsToDynamoWorkerService(
-                      system = actorSystem,
-                      sqsStream = sqsStream,
-                      dynamoInserter = dynamoInserter
-                    )(actorSystem.dispatcher)
+        withLocalS3Bucket { bucket =>
+          withDynamoInserter(table, bucket) { dynamoInserter =>
+            withLocalSqsQueueAndDlq {
+              case queuePair@QueuePair(queue, dlq) =>
+                withMockMetricSender { metricsSender =>
+                  withSQSStream[NotificationMessage, R](
+                    actorSystem,
+                    queue,
+                    metricsSender) { sqsStream =>
+                    val sierraItemsToDynamoWorkerService =
+                      new SierraItemsToDynamoWorkerService(
+                        system = actorSystem,
+                        sqsStream = sqsStream,
+                        dynamoInserter = dynamoInserter
+                      )(actorSystem.dispatcher)
 
-                  testWith(
-                    (
-                      sierraItemsToDynamoWorkerService,
-                      queuePair,
-                      table,
-                      metricsSender
-                    ))
+                    testWith(
+                      (
+                        sierraItemsToDynamoWorkerService,
+                        queuePair,
+                        table,
+                        metricsSender
+                      ))
+                  }
                 }
-              }
+            }
           }
         }
       }
