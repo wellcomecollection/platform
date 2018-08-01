@@ -12,7 +12,11 @@ import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{SQSClientModule, SQSConfigModule}
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.{DynamoClientModule, S3ClientModule, VHSConfigModule}
+import uk.ac.wellcome.finatra.storage.{
+  DynamoClientModule,
+  S3ClientModule,
+  VHSConfigModule
+}
 import uk.ac.wellcome.platform.sierra_items_to_dynamo.modules.SierraItemsToDynamoModule
 
 object ServerMain extends Server

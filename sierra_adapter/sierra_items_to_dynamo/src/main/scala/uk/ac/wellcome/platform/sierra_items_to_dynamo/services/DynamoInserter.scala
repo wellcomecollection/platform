@@ -10,10 +10,9 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import scala.concurrent.Future
 
 class DynamoInserter @Inject()(
-  versionedHybridStore: VersionedHybridStore[
-    SierraItemRecord,
-    EmptyMetadata,
-    ObjectStore[SierraItemRecord]]) {
+  versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                             EmptyMetadata,
+                                             ObjectStore[SierraItemRecord]]) {
 
   def insertIntoDynamo(record: SierraItemRecord): Future[Unit] =
     versionedHybridStore.updateRecord(
@@ -24,8 +23,10 @@ class DynamoInserter @Inject()(
       ifExisting = (existingRecord, existingMetadata) =>
         (
           SierraItemRecordMerger
-            .mergeItems(existingRecord = existingRecord, updatedRecord = record),
+            .mergeItems(
+              existingRecord = existingRecord,
+              updatedRecord = record),
           existingMetadata
-        )
+      )
     )
 }

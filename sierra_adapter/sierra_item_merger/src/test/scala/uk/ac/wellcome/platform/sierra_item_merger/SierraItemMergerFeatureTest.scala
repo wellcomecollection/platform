@@ -33,7 +33,8 @@ class SierraItemMergerFeatureTest
       withLocalS3Bucket { vhsBucket =>
         withLocalS3Bucket { messagingBucket =>
           withLocalDynamoDbTable { table =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(messagingBucket)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
+              messagingBucket)
             withServer(flags) { _ =>
               withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                 vhsBucket,
@@ -76,7 +77,8 @@ class SierraItemMergerFeatureTest
       withLocalS3Bucket { vhsBucket =>
         withLocalS3Bucket { messagingBucket =>
           withLocalDynamoDbTable { table =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(messagingBucket)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
+              messagingBucket)
             withServer(flags) { _ =>
               withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                 vhsBucket,
@@ -137,7 +139,10 @@ class SierraItemMergerFeatureTest
     }
   }
 
-  private def sendNotification(bucket: Bucket, queue: Queue, itemRecord: SierraItemRecord): SendMessageResult = {
+  private def sendNotification(
+    bucket: Bucket,
+    queue: Queue,
+    itemRecord: SierraItemRecord): SendMessageResult = {
     val key = s"messaging/${randomAlphanumeric(10)}.json"
     s3Client.putObject(bucket.name, key, toJson(itemRecord).get)
 

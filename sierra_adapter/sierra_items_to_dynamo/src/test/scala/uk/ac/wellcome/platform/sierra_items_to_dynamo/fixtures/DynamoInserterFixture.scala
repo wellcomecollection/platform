@@ -15,8 +15,10 @@ trait DynamoInserterFixture extends LocalVersionedHybridStore {
 
   def withDynamoInserter[R](table: Table, bucket: Bucket)(
     testWith: TestWith[DynamoInserter, R]): Unit =
-    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table) { versionedHybridStore =>
-      val dynamoInserter = new DynamoInserter(versionedHybridStore = versionedHybridStore)
-      testWith(dynamoInserter)
+    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table) {
+      versionedHybridStore =>
+        val dynamoInserter =
+          new DynamoInserter(versionedHybridStore = versionedHybridStore)
+        testWith(dynamoInserter)
     }
 }

@@ -62,12 +62,18 @@ class SierraItemsToDynamoWorkerServiceTest
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
         withItemRecordVHS(table, bucket) { versionedHybridStore =>
-          storeSingleRecord(record1, versionedHybridStore = versionedHybridStore)
+          storeSingleRecord(
+            record1,
+            versionedHybridStore = versionedHybridStore)
 
           withLocalSqsQueue { queue =>
             withActorSystem { actorSystem =>
               withMetricsSender(actorSystem) { metricsSender =>
-                withSierraWorkerService(versionedHybridStore, queue, actorSystem, metricsSender) { _ =>
+                withSierraWorkerService(
+                  versionedHybridStore,
+                  queue,
+                  actorSystem,
+                  metricsSender) { _ =>
                   sendNotificationToSQS(queue = queue, message = record2)
 
                   eventually {
@@ -91,28 +97,33 @@ class SierraItemsToDynamoWorkerServiceTest
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
         withItemRecordVHS(table, bucket) { versionedHybridStore =>
-          withLocalSqsQueueAndDlq { case queuePair@QueuePair(queue, dlq) =>
-            withActorSystem { actorSystem =>
-              withMockMetricSender { metricsSender =>
-                withSierraWorkerService(versionedHybridStore, queue, actorSystem, metricsSender) { _ =>
-                  val body =
-                    """
+          withLocalSqsQueueAndDlq {
+            case queuePair @ QueuePair(queue, dlq) =>
+              withActorSystem { actorSystem =>
+                withMockMetricSender { metricsSender =>
+                  withSierraWorkerService(
+                    versionedHybridStore,
+                    queue,
+                    actorSystem,
+                    metricsSender) { _ =>
+                    val body =
+                      """
                       |{
                       | "something": "something"
                       |}
                     """.stripMargin
 
-                  sendNotificationToSQS(queue = queue, body = body)
+                    sendNotificationToSQS(queue = queue, body = body)
 
-                  eventually {
-                    assertQueueEmpty(queue)
-                    assertQueueHasSize(dlq, size =1)
-                    verify(metricsSender, never()).incrementCount(
-                      "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                    eventually {
+                      assertQueueEmpty(queue)
+                      assertQueueHasSize(dlq, size = 1)
+                      verify(metricsSender, never()).incrementCount(
+                        "SierraItemsToDynamoWorkerService_ProcessMessage_failure")
+                    }
                   }
                 }
               }
-            }
           }
         }
       }
@@ -121,17 +132,22 @@ class SierraItemsToDynamoWorkerServiceTest
 
   def storeSingleRecord(
     itemRecord: SierraItemRecord,
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]]
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]]
   ): Assertion = {
-    val putFuture = versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
-      ifNotExisting = (itemRecord, EmptyMetadata())
-    )(
-      ifExisting = (existingRecord, existingMetadata) =>
-        throw new RuntimeException(s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
-    )
+    val putFuture =
+      versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
+        ifNotExisting = (itemRecord, EmptyMetadata())
+      )(
+        ifExisting = (existingRecord, existingMetadata) =>
+          throw new RuntimeException(
+            s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
+      )
 
     whenReady(putFuture) { _ =>
-      val getFuture = versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
+      val getFuture =
+        versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
       whenReady(getFuture) { result =>
         result.get shouldBe itemRecord
       }
@@ -139,25 +155,34 @@ class SierraItemsToDynamoWorkerServiceTest
   }
 
   private def withSierraWorkerService[R](
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]],
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]],
     queue: Queue,
     actorSystem: ActorSystem,
     metricsSender: MetricsSender
   )(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
-    withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-      val dynamoInserter = new DynamoInserter(versionedHybridStore)
-      val service = new SierraItemsToDynamoWorkerService(
-        system = actorSystem,
-        sqsStream = sqsStream,
-        dynamoInserter = dynamoInserter
-      )
+    withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) {
+      sqsStream =>
+        val dynamoInserter = new DynamoInserter(versionedHybridStore)
+        val service = new SierraItemsToDynamoWorkerService(
+          system = actorSystem,
+          sqsStream = sqsStream,
+          dynamoInserter = dynamoInserter
+        )
 
-      testWith(service)
+        testWith(service)
     }
 
   def withItemRecordVHS[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]], R]): R =
-    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table, globalS3Prefix = "") { vhs =>
+    testWith: TestWith[VersionedHybridStore[SierraItemRecord,
+                                            EmptyMetadata,
+                                            ObjectStore[SierraItemRecord]],
+                       R]): R =
+    withTypeVHS[SierraItemRecord, EmptyMetadata, R](
+      bucket,
+      table,
+      globalS3Prefix = "") { vhs =>
       testWith(vhs)
     }
 }

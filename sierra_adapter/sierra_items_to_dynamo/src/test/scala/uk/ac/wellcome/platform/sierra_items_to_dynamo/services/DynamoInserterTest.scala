@@ -10,7 +10,11 @@ import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSConfig, VersionedHybridStore}
+import uk.ac.wellcome.storage.vhs.{
+  EmptyMetadata,
+  VHSConfig,
+  VersionedHybridStore
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.utils.JsonUtil._
 
@@ -28,20 +32,22 @@ class DynamoInserterTest
   it("inserts an ItemRecord into the VHS") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore = versionedHybridStore)
-          val record = createSierraItemRecord
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter =
+              new DynamoInserter(versionedHybridStore = versionedHybridStore)
+            val record = createSierraItemRecord
 
-          val futureUnit = dynamoInserter.insertIntoDynamo(record)
+            val futureUnit = dynamoInserter.insertIntoDynamo(record)
 
-          whenReady(futureUnit) { _ =>
-            assertStored[SierraItemRecord](
-              bucket = bucket,
-              table = table,
-              id = record.id.withoutCheckDigit,
-              record = record
-            )
-          }
+            whenReady(futureUnit) { _ =>
+              assertStored[SierraItemRecord](
+                bucket = bucket,
+                table = table,
+                id = record.id.withoutCheckDigit,
+                record = record
+              )
+            }
         }
       }
     }
@@ -50,32 +56,33 @@ class DynamoInserterTest
   it("does not overwrite new data with old data") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord,
-                    EmptyMetadata,
-                    Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore)
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter = new DynamoInserter(versionedHybridStore)
 
-          val newRecord = createSierraItemRecordWith(
-            modifiedDate = newerDate,
-            bibIds = List(createSierraBibNumber)
-          )
-          storeSingleRecord(newRecord, versionedHybridStore = versionedHybridStore)
-
-          val oldRecord = createSierraItemRecordWith(
-            id = newRecord.id,
-            modifiedDate = olderDate,
-            bibIds = List(createSierraBibNumber)
-          )
-
-          val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
-          whenReady(futureUnit) { _ =>
-            assertStored[SierraItemRecord](
-              bucket = bucket,
-              table = table,
-              id = oldRecord.id.withoutCheckDigit,
-              record = newRecord
+            val newRecord = createSierraItemRecordWith(
+              modifiedDate = newerDate,
+              bibIds = List(createSierraBibNumber)
             )
-          }
+            storeSingleRecord(
+              newRecord,
+              versionedHybridStore = versionedHybridStore)
+
+            val oldRecord = createSierraItemRecordWith(
+              id = newRecord.id,
+              modifiedDate = olderDate,
+              bibIds = List(createSierraBibNumber)
+            )
+
+            val futureUnit = dynamoInserter.insertIntoDynamo(oldRecord)
+            whenReady(futureUnit) { _ =>
+              assertStored[SierraItemRecord](
+                bucket = bucket,
+                table = table,
+                id = oldRecord.id.withoutCheckDigit,
+                record = newRecord
+              )
+            }
         }
       }
     }
@@ -84,33 +91,34 @@ class DynamoInserterTest
   it("overwrites old data with new data") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord,
-                    EmptyMetadata,
-                    Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore)
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter = new DynamoInserter(versionedHybridStore)
 
-          val oldRecord = createSierraItemRecordWith(
-            modifiedDate = olderDate,
-            bibIds = List(createSierraBibNumber)
-          )
-          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
-
-          val newRecord = createSierraItemRecordWith(
-            id = oldRecord.id,
-            modifiedDate = newerDate,
-            bibIds = oldRecord.bibIds ++ List(createSierraBibNumber)
-          )
-
-          val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
-
-          whenReady(futureUnit) { _ =>
-            assertStored[SierraItemRecord](
-              bucket = bucket,
-              table = table,
-              id = oldRecord.id.withoutCheckDigit,
-              record = newRecord
+            val oldRecord = createSierraItemRecordWith(
+              modifiedDate = olderDate,
+              bibIds = List(createSierraBibNumber)
             )
-          }
+            storeSingleRecord(
+              oldRecord,
+              versionedHybridStore = versionedHybridStore)
+
+            val newRecord = createSierraItemRecordWith(
+              id = oldRecord.id,
+              modifiedDate = newerDate,
+              bibIds = oldRecord.bibIds ++ List(createSierraBibNumber)
+            )
+
+            val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
+
+            whenReady(futureUnit) { _ =>
+              assertStored[SierraItemRecord](
+                bucket = bucket,
+                table = table,
+                id = oldRecord.id.withoutCheckDigit,
+                record = newRecord
+              )
+            }
         }
       }
     }
@@ -119,34 +127,35 @@ class DynamoInserterTest
   it("records unlinked bibIds") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord,
-                    EmptyMetadata,
-                    Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore)
-          val bibIds = createSierraBibNumbers(count = 3)
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter = new DynamoInserter(versionedHybridStore)
+            val bibIds = createSierraBibNumbers(count = 3)
 
-          val oldRecord = createSierraItemRecordWith(
-            modifiedDate = olderDate,
-            bibIds = bibIds
-          )
-          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
-
-          val newRecord = createSierraItemRecordWith(
-            id = oldRecord.id,
-            modifiedDate = newerDate,
-            bibIds = List(bibIds(0), bibIds(1))
-          )
-
-          val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
-
-          whenReady(futureUnit) { _ =>
-            assertStored[SierraItemRecord](
-              bucket = bucket,
-              table = table,
-              id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(unlinkedBibIds = List(bibIds(2)))
+            val oldRecord = createSierraItemRecordWith(
+              modifiedDate = olderDate,
+              bibIds = bibIds
             )
-          }
+            storeSingleRecord(
+              oldRecord,
+              versionedHybridStore = versionedHybridStore)
+
+            val newRecord = createSierraItemRecordWith(
+              id = oldRecord.id,
+              modifiedDate = newerDate,
+              bibIds = List(bibIds(0), bibIds(1))
+            )
+
+            val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
+
+            whenReady(futureUnit) { _ =>
+              assertStored[SierraItemRecord](
+                bucket = bucket,
+                table = table,
+                id = oldRecord.id.withoutCheckDigit,
+                record = newRecord.copy(unlinkedBibIds = List(bibIds(2)))
+              )
+            }
         }
       }
     }
@@ -155,34 +164,35 @@ class DynamoInserterTest
   it("adds new bibIds and records unlinked bibIds in the same update") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord,
-                    EmptyMetadata,
-                    Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore)
-          val bibIds = createSierraBibNumbers(count = 4)
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter = new DynamoInserter(versionedHybridStore)
+            val bibIds = createSierraBibNumbers(count = 4)
 
-          val oldRecord = createSierraItemRecordWith(
-            modifiedDate = olderDate,
-            bibIds = List(bibIds(0), bibIds(1), bibIds(2))
-          )
-          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
-
-          val newRecord = createSierraItemRecordWith(
-            id = oldRecord.id,
-            modifiedDate = newerDate,
-            bibIds = List(bibIds(1), bibIds(2), bibIds(3))
-          )
-
-          val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
-
-          whenReady(futureUnit) { _ =>
-            assertStored[SierraItemRecord](
-              bucket = bucket,
-              table = table,
-              id = oldRecord.id.withoutCheckDigit,
-              record = newRecord.copy(unlinkedBibIds = List(bibIds(0)))
+            val oldRecord = createSierraItemRecordWith(
+              modifiedDate = olderDate,
+              bibIds = List(bibIds(0), bibIds(1), bibIds(2))
             )
-          }
+            storeSingleRecord(
+              oldRecord,
+              versionedHybridStore = versionedHybridStore)
+
+            val newRecord = createSierraItemRecordWith(
+              id = oldRecord.id,
+              modifiedDate = newerDate,
+              bibIds = List(bibIds(1), bibIds(2), bibIds(3))
+            )
+
+            val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
+
+            whenReady(futureUnit) { _ =>
+              assertStored[SierraItemRecord](
+                bucket = bucket,
+                table = table,
+                id = oldRecord.id.withoutCheckDigit,
+                record = newRecord.copy(unlinkedBibIds = List(bibIds(0)))
+              )
+            }
         }
       }
     }
@@ -191,38 +201,39 @@ class DynamoInserterTest
   it("preserves existing unlinked bibIds in DynamoDB") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord,
-                    EmptyMetadata,
-                    Assertion](bucket, table) { versionedHybridStore =>
-          val dynamoInserter = new DynamoInserter(versionedHybridStore)
-          val bibIds = createSierraBibNumbers(count = 5)
+        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
+          versionedHybridStore =>
+            val dynamoInserter = new DynamoInserter(versionedHybridStore)
+            val bibIds = createSierraBibNumbers(count = 5)
 
-          val oldRecord = createSierraItemRecordWith(
-            modifiedDate = olderDate,
-            bibIds = List(bibIds(0), bibIds(1), bibIds(2)),
-            unlinkedBibIds = List(bibIds(4))
-          )
-          storeSingleRecord(oldRecord, versionedHybridStore = versionedHybridStore)
+            val oldRecord = createSierraItemRecordWith(
+              modifiedDate = olderDate,
+              bibIds = List(bibIds(0), bibIds(1), bibIds(2)),
+              unlinkedBibIds = List(bibIds(4))
+            )
+            storeSingleRecord(
+              oldRecord,
+              versionedHybridStore = versionedHybridStore)
 
-          val newRecord = createSierraItemRecordWith(
-            id = oldRecord.id,
-            modifiedDate = newerDate,
-            bibIds = List(bibIds(1), bibIds(2), bibIds(3)),
-            unlinkedBibIds = List()
-          )
-
-          val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
-
-          whenReady(futureUnit) { _ =>
-            val actualContents = getContentFor(
-              bucket = bucket,
-              table = table,
-              id = oldRecord.id.withoutCheckDigit
+            val newRecord = createSierraItemRecordWith(
+              id = oldRecord.id,
+              modifiedDate = newerDate,
+              bibIds = List(bibIds(1), bibIds(2), bibIds(3)),
+              unlinkedBibIds = List()
             )
 
-            val actualRecord = fromJson[SierraItemRecord](actualContents).get
-            actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(0))
-          }
+            val futureUnit = dynamoInserter.insertIntoDynamo(newRecord)
+
+            whenReady(futureUnit) { _ =>
+              val actualContents = getContentFor(
+                bucket = bucket,
+                table = table,
+                id = oldRecord.id.withoutCheckDigit
+              )
+
+              val actualRecord = fromJson[SierraItemRecord](actualContents).get
+              actualRecord.unlinkedBibIds shouldBe List(bibIds(4), bibIds(0))
+            }
 
         }
       }
@@ -252,23 +263,29 @@ class DynamoInserterTest
     val futureUnit = dynamoInserter.insertIntoDynamo(record)
     whenReady(futureUnit.failed) { ex =>
       ex shouldBe a[ResourceNotFoundException]
-      ex.getMessage should startWith("Cannot do operations on a non-existent table")
+      ex.getMessage should startWith(
+        "Cannot do operations on a non-existent table")
     }
   }
 
   def storeSingleRecord(
     itemRecord: SierraItemRecord,
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]]
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord,
+                                               EmptyMetadata,
+                                               ObjectStore[SierraItemRecord]]
   ): Assertion = {
-    val putFuture = versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
-      ifNotExisting = (itemRecord, EmptyMetadata())
-    )(
-      ifExisting = (existingRecord, existingMetadata) =>
-        throw new RuntimeException(s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
-    )
+    val putFuture =
+      versionedHybridStore.updateRecord(id = itemRecord.id.withoutCheckDigit)(
+        ifNotExisting = (itemRecord, EmptyMetadata())
+      )(
+        ifExisting = (existingRecord, existingMetadata) =>
+          throw new RuntimeException(
+            s"VHS should be empty; got ($existingRecord, $existingMetadata)!")
+      )
 
     whenReady(putFuture) { _ =>
-      val getFuture = versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
+      val getFuture =
+        versionedHybridStore.getRecord(id = itemRecord.id.withoutCheckDigit)
       whenReady(getFuture) { result =>
         result.get shouldBe itemRecord
       }

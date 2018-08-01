@@ -31,7 +31,8 @@ object SierraItemMergerModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def provideItemRecordObjectStore(injector: Injector): ObjectStore[SierraItemRecord] = {
+  def provideItemRecordObjectStore(
+    injector: Injector): ObjectStore[SierraItemRecord] = {
     implicit val storageBackend = injector.instance[S3StorageBackend]
     implicit val executionContext = injector.instance[ExecutionContext]
 
