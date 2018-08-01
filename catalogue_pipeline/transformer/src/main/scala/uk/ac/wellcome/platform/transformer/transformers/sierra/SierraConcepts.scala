@@ -46,8 +46,7 @@ trait SierraConcepts extends MarcUtils {
     //  * The value repeated with a MESH URL prefix
     //    ['D049671', 'https://id.nlm.nih.gov/mesh/D049671']
     //
-    val identifierSubfieldContents = varField.subfields
-      .filter { _.tag == "0" }
+    val identifierSubfieldContents = identifierSubfields
       .map { _.content }
       .map { _.replaceFirst("^\\(DNLM\\)", "") }
       .map { _.replaceFirst("^https://id\\.nlm\\.nih\\.gov/mesh/", "") }
