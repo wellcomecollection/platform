@@ -1,10 +1,10 @@
 package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
-class ConceptTest extends FunSpec with Matchers with JsonTestUtil {
+class ConceptTest extends FunSpec with Matchers with JsonAssertions {
 
   val concept = Concept(label = "Woodwork")
   val expectedJson =

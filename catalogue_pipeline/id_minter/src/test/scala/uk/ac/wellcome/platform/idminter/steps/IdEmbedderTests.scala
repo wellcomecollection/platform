@@ -8,8 +8,9 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
+import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
@@ -20,7 +21,7 @@ class IdEmbedderTests
     with Matchers
     with MockitoSugar
     with Akka
-    with JsonTestUtil
+    with JsonAssertions
     with ExtendedPatience
     with WorksUtil {
 

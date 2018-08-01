@@ -6,15 +6,15 @@ import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.collection.JavaConverters._
 
 class IngestorFeatureTest
     extends FunSpec
     with Matchers
-    with JsonTestUtil
+    with JsonAssertions
     with ScalaFutures
     with fixtures.Server
     with ElasticsearchFixtures

@@ -7,8 +7,8 @@ import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.{BeforeAndAfterEach, FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.test.utils.JsonTestUtil
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,7 +37,7 @@ class ElasticsearchIndexTest
     with ScalaFutures
     with Eventually
     with Matchers
-    with JsonTestUtil
+    with JsonAssertions
     with BeforeAndAfterEach {
 
   val testType = "thing"
