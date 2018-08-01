@@ -9,6 +9,7 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.utils.JsonUtil._
 

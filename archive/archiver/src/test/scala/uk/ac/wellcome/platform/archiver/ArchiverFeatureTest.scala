@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archiver.config.{AppConfig, CloudwatchClientConfig, S3ClientConfig, SQSClientConfig}
+import uk.ac.wellcome.platform.archiver.models._
 import uk.ac.wellcome.platform.archiver.modules._
 
 import scala.concurrent.duration._
@@ -19,25 +19,27 @@ class ArchiverFeatureTest extends FunSpec
 
   it("fails") {
     withLocalSqsQueueAndDlq(queuePair => {
-      sendNotificationToSQS(queuePair.queue, "hello")
+      withLocalS3Bucket { bucket =>
+        sendNotificationToSQS(queuePair.queue, "hello")
 
-      val app = new ArchiverApp {
-        override val injector = Guice.createInjector(
-          new TestAppConfigModule(queuePair.queue.url),
-          AkkaModule,
-          AkkaS3ClientModule,
-          CloudWatchClientModule,
-          SQSClientModule
-        )
+        val app = new Archiver {
+          val injector = Guice.createInjector(
+            new TestAppConfigModule(queuePair.queue.url, bucket.name),
+            AkkaModule,
+            AkkaS3ClientModule,
+            CloudWatchClientModule,
+            SQSClientModule
+          )
+        }
+
+        app.run()
       }
-
-      app.run()
     })
   }
-
 }
 
-class TestAppConfigModule(queueUrl: String) extends AbstractModule {
+class TestAppConfigModule(queueUrl: String, bucketName: String) extends AbstractModule {
+
   @Provides
   def providesAppConfig = {
 
@@ -67,12 +69,17 @@ class TestAppConfigModule(queueUrl: String) extends AbstractModule {
       flushInterval = 20 seconds
     )
 
+    val bagUploaderConfig = BagUploaderConfig(
+      uploadNamespace = bucketName
+    )
+
     AppConfig(
       s3ClientConfig,
+      bagUploaderConfig,
       cloudwatchClientConfig,
       sqsClientConfig,
       sqsConfig,
-      metricsConfig
+      metricsConfig,
     )
   }
 
@@ -95,4 +102,8 @@ class TestAppConfigModule(queueUrl: String) extends AbstractModule {
   @Provides
   def providesMetricsConfig(appConfig: AppConfig) =
     appConfig.metricsConfig
+
+  @Provides
+  def providesBagUploaderConfig(appConfig: AppConfig) =
+    appConfig.bagUploaderConfig
 }

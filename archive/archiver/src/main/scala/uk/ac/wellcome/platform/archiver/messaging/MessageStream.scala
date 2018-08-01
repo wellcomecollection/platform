@@ -1,11 +1,11 @@
-package uk.ac.wellcome.platform.archiver
+package uk.ac.wellcome.platform.archiver.messaging
 
-import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
 import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Zip}
+import akka.{Done, NotUsed}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject

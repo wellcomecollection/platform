@@ -17,7 +17,10 @@ import scala.util.{Failure, Success}
 object DownloadZipFlow {
   val tmpDir = System.getProperty("java.io.tmpdir")
 
-  def apply()(implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext): Flow[ObjectLocation, ZipFile, NotUsed] = {
+  def apply(s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext): Flow[ObjectLocation, ZipFile, NotUsed] = {
+    implicit val m = materializer
+    implicit val e = executionContext
+
     Flow[ObjectLocation].flatMapConcat((objectLocation) => {
       val downloadStream = s3Client.download(objectLocation.namespace, objectLocation.key)._1
 

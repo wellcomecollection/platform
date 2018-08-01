@@ -32,7 +32,11 @@ class DownloadZipFlowTest
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
         implicit val _ = s3AkkaClient
 
-        val downloadZipFlow = DownloadZipFlow()
+        val downloadZipFlow = DownloadZipFlow(
+          s3AkkaClient,
+          materializer,
+          global
+        )
 
         val fileName = randomAlphanumeric()
         val bagName = randomAlphanumeric()
