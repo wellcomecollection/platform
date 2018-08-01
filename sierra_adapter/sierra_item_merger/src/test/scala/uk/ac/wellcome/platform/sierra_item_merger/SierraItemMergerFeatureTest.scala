@@ -33,7 +33,7 @@ class SierraItemMergerFeatureTest
       withLocalS3Bucket { vhsBucket =>
         withLocalS3Bucket { messagingBucket =>
           withLocalDynamoDbTable { table =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(messagingBucket)
             withServer(flags) { _ =>
               withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                 vhsBucket,
@@ -76,7 +76,7 @@ class SierraItemMergerFeatureTest
       withLocalS3Bucket { vhsBucket =>
         withLocalS3Bucket { messagingBucket =>
           withLocalDynamoDbTable { table =>
-            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table)
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(messagingBucket)
             withServer(flags) { _ =>
               withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
                 vhsBucket,
