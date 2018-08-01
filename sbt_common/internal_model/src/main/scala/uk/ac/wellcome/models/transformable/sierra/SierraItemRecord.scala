@@ -11,8 +11,7 @@ case class SierraItemRecord(
   data: String,
   modifiedDate: Instant,
   bibIds: List[SierraBibNumber],
-  unlinkedBibIds: List[SierraBibNumber] = List(),
-  version: Int = 0
+  unlinkedBibIds: List[SierraBibNumber] = List()
 ) extends AbstractSierraRecord
 
 case object SierraItemRecord {
