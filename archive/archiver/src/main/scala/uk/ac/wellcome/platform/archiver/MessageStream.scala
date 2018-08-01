@@ -1,11 +1,11 @@
 package uk.ac.wellcome.platform.archiver
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.ActorSystem
+import akka.stream._
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{SqsAckSink, SqsSource}
-import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Zip}
-import akka.stream.{ActorMaterializer, ActorMaterializerSettings, ClosedShape, Supervision}
+import akka.stream.scaladsl.{Broadcast, Flow, GraphDSL, RunnableGraph, Sink, Zip}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
@@ -30,7 +30,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   implicit val dispatcher = system.dispatcher
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
-  private val sink = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
+  private val sink: Sink[(Message, MessageAction), Future[Done]] = SqsAckSink(sqsConfig.queueUrl)(sqsClient)
 
   def run(streamName: String, workFlow: Flow[T, R, NotUsed])(implicit decoderT: Decoder[T]) = {
     val metricName = s"${streamName}_ProcessMessage"
@@ -39,11 +39,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName)))
 
-    RunnableGraph.fromGraph(GraphDSL.create() { implicit builder: GraphDSL.Builder[NotUsed] =>
+    RunnableGraph.fromGraph(GraphDSL.create(sink) { implicit builder => out =>
       import GraphDSL.Implicits._
-
-      val in = source
-      val out = sink
 
       val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
 
@@ -63,10 +60,10 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       val broadcast = builder.add(Broadcast[Message](2))
       val zip = builder.add(Zip[R, Message])
 
-      in ~> messageRecieptLogFlow ~> broadcast ~> typeConversion ~> workFlow ~> zip.in0
+      source ~> messageRecieptLogFlow ~> broadcast ~> typeConversion ~> workFlow ~> zip.in0
       broadcast ~> zip.in1
 
-      zip.out ~> messageAckFlow ~> out
+      zip.out ~> messageAckFlow ~> out.in
 
       ClosedShape
     }).run()

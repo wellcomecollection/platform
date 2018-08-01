@@ -1,12 +1,19 @@
 package uk.ac.wellcome.platform.archiver.modules
 
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archiver.models.AppConfig
+import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archiver.config.{AppConfig, ArgsConfigurator}
 
-class AppConfigModule(val args: Array[String]) extends AbstractModule {
+class AppConfigModule(val args: Array[String]) extends AbstractModule with Logging {
+  debug(s"Application config loaded from args: ${args.toList}")
+
   override def configure(): Unit = {
-    bind(classOf[AppConfig]).toInstance(new AppConfig(args))
+    bind(classOf[ArgsConfigurator]).toInstance(new ArgsConfigurator(args))
   }
+
+  @Provides
+  def providesAppConfig(configurator: ArgsConfigurator)=
+    configurator.appConfig
 
   @Provides
   def providesS3ClientConfig(appConfig: AppConfig)=
@@ -20,4 +27,11 @@ class AppConfigModule(val args: Array[String]) extends AbstractModule {
   def providesSQSConfig(appConfig: AppConfig) =
     appConfig.sqsConfig
 
+  @Provides
+  def providesSQSClientConfig(appConfig: AppConfig) =
+    appConfig.sqsClientConfig
+
+  @Provides
+  def providesMetricsConfig(appConfig: AppConfig) =
+    appConfig.metricsConfig
 }

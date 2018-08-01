@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archiver.modules
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import uk.ac.wellcome.monitoring.CloudWatchClientFactory
-import uk.ac.wellcome.platform.archiver.models.CloudwatchClientConfig
+import uk.ac.wellcome.platform.archiver.config.CloudwatchClientConfig
 
 
 object CloudWatchClientModule extends AbstractModule {

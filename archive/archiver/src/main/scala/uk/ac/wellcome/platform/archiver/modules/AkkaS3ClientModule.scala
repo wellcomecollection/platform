@@ -8,7 +8,7 @@ import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider,
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archiver.models.S3ClientConfig
+import uk.ac.wellcome.platform.archiver.config.S3ClientConfig
 
 
 object AkkaS3ClientModule extends AbstractModule with Logging {

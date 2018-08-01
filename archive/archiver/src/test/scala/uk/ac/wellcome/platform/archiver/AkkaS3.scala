@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archiver
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import uk.ac.wellcome.platform.archiver.models.S3ClientConfig
+import uk.ac.wellcome.platform.archiver.config.S3ClientConfig
 import uk.ac.wellcome.platform.archiver.modules.AkkaS3ClientModule
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith

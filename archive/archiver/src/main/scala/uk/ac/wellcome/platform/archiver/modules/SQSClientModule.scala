@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archiver.modules
 import com.amazonaws.services.sqs.{AmazonSQS, AmazonSQSAsync}
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import uk.ac.wellcome.messaging.sqs.SQSClientFactory
-import uk.ac.wellcome.platform.archiver.models.SQSClientConfig
+import uk.ac.wellcome.platform.archiver.config.SQSClientConfig
 
 object SQSClientModule extends AbstractModule {
 
