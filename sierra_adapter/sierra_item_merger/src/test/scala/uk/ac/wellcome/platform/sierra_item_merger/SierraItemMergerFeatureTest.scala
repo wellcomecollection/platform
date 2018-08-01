@@ -1,13 +1,18 @@
 package uk.ac.wellcome.platform.sierra_item_merger
 
+import com.amazonaws.services.sqs.model.SendMessageResult
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{Assertion, FunSpec, Matchers}
+import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
+import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -26,33 +31,39 @@ class SierraItemMergerFeatureTest
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
-          withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-              bucket,
-              table) { hybridStore =>
-              val bibId = createSierraBibNumber
+      withLocalS3Bucket { vhsBucket =>
+        withLocalS3Bucket { messagingBucket =>
+          withLocalDynamoDbTable { table =>
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table)
+            withServer(flags) { _ =>
+              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+                vhsBucket,
+                table) { hybridStore =>
+                val bibId = createSierraBibNumber
 
-              val record = createSierraItemRecordWith(
-                bibIds = List(bibId)
-              )
+                val itemRecord = createSierraItemRecordWith(
+                  bibIds = List(bibId)
+                )
 
-              sendNotificationToSQS(queue = queue, message = record)
+                sendNotification(
+                  bucket = messagingBucket,
+                  queue = queue,
+                  itemRecord = itemRecord
+                )
 
-              val expectedSierraTransformable = createSierraTransformableWith(
-                sierraId = bibId,
-                maybeBibRecord = None,
-                itemRecords = List(record)
-              )
+                val expectedSierraTransformable = createSierraTransformableWith(
+                  sierraId = bibId,
+                  maybeBibRecord = None,
+                  itemRecords = List(itemRecord)
+                )
 
-              eventually {
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                eventually {
+                  assertStored[SierraTransformable](
+                    bucket = vhsBucket,
+                    table = table,
+                    id = expectedSierraTransformable.id,
+                    record = expectedSierraTransformable)
+                }
               }
             }
           }
@@ -63,57 +74,82 @@ class SierraItemMergerFeatureTest
 
   it("stores multiple items from SQS") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
-          withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
-              bucket,
-              table) { hybridStore =>
-              val bibId1 = createSierraBibNumber
-              val record1 = createSierraItemRecordWith(
-                bibIds = List(bibId1)
-              )
+      withLocalS3Bucket { vhsBucket =>
+        withLocalS3Bucket { messagingBucket =>
+          withLocalDynamoDbTable { table =>
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table)
+            withServer(flags) { _ =>
+              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+                vhsBucket,
+                table) { hybridStore =>
+                val bibId1 = createSierraBibNumber
+                val itemRecord1 = createSierraItemRecordWith(
+                  bibIds = List(bibId1)
+                )
 
-              sendNotificationToSQS(queue = queue, message = record1)
+                sendNotification(
+                  bucket = messagingBucket,
+                  queue = queue,
+                  itemRecord = itemRecord1
+                )
 
-              val bibId2 = createSierraBibNumber
-              val record2 = createSierraItemRecordWith(
-                bibIds = List(bibId2)
-              )
+                val bibId2 = createSierraBibNumber
+                val itemRecord2 = createSierraItemRecordWith(
+                  bibIds = List(bibId2)
+                )
 
-              sendNotificationToSQS(queue = queue, message = record2)
+                sendNotification(
+                  bucket = messagingBucket,
+                  queue = queue,
+                  itemRecord = itemRecord2
+                )
 
-              eventually {
-                val expectedSierraTransformable1 =
-                  createSierraTransformableWith(
-                    sierraId = bibId1,
-                    maybeBibRecord = None,
-                    itemRecords = List(record1)
-                  )
+                eventually {
+                  val expectedSierraTransformable1 =
+                    createSierraTransformableWith(
+                      sierraId = bibId1,
+                      maybeBibRecord = None,
+                      itemRecords = List(itemRecord1)
+                    )
 
-                val expectedSierraTransformable2 =
-                  createSierraTransformableWith(
-                    sierraId = bibId2,
-                    maybeBibRecord = None,
-                    itemRecords = List(record2)
-                  )
+                  val expectedSierraTransformable2 =
+                    createSierraTransformableWith(
+                      sierraId = bibId2,
+                      maybeBibRecord = None,
+                      itemRecords = List(itemRecord2)
+                    )
 
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedSierraTransformable1.id,
-                  record = expectedSierraTransformable1)
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedSierraTransformable2.id,
-                  record = expectedSierraTransformable2)
+                  assertStored[SierraTransformable](
+                    vhsBucket,
+                    table,
+                    id = expectedSierraTransformable1.id,
+                    record = expectedSierraTransformable1)
+                  assertStored[SierraTransformable](
+                    vhsBucket,
+                    table,
+                    id = expectedSierraTransformable2.id,
+                    record = expectedSierraTransformable2)
+                }
               }
             }
           }
         }
       }
     }
+  }
+
+  private def sendNotification(bucket: Bucket, queue: Queue, itemRecord: SierraItemRecord): SendMessageResult = {
+    val key = s"messaging/${randomAlphanumeric(10)}.json"
+    s3Client.putObject(bucket.name, key, toJson(itemRecord).get)
+
+    val hybridRecord = HybridRecord(
+      id = itemRecord.id.withoutCheckDigit,
+      s3key = key,
+      version = 1
+    )
+
+    val notification = createNotificationMessageWith(hybridRecord)
+
+    sendNotificationToSQS(queue = queue, message = notification)
   }
 }
