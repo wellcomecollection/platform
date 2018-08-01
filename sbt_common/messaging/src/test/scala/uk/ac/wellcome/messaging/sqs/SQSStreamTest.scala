@@ -3,7 +3,6 @@ package uk.ac.wellcome.messaging.sqs
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import akka.stream.scaladsl.Flow
-import org.mockito.Matchers.endsWith
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
@@ -83,7 +82,9 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, never())
-            .incrementCount(endsWith("_failure"))
+            .countFailure("test-stream_ProcessMessage")
+          verify(metricsSender, times(3))
+            .countRecognisedFailure("test-stream_ProcessMessage")
           received shouldBe empty
 
           assertQueueEmpty(queue)
