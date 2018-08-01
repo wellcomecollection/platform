@@ -37,69 +37,6 @@ class SierraItemsToDynamoWorkerServiceTest
     with ScalaFutures
     with SierraUtil {
 
-  def withSierraWorkerService[R](
-    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]],
-    queue: Queue,
-    actorSystem: ActorSystem,
-    metricsSender: MetricsSender
-  )(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
-    withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
-      val dynamoInserter = new DynamoInserter(versionedHybridStore)
-      val service = new SierraItemsToDynamoWorkerService(
-        system = actorSystem,
-        sqsStream = sqsStream,
-        dynamoInserter = dynamoInserter
-      )
-
-      testWith(service)
-    }
-
-  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
-    testWith: TestWith[VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]], R]): R =
-    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table, globalS3Prefix = "") { vhs =>
-      testWith(vhs)
-    }
-
-  def withSierraWorkerService[R](
-    testWith: TestWith[(QueuePair,
-                        Table,
-                        MetricsSender),
-                       R]): Unit = {
-    withActorSystem { actorSystem =>
-      withLocalDynamoDbTable { table =>
-        withLocalS3Bucket { bucket =>
-          withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table, globalS3Prefix = "") { versionedHybridStore =>
-            val dynamoInserter = new DynamoInserter(versionedHybridStore)
-            withLocalSqsQueueAndDlq {
-              case queuePair@QueuePair(queue, dlq) =>
-                withMockMetricSender { metricsSender =>
-                  withSQSStream[NotificationMessage, R](
-                    actorSystem,
-                    queue,
-                    metricsSender) { sqsStream =>
-                    val sierraItemsToDynamoWorkerService =
-                      new SierraItemsToDynamoWorkerService(
-                        system = actorSystem,
-                        sqsStream = sqsStream,
-                        dynamoInserter = dynamoInserter
-                      )(actorSystem.dispatcher)
-
-                    testWith(
-                      (
-                        queuePair,
-                        table,
-                        metricsSender
-                      )
-                    )
-                  }
-                }
-            }
-          }
-        }
-      }
-    }
-  }
-
   it("reads a sierra record from SQS and inserts it into DynamoDB") {
     val bibIds = createSierraBibNumbers(count = 5)
 
@@ -223,4 +160,27 @@ class SierraItemsToDynamoWorkerServiceTest
     record = record,
     metadata = EmptyMetadata()
   )
+
+  private def withSierraWorkerService[R](
+    versionedHybridStore: VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]],
+    queue: Queue,
+    actorSystem: ActorSystem,
+    metricsSender: MetricsSender
+  )(testWith: TestWith[SierraItemsToDynamoWorkerService, R]): R =
+    withSQSStream[NotificationMessage, R](actorSystem, queue, metricsSender) { sqsStream =>
+      val dynamoInserter = new DynamoInserter(versionedHybridStore)
+      val service = new SierraItemsToDynamoWorkerService(
+        system = actorSystem,
+        sqsStream = sqsStream,
+        dynamoInserter = dynamoInserter
+      )
+
+      testWith(service)
+    }
+
+  def withItemRecordVHS[R](table: Table, bucket: Bucket)(
+    testWith: TestWith[VersionedHybridStore[SierraItemRecord, EmptyMetadata, ObjectStore[SierraItemRecord]], R]): R =
+    withTypeVHS[SierraItemRecord, EmptyMetadata, R](bucket, table, globalS3Prefix = "") { vhs =>
+      testWith(vhs)
+    }
 }
