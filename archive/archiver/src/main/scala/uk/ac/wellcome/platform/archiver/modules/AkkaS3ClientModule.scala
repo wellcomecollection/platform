@@ -8,7 +8,7 @@ import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider,
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archiver.models.AppConfig
+import uk.ac.wellcome.platform.archiver.models.S3ClientConfig
 
 
 object AkkaS3ClientModule extends AbstractModule with Logging {
@@ -26,47 +26,42 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
 
   @Singleton
   @Provides
-  def providesAkkaS3Client(actorSystem: ActorSystem, appConfig: AppConfig): S3Client =
-    buildAkkaS3Client(
-      actorSystem = actorSystem,
-      region = appConfig.awsS3Region.toOption.get,
-      endpoint = appConfig.awsS3Region.toOption.get,
-      accessKey = appConfig.awsS3AccessKey.toOption.get,
-      secretKey = appConfig.awsS3SecretKey.toOption.get
-    )
+  def buildAkkaS3Client(clientConfig: S3ClientConfig, actorSystem: ActorSystem): S3Client = {
 
-  def buildAkkaS3Client(region: String,
-                        actorSystem: ActorSystem,
-                        endpoint: String,
-                        accessKey: String,
-                        secretKey: String): S3Client = {
-    val regionProvider =
-      new AwsRegionProvider {
-        def getRegion: String = region
-      }
+    val regionProvider = new AwsRegionProvider {
+      def getRegion: String = clientConfig.region
+    }
 
-    val credentialsProvider = if (endpoint.isEmpty) {
-      DefaultAWSCredentialsProviderChain.getInstance()
-    } else {
-      new AWSStaticCredentialsProvider(
+    val explicitConfigSettings = for {
+      endpoint <- clientConfig.endpoint
+      accessKey <- clientConfig.accessKey
+      secretKey <- clientConfig.secretKey
+    } yield {
+      val credentialsProvider = new AWSStaticCredentialsProvider(
         new BasicAWSCredentials(accessKey, secretKey)
+      )
+
+      akkaS3Settings(
+        credentialsProvider = credentialsProvider,
+        regionProvider = regionProvider,
+        endpointUrl = Some(endpoint)
+      )
+    }
+
+    val settings = explicitConfigSettings.getOrElse {
+      val credentialsProvider = DefaultAWSCredentialsProviderChain.getInstance()
+
+      akkaS3Settings(
+        credentialsProvider = credentialsProvider,
+        regionProvider = regionProvider,
+        endpointUrl = None
       )
     }
 
     val actorMaterializer = ActorMaterializer()(actorSystem)
-    val endpointUrl = if (endpoint.isEmpty) {
-      None
-    } else {
-      Some(endpoint)
-    }
-
-    val settings = akkaS3Settings(
-      credentialsProvider = credentialsProvider,
-      regionProvider = regionProvider,
-      endpointUrl = endpointUrl
-    )
 
     logger.debug(s"creating S3 Akka client with settings=[$settings]")
+
     new S3Client(settings)(actorSystem, actorMaterializer)
   }
 }
