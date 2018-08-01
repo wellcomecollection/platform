@@ -37,10 +37,10 @@ object DisplayItemV1 {
           id = identifiedItem.canonicalId,
           identifiers =
             if (includesIdentifiers)
-            // If there aren't any identifiers on the item JSON, Jackson puts a
-            // nil here.  Wrapping it in an Option casts it into a None or Some
-            // as appropriate, and avoids throwing a NullPointerError when
-            // we map over the value.
+              // If there aren't any identifiers on the item JSON, Jackson puts a
+              // nil here.  Wrapping it in an Option casts it into a None or Some
+              // as appropriate, and avoids throwing a NullPointerError when
+              // we map over the value.
               Option[List[SourceIdentifier]](identifiedItem.identifiers) match {
                 case Some(identifiers) =>
                   Some(identifiers.map(DisplayIdentifierV1(_)))

@@ -49,7 +49,8 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
     val expectedLocations = physicalItem.agent.locations ++ digitalItem.agent.locations
 
-    val expectedItem = physicalItem.copy(agent = physicalItem.agent.copy(locations = expectedLocations))
+    val expectedItem = physicalItem.copy(
+      agent = physicalItem.agent.copy(locations = expectedLocations))
 
     val expectedItems = List(expectedItem)
 
@@ -77,10 +78,9 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   it("does not merge a physical work with a digital work having multiple items") {
     val works = List(
       createPhysicalWork,
-      createDigitalWork.copy(
-        items = List(
-          createUnidentifiableItemWith(locations = List(createDigitalLocation)),
-          createUnidentifiableItemWith(locations = List(createDigitalLocation))))
+      createDigitalWork.copy(items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)),
+        createUnidentifiableItemWith(locations = List(createDigitalLocation))))
     )
 
     assertDoesNotMerge(works)

@@ -251,7 +251,8 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
             includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(work.items.head.asInstanceOf[Identified[Item]].sourceIdentifier)))
+          List(DisplayIdentifierV1(
+            work.items.head.asInstanceOf[Identified[Item]].sourceIdentifier)))
       }
     }
   }

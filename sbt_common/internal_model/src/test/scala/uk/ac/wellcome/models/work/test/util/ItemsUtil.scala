@@ -28,7 +28,8 @@ trait ItemsUtil extends IdentifiersUtil {
       agent = Item(locations = locations)
     )
 
-  def createUnidentifiableItemWith(locations: List[Location] = List(defaultLocation))=
+  def createUnidentifiableItemWith(
+    locations: List[Location] = List(defaultLocation)) =
     Unidentifiable(
       agent = Item(locations = locations)
     )
