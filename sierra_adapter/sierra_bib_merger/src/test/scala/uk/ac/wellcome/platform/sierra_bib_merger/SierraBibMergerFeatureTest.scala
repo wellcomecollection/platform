@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_bib_merger
 
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
@@ -9,7 +9,6 @@ import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.SourceMetadata
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
@@ -20,7 +19,7 @@ class SierraBibMergerFeatureTest
     with Matchers
     with Eventually
     with MockitoSugar
-    with ExtendedPatience
+    with IntegrationPatience
     with ScalaFutures
     with SQS
     with fixtures.Server

@@ -2,18 +2,17 @@ package uk.ac.wellcome.platform.goobi_reader
 
 import java.time.Instant
 
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.{FunSpec, Inside, Matchers}
 import uk.ac.wellcome.platform.goobi_reader.fixtures.GoobiReaderFixtures
 import uk.ac.wellcome.storage.vhs.HybridRecord
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class GoobiReaderFeatureTest
     extends FunSpec
     with fixtures.Server
     with Eventually
     with Matchers
-    with ExtendedPatience
+    with IntegrationPatience
     with GoobiReaderFixtures
     with Inside {
   private val eventTime = Instant.parse("2018-01-01T01:00:00.000Z")

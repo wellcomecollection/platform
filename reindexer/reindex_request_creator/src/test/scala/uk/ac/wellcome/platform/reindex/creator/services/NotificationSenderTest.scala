@@ -1,14 +1,13 @@
 package uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.sns.model.AmazonSNSException
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -16,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NotificationSenderTest
     extends FunSpec
     with Matchers
-    with ExtendedPatience
+    with IntegrationPatience
     with ReindexFixtures
     with ScalaFutures
     with SNS {

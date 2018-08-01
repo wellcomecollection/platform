@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.sierra_item_merger.services
 
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{Assertion, FunSpec}
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.SierraTransformable
@@ -11,7 +11,6 @@ import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.vhs.{SourceMetadata, VersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
@@ -19,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
-    with ExtendedPatience
+    with IntegrationPatience
     with ScalaFutures
     with LocalVersionedHybridStore
     with SQS

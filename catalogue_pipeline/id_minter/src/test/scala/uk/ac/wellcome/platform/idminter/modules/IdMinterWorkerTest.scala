@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.idminter.modules
 
 import com.twitter.finatra.http.EmbeddedHttpServer
-import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import scalikejdbc._
@@ -12,7 +12,6 @@ import uk.ac.wellcome.platform.idminter.database.{
 }
 import uk.ac.wellcome.platform.idminter.fixtures
 import uk.ac.wellcome.storage.fixtures.S3
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 class IdMinterWorkerTest
     extends FunSpec
@@ -23,7 +22,7 @@ class IdMinterWorkerTest
     with fixtures.IdentifiersDatabase
     with fixtures.Server
     with Eventually
-    with ExtendedPatience
+    with IntegrationPatience
     with Matchers
     with MockitoSugar {
 

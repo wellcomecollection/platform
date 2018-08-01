@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.reindex.processor
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.FunSpec
+import org.scalatest.concurrent.IntegrationPatience
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
 class ReindexProcessorFeatureTest
@@ -14,7 +14,7 @@ class ReindexProcessorFeatureTest
     with fixtures.Server
     with SQS
     with LocalDynamoDbVersioned
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   it("processes a ReindexRequest") {
     withLocalSqsQueue { queue =>

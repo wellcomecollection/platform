@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import io.circe.Json
 import io.circe.parser._
 import org.scalatest.compatible.Assertion
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.{
   AbstractSierraRecord,
@@ -17,7 +17,6 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.utils.JsonAssertions
 
@@ -25,7 +24,7 @@ class SierraRecordWrapperFlowTest
     extends FunSpec
     with Akka
     with ScalaFutures
-    with ExtendedPatience
+    with IntegrationPatience
     with Matchers
     with JsonAssertions
     with SierraUtil {

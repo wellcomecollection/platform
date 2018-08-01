@@ -1,8 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
-import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
 import org.scalatest.Matchers
-import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.json.JsonUtil._
@@ -35,7 +34,7 @@ class SierraReaderWorkerServiceTest
     with Akka
     with Eventually
     with Matchers
-    with ExtendedPatience
+    with IntegrationPatience
     with MetricsSenderFixture
     with ScalaFutures {
 
