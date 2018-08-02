@@ -3,11 +3,11 @@ package uk.ac.wellcome.platform.sierra_item_merger.modules
 import akka.actor.ActorSystem
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.platform.sierra_item_merger.services.SierraItemMergerWorkerService
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext
 
