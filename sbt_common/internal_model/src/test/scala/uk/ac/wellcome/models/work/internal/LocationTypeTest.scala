@@ -1,7 +1,6 @@
 package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 
 class LocationTypeTest extends FunSpec with Matchers {
   it("looks up a location type") {
@@ -12,9 +11,9 @@ class LocationTypeTest extends FunSpec with Matchers {
   }
 
   it("throws an error if looking up a non-existent location type") {
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[IllegalArgumentException] {
       LocationType(id = "DoesNotExist")
     }
-    caught.e.getMessage shouldBe "Unrecognised location type: [DoesNotExist]"
+    caught.getMessage shouldBe "Unrecognised location type: [DoesNotExist]"
   }
 }

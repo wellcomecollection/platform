@@ -44,9 +44,8 @@ case object LocationType {
     locationTypeMap.get(id) match {
       case Some(id) => id
       case None =>
-        throw GracefulFailureException(
-          new RuntimeException(s"Unrecognised location type: [$id]")
-        )
+        throw new IllegalArgumentException(
+          s"Unrecognised location type: [$id]")
     }
   }
 
