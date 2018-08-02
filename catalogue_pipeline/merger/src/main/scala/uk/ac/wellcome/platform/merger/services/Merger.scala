@@ -4,7 +4,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 
 class Merger extends Logging {
-  def merge(works: Seq[UnidentifiedWork]) = {
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     mergePhysicalDigitalPair(works)
       .getOrElse(works)
   }
