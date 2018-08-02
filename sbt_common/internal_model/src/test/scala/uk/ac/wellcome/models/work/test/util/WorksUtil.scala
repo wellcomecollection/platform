@@ -76,7 +76,7 @@ trait WorksUtil extends ItemsUtil {
     workType: Option[WorkType] = None,
     contributors: List[Contributor[MaybeDisplayable[AbstractAgent]]] = List(),
     production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]] = List(),
-    items: List[MaybeDisplayable[Item]] = List()
+    items: List[MaybeDisplayable[Item[MaybeDisplayable[String]]]] = List()
   ): UnidentifiedWork =
     UnidentifiedWork(
       sourceIdentifier = sourceIdentifier,
@@ -124,7 +124,7 @@ trait WorksUtil extends ItemsUtil {
     thumbnail: Option[Location] = None,
     production: List[ProductionEvent[Displayable[AbstractAgent]]] = List(),
     language: Option[Language] = None,
-    items: List[Displayable[Item]] = List(),
+    items: List[Displayable[Item[Displayable[String]]]] = List(),
     version: Int = 1
   ): IdentifiedWork =
     IdentifiedWork(

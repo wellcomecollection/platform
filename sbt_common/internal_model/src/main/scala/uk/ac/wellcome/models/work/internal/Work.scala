@@ -31,7 +31,7 @@ sealed trait Work extends BaseWork with MultipleSourceIdentifiers {
   val language: Option[Language]
   val dimensions: Option[String]
 
-  val items: List[IdentityState[Item]]
+  val items: List[IdentityState[Item[IdentityState[String]]]]
 
   val version: Int
 
@@ -56,7 +56,7 @@ case class UnidentifiedWork(
   production: List[ProductionEvent[MaybeDisplayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[MaybeDisplayable[Item]],
+  items: List[MaybeDisplayable[Item[MaybeDisplayable[String]]]],
   version: Int,
   ontologyType: String = "Work",
   identifiedType: String = classOf[IdentifiedWork].getSimpleName)
@@ -82,7 +82,7 @@ case class IdentifiedWork(
   production: List[ProductionEvent[Displayable[AbstractAgent]]],
   language: Option[Language],
   dimensions: Option[String],
-  items: List[Displayable[Item]],
+  items: List[Displayable[Item[Displayable[String]]]],
   version: Int,
   ontologyType: String = "Work")
     extends Work

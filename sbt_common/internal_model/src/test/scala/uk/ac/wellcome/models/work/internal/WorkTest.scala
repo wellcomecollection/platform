@@ -59,6 +59,6 @@ class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
     val caught = intercept[JsonDecodingError] {
       fromJson[IdentifiedWork](jsonString).get
     }
-    caught.getMessage shouldBe "Attempt to decode value on failed cursor: DownField(agent),DownArray,DownField(items)"
+    caught.getMessage should startWith("Attempt to decode value on failed cursor")
   }
 }
