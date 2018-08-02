@@ -56,15 +56,15 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   )
 
   val cloudwatchClientConfig = CloudwatchClientConfig(
-    region = awsCloudWatchRegion(),
-    endpoint = awsCloudWatchEndpoint.toOption
+    region = awsCloudwatchRegion(),
+    endpoint = awsCloudwatchEndpoint.toOption
   )
 
   val sqsClientConfig = SQSClientConfig(
-    accessKey = awsSQSAccessKey.toOption,
-    secretKey = awsSQSSecretKey.toOption,
-    region = awsSQSRegion(),
-    endpoint = awsSQSEndpoint.toOption
+    accessKey = awsSqsAccessKey.toOption,
+    secretKey = awsSqsSecretKey.toOption,
+    region = awsSqsRegion(),
+    endpoint = awsSqsEndpoint.toOption
   )
 
   val sqsConfig = SQSConfig(

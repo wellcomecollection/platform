@@ -11,7 +11,7 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.duration._
 

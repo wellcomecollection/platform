@@ -9,7 +9,7 @@ import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.platform.archiver.BagItUtils._
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class ArchiverFeatureTest extends FunSpec
   with Matchers

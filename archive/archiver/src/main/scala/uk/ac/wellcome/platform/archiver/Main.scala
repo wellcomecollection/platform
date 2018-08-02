@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archiver.flow.{DownloadNotificationFlow, Download
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archiver.modules._
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

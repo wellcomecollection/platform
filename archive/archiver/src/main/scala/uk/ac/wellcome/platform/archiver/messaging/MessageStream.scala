@@ -15,7 +15,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
-import uk.ac.wellcome.utils.JsonUtil.fromJson
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.Future
 
@@ -45,7 +45,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
 
       val messageAckFlow = Flow[(R, Message)].map { case (r, m) =>
-        metricsSender.count(metricName, Future.successful(()))
+        metricsSender.countSuccess(metricName)
+
         debug(s"Deleting message ${m.getMessageId}")
 
         (m, MessageAction.Delete)
@@ -72,7 +73,9 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   private def decider(metricName: String): Supervision.Decider = {
     case e: Exception =>
       logException(e)
-      metricsSender.count(metricName, Future.failed(e))
+
+      metricsSender.countFailure(metricName)
+
       Supervision.Resume
     case _ => Supervision.Stop
   }

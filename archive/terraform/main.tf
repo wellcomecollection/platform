@@ -34,12 +34,17 @@ resource "aws_security_group" "service_egress_security_group" {
   }
 }
 
+module "archiver_topic" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${local.namespace}_archiver"
+}
+
 module "archiver_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
   queue_name  = "${local.namespace}_transformer_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = []
+  topic_names = ["${module.archiver_topic.name}"]
 
   visibility_timeout_seconds = 30
   max_receive_count          = 3
