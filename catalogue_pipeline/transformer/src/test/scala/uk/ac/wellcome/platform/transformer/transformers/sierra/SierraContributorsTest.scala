@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -645,7 +645,7 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
     }
   }
 
-  it("throws a GracefulFailureException if subfield $$a is missing") {
+  it("fails the transform if subfield $$a is missing") {
     val varFields = List(
       VarField(
         fieldTag = "p",
@@ -670,7 +670,7 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
   private def assertTransformFails(varFields: List[VarField]) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
 
-    intercept[GracefulFailureException] {
+    intercept[TransformerException] {
       transformer.getContributors(bibData)
     }
   }

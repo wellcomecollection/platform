@@ -7,8 +7,8 @@ import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.query._
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.reindexer.ReindexableRecord
+import uk.ac.wellcome.platform.reindex.creator.exceptions.ReindexerException
 import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,9 +56,7 @@ class RecordReader @Inject()(dynamoDbClient: AmazonDynamoDB)(
     scanamoResult match {
       case Left(err: DynamoReadError) => {
         warn(s"Failed to read Dynamo records: $err")
-        throw GracefulFailureException(
-          new RuntimeException(s"Error in the DynamoDB query: $err")
-        )
+        throw ReindexerException(s"Error in the DynamoDB query: $err")
       }
       case Right(r: ReindexableRecord) => r.id
     }

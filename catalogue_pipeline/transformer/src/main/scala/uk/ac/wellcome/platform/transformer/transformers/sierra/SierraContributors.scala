@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData}
 
 trait SierraContributors extends MarcUtils {
@@ -127,10 +127,8 @@ trait SierraContributors extends MarcUtils {
     maybeSubfieldA match {
       case Some(content) => content
       case None =>
-        throw GracefulFailureException(
-          new RuntimeException(
-            s"Unable to find subfield $$a?  $subfields"
-          ))
+        throw TransformerException(
+          s"Unable to find subfield $$a? <<$subfields>>")
     }
   }
 
@@ -181,8 +179,8 @@ trait SierraContributors extends MarcUtils {
         )
       }
       case _ =>
-        throw GracefulFailureException(
-          new RuntimeException(s"Multiple identifiers in subfield $$0: $codes"))
+        throw TransformerException(
+          s"Multiple identifiers in subfield $$0: $codes")
     }
   }
 }

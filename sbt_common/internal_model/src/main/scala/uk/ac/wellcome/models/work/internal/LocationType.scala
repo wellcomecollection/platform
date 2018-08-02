@@ -3,7 +3,7 @@ package uk.ac.wellcome.models.work.internal
 import java.io.InputStream
 
 import com.github.tototoshi.csv.CSVReader
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.exceptions.InternalModelException
 
 import scala.io.Source
 
@@ -44,9 +44,7 @@ case object LocationType {
     locationTypeMap.get(id) match {
       case Some(id) => id
       case None =>
-        throw GracefulFailureException(
-          new RuntimeException(s"Unrecognised location type: [$id]")
-        )
+        throw InternalModelException(s"Unrecognised location type: [$id]")
     }
   }
 

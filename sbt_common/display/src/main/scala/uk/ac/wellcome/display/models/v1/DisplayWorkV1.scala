@@ -2,8 +2,8 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
+import uk.ac.wellcome.display.exceptions.DisplayException
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   Contributor,
@@ -112,10 +112,9 @@ case object DisplayWorkV1 {
     // data, which never populates the production field -- so rather than
     // writing and testing code to tease it out, just error here instead.
     if (work.production != Nil) {
-      throw GracefulFailureException(
-        new RuntimeException(
-          s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
-        ))
+      throw DisplayException(
+        s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
+      )
     }
 
     DisplayWorkV1(

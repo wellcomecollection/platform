@@ -2,7 +2,7 @@ package uk.ac.wellcome.display.models.v1
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.display.exceptions.DisplayException
 import uk.ac.wellcome.models.work.internal._
 
 /** Represents an Agent in the API.
@@ -34,10 +34,8 @@ case object DisplayAgentV1 {
       // bits here, error out -- the nature of the Miro data means we
       // should never hit this in practice.
       case Identified(_, _, _, _) =>
-        throw GracefulFailureException(
-          new RuntimeException(
-            s"Unexpectedly asked to convert identified agent ${displayableAgent} to DisplayAgentV1"
-          )
+        throw DisplayException(
+          s"Unexpectedly asked to convert identified agent $displayableAgent to DisplayAgentV1"
         )
     }
 }

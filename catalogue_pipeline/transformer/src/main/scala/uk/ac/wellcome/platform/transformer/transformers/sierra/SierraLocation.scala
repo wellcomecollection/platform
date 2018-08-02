@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraItemLocation
@@ -36,9 +36,8 @@ trait SierraLocation {
         locationType = LocationType("iiif-presentation")
       )
     } else {
-      throw GracefulFailureException(
-        new RuntimeException(
-          "id required by DigitalLocation has not been provided"))
+      throw TransformerException(
+        "id required by DigitalLocation has not been provided")
     }
   }
 }
