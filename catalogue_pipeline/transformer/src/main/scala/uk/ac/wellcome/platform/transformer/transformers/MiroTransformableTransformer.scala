@@ -69,7 +69,7 @@ class MiroTransformableTransformer
           language = None,
           dimensions = None,
           items = getItems(miroData, miroTransformable.sourceId),
-          itemsV1 = List(),
+          itemsV1 = getItemsV1(miroData, miroTransformable.sourceId),
           version = version
         )
       }.recover {
@@ -205,6 +205,4 @@ class MiroTransformableTransformer
     }
 
   private def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
-
-
 }

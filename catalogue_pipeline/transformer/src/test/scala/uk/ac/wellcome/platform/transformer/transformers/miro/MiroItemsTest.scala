@@ -1,20 +1,30 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.DigitalLocation
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
-class MiroItemsTest extends FunSpec with Matchers{
+class MiroItemsTest extends FunSpec with Matchers {
   val transformer = new MiroItems {}
 
-  it("finds the credit line for an image-specific contributor code") {
-    transformer.getItems(
-      miroId = "B0011308",
-      miroData = MiroTransformableData(
-        creditLine = None,
-        sourceCode = Some("FDN"),
-        useRestrictions = Some("CC-0")
-      )
-    ).head.agent.locations.head.asInstanceOf[DigitalLocation].credit shouldBe Some("Ezra Feilden")
+  describe("getItemsV1") {
+    it("extracts an identifiable item") {
+      transformer.getItemsV1(miroId = "B0011308",
+        miroData = MiroTransformableData(
+          creditLine = None,
+          sourceCode = Some("FDN"),
+          useRestrictions = Some("CC-0")
+        )) shouldBe List(Identifiable(agent = Item(locations = List(DigitalLocation("https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json", LocationType("iiif-image"), Some(License_CC0), credit = Some("Ezra Feilden")))), sourceIdentifier = SourceIdentifier(IdentifierType("miro-image-number"), "Item", "B0011308")))
+    }
+  }
+  describe("getItems") {
+    it("extracts an unidentifiable item") {
+      transformer.getItems(miroId = "B0011308",
+        miroData = MiroTransformableData(
+          creditLine = None,
+          sourceCode = Some("FDN"),
+          useRestrictions = Some("CC-0")
+        )) shouldBe List(Unidentifiable(agent = Item(locations = List(DigitalLocation("https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json", LocationType("iiif-image"), Some(License_CC0), credit = Some("Ezra Feilden"))))))
+    }
   }
 }
