@@ -6,7 +6,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.storage.s3.S3Config
@@ -20,6 +19,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
   SierraConfig,
@@ -224,7 +224,7 @@ class SierraReaderWorkerServiceTest
       val notificationMessage = createNotificationMessageWith(body = body)
       whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
         ex =>
-          ex shouldBe a[GracefulFailureException]
+          ex shouldBe a[SierraReaderException]
       }
 
     }
@@ -247,7 +247,7 @@ class SierraReaderWorkerServiceTest
 
         whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
           ex =>
-            ex shouldNot be(a[GracefulFailureException])
+            ex shouldNot be(a[SierraReaderException])
         }
     }
   }

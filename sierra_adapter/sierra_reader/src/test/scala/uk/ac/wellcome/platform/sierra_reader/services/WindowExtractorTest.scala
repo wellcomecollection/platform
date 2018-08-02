@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.sierra_reader.services
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 
 class WindowExtractorTest extends FunSpec with Matchers {
 
@@ -18,7 +18,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor.extractWindow(jsonString).get shouldBe s"[$start,$end]"
   }
 
-  it("returns a GracefulFailureException if start is not a valid iso datetime") {
+  it("returns a SierraReaderException if start is not a valid iso datetime") {
     val jsonString =
       s"""
          |{
@@ -29,11 +29,11 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
   it(
-    "returns a GracefulFailureException if start is a datetime but does not have a timezone") {
+    "returns a SierraReaderException if start is a datetime but does not have a timezone") {
     val jsonString =
       s"""
          |{
@@ -44,10 +44,10 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
-  it("returns a GracefulFailureException if end is not a valid iso datetime") {
+  it("returns a SierraReaderException if end is not a valid iso datetime") {
     val jsonString =
       s"""
          |{
@@ -58,11 +58,11 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
   it(
-    "returns a GracefulFailureException if end is a datetime but does not have a timezone") {
+    "returns a SierraReaderException if end is a datetime but does not have a timezone") {
     val jsonString =
       s"""
          |{
@@ -73,10 +73,10 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
-  it("returns a GracefulFailureException if there is not a start datetime") {
+  it("returns a SierraReaderException if there is not a start datetime") {
     val jsonString =
       s"""
          |{
@@ -86,10 +86,10 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
-  it("returns a GracefulFailureException if there is not an end datetime") {
+  it("returns a SierraReaderException if there is not an end datetime") {
     val jsonString =
       s"""
          |{
@@ -99,11 +99,11 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
   it(
-    "returns a GracefulFailureException if the start time is after the end time") {
+    "returns a SierraReaderException if the start time is after the end time") {
     val jsonString =
       s"""
          |{
@@ -114,11 +114,11 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 
   it(
-    "returns a GracefulFailureException if the start time is equal to the end time") {
+    "returns a SierraReaderException if the start time is equal to the end time") {
     val jsonString =
       s"""
          |{
@@ -129,6 +129,6 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor
       .extractWindow(jsonString)
       .failed
-      .get shouldBe a[GracefulFailureException]
+      .get shouldBe a[SierraReaderException]
   }
 }

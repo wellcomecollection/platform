@@ -15,6 +15,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkNode
 }
 import uk.ac.wellcome.models.work.internal.MergeCandidate
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.platform.matcher.locking.{
   DynamoRowLockDao,
@@ -232,7 +233,7 @@ class WorkMatcherTest
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                     }
 
                   }
@@ -285,7 +286,7 @@ class WorkMatcherTest
                     } yield result
 
                     whenReady(failedLock.failed) { failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                     }
                   }
               }
@@ -318,7 +319,7 @@ class WorkMatcherTest
                   whenReady(
                     workMatcher.matchWork(anUnidentifiedSierraWork).failed) {
                     failedMatch =>
-                      failedMatch shouldBe a[GracefulFailureException]
+                      failedMatch shouldBe a[MatcherException]
                   }
                 }
             }
