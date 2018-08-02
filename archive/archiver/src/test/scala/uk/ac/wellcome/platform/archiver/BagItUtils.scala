@@ -24,7 +24,7 @@ object BagItUtils {
 
   def createZip(files: List[FileEntry]) = {
 
-    val zipFileName = File.createTempFile("",".zip").getName
+    val zipFileName = File.createTempFile("archiver-test",".zip").getName
     val zipFileOutputStream = new FileOutputStream(zipFileName)
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
 
