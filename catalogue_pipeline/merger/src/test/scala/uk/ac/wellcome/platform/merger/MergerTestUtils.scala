@@ -2,7 +2,11 @@ package uk.ac.wellcome.platform.merger
 
 import org.scalatest.{Assertion, Suite}
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
-import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{
+  MatchedIdentifiers,
+  MatcherResult,
+  WorkIdentifier
+}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
@@ -10,7 +14,11 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
-trait MergerTestUtils extends Eventually with ScalaFutures with LocalVersionedHybridStore with WorksUtil { this: Suite =>
+trait MergerTestUtils
+    extends Eventually
+    with ScalaFutures
+    with LocalVersionedHybridStore
+    with WorksUtil { this: Suite =>
 
   def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
     MatcherResult(

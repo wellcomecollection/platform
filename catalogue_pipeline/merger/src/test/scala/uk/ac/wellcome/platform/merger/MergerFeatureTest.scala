@@ -43,7 +43,8 @@ class MergerFeatureTest
 
                     storeInVHS(vhs, recorderWorkEntry)
 
-                    val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
+                    val matcherResult =
+                      matcherResultWith(Set(Set(recorderWorkEntry)))
                     sendNotificationToSQS(queue, matcherResult)
 
                     eventually {

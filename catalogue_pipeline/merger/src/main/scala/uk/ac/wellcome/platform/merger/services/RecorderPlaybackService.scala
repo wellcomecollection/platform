@@ -17,16 +17,18 @@ import scala.concurrent.{ExecutionContext, Future}
   * so the merger has everything it needs to work with.
   *
   */
-class RecorderPlaybackService @Inject() (
+class RecorderPlaybackService @Inject()(
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
                                              EmptyMetadata,
                                              ObjectStore[RecorderWorkEntry]],
-)(implicit ec: ExecutionContext) extends Logging {
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
   /** Given a collection of matched identifiers, return all the
     * corresponding works from VHS.
     */
-  def fetchAllRecorderWorkEntries(workIdentifiers: List[WorkIdentifier]): Future[List[Option[RecorderWorkEntry]]] = {
+  def fetchAllRecorderWorkEntries(workIdentifiers: List[WorkIdentifier])
+    : Future[List[Option[RecorderWorkEntry]]] = {
     Future.sequence(
       workIdentifiers
         .map { getRecorderEntryForIdentifier }

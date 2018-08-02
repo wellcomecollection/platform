@@ -29,7 +29,8 @@ class MergerWorkerService @Inject()(
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
       workIdentifiers = getWorksIdentifiers(matcherResult).toList
-      maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(workIdentifiers)
+      maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
+        workIdentifiers)
       works <- mergeIfAllWorksDefined(maybeWorkEntries)
       _ <- sendWorks(works)
     } yield ()

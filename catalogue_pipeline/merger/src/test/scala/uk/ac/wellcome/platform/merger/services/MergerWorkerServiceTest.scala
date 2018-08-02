@@ -70,9 +70,9 @@ class MergerWorkerServiceTest
           assertQueueEmpty(dlq)
 
           val worksSent = getMessages[BaseWork](topic)
-          worksSent should contain only(recorderWorkEntry1.work,
-            recorderWorkEntry2.work,
-            recorderWorkEntry3.work)
+          worksSent should contain only (recorderWorkEntry1.work,
+          recorderWorkEntry2.work,
+          recorderWorkEntry3.work)
 
           verify(metricsSender, times(1))
             .countSuccess(any[String])
@@ -144,9 +144,7 @@ class MergerWorkerServiceTest
         val matcherResult = matcherResultWith(
           Set(Set(recorderWorkEntry, olderVersionRecorderWorkEntry)))
 
-        storeInVHS(
-          vhs,
-          List(recorderWorkEntry, newerVersionRecorderWorkEntry))
+        storeInVHS(vhs, List(recorderWorkEntry, newerVersionRecorderWorkEntry))
 
         sendNotificationToSQS(
           queue = queue,
