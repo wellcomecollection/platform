@@ -8,6 +8,7 @@ import akka.NotUsed
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{FileIO, Flow, Source}
+import akka.util.ByteString
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
@@ -21,8 +22,8 @@ object DownloadZipFlow {
     implicit val m = materializer
     implicit val e = executionContext
 
-    Flow[ObjectLocation].flatMapConcat((objectLocation) => {
-      val downloadStream = s3Client.download(objectLocation.namespace, objectLocation.key)._1
+    Flow[ObjectLocation].flatMapConcat(objectLocation => {
+      val downloadStream: Source[ByteString, NotUsed] = s3Client.download(objectLocation.namespace, objectLocation.key)._1
 
       // TODO: Use File.createTempFile
       val fileName = randomUUID().toString

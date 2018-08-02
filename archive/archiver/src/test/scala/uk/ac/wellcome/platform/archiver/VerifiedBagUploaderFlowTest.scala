@@ -27,7 +27,7 @@ class VerifiedBagUploaderFlowTest
 
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
         val bagName = randomAlphanumeric()
-        val zipFile = createBagItZip(bagName, 1)
+        val (zipFile, _) = createBagItZip(bagName, 1)
 
         val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
 
@@ -47,7 +47,7 @@ class VerifiedBagUploaderFlowTest
 
         val bagUploaderConfig = BagUploaderConfig(uploadNamespace = storageBucket.name)
         val bagName = randomAlphanumeric()
-        val zipFile = createBagItZip(bagName, 1, false)
+        val (zipFile, _) = createBagItZip(bagName, 1, false)
 
         val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
 

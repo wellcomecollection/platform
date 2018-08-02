@@ -40,7 +40,7 @@ class DownloadZipFlowTest
 
         val fileName = randomAlphanumeric()
         val bagName = randomAlphanumeric()
-        val zipFile = createBagItZip(bagName, 1)
+        val (zipFile, _) = createBagItZip(bagName, 1)
 
         val file = new File(zipFile.getName)
         s3Client.putObject(storageBucket.name, fileName, file)

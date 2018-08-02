@@ -41,7 +41,7 @@ object BagItUtils {
 
     val zipFile = new ZipFile(zipFileName)
 
-    zipFile
+    (zipFile, zipFileName)
   }
 
   def createBagItZip(bagName: String, dataFileCount: Int = 1, valid: Boolean = true) = {
