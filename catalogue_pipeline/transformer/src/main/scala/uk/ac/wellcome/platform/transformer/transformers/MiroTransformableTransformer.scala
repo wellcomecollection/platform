@@ -69,6 +69,7 @@ class MiroTransformableTransformer
           language = None,
           dimensions = None,
           items = getItems(miroData, miroTransformable.sourceId),
+          itemsV1 = List(),
           version = version
         )
       }.recover {
