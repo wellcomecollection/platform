@@ -7,14 +7,14 @@ trait ItemsUtil extends IdentifiersUtil {
     canonicalId: String = createCanonicalId,
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     locations: List[Location] = List(defaultLocation)
-  ): Identified[Item[Identified[String]]] =
+  ): Identified[Item] =
     Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
-      agent = Item(locations = locations, v1SourceIdentifier = Identified(canonicalId = canonicalId, sourceIdentifier = sourceIdentifier, agent = ""))
+      agent = Item(locations = locations)
     )
 
-  def createIdentifiedItems(count: Int): List[Identified[Item[Identified[String]]]] =
+  def createIdentifiedItems(count: Int): List[Identified[Item]] =
     (1 to count).map { _ =>
       createIdentifiedItem()
     }.toList
@@ -22,16 +22,16 @@ trait ItemsUtil extends IdentifiersUtil {
   def createIdentifiableItemWith(
     sourceIdentifier: SourceIdentifier = createSourceIdentifier,
     locations: List[Location] = List(defaultLocation)
-  ): Identifiable[Item[Identifiable[String]]] =
+  ): Identifiable[Item] =
     Identifiable(
       sourceIdentifier = sourceIdentifier,
-      agent = Item(locations = locations, v1SourceIdentifier = Identifiable(sourceIdentifier = sourceIdentifier, agent = ""))
+      agent = Item(locations = locations)
     )
 
   def createUnidentifiableItemWith(
     locations: List[Location] = List(defaultLocation)) =
     Unidentifiable(
-      agent = Item(locations = locations, v1SourceIdentifier = Unidentifiable(agent = ""))
+      agent = Item(locations = locations)
     )
 
   def createPhysicalLocation = createPhysicalLocationWith()
