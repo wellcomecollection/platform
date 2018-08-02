@@ -27,9 +27,7 @@ def doSharedSierraSetup(project: Project, folder: String) =
 lazy val common = doSharedLibrarySetup(project, "sbt_common/common")
   .settings(libraryDependencies ++= Dependencies.commonDependencies)
 
-// It depends on common because it uses JsonUtil
 lazy val internal_model = doSharedLibrarySetup(project, "sbt_common/internal_model")
-  .dependsOn(common % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.internalModelDependencies)
 
 lazy val display = doSharedLibrarySetup(project, "sbt_common/display")
