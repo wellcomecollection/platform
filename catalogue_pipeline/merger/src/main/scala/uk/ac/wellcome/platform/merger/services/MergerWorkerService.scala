@@ -28,7 +28,8 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
-      maybeWorkEntries <- getFromVHS(matcherResult)
+      workIdentifiers = getWorksIdentifiers(matcherResult).toList
+      maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(workIdentifiers)
       works <- mergeIfAllWorksDefined(maybeWorkEntries)
       _ <- sendWorks(works)
     } yield ()
@@ -45,11 +46,6 @@ class MergerWorkerService @Inject()(
       workEntries.map(_.work)
     }
   }
-
-  private def getFromVHS(
-    matcherResult: MatcherResult): Future[List[Option[RecorderWorkEntry]]] =
-    playbackService
-      .fetchAllRecorderWorkEntries(getWorksIdentifiers(matcherResult).toList)
 
   private def sendWorks(mergedWorks: Seq[BaseWork]) = {
     Future
