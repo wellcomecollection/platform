@@ -26,7 +26,6 @@ This allows us to replace the three existing bulk upload mechanisms, one of whic
 
 This is already available in Goobi, no changes required.
 
-
 ### S3
 
 #### Package format
