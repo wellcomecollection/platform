@@ -55,8 +55,17 @@ object BagItUtils {
       FileEntry(filePath, fileContents)
     }
 
+    // Create object files
+    val objectFiles = (1 to dataFileCount).map { _ =>
+      val fileName = randomAlphanumeric()
+      val filePath = s"$bagName/data/object/$fileName.jp2"
+      val fileContents = Random.nextString(256)
+
+      FileEntry(filePath, fileContents)
+    }
+
     // Create data manifest
-    val dataManifest = FileEntry(s"$bagName/manifest-sha256.txt", dataFiles.map {
+    val dataManifest = FileEntry(s"$bagName/manifest-sha256.txt", (dataFiles ++ objectFiles).map {
       case FileEntry(fileName, fileContents) => {
         val fileContentsDigest = createDigest(fileContents)
 
@@ -102,7 +111,7 @@ object BagItUtils {
     )
 
     val allFiles =
-      dataFiles ++ List(dataManifest, metaManifest, bagInfoFile, bagItFile)
+      dataFiles ++ objectFiles ++ List(dataManifest, metaManifest, bagInfoFile, bagItFile)
 
     createZip(allFiles.toList)
   }

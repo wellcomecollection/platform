@@ -18,13 +18,19 @@ class ArchiverFeatureTest extends FunSpec
   with AkkaS3 {
 
   // TODO: Need to test failure cases!!!
-
   it("downloads, uploads and verifies a BagIt bag") {
     withLocalSqsQueueAndDlq(queuePair => {
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
           val bagName = randomAlphanumeric()
-          val (_, fileName) = createBagItZip(bagName, 1)
+          val (zipFile, fileName) = createBagItZip(bagName, 1)
+
+          val entries = zipFile.entries()
+          val fileCount = Stream
+            .continually(entries.nextElement)
+            .takeWhile(_ => entries.hasMoreElements)
+            .toList
+            .length
 
           val uploadKey = "upload/path/file.zip"
           s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
@@ -48,7 +54,7 @@ class ArchiverFeatureTest extends FunSpec
             val objects = s3Client.listObjects(storageBucket.name)
             val objectSummaries = objects.getObjectSummaries
 
-            objectSummaries.toArray.length should be > 0
+            objectSummaries.toArray.length shouldEqual fileCount
           }
         }
       }

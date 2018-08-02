@@ -11,6 +11,7 @@ import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 // TODO: Verify checksums in S3 are what you set them to
 object VerifiedBagUploaderFlow extends Logging {
@@ -30,30 +31,21 @@ object VerifiedBagUploaderFlow extends Logging {
       Source.fromIterator(() => config.digestNames.toIterator)
         .map(digestName => ObjectLocation(bagName, digestName))
         .map(digestLocation => {
-
           debug(s"Looking for digest location: $digestLocation")
-
           digestLocation
         })
         .via(bagDigestItemFlow)
         .via(archiveItemFlow)
+        .map(future => {
+
+          future.onComplete {
+            case Success(_) => info(s"$bagName archived successfully.")
+            case Failure(e) => warn(s"Failed to archive $bagName!", e)
+          }
+
+          future
+        })
 
     })
-  }
-}
-
-object BagNameSource extends Logging {
-  def apply(zipFile: ZipFile): Source[String, NotUsed] = {
-    val entries = zipFile.entries()
-
-    val tld = Stream
-      .continually(entries.nextElement)
-      .map(_.getName.split("/"))
-      .flatMap(_.headOption)
-      .filterNot(_.equals("."))
-      .takeWhile(_ => entries.hasMoreElements)
-      .toSet
-
-    Source.fromIterator(() => tld.toIterator)
   }
 }
