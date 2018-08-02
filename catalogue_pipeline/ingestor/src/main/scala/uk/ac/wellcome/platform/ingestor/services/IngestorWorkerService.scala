@@ -82,7 +82,8 @@ class IngestorWorkerService @Inject()(
       case sierraIdentifier.id =>
         Set(ingestorConfig.elasticConfig.indexV2name)
       case _ =>
-        throw IngestorException(s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}")
+        throw IngestorException(
+          s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}")
     }
 
   }

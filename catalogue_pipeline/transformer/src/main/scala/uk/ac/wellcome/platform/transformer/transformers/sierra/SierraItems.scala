@@ -4,7 +4,11 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{SierraBibData, SierraItemData, SierraMaterialType}
+import uk.ac.wellcome.platform.transformer.source.{
+  SierraBibData,
+  SierraItemData,
+  SierraMaterialType
+}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 

@@ -59,7 +59,8 @@ class WindowManager @Inject()(
             val newId = (id.toInt + 1).toString
             WindowStatus(id = newId, offset = offset + 1)
           case None =>
-            throw SierraReaderException(s"JSON <<$lastBody>> did not contain an id")
+            throw SierraReaderException(
+              s"JSON <<$lastBody>> did not contain an id")
         }
       }
       case None => WindowStatus(id = None, offset = 0)

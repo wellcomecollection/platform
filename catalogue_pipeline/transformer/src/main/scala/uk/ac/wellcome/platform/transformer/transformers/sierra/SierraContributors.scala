@@ -126,8 +126,9 @@ trait SierraContributors extends MarcUtils {
 
     maybeSubfieldA match {
       case Some(content) => content
-      case None => throw TransformerException(
-        s"Unable to find subfield $$a? <<$subfields>>")
+      case None =>
+        throw TransformerException(
+          s"Unable to find subfield $$a? <<$subfields>>")
     }
   }
 
@@ -177,8 +178,9 @@ trait SierraContributors extends MarcUtils {
           sourceIdentifier = sourceIdentifier
         )
       }
-      case _ => throw TransformerException(
-        s"Multiple identifiers in subfield $$0: $codes")
+      case _ =>
+        throw TransformerException(
+          s"Multiple identifiers in subfield $$0: $codes")
     }
   }
 }
