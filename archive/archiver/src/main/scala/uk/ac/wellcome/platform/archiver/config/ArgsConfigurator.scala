@@ -14,13 +14,13 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val awsS3Region = opt[String](default = Some("eu-west-1"))
   val awsS3Endpoint = opt[String]()
 
-  val awsSQSAccessKey = opt[String]()
-  val awsSQSSecretKey = opt[String]()
-  val awsSQSRegion = opt[String](default = Some("eu-west-1"))
-  val awsSQSEndpoint = opt[String]()
+  val awsSqsAccessKey = opt[String]()
+  val awsSqsSecretKey = opt[String]()
+  val awsSqsRegion = opt[String](default = Some("eu-west-1"))
+  val awsSqsEndpoint = opt[String]()
 
-  val awsCloudWatchRegion = opt[String](default = Some("eu-west-1"))
-  val awsCloudWatchEndpoint = opt[String]()
+  val awsCloudwatchRegion = opt[String](default = Some("eu-west-1"))
+  val awsCloudwatchEndpoint = opt[String]()
 
   val sqsQueueUrl: ScallopOption[String] = opt[String](required = true)
   val sqsWaitTimeSeconds = opt[Int](required = true, default = Some(20))

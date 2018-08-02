@@ -1,1 +1,3 @@
--config=value
+-sqs-queue-url=${queue_url}
+-upload-namespace=${archive_bucket}
+-metrics-namespace=archiver

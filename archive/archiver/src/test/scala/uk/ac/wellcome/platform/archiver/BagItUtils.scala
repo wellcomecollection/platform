@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.archiver
 
-import java.io.FileOutputStream
+import java.io.{File, FileOutputStream}
 import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
@@ -24,7 +24,7 @@ object BagItUtils {
 
   def createZip(files: List[FileEntry]) = {
 
-    val zipFileName = s"/Users/k/Desktop/${randomAlphanumeric()}.zip"
+    val zipFileName = File.createTempFile("",".zip").getName
     val zipFileOutputStream = new FileOutputStream(zipFileName)
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
 
