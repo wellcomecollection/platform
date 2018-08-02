@@ -1,7 +1,6 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{Agent, Identified}
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 
