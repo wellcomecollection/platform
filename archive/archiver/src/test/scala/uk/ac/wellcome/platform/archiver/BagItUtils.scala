@@ -13,7 +13,7 @@ object BagItUtils {
   }
 
   def createDigest(string: String) = MessageDigest
-    .getInstance("MD5")
+    .getInstance("SHA-256")
     .digest(string.getBytes)
     .map(0xFF & _)
     .map {
@@ -94,8 +94,8 @@ object BagItUtils {
     val bagInfoFileChecksum = createDigest(bagInfoFileContents)
 
     val metaManifest = FileEntry(
-      s"$bagName/tagmanifest-md5.txt",
-      s"""$dataManifestChecksum  manifest-md5.txt
+      s"$bagName/tagmanifest-sha256.txt",
+      s"""$dataManifestChecksum  manifest-sha256.txt
          |$bagItFileChecksum  bagit.txt
          |$bagInfoFileChecksum  bag-info.txt
        """.stripMargin.trim

@@ -15,7 +15,7 @@ object UploadVerificationFlow {
   def apply(zipFile: ZipFile, checksum: String, config: BagUploaderConfig)(
     implicit s3Client: S3Client, materializer: ActorMaterializer
   ): Flow[ObjectLocation, Future[MultipartUploadResult], NotUsed] = {
-    val verify = DigestCalculatorFlow("MD5", checksum)
+    val verify = DigestCalculatorFlow("SHA-256", checksum)
     val extract = FileExtractorFlow(zipFile)
 
     Flow[ObjectLocation].map((bagLocation) => {
