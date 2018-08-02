@@ -41,8 +41,7 @@ class MergerFeatureTest
 
                     storeInVHS(vhs, recorderWorkEntry)
 
-                    val matcherResult =
-                      matcherResultWith(Set(Set(recorderWorkEntry)))
+                    val matcherResult = matcherResultWith(Set(Set(recorderWorkEntry)))
                     sendNotificationToSQS(queue, matcherResult)
 
                     eventually {
@@ -50,7 +49,6 @@ class MergerFeatureTest
                       assertQueueEmpty(dlq)
                       val worksSent = getMessages[TransformedBaseWork](topic)
                       worksSent should contain only recorderWorkEntry.work
-
                     }
                   }
               }
