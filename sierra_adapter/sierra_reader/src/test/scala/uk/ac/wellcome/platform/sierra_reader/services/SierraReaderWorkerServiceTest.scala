@@ -212,7 +212,7 @@ class SierraReaderWorkerServiceTest
     getObjectFromS3[List[SierraItemRecord]](bucket, key)
 
   it(
-    "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
+    "returns a SierraReaderException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
       val body =
         """
@@ -232,7 +232,7 @@ class SierraReaderWorkerServiceTest
   }
 
   it(
-    "does not return a GracefulFailureException if it cannot reach the Sierra API") {
+    "doesn't return a SierraReaderException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
         val body =

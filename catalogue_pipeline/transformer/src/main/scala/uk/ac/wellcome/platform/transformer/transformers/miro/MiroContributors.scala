@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException

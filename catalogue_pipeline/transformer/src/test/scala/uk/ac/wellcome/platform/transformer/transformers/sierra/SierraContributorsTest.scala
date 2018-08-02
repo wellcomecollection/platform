@@ -645,7 +645,7 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
     }
   }
 
-  it("throws a GracefulFailureException if subfield $$a is missing") {
+  it("fails the transform if subfield $$a is missing") {
     val varFields = List(
       VarField(
         fieldTag = "p",

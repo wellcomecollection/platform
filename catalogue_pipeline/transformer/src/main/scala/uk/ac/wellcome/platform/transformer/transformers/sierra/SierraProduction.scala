@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
