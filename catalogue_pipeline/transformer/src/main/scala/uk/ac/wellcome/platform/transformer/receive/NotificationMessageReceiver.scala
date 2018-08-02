@@ -4,23 +4,16 @@ import com.amazonaws.services.s3.AmazonS3
 import com.google.inject.Inject
 import com.twitter.inject.Logging
 import io.circe.ParsingFailure
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.transformers.{
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.platform.transformer.transformers.{MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -53,7 +46,7 @@ class NotificationMessageReceiver @Inject()(
       .recover {
         case e: ParsingFailure =>
           info("Recoverable failure parsing HybridRecord from message", e)
-          throw GracefulFailureException(e)
+          throw TransformerException(e)
       }
       .map(_ => ())
 

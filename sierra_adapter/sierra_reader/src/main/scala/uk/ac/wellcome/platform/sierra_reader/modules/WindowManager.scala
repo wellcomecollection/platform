@@ -5,10 +5,10 @@ import com.google.inject.Inject
 import com.twitter.inject.Logging
 import org.apache.commons.io.IOUtils
 import uk.ac.wellcome.platform.sierra_reader.models.{SierraConfig, WindowStatus}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.sierra.UntypedSierraRecordNumber
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
@@ -44,8 +44,7 @@ class WindowManager @Inject()(
         val offset = key match {
           case embeddedIndexMatch(index) => index.toInt
           case _ =>
-            throw GracefulFailureException(
-              new RuntimeException(s"Unable to determine offset in $key"))
+            throw SierraReaderException(s"Unable to determine offset in $key")
         }
 
         val lastBody = IOUtils.toString(
@@ -60,8 +59,7 @@ class WindowManager @Inject()(
             val newId = (id.toInt + 1).toString
             WindowStatus(id = newId, offset = offset + 1)
           case None =>
-            throw GracefulFailureException(
-              new RuntimeException(s"JSON <<$lastBody>> did not contain an id"))
+            throw SierraReaderException(s"JSON <<$lastBody>> did not contain an id")
         }
       }
       case None => WindowStatus(id = None, offset = 0)
@@ -94,9 +92,8 @@ class WindowManager @Inject()(
           .sorted
           .lastOption
       case Failure(_) =>
-        throw GracefulFailureException(
-          new RuntimeException(
-            s"S3 contents <<$s3contents> could not be parsed as JSON"))
+        throw SierraReaderException(
+          s"S3 contents <<$s3contents> could not be parsed as JSON")
     }
   }
 }

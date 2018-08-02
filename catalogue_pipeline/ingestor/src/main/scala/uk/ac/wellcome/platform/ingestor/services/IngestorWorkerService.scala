@@ -3,10 +3,10 @@ package uk.ac.wellcome.platform.ingestor.services
 import akka.actor.{ActorSystem, Terminated}
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.messaging.message.MessageStream
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifierType}
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
+import uk.ac.wellcome.platform.ingestor.exceptions.IngestorException
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -82,8 +82,7 @@ class IngestorWorkerService @Inject()(
       case sierraIdentifier.id =>
         Set(ingestorConfig.elasticConfig.indexV2name)
       case _ =>
-        throw GracefulFailureException(new RuntimeException(
-          s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}"))
+        throw IngestorException(s"Cannot ingest work with identifierType: ${work.sourceIdentifier.identifierType}")
     }
 
   }

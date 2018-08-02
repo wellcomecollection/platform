@@ -7,8 +7,8 @@ import com.gu.scanamo.Scanamo
 import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
 import com.twitter.inject.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,7 +25,7 @@ class WorkNodeDao @Inject()(
       Scanamo.put(dynamoDbClient)(dynamoConfig.table)(work)
     }.recover {
       case exception: ProvisionedThroughputExceededException =>
-        throw GracefulFailureException(exception)
+        throw MatcherException(exception)
     }
 
   def get(ids: Set[String]): Future[Set[WorkNode]] =
@@ -44,7 +44,7 @@ class WorkNodeDao @Inject()(
         }
     }.recover {
       case exception: ProvisionedThroughputExceededException =>
-        throw GracefulFailureException(exception)
+        throw MatcherException(exception)
     }
 
   def getByComponentIds(setIds: Set[String]): Future[Set[WorkNode]] =
@@ -70,6 +70,6 @@ class WorkNodeDao @Inject()(
         }
     }.recover {
       case exception: ProvisionedThroughputExceededException =>
-        throw GracefulFailureException(exception)
+        throw MatcherException(exception)
     }
 }
