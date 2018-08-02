@@ -10,7 +10,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraItemRecord
 }
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.Random
 

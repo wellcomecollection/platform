@@ -13,7 +13,7 @@ import uk.ac.wellcome.test.fixtures._
 import scala.concurrent.duration._
 import scala.collection.JavaConverters._
 import scala.util.Random
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 object SQS {
 

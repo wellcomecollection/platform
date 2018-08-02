@@ -17,8 +17,9 @@ import uk.ac.wellcome.models.transformable.sierra.{
 }
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 class SierraRecordWrapperFlowTest
     extends FunSpec
@@ -26,7 +27,7 @@ class SierraRecordWrapperFlowTest
     with ScalaFutures
     with ExtendedPatience
     with Matchers
-    with JsonTestUtil
+    with JsonAssertions
     with SierraUtil {
 
   private def withRecordWrapperFlow[T <: AbstractSierraRecord](

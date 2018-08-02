@@ -9,7 +9,7 @@ import com.twitter.inject.Logging
 import org.elasticsearch.index.VersionType
 import uk.ac.wellcome.elasticsearch.ElasticsearchExceptionManager
 import uk.ac.wellcome.models.work.internal.IdentifiedBaseWork
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 

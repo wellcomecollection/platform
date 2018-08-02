@@ -4,10 +4,10 @@ import com.sksamuel.elastic4s.http.get.GetResponse
 import com.sksamuel.elastic4s.http.search.SearchHit
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.api.fixtures.ElasticsearchServiceFixture
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.Future
 

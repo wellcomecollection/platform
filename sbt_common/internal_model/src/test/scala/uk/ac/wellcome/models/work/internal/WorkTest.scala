@@ -1,9 +1,9 @@
 package uk.ac.wellcome.models.work.internal
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
 
@@ -56,7 +56,7 @@ class WorkTest extends FunSpec with Matchers with IdentifiersUtil {
         |}
       """.stripMargin
 
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[JsonDecodingError] {
       fromJson[IdentifiedWork](jsonString).get
     }
     caught.getMessage shouldBe "Attempt to decode value on failed cursor: DownField(agent),DownArray,DownField(items)"

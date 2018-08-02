@@ -19,7 +19,7 @@ import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class SierraItemsToDynamoWorkerServiceTest
     extends FunSpec

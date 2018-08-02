@@ -10,7 +10,7 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraItemData,
   SierraMaterialType
 }
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.{Failure, Success}
 

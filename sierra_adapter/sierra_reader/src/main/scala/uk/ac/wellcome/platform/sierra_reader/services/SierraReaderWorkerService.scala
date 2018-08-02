@@ -26,7 +26,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 
 import scala.concurrent.Future

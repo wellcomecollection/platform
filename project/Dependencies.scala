@@ -2,9 +2,15 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
+    val json = "1.0.0"
     val monitoring = "1.1.0"
     val storage = "1.5.0"
   }
+
+  val jsonLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "json_2.12" % versions.json,
+    "uk.ac.wellcome" % "json_2.12" % versions.json % "test" classifier "tests"
+  )
 
   val monitoringLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring,
@@ -139,7 +145,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
+  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
@@ -149,7 +155,7 @@ object Dependencies {
 
   val internalModelDependencies = dynamoDependencies ++ Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
-  )
+  ) ++ WellcomeDependencies.jsonLibrary
 
   // Application specific dependency groups
   val idminterDependencies = Seq(

@@ -14,7 +14,7 @@ import uk.ac.wellcome.platform.goobi_reader.models.{S3Event, S3Record}
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.VersionedHybridStore
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.Try

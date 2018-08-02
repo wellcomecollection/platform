@@ -23,8 +23,9 @@ import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 class SnapshotGeneratorFeatureTest
     extends FunSpec
@@ -38,7 +39,7 @@ class SnapshotGeneratorFeatureTest
     with fixtures.Server
     with CloudWatch
     with GzipUtils
-    with JsonTestUtil
+    with JsonAssertions
     with ExtendedPatience
     with ElasticsearchFixtures
     with DisplayV1SerialisationTestBase

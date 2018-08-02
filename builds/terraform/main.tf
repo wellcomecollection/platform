@@ -9,6 +9,13 @@ module "platform" {
   ecr_pushes_topic_name    = "${local.lambda_pushes_topic_name}"
 }
 
+module "scala_json" {
+  source = "./scala_library"
+
+  name       = "json"
+  bucket_arn = "${aws_s3_bucket.releases.arn}"
+}
+
 module "scala_monitoring" {
   source = "./scala_library"
 

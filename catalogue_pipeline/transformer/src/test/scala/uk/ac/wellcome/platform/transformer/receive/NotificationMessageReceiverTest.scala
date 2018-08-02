@@ -8,6 +8,8 @@ import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -28,8 +30,6 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -180,7 +180,7 @@ class NotificationMessageReceiverTest
               recordReceiver.receiveMessage(failingSqsMessage)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[GracefulFailureException]
+              x shouldBe a[JsonDecodingError]
             }
           }
         }
@@ -197,7 +197,7 @@ class NotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val message = hybridRecordNotificationMessage(
-            message = JsonUtil.toJson(sierraTransformable).get,
+            message = toJson(sierraTransformable).get,
             sourceName = "sierra",
             s3Client = s3Client,
             bucket = bucket

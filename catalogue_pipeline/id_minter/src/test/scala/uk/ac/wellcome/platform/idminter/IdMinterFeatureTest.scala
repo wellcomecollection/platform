@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.JavaConverters._
 

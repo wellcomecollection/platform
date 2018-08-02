@@ -20,7 +20,7 @@ import uk.ac.wellcome.platform.transformer.transformers.{
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

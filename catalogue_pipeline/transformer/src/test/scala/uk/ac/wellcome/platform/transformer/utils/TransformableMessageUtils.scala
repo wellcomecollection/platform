@@ -1,13 +1,12 @@
 package uk.ac.wellcome.platform.transformer.utils
 
 import com.amazonaws.services.s3.AmazonS3
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.SQS
 import uk.ac.wellcome.models.transformable.MiroTransformable
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
-import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 trait TransformableMessageUtils extends IdentifiersUtil with SQS {
   def createValidMiroTransformableJson(MiroID: String,
@@ -20,7 +19,7 @@ trait TransformableMessageUtils extends IdentifiersUtil with SQS {
         data = data
       )
 
-    JsonUtil.toJson(miroTransformable).get
+    toJson(miroTransformable).get
   }
 
   def hybridRecordNotificationMessage(message: String,

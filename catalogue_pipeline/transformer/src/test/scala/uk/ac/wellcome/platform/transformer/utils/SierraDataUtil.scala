@@ -7,7 +7,7 @@ import uk.ac.wellcome.platform.transformer.source._
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Language => SierraLanguage
 }
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibDataWith(

@@ -14,7 +14,7 @@ import uk.ac.wellcome.models.work.internal.{
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class SierraTransformerFeatureTest
     extends FunSpec

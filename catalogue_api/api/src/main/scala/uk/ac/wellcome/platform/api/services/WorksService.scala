@@ -3,9 +3,9 @@ package uk.ac.wellcome.platform.api.services
 import com.google.inject.{Inject, Singleton}
 import com.sksamuel.elastic4s.http.search.SearchHit
 import io.circe.Decoder
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, IdentifiedWork}
 import uk.ac.wellcome.platform.api.models.{ApiConfig, ResultList}
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

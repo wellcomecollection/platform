@@ -18,4 +18,15 @@ data "aws_iam_policy_document" "travis_permissions" {
       "${var.bucket_arn}",
     ]
   }
+
+  statement {
+    actions = [
+      "s3:Get*",
+      "s3:List*",
+    ]
+
+    resources = [
+      "${var.bucket_arn}/uk/ac/wellcome/*",
+    ]
+  }
 }
