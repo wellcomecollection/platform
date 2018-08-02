@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 08 June 2018.**
+**Last updated: 02 August 2018.**
 
 ## Problem statement
 
@@ -46,15 +46,15 @@ These services will need to provide accessions in the BagIt bag format, gzip-com
 
 ### Storage
 
-Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to a second AWS region, using cross-region replication. All asset storage will have S3 versioning enabled.
+Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. All AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
 
 #### Locations
 
 The storage service will use three S3 buckets:
 
-- Archival asset storage (S3 Glacier, Dublin)
-- Archival asset storage replica (S3 Glacier, Frankfurt)
-- Access asset storage (S3 IA, Dublin)
+- Archival asset storage (AWS S3 Glacier, Dublin)
+- Archival asset storage replica (Azure Blob Storage Archive, Netherlands)
+- Access asset storage (AWS S3 IA, Dublin)
 
 Within each bucket, assets will be namespaced by source and shard, e.g.:
 
@@ -63,7 +63,7 @@ Within each bucket, assets will be namespaced by source and shard, e.g.:
 
 #### Assets
 
-Assets will be stored in the above S3 locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed in S3. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -148,17 +148,29 @@ b22036593/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "sierra-system-number",
+      "identifierType": {
+        "id": "sierra-system-number",
+        "label": "Sierra system number",
+        "type": "IdentifierType"
+      },
       "value": "b22036593"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-title",
+      "identifierType": {
+        "id": "goobi-process-title",
+        "label": "Goobi process title",
+        "type": "IdentifierType"
+      },
       "value": "12324_b_b22036593"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-id",
+      "identifierType": {
+        "id": "goobi-process-id",
+        "label": "Goobi process identifier",
+        "type": "IdentifierType"
+      },
       "value": "170131"
     }
   ],
@@ -207,17 +219,29 @@ b22036593/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
       "url": "s3://archivebucket/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/digitised/b22036593/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
       "url": "s3://accessbucket/digitised/b22036593/"
     }
   ],
@@ -275,17 +299,29 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-identifier",
+      "identifierType": {
+        "id": "archivematica-aip-identifier",
+        "label": "Archivematica AIP identifier",
+        "type": "IdentifierType"
+      },
       "value": "GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-guid",
+      "identifierType": {
+        "id": "archivematica-aip-guid",
+        "label": "Archivematica AIP GUID",
+        "type": "IdentifierType"
+      },
       "value": "a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "calm-alt-ref-no",
+      "identifierType": {
+        "id": "calm-alt-ref-no",
+        "label": "Calm Alt Ref No",
+        "type": "IdentifierType"
+      },
       "value": "GC253/1046"
     }
   ],
@@ -329,17 +365,29 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
       "url": "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
       "url": "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     }
   ],
