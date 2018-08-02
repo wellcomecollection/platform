@@ -14,7 +14,7 @@ object DownloadVerificationFlow extends Logging {
   def apply(checksum: String)(implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext):
   Flow[ObjectLocation, Future[Done], NotUsed] = {
 
-    val verify = DigestCalculatorFlow("MD5", checksum)
+    val verify = DigestCalculatorFlow("SHA-256", checksum)
 
     val download = Flow[ObjectLocation].flatMapConcat((uploadLocation) => {
       s3Client.download(uploadLocation.namespace, uploadLocation.key)._1
