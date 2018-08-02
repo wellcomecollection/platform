@@ -42,9 +42,10 @@ class DigestCalculatorFlow(algorithm: String, checksum: String) extends GraphSta
           warn(s"Checksum not matched: $streamDigest != $checksum")
 
           fail(out, new RuntimeException(s"Checksum not matched!"))
-        }
+        } else {
 
-        debug(s"Checksum matched $checksum")
+          debug(s"Checksum matched $streamDigest == $checksum")
+        }
 
         digest.reset()
 
