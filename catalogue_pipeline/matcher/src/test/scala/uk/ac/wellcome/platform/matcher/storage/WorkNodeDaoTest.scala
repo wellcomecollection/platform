@@ -10,8 +10,8 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.WorkNode
+import uk.ac.wellcome.platform.matcher.exceptions.MatcherException
 import uk.ac.wellcome.platform.matcher.fixtures.MatcherFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
 
@@ -82,7 +82,7 @@ class WorkNodeDaoTest
         )
 
         whenReady(workNodeDao.get(Set("A")).failed) { failedException =>
-          failedException shouldBe a[GracefulFailureException]
+          failedException shouldBe a[MatcherException]
         }
       }
     }
@@ -150,7 +150,7 @@ class WorkNodeDaoTest
 
         whenReady(workNodeDao.getByComponentIds(Set("A+B")).failed) {
           failedException =>
-            failedException shouldBe a[GracefulFailureException]
+            failedException shouldBe a[MatcherException]
         }
       }
     }
@@ -230,7 +230,7 @@ class WorkNodeDaoTest
 
         whenReady(workNodeDao.put(WorkNode("A", 1, List("B"), "A+B")).failed) {
           failedException =>
-            failedException shouldBe a[GracefulFailureException]
+            failedException shouldBe a[MatcherException]
         }
       }
     }

@@ -7,7 +7,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
@@ -24,6 +23,7 @@ import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
@@ -149,7 +149,7 @@ class NotificationMessageReceiverTest
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[GracefulFailureException]
+              x shouldBe a[TransformerException]
             }
           }
         }
