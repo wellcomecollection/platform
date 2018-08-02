@@ -1,6 +1,6 @@
 # RFC 002: Archival Storage Service
 
-**Last updated: 08 June 2018.**
+**Last updated: 02 August 2018.**
 
 ## Problem statement
 
@@ -46,15 +46,15 @@ These services will need to provide accessions in the BagIt bag format, gzip-com
 
 ### Storage
 
-Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to a second AWS region, using cross-region replication. All asset storage will have S3 versioning enabled.
+Assets will be stored on S3, with archival copies stored separately from access copies. A full set of access copies will be stored for all assets, with a Standard-IA storage class. Archival assets will be stored with a Glacier storage class and replicated to Azure Blob Storage with the Archive storage class. All AWS storage will have versioning enabled, but we will only keep the most recent version in Azure as it is intended only for worst case disaster recovery following a complete failure of AWS.
 
 #### Locations
 
 The storage service will use three S3 buckets:
 
-- Archival asset storage (S3 Glacier, Dublin)
-- Archival asset storage replica (S3 Glacier, Frankfurt)
-- Access asset storage (S3 IA, Dublin)
+- Archival asset storage (AWS S3 Glacier, Dublin)
+- Archival asset storage replica (Azure Blob Storage Archive, Netherlands)
+- Access asset storage (AWS S3 IA, Dublin)
 
 Within each bucket, assets will be namespaced by source and shard, e.g.:
 
@@ -63,7 +63,7 @@ Within each bucket, assets will be namespaced by source and shard, e.g.:
 
 #### Assets
 
-Assets will be stored in the above S3 locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed in S3. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
+Assets will be stored in the above locations inside the BagIt bags that were transferred for ingest. Unlike during transfer, bags will be stored uncompressed. BagIt is a standard archival file format: https://tools.ietf.org/html/draft-kunze-bagit-08
 
 > The BagIt specification is organized around the notion of a “bag”. A bag is a named file system directory that minimally contains:
 >
@@ -96,19 +96,25 @@ The Versioned Hybrid Store also includes the ability to "reindex" the entire dat
 
 ### Digitised content
 
-Digitised content will be ingested using Goobi, which will provide a bag layout that we define.
+Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
 
 #### Bag
 
 ```
 b22036593/
 |-- data
-|   |-- b22036593.xml    // mets file
+|   |-- b22036593.xml      // mets file
+|  [|-- bb22036593_001.xml // multiple manifestations]
+|  [|-- bb22036593_002.xml // multiple manifestations]
 |   \-- objects
 |       \-- b22036593_001.jp2
+|      [\-- b22036593_001_001.jp2 // multiple manifestations]
+|      [\-- b22036593_002_001.jp2 // multiple manifestations]
 |           ...
 |   \-- alto
 |       \-- b22036593_001.xml
+|      [\-- b22036593_001_001.xml // multiple manifestations]
+|      [\-- b22036593_002_001.xml // multiple manifestations]
 |           ...
 |-- manifest-sha256.txt
 |     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b22036593.xml
@@ -133,6 +139,76 @@ b22036593/
       Tag-File-Character-Encoding: UTF-8
 ```
 
+#### METS
+
+The existing METS structure should be change to reflect the following. The main change is removing data from Preservica and replacing it with PREMIS object metadata.
+
+```
+<?xml version='1.0' encoding='utf-8'?>
+<mets:mets xmlns:dv="http://dfg-viewer.de/" xmlns:mets="http://www.loc.gov/METS/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:premis="http://www.loc.gov/premis/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd">
+  <mets:metsHdr CREATEDATE="2016-01-06T07:36:48">
+    <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
+      <mets:name>Goobi - ugh-1.10-ugh-2.0.0-18-g99df876 - 21−May−2015</mets:name>
+      <mets:note>Goobi</mets:note>
+    </mets:agent>
+  </mets:metsHdr>
+  <mets:dmdSec ID="DMDLOG_0000">
+    <mets:mdWrap MDTYPE="MODS"><!-- no change --></mets:dmdSec>
+  <mets:dmdSec ID="DMDPHYS_0000"><!-- no change --></mets:dmdSec>
+  <mets:amdSec ID="AMD"><!-- remove techMD for deliverable unit, so first file is now AMD_0001 -->
+    <mets:techMD ID="AMD_0001">
+      <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml">
+        <mets:xmlData><!-- replace Preservica data with PREMIS object as below -->
+          <premis:object version="3.0" xsi:schemaLocation="http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd" xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>b22036593_0001.jp2</premis:objectIdentifierValue>
+              </premis:objectIdentifier>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageHeight</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>4378</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageWidth</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>2816</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel />
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>0adcae8b53ba8af8d6fef0c1517ef822f0d0c3a7</premis:messageDigest>
+                </premis:fixity>
+              <premis:size>310448</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>JP2 (JPEG 2000 part 1)</premis:formatName>
+                  </premis:formatDesignation>
+                <premis:formatRegistry>
+                  <premis:formatRegistryName>PRONOM</premis:formatRegistryName>
+                  <premis:formatRegistryKey>x-fmt/392</premis:formatRegistryKey>
+                  </premis:formatRegistry>
+                </premis:format>
+              </premis:objectCharacteristics>
+            </premis:object>
+          </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="RIGHTS"><!-- no change --></mets:rightsMD>
+    <mets:digiprovMD ID="DIGIPROV"><!-- no change --></mets:digiprovMD>
+  </mets:amdSec>
+  <mets:fileSec>
+    <mets:fileGrp USE="OBJECTS"><!-- change USE from SDB to OBJECTS -->
+      <mets:file ID="FILE_0001_OBJECTS" MIMETYPE="image/jp2"><!-- change SDB suffix to OBJECTS -->
+        <mets:FLocat LOCTYPE="URL" xlink:href="objects/b22454408_0001.jp2" /><!-- remove CHECKSUM -->
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap TYPE="LOGICAL"><!-- no change --></mets:structMap>
+  <mets:structMap TYPE="PHYSICAL"><!-- no change other than reflecting new IDs --></mets:structMap>
+  <mets:structLink><!-- no change --></mets:structLink>
+</mets:mets>
+```
+
 #### Storage manifest
 
 ```
@@ -148,17 +224,29 @@ b22036593/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "sierra-system-number",
+      "identifierType": {
+        "id": "sierra-system-number",
+        "label": "Sierra system number",
+        "type": "IdentifierType"
+      },
       "value": "b22036593"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-title",
+      "identifierType": {
+        "id": "goobi-process-title",
+        "label": "Goobi process title",
+        "type": "IdentifierType"
+      },
       "value": "12324_b_b22036593"
     },
     {
       "type": "Identifier",
-      "scheme": "goobi-process-id",
+      "identifierType": {
+        "id": "goobi-process-id",
+        "label": "Goobi process identifier",
+        "type": "IdentifierType"
+      },
       "value": "170131"
     }
   ],
@@ -207,17 +295,29 @@ b22036593/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
       "url": "s3://archivebucket/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/digitised/b22036593/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/digitised/b22036593/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
       "url": "s3://accessbucket/digitised/b22036593/"
     }
   ],
@@ -260,6 +360,10 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
       Tag-File-Character-Encoding: UTF-8
 ```
 
+#### METS
+
+The METS file will be as provided out of the box by Archivematica.
+
 #### Storage manifest
 
 ```
@@ -275,17 +379,29 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   "identifiers": [
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-identifier",
+      "identifierType": {
+        "id": "archivematica-aip-identifier",
+        "label": "Archivematica AIP identifier",
+        "type": "IdentifierType"
+      },
       "value": "GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "archivematica-aip-guid",
+      "identifierType": {
+        "id": "archivematica-aip-guid",
+        "label": "Archivematica AIP GUID",
+        "type": "IdentifierType"
+      },
       "value": "a2870a2d-5111-403f-b092-45c569ef9476"
     },
     {
       "type": "Identifier",
-      "scheme": "calm-alt-ref-no",
+      "identifierType": {
+        "id": "calm-alt-ref-no",
+        "label": "Calm Alt Ref No",
+        "type": "IdentifierType"
+      },
       "value": "GC253/1046"
     }
   ],
@@ -329,17 +445,29 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
   locations: [
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive",
+      "locationType": {
+        "id": "aws-s3-glacier",
+        "label": "AWS S3 Glacier",
+        "type": "LocationType"
+      },
       "url": "s3://archivebucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-archive-replica",
-      "url": "s3://archivebucket-replica/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
+      "locationType": {
+        "id": "azure-blob-archive",
+        "label": "Azure Blob Storage Archive",
+        "type": "LocationType"
+      },
+      "url": "https://archivebucket-replica.blob.core.windows.net/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     },
     {
       "type": "DigitalLocation",
-      "locationType": "s3-access",
+      "locationType": {
+        "id": "aws-s3-standard-ia",
+        "label": "AWS S3 Standard IA",
+        "type": "LocationType"
+      },
       "url": "s3://accessbucket/born_digital/GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/"
     }
   ],
