@@ -16,7 +16,7 @@ class TestAppConfigModule(queueUrl: String, bucketName: String) extends Abstract
       accessKey = Some("accessKey1"),
       secretKey = Some("verySecretKey1"),
       region = "localhost",
-      endpoint = Some("localhost:33333")
+      endpoint = Some("http://localhost:33333")
     )
 
     val cloudwatchClientConfig = CloudwatchClientConfig(

@@ -6,7 +6,7 @@ import com.google.inject.Guice
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archiver.BagItUtils.{createBagItZip, randomAlphanumeric}
+import uk.ac.wellcome.platform.archiver.BagItUtils._
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.utils.JsonUtil._
@@ -22,13 +22,12 @@ class ArchiverFeatureTest extends FunSpec
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
           val bagName = randomAlphanumeric()
-          val (zipFile, fileName) = createBagItZip(bagName, 1)
+          val (_, fileName) = createBagItZip(bagName, 1)
 
           val uploadKey = "upload/path/file.zip"
           s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
 
           val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
-
           sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
 
           val app = new Archiver {
@@ -42,6 +41,13 @@ class ArchiverFeatureTest extends FunSpec
           }
 
           app.run()
+
+          eventually {
+            val objects = s3Client.listObjects(storageBucket.name)
+            val objectSummaries = objects.getObjectSummaries
+
+            objectSummaries.toArray.length should be > 0
+          }
         }
       }
     })

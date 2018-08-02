@@ -29,7 +29,7 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile)
 
         val verification = uploader.runWith(Sink.ignore)
 
@@ -49,7 +49,7 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1, false)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, bagName)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile)
 
         val verification = uploader.runWith(Sink.ignore)
 

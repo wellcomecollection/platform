@@ -27,7 +27,9 @@ object Main extends App with Archiver {
     MessageStreamModule
   )
 
-  run()
+  val app = run()
+
+  Await.result(app, Duration.Inf)
 }
 
 trait Archiver extends Logging {
@@ -41,22 +43,20 @@ trait Archiver extends Logging {
       val s3Client = injector.getInstance(classOf[S3Client])
       val actorSystem = injector.getInstance(classOf[ActorSystem])
       val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
-
       val materializer = ActorMaterializer()(actorSystem)
 
       val workFlow = Flow[NotificationMessage]
         .via(DownloadNotificationFlow())
         .via(DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher))
         .flatMapConcat(zipFile => {
-          VerifiedBagUploaderFlow(bagUploaderConfig, zipFile, "gabname")(materializer, s3Client)
+          VerifiedBagUploaderFlow(bagUploaderConfig, zipFile)(materializer, s3Client)
         })
         .flatMapConcat(futureDone => {
           Source.fromFuture(futureDone)
         })
         .map(_ => ())
 
-      val done = messageStream.run("archiver", workFlow)
-      Await.result(done, Duration.Inf)
+      messageStream.run("archiver", workFlow)
 
     } finally {
       info(s"Terminating worker.")
