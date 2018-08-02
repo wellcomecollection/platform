@@ -57,6 +57,7 @@ trait CustomElasticsearchMapping {
         objectField("contributors"),
         objectField("genres"),
         objectField("items"),
+        objectField("itemsV1"),
         objectField("production"),
         keywordField("ontologyType"),
         keywordField("type")
