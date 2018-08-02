@@ -6,6 +6,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
+import uk.ac.wellcome.platform.sierra_items_to_dynamo.fixtures.DynamoInserterFixture
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
@@ -26,28 +27,26 @@ class DynamoInserterTest
     with LocalVersionedHybridStore
     with ScalaFutures
     with MockitoSugar
+    with DynamoInserterFixture
     with ExtendedPatience
     with SierraUtil {
 
   it("inserts an ItemRecord into the VHS") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { bucket =>
-        withTypeVHS[SierraItemRecord, EmptyMetadata, Assertion](bucket, table) {
-          versionedHybridStore =>
-            val dynamoInserter =
-              new DynamoInserter(versionedHybridStore = versionedHybridStore)
-            val record = createSierraItemRecord
+        withDynamoInserter(table, bucket) { dynamoInserter =>
+          val record = createSierraItemRecord
 
-            val futureUnit = dynamoInserter.insertIntoDynamo(record)
+          val futureUnit = dynamoInserter.insertIntoDynamo(record)
 
-            whenReady(futureUnit) { _ =>
-              assertStored[SierraItemRecord](
-                bucket = bucket,
-                table = table,
-                id = record.id.withoutCheckDigit,
-                record = record
-              )
-            }
+          whenReady(futureUnit) { _ =>
+            assertStored[SierraItemRecord](
+              bucket = bucket,
+              table = table,
+              id = record.id.withoutCheckDigit,
+              record = record
+            )
+          }
         }
       }
     }
