@@ -7,7 +7,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.matcher.{
   MatchedIdentifiers,
   MatcherResult,
@@ -213,7 +212,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to lock primary works") {
+  it("throws MatcherException if it fails to lock primary works") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
@@ -245,7 +244,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to lock secondary works") {
+  it("throws MatcherException if it fails to lock secondary works") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>
@@ -297,7 +296,7 @@ class WorkMatcherTest
     }
   }
 
-  it("throws GracefulFailureException if it fails to unlock") {
+  it("throws MatcherException if it fails to unlock") {
     withMockMetricSender { mockMetricsSender =>
       withSpecifiedLocalDynamoDbTable(createLockTable) { lockTable =>
         withSpecifiedLocalDynamoDbTable(createWorkGraphTable) { graphTable =>

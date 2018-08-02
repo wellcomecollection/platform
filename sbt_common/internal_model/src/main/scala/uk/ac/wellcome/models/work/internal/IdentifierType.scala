@@ -2,7 +2,7 @@ package uk.ac.wellcome.models.work.internal
 
 import java.io.InputStream
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.models.exceptions.InternalModelException
 
 import scala.io.Source
 
@@ -44,8 +44,7 @@ case object IdentifierType {
     identifierTypeMap.get(platformId) match {
       case Some(id) => id
       case None =>
-        throw GracefulFailureException(
-          new RuntimeException(s"Unrecognised identifier type: [$platformId]")
-        )
+        throw InternalModelException(
+          s"Unrecognised identifier type: [$platformId]")
     }
 }

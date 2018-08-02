@@ -1,8 +1,8 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.exceptions.DisplayException
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
@@ -209,7 +209,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
       )
     )
 
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[DisplayException] {
       DisplayWorkV1(work)
     }
 
