@@ -36,16 +36,10 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   verify()
 
-  val digestNames: List[String] = List(
-    "manifest-md5.txt",
-    "tagmanifest-md5.txt"
-  )
-
   val bagUploaderConfig = BagUploaderConfig(
     uploadNamespace = uploadNamespace(),
     uploadPrefix = uploadPrefix(),
-    digestDelimiter = digestDelimiter(),
-    digestNames = digestNames
+    digestDelimiter = digestDelimiter()
   )
 
   val s3ClientConfig = S3ClientConfig(

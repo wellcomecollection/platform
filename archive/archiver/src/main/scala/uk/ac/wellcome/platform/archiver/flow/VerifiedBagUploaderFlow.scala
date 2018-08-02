@@ -50,6 +50,7 @@ object BagNameSource extends Logging {
       .continually(entries.nextElement)
       .map(_.getName.split("/"))
       .flatMap(_.headOption)
+      .filterNot(_.equals("."))
       .takeWhile(_ => entries.hasMoreElements)
       .toSet
 
