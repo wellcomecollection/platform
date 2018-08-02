@@ -11,9 +11,8 @@ import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.reindex.creator.TestRecord
-import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.fixtures._
 import uk.ac.wellcome.json.JsonUtil._
@@ -27,11 +26,12 @@ class ReindexRequestCreatorWorkerTest
     with Akka
     with LocalDynamoDbVersioned
     with MetricsSenderFixture
+    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
 
-  def withReindexWorkerService(table: Table, topic: Topic)(
+  def withReindexWorkerService(topic: Topic)(
     testWith: TestWith[(ReindexRequestCreatorWorker, QueuePair), Assertion]) = {
     withActorSystem { actorSystem =>
       withMetricsSender(actorSystem) { metricsSender =>
@@ -42,11 +42,7 @@ class ReindexRequestCreatorWorkerTest
               queue,
               metricsSender) { sqsStream =>
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(
-                  table = table.name,
-                  index = table.index
-                )
+                dynamoDbClient = dynamoDbClient
               )
 
               withSNSWriter(topic) { snsWriter =>
@@ -76,9 +72,10 @@ class ReindexRequestCreatorWorkerTest
   it("successfully completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
+        withReindexWorkerService(topic) {
           case (service, QueuePair(queue, dlq)) =>
-            val reindexJob = ReindexJob(
+            val reindexJob = createReindexJobWith(
+              table = table,
               shardId = "sierra/123",
               desiredVersion = 6
             )
@@ -96,7 +93,8 @@ class ReindexRequestCreatorWorkerTest
             val expectedRecords = Seq(
               ReindexRequest(
                 id = testRecord.id,
-                desiredVersion = reindexJob.desiredVersion
+                desiredVersion = reindexJob.desiredVersion,
+                tableName = table.name
               )
             )
 
@@ -124,7 +122,7 @@ class ReindexRequestCreatorWorkerTest
   it("fails if it cannot parse the SQS message as a ReindexJob") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
-        withReindexWorkerService(table, topic) {
+        withReindexWorkerService(topic) {
           case (_, QueuePair(queue, dlq)) =>
             sendNotificationToSQS(
               queue = queue,
@@ -150,11 +148,7 @@ class ReindexRequestCreatorWorkerTest
               queue,
               metricsSender) { sqsStream =>
               val readerService = new RecordReader(
-                dynamoDbClient = dynamoDbClient,
-                dynamoConfig = DynamoConfig(
-                  table = "doesnotexist",
-                  index = "whatindex?"
-                )
+                dynamoDbClient = dynamoDbClient
               )
 
               withSNSWriter(Topic("does-not-exist")) { snsWriter =>
@@ -169,9 +163,11 @@ class ReindexRequestCreatorWorkerTest
                   sqsStream = sqsStream
                 )
 
-                val reindexJob = ReindexJob(
-                  shardId = "sierra/444",
-                  desiredVersion = 4
+                val reindexJob = createReindexJobWith(
+                  dynamoConfig = DynamoConfig(
+                    table = "doesnotexist",
+                    index = "whatindex?"
+                  )
                 )
 
                 sendNotificationToSQS(

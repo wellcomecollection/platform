@@ -6,7 +6,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.models.reindexer.ReindexRequest
-import uk.ac.wellcome.platform.reindex.creator.models.ReindexJob
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience
@@ -27,6 +27,7 @@ class ReindexRequestCreatorFeatureTest
     with ExtendedPatience
     with fixtures.Server
     with LocalDynamoDbVersioned
+    with ReindexFixtures
     with SNS
     with SQS
     with ScalaFutures {
@@ -53,20 +54,11 @@ class ReindexRequestCreatorFeatureTest
     //TODO re-factor shared test state here into fixture method
     testRecords.foreach(Scanamo.put(dynamoDbClient)(table.name)(_))
 
-    val reindexJob = ReindexJob(
-      shardId = shardName,
-      desiredVersion = desiredVersion
-    )
-
-    sendNotificationToSQS(
-      queue = queue,
-      message = reindexJob
-    )
-
     testRecords.map { record =>
       ReindexRequest(
         id = record.id,
-        desiredVersion = desiredVersion
+        desiredVersion = desiredVersion,
+        tableName = table.name
       )
     }
   }
@@ -75,12 +67,22 @@ class ReindexRequestCreatorFeatureTest
     withLocalSqsQueue { queue =>
       withLocalDynamoDbTable { table =>
         withLocalSnsTopic { topic =>
-          val flags = snsLocalFlags(topic) ++ dynamoDbLocalEndpointFlags(table) ++ sqsLocalFlags(
+          val flags = snsLocalFlags(topic) ++ dynamoClientLocalFlags ++ sqsLocalFlags(
             queue)
 
           withServer(flags) { _ =>
-            val expectedRecords =
-              createReindexableData(queue, table)
+            val expectedRecords = createReindexableData(queue, table)
+
+            val reindexJob = createReindexJobWith(
+              table = table,
+              shardId = shardName,
+              desiredVersion = desiredVersion
+            )
+
+            sendNotificationToSQS(
+              queue = queue,
+              message = reindexJob
+            )
 
             eventually {
               val actualRecords: Seq[ReindexRequest] =

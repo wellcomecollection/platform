@@ -24,8 +24,8 @@ class ReindexRequestCreatorWorker @Inject()(
       outdatedRecordIds: List[String] <- readerService.findRecordsForReindexing(
         reindexJob)
       _ <- notificationService.sendNotifications(
-        outdatedRecordIds,
-        desiredVersion = reindexJob.desiredVersion)
+        recordIds = outdatedRecordIds,
+        reindexJob = reindexJob)
     } yield ()
 
   def stop() = system.terminate()

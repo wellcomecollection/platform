@@ -11,12 +11,11 @@ module "reindex_request_processor" {
   memory          = 2048
 
   env_vars = {
-    dynamo_table_name         = "${local.vhs_sourcedata_table_name}"
     reindex_requests_queue_id = "${module.reindex_requests_queue.id}"
     metrics_namespace         = "reindex_request_processor"
   }
 
-  env_vars_length = 3
+  env_vars_length = 2
 
   ecs_cluster_name   = "${aws_ecs_cluster.cluster.name}"
   ecs_cluster_id     = "${aws_ecs_cluster.cluster.id}"

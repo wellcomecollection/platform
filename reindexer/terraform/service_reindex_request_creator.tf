@@ -13,13 +13,12 @@ module "reindex_request_creator" {
   memory = 2048
 
   env_vars = {
-    dynamo_table_name          = "${local.vhs_sourcedata_table_name}"
     reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
     reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
     metrics_namespace          = "reindex_request_creator"
   }
 
-  env_vars_length = 4
+  env_vars_length = 3
 
   ecs_cluster_name = "${aws_ecs_cluster.cluster.name}"
   ecs_cluster_id   = "${aws_ecs_cluster.cluster.id}"

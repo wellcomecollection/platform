@@ -6,6 +6,8 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.models.reindexer.ReindexRequest
+import uk.ac.wellcome.platform.reindex.creator.fixtures.ReindexFixtures
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -15,6 +17,7 @@ class NotificationSenderTest
     extends FunSpec
     with Matchers
     with ExtendedPatience
+    with ReindexFixtures
     with ScalaFutures
     with SNS {
   it("sends ReindexRequests for the provided IDs") {
@@ -27,13 +30,22 @@ class NotificationSenderTest
         val recordIds = List("miro/1", "miro/2", "miro/3")
         val desiredVersion = 5
 
+        val table = Table("my-test-table", "my-index")
+
         val expectedRequests = recordIds.map { id =>
-          ReindexRequest(id = id, desiredVersion = desiredVersion)
+          ReindexRequest(
+            id = id,
+            desiredVersion = desiredVersion,
+            tableName = table.name
+          )
         }
 
         val future = notificationSender.sendNotifications(
           recordIds = recordIds,
-          desiredVersion = desiredVersion
+          reindexJob = createReindexJobWith(
+            table = table,
+            desiredVersion = desiredVersion
+          )
         )
 
         whenReady(future) { _ =>
@@ -60,7 +72,10 @@ class NotificationSenderTest
 
       val future = notificationSender.sendNotifications(
         recordIds = List("1", "2", "3"),
-        desiredVersion = 2)
+        reindexJob = createReindexJobWith(
+          table = Table("my-test-table", "my-index")
+        )
+      )
       whenReady(future.failed) {
         _ shouldBe a[AmazonSNSException]
       }
