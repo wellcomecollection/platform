@@ -31,6 +31,19 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
     displayItemV2 shouldBe DisplayItemV2(id = None, identifiers = None, locations = List(DisplayLocationV2(item.agent.locations.head)))
   }
 
+  it("parses an unidentified Item without any locations") {
+    val item = createUnidentifiableItemWith(
+      locations = null
+    )
+
+    val displayItemV2 = DisplayItemV2(
+      item = item,
+      includesIdentifiers = true
+    )
+
+    displayItemV2.locations shouldBe List()
+  }
+
   it("correctly parses an Item without any extra identifiers") {
     val item = createIdentifiedItem()
 
@@ -43,7 +56,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
       List(DisplayIdentifierV2(item.sourceIdentifier)))
   }
 
-  it("correctly parses an Item without any locations") {
+  it("correctly parses an identified Item without any locations") {
     val item = createIdentifiedItem(
       locations = List()
     )
