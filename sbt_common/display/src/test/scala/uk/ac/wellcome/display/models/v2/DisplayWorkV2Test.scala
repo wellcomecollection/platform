@@ -33,6 +33,22 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayItem.id shouldBe Some(items.head.canonicalId)
   }
 
+  it("correctly parses unidentified items on a work") {
+    val item = createUnidentifiableItemWith()
+    val location = item.agent.locations.head.asInstanceOf[DigitalLocation]
+    val work = createIdentifiedWorkWith(
+      items = List(item)
+    )
+
+    val displayWork = DisplayWorkV2(
+      work = work,
+      includes = WorksIncludes(items = true)
+    )
+
+    val displayItem = displayWork.items.get.head
+    displayItem shouldBe DisplayItemV2(id = None, identifiers = None, locations = List(DisplayDigitalLocationV2(DisplayLocationType(location.locationType), url = location.url, credit = location.credit, license = location.license.map {DisplayLicenseV2.apply})))
+  }
+
   it("correctly parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
