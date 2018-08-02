@@ -3,7 +3,6 @@ package uk.ac.wellcome.models.work.internal
 import java.io.InputStream
 
 import com.github.tototoshi.csv.CSVReader
-import uk.ac.wellcome.exceptions.GracefulFailureException
 
 import scala.io.Source
 
