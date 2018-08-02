@@ -43,6 +43,15 @@ class MergerWorkerService @Inject()(
         ))
   }
 
+  // val r = MatcherResult(works = Set(
+  //     |   MatchedIdentifiers(identifiers = Set(WorkIdentifier("111", 1), WorkIdentifier("112", 1), WorkIdentifier("113", 1))),
+  //     |   MatchedIdentifiers(identifiers = Set(WorkIdentifier("211", 1), WorkIdentifier("212", 1)))
+  //     | )
+  //     |
+  //     | )
+
+  // getWorksIdentifiers(r)
+  //res0: Set[WorkIdentifier] = Set(WorkIdentifier(212,1), WorkIdentifier(211,1), WorkIdentifier(113,1), WorkIdentifier(111,1), WorkIdentifier(112,1))
   private def getWorksIdentifiers(
     matcherResult: MatcherResult): Set[WorkIdentifier] = {
     for {
