@@ -1,21 +1,16 @@
 package uk.ac.wellcome.platform.merger
 
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
-import uk.ac.wellcome.models.matcher.{
-  MatchedIdentifiers,
-  MatcherResult,
-  WorkIdentifier
-}
+import org.scalatest.{Assertion, Suite}
+import org.scalatest.concurrent.{Eventually, ScalaFutures}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult, WorkIdentifier}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import uk.ac.wellcome.storage.dynamo._
+import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
+trait MergerTestUtils extends Eventually with ScalaFutures with LocalVersionedHybridStore with WorksUtil { this: Suite =>
 
   def matcherResultWith(matchedEntries: Set[Set[RecorderWorkEntry]]) =
     MatcherResult(
@@ -30,19 +25,25 @@ trait MergerTestUtils extends WorksUtil { this: SQS with SNS with Messaging =>
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
                                            ObjectStore[RecorderWorkEntry]],
-                 recorderWorkEntry: RecorderWorkEntry): Future[Unit] =
+                 recorderWorkEntry: RecorderWorkEntry): Assertion = {
     vhs.updateRecord(recorderWorkEntry.id)(
       ifNotExisting = (recorderWorkEntry, EmptyMetadata()))((_, _) =>
       throw new RuntimeException("Not possible, VHS is empty!"))
 
+    eventually {
+      whenReady(vhs.getRecord(id = recorderWorkEntry.id)) { result =>
+        result.get shouldBe recorderWorkEntry
+      }
+    }
+  }
+
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
                                            ObjectStore[RecorderWorkEntry]],
-                 entries: List[RecorderWorkEntry]): Future[List[Unit]] = {
-    Future.sequence(entries.map { recorderWorkEntry =>
+                 entries: List[RecorderWorkEntry]): List[Assertion] =
+    entries.map { recorderWorkEntry =>
       storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
-    })
-  }
+    }
 
   def createRecorderWorkEntryWith(version: Int) =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))

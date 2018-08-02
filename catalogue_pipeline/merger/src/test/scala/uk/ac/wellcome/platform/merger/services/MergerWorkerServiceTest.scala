@@ -56,28 +56,26 @@ class MergerWorkerServiceTest
             Set(recorderWorkEntry3),
             Set(recorderWorkEntry1, recorderWorkEntry2)))
 
-        whenReady(
-          storeInVHS(
-            vhs,
-            List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))) {
-          _ =>
-            sendNotificationToSQS(
-              queue = queue,
-              message = matcherResult
-            )
+        storeInVHS(
+          vhs,
+          List(recorderWorkEntry1, recorderWorkEntry2, recorderWorkEntry3))
 
-            eventually {
-              assertQueueEmpty(queue)
-              assertQueueEmpty(dlq)
+        sendNotificationToSQS(
+          queue = queue,
+          message = matcherResult
+        )
 
-              val worksSent = getMessages[BaseWork](topic)
-              worksSent should contain only (recorderWorkEntry1.work,
-              recorderWorkEntry2.work,
-              recorderWorkEntry3.work)
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueEmpty(dlq)
 
-              verify(metricsSender, times(1))
-                .countSuccess(any[String])
-            }
+          val worksSent = getMessages[BaseWork](topic)
+          worksSent should contain only(recorderWorkEntry1.work,
+            recorderWorkEntry2.work,
+            recorderWorkEntry3.work)
+
+          verify(metricsSender, times(1))
+            .countSuccess(any[String])
         }
     }
   }

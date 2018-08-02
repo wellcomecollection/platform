@@ -11,8 +11,6 @@ import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
 class MergerFeatureTest
     extends FunSpec
     with Messaging
@@ -41,17 +39,18 @@ class MergerFeatureTest
                     val recorderWorkEntry =
                       createRecorderWorkEntryWith(version = 1)
 
-                    whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-                      val matcherResult =
-                        matcherResultWith(Set(Set(recorderWorkEntry)))
-                      sendNotificationToSQS(queue, matcherResult)
+                    storeInVHS(vhs, recorderWorkEntry)
 
-                      eventually {
-                        assertQueueEmpty(queue)
-                        assertQueueEmpty(dlq)
-                        val worksSent = getMessages[TransformedBaseWork](topic)
-                        worksSent should contain only recorderWorkEntry.work
-                      }
+                    val matcherResult =
+                      matcherResultWith(Set(Set(recorderWorkEntry)))
+                    sendNotificationToSQS(queue, matcherResult)
+
+                    eventually {
+                      assertQueueEmpty(queue)
+                      assertQueueEmpty(dlq)
+                      val worksSent = getMessages[TransformedBaseWork](topic)
+                      worksSent should contain only recorderWorkEntry.work
+
                     }
                   }
               }
