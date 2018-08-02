@@ -41,7 +41,7 @@ module "archiver_topic" {
 
 module "archiver_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${local.namespace}_transformer_queue"
+  queue_name  = "${local.namespace}_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.archiver_topic.name}"]
@@ -118,11 +118,11 @@ module "archiver" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}_transformer"
+  service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
 
   env_vars = {
-    queue_url = "${module.archiver_queue.arn}"
+    queue_url = "${module.archiver_queue.id}"
     archive_bucket = "${aws_s3_bucket.archive_storage.id}"
   }
 
