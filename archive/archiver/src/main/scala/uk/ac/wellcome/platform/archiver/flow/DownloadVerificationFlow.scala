@@ -8,6 +8,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 object DownloadVerificationFlow extends Logging {
   def apply(checksum: String)(implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext):
@@ -23,7 +24,8 @@ object DownloadVerificationFlow extends Logging {
       val (_, downloadResult) = download.via(verify).runWith(Source.single(uploadLocation), Sink.ignore)
 
       downloadResult.onComplete {
-        result => debug(s"Verification download completed.")
+        case Success(_) => debug(s"Verification download completed.")
+        case Failure(e) => warn(s"Verification download failed.", e)
       }
 
       downloadResult

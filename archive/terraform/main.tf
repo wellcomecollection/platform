@@ -64,7 +64,8 @@ resource "aws_s3_bucket" "archive_storage" {
 data "aws_iam_policy_document" "archive_upload" {
   statement {
     actions = [
-      "s3:PutObject",
+      "s3:PutObject*",
+      "s3:GetObject*",
     ]
 
     resources = [
@@ -89,7 +90,7 @@ resource "aws_s3_bucket" "ingest_storage" {
 data "aws_iam_policy_document" "archive_ingest" {
   statement {
     actions = [
-      "s3:GetObject",
+      "s3:GetObject*",
     ]
 
     resources = [
