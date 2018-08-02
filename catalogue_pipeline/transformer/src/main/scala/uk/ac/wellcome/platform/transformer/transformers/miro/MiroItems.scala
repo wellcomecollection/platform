@@ -1,8 +1,29 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
-trait MiroCredits extends MiroContributorCodes {
+trait MiroItems extends MiroImageApiURL with MiroLicenses with MiroContributorCodes{
+  def getItems(miroData: MiroTransformableData,
+                       miroId: String): List[Identifiable[Item]] = {
+    List(
+      Identifiable(
+        sourceIdentifier = SourceIdentifier(
+          identifierType = IdentifierType("miro-image-number"),
+          "Item",
+          miroId),
+        agent = Item(
+          locations = List(
+            DigitalLocation(
+              locationType = LocationType("iiif-image"),
+              url = buildImageApiURL(miroId, "info"),
+              credit = getCredit(miroId = miroId, miroData = miroData),
+              license = Some(chooseLicense(miroId, miroData.useRestrictions))
+            )
+          )
+        )
+      ))
+  }
 
   /** Image credits in MIRO could be set in two ways:
     *
@@ -13,7 +34,7 @@ trait MiroCredits extends MiroContributorCodes {
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  def getCredit(miroId: String,
+  private def getCredit(miroId: String,
                 miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
 
@@ -68,5 +89,4 @@ trait MiroCredits extends MiroContributorCodes {
         }
     }
   }
-
 }

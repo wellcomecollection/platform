@@ -11,7 +11,7 @@ import scala.util.Try
 class MiroTransformableTransformer
     extends TransformableTransformer[MiroTransformable]
     with MiroContributors
-    with MiroCredits
+    with MiroItems
     with MiroGenres
     with MiroIdentifiers
     with MiroLicenses
@@ -196,27 +196,6 @@ class MiroTransformableTransformer
     )
   }
 
-  private def getItems(miroData: MiroTransformableData,
-                       miroId: String): List[Identifiable[Item]] = {
-    List(
-      Identifiable(
-        sourceIdentifier = SourceIdentifier(
-          identifierType = IdentifierType("miro-image-number"),
-          "Item",
-          miroId),
-        agent = Item(
-          locations = List(
-            DigitalLocation(
-              locationType = LocationType("iiif-image"),
-              url = buildImageApiURL(miroId, "info"),
-              credit = getCredit(miroId = miroId, miroData = miroData),
-              license = Some(chooseLicense(miroId, miroData.useRestrictions))
-            )
-          )
-        )
-      ))
-  }
-
   private def getCreatedDate(miroData: MiroTransformableData,
                              collection: String): Option[Period] =
     if (collectionIsV(collection)) {
@@ -227,19 +206,5 @@ class MiroTransformableTransformer
 
   private def collectionIsV(c: String) = c.toLowerCase.contains("images-v")
 
-  private def buildImageApiURL(miroID: String, templateName: String): String = {
-    val iiifImageApiBaseUri = "https://iiif.wellcomecollection.org"
 
-    val imageUriTemplates = Map(
-      "thumbnail" -> "%s/image/%s.jpg/full/300,/0/default.jpg",
-      "info" -> "%s/image/%s.jpg/info.json"
-    )
-
-    val imageUriTemplate = imageUriTemplates.getOrElse(
-      templateName,
-      throw new Exception(
-        s"Unrecognised Image API URI template ($templateName)!"))
-
-    imageUriTemplate.format(iiifImageApiBaseUri, miroID)
-  }
 }
