@@ -5,8 +5,9 @@ import java.security.MessageDigest
 import akka.stream.stage._
 import akka.stream.{Attributes, FlowShape, Inlet, Outlet}
 import akka.util.ByteString
+import grizzled.slf4j.Logging
 
-class DigestCalculatorFlow(algorithm: String, checksum: String) extends GraphStage[FlowShape[ByteString, ByteString]] {
+class DigestCalculatorFlow(algorithm: String, checksum: String) extends GraphStage[FlowShape[ByteString, ByteString]] with Logging {
   val in = Inlet[ByteString]("DigestCalculator.in")
   val out = Outlet[ByteString]("DigestCalculator.out")
 
@@ -37,7 +38,13 @@ class DigestCalculatorFlow(algorithm: String, checksum: String) extends GraphSta
             _ + _
           }.mkString
 
-        if(streamDigest != checksum) fail(out, new RuntimeException(s"Checksum not matched!"))
+        if(streamDigest != checksum) {
+          warn(s"Checksum not matched: $streamDigest != $checksum")
+
+          fail(out, new RuntimeException(s"Checksum not matched!"))
+        }
+
+        debug(s"Checksum matched $checksum")
 
         digest.reset()
 

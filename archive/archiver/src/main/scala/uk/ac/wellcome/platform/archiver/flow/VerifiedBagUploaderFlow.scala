@@ -10,22 +10,31 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 // TODO: Verify checksums in S3 are what you set them to
-object VerifiedBagUploaderFlow {
+object VerifiedBagUploaderFlow extends Logging {
   def apply(config: BagUploaderConfig, zipFile: ZipFile)(
     implicit
     materializer: ActorMaterializer,
-    s3Client: S3Client
+    s3Client: S3Client,
+    executionContext: ExecutionContext
   ): Source[Future[Done], NotUsed] = {
     BagNameSource(zipFile).flatMapConcat(bagName => {
+
+      debug(s"Found bag: $bagName")
 
       val bagDigestItemFlow = BagDigestItemFlow(config, bagName, zipFile)
       val archiveItemFlow = ArchiveItemFlow(zipFile, config)
 
       Source.fromIterator(() => config.digestNames.toIterator)
         .map(digestName => ObjectLocation(bagName, digestName))
+        .map(digestLocation => {
+
+          debug(s"Looking for digest location: $digestLocation")
+
+          digestLocation
+        })
         .via(bagDigestItemFlow)
         .via(archiveItemFlow)
 

@@ -9,13 +9,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{FileIO, Flow, Source}
 import akka.util.ByteString
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 
-object DownloadZipFlow {
+object DownloadZipFlow extends Logging {
   val tmpDir = System.getProperty("java.io.tmpdir")
 
   def apply(s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext): Flow[ObjectLocation, ZipFile, NotUsed] = {
@@ -35,6 +36,12 @@ object DownloadZipFlow {
       Source.fromFuture(downloadStream
         .runWith(fileSink)
         .map(_.status)
+        .map(status => {
+
+          debug(s"Download status: $status")
+
+          status
+        })
         .map {
           case Success(_) => new ZipFile(path.toFile)
           case Failure(e) => throw e

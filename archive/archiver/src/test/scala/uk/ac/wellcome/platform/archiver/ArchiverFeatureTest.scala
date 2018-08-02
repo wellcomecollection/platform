@@ -17,6 +17,8 @@ class ArchiverFeatureTest extends FunSpec
   with Messaging
   with AkkaS3 {
 
+  // TODO: Need to test failure cases!!!
+
   it("downloads, uploads and verifies a BagIt bag") {
     withLocalSqsQueueAndDlq(queuePair => {
       withLocalS3Bucket { ingestBucket =>

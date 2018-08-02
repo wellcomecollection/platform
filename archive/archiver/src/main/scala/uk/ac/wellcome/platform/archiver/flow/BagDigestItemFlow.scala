@@ -5,10 +5,11 @@ import java.util.zip.ZipFile
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Framing}
 import akka.util.ByteString
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-object BagDigestItemFlow {
+object BagDigestItemFlow extends Logging {
 
   def apply(config: BagUploaderConfig, bagName: String, zipFile: ZipFile):
   Flow[ObjectLocation, BagDigestItem, NotUsed] = {
@@ -25,7 +26,13 @@ object BagDigestItemFlow {
       .map(_.utf8String)
       .map(_.split(config.digestDelimiter).map(_.trim))
       .map {
-        case Array(checksum: String, key: String) => BagDigestItem(checksum, ObjectLocation(bagName, key))
+        case Array(checksum: String, key: String) => {
+          val bagDigestItem = BagDigestItem(checksum, ObjectLocation(bagName, key))
+
+          debug(s"Found BagDigestItem: $bagDigestItem")
+
+          bagDigestItem
+        }
         case default => throw new RuntimeException(s"Malformed bag digest line: ${default.mkString(config.digestDelimiter)}")
       }
   }

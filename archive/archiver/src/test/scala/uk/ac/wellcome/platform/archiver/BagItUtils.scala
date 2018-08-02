@@ -56,7 +56,7 @@ object BagItUtils {
     }
 
     // Create data manifest
-    val dataManifest = FileEntry(s"$bagName/manifest-md5.txt", dataFiles.map {
+    val dataManifest = FileEntry(s"$bagName/manifest-sha256.txt", dataFiles.map {
       case FileEntry(fileName, fileContents) => {
         val fileContentsDigest = createDigest(fileContents)
 
