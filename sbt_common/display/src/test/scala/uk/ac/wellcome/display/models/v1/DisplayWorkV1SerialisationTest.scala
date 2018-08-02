@@ -50,7 +50,7 @@ class DisplayWorkV1SerialisationTest
 
   it("renders an item if the items include is present") {
     val work = createIdentifiedWorkWith(
-      items = createIdentifiedItems(count = 1)
+      itemsV1 = createIdentifiedItems(count = 1)
     )
 
     val actualJson = objectMapper.writeValueAsString(
@@ -61,7 +61,7 @@ class DisplayWorkV1SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "creators": [ ],
-                          | "items": [ ${items(work.items)} ],
+                          | "items": [ ${items(work.itemsV1)} ],
                           | "subjects": [ ],
                           | "genres": [ ],
                           | "publishers": [ ],
@@ -104,7 +104,7 @@ class DisplayWorkV1SerialisationTest
     )
     val item = createIdentifiedItem(locations = List(location))
     val workWithCopyright = createIdentifiedWorkWith(
-      items = List(item)
+      itemsV1 = List(item)
     )
 
     val actualJson = objectMapper.writeValueAsString(

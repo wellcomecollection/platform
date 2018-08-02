@@ -13,7 +13,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
       includesIdentifiers = true
     )
 
-    displayItemV2.id shouldBe item.canonicalId
+    displayItemV2.id shouldBe Some(item.canonicalId)
     displayItemV2.locations shouldBe List(
       DisplayLocationV2(item.agent.locations.head))
     displayItemV2.identifiers shouldBe Some(

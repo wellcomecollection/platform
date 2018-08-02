@@ -12,7 +12,7 @@ case class DisplayItemV2(
   @ApiModelProperty(
     dataType = "String",
     readOnly = true,
-    value = "The canonical identifier given to a thing.") id: String,
+    value = "The canonical identifier given to a thing.") id: Option[String],
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
@@ -32,7 +32,7 @@ object DisplayItemV2 {
     item match {
       case identifiedItem: Identified[Item] =>
         DisplayItemV2(
-          id = identifiedItem.canonicalId,
+          id = Some(identifiedItem.canonicalId),
           identifiers =
             if (includesIdentifiers)
               // If there aren't any identifiers on the item JSON, Jackson puts a

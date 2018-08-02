@@ -33,15 +33,19 @@ trait DisplaySerialisationTestBase { this: Suite =>
     identifiedItems
       .collect {
         case it: Identified[Item] =>
-          s"""{
+          identifiedItem(it)
+      }
+      .mkString(",")
+
+  def identifiedItem(it: Identified[Item]) = {
+    s"""{
           "id": "${it.canonicalId}",
           "type": "${it.agent.ontologyType}",
           "locations": [
             ${locations(it.agent.locations)}
           ]
         }"""
-      }
-      .mkString(",")
+  }
 
   def locations(locations: List[Location]) =
     locations

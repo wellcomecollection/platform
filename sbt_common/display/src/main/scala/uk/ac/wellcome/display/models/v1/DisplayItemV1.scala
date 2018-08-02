@@ -1,7 +1,5 @@
 package uk.ac.wellcome.display.models.v1
 
-import java.lang.RuntimeException
-
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.models.work.internal._
@@ -29,30 +27,26 @@ case class DisplayItemV1(
 }
 
 object DisplayItemV1 {
-  def apply(item: Displayable[Item],
+  def apply(item: Identified[Item],
             includesIdentifiers: Boolean): DisplayItemV1 = {
-    item match {
-      case identifiedItem: Identified[Item] =>
-        DisplayItemV1(
-          id = identifiedItem.canonicalId,
+   DisplayItemV1(
+          id = item.canonicalId,
           identifiers =
             if (includesIdentifiers)
               // If there aren't any identifiers on the item JSON, Jackson puts a
               // nil here.  Wrapping it in an Option casts it into a None or Some
               // as appropriate, and avoids throwing a NullPointerError when
               // we map over the value.
-              Option[List[SourceIdentifier]](identifiedItem.identifiers) match {
+              Option[List[SourceIdentifier]](item.identifiers) match {
                 case Some(identifiers) =>
                   Some(identifiers.map(DisplayIdentifierV1(_)))
                 case None => Some(List())
               } else None,
           locations = // Same as with identifiers
-            Option[List[Location]](identifiedItem.agent.locations) match {
+            Option[List[Location]](item.agent.locations) match {
               case Some(locations) => locations.map(DisplayLocationV1(_))
               case None            => List()
             }
         )
-      case _ => throw new RuntimeException("Not Supported!")
-    }
   }
 }
