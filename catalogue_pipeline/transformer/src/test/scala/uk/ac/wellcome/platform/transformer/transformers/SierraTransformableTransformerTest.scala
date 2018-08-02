@@ -109,6 +109,44 @@ class SierraTransformableTransformerTest
     )
   }
 
+  it("puts an empty list in the itemsV1 field") {
+    val bibId = createSierraBibNumber
+    val itemId = createSierraItemNumber
+    val locationType = LocationType("sgmed")
+    val locationLabel = "A museum of mermaids"
+    val itemData =
+      s"""
+         |{
+         |  "id": "$itemId",
+         |  "location": {
+         |    "code": "${locationType.id}",
+         |    "name": "$locationLabel"
+         |  }
+         |}
+         |""".stripMargin
+
+    val itemRecord = createSierraItemRecordWith(
+      id = itemId,
+      data = itemData,
+      bibIds = List(bibId)
+    )
+
+    val bibRecord = createSierraBibRecordWith(id = bibId)
+
+    val transformable = createSierraTransformableWith(
+      sierraId = bibId,
+      maybeBibRecord = Some(bibRecord),
+      itemRecords = List(itemRecord)
+    )
+
+    val work = transformToWork(transformable)
+    work shouldBe a[UnidentifiedWork]
+    val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
+    unidentifiedWork.items should have size 1
+
+    unidentifiedWork.itemsV1 shouldBe Nil
+  }
+
   it("returns an InvisibleWork if there isn't any bib data") {
     assertTransformReturnsInvisibleWork(
       maybeBibRecord = None
