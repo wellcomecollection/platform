@@ -5,9 +5,10 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.matcher.WorkIdentifier
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /** Before the matcher/merger, the recorder stores a copy of every
   * transformed work in an instance of the VHS.
@@ -20,7 +21,7 @@ class RecorderPlaybackService @Inject() (
   versionedHybridStore: VersionedHybridStore[RecorderWorkEntry,
                                              EmptyMetadata,
                                              ObjectStore[RecorderWorkEntry]],
-) extends Logging {
+)(implicit ec: ExecutionContext) extends Logging {
 
   /** Given a collection of matched identifiers, return all the
     * corresponding works from VHS.
