@@ -96,19 +96,25 @@ The Versioned Hybrid Store also includes the ability to "reindex" the entire dat
 
 ### Digitised content
 
-Digitised content will be ingested using Goobi, which will provide a bag layout that we define.
+Digitised content will be ingested using Goobi, which should provide the bag layout defined below.
 
 #### Bag
 
 ```
 b22036593/
 |-- data
-|   |-- b22036593.xml    // mets file
+|   |-- b22036593.xml      // mets file
+|  [|-- bb22036593_001.xml // multiple manifestations]
+|  [|-- bb22036593_002.xml // multiple manifestations]
 |   \-- objects
 |       \-- b22036593_001.jp2
+|      [\-- b22036593_001_001.jp2 // multiple manifestations]
+|      [\-- b22036593_002_001.jp2 // multiple manifestations]
 |           ...
 |   \-- alto
 |       \-- b22036593_001.xml
+|      [\-- b22036593_001_001.xml // multiple manifestations]
+|      [\-- b22036593_002_001.xml // multiple manifestations]
 |           ...
 |-- manifest-sha256.txt
 |     a20eee40d609a0abeaf126bc7d50364921cc42ffacee3bf20b8d1c9b9c425d6f data/b22036593.xml
@@ -131,6 +137,76 @@ b22036593/
 \-- bagit.txt
       BagIt-Version: 0.97
       Tag-File-Character-Encoding: UTF-8
+```
+
+#### METS
+
+The existing METS structure should be change to reflect the following. The main change is removing data from Preservica and replacing it with PREMIS object metadata.
+
+```
+<?xml version='1.0' encoding='utf-8'?>
+<mets:mets xmlns:dv="http://dfg-viewer.de/" xmlns:mets="http://www.loc.gov/METS/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:premis="http://www.loc.gov/premis/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd">
+  <mets:metsHdr CREATEDATE="2016-01-06T07:36:48">
+    <mets:agent OTHERTYPE="SOFTWARE" ROLE="CREATOR" TYPE="OTHER">
+      <mets:name>Goobi - ugh-1.10-ugh-2.0.0-18-g99df876 - 21−May−2015</mets:name>
+      <mets:note>Goobi</mets:note>
+    </mets:agent>
+  </mets:metsHdr>
+  <mets:dmdSec ID="DMDLOG_0000">
+    <mets:mdWrap MDTYPE="MODS"><!-- no change --></mets:dmdSec>
+  <mets:dmdSec ID="DMDPHYS_0000"><!-- no change --></mets:dmdSec>
+  <mets:amdSec ID="AMD"><!-- remove techMD for deliverable unit, so first file is now AMD_0001 -->
+    <mets:techMD ID="AMD_0001">
+      <mets:mdWrap MDTYPE="OTHER" MIMETYPE="text/xml">
+        <mets:xmlData><!-- replace Preservica data with PREMIS object as below -->
+          <premis:object version="3.0" xsi:schemaLocation="http://www.loc.gov/premis/v3 http://www.loc.gov/standards/premis/v3/premis.xsd" xsi:type="premis:file">
+            <premis:objectIdentifier>
+              <premis:objectIdentifierType>local</premis:objectIdentifierType>
+              <premis:objectIdentifierValue>b22036593_0001.jp2</premis:objectIdentifierValue>
+              </premis:objectIdentifier>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageHeight</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>4378</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:significantProperties>
+              <premis:significantPropertiesType>ImageWidth</premis:significantPropertiesType>
+              <premis:significantPropertiesValue>2816</premis:significantPropertiesValue>
+              </premis:significantProperties>
+            <premis:objectCharacteristics>
+              <premis:compositionLevel />
+              <premis:fixity>
+                <premis:messageDigestAlgorithm>SHA-256</premis:messageDigestAlgorithm>
+                <premis:messageDigest>0adcae8b53ba8af8d6fef0c1517ef822f0d0c3a7</premis:messageDigest>
+                </premis:fixity>
+              <premis:size>310448</premis:size>
+              <premis:format>
+                <premis:formatDesignation>
+                  <premis:formatName>JP2 (JPEG 2000 part 1)</premis:formatName>
+                  </premis:formatDesignation>
+                <premis:formatRegistry>
+                  <premis:formatRegistryName>PRONOM</premis:formatRegistryName>
+                  <premis:formatRegistryKey>x-fmt/392</premis:formatRegistryKey>
+                  </premis:formatRegistry>
+                </premis:format>
+              </premis:objectCharacteristics>
+            </premis:object>
+          </mets:xmlData>
+      </mets:mdWrap>
+    </mets:techMD>
+    <mets:rightsMD ID="RIGHTS"><!-- no change --></mets:rightsMD>
+    <mets:digiprovMD ID="DIGIPROV"><!-- no change --></mets:digiprovMD>
+  </mets:amdSec>
+  <mets:fileSec>
+    <mets:fileGrp USE="OBJECTS"><!-- change USE from SDB to OBJECTS -->
+      <mets:file ID="FILE_0001_OBJECTS" MIMETYPE="image/jp2"><!-- change SDB suffix to OBJECTS -->
+        <mets:FLocat LOCTYPE="URL" xlink:href="objects/b22454408_0001.jp2" /><!-- remove CHECKSUM -->
+      </mets:file>
+    </mets:fileGrp>
+  </mets:fileSec>
+  <mets:structMap TYPE="LOGICAL"><!-- no change --></mets:structMap>
+  <mets:structMap TYPE="PHYSICAL"><!-- no change other than reflecting new IDs --></mets:structMap>
+  <mets:structLink><!-- no change --></mets:structLink>
+</mets:mets>
 ```
 
 #### Storage manifest
@@ -283,6 +359,10 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
       BagIt-Version: 0.97
       Tag-File-Character-Encoding: UTF-8
 ```
+
+#### METS
+
+The METS file will be as provided out of the box by Archivematica.
 
 #### Storage manifest
 
