@@ -95,7 +95,7 @@ class RecorderPlaybackServiceTest extends FunSpec with Matchers with ScalaFuture
       val service = new RecorderPlaybackService(vhs)
 
       whenReady(service.fetchAllRecorderWorkEntries(getWorkIdentifiers(allWorkEntries: _*))) { result =>
-        result shouldBe (workEntriesToFetch ++ (4 to 7).map { _ => None }).toList
+        result shouldBe (workEntriesToFetch.map { Some(_) } ++ (4 to 7).map { _ => None }).toList
       }
     }
   }
