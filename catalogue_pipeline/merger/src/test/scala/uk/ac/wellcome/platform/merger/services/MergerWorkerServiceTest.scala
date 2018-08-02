@@ -273,7 +273,7 @@ class MergerWorkerServiceTest
       new MergerWorkerService(
         actorSystem,
         sqsStream,
-        new RecorderPlaybackService(vhs),
+        playbackService = new RecorderPlaybackService(vhs),
         merger,
         messageWriter))
   }
