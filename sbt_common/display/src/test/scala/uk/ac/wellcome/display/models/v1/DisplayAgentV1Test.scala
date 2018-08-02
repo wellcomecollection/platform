@@ -16,7 +16,7 @@ class DisplayAgentV1Test extends FunSpec with Matchers with IdentifiersUtil {
       otherIdentifiers = List()
     )
 
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[IllegalArgumentException] {
       DisplayAgentV1(agent)
     }
 
