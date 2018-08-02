@@ -3,63 +3,145 @@
 """
 Start/stop all the instances in an autoscaling group.
 
-Usage: toggle_asg.py (--start | --stop | --status) [--type=(p2 | t2)]
+Usage: toggle_asg.py (--start | --stop | --enable-overnight | --disable-overnight) [--type=(p2 | t2)]
+       toggle_asg.py [--type=(p2 | t2)]
+
 
 Actions:
   --start                 Start the autoscaling group (set the desired count to 1).
   --stop                  Stop the autoscaling group (set the desired count to 0).
-  --status                Report the current side of autoscaling group.
+  --enable-overnight      Keeps the autoscaling group desired count at 1 (disables auto scale down)
+  --disable-overnight     Allows the automatic scaling action to be set desired count to 0 (enables auto scale down)
   --type=(p2 | t2)        AWS Instance type (valid values: p2,t2) defaults to t2
 
 """
-
-import sys
 
 import boto3
 import docopt
 
 from asg_utils import discover_asg, set_asg_size
 
+
+def update_desired_capacity_for_scheduled_action(client, scaling_group_name, scheduled_action_name, desired_capacity):
+    """Updates the desired capacity for a scheduled action.
+
+    Keyword arguments:
+    client -- boto3 autoscaling client
+    scaling_group_name -- name of the autoscaling group to modify
+    scheduled_action_name -- name of the scheduled action to modify
+    desired_capacity -- desired capacity of scheduled action
+    """
+
+    action_str = (
+        "Setting desired capacity of ScheduledAction {scheduled_action_name} to {desired_capacity}."
+    ).format(
+        scheduled_action_name=scheduled_action_name,
+        desired_capacity=desired_capacity
+    )
+
+    print(action_str)
+
+    client.put_scheduled_update_group_action(
+        AutoScalingGroupName=scaling_group_name,
+        ScheduledActionName=scheduled_action_name,
+        Recurrence='0 20 * * *',
+        DesiredCapacity=desired_capacity
+    )
+
+
+def get_status(client, tag_name, scheduled_action_name):
+    """Gets the status of an autoscaling group.
+
+    Keyword arguments:
+    client -- boto3 autoscaling client
+    tag_name -- tags used to identify autoscaling group
+    scheduled_action_name -- name of the scheduled action to get status for
+    """
+    scaling_group = discover_asg(asg_client=client, tag_name=tag_name)
+
+    desired_capacity = scaling_group['DesiredCapacity']
+    instance_count = len(scaling_group['Instances'])
+    scaling_group_name = scaling_group['AutoScalingGroupName']
+
+    response = client.describe_scheduled_actions(
+        AutoScalingGroupName=scaling_group_name,
+        ScheduledActionNames=[scheduled_action_name]
+    )
+
+    scheduled_desired_capacity = response['ScheduledUpdateGroupActions'][0]['DesiredCapacity']
+
+    return {
+        'scaling_group_name': scaling_group_name,
+        'desired_capacity': desired_capacity,
+        'instance_count': instance_count,
+        'scheduled_desired_capacity': scheduled_desired_capacity
+    }
+
+
+def print_status(status):
+    """Prints the status of an autoscaling group.
+
+    Keyword arguments:
+    status -- status as returned from the get_status function
+    """
+    instance_str = (
+        'The desired size of autoscaling group "{name}" is {desired}.\n\nThere are currently {count} running.\n'
+    ).format(
+        name=status['scaling_group_name'],
+        desired=status['desired_capacity'],
+        count=status['instance_count']
+    )
+
+    if status['scheduled_desired_capacity'] == 1:
+        scheduled_action_str = 'The instances will continue running overnight.\n'
+    else:
+        scheduled_action_str = "The instances will be turned off at 8pm this evening.\n"
+
+    print(instance_str)
+    print(scheduled_action_str)
+
+
 if __name__ == '__main__':
     args = docopt.docopt(__doc__)
 
     instance_type = args['--type'] or 't2'
     tag_name = 'jupyter-%s' % instance_type
+    scheduled_action_name = 'ensure_down'
 
-    asg_client = boto3.client('autoscaling')
-    asg = discover_asg(asg_client=asg_client, tag_name=tag_name)
-    asg_name = asg['AutoScalingGroupName']
+    client = boto3.client('autoscaling')
+    scaling_group_name = discover_asg(asg_client=client, tag_name=tag_name)['AutoScalingGroupName']
 
-    if args['--start'] or args['--stop']:
-        if args['--start']:
-            desired_size = 1
-        else:
-            desired_size = 0
-
+    if args['--start']:
         set_asg_size(
-            asg_client=asg_client,
-            asg_name=asg_name,
-            desired_size=desired_size
+            asg_client=client,
+            asg_name=scaling_group_name,
+            desired_size=1
         )
 
-    elif args['--status']:
-        actual_size = asg['DesiredCapacity']
-        instance_count = len(asg['Instances'])
-
-        if instance_count == 1:
-            instance_str = '1 instance'
-        elif instance_count == 0:
-            instance_str = 'no instances'
-        else:
-            instance_str = '%d instances' % instance_count
-
-        print(
-            'The desired size of ASG group %r is %r, with %s running' %
-            (asg_name, actual_size, instance_str)
+    if args['--stop']:
+        set_asg_size(
+            asg_client=client,
+            asg_name=scaling_group_name,
+            desired_size=0
         )
 
-    else:
-        print(
-            'Neither --start, --stop nor --status flags supplied?  args=%r' %
-            args)
-        sys.exit(1)
+    if args['--enable-overnight']:
+        update_desired_capacity_for_scheduled_action(
+            client=client,
+            scaling_group_name=scaling_group_name,
+            scheduled_action_name=scheduled_action_name,
+            desired_capacity=1
+        )
+
+    if args['--disable-overnight']:
+        update_desired_capacity_for_scheduled_action(
+            client=client,
+            scaling_group_name=scaling_group_name,
+            scheduled_action_name=scheduled_action_name,
+            desired_capacity=0
+        )
+
+    print("---\n")
+
+    status = get_status(client, tag_name, scheduled_action_name)
+    print_status(status)
