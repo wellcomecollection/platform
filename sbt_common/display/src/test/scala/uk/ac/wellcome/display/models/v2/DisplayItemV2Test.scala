@@ -5,24 +5,50 @@ import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
 class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
 
-  it("should read an Item as a DisplayItemV2 correctly") {
-    val item = createItem()
+  it("should read an identified Item as a DisplayItemV2 correctly") {
+    val item = createIdentifiedItem()
 
     val displayItemV2 = DisplayItemV2(
       item = item,
       includesIdentifiers = true
     )
 
-    displayItemV2.id shouldBe item.canonicalId
+    displayItemV2.id shouldBe Some(item.canonicalId)
     displayItemV2.locations shouldBe List(
       DisplayLocationV2(item.agent.locations.head))
     displayItemV2.identifiers shouldBe Some(
       List(DisplayIdentifierV2(item.sourceIdentifier)))
     displayItemV2.ontologyType shouldBe "Item"
   }
+  it("parses an unidentified Item as a DisplayItemV2 correctly") {
+    val item = createUnidentifiableItemWith()
+
+    val displayItemV2 = DisplayItemV2(
+      item = item,
+      includesIdentifiers = true
+    )
+
+    displayItemV2 shouldBe DisplayItemV2(
+      id = None,
+      identifiers = None,
+      locations = List(DisplayLocationV2(item.agent.locations.head)))
+  }
+
+  it("parses an unidentified Item without any locations") {
+    val item = createUnidentifiableItemWith(
+      locations = null
+    )
+
+    val displayItemV2 = DisplayItemV2(
+      item = item,
+      includesIdentifiers = true
+    )
+
+    displayItemV2.locations shouldBe List()
+  }
 
   it("correctly parses an Item without any extra identifiers") {
-    val item = createItem()
+    val item = createIdentifiedItem()
 
     val displayItemV2 = DisplayItemV2(
       item = item,
@@ -33,8 +59,8 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
       List(DisplayIdentifierV2(item.sourceIdentifier)))
   }
 
-  it("correctly parses an Item without any locations") {
-    val item = createItem(
+  it("correctly parses an identified Item without any locations") {
+    val item = createIdentifiedItem(
       locations = List()
     )
 

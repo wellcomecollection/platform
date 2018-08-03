@@ -144,7 +144,7 @@ case object DisplayWorkV1 {
           work.thumbnail.map { DisplayLocationV1(_) } else None,
       items =
         if (includes.items)
-          Some(work.items.map {
+          Some(work.itemsV1.map {
             DisplayItemV1(_, includesIdentifiers = includes.identifiers)
           })
         else None,

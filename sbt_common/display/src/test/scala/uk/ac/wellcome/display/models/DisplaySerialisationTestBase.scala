@@ -29,18 +29,34 @@ trait DisplaySerialisationTestBase { this: Suite =>
          """
     }
 
-  def items(identifiedItems: List[Identified[Item]]) =
+  def items(identifiedItems: List[Displayable[Item]]) =
     identifiedItems
-      .map { it =>
-        s"""{
+      .map {
+        case it: Identified[Item] =>
+          identifiedItem(it)
+        case it: Unidentifiable[Item] =>
+          unidentifiableItem(it)
+      }
+      .mkString(",")
+
+  def unidentifiableItem(it: Unidentifiable[Item]) = {
+    s"""{
+          "type": "${it.agent.ontologyType}",
+          "locations": [
+            ${locations(it.agent.locations)}
+          ]
+        }"""
+  }
+
+  def identifiedItem(it: Identified[Item]) = {
+    s"""{
           "id": "${it.canonicalId}",
           "type": "${it.agent.ontologyType}",
           "locations": [
             ${locations(it.agent.locations)}
           ]
         }"""
-      }
-      .mkString(",")
+  }
 
   def locations(locations: List[Location]) =
     locations

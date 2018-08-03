@@ -20,9 +20,9 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
   }
 
   it("correctly parses items on a work") {
-    val item = createItem(locations = List())
+    val item = createIdentifiedItem(locations = List())
     val work = createIdentifiedWorkWith(
-      items = List(item)
+      itemsV1 = List(item)
     )
 
     val displayWork = DisplayWorkV1(
@@ -217,7 +217,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
   describe("correctly uses the WorksIncludes.identifiers include") {
     val work = createIdentifiedWorkWith(
-      items = createItems(count = 1)
+      itemsV1 = createIdentifiedItems(count = 1)
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {
@@ -251,7 +251,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
             includes = WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(work.items.head.sourceIdentifier)))
+          List(DisplayIdentifierV1(work.itemsV1.head.sourceIdentifier)))
       }
     }
   }

@@ -271,7 +271,27 @@ class MiroTransformableTransformerTest
       credit = Some("Ezra Feilden"),
       locationType = LocationType("iiif-image")
     )
-    work.items.head.agent.locations shouldBe List(expectedDigitalLocation)
+    work.itemsV1.head.agent.locations shouldBe List(expectedDigitalLocation)
+  }
+
+  it("extracts both identifiable and unidentifiable items") {
+    val work = transformWork(
+      MiroID = "B0011308"
+    )
+
+    val expectedLocation = DigitalLocation(
+      "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+      LocationType("iiif-image"),
+      Some(License_CCBY),
+      None)
+    work.itemsV1 shouldBe List(
+      Identifiable(
+        Item(List(expectedLocation)),
+        SourceIdentifier(
+          IdentifierType("miro-image-number"),
+          "Item",
+          "B0011308")))
+    work.items shouldBe List(Unidentifiable(Item(List(expectedLocation))))
   }
 
   it("sets the WorkType as 'Digital images'") {

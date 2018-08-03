@@ -1,8 +1,23 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
+import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType}
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
-trait MiroCredits extends MiroContributorCodes {
+trait MiroLocations
+    extends MiroImageApiURL
+    with MiroLicenses
+    with MiroContributorCodes {
+
+  def getLocations(miroData: MiroTransformableData, miroId: String) = {
+    List(
+      DigitalLocation(
+        locationType = LocationType("iiif-image"),
+        url = buildImageApiURL(miroId, "info"),
+        credit = getCredit(miroId = miroId, miroData = miroData),
+        license = Some(chooseLicense(miroId, miroData.useRestrictions))
+      )
+    )
+  }
 
   /** Image credits in MIRO could be set in two ways:
     *
@@ -13,8 +28,8 @@ trait MiroCredits extends MiroContributorCodes {
     * We prefer the per-image credit line, but use the contributor-level credit
     * if unavailable.
     */
-  def getCredit(miroId: String,
-                miroData: MiroTransformableData): Option[String] = {
+  private def getCredit(miroId: String,
+                        miroData: MiroTransformableData): Option[String] = {
     miroData.creditLine match {
 
       // Some of the credit lines are inconsistent or use old names for
@@ -68,5 +83,4 @@ trait MiroCredits extends MiroContributorCodes {
         }
     }
   }
-
 }

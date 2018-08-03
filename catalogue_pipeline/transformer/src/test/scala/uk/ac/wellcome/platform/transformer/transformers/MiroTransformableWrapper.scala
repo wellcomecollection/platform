@@ -17,14 +17,18 @@ trait MiroTransformableWrapper
 
   val transformer = new MiroTransformableTransformer
   def buildJSONForWork(extraData: String): String = {
-    val jsonString = if (extraData == "") "" else s", $extraData"
+    val baseData =
+      """
+        |"image_cleared": "Y",
+        |        "image_copyright_cleared": "Y",
+        |        "image_tech_file_size": ["1000000"],
+        |        "image_use_restrictions": "CC-BY"
+      """.stripMargin
 
-    s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": ["1000000"],
-        "image_use_restrictions": "CC-BY"
-        $jsonString
+    if (extraData.isEmpty) s"""{$baseData}"""
+    else s"""{
+        $baseData,
+        $extraData
       }"""
   }
 

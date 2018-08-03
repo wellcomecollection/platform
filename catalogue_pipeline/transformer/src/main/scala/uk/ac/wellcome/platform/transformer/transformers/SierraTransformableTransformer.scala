@@ -67,6 +67,7 @@ class SierraTransformableTransformer
                       getDigitalItems(
                         sourceIdentifier.copy(ontologyType = "Item"),
                         sierraBibData),
+                  itemsV1 = List(),
                   version = version
                 )
               } else {

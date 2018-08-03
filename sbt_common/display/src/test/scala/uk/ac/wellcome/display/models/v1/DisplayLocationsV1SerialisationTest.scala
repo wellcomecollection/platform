@@ -19,8 +19,8 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(
-        createItem(locations = List(physicalLocation))
+      itemsV1 = List(
+        createIdentifiedItem(locations = List(physicalLocation))
       )
     )
     val displayWork =
@@ -33,7 +33,7 @@ class DisplayLocationsV1SerialisationTest
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title}",
                             |  "creators": [ ],
-                            |  "items": [ ${items(work.items)} ],
+                            |  "items": [ ${items(work.itemsV1)} ],
                             |  "subjects": [ ],
                             |  "genres": [ ],
                             |  "publishers": [],
@@ -50,7 +50,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
 
     val displayWork =
@@ -63,7 +63,7 @@ class DisplayLocationsV1SerialisationTest
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
                           |  "creators": [ ],
-                          |  "items": [ ${items(work.items)} ],
+                          |  "items": [ ${items(work.itemsV1)} ],
                           |  "subjects": [ ],
                           |  "genres": [ ],
                           |  "publishers": [],
@@ -80,7 +80,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val work = createIdentifiedWorkWith(
-      items = List(createItem(locations = List(digitalLocation)))
+      itemsV1 = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
 
     val displayWork =
@@ -94,7 +94,7 @@ class DisplayLocationsV1SerialisationTest
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
                           |  "creators": [ ],
-                          |  "items": [ ${items(work.items)} ],
+                          |  "items": [ ${items(work.itemsV1)} ],
                           |  "subjects": [ ],
                           |  "genres": [ ],
                           |  "publishers": [],

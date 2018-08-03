@@ -68,9 +68,9 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  def getDigitalItem(sourceIdentifier: SourceIdentifier): Identifiable[Item] = {
-    Identifiable(
-      sourceIdentifier = sourceIdentifier,
+  def getDigitalItem(
+    sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
+    Unidentifiable(
       agent = Item(
         locations = List(getDigitalLocation(sourceIdentifier.value))
       )
@@ -79,7 +79,7 @@ trait SierraItems extends Logging with SierraLocation {
 
   def getDigitalItems(
     sourceIdentifier: SourceIdentifier,
-    sierraBibData: SierraBibData): List[Identifiable[Item]] = {
+    sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
     sierraBibData.materialType match {
       case Some(SierraMaterialType("v", "E-books")) =>
         List(getDigitalItem(sourceIdentifier))

@@ -21,7 +21,7 @@ class SierraTransformableTransformerTest
     with WorksUtil {
   val transformer = new SierraTransformableTransformer
 
-  it("performs a transformation on a work with items") {
+  it("performs a transformation on a work with physical items") {
     val itemRecords = List(
       createSierraItemRecord,
       createSierraItemRecord
@@ -47,7 +47,7 @@ class SierraTransformableTransformerTest
     val actualIdentifiers = work
       .asInstanceOf[UnidentifiedWork]
       .items
-      .map { _.sourceIdentifier }
+      .map { _.asInstanceOf[Identifiable[Item]].sourceIdentifier }
 
     actualIdentifiers should contain theSameElementsAs expectedIdentifiers
   }
@@ -107,6 +107,44 @@ class SierraTransformableTransformerTest
       agent =
         Item(locations = List(PhysicalLocation(locationType, locationLabel)))
     )
+  }
+
+  it("puts an empty list in the itemsV1 field") {
+    val bibId = createSierraBibNumber
+    val itemId = createSierraItemNumber
+    val locationType = LocationType("sgmed")
+    val locationLabel = "A museum of mermaids"
+    val itemData =
+      s"""
+         |{
+         |  "id": "$itemId",
+         |  "location": {
+         |    "code": "${locationType.id}",
+         |    "name": "$locationLabel"
+         |  }
+         |}
+         |""".stripMargin
+
+    val itemRecord = createSierraItemRecordWith(
+      id = itemId,
+      data = itemData,
+      bibIds = List(bibId)
+    )
+
+    val bibRecord = createSierraBibRecordWith(id = bibId)
+
+    val transformable = createSierraTransformableWith(
+      sierraId = bibId,
+      maybeBibRecord = Some(bibRecord),
+      itemRecords = List(itemRecord)
+    )
+
+    val work = transformToWork(transformable)
+    work shouldBe a[UnidentifiedWork]
+    val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
+    unidentifiedWork.items should have size 1
+
+    unidentifiedWork.itemsV1 shouldBe Nil
   }
 
   it("returns an InvisibleWork if there isn't any bib data") {

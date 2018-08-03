@@ -111,10 +111,11 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
     keywordField("ontologyType")
   )
 
-  val items = objectField("items").fields(
+  def items(fieldName: String) = objectField(fieldName).fields(
     keywordField("canonicalId"),
     sourceIdentifier,
     otherIdentifiers,
+    keywordField("type"),
     objectField("agent").fields(location(), keywordField("ontologyType"))
   )
   val language = objectField("language").fields(
@@ -168,7 +169,8 @@ class WorksIndex @Inject()(client: HttpClient, elasticConfig: ElasticConfig)(
       contributors,
       subject("subjects"),
       genre("genres"),
-      items,
+      items("items"),
+      items("itemsV1"),
       production,
       language,
       location("thumbnail"),
