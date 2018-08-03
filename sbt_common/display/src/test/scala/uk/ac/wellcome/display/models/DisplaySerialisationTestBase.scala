@@ -30,7 +30,8 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
 
   def items(identifiedItems: List[Displayable[Item]]) =
-    identifiedItems.map {
+    identifiedItems
+      .map {
         case it: Identified[Item] =>
           identifiedItem(it)
         case it: Unidentifiable[Item] =>

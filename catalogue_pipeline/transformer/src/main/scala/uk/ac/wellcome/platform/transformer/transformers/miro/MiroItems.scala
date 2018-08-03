@@ -6,18 +6,20 @@ import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 trait MiroItems extends MiroLocations {
 
   def getItemsV1(miroData: MiroTransformableData,
-                 miroId: String): List[Identifiable[Item]] = List(
-                   Identifiable(
-                     sourceIdentifier = SourceIdentifier(
-                       identifierType = IdentifierType("miro-image-number"),
-                       "Item",
-                       miroId),
-                     agent = Item(
-                       locations = getLocations(miroData, miroId)
-                     )
-                   ))
+                 miroId: String): List[Identifiable[Item]] =
+    List(
+      Identifiable(
+        sourceIdentifier = SourceIdentifier(
+          identifierType = IdentifierType("miro-image-number"),
+          "Item",
+          miroId),
+        agent = Item(
+          locations = getLocations(miroData, miroId)
+        )
+      ))
 
   def getItems(miroData: MiroTransformableData,
-               miroId: String): List[Unidentifiable[Item]] = List(Unidentifiable(Item(locations = getLocations(miroData, miroId))))
+               miroId: String): List[Unidentifiable[Item]] =
+    List(Unidentifiable(Item(locations = getLocations(miroData, miroId))))
 
 }

@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.transformer.transformers.miro
 import uk.ac.wellcome.models.work.internal.{DigitalLocation, LocationType}
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
-trait MiroLocations extends MiroImageApiURL with MiroLicenses with MiroContributorCodes{
+trait MiroLocations
+    extends MiroImageApiURL
+    with MiroLicenses
+    with MiroContributorCodes {
 
   def getLocations(miroData: MiroTransformableData, miroId: String) = {
     List(
@@ -15,7 +18,6 @@ trait MiroLocations extends MiroImageApiURL with MiroLicenses with MiroContribut
       )
     )
   }
-
 
   /** Image credits in MIRO could be set in two ways:
     *

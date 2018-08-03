@@ -50,15 +50,16 @@ object DisplayItemV2 {
               case None            => List()
             }
         )
-      case unidientifiableItem: Unidentifiable[Item] => DisplayItemV2(
-        id = None,
-        identifiers = None,
-        locations =
-          Option[List[Location]](unidientifiableItem.agent.locations) match {
-            case Some(locations) => locations.map(DisplayLocationV2(_))
-            case None            => List()
-          }
-      )
+      case unidientifiableItem: Unidentifiable[Item] =>
+        DisplayItemV2(
+          id = None,
+          identifiers = None,
+          locations =
+            Option[List[Location]](unidientifiableItem.agent.locations) match {
+              case Some(locations) => locations.map(DisplayLocationV2(_))
+              case None            => List()
+            }
+        )
     }
 
   }

@@ -25,7 +25,7 @@ trait MiroTransformableWrapper
         |        "image_use_restrictions": "CC-BY"
       """.stripMargin
 
-    if(extraData.isEmpty) s"""{$baseData}"""
+    if (extraData.isEmpty) s"""{$baseData}"""
     else s"""{
         $baseData,
         $extraData

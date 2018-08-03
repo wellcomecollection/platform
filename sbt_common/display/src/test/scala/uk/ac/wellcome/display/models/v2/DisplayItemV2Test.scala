@@ -28,7 +28,10 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
       includesIdentifiers = true
     )
 
-    displayItemV2 shouldBe DisplayItemV2(id = None, identifiers = None, locations = List(DisplayLocationV2(item.agent.locations.head)))
+    displayItemV2 shouldBe DisplayItemV2(
+      id = None,
+      identifiers = None,
+      locations = List(DisplayLocationV2(item.agent.locations.head)))
   }
 
   it("parses an unidentified Item without any locations") {

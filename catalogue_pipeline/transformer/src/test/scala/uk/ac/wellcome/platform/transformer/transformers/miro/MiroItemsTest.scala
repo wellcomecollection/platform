@@ -9,22 +9,41 @@ class MiroItemsTest extends FunSpec with Matchers {
 
   describe("getItemsV1") {
     it("extracts an identifiable item") {
-      transformer.getItemsV1(miroId = "B0011308",
+      transformer.getItemsV1(
+        miroId = "B0011308",
         miroData = MiroTransformableData(
           creditLine = None,
           sourceCode = Some("FDN"),
           useRestrictions = Some("CC-0")
-        )) shouldBe List(Identifiable(agent = Item(locations = List(DigitalLocation("https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json", LocationType("iiif-image"), Some(License_CC0), credit = Some("Ezra Feilden")))), sourceIdentifier = SourceIdentifier(IdentifierType("miro-image-number"), "Item", "B0011308")))
+        )) shouldBe List(
+        Identifiable(
+          agent = Item(locations = List(DigitalLocation(
+            "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+            LocationType("iiif-image"),
+            Some(License_CC0),
+            credit = Some("Ezra Feilden")))),
+          sourceIdentifier = SourceIdentifier(
+            IdentifierType("miro-image-number"),
+            "Item",
+            "B0011308")
+        ))
     }
   }
   describe("getItems") {
     it("extracts an unidentifiable item") {
-      transformer.getItems(miroId = "B0011308",
+      transformer.getItems(
+        miroId = "B0011308",
         miroData = MiroTransformableData(
           creditLine = None,
           sourceCode = Some("FDN"),
           useRestrictions = Some("CC-0")
-        )) shouldBe List(Unidentifiable(agent = Item(locations = List(DigitalLocation("https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json", LocationType("iiif-image"), Some(License_CC0), credit = Some("Ezra Feilden"))))))
+        )) shouldBe List(
+        Unidentifiable(
+          agent = Item(locations = List(DigitalLocation(
+            "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+            LocationType("iiif-image"),
+            Some(License_CC0),
+            credit = Some("Ezra Feilden"))))))
     }
   }
 }

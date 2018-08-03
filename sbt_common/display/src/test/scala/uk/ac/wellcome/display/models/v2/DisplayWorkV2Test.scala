@@ -46,7 +46,16 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayItem = displayWork.items.get.head
-    displayItem shouldBe DisplayItemV2(id = None, identifiers = None, locations = List(DisplayDigitalLocationV2(DisplayLocationType(location.locationType), url = location.url, credit = location.credit, license = location.license.map {DisplayLicenseV2.apply})))
+    displayItem shouldBe DisplayItemV2(
+      id = None,
+      identifiers = None,
+      locations = List(
+        DisplayDigitalLocationV2(
+          DisplayLocationType(location.locationType),
+          url = location.url,
+          credit = location.credit,
+          license = location.license.map { DisplayLicenseV2.apply }))
+    )
   }
 
   it("correctly parses a work without any extra identifiers") {

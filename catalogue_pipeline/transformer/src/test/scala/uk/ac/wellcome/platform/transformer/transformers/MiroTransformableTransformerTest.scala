@@ -279,8 +279,18 @@ class MiroTransformableTransformerTest
       MiroID = "B0011308"
     )
 
-    val expectedLocation = DigitalLocation("https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json", LocationType("iiif-image"), Some(License_CCBY), None)
-    work.itemsV1 shouldBe List(Identifiable(Item(List(expectedLocation)), SourceIdentifier(IdentifierType("miro-image-number"), "Item", "B0011308")))
+    val expectedLocation = DigitalLocation(
+      "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+      LocationType("iiif-image"),
+      Some(License_CCBY),
+      None)
+    work.itemsV1 shouldBe List(
+      Identifiable(
+        Item(List(expectedLocation)),
+        SourceIdentifier(
+          IdentifierType("miro-image-number"),
+          "Item",
+          "B0011308")))
     work.items shouldBe List(Unidentifiable(Item(List(expectedLocation))))
   }
 

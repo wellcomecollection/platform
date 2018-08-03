@@ -29,24 +29,24 @@ case class DisplayItemV1(
 object DisplayItemV1 {
   def apply(item: Identified[Item],
             includesIdentifiers: Boolean): DisplayItemV1 = {
-   DisplayItemV1(
-          id = item.canonicalId,
-          identifiers =
-            if (includesIdentifiers)
-              // If there aren't any identifiers on the item JSON, Jackson puts a
-              // nil here.  Wrapping it in an Option casts it into a None or Some
-              // as appropriate, and avoids throwing a NullPointerError when
-              // we map over the value.
-              Option[List[SourceIdentifier]](item.identifiers) match {
-                case Some(identifiers) =>
-                  Some(identifiers.map(DisplayIdentifierV1(_)))
-                case None => Some(List())
-              } else None,
-          locations = // Same as with identifiers
-            Option[List[Location]](item.agent.locations) match {
-              case Some(locations) => locations.map(DisplayLocationV1(_))
-              case None            => List()
-            }
-        )
+    DisplayItemV1(
+      id = item.canonicalId,
+      identifiers =
+        if (includesIdentifiers)
+          // If there aren't any identifiers on the item JSON, Jackson puts a
+          // nil here.  Wrapping it in an Option casts it into a None or Some
+          // as appropriate, and avoids throwing a NullPointerError when
+          // we map over the value.
+          Option[List[SourceIdentifier]](item.identifiers) match {
+            case Some(identifiers) =>
+              Some(identifiers.map(DisplayIdentifierV1(_)))
+            case None => Some(List())
+          } else None,
+      locations = // Same as with identifiers
+        Option[List[Location]](item.agent.locations) match {
+          case Some(locations) => locations.map(DisplayLocationV1(_))
+          case None            => List()
+        }
+    )
   }
 }
