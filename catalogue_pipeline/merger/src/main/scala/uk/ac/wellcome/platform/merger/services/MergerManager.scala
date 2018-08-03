@@ -18,6 +18,10 @@ object MergerManager {
       .map { _.work }
       .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
 
-    process(works)
+    if (works.size == maybeWorkEntries.size) {
+      process(works)
+    } else {
+      works
+    }
   }
 }
