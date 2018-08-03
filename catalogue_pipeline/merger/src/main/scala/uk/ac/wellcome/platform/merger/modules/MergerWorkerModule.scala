@@ -4,7 +4,11 @@ import akka.actor.ActorSystem
 import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
 import javax.inject.Singleton
-import uk.ac.wellcome.platform.merger.services.{Merger, MergerRules, MergerWorkerService}
+import uk.ac.wellcome.platform.merger.services.{
+  Merger,
+  MergerRules,
+  MergerWorkerService
+}
 
 object MergerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {

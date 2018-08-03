@@ -15,8 +15,8 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   it("performs a merge with a single work") {
     val workEntry = createRecorderWorkEntry
 
-    val result = mergerManager.applyMerge(
-      maybeWorkEntries = List(Some(workEntry)))
+    val result =
+      mergerManager.applyMerge(maybeWorkEntries = List(Some(workEntry)))
 
     result shouldBe List(workEntry.work)
   }
@@ -48,8 +48,9 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
       createRecorderWorkEntry
     }
 
-    val result = mergerManager.applyMerge(
-      maybeWorkEntries = workEntries.map { Some(_) }.toList ++ List(None))
+    val result = mergerManager.applyMerge(maybeWorkEntries = workEntries.map {
+      Some(_)
+    }.toList ++ List(None))
 
     result should contain theSameElementsAs workEntries.map { _.work }
   }
