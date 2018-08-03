@@ -41,6 +41,17 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
     }
   }
 
+  it("returns the works unmerged if any of the work entries are None") {
+    val workEntries = (1 to 3).map { _ => createRecorderWorkEntry }
+
+    val result = MergerManager.applyMerge(
+      maybeWorkEntries = workEntries.map { Some(_) }.toList ++ List(None),
+      process = mergeTailIntoHead
+    )
+
+    result should contain theSameElementsAs workEntries.map { _.work }
+  }
+
   /** Make every work a redirect to the first work in the list, and leave
     * the first work intact.
     */
