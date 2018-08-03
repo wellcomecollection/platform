@@ -130,19 +130,4 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
 
     mergedRecord shouldBe existingRecord
   }
-
-  it("carries across the version from the existing record") {
-    val existingRecord = createSierraItemRecordWith(
-      modifiedDate = olderDate,
-      version = 10
-    )
-    val updatedRecord = createSierraItemRecordWith(
-      modifiedDate = newerDate,
-      version = 2
-    )
-
-    val mergedRecord =
-      SierraItemRecordMerger.mergeItems(existingRecord, updatedRecord)
-    mergedRecord.version shouldBe existingRecord.version
-  }
 }
