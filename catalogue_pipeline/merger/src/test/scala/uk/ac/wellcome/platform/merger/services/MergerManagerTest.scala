@@ -35,10 +35,10 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
       case (baseWork: BaseWork, workEntry: RecorderWorkEntry) =>
         baseWork.sourceIdentifier shouldBe workEntry.work.sourceIdentifier
 
-        val redirect: IdentifiableRedirect = baseWork.asInstanceOf[IdentifiableRedirect]
-        redirect.sourceIdentifier shouldBe workEntry.work.sourceIdentifier
+        val redirect = baseWork.asInstanceOf[UnidentifiedRedirectedWork]
+        val redirectTarget = result.head.asInstanceOf[UnidentifiedWork]
+        redirect.redirect.sourceIdentifier shouldBe redirectTarget.sourceIdentifier
     }
-
   }
 
   /** Make every work a redirect to the first work in the list, and leave

@@ -12,6 +12,12 @@ object MergerManager {
     * wrong versions), we skip the merge and return the original works.
     */
   def applyMerge(maybeWorkEntries: List[Option[RecorderWorkEntry]],
-                 process: Seq[UnidentifiedWork] => Seq[BaseWork]): Seq[BaseWork] =
-    maybeWorkEntries.flatten.map { _.work }
+                 process: Seq[UnidentifiedWork] => Seq[BaseWork]): Seq[BaseWork] = {
+    val workEntries = maybeWorkEntries.flatten
+    val works = workEntries
+      .map { _.work }
+      .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
+
+    process(works)
+  }
 }
