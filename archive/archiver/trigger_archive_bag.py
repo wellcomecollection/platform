@@ -8,9 +8,9 @@ Usage: trigger_archive_bag.py <BAG>... [--bucket=<BUCKET_NAME>]  [--topic=<TOPIC
 
 Options:
   --bucket=<BUCKET_NAME> The S3 bucket containing the bags.
-                         [default: archive-storage_archiver]
-  --topic=<TOPIC_NAME>   The archiver topic.
                          [default: wellcomecollection-assets-archive-ingest]
+  --topic=<TOPIC_NAME>   The archiver topic.
+                         [default: archive-storage_archiver]
   -h --help              Print this help message
 """
 

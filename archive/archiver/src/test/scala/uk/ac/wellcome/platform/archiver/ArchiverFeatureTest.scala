@@ -1,12 +1,13 @@
 package uk.ac.wellcome.platform.archiver
 
 import java.io.File
+import java.util.zip.ZipFile
 
 import com.google.inject.Guice
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archiver.BagItUtils._
+//import uk.ac.wellcome.platform.archiver.BagItUtils._
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.json.JsonUtil._
@@ -22,8 +23,12 @@ class ArchiverFeatureTest extends FunSpec
     withLocalSqsQueueAndDlq(queuePair => {
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
-          val bagName = randomAlphanumeric()
-          val (zipFile, fileName) = createBagItZip(bagName, 1)
+          //val bagName = randomAlphanumeric()
+          //val (zipFile, fileName) = createBagItZip(bagName, 1)
+
+          //val bagName = "b22454408"
+          val fileName = "/Users/k/Desktop/b22454408.zip"
+          val zipFile = new ZipFile(fileName)
 
           val entries = zipFile.entries()
           val fileCount = Stream
