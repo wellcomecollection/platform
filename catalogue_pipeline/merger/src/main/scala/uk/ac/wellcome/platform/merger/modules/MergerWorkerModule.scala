@@ -1,8 +1,15 @@
 package uk.ac.wellcome.platform.merger.modules
 
 import akka.actor.ActorSystem
+import com.google.inject.Provides
 import com.twitter.inject.{Injector, TwitterModule}
-import uk.ac.wellcome.platform.merger.services.MergerWorkerService
+import javax.inject.Singleton
+import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.platform.merger.services.{Merger, MergerRules, MergerWorkerService}
+import uk.ac.wellcome.storage.ObjectStore
+import uk.ac.wellcome.storage.s3.S3StorageBackend
+
+import scala.concurrent.ExecutionContext
 
 object MergerWorkerModule extends TwitterModule {
   override def singletonStartup(injector: Injector) {
@@ -20,4 +27,9 @@ object MergerWorkerModule extends TwitterModule {
     workerService.stop()
     system.terminate()
   }
+
+  @Provides
+  @Singleton
+  def providesMergerRules(): MergerRules =
+    new Merger()
 }

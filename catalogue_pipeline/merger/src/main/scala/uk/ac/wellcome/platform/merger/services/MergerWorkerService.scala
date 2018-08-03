@@ -17,7 +17,7 @@ class MergerWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   playbackService: RecorderPlaybackService,
-  merger: Merger,
+  mergerManager: MergerManager,
   messageWriter: MessageWriter[BaseWork]
 )(implicit ec: ExecutionContext)
     extends Logging {
@@ -30,10 +30,8 @@ class MergerWorkerService @Inject()(
       workIdentifiers = getWorksIdentifiers(matcherResult).toList
       maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
         workIdentifiers)
-      works: Seq[BaseWork] = MergerManager.applyMerge(
-        maybeWorkEntries = maybeWorkEntries,
-        process = merger.merge
-      )
+      works: Seq[BaseWork] = mergerManager.applyMerge(
+        maybeWorkEntries = maybeWorkEntries)
       _ <- sendWorks(works)
     } yield ()
 

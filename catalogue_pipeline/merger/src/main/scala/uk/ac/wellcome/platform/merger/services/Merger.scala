@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.merger.services
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 
-class Merger extends Logging {
+trait MergerRules {
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
+}
+
+class Merger extends Logging with MergerRules {
   def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     mergePhysicalDigitalPair(works)
       .getOrElse(works)
