@@ -61,8 +61,10 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       val broadcast = builder.add(Broadcast[Message](2))
       val zip = builder.add(Zip[R, Message])
 
-      source ~> messageRecieptLogFlow ~> broadcast ~> typeConversion ~> workFlow ~> zip.in0
-      broadcast ~> zip.in1
+      source ~> messageRecieptLogFlow ~> broadcast.in
+
+      broadcast.out(0) ~> typeConversion ~> workFlow ~> zip.in0
+      broadcast.out(1) ~> zip.in1
 
       zip.out ~> messageAckFlow ~> out.in
 

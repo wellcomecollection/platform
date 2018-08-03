@@ -10,30 +10,31 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 object UploadVerificationFlow extends Logging {
-  def apply(zipFile: ZipFile, checksum: String, config: BagUploaderConfig)(
+  def apply(config: BagUploaderConfig)(
     implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext
-  ): Flow[ObjectLocation, Future[MultipartUploadResult], NotUsed] = {
-    val verify = DigestCalculatorFlow("SHA-256", checksum)
-    val extract = FileExtractorFlow(zipFile)
+  ): Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] = {
 
-    Flow[ObjectLocation].map((bagLocation) => {
+    val extract = FileExtractorFlow()
+
+    Flow[(BagDigestItem, ZipFile)].flatMapConcat { case (bagDigestItem, zipFile) =>
+      val verify = DigestCalculatorFlow("SHA-256", bagDigestItem.checksum)
       val uploadLocation: ObjectLocation = ObjectLocation(
-        config.uploadNamespace, s"${config.uploadPrefix}/${bagLocation.namespace}/${bagLocation.key}"
+        config.uploadNamespace, s"${config.uploadPrefix}/${bagDigestItem.location.namespace}/${bagDigestItem.location.key}"
       )
 
       debug(s"Trying to upload to: $uploadLocation")
 
       val upload = s3Client.multipartUpload(uploadLocation.namespace, uploadLocation.key)
-      val (_, uploadResult) = extract.via(verify).runWith(Source.single(bagLocation), upload)
+      val (_, uploadResult) = extract.via(verify).runWith(Source.single((bagDigestItem.location, zipFile)), upload)
 
       uploadResult.onComplete {
         result => debug(s"Got MultipartUploadResult: $result")
       }
 
-      uploadResult
-    })
+      Source.fromFuture(uploadResult)
+    }
   }
 }

@@ -1,34 +1,20 @@
 package uk.ac.wellcome.platform.archiver.flow
 
-import akka.stream.ActorMaterializer
+import akka.NotUsed
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.{Done, NotUsed}
+import akka.stream.scaladsl.Flow
+import akka.util.ByteString
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
-
 object DownloadVerificationFlow extends Logging {
-  def apply(checksum: String)(implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext):
-  Flow[ObjectLocation, Future[Done], NotUsed] = {
+  def apply()(implicit s3Client: S3Client): Flow[(ObjectLocation, String), ByteString, NotUsed] = {
+    Flow[(ObjectLocation, String)].flatMapConcat { case(uploadLocation, checksum) =>
+      val verify = DigestCalculatorFlow("SHA-256", checksum)
 
-    val verify = DigestCalculatorFlow("SHA-256", checksum)
+      debug(s"Downloading $uploadLocation.")
 
-    val download = Flow[ObjectLocation].flatMapConcat((uploadLocation) => {
-      s3Client.download(uploadLocation.namespace, uploadLocation.key)._1
-    })
-
-    Flow[ObjectLocation].map((uploadLocation) => {
-      val (_, downloadResult) = download.via(verify).runWith(Source.single(uploadLocation), Sink.ignore)
-
-      downloadResult.onComplete {
-        case Success(_) => debug(s"Verification download completed.")
-        case Failure(e) => warn(s"Verification download failed.", e)
-      }
-
-      downloadResult
-    })
+      s3Client.download(uploadLocation.namespace, uploadLocation.key)._1.via(verify)
+    }
   }
 }

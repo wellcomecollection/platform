@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.archiver
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Sink
+import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
@@ -30,9 +30,9 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig)
 
-        val verification = uploader.runWith(Sink.ignore)
+        val (_, verification) = uploader.runWith(Source.single(zipFile), Sink.ignore)
 
         whenReady(verification) { _ =>
           // Do nothing
@@ -50,9 +50,9 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1, false)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig, zipFile)
+        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig)
 
-        val verification = uploader.runWith(Sink.ignore)
+        val (_, verification) = uploader.runWith(Source.single(zipFile), Sink.ignore)
 
         whenReady(verification.failed) { e =>
           println(e)

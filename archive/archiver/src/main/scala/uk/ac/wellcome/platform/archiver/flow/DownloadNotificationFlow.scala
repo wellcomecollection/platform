@@ -22,7 +22,6 @@ object DownloadNotificationFlow extends Logging {
         case Failure(e) => throw e
       }
       .map(location => {
-
         debug(s"Found $location to download.")
 
         location
