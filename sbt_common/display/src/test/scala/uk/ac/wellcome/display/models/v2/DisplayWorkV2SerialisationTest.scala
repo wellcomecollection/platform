@@ -47,7 +47,7 @@ class DisplayWorkV2SerialisationTest
 
   it("renders an item if the items include is present") {
     val work = createIdentifiedWorkWith(
-      items = createIdentifiedItems(count = 1)
+      items = createIdentifiedItems(count = 1) :+ createUnidentifiableItemWith()
     )
 
     val actualJson = objectMapper.writeValueAsString(
