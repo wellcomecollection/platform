@@ -30,12 +30,22 @@ trait DisplaySerialisationTestBase { this: Suite =>
     }
 
   def items(identifiedItems: List[Displayable[Item]]) =
-    identifiedItems
-      .collect {
+    identifiedItems.map {
         case it: Identified[Item] =>
           identifiedItem(it)
+        case it: Unidentifiable[Item] =>
+          unidentifiableItem(it)
       }
       .mkString(",")
+
+  def unidentifiableItem(it: Unidentifiable[Item]) = {
+    s"""{
+          "type": "${it.agent.ontologyType}",
+          "locations": [
+            ${locations(it.agent.locations)}
+          ]
+        }"""
+  }
 
   def identifiedItem(it: Identified[Item]) = {
     s"""{
