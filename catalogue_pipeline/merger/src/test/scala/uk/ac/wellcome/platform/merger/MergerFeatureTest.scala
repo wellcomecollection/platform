@@ -41,17 +41,17 @@ class MergerFeatureTest
                     val recorderWorkEntry =
                       createRecorderWorkEntryWith(version = 1)
 
-                    whenReady(storeInVHS(vhs, recorderWorkEntry)) { _ =>
-                      val matcherResult =
-                        matcherResultWith(Set(Set(recorderWorkEntry)))
-                      sendNotificationToSQS(queue, matcherResult)
+                    storeInVHS(vhs, recorderWorkEntry)
 
-                      eventually {
-                        assertQueueEmpty(queue)
-                        assertQueueEmpty(dlq)
-                        val worksSent = getMessages[TransformedBaseWork](topic)
-                        worksSent should contain only recorderWorkEntry.work
-                      }
+                    val matcherResult =
+                      matcherResultWith(Set(Set(recorderWorkEntry)))
+                    sendNotificationToSQS(queue, matcherResult)
+
+                    eventually {
+                      assertQueueEmpty(queue)
+                      assertQueueEmpty(dlq)
+                      val worksSent = getMessages[TransformedBaseWork](topic)
+                      worksSent should contain only recorderWorkEntry.work
                     }
                   }
               }
