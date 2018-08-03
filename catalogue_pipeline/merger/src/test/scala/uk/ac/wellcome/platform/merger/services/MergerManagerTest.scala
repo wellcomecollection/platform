@@ -2,7 +2,12 @@ package uk.ac.wellcome.platform.merger.services
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifiableRedirect, UnidentifiedRedirectedWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  IdentifiableRedirect,
+  UnidentifiedRedirectedWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.merger.MergerTestUtils
 
 class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
@@ -20,7 +25,9 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
   it("performs a merge with multiple works") {
     val workEntry = createRecorderWorkEntry
-    val otherEntries = (1 to 3).map { _ => createRecorderWorkEntry }
+    val otherEntries = (1 to 3).map { _ =>
+      createRecorderWorkEntry
+    }
 
     val workEntries = (workEntry +: otherEntries).map { Some(_) }.toList
 
@@ -42,7 +49,9 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   }
 
   it("returns the works unmerged if any of the work entries are None") {
-    val workEntries = (1 to 3).map { _ => createRecorderWorkEntry }
+    val workEntries = (1 to 3).map { _ =>
+      createRecorderWorkEntry
+    }
 
     val result = MergerManager.applyMerge(
       maybeWorkEntries = workEntries.map { Some(_) }.toList ++ List(None),

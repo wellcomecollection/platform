@@ -11,8 +11,9 @@ object MergerManager {
     * If we got an incomplete list of results from VHS (for example,
     * wrong versions), we skip the merge and return the original works.
     */
-  def applyMerge(maybeWorkEntries: List[Option[RecorderWorkEntry]],
-                 process: Seq[UnidentifiedWork] => Seq[BaseWork]): Seq[BaseWork] = {
+  def applyMerge(
+    maybeWorkEntries: List[Option[RecorderWorkEntry]],
+    process: Seq[UnidentifiedWork] => Seq[BaseWork]): Seq[BaseWork] = {
     val workEntries = maybeWorkEntries.flatten
     val works = workEntries
       .map { _.work }

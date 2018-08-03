@@ -30,10 +30,11 @@ class MergerWorkerService @Inject()(
       workIdentifiers = getWorksIdentifiers(matcherResult).toList
       maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
         workIdentifiers)
-      works <- Future.successful(MergerManager.applyMerge(
-        maybeWorkEntries = maybeWorkEntries,
-        process = merger.merge
-      ))
+      works <- Future.successful(
+        MergerManager.applyMerge(
+          maybeWorkEntries = maybeWorkEntries,
+          process = merger.merge
+        ))
       _ <- sendWorks(works)
     } yield ()
 
