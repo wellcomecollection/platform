@@ -1,11 +1,12 @@
-package uk.ac.wellcome.platform.api.works
+package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
+import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
-class ApiErrorsTest
+class ApiV2ErrorsTest
     extends ApiWorksTestBase
     with DisplayV1SerialisationTestBase {
 
@@ -155,7 +156,7 @@ class ApiErrorsTest
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
-            path = s"/$apiPrefix/works?includes=foo",
+            path = s"/$apiPrefix/works?include=foo",
             andExpect = Status.BadRequest,
             withJsonBody =
               badRequest(apiPrefix, "includes: 'foo' is not a valid include")
@@ -169,7 +170,7 @@ class ApiErrorsTest
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
-            path = s"/$apiPrefix/works?includes=foo,bar",
+            path = s"/$apiPrefix/works?include=foo,bar",
             andExpect = Status.BadRequest,
             withJsonBody = badRequest(
               apiPrefix,
@@ -185,7 +186,7 @@ class ApiErrorsTest
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
-            path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
+            path = s"/$apiPrefix/works?include=foo,identifiers,bar",
             andExpect = Status.BadRequest,
             withJsonBody = badRequest(
               apiPrefix,
@@ -201,7 +202,7 @@ class ApiErrorsTest
       withApiFixtures(apiVersion = version) {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
-            path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
+            path = s"/$apiPrefix/works/nfdn7wac?include=foo",
             andExpect = Status.BadRequest,
             withJsonBody =
               badRequest(apiPrefix, "includes: 'foo' is not a valid include")
