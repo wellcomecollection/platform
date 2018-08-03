@@ -15,10 +15,8 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
   it("performs a merge with a single work") {
     val workEntry = createRecorderWorkEntry
 
-    val result = MergerManager.applyMerge(
-      maybeWorkEntries = List(Some(workEntry)),
-      process = mergeTailIntoHead
-    )
+    val result = mergerManager.applyMerge(
+      maybeWorkEntries = List(Some(workEntry)))
 
     result shouldBe List(workEntry.work)
   }
@@ -31,10 +29,7 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
 
     val workEntries = (workEntry +: otherEntries).map { Some(_) }.toList
 
-    val result = MergerManager.applyMerge(
-      maybeWorkEntries = workEntries,
-      process = mergeTailIntoHead
-    )
+    val result = mergerManager.applyMerge(maybeWorkEntries = workEntries)
 
     result.head shouldBe workEntry.work
 
@@ -53,23 +48,26 @@ class MergerManagerTest extends FunSpec with Matchers with MergerTestUtils {
       createRecorderWorkEntry
     }
 
-    val result = MergerManager.applyMerge(
-      maybeWorkEntries = workEntries.map { Some(_) }.toList ++ List(None),
-      process = mergeTailIntoHead
-    )
+    val result = mergerManager.applyMerge(
+      maybeWorkEntries = workEntries.map { Some(_) }.toList ++ List(None))
 
     result should contain theSameElementsAs workEntries.map { _.work }
   }
 
-  /** Make every work a redirect to the first work in the list, and leave
-    * the first work intact.
-    */
-  private def mergeTailIntoHead(works: Seq[UnidentifiedWork]): Seq[BaseWork] =
-    works.head +: works.tail.map { work =>
-      UnidentifiedRedirectedWork(
-        sourceIdentifier = work.sourceIdentifier,
-        version = work.version,
-        redirect = IdentifiableRedirect(works.head.sourceIdentifier)
-      )
-    }
+  val mergerRules: MergerRules = new MergerRules {
+
+    /** Make every work a redirect to the first work in the list, and leave
+      * the first work intact.
+      */
+    override def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] =
+      works.head +: works.tail.map { work =>
+        UnidentifiedRedirectedWork(
+          sourceIdentifier = work.sourceIdentifier,
+          version = work.version,
+          redirect = IdentifiableRedirect(works.head.sourceIdentifier)
+        )
+      }
+  }
+
+  val mergerManager = new MergerManager(mergerRules = mergerRules)
 }

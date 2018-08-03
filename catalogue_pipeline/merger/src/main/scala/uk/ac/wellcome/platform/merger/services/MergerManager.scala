@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
 
 class MergerManager @Inject()(
-  merger: MergerRules
+  mergerRules: MergerRules
 ) {
 
   /** Given a list of recorder work entries retrieved from VHS, and a
@@ -22,7 +22,7 @@ class MergerManager @Inject()(
       .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
 
     if (works.size == maybeWorkEntries.size) {
-      merger.merge(works)
+      mergerRules.merge(works)
     } else {
       works
     }
