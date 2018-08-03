@@ -238,8 +238,7 @@ class MergerWorkerServiceTest
                                 sqsStream,
                                 vhs,
                                 snsWriter) { _ =>
-                                testWith(
-                                  (vhs, queuePair, topic, metricsSender))
+                                testWith((vhs, queuePair, topic, metricsSender))
                               }
                           }
                         }
