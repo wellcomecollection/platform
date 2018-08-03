@@ -6,9 +6,16 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable,
+  Transformable
+}
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.transformers.{MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.platform.transformer.transformers.{
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}

@@ -102,8 +102,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
       .get shouldBe a[SierraReaderException]
   }
 
-  it(
-    "returns a SierraReaderException if the start time is after the end time") {
+  it("returns a SierraReaderException if the start time is after the end time") {
     val jsonString =
       s"""
          |{

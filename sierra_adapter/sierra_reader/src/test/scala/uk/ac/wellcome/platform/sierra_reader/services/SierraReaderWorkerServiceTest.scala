@@ -231,8 +231,7 @@ class SierraReaderWorkerServiceTest
 
   }
 
-  it(
-    "doesn't return a SierraReaderException if it cannot reach the Sierra API") {
+  it("doesn't return a SierraReaderException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
         val body =
