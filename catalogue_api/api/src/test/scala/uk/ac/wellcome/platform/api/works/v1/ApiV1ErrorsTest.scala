@@ -3,16 +3,12 @@ package uk.ac.wellcome.platform.api.works.v1
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 import uk.ac.wellcome.display.models.ApiVersions
-import uk.ac.wellcome.display.models.v1.DisplayV1SerialisationTestBase
-import uk.ac.wellcome.platform.api.works.ApiWorksTestBase
 
 class ApiV1ErrorsTest
-    extends ApiWorksTestBase
-    with DisplayV1SerialisationTestBase {
+    extends ApiV1WorksTestBase {
 
   it("returns a BadRequest error when malformed query parameters are presented") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=penguin",
@@ -22,12 +18,11 @@ class ApiV1ErrorsTest
               "pageSize: 'penguin' is not a valid Integer")
           )
       }
-    }
+
   }
 
   it("returns a NotFound error when requesting a work with a non-existent id") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val badId = "non-existing-id"
           server.httpGet(
@@ -38,12 +33,11 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it(
     "returns a BadRequest error if the user asks for a page size just over the maximum") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 101
           server.httpGet(
@@ -54,13 +48,12 @@ class ApiV1ErrorsTest
               s"pageSize: [$pageSize] is not less than or equal to 100")
           )
       }
-    }
+
   }
 
   it(
     "returns a BadRequest error if the user asks for an overly large page size") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 100000
           server.httpGet(
@@ -70,13 +63,12 @@ class ApiV1ErrorsTest
               apiPrefix,
               s"pageSize: [$pageSize] is not less than or equal to 100")
           )
-      }
+
     }
   }
 
   it("returns a BadRequest error if the user asks for zero-length pages") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = 0
           server.httpGet(
@@ -87,12 +79,11 @@ class ApiV1ErrorsTest
               s"pageSize: [$pageSize] is not greater than or equal to 1")
           )
       }
-    }
+
   }
 
   it("returns a BadRequest error if the user asks for a negative page size") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           val pageSize = -50
           server.httpGet(
@@ -104,11 +95,10 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it("returns a BadRequest error if the user asks for page 0") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=0",
@@ -118,12 +108,11 @@ class ApiV1ErrorsTest
               "page: [0] is not greater than or equal to 1")
           )
       }
-    }
+
   }
 
   it("returns a BadRequest error if the user asks for a page before 0") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=-50",
@@ -133,12 +122,11 @@ class ApiV1ErrorsTest
               "page: [-50] is not greater than or equal to 1")
           )
       }
-    }
+
   }
 
   it("returns multiple errors if there's more than one invalid parameter") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=-60&page=-50",
@@ -149,11 +137,10 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it("returns a Bad Request error if asked for an invalid include") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo",
@@ -162,12 +149,11 @@ class ApiV1ErrorsTest
               badRequest(apiPrefix, "includes: 'foo' is not a valid include")
           )
       }
-    }
+
   }
 
   it("returns a Bad Request error if asked for more than one invalid include") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo,bar",
@@ -177,13 +163,12 @@ class ApiV1ErrorsTest
               "includes: 'foo', 'bar' are not valid includes")
           )
       }
-    }
+
   }
 
   it(
     "returns a Bad Request error if asked for a mixture of valid and invalid includes") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?includes=foo,identifiers,bar",
@@ -193,13 +178,12 @@ class ApiV1ErrorsTest
               "includes: 'foo', 'bar' are not valid includes")
           )
       }
-    }
+
   }
 
   it(
     "returns a Bad Request error if asked for an invalid include on an individual work") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/nfdn7wac?includes=foo",
@@ -207,26 +191,24 @@ class ApiV1ErrorsTest
             withJsonBody =
               badRequest(apiPrefix, "includes: 'foo' is not a valid include")
           )
-      }
+
     }
   }
 
   it("returns Not Found if you look up a non-existent index") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?_index=foobarbaz",
             andExpect = Status.NotFound,
             withJsonBody = notFound(apiPrefix, "There is no index foobarbaz")
           )
-      }
+
     }
   }
 
   it("returns Not Found if you ask for a non-existent work") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/xhu96f9j",
@@ -236,11 +218,10 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it("returns Bad Request if you ask for a malformed identifier") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works/zd224ncv]",
@@ -250,7 +231,7 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it("returns an Internal Server error if you try to search a malformed index") {
     // We need to do something that reliably triggers an internal exception
@@ -259,8 +240,7 @@ class ApiV1ErrorsTest
     // Elasticsearch has a number of "private" indexes, which don't have
     // a canonicalId field to sort on.  Trying to query one of these will
     // trigger one such exception!
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?_index=.watches",
@@ -275,11 +255,10 @@ class ApiV1ErrorsTest
           )
       }
     }
-  }
+
 
   it("returns a Bad Request error if you try to access the 10000th page") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?page=10000",
@@ -288,14 +267,13 @@ class ApiV1ErrorsTest
               apiPrefix,
               "Only the first 10000 works are available in the API.")
           )
-      }
+
     }
   }
 
   it(
     "returns a Bad Request error if you try to get the 101th page with 100 results per page") {
-    ApiVersions.values.toList.foreach { version: ApiVersions.Value =>
-      withApiFixtures(apiVersion = version) {
+    withV1Api {
         case (apiPrefix, _, _, _, server: EmbeddedHttpServer) =>
           server.httpGet(
             path = s"/$apiPrefix/works?pageSize=100&page=101",
@@ -304,7 +282,7 @@ class ApiV1ErrorsTest
               apiPrefix,
               "Only the first 10000 works are available in the API.")
           )
-      }
+
     }
   }
 
