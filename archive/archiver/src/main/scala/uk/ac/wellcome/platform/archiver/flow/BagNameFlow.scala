@@ -28,4 +28,3 @@ object BagNameFlow extends Logging {
 }
 
 case class BagName(value: String)
-

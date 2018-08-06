@@ -7,9 +7,9 @@ import akka.stream.scaladsl.Flow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-
 object DigestLocationFlow {
-  def apply(config: BagUploaderConfig): Flow[ZipFile, ObjectLocation, NotUsed] = {
+  def apply(
+    config: BagUploaderConfig): Flow[ZipFile, ObjectLocation, NotUsed] = {
     val bagNameFlow: Flow[ZipFile, BagName, NotUsed] = BagNameFlow()
 
     bagNameFlow

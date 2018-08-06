@@ -16,12 +16,12 @@ object ArchiveItemFlow extends Logging {
     materializer: ActorMaterializer
   ): Flow[(BagDigestItem, ZipFile), Done, NotUsed] = {
 
-    val uploadVerificationFlow: Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] =
-
+    val uploadVerificationFlow
+      : Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] =
       UploadVerificationFlow(config)
 
     val uploadLocationFlow
-    : Flow[MultipartUploadResult, ObjectLocation, NotUsed] =
+      : Flow[MultipartUploadResult, ObjectLocation, NotUsed] =
       Flow[MultipartUploadResult]
         .map {
           case MultipartUploadResult(_, bucket, key, _) =>
@@ -36,7 +36,7 @@ object ArchiveItemFlow extends Logging {
 
       val objectLocationFlow = b.add(Flow[(BagDigestItem, ZipFile)])
       val uploadVerificationFlowShape
-      : FlowShape[(BagDigestItem, ZipFile), MultipartUploadResult] =
+        : FlowShape[(BagDigestItem, ZipFile), MultipartUploadResult] =
         b.add(uploadVerificationFlow)
       val uploadLocationFlowShape = b.add(uploadLocationFlow)
       val downloadVerificationZipIn = b.add(Zip[ObjectLocation, String])

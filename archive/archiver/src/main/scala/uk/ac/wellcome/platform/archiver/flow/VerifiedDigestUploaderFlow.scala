@@ -10,7 +10,6 @@ import akka.stream.scaladsl.Flow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-
 object VerifiedDigestUploaderFlow {
   def apply(zipFile: ZipFile, bagName: BagName, config: BagUploaderConfig)(
     implicit
@@ -18,8 +17,11 @@ object VerifiedDigestUploaderFlow {
     s3Client: S3Client
   ): Flow[ObjectLocation, Done, NotUsed] = {
 
-    val bagDigestItemFlow: Flow[(ObjectLocation, BagName, ZipFile), BagDigestItem, NotUsed] = BagDigestItemFlow(config)
-    val archiveItemFlow: Flow[(BagDigestItem, ZipFile), Done, NotUsed] = ArchiveItemFlow(config)
+    val bagDigestItemFlow
+      : Flow[(ObjectLocation, BagName, ZipFile), BagDigestItem, NotUsed] =
+      BagDigestItemFlow(config)
+    val archiveItemFlow: Flow[(BagDigestItem, ZipFile), Done, NotUsed] =
+      ArchiveItemFlow(config)
 
     Flow[ObjectLocation]
       .log("digest location")

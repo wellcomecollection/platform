@@ -18,18 +18,22 @@ object VerifiedBagUploaderFlow extends Logging {
     s3Client: S3Client
   ): Flow[ZipFile, Seq[Done], NotUsed] = {
 
-    val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] = DigestLocationFlow(config)
+    val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] =
+      DigestLocationFlow(config)
 
     Flow[ZipFile].flatMapConcat((zipFile) => {
-      Source.single(zipFile)
+      Source
+        .single(zipFile)
         .via(digestLocationFlow)
         .flatMapConcat(digestLocation => {
 
           val bagName = BagName(digestLocation.namespace)
-          val verifiedDigestUploaderFlow = VerifiedDigestUploaderFlow(zipFile, bagName, config)
+          val verifiedDigestUploaderFlow =
+            VerifiedDigestUploaderFlow(zipFile, bagName, config)
 
           Source.fromFuture(
-            Source.single(digestLocation)
+            Source
+              .single(digestLocation)
               .via(verifiedDigestUploaderFlow)
               .runWith(Sink.seq)
           )
@@ -38,4 +42,3 @@ object VerifiedBagUploaderFlow extends Logging {
     })
   }
 }
-
