@@ -7,7 +7,7 @@ import com.google.inject.Guice
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
+import fixtures.AkkaS3
 //import uk.ac.wellcome.platform.archiver.BagItUtils._
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
