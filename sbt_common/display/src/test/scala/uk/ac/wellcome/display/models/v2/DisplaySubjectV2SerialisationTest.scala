@@ -11,7 +11,7 @@ class DisplaySubjectV2SerialisationTest
     with JsonMapperTestUtil
     with IdentifiersUtil {
 
-  it("serialises a DisplaySubject constructed from a Subject correctly") {
+  it("serialises a DisplaySubject constructed from a Subject") {
     val concept0 = Unidentifiable(Concept("conceptLabel"))
     val concept1 = Unidentifiable(Period("periodLabel"))
     val concept2 = Identified(

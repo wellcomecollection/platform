@@ -14,7 +14,7 @@ class WorksIncludesTest extends FunSpec with Matchers {
     includes.identifiers shouldBe false
   }
 
-  it("successfully rejects an correct string") {
+  it("successfully rejects an incorrect string") {
     intercept[WorksIncludesParsingException] {
       WorksIncludes(queryParam = "foo,bar")
     }

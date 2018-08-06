@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
-  it("correctly parses a Work without any items") {
+  it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
       items = List()
     )
@@ -19,7 +19,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
     displayWork.items shouldBe Some(List())
   }
 
-  it("correctly parses items on a work") {
+  it("parses items on a work") {
     val item = createIdentifiedItem(locations = List())
     val work = createIdentifiedWorkWith(
       itemsV1 = List(item)
@@ -33,7 +33,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
     displayItem.id shouldBe item.canonicalId
   }
 
-  it("correctly parses a work without any extra identifiers") {
+  it("parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
