@@ -33,7 +33,7 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val uploadNamespace = opt[String](required = true)
   val uploadPrefix = opt[String](default = Some("archive"))
-  val digestDelimiter = opt[String](default = Some("  "))
+  val digestDelimiter = opt[String](default = Some(" +"))
 
   verify()
 
