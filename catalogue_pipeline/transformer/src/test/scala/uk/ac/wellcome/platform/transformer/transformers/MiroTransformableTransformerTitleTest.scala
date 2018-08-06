@@ -21,7 +21,7 @@ class MiroTransformableTransformerTitleTest
     )
   }
 
-  describe("titles on V images")
+  describe("titles on V images") {
     it("uses image_title if image_image_desc is absent") {
       val title = "A limerick about a lemming"
       transformRecordAndCheckTitle(
