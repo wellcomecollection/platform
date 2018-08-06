@@ -230,7 +230,7 @@ class DisplayWorkV2SerialisationTest
   }
 
   it(
-    "includes the thumbnail field if available and we use the thumbnail include") {
+    "shows the thumbnail field if available") {
     val work = createIdentifiedWorkWith(
       thumbnail = Some(
         DigitalLocation(
@@ -240,7 +240,7 @@ class DisplayWorkV2SerialisationTest
         ))
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, V2WorksIncludes(thumbnail = true)))
+      DisplayWorkV2(work, V2WorksIncludes()))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",

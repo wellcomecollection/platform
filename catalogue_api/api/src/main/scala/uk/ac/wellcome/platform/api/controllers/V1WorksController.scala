@@ -7,7 +7,6 @@ import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.requests.{V1MultipleResultsRequest, V1SingleWorkRequest}
 import uk.ac.wellcome.platform.api.services.WorksService
-import uk.ac.wellcome.display.models.Attributes._
 
 import scala.concurrent.ExecutionContext
 
@@ -23,6 +22,7 @@ class V1WorksController @Inject()(
     ) {
   implicit protected val swagger = ApiV1Swagger
   override def emptyWorksIncludes: V1WorksIncludes = V1WorksIncludes.apply()
+  override def recognisedIncludes: List[String] = V1WorksIncludes.recognisedIncludes
 
   prefix(s"${apiConfig.pathPrefix}/${ApiVersions.v1.toString}") {
     setupResultListEndpoint(ApiVersions.v1, "/works", DisplayWorkV1.apply)

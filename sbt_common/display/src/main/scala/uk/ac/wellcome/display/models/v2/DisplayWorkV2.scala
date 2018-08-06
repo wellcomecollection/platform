@@ -115,8 +115,7 @@ case object DisplayWorkV2 {
         else None,
       workType = work.workType.map { DisplayWorkType(_) },
       thumbnail =
-        if (includes.thumbnail)
-          work.thumbnail.map { DisplayLocationV2(_) } else None,
+        work.thumbnail.map { DisplayLocationV2(_) } ,
       items =
         if (includes.items)
           Some(work.items.map {

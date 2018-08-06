@@ -13,21 +13,22 @@ import uk.ac.wellcome.platform.api.requests._
 import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
 import uk.ac.wellcome.platform.api.services.WorksService
 
+import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
-import scala.collection.JavaConverters._
 
 abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
 W <: WorksIncludes](
   apiConfig: ApiConfig,
   indexName: String,
-  worksService: WorksService)(implicit ec: ExecutionContext, toAttribute: ToAttributes[W])
+  worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
 
   protected val includeParameterName: String
   def emptyWorksIncludes: W
+  def recognisedIncludes: List[String]
 
   val includeSwaggerParam: QueryParameter = new QueryParameter()
     .name(includeParameterName)
@@ -35,7 +36,7 @@ W <: WorksIncludes](
     .required(false)
     .`type`("array")
     .collectionFormat("csv")
-    .items(new StringProperty()._enum(Attributes.toAttributes(emptyWorksIncludes).asJava))
+    .items(new StringProperty()._enum(recognisedIncludes.asJava))
 
   protected def setupResultListEndpoint[T <: DisplayWork](
     version: ApiVersions.Value,
