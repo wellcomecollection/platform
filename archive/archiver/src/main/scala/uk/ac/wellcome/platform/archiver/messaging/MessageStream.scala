@@ -90,8 +90,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
         logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
         logger.error(
-          s"Unrecognised failure while: ${exception.getMessage}",
-          exception)
+          s"Unrecognised failure while: ${exception.getMessage}", exception)
     }
   }
 }

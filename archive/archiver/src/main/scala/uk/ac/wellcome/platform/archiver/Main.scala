@@ -34,6 +34,7 @@ object Main extends App with Archiver {
 
   try {
     info(s"Starting worker.")
+
     val app = run()
 
     Await.result(app, Duration.Inf)
