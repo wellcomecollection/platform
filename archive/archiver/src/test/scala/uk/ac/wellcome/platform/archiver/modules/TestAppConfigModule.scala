@@ -8,7 +8,7 @@ import uk.ac.wellcome.platform.archiver.models._
 import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String, bucketName: String)
-  extends AbstractModule {
+    extends AbstractModule {
   @Provides
   def providesAppConfig = {
     val s3ClientConfig = S3ClientConfig(

@@ -8,8 +8,8 @@ import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 trait AkkaS3 extends S3 {
   def withS3AkkaClient[R](
-                           actorSystem: ActorSystem,
-                           materializer: ActorMaterializer)(testWith: TestWith[S3Client, R]): R = {
+    actorSystem: ActorSystem,
+    materializer: ActorMaterializer)(testWith: TestWith[S3Client, R]): R = {
     val s3AkkaClient = AkkaS3ClientModule.buildAkkaS3Client(
       S3ClientConfig(
         region = "localhost",

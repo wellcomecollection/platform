@@ -13,58 +13,66 @@ import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.json.JsonUtil._
 
-class ArchiverFeatureTest extends FunSpec
-  with Matchers
-  with ScalaFutures
-  with Messaging
-  with AkkaS3 {
+class ArchiverFeatureTest
+    extends FunSpec
+    with Matchers
+    with ScalaFutures
+    with Messaging
+    with AkkaS3 {
 
   // TODO: Need to test failure cases!!!
   it("downloads, uploads and verifies a BagIt bag") {
     withLocalSqsQueueAndDlq(queuePair => {
-      withLocalS3Bucket { ingestBucket =>
-        withLocalS3Bucket { storageBucket =>
-          //val bagName = randomAlphanumeric()
-          //val (zipFile, fileName) = createBagItZip(bagName, 1)
+      withLocalS3Bucket {
+        ingestBucket =>
+          withLocalS3Bucket {
+            storageBucket =>
+              //val bagName = randomAlphanumeric()
+              //val (zipFile, fileName) = createBagItZip(bagName, 1)
 
-          //val bagName = "b22454408"
-          val filePath = Paths.get(System.getProperty("user.home"), "Desktop", "b24923333-a.zip")
-          val zipFile = new ZipFile(filePath.toFile)
+              //val bagName = "b22454408"
+              val filePath = Paths.get(
+                System.getProperty("user.home"),
+                "Desktop",
+                "b24923333-a.zip")
+              val zipFile = new ZipFile(filePath.toFile)
 
-          val entries = zipFile.entries()
-          val fileCount = Stream
-            .continually(entries.nextElement)
-            .takeWhile(_ => entries.hasMoreElements)
-            .toList
-            .length
+              val entries = zipFile.entries()
+              val fileCount = Stream
+                .continually(entries.nextElement)
+                .takeWhile(_ => entries.hasMoreElements)
+                .toList
+                .length
 
-          val uploadKey = "upload/path/file.zip"
-          s3Client.putObject(ingestBucket.name, uploadKey, filePath.toFile)
+              val uploadKey = "upload/path/file.zip"
+              s3Client.putObject(ingestBucket.name, uploadKey, filePath.toFile)
 
-          val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
-          sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
+              val uploadObjectLocation =
+                ObjectLocation(ingestBucket.name, uploadKey)
+              sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
 
-          val app = new Archiver {
-            val injector = Guice.createInjector(
-              new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
-              AkkaModule,
-              AkkaS3ClientModule,
-              CloudWatchClientModule,
-              SQSClientModule
-            )
+              val app = new Archiver {
+                val injector = Guice.createInjector(
+                  new TestAppConfigModule(
+                    queuePair.queue.url,
+                    storageBucket.name),
+                  AkkaModule,
+                  AkkaS3ClientModule,
+                  CloudWatchClientModule,
+                  SQSClientModule
+                )
+              }
+
+              app.run()
+
+              eventually {
+                val objects = s3Client.listObjects(storageBucket.name)
+                val objectSummaries = objects.getObjectSummaries
+
+                objectSummaries.toArray.length shouldEqual fileCount
+              }
           }
-
-          app.run()
-
-          eventually {
-            val objects = s3Client.listObjects(storageBucket.name)
-            val objectSummaries = objects.getObjectSummaries
-
-            objectSummaries.toArray.length shouldEqual fileCount
-          }
-        }
       }
     })
   }
 }
-
