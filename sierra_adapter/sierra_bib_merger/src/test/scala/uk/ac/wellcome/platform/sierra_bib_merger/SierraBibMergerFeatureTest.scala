@@ -9,9 +9,10 @@ import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -25,7 +26,8 @@ class SierraBibMergerFeatureTest
     with SQS
     with fixtures.Server
     with LocalVersionedHybridStore
-    with SierraUtil {
+    with SierraUtil
+    with SierraVHSUtil {
 
   it("stores a bib in the hybrid store") {
     withLocalSqsQueue { queue =>
@@ -33,7 +35,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val bibRecord = createSierraBibRecord
@@ -44,11 +46,10 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = bibRecord)
 
               eventually {
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                assertStored(
+                  transformable = expectedSierraTransformable,
+                  bucket = bucket, table = table
+                )
               }
             }
           }
@@ -63,7 +64,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val record1 = createSierraBibRecord
@@ -80,16 +81,14 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = record2)
 
               eventually {
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedTransformable1.id,
-                  record = expectedTransformable1)
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedTransformable2.id,
-                  record = expectedTransformable2)
+                assertStored(
+                  transformable = expectedTransformable1,
+                  bucket = bucket, table = table
+                )
+                assertStored(
+                  transformable = expectedTransformable2,
+                  bucket = bucket, table = table
+                )
               }
             }
           }
@@ -104,7 +103,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val oldBibRecord = createSierraBibRecordWith(
@@ -119,12 +118,10 @@ class SierraBibMergerFeatureTest
                 modifiedDate = newerDate
               )
 
-              hybridStore
-                .updateRecord(oldTransformable.id)(
-                  (
-                    oldTransformable,
-                    SourceMetadata(oldTransformable.sourceName)))((t, m) =>
-                  (t, m))
+              storeInVHS(
+                transformable = oldTransformable,
+                hybridStore = hybridStore
+              )
                 .map { _ =>
                   sendNotificationToSQS(queue = queue, message = newBibRecord)
                 }
@@ -133,11 +130,10 @@ class SierraBibMergerFeatureTest
                 SierraTransformable(bibRecord = newBibRecord)
 
               eventually {
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedTransformable.id,
-                  record = expectedTransformable)
+                assertStored(
+                  transformable = expectedTransformable,
+                  bucket = bucket, table = table
+                )
               }
             }
           }
@@ -152,7 +148,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val newBibRecord = createSierraBibRecordWith(
@@ -167,11 +163,10 @@ class SierraBibMergerFeatureTest
                 modifiedDate = olderDate
               )
 
-              hybridStore
-                .updateRecord(expectedTransformable.id)((
-                  expectedTransformable,
-                  SourceMetadata(expectedTransformable.sourceName)))((t, m) =>
-                  (t, m))
+              storeInVHS(
+                transformable = expectedTransformable,
+                hybridStore = hybridStore
+              )
                 .map { _ =>
                   sendNotificationToSQS(queue = queue, message = oldBibRecord)
                 }
@@ -180,11 +175,10 @@ class SierraBibMergerFeatureTest
               // enough time for this update to have gone through (if it was going to).
               Thread.sleep(5000)
 
-              assertStored[SierraTransformable](
-                bucket,
-                table,
-                id = expectedTransformable.id,
-                record = expectedTransformable)
+              assertStored(
+                transformable = expectedTransformable,
+                bucket = bucket, table = table
+              )
             }
           }
         }
@@ -198,7 +192,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Unit](
+            withTypeVHS[SierraTransformable, EmptyMetadata, Unit](
               bucket,
               table) { hybridStore =>
               val transformable = createSierraTransformableWith(
@@ -208,24 +202,22 @@ class SierraBibMergerFeatureTest
               val bibRecord =
                 createSierraBibRecordWith(id = transformable.sierraId)
 
-              val future =
-                hybridStore.updateRecord(transformable.id)(
-                  (transformable, SourceMetadata(transformable.sourceName)))(
-                  (t, m) => (t, m))
+              storeInVHS(
+                transformable = transformable,
+                hybridStore = hybridStore
+              )
+                .map { _ =>
+                  sendNotificationToSQS(queue = queue, message = bibRecord)
+                }
 
-              future.map { _ =>
-                sendNotificationToSQS(queue = queue, message = bibRecord)
-              }
-
-              val expectedSierraTransformable =
+              val expectedTransformable =
                 SierraTransformable(bibRecord = bibRecord)
 
               eventually {
-                assertStored[SierraTransformable](
-                  bucket,
-                  table,
-                  id = expectedSierraTransformable.id,
-                  record = expectedSierraTransformable)
+                assertStored(
+                  transformable = expectedTransformable,
+                  bucket = bucket, table = table
+                )
               }
             }
           }
