@@ -12,7 +12,7 @@ class DisplayWorkV2SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises a DisplayWorkV2 correctly") {
+  it("serialises a DisplayWorkV2") {
     val work = createIdentifiedWorkWith(
       workType = Some(
         WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),

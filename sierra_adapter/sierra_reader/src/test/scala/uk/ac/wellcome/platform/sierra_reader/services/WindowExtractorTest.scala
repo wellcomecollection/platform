@@ -5,7 +5,7 @@ import uk.ac.wellcome.exceptions.GracefulFailureException
 
 class WindowExtractorTest extends FunSpec with Matchers {
 
-  it("should extract a valid message window from a json string") {
+  it("extracts a valid message window from a json string") {
     val start = "2013-12-10T17:16:35Z"
     val end = "2013-12-13T21:34:35Z"
     val jsonString =
@@ -18,8 +18,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor.extractWindow(jsonString).get shouldBe s"[$start,$end]"
   }
 
-  it(
-    "should return a GracefulFailureException if start is not a valid iso datetime") {
+  it("returns a GracefulFailureException if start is not a valid iso datetime") {
     val jsonString =
       s"""
          |{
@@ -34,7 +33,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
   }
 
   it(
-    "should return a GracefulFailureException if start is a datetime but does not have a timezone") {
+    "returns a GracefulFailureException if start is a datetime but does not have a timezone") {
     val jsonString =
       s"""
          |{
@@ -48,8 +47,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
       .get shouldBe a[GracefulFailureException]
   }
 
-  it(
-    "should return a GracefulFailureException if end is not a valid iso datetime") {
+  it("returns a GracefulFailureException if end is not a valid iso datetime") {
     val jsonString =
       s"""
          |{
@@ -64,7 +62,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
   }
 
   it(
-    "should return a GracefulFailureException if end is a datetime but does not have a timezone") {
+    "returns a GracefulFailureException if end is a datetime but does not have a timezone") {
     val jsonString =
       s"""
          |{
@@ -78,8 +76,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
       .get shouldBe a[GracefulFailureException]
   }
 
-  it(
-    "should return a GracefulFailureException if there is not a start datetime") {
+  it("returns a GracefulFailureException if there is not a start datetime") {
     val jsonString =
       s"""
          |{
@@ -92,7 +89,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
       .get shouldBe a[GracefulFailureException]
   }
 
-  it("should return a GracefulFailureException if there is not an end datetime") {
+  it("returns a GracefulFailureException if there is not an end datetime") {
     val jsonString =
       s"""
          |{
@@ -106,7 +103,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
   }
 
   it(
-    "should return a GracefulFailureException if the start time is after the end time") {
+    "returns a GracefulFailureException if the start time is after the end time") {
     val jsonString =
       s"""
          |{
@@ -121,7 +118,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
   }
 
   it(
-    "should return a GracefulFailureException if the start time is equal to the end time") {
+    "returns a GracefulFailureException if the start time is equal to the end time") {
     val jsonString =
       s"""
          |{

@@ -12,7 +12,7 @@ class DisplayLocationsV2SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises a physical location correctly") {
+  it("serialises a physical location") {
     val physicalLocation = PhysicalLocation(
       locationType = LocationType("sgmed"),
       label = "a stack of slick slimes"
@@ -40,7 +40,7 @@ class DisplayLocationsV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location correctly") {
+  it("serialises a digital location") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image")
@@ -68,7 +68,7 @@ class DisplayLocationsV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location with a license correctly") {
+  it("serialises a digital location with a license") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image"),

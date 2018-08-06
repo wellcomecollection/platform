@@ -136,7 +136,7 @@ class IdentifierGeneratorTest
     }
   }
 
-  it("should preserve the ontologyType when generating a new identifier") {
+  it("preserves the ontologyType when generating a new identifier") {
     withIdentifierGenerator() {
       case (identifierGenerator, identifiersTable) =>
         implicit val session = AutoSession

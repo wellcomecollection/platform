@@ -95,7 +95,7 @@ class SnapshotServiceTest
       }
     }
 
-  it("completes a V1 snapshot generation successfully") {
+  it("completes a V1 snapshot generation") {
     withFixtures {
       case (snapshotService: SnapshotService, indexNameV1, _, publicBucket) =>
         val visibleWorks = createIdentifiedWorks(count = 3)
@@ -143,7 +143,7 @@ class SnapshotServiceTest
     }
   }
 
-  it("completes a V2 snapshot generation successfully") {
+  it("completes a V2 snapshot generation") {
     withFixtures {
       case (snapshotService: SnapshotService, _, indexNameV2, publicBucket) =>
         val visibleWorks = createIdentifiedWorks(count = 4)

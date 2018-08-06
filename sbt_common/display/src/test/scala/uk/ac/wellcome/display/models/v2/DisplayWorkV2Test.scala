@@ -7,7 +7,7 @@ import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
-  it("correctly parses a Work without any items") {
+  it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
       items = List()
     )
@@ -19,7 +19,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayWork.items shouldBe Some(List())
   }
 
-  it("correctly parses identified items on a work") {
+  it("parses identified items on a work") {
     val items = createIdentifiedItems(count = 1)
     val work = createIdentifiedWorkWith(
       items = items
@@ -33,7 +33,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayItem.id shouldBe Some(items.head.canonicalId)
   }
 
-  it("correctly parses unidentified items on a work") {
+  it("parses unidentified items on a work") {
     val item = createUnidentifiableItemWith()
     val location = item.agent.locations.head.asInstanceOf[DigitalLocation]
     val work = createIdentifiedWorkWith(
@@ -58,7 +58,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
   }
 
-  it("correctly parses a work without any extra identifiers") {
+  it("parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
@@ -196,7 +196,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
+  describe("uses the WorksIncludes.identifiers include") {
     val contributorAgentSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
