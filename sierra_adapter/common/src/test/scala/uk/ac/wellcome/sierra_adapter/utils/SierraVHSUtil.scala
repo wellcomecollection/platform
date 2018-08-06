@@ -33,6 +33,6 @@ trait SierraVHSUtil extends LocalVersionedHybridStore {
     assertStored[SierraTransformable](
       bucket,
       table,
-      id = transformable.id,
+      id = transformable.sierraId.withoutCheckDigit,
       record = transformable)
 }
