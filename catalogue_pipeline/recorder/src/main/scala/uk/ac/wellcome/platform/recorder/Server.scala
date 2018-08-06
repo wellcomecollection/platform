@@ -12,6 +12,7 @@ import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
   MessageConfigModule,
+  MessageReaderConfigModule,
   SQSClientModule,
   SQSConfigModule
 }
@@ -34,6 +35,7 @@ class Server extends HttpServer {
     "uk.ac.wellcome.platform.recorder Recorder"
   override val modules = Seq(
     ExecutionContextModule,
+    MessageReaderConfigModule,
     VHSConfigModule,
     MessageConfigModule,
     DynamoClientModule,
