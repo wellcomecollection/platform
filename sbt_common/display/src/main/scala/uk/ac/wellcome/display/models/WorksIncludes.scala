@@ -4,11 +4,19 @@ import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
 
-case class WorksIncludes(
+trait WorksIncludes
+
+case class V1WorksIncludes(
   identifiers: Boolean = false,
   thumbnail: Boolean = false,
   items: Boolean = false
-)
+) extends WorksIncludes
+
+case class V2WorksIncludes(
+  identifiers: Boolean = false,
+  thumbnail: Boolean = false,
+  items: Boolean = false
+) extends WorksIncludes
 
 class WorksIncludesParsingException(msg: String)
     extends JsonProcessingException(msg: String)
@@ -17,10 +25,6 @@ case object WorksIncludes {
 
   val recognisedIncludes = List("identifiers", "thumbnail", "items")
 
-  /// Parse an ?includes query-parameter string.
-  ///
-  /// If any unexpected includes are spotted, we raise an
-  /// `WorksIncludesParsingException`.
   def apply(queryParam: String): WorksIncludes = {
     val includesList = queryParam.split(",").toList
     val unrecognisedIncludes = includesList
