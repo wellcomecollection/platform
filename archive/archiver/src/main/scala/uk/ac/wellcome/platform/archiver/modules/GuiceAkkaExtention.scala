@@ -22,7 +22,7 @@ class GuiceAkkaExtensionImpl extends Extension {
 }
 
 object GuiceAkkaExtension
-  extends ExtensionId[GuiceAkkaExtensionImpl]
+    extends ExtensionId[GuiceAkkaExtensionImpl]
     with ExtensionIdProvider {
 
   /** Register ourselves with the ExtensionIdProvider */
@@ -62,7 +62,7 @@ trait GuiceAkkaActorRefProvider {
   * module) so that the name-based lookup obtains the correct actor from Guice.
   */
 class GuiceActorProducer(val injector: Injector, val actorName: String)
-  extends IndirectActorProducer {
+    extends IndirectActorProducer {
 
   override def actorClass = classOf[Actor]
 

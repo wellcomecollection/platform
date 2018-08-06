@@ -13,11 +13,11 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-
 object DownloadZipFlow extends Logging {
-  val tmpDir = System.getProperty("java.io.tmpdir")
-
-  def apply(s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext): Flow[ObjectLocation, ZipFile, NotUsed] = {
+  def apply(s3Client: S3Client,
+            materializer: ActorMaterializer,
+            executionContext: ExecutionContext)
+    : Flow[ObjectLocation, ZipFile, NotUsed] = {
     implicit val m = materializer
     implicit val e = executionContext
 
@@ -33,16 +33,15 @@ object DownloadZipFlow extends Logging {
         val tmpFile = File.createTempFile("archiver", ".tmp")
         val fileSink = FileIO.toPath(tmpFile.toPath)
 
-        Source.fromFuture(downloadStream
-          .runWith(fileSink)
-          .map(_.status)
-          .map {
-            case Success(_) => new ZipFile(tmpFile)
-            case Failure(e) => throw e
-          }
-        )
-      }).log("downloaded zipfile")
+        Source.fromFuture(
+          downloadStream
+            .runWith(fileSink)
+            .map(_.status)
+            .map {
+              case Success(_) => new ZipFile(tmpFile)
+              case Failure(e) => throw e
+            })
+      })
+      .log("downloaded zipfile")
   }
 }
-
-

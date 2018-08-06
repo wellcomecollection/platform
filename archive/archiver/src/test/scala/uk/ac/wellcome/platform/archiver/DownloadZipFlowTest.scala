@@ -8,6 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archiver.flow.DownloadZipFlow
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -16,12 +17,12 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class DownloadZipFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with AkkaS3 {
 
-  import BagItUtils._
+  import uk.ac.wellcome.platform.archiver.fixtures.BagItUtils._
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -47,10 +48,13 @@ class DownloadZipFlowTest
 
         val objectLocation = ObjectLocation(storageBucket.name, fileName)
 
-        val download: Future[ZipFile] = downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
+        val download: Future[ZipFile] =
+          downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
 
         whenReady(download) { downloadedZipFile =>
-          zipFile.entries.asScala.toList.map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList.map(_.toString)
+          zipFile.entries.asScala.toList
+            .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
+            .map(_.toString)
           zipFile.size shouldEqual downloadedZipFile.size
         }
       }

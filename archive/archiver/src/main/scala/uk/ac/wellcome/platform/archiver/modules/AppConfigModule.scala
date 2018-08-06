@@ -5,7 +5,9 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.config.ArgsConfigurator
 import uk.ac.wellcome.platform.archiver.models.AppConfig
 
-class AppConfigModule(val args: Array[String]) extends AbstractModule with Logging {
+class AppConfigModule(val args: Array[String])
+    extends AbstractModule
+    with Logging {
   debug(s"Application config loaded from args: ${args.toList}")
 
   override def configure(): Unit = {
@@ -13,15 +15,15 @@ class AppConfigModule(val args: Array[String]) extends AbstractModule with Loggi
   }
 
   @Provides
-  def providesAppConfig(configurator: ArgsConfigurator)=
+  def providesAppConfig(configurator: ArgsConfigurator) =
     configurator.appConfig
 
   @Provides
-  def providesS3ClientConfig(appConfig: AppConfig)=
+  def providesS3ClientConfig(appConfig: AppConfig) =
     appConfig.s3ClientConfig
 
   @Provides
-  def providesCloudwatchClientConfig(appConfig: AppConfig)=
+  def providesCloudwatchClientConfig(appConfig: AppConfig) =
     appConfig.cloudwatchClientConfig
 
   @Provides

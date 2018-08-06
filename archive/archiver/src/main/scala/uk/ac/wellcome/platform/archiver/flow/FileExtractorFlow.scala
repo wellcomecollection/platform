@@ -6,17 +6,21 @@ import akka.stream.scaladsl.{Flow, Source, StreamConverters}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.storage.ObjectLocation
 
-
 object FileExtractorFlow extends Logging {
 
   def apply() = {
-    Flow[(ObjectLocation, ZipFile)].flatMapConcat { case (bagLocation, zipFile) =>
-      Source.single(bagLocation)
-        .map(getStream(zipFile, _))
-        .flatMapConcat {
-          case Some(inputStream) => StreamConverters.fromInputStream(() => inputStream)
-          case _ => throw new RuntimeException(s"Failed to get InputStream for $bagLocation")
-        }
+    Flow[(ObjectLocation, ZipFile)].flatMapConcat {
+      case (bagLocation, zipFile) =>
+        Source
+          .single(bagLocation)
+          .map(getStream(zipFile, _))
+          .flatMapConcat {
+            case Some(inputStream) =>
+              StreamConverters.fromInputStream(() => inputStream)
+            case _ =>
+              throw new RuntimeException(
+                s"Failed to get InputStream for $bagLocation")
+          }
     }
   }
 

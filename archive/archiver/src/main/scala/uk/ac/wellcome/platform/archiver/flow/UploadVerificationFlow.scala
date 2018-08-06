@@ -11,23 +11,24 @@ import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 object UploadVerificationFlow extends Logging {
   def apply(config: BagUploaderConfig)(
-    implicit s3Client: S3Client, materializer: ActorMaterializer
+    implicit s3Client: S3Client,
+    materializer: ActorMaterializer
   ): Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] = {
-
 
     Flow[(BagDigestItem, ZipFile)]
       .log("verifying upload")
-      .flatMapConcat { case (BagDigestItem(checksum, location), zipFile) =>
+      .flatMapConcat {
+        case (BagDigestItem(checksum, location), zipFile) =>
+          val extract = FileExtractorFlow()
+          val verify = DigestCalculatorFlow("SHA-256", checksum)
 
-      val extract = FileExtractorFlow()
-      val verify = DigestCalculatorFlow("SHA-256", checksum)
+          val uploadKey = s"${config.uploadPrefix}/${location.namespace}/${location.key}"
+          val uploadSink = s3Client.multipartUpload(config.uploadNamespace, uploadKey)
+          val uploadSource = Source.single((location, zipFile))
+          val uploadResult = uploadSource.via(extract).via(verify).runWith(uploadSink)
 
-      val uploadKey = s"${config.uploadPrefix}/${location.namespace}/${location.key}"
-      val uploadSink = s3Client.multipartUpload(config.uploadNamespace, uploadKey)
-      val uploadSource = Source.single((location, zipFile))
-      val uploadResult = uploadSource.via(extract).via(verify).runWith(uploadSink)
-
-      Source.fromFuture(uploadResult).log("upload result")
-    }.log("upload verified")
+          Source.fromFuture(uploadResult).log("upload result")
+      }
+      .log("upload verified")
   }
 }

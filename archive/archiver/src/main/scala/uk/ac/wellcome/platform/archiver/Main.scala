@@ -12,7 +12,11 @@ import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archiver.flow.{DownloadNotificationFlow, DownloadZipFlow, VerifiedBagUploaderFlow}
+import uk.ac.wellcome.platform.archiver.flow.{
+  DownloadNotificationFlow,
+  DownloadZipFlow,
+  VerifiedBagUploaderFlow
+}
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archiver.modules._
@@ -20,7 +24,6 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 
 object Main extends App with Archiver {
   override val injector: Injector = Guice.createInjector(
@@ -50,15 +53,20 @@ trait Archiver extends Logging {
   val injector: Injector
 
   def run() = {
-    val messageStream = injector.getInstance(classOf[MessageStream[NotificationMessage, Unit]])
+    val messageStream =
+      injector.getInstance(classOf[MessageStream[NotificationMessage, Unit]])
     val s3Client = injector.getInstance(classOf[S3Client])
     val actorSystem = injector.getInstance(classOf[ActorSystem])
     val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
     val materializer = ActorMaterializer()(actorSystem)
 
-    val downloadNotificationFlow: Flow[NotificationMessage, ObjectLocation, NotUsed] = DownloadNotificationFlow()
-    val downloadZipFlow: Flow[ObjectLocation, ZipFile, NotUsed] = DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher)
-    val verifiedBagUploaderFlow: Flow[ZipFile, Seq[Done], NotUsed] = VerifiedBagUploaderFlow(bagUploaderConfig)(materializer, s3Client)
+    val downloadNotificationFlow
+      : Flow[NotificationMessage, ObjectLocation, NotUsed] =
+      DownloadNotificationFlow()
+    val downloadZipFlow: Flow[ObjectLocation, ZipFile, NotUsed] =
+      DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher)
+    val verifiedBagUploaderFlow: Flow[ZipFile, Seq[Done], NotUsed] =
+      VerifiedBagUploaderFlow(bagUploaderConfig)(materializer, s3Client)
 
     val workFlow = Flow[NotificationMessage]
       .log("notification")

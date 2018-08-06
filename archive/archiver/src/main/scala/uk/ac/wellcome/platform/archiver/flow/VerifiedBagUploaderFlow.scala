@@ -33,9 +33,9 @@ object VerifiedBagUploaderFlow extends Logging {
               .via(verifiedDigestUploaderFlow)
               .runWith(Sink.seq)
           )
+
         })
     })
   }
 }
-
 

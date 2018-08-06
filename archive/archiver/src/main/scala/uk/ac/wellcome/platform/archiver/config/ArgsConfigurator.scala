@@ -28,11 +28,12 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   val sqsParallelism = opt[Int](required = true, default = Some(10))
 
   val metricsNamespace = opt[String](default = Some("app"))
-  val metricsFlushIntervalSeconds = opt[Int](required = true, default = Some(20))
+  val metricsFlushIntervalSeconds =
+    opt[Int](required = true, default = Some(20))
 
   val uploadNamespace = opt[String](required = true)
   val uploadPrefix = opt[String](default = Some("archive"))
-  val digestDelimiter = opt[String](default = Some("  "))
+  val digestDelimiter = opt[String](default = Some(" +"))
 
   verify()
 
@@ -82,4 +83,3 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
     metricsConfig
   )
 }
-

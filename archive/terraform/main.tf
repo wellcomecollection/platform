@@ -1,11 +1,11 @@
 locals {
-  namespace                   = "archive-storage"
-  dlq_alarm_arn               = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  vpc_id                      = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  private_subnets             = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
-  archive_bucket_name         = "wellcomecollection-assets-archive-storage"
-  ingest_bucket_name          = "wellcomecollection-assets-archive-ingest"
-  archiver_container_image    = "${module.ecr_repository_archiver.repository_url}:${var.release_ids["archiver"]}"
+  namespace                = "archive-storage"
+  dlq_alarm_arn            = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+  vpc_id                   = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
+  private_subnets          = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
+  archive_bucket_name      = "wellcomecollection-assets-archive-storage"
+  ingest_bucket_name       = "wellcomecollection-assets-archive-ingest"
+  archiver_container_image = "${module.ecr_repository_archiver.repository_url}:${var.release_ids["archiver"]}"
 }
 
 resource "aws_ecs_cluster" "cluster" {
@@ -52,13 +52,12 @@ module "archiver_queue" {
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
-
 # Archive bucket
 
 # TODO: Add proper lifecycyle policy to prevent deletion and move to assets?
 resource "aws_s3_bucket" "archive_storage" {
   bucket = "${local.archive_bucket_name}"
-  acl = "private"
+  acl    = "private"
 }
 
 data "aws_iam_policy_document" "archive_upload" {
@@ -83,7 +82,7 @@ resource "aws_iam_role_policy" "archive_archive_upload_bucket" {
 
 resource "aws_s3_bucket" "ingest_storage" {
   bucket = "${local.ingest_bucket_name}"
-  acl = "private"
+  acl    = "private"
 }
 
 # TODO: Needs a lifecyle policy which deletes old stuff
@@ -123,7 +122,7 @@ module "archiver" {
   aws_region                       = "${var.aws_region}"
 
   env_vars = {
-    queue_url = "${module.archiver_queue.id}"
+    queue_url      = "${module.archiver_queue.id}"
     archive_bucket = "${aws_s3_bucket.archive_storage.id}"
   }
 
