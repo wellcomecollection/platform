@@ -47,7 +47,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         transformer.extractItemData(transformable)
       }
 
-      caught.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
+      caught.e.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
     }
   }
 

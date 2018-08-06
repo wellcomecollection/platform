@@ -260,7 +260,7 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
           transformToProduction(varFields)
         }
 
-        caught.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
+        caught.e.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
       }
     }
 

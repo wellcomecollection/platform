@@ -67,7 +67,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
       val caught = intercept[TransformerException] {
         transformer.getDigitalLocation(identifier = "")
       }
-      caught.getMessage shouldEqual "id required by DigitalLocation has not been provided"
+      caught.e.getMessage shouldEqual "id required by DigitalLocation has not been provided"
     }
   }
 }
