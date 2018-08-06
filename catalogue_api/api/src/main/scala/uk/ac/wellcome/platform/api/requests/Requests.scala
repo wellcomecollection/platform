@@ -9,10 +9,10 @@ sealed trait ApiRequest {
   val request: Request
 }
 
-trait MultipleResultsRequest extends ApiRequest {
+trait MultipleResultsRequest[W <: WorksIncludes] extends ApiRequest {
   val page: Int
   val pageSize: Option[Int]
-  val include: Option[WorksIncludes]
+  val include: Option[W]
   val query: Option[String]
   val _index: Option[String]
   val request: Request
@@ -25,8 +25,8 @@ case class V1MultipleResultsRequest(
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String],
   request: Request
-) extends MultipleResultsRequest {
-  val include: Option[WorksIncludes] = includes
+) extends MultipleResultsRequest[V1WorksIncludes] {
+  val include: Option[V1WorksIncludes] = includes
 }
 
 case class V2MultipleResultsRequest(
@@ -36,11 +36,11 @@ case class V2MultipleResultsRequest(
   @QueryParam query: Option[String],
   @QueryParam _index: Option[String],
   request: Request
-) extends MultipleResultsRequest
+) extends MultipleResultsRequest[V2WorksIncludes]
 
-trait SingleWorkRequest {
+trait SingleWorkRequest[W <: WorksIncludes] {
   val id: String
-  val include: Option[WorksIncludes]
+  val include: Option[W]
   val _index: Option[String]
   val request: Request
 }
@@ -50,7 +50,7 @@ case class V1SingleWorkRequest(
   @QueryParam includes: Option[V1WorksIncludes],
   @QueryParam _index: Option[String],
   request: Request
-) extends SingleWorkRequest {
+) extends SingleWorkRequest[V1WorksIncludes] {
   val include = includes
 }
 
@@ -59,4 +59,4 @@ case class V2SingleWorkRequest(
   @QueryParam include: Option[V2WorksIncludes],
   @QueryParam _index: Option[String],
   request: Request
-) extends SingleWorkRequest
+) extends SingleWorkRequest[V2WorksIncludes]

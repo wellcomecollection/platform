@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -51,7 +51,7 @@ class DisplayWorkV2SerialisationTest
     )
 
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(items = true)))
+      DisplayWorkV2(work, V2WorksIncludes(items = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -73,7 +73,7 @@ class DisplayWorkV2SerialisationTest
       items = List()
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(items = true)))
+      DisplayWorkV2(work, V2WorksIncludes(items = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -103,7 +103,7 @@ class DisplayWorkV2SerialisationTest
     )
 
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(workWithCopyright, WorksIncludes(items = true)))
+      DisplayWorkV2(workWithCopyright, V2WorksIncludes(items = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
@@ -191,7 +191,7 @@ class DisplayWorkV2SerialisationTest
       otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(identifiers = true)))
+      DisplayWorkV2(work, V2WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -213,7 +213,7 @@ class DisplayWorkV2SerialisationTest
       otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(identifiers = true)))
+      DisplayWorkV2(work, V2WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -240,7 +240,7 @@ class DisplayWorkV2SerialisationTest
         ))
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(thumbnail = true)))
+      DisplayWorkV2(work, V2WorksIncludes(thumbnail = true)))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",

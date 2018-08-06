@@ -90,7 +90,7 @@ case class DisplayWorkV2(
 
 case object DisplayWorkV2 {
 
-  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV2 = {
+  def apply(work: IdentifiedWork, includes: V2WorksIncludes): DisplayWorkV2 = {
 
     DisplayWorkV2(
       id = work.canonicalId,
@@ -132,5 +132,5 @@ case object DisplayWorkV2 {
   }
 
   def apply(work: IdentifiedWork): DisplayWorkV2 =
-    DisplayWorkV2(work = work, includes = WorksIncludes())
+    DisplayWorkV2(work = work, includes = V2WorksIncludes())
 }

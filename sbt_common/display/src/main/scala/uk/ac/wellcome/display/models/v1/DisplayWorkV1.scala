@@ -102,7 +102,7 @@ case class DisplayWorkV1(
 }
 
 case object DisplayWorkV1 {
-  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV1 = {
+  def apply(work: IdentifiedWork, includes: V1WorksIncludes): DisplayWorkV1 = {
 
     // The "production" field on work contains information that should go
     // into the publisher-specific fields.
@@ -157,5 +157,5 @@ case object DisplayWorkV1 {
   }
 
   def apply(work: IdentifiedWork): DisplayWorkV1 =
-    DisplayWorkV1(work = work, includes = WorksIncludes())
+    DisplayWorkV1(work = work, includes = V1WorksIncludes())
 }

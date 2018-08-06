@@ -19,11 +19,11 @@ case class DisplayResultList[T <: DisplayWork](
 }
 
 case object DisplayResultList {
-  def apply[T <: DisplayWork](
+  def apply[T <: DisplayWork, W <: WorksIncludes](
     resultList: ResultList,
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
+    toDisplayWork: (IdentifiedWork, W) => T,
     pageSize: Int,
-    includes: WorksIncludes): DisplayResultList[T] =
+    includes: W): DisplayResultList[T] =
     DisplayResultList(
       results = resultList.results.map { toDisplayWork(_, includes) },
       pageSize = pageSize,

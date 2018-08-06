@@ -14,7 +14,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V2WorksIncludes(items = true)
     )
     displayWork.items shouldBe Some(List())
   }
@@ -27,7 +27,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V2WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
     displayItem.id shouldBe Some(items.head.canonicalId)
@@ -42,7 +42,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V2WorksIncludes(items = true)
     )
 
     val displayItem = displayWork.items.get.head
@@ -65,7 +65,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(identifiers = true)
+      includes = V2WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
       List(DisplayIdentifierV2(work.sourceIdentifier)))
@@ -155,7 +155,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+      DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true))
 
     displayWork.contributors shouldBe List(
       DisplayContributor(
@@ -191,7 +191,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       production = List(productionEvent)
     )
 
-    val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
+    val displayWork = DisplayWorkV2(work, includes = V2WorksIncludes.includeAll())
     displayWork.production shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
@@ -286,7 +286,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {
-      val displayWork = DisplayWorkV2(work, includes = WorksIncludes())
+      val displayWork = DisplayWorkV2(work, includes = V2WorksIncludes())
 
       it("the top-level Work") {
         displayWork.identifiers shouldBe None
@@ -300,7 +300,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
       it("items") {
         val displayWork =
-          DisplayWorkV2(work, includes = WorksIncludes(items = true))
+          DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
@@ -317,7 +317,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
       val displayWork =
-        DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+        DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
@@ -343,7 +343,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       it("items") {
         val displayWork = DisplayWorkV2(
           work,
-          includes = WorksIncludes(identifiers = true, items = true))
+          includes = V2WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         val identifiedItem = work.items.head.asInstanceOf[Identified[Item]]
         item.identifiers shouldBe Some(
