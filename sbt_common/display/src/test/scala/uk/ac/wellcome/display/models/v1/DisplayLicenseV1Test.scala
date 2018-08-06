@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal.License_CCBY
 
 class DisplayLicenseV1Test extends FunSpec with Matchers {
 
-  it("should read a License as a DisplayLicenseV1 correctly") {
+  it("reads a License as a DisplayLicenseV1") {
     val displayLicense = DisplayLicenseV1(License_CCBY)
 
     // These outputs are deliberately hard-coded -- because the V1 API

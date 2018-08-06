@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
 class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
 
-  it("should read an identified Item as a DisplayItemV2 correctly") {
+  it("reads an identified Item as a DisplayItemV2 correctly") {
     val item = createIdentifiedItem()
 
     val displayItemV2 = DisplayItemV2(

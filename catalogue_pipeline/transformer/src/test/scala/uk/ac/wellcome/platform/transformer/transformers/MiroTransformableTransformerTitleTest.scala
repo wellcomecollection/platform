@@ -12,7 +12,7 @@ class MiroTransformableTransformerTitleTest
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should use the image_title field on non-V records") {
+  it("uses the image_title field on non-V records") {
     val title = "A picture of a parrot"
     transformRecordAndCheckTitle(
       data = s""""image_title": "$title"""",
@@ -150,7 +150,7 @@ class MiroTransformableTransformerTitleTest
     )
   }
 
-  it("should use the description if image_title is None") {
+  it("uses image_image_desc if image_title is None") {
     val description = "A noisy narwhal in November"
     transformRecordAndCheckTitle(
       data = s"""
