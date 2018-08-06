@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.archiver.models._
 
 import scala.concurrent.duration._
 
-class TestAppConfigModule(queueUrl: String, bucketName: String) extends AbstractModule {
+class TestAppConfigModule(queueUrl: String, bucketName: String)
+    extends AbstractModule {
 
   @Provides
   def providesAppConfig = {

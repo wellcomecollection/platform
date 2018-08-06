@@ -9,7 +9,8 @@ import grizzled.slf4j.Logging
 object BagNameFlow extends Logging {
   def apply(): Flow[ZipFile, String, NotUsed] = {
 
-    Flow[ZipFile].map(_.entries)
+    Flow[ZipFile]
+      .map(_.entries)
       .log("zip entry")
       .mapConcat(entries => {
         Stream

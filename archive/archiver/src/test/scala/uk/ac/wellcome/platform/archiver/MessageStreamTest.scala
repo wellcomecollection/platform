@@ -15,9 +15,8 @@ import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.duration._
 
-
 class MessageStreamTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
@@ -51,13 +50,15 @@ class MessageStreamTest
   }
 
   def withMessageStreamFixtures[R](
-                                    testWith: TestWith[(MessageStream[ExampleObject, Unit], QueuePair, MetricsSender), R]
-                                  ) = {
+    testWith: TestWith[(MessageStream[ExampleObject, Unit],
+                        QueuePair,
+                        MetricsSender),
+                       R]
+  ) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair@QueuePair(queue, _) =>
+        case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
-
             val sqsConfig = SQSConfig(
               queueUrl = queue.url,
               waitTime = 1 millisecond,
@@ -78,9 +79,9 @@ class MessageStreamTest
   }
 
   private def createExampleObjects(
-                                    start: Int,
-                                    count: Int
-                                  ): List[ExampleObject] =
+    start: Int,
+    count: Int
+  ): List[ExampleObject] =
     (start to (start + count - 1)).map { i =>
       ExampleObject(s"Example value $i")
     }.toList

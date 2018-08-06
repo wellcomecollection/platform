@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class DownloadZipFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with AkkaS3 {
@@ -47,10 +47,13 @@ class DownloadZipFlowTest
 
         val objectLocation = ObjectLocation(storageBucket.name, fileName)
 
-        val download: Future[ZipFile] = downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
+        val download: Future[ZipFile] =
+          downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
 
         whenReady(download) { downloadedZipFile =>
-          zipFile.entries.asScala.toList.map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList.map(_.toString)
+          zipFile.entries.asScala.toList
+            .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
+            .map(_.toString)
           zipFile.size shouldEqual downloadedZipFile.size
         }
       }

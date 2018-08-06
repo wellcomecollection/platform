@@ -16,7 +16,7 @@ object DownloadNotificationFlow extends Logging {
       .map((m: NotificationMessage) => fromJson[ObjectLocation](m.Message))
       .map {
         case Success(objectLocation) => objectLocation
-        case Failure(e) => throw e
+        case Failure(e)              => throw e
       }
       .log("download location")
   }

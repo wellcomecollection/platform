@@ -10,19 +10,24 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-
 object ArchiveItemFlow extends Logging {
   def apply(config: BagUploaderConfig)(
-    implicit s3Client: S3Client, materializer: ActorMaterializer
+    implicit s3Client: S3Client,
+    materializer: ActorMaterializer
   ): Flow[(BagDigestItem, ZipFile), Done, NotUsed] = {
 
-
-    val uploadVerificationFlow: Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] =
+    val uploadVerificationFlow
+      : Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] =
       UploadVerificationFlow(config)
 
-    val uploadLocationFlow: Flow[MultipartUploadResult, ObjectLocation, NotUsed] = Flow[MultipartUploadResult].map {
-      case MultipartUploadResult(_, bucket, key, _) => ObjectLocation(bucket, key)
-    }.log("upload location")
+    val uploadLocationFlow
+      : Flow[MultipartUploadResult, ObjectLocation, NotUsed] =
+      Flow[MultipartUploadResult]
+        .map {
+          case MultipartUploadResult(_, bucket, key, _) =>
+            ObjectLocation(bucket, key)
+        }
+        .log("upload location")
 
     val downloadVerification = DownloadVerificationFlow()
 
@@ -30,7 +35,9 @@ object ArchiveItemFlow extends Logging {
       import GraphDSL.Implicits._
 
       val objectLocationFlow = b.add(Flow[(BagDigestItem, ZipFile)])
-      val uploadVerificationFlowShape: FlowShape[(BagDigestItem, ZipFile), MultipartUploadResult] = b.add(uploadVerificationFlow)
+      val uploadVerificationFlowShape
+        : FlowShape[(BagDigestItem, ZipFile), MultipartUploadResult] =
+        b.add(uploadVerificationFlow)
       val uploadLocationFlowShape = b.add(uploadLocationFlow)
       val downloadVerificationZipIn = b.add(Zip[ObjectLocation, String])
       val downloadVerificationFlowShape = b.add(downloadVerification)

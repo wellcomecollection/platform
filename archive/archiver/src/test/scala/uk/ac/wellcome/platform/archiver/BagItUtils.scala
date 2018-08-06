@@ -12,19 +12,21 @@ object BagItUtils {
     Random.alphanumeric take length mkString
   }
 
-  def createDigest(string: String) = MessageDigest
-    .getInstance("SHA-256")
-    .digest(string.getBytes)
-    .map(0xFF & _)
-    .map {
-      "%02x".format(_)
-    }.foldLeft("") {
-    _ + _
-  }
+  def createDigest(string: String) =
+    MessageDigest
+      .getInstance("SHA-256")
+      .digest(string.getBytes)
+      .map(0xFF & _)
+      .map {
+        "%02x".format(_)
+      }
+      .foldLeft("") {
+        _ + _
+      }
 
   def createZip(files: List[FileEntry]) = {
 
-    val zipFileName = File.createTempFile("archiver-test",".zip").getName
+    val zipFileName = File.createTempFile("archiver-test", ".zip").getName
     val zipFileOutputStream = new FileOutputStream(zipFileName)
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
 
@@ -44,7 +46,9 @@ object BagItUtils {
     (zipFile, zipFileName)
   }
 
-  def createBagItZip(bagName: String, dataFileCount: Int = 1, valid: Boolean = true) = {
+  def createBagItZip(bagName: String,
+                     dataFileCount: Int = 1,
+                     valid: Boolean = true) = {
 
     // Create data files
     val dataFiles = (1 to dataFileCount).map { _ =>
@@ -65,20 +69,25 @@ object BagItUtils {
     }
 
     // Create data manifest
-    val dataManifest = FileEntry(s"$bagName/manifest-sha256.txt", (dataFiles ++ objectFiles).map {
-      case FileEntry(fileName, fileContents) => {
-        val fileContentsDigest = createDigest(fileContents)
+    val dataManifest = FileEntry(
+      s"$bagName/manifest-sha256.txt",
+      (dataFiles ++ objectFiles)
+        .map {
+          case FileEntry(fileName, fileContents) => {
+            val fileContentsDigest = createDigest(fileContents)
 
-        val contentsDigest = if (!valid) {
-          "bad_digest"
-        } else {
-          fileContentsDigest
+            val contentsDigest = if (!valid) {
+              "bad_digest"
+            } else {
+              fileContentsDigest
+            }
+
+            val digestFileName = fileName.replace(s"$bagName/", "")
+            s"$contentsDigest  $digestFileName"
+          }
         }
-
-        val digestFileName = fileName.replace(s"$bagName/", "")
-        s"$contentsDigest  $digestFileName"
-      }
-    }.mkString("\n"))
+        .mkString("\n")
+    )
 
     // Create bagIt file
     val bagItFileContents =
@@ -111,7 +120,11 @@ object BagItUtils {
     )
 
     val allFiles =
-      dataFiles ++ objectFiles ++ List(dataManifest, metaManifest, bagInfoFile, bagItFile)
+      dataFiles ++ objectFiles ++ List(
+        dataManifest,
+        metaManifest,
+        bagInfoFile,
+        bagItFile)
 
     createZip(allFiles.toList)
   }
