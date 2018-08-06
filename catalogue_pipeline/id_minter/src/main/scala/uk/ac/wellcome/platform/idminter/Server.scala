@@ -11,8 +11,8 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
-  MessageWriterConfigModule,
   MessageReaderConfigModule,
+  MessageWriterConfigModule,
   SNSClientModule,
   SQSClientModule
 }

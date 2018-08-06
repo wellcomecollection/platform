@@ -15,8 +15,8 @@ import uk.ac.wellcome.finatra.elasticsearch.{
   ElasticConfigModule
 }
 import uk.ac.wellcome.finatra.messaging.{
-  MessageWriterConfigModule,
   MessageReaderConfigModule,
+  MessageWriterConfigModule,
   SQSClientModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
