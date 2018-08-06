@@ -45,7 +45,8 @@ class MiroTransformableTransformerTitleTest
       )
     }
 
-    it("uses image_image_desc if image_title is a prefix of image_image_desc (one-line description)") {
+    it(
+      "uses image_image_desc if image_title is a prefix of image_image_desc (one-line description)") {
       val title = "An icon of an iguana"
       val description = "An icon of an iguana is an intriguing image"
       transformRecordAndCheckTitle(
@@ -59,7 +60,8 @@ class MiroTransformableTransformerTitleTest
       )
     }
 
-    it("uses image_image_desc if image_title is a prefix of image_image_desc (multi-line description)") {
+    it(
+      "uses image_image_desc if image_title is a prefix of image_image_desc (multi-line description)") {
       val title = "An icon of an iguana"
       val longTitle = "An icon of an iguana is an intriguing image"
       val descriptionBody = "Woodcut, by A.R. Tist.  Italian.  1897."
@@ -76,7 +78,8 @@ class MiroTransformableTransformerTitleTest
     }
   }
 
-  describe("using the image_image_desc_academic if image_image_desc is unhelpful") {
+  describe(
+    "using the image_image_desc_academic if image_image_desc is unhelpful") {
     it("mixed hyphens in title/description") {
       val academicDescription = "An alibi for an academic"
       transformRecordAndCheckTitle(
