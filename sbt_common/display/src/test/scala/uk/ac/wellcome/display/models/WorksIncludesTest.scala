@@ -9,12 +9,12 @@ class WorksIncludesTest extends FunSpec with Matchers {
     includes.identifiers shouldBe true
   }
 
-  it("successfully creates if no query parameter is provided") {
+  it("can be constructed if no query parameter is provided") {
     val includes = WorksIncludes(queryParam = None)
     includes.identifiers shouldBe false
   }
 
-  it("successfully rejects an incorrect string") {
+  it("rejects an incorrect string") {
     intercept[WorksIncludesParsingException] {
       WorksIncludes(queryParam = "foo,bar")
     }

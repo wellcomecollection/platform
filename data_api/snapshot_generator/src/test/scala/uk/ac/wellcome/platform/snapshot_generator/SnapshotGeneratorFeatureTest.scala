@@ -47,7 +47,7 @@ class SnapshotGeneratorFeatureTest
 
   val itemType = "work"
 
-  it("completes a snapshot generation successfully") {
+  it("completes a snapshot generation") {
     withFixtures {
       case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
         val works = createIdentifiedWorks(count = 3)
