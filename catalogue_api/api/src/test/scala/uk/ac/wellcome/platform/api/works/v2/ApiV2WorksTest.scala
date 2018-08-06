@@ -94,7 +94,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/${work.canonicalId}?includes=items",
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=items",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
@@ -263,7 +263,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it(
-    "includes a list of identifiers on a list endpoint if we pass ?includes=identifiers") {
+    "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
@@ -278,7 +278,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works?includes=identifiers",
+            path = s"/$apiPrefix/works?include=identifiers",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
@@ -315,7 +315,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
   }
 
   it(
-    "includes a list of identifiers on a single work endpoint if we pass ?includes=identifiers") {
+    "includes a list of identifiers on a single work endpoint if we pass ?include=identifiers") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val otherIdentifier = createSourceIdentifier
@@ -326,7 +326,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works/${work.canonicalId}?includes=identifiers",
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=identifiers",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{
@@ -484,7 +484,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
 
         eventually {
           server.httpGet(
-            path = s"/$apiPrefix/works?includes=thumbnail",
+            path = s"/$apiPrefix/works?include=thumbnail",
             andExpect = Status.Ok,
             withJsonBody = s"""
                |{

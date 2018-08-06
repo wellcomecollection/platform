@@ -25,15 +25,17 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class WorksController(
+abstract class WorksController[M <: MultipleResultsRequest,
+                               S <: SingleWorkRequest](
   apiConfig: ApiConfig,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
     extends Controller
     with SwaggerController {
 
-  val includesSwaggerParam: QueryParameter = new QueryParameter()
-    .name("includes")
+  protected val includeParameterName: String
+  val includeSwaggerParam: QueryParameter = new QueryParameter()
+    .name(includeParameterName)
     .description("A comma-separated list of extra fields to include")
     .required(false)
     .`type`("array")
@@ -44,12 +46,13 @@ abstract class WorksController(
     version: ApiVersions.Value,
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit evidence: TypeTag[DisplayResultList[T]]): Unit = {
+    implicit evidence: TypeTag[DisplayResultList[T]],
+    manifest: Manifest[M]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
-    } { request: MultipleResultsRequest =>
+    } { request: M =>
       val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
-      val includes = request.includes.getOrElse(WorksIncludes())
+      val includes = request.include.getOrElse(WorksIncludes())
 
       for {
         resultList <- getWorkList(request, pageSize)
@@ -72,11 +75,12 @@ abstract class WorksController(
     version: ApiVersions.Value,
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit evidence: TypeTag[T]): Unit = {
+    implicit evidence: TypeTag[T],
+    manifest: Manifest[S]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
-    } { request: SingleWorkRequest =>
-      val includes = request.includes.getOrElse(WorksIncludes())
+    } { request: S =>
+      val includes = request.include.getOrElse(WorksIncludes())
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
@@ -95,7 +99,7 @@ abstract class WorksController(
     }
   }
 
-  private def getWorkList(request: MultipleResultsRequest, pageSize: Int) = {
+  private def getWorkList(request: M, pageSize: Int) = {
     val works = request.query match {
       case Some(queryString) =>
         worksService.searchWorks(
@@ -120,7 +124,7 @@ abstract class WorksController(
     maybeWork: Option[IdentifiedBaseWork],
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
     includes: WorksIncludes,
-    request: SingleWorkRequest,
+    request: S,
     contextUri: String) =
     maybeWork match {
       case Some(work: IdentifiedWork) =>
@@ -171,8 +175,7 @@ abstract class WorksController(
     )
   }
 
-  private def respondWithNotFoundError(request: SingleWorkRequest,
-                                       contextUri: String) = {
+  private def respondWithNotFoundError(request: S, contextUri: String) = {
     val result = Error(
       variant = "http-404",
       description = Some(s"Work not found for identifier ${request.id}")
@@ -221,7 +224,7 @@ abstract class WorksController(
         |To search for any of these special characters, they should be escaped with \.""".stripMargin,
         required = false
       )
-      .parameter(includesSwaggerParam)
+      .parameter(includeSwaggerParam)
     // Deliberately undocumented: we have an 'index' query param that
     // allows the user to pick which Elasticsearch index to use.  This is
     // useful for us to try out transformer changes, different index
@@ -243,7 +246,7 @@ abstract class WorksController(
       .responseWith[DisplayError](404, "Not Found Error")
       .responseWith[DisplayError](410, "Gone Error")
       .responseWith[DisplayError](500, "Internal Server Error")
-      .parameter(includesSwaggerParam)
+      .parameter(includeSwaggerParam)
     // Deliberately undocumented: the index flag.  See above.
   }
 }
