@@ -14,6 +14,7 @@ import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
 import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -26,7 +27,8 @@ class SierraItemMergerFeatureTest
     with SQS
     with S3
     with LocalVersionedHybridStore
-    with SierraUtil {
+    with SierraUtil
+    with SierraVHSUtil {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
@@ -58,11 +60,10 @@ class SierraItemMergerFeatureTest
                 )
 
                 eventually {
-                  assertStored[SierraTransformable](
-                    bucket = vhsBucket,
-                    table = table,
-                    id = expectedSierraTransformable.id,
-                    record = expectedSierraTransformable)
+                  assertStored(
+                    transformable = expectedSierraTransformable,
+                    bucket = vhsBucket, table = table
+                  )
                 }
               }
             }
@@ -120,16 +121,14 @@ class SierraItemMergerFeatureTest
                       itemRecords = List(itemRecord2)
                     )
 
-                  assertStored[SierraTransformable](
-                    vhsBucket,
-                    table,
-                    id = expectedSierraTransformable1.id,
-                    record = expectedSierraTransformable1)
-                  assertStored[SierraTransformable](
-                    vhsBucket,
-                    table,
-                    id = expectedSierraTransformable2.id,
-                    record = expectedSierraTransformable2)
+                  assertStored(
+                    transformable = expectedSierraTransformable1,
+                    bucket = vhsBucket, table = table
+                  )
+                  assertStored(
+                    transformable = expectedSierraTransformable2,
+                    bucket = vhsBucket, table = table
+                  )
                 }
               }
             }
