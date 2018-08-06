@@ -24,7 +24,9 @@ notice fairly quickly of the problem in master.
 
 """
 
+import contextlib
 import os
+import subprocess
 import sys
 
 from travistooling import (
@@ -35,6 +37,15 @@ from travistooling import (
     should_run_build_task,
     unpack_secrets
 )
+
+
+@contextlib.contextmanager
+def timestamps():
+    proc = subprocess.Popen(
+        'while true; do echo "[[run_travis_task.py]] "$(date); sleep 1; done',
+        shell=True)
+    yield
+    proc.kill()
 
 
 def _should_run_tests(task, travis_event_type):
@@ -85,44 +96,46 @@ def _should_run_publish(task, travis_event_type):
 
 
 def main():
-    # https://docs.travis-ci.com/user/environment-variables/
-    travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
-    task = os.environ['TASK']
+    with timestamps():
 
-    if _should_run_tests(task=task, travis_event_type=travis_event_type):
-        print("*** We're going to run tests")
-    else:
-        print("*** We don't need to run tests, exiting early")
+        # https://docs.travis-ci.com/user/environment-variables/
+        travis_event_type = os.environ['TRAVIS_EVENT_TYPE']
+        task = os.environ['TASK']
+
+        if _should_run_tests(task=task, travis_event_type=travis_event_type):
+            print("*** We're going to run tests")
+        else:
+            print("*** We don't need to run tests, exiting early")
+            return 0
+
+        unpack_secrets()
+
+        make(task)
+
+        if task in [
+            'travis-format',
+            'travistooling-test',
+        ]:
+            print('*** Task %s does not have a publish step' % task)
+            return 0
+
+        publish_task = task.replace('-build', '-publish')
+        publish_task = task.replace('-test', '-publish')
+
+        if _should_run_publish(
+            task=publish_task,
+            travis_event_type=travis_event_type
+        ):
+            print("*** We're going to run the publish task")
+            make(publish_task)
+        else:
+            print("*** We don't need to run the publish task")
+
+            # Doing a --dry-run checks that the associated publish task exists,
+            # which protects us from merging a branch with no publish task.
+            make(publish_task, '--dry-run')
+
         return 0
-
-    unpack_secrets()
-
-    make(task)
-
-    if task in [
-        'travis-format',
-        'travistooling-test',
-    ]:
-        print('*** Task %s does not have a publish step' % task)
-        return 0
-
-    publish_task = task.replace('-build', '-publish')
-    publish_task = task.replace('-test', '-publish')
-
-    if _should_run_publish(
-        task=publish_task,
-        travis_event_type=travis_event_type
-    ):
-        print("*** We're going to run the publish task")
-        make(publish_task)
-    else:
-        print("*** We don't need to run the publish task")
-
-        # Doing a --dry-run checks that the associated publish task exists,
-        # which protects us from merging a branch with no publish task.
-        make(publish_task, '--dry-run')
-
-    return 0
 
 
 if __name__ == '__main__':
