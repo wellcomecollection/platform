@@ -41,8 +41,11 @@ from travistooling import (
 
 @contextlib.contextmanager
 def timestamps():
+    """
+    Print a timestamp to the log every minute (roughly!).
+    """
     proc = subprocess.Popen(
-        'while true; do echo "[[run_travis_task.py]] "$(date); sleep 1; done',
+        'while true; do echo "[[run_travis_task.py]] "$(date); sleep 60; done',
         shell=True)
     yield
     proc.kill()
