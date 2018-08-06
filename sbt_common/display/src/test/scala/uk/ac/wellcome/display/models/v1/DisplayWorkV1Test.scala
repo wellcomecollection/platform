@@ -215,7 +215,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
+  describe("uses the WorksIncludes.identifiers include") {
     val work = createIdentifiedWorkWith(
       itemsV1 = createIdentifiedItems(count = 1)
     )

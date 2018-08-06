@@ -196,7 +196,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
+  describe("uses the WorksIncludes.identifiers include") {
     val contributorAgentSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
