@@ -7,7 +7,7 @@ import akka.stream.scaladsl.Flow
 import grizzled.slf4j.Logging
 
 object BagNameFlow extends Logging {
-  def apply(): Flow[ZipFile, String, NotUsed] = {
+  def apply(): Flow[ZipFile, BagName, NotUsed] = {
 
     Flow[ZipFile].map(_.entries)
       .log("zip entry")
@@ -20,7 +20,10 @@ object BagNameFlow extends Logging {
           .takeWhile(_ => entries.hasMoreElements)
           .toSet
           .filterNot(_.startsWith("_"))
+          .map(BagName)
       })
       .log("bag name")
   }
 }
+
+case class BagName(value: String)

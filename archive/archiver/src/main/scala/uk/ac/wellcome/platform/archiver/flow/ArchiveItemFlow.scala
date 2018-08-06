@@ -16,7 +16,6 @@ object ArchiveItemFlow extends Logging {
     implicit s3Client: S3Client, materializer: ActorMaterializer
   ): Flow[(BagDigestItem, ZipFile), Done, NotUsed] = {
 
-
     val uploadVerificationFlow: Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] =
       UploadVerificationFlow(config)
 

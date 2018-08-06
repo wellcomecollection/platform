@@ -11,8 +11,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 
 object BagDigestItemFlow extends Logging {
-  def apply(config: BagUploaderConfig):
-  Flow[(ObjectLocation, String, ZipFile), BagDigestItem, NotUsed] = {
+  def apply(config: BagUploaderConfig): Flow[(ObjectLocation, BagName, ZipFile), BagDigestItem, NotUsed] = {
 
     val framingDelimiter = Framing.delimiter(
       ByteString("\n"),
@@ -27,13 +26,15 @@ object BagDigestItemFlow extends Logging {
       .filter(_.nonEmpty)
       .map(_.split(config.digestDelimiter).map(_.trim))
 
-    val bagDigestItemFlow: Flow[(Array[String], String), BagDigestItem, NotUsed] = Flow[(Array[String], String)]
+    val bagDigestItemFlow: Flow[(Array[String], BagName), BagDigestItem, NotUsed] = Flow[(Array[String], BagName)]
       .map {
-        case (Array(checksum: String, key: String), bagName) => BagDigestItem(checksum, ObjectLocation(bagName, key))
-        case (default, bagName) => throw MalformedBagDigestException(default.mkString(config.digestDelimiter), bagName)
+        case (Array(checksum: String, key: String), bagName) =>
+          BagDigestItem(checksum, ObjectLocation(bagName.value, key))
+        case (default, bagName) =>
+          throw MalformedBagDigestException(default.mkString(config.digestDelimiter), bagName.value)
       }
 
-    Flow[(ObjectLocation, String, ZipFile)]
+    Flow[(ObjectLocation, BagName, ZipFile)]
       .log("digest location")
       .flatMapConcat {
         case (objectLocation, bagName, zipFile) => Source

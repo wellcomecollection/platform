@@ -28,7 +28,7 @@ case class StorageManifest(
                             source: SourceIdentifier,
                             identifiers: List[SourceIdentifier],
                             manifest: Manifest,
-                            tagManifest: TagManifest,
+                            tagManifest: Option[TagManifest],
                             locations: List[Location],
                             description: Option[BagDescription],
                             createdDate: Instant,

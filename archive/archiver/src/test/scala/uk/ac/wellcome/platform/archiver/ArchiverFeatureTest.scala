@@ -1,16 +1,18 @@
 package uk.ac.wellcome.platform.archiver
 
 import java.io.File
-import java.util.zip.ZipFile
 
 import com.google.inject.Guice
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
-//import uk.ac.wellcome.platform.archiver.BagItUtils._
+import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archiver.BagItUtils._
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.storage.ObjectLocation
-import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.TestWith
 
 class ArchiverFeatureTest extends FunSpec
   with Matchers
@@ -18,52 +20,74 @@ class ArchiverFeatureTest extends FunSpec
   with Messaging
   with AkkaS3 {
 
-  // TODO: Need to test failure cases!!!
-  it("downloads, uploads and verifies a BagIt bag") {
+
+  case class Bag(bagName: String)
+
+  def withBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+    val bagName = randomAlphanumeric()
+    val (zipFile, fileName) = createBagItZip(bagName, 1, valid)
+
+    val uploadKey = s"upload/path/$bagName.zip"
+    s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
+
+    val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
+    sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
+
+    testWith(Bag(bagName))
+  }
+
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[Archiver, R]) = {
+    val archiver = new Archiver {
+      val injector = Guice.createInjector(
+        new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
+        AkkaModule,
+        AkkaS3ClientModule,
+        CloudWatchClientModule,
+        SQSClientModule
+      )
+    }
+
+    testWith(archiver)
+  }
+
+  def withArchiver[R](testWith: TestWith[(Bucket, Bucket, QueuePair, Archiver), R]) = {
     withLocalSqsQueueAndDlq(queuePair => {
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
-          //val bagName = randomAlphanumeric()
-          //val (zipFile, fileName) = createBagItZip(bagName, 1)
-
-          //val bagName = "b22454408"
-          val fileName = "/Users/k/Desktop/b22454408.zip"
-          val zipFile = new ZipFile(fileName)
-
-          val entries = zipFile.entries()
-          val fileCount = Stream
-            .continually(entries.nextElement)
-            .takeWhile(_ => entries.hasMoreElements)
-            .toList
-            .length
-
-          val uploadKey = "upload/path/file.zip"
-          s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
-
-          val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
-          sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
-
-          val app = new Archiver {
-            val injector = Guice.createInjector(
-              new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
-              AkkaModule,
-              AkkaS3ClientModule,
-              CloudWatchClientModule,
-              SQSClientModule
-            )
-          }
-
-          app.run()
-
-          eventually {
-            val objects = s3Client.listObjects(storageBucket.name)
-            val objectSummaries = objects.getObjectSummaries
-
-            objectSummaries.toArray.length shouldEqual fileCount
+          withApp(ingestBucket, queuePair) { archiver =>
+            testWith((ingestBucket, storageBucket, queuePair, archiver))
           }
         }
       }
     })
+  }
+
+  it("continues after failure") {
+    withArchiver { case (ingestBucket, storageBucket, queuePair, archiver) =>
+      withBag(ingestBucket, queuePair, false) { invalidBag =>
+        withBag(ingestBucket, queuePair, true) { validBag =>
+
+          val _ = archiver.run()
+
+          eventually {
+            assertQueueHasSize(queuePair.queue, 0)
+            assertQueueHasSize(queuePair.dlq, 1)
+          }
+        }
+      }
+    }
+  }
+
+  it("downloads, uploads and verifies a BagIt bag") {
+    withArchiver { case (ingestBucket, storageBucket, queuePair, archiver) =>
+      withBag(ingestBucket, queuePair, false) { invalidBag =>
+        archiver.run()
+
+        eventually {
+          assertQueueHasSize(queuePair.queue, 0)
+        }
+      }
+    }
   }
 }
 
