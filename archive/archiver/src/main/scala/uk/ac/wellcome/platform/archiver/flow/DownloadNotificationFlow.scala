@@ -12,19 +12,12 @@ import scala.util.{Failure, Success}
 object DownloadNotificationFlow extends Logging {
   def apply(): Flow[NotificationMessage, ObjectLocation, NotUsed] = {
     Flow[NotificationMessage]
-      .map(m => {
-        debug(s"Recieved notification: $m")
-        m
-      })
+      .log("notification message")
       .map((m: NotificationMessage) => fromJson[ObjectLocation](m.Message))
       .map {
         case Success(objectLocation) => objectLocation
         case Failure(e) => throw e
       }
-      .map(location => {
-        debug(s"Found $location to download.")
-
-        location
-      })
+      .log("download location")
   }
 }

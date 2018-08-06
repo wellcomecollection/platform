@@ -8,33 +8,28 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Source}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
-import uk.ac.wellcome.storage.ObjectLocation
-
-import scala.concurrent.ExecutionContext
 
 object UploadVerificationFlow extends Logging {
   def apply(config: BagUploaderConfig)(
-    implicit s3Client: S3Client, materializer: ActorMaterializer, executionContext: ExecutionContext
+    implicit s3Client: S3Client, materializer: ActorMaterializer
   ): Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] = {
 
-    val extract = FileExtractorFlow()
 
-    Flow[(BagDigestItem, ZipFile)].flatMapConcat { case (bagDigestItem, zipFile) =>
-      val verify = DigestCalculatorFlow("SHA-256", bagDigestItem.checksum)
-      val uploadLocation: ObjectLocation = ObjectLocation(
-        config.uploadNamespace, s"${config.uploadPrefix}/${bagDigestItem.location.namespace}/${bagDigestItem.location.key}"
-      )
+    Flow[(BagDigestItem, ZipFile)]
+      .log("verifying upload")
+      .flatMapConcat { case (BagDigestItem(checksum, location), zipFile) =>
 
-      debug(s"Trying to upload to: $uploadLocation")
+      val extract = FileExtractorFlow()
+      val verify = DigestCalculatorFlow("SHA-256", checksum)
 
-      val upload = s3Client.multipartUpload(uploadLocation.namespace, uploadLocation.key)
-      val (_, uploadResult) = extract.via(verify).runWith(Source.single((bagDigestItem.location, zipFile)), upload)
+      val uploadKey = s"${config.uploadPrefix}/${location.namespace}/${location.key}"
 
-      uploadResult.onComplete {
-        result => debug(s"Got MultipartUploadResult: $result")
-      }
+      val uploadSink = s3Client.multipartUpload(config.uploadNamespace, uploadKey)
+      val uploadSource = Source.single((location, zipFile))
 
-      Source.fromFuture(uploadResult)
-    }
+      val uploadResult = uploadSource.via(extract).via(verify).runWith(uploadSink)
+
+      Source.fromFuture(uploadResult).log("upload result")
+    }.log("upload verified")
   }
 }

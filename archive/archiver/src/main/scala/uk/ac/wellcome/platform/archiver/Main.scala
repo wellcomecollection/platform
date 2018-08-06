@@ -1,9 +1,13 @@
 package uk.ac.wellcome.platform.archiver
 
+import java.util.zip.ZipFile
+
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.event.Logging
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
+import akka.stream.{ActorMaterializer, Attributes}
+import akka.{Done, NotUsed}
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
@@ -12,6 +16,7 @@ import uk.ac.wellcome.platform.archiver.flow.{DownloadNotificationFlow, Download
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archiver.modules._
+import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -50,15 +55,25 @@ trait Archiver extends Logging {
     val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
     val materializer = ActorMaterializer()(actorSystem)
 
-    val downloadNotificationFlow = DownloadNotificationFlow()
-    val downloadZipFlow = DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher)
-    val verifiedBagUploaderFlow = VerifiedBagUploaderFlow(bagUploaderConfig)(materializer, s3Client, actorSystem.dispatcher)
+    val downloadNotificationFlow: Flow[NotificationMessage, ObjectLocation, NotUsed] = DownloadNotificationFlow()
+    val downloadZipFlow: Flow[ObjectLocation, ZipFile, NotUsed] = DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher)
+    val verifiedBagUploaderFlow: Flow[ZipFile, Seq[Done], NotUsed] = VerifiedBagUploaderFlow(bagUploaderConfig)(materializer, s3Client)
 
     val workFlow = Flow[NotificationMessage]
+      .log("notification")
       .via(downloadNotificationFlow)
+      .log("download notice")
       .via(downloadZipFlow)
+      .log("download zip")
       .via(verifiedBagUploaderFlow)
+      .log("archive verified")
       .map(_ => ())
+      .withAttributes(
+        Attributes.logLevels(
+          onElement = Logging.WarningLevel,
+          onFinish = Logging.InfoLevel,
+          onFailure = Logging.DebugLevel
+        ))
 
     messageStream.run("archiver", workFlow)
   }

@@ -9,8 +9,8 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
-object BagDigestItemFlow extends Logging {
 
+object BagDigestItemFlow extends Logging {
   def apply(config: BagUploaderConfig):
   Flow[(ObjectLocation, String, ZipFile), BagDigestItem, NotUsed] = {
 
@@ -24,30 +24,28 @@ object BagDigestItemFlow extends Logging {
       .map(byteString => byteString.concat(ByteString("\n")))
       .via(framingDelimiter)
       .map(_.utf8String)
+      .filter(_.nonEmpty)
       .map(_.split(config.digestDelimiter).map(_.trim))
 
     val bagDigestItemFlow: Flow[(Array[String], String), BagDigestItem, NotUsed] = Flow[(Array[String], String)]
       .map {
-        case (Array(checksum: String, key: String), bagName) => {
-          val bagDigestItem = BagDigestItem(checksum, ObjectLocation(bagName, key))
-
-          debug(s"Found BagDigestItem: $bagDigestItem in $bagName")
-
-          bagDigestItem
-        }
-        case (default, bagName) => throw new RuntimeException(
-          s"Malformed bag digest line: ${default.mkString(config.digestDelimiter)} in $bagName")
+        case (Array(checksum: String, key: String), bagName) => BagDigestItem(checksum, ObjectLocation(bagName, key))
+        case (default, bagName) => throw MalformedBagDigestException(default.mkString(config.digestDelimiter), bagName)
       }
 
-    Flow[(ObjectLocation, String, ZipFile)].flatMapConcat {
-      case (objectLocation, bagName, zipFile) =>
-
-        Source.single((objectLocation, zipFile))
+    Flow[(ObjectLocation, String, ZipFile)]
+      .log("digest location")
+      .flatMapConcat {
+        case (objectLocation, bagName, zipFile) => Source
+          .single((objectLocation, zipFile))
           .via(fileSplitterFlow)
           .map(stringArray => (stringArray, bagName))
           .via(bagDigestItemFlow)
-    }
+      }.log("bag digest item")
   }
 }
 
 case class BagDigestItem(checksum: String, location: ObjectLocation)
+
+case class MalformedBagDigestException(line: String, bagName: String)
+  extends RuntimeException(s"Malformed bag digest line: $line in $bagName")

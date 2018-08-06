@@ -34,11 +34,11 @@ case class CloudwatchClientConfig(
 case class BagUploaderConfig(
                               uploadNamespace: String,
                               uploadPrefix: String = "archive",
-                              digestDelimiter: String = "  ",
+                              digestDelimiter: String = " +",
 
                               digestNames: List[String] = List(
-                                "manifest-sha256.txt",
-                                "tagmanifest-sha256.txt"
+                                "tagmanifest-sha256.txt",
+                                "manifest-sha256.txt"
                               )
                             )
 

@@ -35,7 +35,7 @@ class TestAppConfigModule(queueUrl: String, bucketName: String) extends Abstract
 
     val metricsConfig = MetricsConfig(
       namespace = "namespace",
-      flushInterval = 20 seconds
+      flushInterval = 60 seconds
     )
 
     val bagUploaderConfig = BagUploaderConfig(

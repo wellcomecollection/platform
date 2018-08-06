@@ -8,7 +8,6 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class VerifiedBagUploaderFlowTest
   extends FunSpec
