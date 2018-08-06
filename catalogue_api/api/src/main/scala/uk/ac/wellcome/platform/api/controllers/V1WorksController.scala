@@ -5,7 +5,10 @@ import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.platform.api.models.ApiConfig
-import uk.ac.wellcome.platform.api.requests.{V1MultipleResultsRequest, V1SingleWorkRequest}
+import uk.ac.wellcome.platform.api.requests.{
+  V1MultipleResultsRequest,
+  V1SingleWorkRequest
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 
 import scala.concurrent.ExecutionContext

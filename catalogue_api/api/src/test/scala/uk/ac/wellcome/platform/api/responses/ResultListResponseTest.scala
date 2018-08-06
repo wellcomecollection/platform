@@ -114,10 +114,10 @@ class ResultListResponseTest extends FunSpec with Matchers {
   }
 
   private def getResponse(
-                           contextUri: String = contextUri,
-                           displayResultList: DisplayResultList[DisplayWorkV1],
-                           multipleResultsRequest: V1MultipleResultsRequest = multipleResultsRequest,
-                           requestBaseUri: String = requestBaseUri
+    contextUri: String = contextUri,
+    displayResultList: DisplayResultList[DisplayWorkV1],
+    multipleResultsRequest: V1MultipleResultsRequest = multipleResultsRequest,
+    requestBaseUri: String = requestBaseUri
   ): ResultListResponse =
     ResultListResponse.create(
       contextUri = contextUri,

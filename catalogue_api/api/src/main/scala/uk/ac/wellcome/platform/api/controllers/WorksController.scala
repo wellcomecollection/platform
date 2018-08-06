@@ -25,7 +25,8 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class WorksController[M <: MultipleResultsRequest, S <: SingleWorkRequest](
+abstract class WorksController[M <: MultipleResultsRequest,
+                               S <: SingleWorkRequest](
   apiConfig: ApiConfig,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
@@ -45,7 +46,8 @@ abstract class WorksController[M <: MultipleResultsRequest, S <: SingleWorkReque
     version: ApiVersions.Value,
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit evidence: TypeTag[DisplayResultList[T]], manifest: Manifest[M]): Unit = {
+    implicit evidence: TypeTag[DisplayResultList[T]],
+    manifest: Manifest[M]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: M =>
@@ -73,7 +75,8 @@ abstract class WorksController[M <: MultipleResultsRequest, S <: SingleWorkReque
     version: ApiVersions.Value,
     endpointSuffix: String,
     toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit evidence: TypeTag[T], manifest: Manifest[S]): Unit = {
+    implicit evidence: TypeTag[T],
+    manifest: Manifest[S]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>
@@ -172,8 +175,7 @@ abstract class WorksController[M <: MultipleResultsRequest, S <: SingleWorkReque
     )
   }
 
-  private def respondWithNotFoundError(request: S,
-                                       contextUri: String) = {
+  private def respondWithNotFoundError(request: S, contextUri: String) = {
     val result = Error(
       variant = "http-404",
       description = Some(s"Work not found for identifier ${request.id}")

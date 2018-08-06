@@ -56,7 +56,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .at("/get/parameters")
       .asScala
       .map(_.findPath("name").asText())
-    parameters should contain ("includes")
+    parameters should contain("includes")
     parameters should not contain "include"
   }
 
@@ -69,7 +69,7 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .at("/get/parameters")
       .asScala
       .map(_.findPath("name").asText())
-    parameters should contain ("include")
+    parameters should contain("include")
     parameters should not contain "includes"
   }
 

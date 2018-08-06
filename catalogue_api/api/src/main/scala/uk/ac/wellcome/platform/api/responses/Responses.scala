@@ -23,10 +23,10 @@ case class ResultListResponse(
 
 object ResultListResponse {
   def create[T <: DisplayWork, M <: MultipleResultsRequest](
-                                contextUri: String,
-                                displayResultList: DisplayResultList[T],
-                                multipleResultsRequest: M,
-                                requestBaseUri: String
+    contextUri: String,
+    displayResultList: DisplayResultList[T],
+    multipleResultsRequest: M,
+    requestBaseUri: String
   ): ResultListResponse = {
 
     val currentPage = multipleResultsRequest.page
