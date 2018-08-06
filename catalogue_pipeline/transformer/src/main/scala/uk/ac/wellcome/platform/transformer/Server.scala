@@ -11,7 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
-  MessageConfigModule,
+  MessageWriterConfigModule,
   SNSClientModule,
   SQSClientModule,
   SQSConfigModule
@@ -25,6 +25,7 @@ object ServerMain extends Server
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.transformer Transformer"
   override val modules = Seq(
+    MessageWriterConfigModule,
     MetricsSenderModule,
     AkkaModule,
     SQSClientModule,
@@ -35,7 +36,6 @@ class Server extends HttpServer {
     TransformablesModule,
     S3ClientModule,
     S3ConfigModule,
-    MessageConfigModule,
     TransformedBaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {
