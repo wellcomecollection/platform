@@ -10,7 +10,7 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 
 import scala.concurrent.Future
 
-class SierraVHSUtil extends LocalVersionedHybridStore {
+trait SierraVHSUtil extends LocalVersionedHybridStore {
   def storeInVHS(transformable: SierraTransformable,
                  hybridStore: VersionedHybridStore[SierraTransformable,
                                                    EmptyMetadata,
@@ -21,10 +21,18 @@ class SierraVHSUtil extends LocalVersionedHybridStore {
       ifExisting = (t, m) => throw new RuntimeException(s"Found record ${transformable.sierraId}, but VHS should be empty")
     )
 
+  def storeInVHS(transformables: List[SierraTransformable],
+                 hybridStore: VersionedHybridStore[SierraTransformable,
+                                                   EmptyMetadata,
+                                                   ObjectStore[SierraTransformable]]): Future[List[Unit]] =
+    Future.sequence(
+      transformables.map { t => storeInVHS(t, hybridStore = hybridStore) }
+    )
+
   def assertStored(transformable: SierraTransformable, bucket: Bucket, table: Table): Assertion =
     assertStored[SierraTransformable](
       bucket,
       table,
-      id = transformable.sierraId.withoutCheckDigit,
+      id = transformable.id,
       record = transformable)
 }
