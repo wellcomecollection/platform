@@ -11,7 +11,7 @@ import com.twitter.finatra.http.routing.HttpRouter
 import uk.ac.wellcome.finatra.akka.{AkkaModule, ExecutionContextModule}
 import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.messaging.{
-  MessageConfigModule,
+  MessageWriterConfigModule,
   MessageReaderConfigModule,
   SNSClientModule,
   SQSClientModule
@@ -31,10 +31,10 @@ class Server extends HttpServer {
     ExecutionContextModule,
     IdMinterWorkerModule,
     MessageReaderConfigModule,
+    MessageWriterConfigModule,
     SQSClientModule,
     SNSClientModule,
     S3ClientModule,
-    MessageConfigModule,
     JsonModule,
     MetricsSenderModule
   )
