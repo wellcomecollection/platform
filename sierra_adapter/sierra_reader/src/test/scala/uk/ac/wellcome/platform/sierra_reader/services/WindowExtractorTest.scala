@@ -18,8 +18,7 @@ class WindowExtractorTest extends FunSpec with Matchers {
     WindowExtractor.extractWindow(jsonString).get shouldBe s"[$start,$end]"
   }
 
-  it(
-    "returns a GracefulFailureException if start is not a valid iso datetime") {
+  it("returns a GracefulFailureException if start is not a valid iso datetime") {
     val jsonString =
       s"""
          |{
