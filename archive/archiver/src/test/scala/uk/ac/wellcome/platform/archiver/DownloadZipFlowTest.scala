@@ -8,6 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archiver.flow.DownloadZipFlow
 import uk.ac.wellcome.storage.ObjectLocation
 
@@ -21,7 +22,7 @@ class DownloadZipFlowTest
     with ScalaFutures
     with AkkaS3 {
 
-  import BagItUtils._
+  import uk.ac.wellcome.platform.archiver.fixtures.BagItUtils._
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
