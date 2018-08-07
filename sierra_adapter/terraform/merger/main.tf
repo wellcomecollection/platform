@@ -24,8 +24,14 @@ module "sierra_merger_service" {
   cpu    = 512
   memory = 2048
 
-  env_vars = "${var.env_vars}"
-  env_vars_length = "${var.env_vars_length}"
+  env_vars = {
+    windows_queue_url = "${module.updates_queue.id}"
+    metrics_namespace = "sierra_${local.resource_type_singular}_merger"
+    dynamo_table_name = "${var.merged_dynamo_table_name}"
+    bucket_name       = "${var.bucket_name}"
+  }
+
+  env_vars_length = 4
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"

@@ -68,42 +68,26 @@ module "items_to_dynamo" {
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }
 
-module "item_updates_queue" {
-  source      = "git::https://github.com/wellcometrust/terraform.git//sqs?ref=v6.4.0"
-  queue_name  = "sierra_item_merger_queue"
-  aws_region  = "${var.aws_region}"
-  account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.items_reader.topic_name}"]
-
-  # Ensure that messages are spread around -- if the merger has an error
-  # (for example, hitting DynamoDB write limits), we don't retry too quickly.
-  visibility_timeout_seconds = 300
-
-  max_receive_count = 4
-
-  alarm_topic_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-}
-
 module "items_merger" {
   source = "merger"
 
   resource_type = "items"
+  release_id    = "${var.release_ids["sierra_item_merger"]}"
 
-  release_id = "${var.release_ids["sierra_item_merger"]}"
+  merged_dynamo_table_name = "${local.vhs_table_name}"
 
-  env_vars = {
-    windows_queue_url = "${module.item_updates_queue.id}"
-    metrics_namespace = "sierra_item_merger"
-    dynamo_table_name = "${local.vhs_table_name}"
-    bucket_name       = "${local.vhs_bucket_name}"
-  }
-
-  env_vars_length = 4
+  updates_topic_name = "${module.items_to_dynamo.topic_name}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
   vpc_id       = "${local.vpc_id}"
 
+  dlq_alarm_arn = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
+
+  account_id = "${data.aws_caller_identity.current.account_id}"
+
   vhs_full_access_policy = "${local.vhs_full_access_policy}"
+
+  bucket_name = "${local.vhs_bucket_name}"
 
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = ["${local.private_subnets}"]
