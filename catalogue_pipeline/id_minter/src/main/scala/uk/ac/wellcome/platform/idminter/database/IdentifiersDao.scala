@@ -5,8 +5,8 @@ import java.sql.SQLIntegrityConstraintViolationException
 import com.google.inject.{Inject, Singleton}
 import com.twitter.inject.Logging
 import scalikejdbc._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.SourceIdentifier
+import uk.ac.wellcome.platform.idminter.database.exceptions.IdMinterException
 import uk.ac.wellcome.platform.idminter.models.{Identifier, IdentifiersTable}
 
 import scala.concurrent.blocking
@@ -76,7 +76,7 @@ class IdentifiersDao @Inject()(db: DB, identifiers: IdentifiersTable)
       case e: SQLIntegrityConstraintViolationException =>
         warn(
           s"Unable to insert $identifier because of integrity constraints: ${e.getMessage}")
-        throw GracefulFailureException(e)
+        throw IdMinterException(e)
       case e =>
         error(s"Failed inserting identifier $identifier in database", e)
         throw e

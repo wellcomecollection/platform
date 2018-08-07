@@ -6,7 +6,6 @@ import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.storage.s3.S3Config
@@ -20,6 +19,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
   SierraConfig,
@@ -212,7 +212,7 @@ class SierraReaderWorkerServiceTest
     getObjectFromS3[List[SierraItemRecord]](bucket, key)
 
   it(
-    "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
+    "returns a SierraReaderException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
       val body =
         """
@@ -224,15 +224,14 @@ class SierraReaderWorkerServiceTest
       val notificationMessage = createNotificationMessageWith(body = body)
       whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
         ex =>
-          ex shouldBe a[GracefulFailureException]
+          ex shouldBe a[SierraReaderException]
       }
 
     }
 
   }
 
-  it(
-    "does not return a GracefulFailureException if it cannot reach the Sierra API") {
+  it("doesn't return a SierraReaderException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
         val body =
@@ -247,7 +246,7 @@ class SierraReaderWorkerServiceTest
 
         whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
           ex =>
-            ex shouldNot be(a[GracefulFailureException])
+            ex shouldNot be(a[SierraReaderException])
         }
     }
   }

@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
@@ -11,6 +10,7 @@ import uk.ac.wellcome.platform.transformer.source.{
   SierraMaterialType
 }
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 
 import scala.util.{Failure, Success}
 
@@ -24,10 +24,8 @@ trait SierraItems extends Logging with SierraLocation {
           fromJson[SierraItemData](jsonString) match {
             case Success(data) => id -> data
             case Failure(_) =>
-              throw GracefulFailureException(
-                new RuntimeException(
-                  s"Unable to parse item data for $id as JSON: <<$jsonString>>"
-                ))
+              throw TransformerException(
+                s"Unable to parse item data for $id as JSON: <<$jsonString>>")
           }
       }
 

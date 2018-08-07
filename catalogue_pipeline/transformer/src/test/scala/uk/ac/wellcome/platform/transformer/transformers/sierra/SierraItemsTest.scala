@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -43,11 +43,11 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         itemRecords = itemRecords
       )
 
-      val caught = intercept[GracefulFailureException] {
+      val caught = intercept[TransformerException] {
         transformer.extractItemData(transformable)
       }
 
-      caught.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
+      caught.e.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
     }
   }
 
