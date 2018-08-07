@@ -1,13 +1,67 @@
 package uk.ac.wellcome.platform.archiver.fixtures
+
 import java.io.{File, FileOutputStream}
 import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
+import com.google.inject.Guice
+import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archiver.modules._
+import uk.ac.wellcome.storage.ObjectLocation
+import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
+
+import uk.ac.wellcome.json.JsonUtil._
+
 import scala.util.Random
-object BagItUtils {
+
+trait Archiver extends AkkaS3 with Messaging {
+
+  def withBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+    val bagName = randomAlphanumeric()
+    val (zipFile, fileName) = createBagItZip(bagName, 1, valid)
+
+    val uploadKey = s"upload/path/$bagName.zip"
+    s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
+
+    val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
+    sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
+
+    testWith(Bag(bagName))
+  }
+
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[ArchiverApp, R]) = {
+    val archiver = new ArchiverApp {
+      val injector = Guice.createInjector(
+        new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
+        AkkaModule,
+        AkkaS3ClientModule,
+        CloudWatchClientModule,
+        SQSClientModule
+      )
+    }
+
+    testWith(archiver)
+  }
+
+  def withArchiver[R](testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
+    withLocalSqsQueueAndDlq(queuePair => {
+      withLocalS3Bucket { ingestBucket =>
+        withLocalS3Bucket { storageBucket =>
+          withApp(ingestBucket, queuePair) { archiver =>
+            testWith((ingestBucket, storageBucket, queuePair, archiver))
+          }
+        }
+      }
+    })
+  }
+
   def randomAlphanumeric(length: Int = 8) = {
     Random.alphanumeric take length mkString
   }
+
   def createDigest(string: String) =
     MessageDigest
       .getInstance("SHA-256")
@@ -19,6 +73,7 @@ object BagItUtils {
       .foldLeft("") {
         _ + _
       }
+
   def createZip(files: List[FileEntry]) = {
     val zipFileName = File.createTempFile("archiver-test", ".zip").getName
     val zipFileOutputStream = new FileOutputStream(zipFileName)
@@ -34,6 +89,7 @@ object BagItUtils {
     val zipFile = new ZipFile(zipFileName)
     (zipFile, zipFileName)
   }
+
   def createBagItZip(bagName: String,
                      dataFileCount: Int = 1,
                      valid: Boolean = true) = {
@@ -104,4 +160,8 @@ object BagItUtils {
     createZip(allFiles.toList)
   }
 }
+
 case class FileEntry(name: String, contents: String)
+
+case class Bag(bagName: String)
+

@@ -5,17 +5,14 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 class VerifiedBagUploaderFlowTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
-    with AkkaS3 {
-
-  import uk.ac.wellcome.platform.archiver.fixtures.BagItUtils._
+    with fixtures.Archiver {
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -59,7 +56,7 @@ class VerifiedBagUploaderFlowTest
 
         whenReady(verification.failed) { e =>
           println(e)
-        // Do nothing
+          // Do nothing
         }
       }
     }

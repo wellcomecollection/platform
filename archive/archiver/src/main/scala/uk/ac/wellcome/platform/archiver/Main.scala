@@ -2,21 +2,17 @@ package uk.ac.wellcome.platform.archiver
 
 import java.util.zip.ZipFile
 
+import akka.NotUsed
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Flow
 import akka.stream.{ActorMaterializer, Attributes}
-import akka.{Done, NotUsed}
 import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archiver.flow.{
-  DownloadNotificationFlow,
-  DownloadZipFlow,
-  VerifiedBagUploaderFlow
-}
+import uk.ac.wellcome.platform.archiver.flow.{BagName, DownloadNotificationFlow, DownloadZipFlow, VerifiedBagUploaderFlow}
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archiver.modules._
@@ -61,11 +57,11 @@ trait Archiver extends Logging {
     val materializer = ActorMaterializer()(actorSystem)
 
     val downloadNotificationFlow
-      : Flow[NotificationMessage, ObjectLocation, NotUsed] =
+    : Flow[NotificationMessage, ObjectLocation, NotUsed] =
       DownloadNotificationFlow()
     val downloadZipFlow: Flow[ObjectLocation, ZipFile, NotUsed] =
       DownloadZipFlow(s3Client, materializer, actorSystem.dispatcher)
-    val verifiedBagUploaderFlow: Flow[ZipFile, Seq[Done], NotUsed] =
+    val verifiedBagUploaderFlow: Flow[ZipFile, Seq[BagName], NotUsed] =
       VerifiedBagUploaderFlow(bagUploaderConfig)(materializer, s3Client)
 
     val workFlow = Flow[NotificationMessage]

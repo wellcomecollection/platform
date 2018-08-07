@@ -2,10 +2,10 @@ package uk.ac.wellcome.platform.archiver.flow
 
 import java.util.zip.ZipFile
 
+import akka.NotUsed
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
@@ -16,7 +16,7 @@ object VerifiedBagUploaderFlow extends Logging {
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client
-  ): Flow[ZipFile, Seq[Done], NotUsed] = {
+  ): Flow[ZipFile, Seq[BagName], NotUsed] = {
 
     val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] =
       DigestLocationFlow(config)
@@ -35,9 +35,9 @@ object VerifiedBagUploaderFlow extends Logging {
             Source
               .single(digestLocation)
               .via(verifiedDigestUploaderFlow)
+              .map(_ => bagName)
               .runWith(Sink.seq)
           )
-
         })
     })
   }

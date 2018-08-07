@@ -23,7 +23,7 @@ class MessageStreamTest
     with Messaging
     with AkkaS3 {
 
-  it("reads messages off a queue, processes them and deletes them") {
+  it("reads messages off a queue, processes it and deletes them") {
     withMessageStreamFixtures[Unit] {
       case (messageStream, QueuePair(queue, dlq), _) =>
         sendExampleObjects(queue = queue, start = 1, count = 3)
