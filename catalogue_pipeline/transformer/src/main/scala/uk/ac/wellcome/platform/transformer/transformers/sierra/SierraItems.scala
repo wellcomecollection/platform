@@ -96,7 +96,7 @@ trait SierraItems extends Logging with SierraLocation {
 
     val hasDlnkLocation = sierraBibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")
-      case None => false
+      case None            => false
     }
 
     if (hasEbookMaterialType || hasDlnkLocation) {
