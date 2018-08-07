@@ -112,15 +112,16 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[
-      (Queue, Topic, String, String, Bucket),
-      R]) =
+    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(
+                indexNameV1,
+                indexNameV2,
+                itemType)
               withServer(flags) { _ =>
                 testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
