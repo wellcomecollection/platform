@@ -1,4 +1,4 @@
-module "transformer" {
+module "miro_transformer" {
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
@@ -6,22 +6,48 @@ module "transformer" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"
   vpc_id                           = "${var.vpc_id}"
-  service_name                     = "${var.namespace}_transformer"
+  service_name                     = "${var.namespace}_miro_transformer"
   aws_region                       = "${var.aws_region}"
 
   env_vars = {
     sns_arn              = "${module.transformed_works_topic.arn}"
-    transformer_queue_id = "${module.transformer_queue.id}"
-    metrics_namespace    = "${var.namespace}_transformer"
-    storage_bucket_name  = "${var.vhs_sourcedata_bucket_name}"
+    transformer_queue_id = "${module.miro_transformer_queue.id}"
+    metrics_namespace    = "${var.namespace}_miro_transformer"
+    storage_bucket_name  = "${var.vhs_miro_bucket_name}"
     message_bucket_name  = "${var.messages_bucket}"
   }
 
   env_vars_length = 5
 
   container_image   = "${var.transformer_container_image}"
-  source_queue_name = "${module.transformer_queue.name}"
-  source_queue_arn  = "${module.transformer_queue.arn}"
+  source_queue_name = "${module.miro_transformer_queue.name}"
+  source_queue_arn  = "${module.miro_transformer_queue.arn}"
+}
+
+module "sierra_transformer" {
+  source = "service"
+
+  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  cluster_name                     = "${aws_ecs_cluster.cluster.name}"
+  namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
+  subnets                          = "${var.subnets}"
+  vpc_id                           = "${var.vpc_id}"
+  service_name                     = "${var.namespace}_sierra_transformer"
+  aws_region                       = "${var.aws_region}"
+
+  env_vars = {
+    sns_arn              = "${module.transformed_works_topic.arn}"
+    transformer_queue_id = "${module.sierra_transformer_queue.id}"
+    metrics_namespace    = "${var.namespace}_sierra_transformer"
+    storage_bucket_name  = "${var.vhs_sierra_bucket_name}"
+    message_bucket_name  = "${var.messages_bucket}"
+  }
+
+  env_vars_length = 5
+
+  container_image   = "${var.transformer_container_image}"
+  source_queue_name = "${module.sierra_transformer_queue.name}"
+  source_queue_arn  = "${module.sierra_transformer_queue.arn}"
 }
 
 module "recorder" {
