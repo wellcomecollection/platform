@@ -125,8 +125,8 @@ class SierraBibMergerFeatureTest
                 transformable = oldTransformable,
                 hybridStore = hybridStore
               ).map { _ =>
-                  sendNotificationToSQS(queue = queue, message = newBibRecord)
-                }
+                sendNotificationToSQS(queue = queue, message = newBibRecord)
+              }
 
               val expectedTransformable =
                 SierraTransformable(bibRecord = newBibRecord)
@@ -170,8 +170,8 @@ class SierraBibMergerFeatureTest
                 transformable = expectedTransformable,
                 hybridStore = hybridStore
               ).map { _ =>
-                  sendNotificationToSQS(queue = queue, message = oldBibRecord)
-                }
+                sendNotificationToSQS(queue = queue, message = oldBibRecord)
+              }
 
               // Blocking in Scala is generally a bad idea; we do it here so there's
               // enough time for this update to have gone through (if it was going to).
@@ -208,8 +208,8 @@ class SierraBibMergerFeatureTest
                   transformable = transformable,
                   hybridStore = hybridStore
                 ).map { _ =>
-                    sendNotificationToSQS(queue = queue, message = bibRecord)
-                  }
+                  sendNotificationToSQS(queue = queue, message = bibRecord)
+                }
 
                 val expectedTransformable =
                   SierraTransformable(bibRecord = bibRecord)
