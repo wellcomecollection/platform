@@ -30,7 +30,7 @@ module "sierra_merger_service" {
     dynamo_table_name   = "${var.merged_dynamo_table_name}"
     bucket_name         = "${var.bucket_name}"
     sierra_items_bucket = "${var.sierra_items_bucket}"
-    log_level = "DEBUG"
+    log_level           = "DEBUG"
   }
 
   env_vars_length = 6
