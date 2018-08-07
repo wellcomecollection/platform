@@ -69,7 +69,7 @@ module "items_to_dynamo" {
 }
 
 module "items_merger" {
-  source = "merger"
+  source = "item_merger"
 
   resource_type = "items"
   release_id    = "${var.release_ids["sierra_item_merger"]}"
