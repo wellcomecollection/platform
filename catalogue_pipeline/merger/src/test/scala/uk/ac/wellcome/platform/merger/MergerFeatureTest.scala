@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.merger
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{Assertion, FunSpec}
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.Messaging
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore

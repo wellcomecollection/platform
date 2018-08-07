@@ -4,8 +4,8 @@ import com.gu.scanamo.Scanamo
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil

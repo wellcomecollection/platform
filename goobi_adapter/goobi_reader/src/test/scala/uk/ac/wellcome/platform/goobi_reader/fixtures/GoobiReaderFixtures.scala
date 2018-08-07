@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.goobi_reader.fixtures
 import java.time.{Instant, ZoneOffset}
 import java.time.format.DateTimeFormatter
 
-import uk.ac.wellcome.messaging.test.fixtures.SQS
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket

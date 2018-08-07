@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.reindex.processor
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 import uk.ac.wellcome.test.utils.ExtendedPatience

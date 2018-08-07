@@ -2,8 +2,8 @@ package uk.ac.wellcome.messaging.sns
 
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SNS
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SNS
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
 
 class SNSWriterTest
     extends FunSpec

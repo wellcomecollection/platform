@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.reindex.processor
 
 import com.twitter.finagle.http.Status._
 import org.scalatest.FunSpec
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDbVersioned
 
 class ServerTest

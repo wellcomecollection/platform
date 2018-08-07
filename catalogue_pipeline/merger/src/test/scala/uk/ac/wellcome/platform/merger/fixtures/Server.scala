@@ -2,9 +2,9 @@ package uk.ac.wellcome.platform.merger.fixtures
 
 import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.Suite
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.SQS.Queue
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.monitoring.fixtures.CloudWatch
 import uk.ac.wellcome.platform.merger.{Server => AppServer}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table

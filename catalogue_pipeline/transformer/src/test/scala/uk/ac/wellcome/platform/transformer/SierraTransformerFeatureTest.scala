@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.transformer
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil

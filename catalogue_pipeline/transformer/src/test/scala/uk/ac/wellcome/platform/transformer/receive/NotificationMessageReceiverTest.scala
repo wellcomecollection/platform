@@ -12,8 +12,8 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
-import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.SNS.Topic
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,

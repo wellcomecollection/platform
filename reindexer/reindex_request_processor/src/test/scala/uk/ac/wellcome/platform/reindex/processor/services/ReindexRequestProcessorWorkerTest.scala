@@ -3,8 +3,8 @@ package uk.ac.wellcome.platform.reindex.processor.services
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.{Queue, QueuePair}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.reindexer.{ReindexRequest, ReindexableRecord}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table

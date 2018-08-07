@@ -1,6 +1,6 @@
 package uk.ac.wellcome.platform.merger.fixtures
 
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.services.Merger
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore

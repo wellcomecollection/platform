@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.sierra_items_to_dynamo
 
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.messaging.test.fixtures.SQS
+import uk.ac.wellcome.messaging.fixtures.SQS
 import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore

@@ -7,11 +7,11 @@ import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.ObjectStore
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.{ExecutionContext, Future}
 

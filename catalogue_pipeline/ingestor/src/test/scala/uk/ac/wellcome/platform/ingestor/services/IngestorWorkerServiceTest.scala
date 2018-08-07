@@ -9,8 +9,8 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.elasticsearch.{ElasticConfig, ElasticCredentials}
 import uk.ac.wellcome.messaging.message.MessageStream
-import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
+import uk.ac.wellcome.messaging.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.work.internal.{IdentifiedBaseWork, Subject}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.ingestor.IngestorConfig
