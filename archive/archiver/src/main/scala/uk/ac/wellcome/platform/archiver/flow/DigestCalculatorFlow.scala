@@ -45,13 +45,15 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
               }
               .mkString
 
-            if (streamDigest != checksum) {
-              fail(out, new RuntimeException(s"Checksum not matched!"))
-            }
-
             digest.reset()
 
-            completeStage()
+            if (streamDigest != checksum) {
+              debug(s"$streamDigest != $checksum FAILED!")
+              
+              failStage(new RuntimeException(s"Checksum not matched!"))
+            } else {
+              completeStage()
+            }
           }
         }
       )

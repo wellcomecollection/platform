@@ -2,22 +2,23 @@ package uk.ac.wellcome.platform.archiver
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
+import akka.actor.ActorSystem
+import akka.event.Logging
 import akka.stream.scaladsl.Flow
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
-import uk.ac.wellcome.monitoring.MetricsSender
+import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archiver.fixtures.AkkaS3
 
 import scala.concurrent.duration._
 
 class MessageStreamTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
@@ -25,7 +26,9 @@ class MessageStreamTest
 
   it("reads messages off a queue, processes it and deletes them") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, QueuePair(queue, dlq), _) =>
+      case (messageStream, QueuePair(queue, dlq), actorSystem) =>
+        implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
+
         sendExampleObjects(queue = queue, start = 1, count = 3)
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
@@ -51,14 +54,14 @@ class MessageStreamTest
   }
 
   def withMessageStreamFixtures[R](
-    testWith: TestWith[(MessageStream[ExampleObject, Unit],
-                        QueuePair,
-                        MetricsSender),
-                       R]
-  ) = {
+                                    testWith: TestWith[(MessageStream[ExampleObject, Unit],
+                                      QueuePair,
+                                      ActorSystem),
+                                      R]
+                                  ) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair @ QueuePair(queue, _) =>
+        case queuePair@QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
             val sqsConfig = SQSConfig(
               queueUrl = queue.url,
@@ -73,16 +76,16 @@ class MessageStreamTest
               metricsSender = metricsSender
             )
 
-            testWith((stream, queuePair, metricsSender))
+            testWith((stream, queuePair, actorSystem))
           }
       }
     }
   }
 
   private def createExampleObjects(
-    start: Int,
-    count: Int
-  ): List[ExampleObject] =
+                                    start: Int,
+                                    count: Int
+                                  ): List[ExampleObject] =
     (start to (start + count - 1)).map { i =>
       ExampleObject(s"Example value $i")
     }.toList

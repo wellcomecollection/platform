@@ -12,7 +12,6 @@ import uk.ac.wellcome.platform.archiver.flow.DownloadZipFlow
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class DownloadZipFlowTest
@@ -33,8 +32,7 @@ class DownloadZipFlowTest
 
         val downloadZipFlow = DownloadZipFlow(
           s3AkkaClient,
-          materializer,
-          global
+          materializer
         )
 
         val fileName = randomAlphanumeric()

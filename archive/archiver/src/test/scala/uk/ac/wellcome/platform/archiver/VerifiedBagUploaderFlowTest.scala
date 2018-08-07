@@ -16,11 +16,13 @@ class VerifiedBagUploaderFlowTest
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
+  //    SupervisedMaterializer.create(
+  //    "archiver", mock[MetricsSender])(system)
 
   it("succeeds when verifying and uploading a valid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        implicit val _ = s3AkkaClient
+        implicit val s3Client = s3AkkaClient
 
         val bagUploaderConfig =
           BagUploaderConfig(uploadNamespace = storageBucket.name)
@@ -42,7 +44,7 @@ class VerifiedBagUploaderFlowTest
   it("fails when verifying and uploading an invalid bag") {
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        implicit val _ = s3AkkaClient
+        implicit val s3Client = s3AkkaClient
 
         val bagUploaderConfig =
           BagUploaderConfig(uploadNamespace = storageBucket.name)

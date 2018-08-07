@@ -1,35 +1,45 @@
 package uk.ac.wellcome.platform.archiver.fixtures
 
 import java.io.{File, FileOutputStream}
+import java.nio.file.{Path, Paths}
 import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archiver.modules._
+import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
-import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
-
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.Random
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def withBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+  def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[Bag, R]) = {
     val bagName = randomAlphanumeric()
-    val (zipFile, fileName) = createBagItZip(bagName, 1, valid)
-
     val uploadKey = s"upload/path/$bagName.zip"
-    s3Client.putObject(ingestBucket.name, uploadKey, new File(fileName))
+
+    s3Client.putObject(ingestBucket.name, uploadKey, path.toFile)
 
     val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
     sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
 
+    info(s"Creating bag $bagName")
+
     testWith(Bag(bagName))
+  }
+
+  def withFakeBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+    val bagName = randomAlphanumeric()
+    val (zipFile, fileName) = createBagItZip(bagName, 1, valid)
+
+    withBag(Paths.get(fileName), ingestBucket, queuePair) { bag =>
+      testWith(bag)
+    }
   }
 
   def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[ArchiverApp, R]) = {

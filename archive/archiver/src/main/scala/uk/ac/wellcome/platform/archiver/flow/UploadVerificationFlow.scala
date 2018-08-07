@@ -16,7 +16,6 @@ object UploadVerificationFlow extends Logging {
   ): Flow[(BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] = {
 
     Flow[(BagDigestItem, ZipFile)]
-      .log("verifying upload")
       .flatMapConcat {
         case (BagDigestItem(checksum, location), zipFile) =>
           val extract = FileExtractorFlow()
@@ -30,8 +29,8 @@ object UploadVerificationFlow extends Logging {
           val uploadResult =
             uploadSource.via(extract).via(verify).runWith(uploadSink)
 
-          Source.fromFuture(uploadResult).log("upload result")
+          Source.fromFuture(uploadResult)
+            .log("upload result")
       }
-      .log("upload verified")
   }
 }
