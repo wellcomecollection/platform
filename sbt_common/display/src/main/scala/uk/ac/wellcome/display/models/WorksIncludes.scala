@@ -12,7 +12,8 @@ case class V1WorksIncludes(
 
 case class V2WorksIncludes(
   identifiers: Boolean = false,
-  items: Boolean = false
+  items: Boolean = false,
+  subjects: Boolean = false
 ) extends WorksIncludes
 
 class WorksIncludesParsingException(msg: String)
@@ -30,9 +31,10 @@ object V1WorksIncludes {
 }
 
 object V2WorksIncludes {
-  val recognisedIncludes = List("identifiers", "items")
+  val recognisedIncludes = List("identifiers", "subjects","items")
   def apply(includesList: List[String]): V2WorksIncludes = V2WorksIncludes(
     identifiers = includesList.contains("identifiers"),
+    subjects = includesList.contains("subjects"),
     items = includesList.contains("items")
   )
 

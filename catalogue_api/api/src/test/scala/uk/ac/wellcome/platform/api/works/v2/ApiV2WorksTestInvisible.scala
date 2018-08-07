@@ -44,7 +44,6 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   },
@@ -53,7 +52,6 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }
@@ -87,7 +85,6 @@ class ApiV2WorksTestInvisible extends ApiV2WorksTestBase {
                |     "id": "${work.canonicalId}",
                |     "title": "${work.title}",
                |     "contributors": [],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }

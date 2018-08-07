@@ -36,7 +36,6 @@ class DisplayWorkV2SerialisationTest
        | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "contributors": [ ${contributor(work.contributors.head)} ],
-       | "subjects": [ ],
        | "genres": [ ],
        | "production": [ ]
        |}
@@ -59,7 +58,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ${items(work.items)} ],
-                          | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]
                           |}
@@ -81,7 +79,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ],
-                          | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]
                           |}
@@ -109,7 +106,6 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithCopyright.canonicalId}",
                           |     "title": "${workWithCopyright.title}",
                           |     "contributors": [ ],
-                          |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "production": [ ],
                           |     "items": [
@@ -134,7 +130,7 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("includes subject information in DisplayWorkV2 serialisation") {
+  it("includes subject information in DisplayWorkV2 serialisation with the subjects include") {
     val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
         Subject("label", List(Unidentifiable(Concept("fish")))),
@@ -142,7 +138,7 @@ class DisplayWorkV2SerialisationTest
       )
     )
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
+      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects, includes = V2WorksIncludes(subjects = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
@@ -177,7 +173,6 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title}",
                           |     "contributors": [],
-                          |     "subjects": [ ],
                           |     "genres": [ ${genres(workWithSubjects.genres)} ],
                           |     "production": [ ]
                           |   }""".stripMargin
@@ -200,7 +195,6 @@ class DisplayWorkV2SerialisationTest
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
-                          | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]
                           |}
@@ -221,7 +215,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
-                          | "subjects": [ ],
                           | "genres": [ ],
                           | "production": [ ]
                           |}
@@ -246,7 +239,6 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.title}",
                           |     "contributors": [ ],
-                          |     "subjects": [ ],
                           |     "genres": [ ],
                           |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}

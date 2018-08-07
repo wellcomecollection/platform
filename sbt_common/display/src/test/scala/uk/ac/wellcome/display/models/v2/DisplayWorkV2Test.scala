@@ -307,7 +307,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("subjects") {
-        val concepts = displayWork.subjects.head.concepts
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(subjects = true))
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe List(None, None, None)
       }
 
@@ -352,6 +354,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("subjects") {
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, subjects = true))
         val expectedIdentifiers = List(
           conceptSourceIdentifier,
           periodSourceIdentifier,
@@ -360,7 +364,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           .map { List(_) }
           .map { Some(_) }
 
-        val concepts = displayWork.subjects.head.concepts
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers
       }
 

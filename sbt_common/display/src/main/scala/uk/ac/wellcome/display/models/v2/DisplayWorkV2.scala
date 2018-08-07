@@ -56,7 +56,7 @@ case class DisplayWorkV2(
   @ApiModelProperty(
     value =
       "Relates a work to the general thesaurus-based concept that describes the work's content."
-  ) subjects: List[DisplaySubject] = List(),
+  ) subjects: Option[List[DisplaySubject]] = None,
   @ApiModelProperty(
     value = "Relates a work to the genre that describes the work's content."
   ) genres: List[DisplayGenre] = List(),
@@ -103,9 +103,10 @@ case object DisplayWorkV2 {
       contributors = work.contributors.map {
         DisplayContributor(_, includesIdentifiers = includes.identifiers)
       },
-      subjects = work.subjects.map {
-        DisplaySubject(_, includesIdentifiers = includes.identifiers)
-      },
+      subjects = if(includes.subjects){
+        Some(work.subjects.map {
+        DisplaySubject(_, includesIdentifiers = includes.identifiers)})}
+          else None,
       genres = work.genres.map {
         DisplayGenre(_, includesIdentifiers = includes.identifiers)
       },

@@ -25,7 +25,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   },
@@ -34,7 +33,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   },
@@ -43,7 +41,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }
@@ -73,7 +70,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                | "id": "${work.canonicalId}",
                | "title": "${work.title}",
                | "contributors": [],
-               | "subjects": [],
                | "genres": [],
                | "production": [ ]
                |}
@@ -110,7 +106,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(1).canonicalId}",
                |     "title": "${works(1).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }]
@@ -137,7 +132,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(0).canonicalId}",
                |     "title": "${works(0).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }]
@@ -164,7 +158,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${works(2).canonicalId}",
                |     "title": "${works(2).title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }]
@@ -220,7 +213,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work1.canonicalId}",
                |     "title": "${work1.title}",
                |     "contributors": [],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ]
                |   }
@@ -255,7 +247,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                    | "id": "${work.canonicalId}",
                    | "title": "${work.title}",
                    | "contributors": [ ],
-                   | "subjects": [ ],
                    | "genres": [ ],
                    | "production": [ ]
                    |}
@@ -275,7 +266,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                    | "id": "${work_alt.canonicalId}",
                    | "title": "${work_alt.title}",
                    | "contributors": [ ],
-                   | "subjects": [ ],
                    | "genres": [ ],
                    | "production": [ ]
                    |}
@@ -316,7 +306,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                    |     "id": "${work.canonicalId}",
                    |     "title": "${work.title}",
                    |     "contributors": [ ],
-                   |     "subjects": [ ],
                    |     "genres": [ ],
                    |     "production": [ ]
                    |   }
@@ -339,7 +328,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                    |     "id": "${work_alt.canonicalId}",
                    |     "title": "${work_alt.title}",
                    |     "contributors": [ ],
-                   |     "subjects": [ ],
                    |     "genres": [ ],
                    |     "production": [ ]
                    |   }
@@ -378,7 +366,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                |     "id": "${work.canonicalId}",
                |     "title": "${work.title}",
                |     "contributors": [ ],
-               |     "subjects": [ ],
                |     "genres": [ ],
                |     "production": [ ],
                |     "thumbnail": ${location(work.thumbnail.get)}
@@ -423,7 +410,6 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
                  |     "id": "${work2.canonicalId}",
                  |     "title": "${work2.title}",
                  |     "contributors": [ ],
-                 |     "subjects": [ ],
                  |     "genres": [ ],
                  |     "production": [ ]
                  |   }
