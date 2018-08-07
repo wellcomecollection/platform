@@ -1,22 +1,44 @@
-# Role policies for the transformer
+# Role policies for the miro transformer
 
-resource "aws_iam_role_policy" "ecs_transformer_task_sns" {
-  role   = "${module.transformer.task_role_name}"
+resource "aws_iam_role_policy" "ecs_miro_transformer_task_sns" {
+  role   = "${module.miro_transformer.task_role_name}"
   policy = "${module.transformed_works_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "ecs_transformer_task_vhs" {
-  role   = "${module.transformer.task_role_name}"
-  policy = "${var.vhs_sourcedata_read_policy}"
+resource "aws_iam_role_policy" "ecs_miro_transformer_task_vhs" {
+  role   = "${module.miro_transformer.task_role_name}"
+  policy = "${var.vhs_miro_read_policy}"
 }
 
-resource "aws_iam_role_policy" "transformer_task_cloudwatch_metric" {
-  role   = "${module.transformer.task_role_name}"
+resource "aws_iam_role_policy" "miro_transformer_task_cloudwatch_metric" {
+  role   = "${module.miro_transformer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
 }
 
-resource "aws_iam_role_policy" "transformer_s3_messages" {
-  role   = "${module.transformer.task_role_name}"
+resource "aws_iam_role_policy" "miro_transformer_s3_messages" {
+  role   = "${module.miro_transformer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
+}
+
+# Role policies for the sierra transformer
+
+resource "aws_iam_role_policy" "ecs_sierra_transformer_task_sns" {
+  role   = "${module.sierra_transformer.task_role_name}"
+  policy = "${module.transformed_works_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "ecs_sierra_transformer_task_vhs" {
+  role   = "${module.sierra_transformer.task_role_name}"
+  policy = "${var.vhs_sierra_read_policy}"
+}
+
+resource "aws_iam_role_policy" "sierra_transformer_task_cloudwatch_metric" {
+  role   = "${module.sierra_transformer.task_role_name}"
+  policy = "${data.aws_iam_policy_document.allow_cloudwatch_push_metrics.json}"
+}
+
+resource "aws_iam_role_policy" "sierra_transformer_s3_messages" {
+  role   = "${module.sierra_transformer.task_role_name}"
   policy = "${data.aws_iam_policy_document.allow_s3_messages_put.json}"
 }
 
