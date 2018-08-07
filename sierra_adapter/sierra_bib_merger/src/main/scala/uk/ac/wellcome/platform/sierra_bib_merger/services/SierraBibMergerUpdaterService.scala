@@ -23,7 +23,7 @@ class SierraBibMergerUpdaterService @Inject()(
 
     versionedHybridStore.updateRecord(id = bibRecord.id.withoutCheckDigit)(
       ifNotExisting = (SierraTransformable(bibRecord), EmptyMetadata()))(
-      ifNotExisting = (existingSierraTransformable, existingMetadata) => {
+      ifExisting = (existingSierraTransformable, existingMetadata) => {
         (
           BibMerger.mergeBibRecord(existingSierraTransformable, bibRecord),
           existingMetadata)
