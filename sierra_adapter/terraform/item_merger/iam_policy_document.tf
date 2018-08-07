@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "allow_cloudwatch_push_metrics" {
 data "aws_iam_policy_document" "allow_items_bucket_reading" {
   statement {
     actions = [
-      "cloudwatch:GetObject",
+      "s3:GetObject",
     ]
 
     resources = [
