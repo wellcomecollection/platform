@@ -1,7 +1,7 @@
 package uk.ac.wellcome.sierra_adapter.utils
 
+import io.circe.Encoder
 import org.scalatest.Assertion
-import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo._
@@ -32,7 +32,9 @@ trait SierraVHSUtil extends LocalVersionedHybridStore {
       transformables.map { t => storeInVHS(t, hybridStore = hybridStore) }
     )
 
-  def assertStored(transformable: SierraTransformable, bucket: Bucket, table: Table): Assertion =
+  def assertStored(transformable: SierraTransformable,
+                   bucket: Bucket,
+                   table: Table)(implicit encoder: Encoder[SierraTransformable]): Assertion =
     assertStored[SierraTransformable](
       bucket,
       table,
