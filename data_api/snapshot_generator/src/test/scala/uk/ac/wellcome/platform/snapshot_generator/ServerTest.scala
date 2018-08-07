@@ -7,7 +7,6 @@ import org.scalatest.FunSpec
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.messaging.test.fixtures.{SNS, SQS}
 import uk.ac.wellcome.monitoring.fixtures.CloudWatch
-import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.test.fixtures.TestWith
 
 class ServerTest
