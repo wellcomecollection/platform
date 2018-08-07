@@ -90,7 +90,7 @@ case class DisplayWorkV2(
 
 case object DisplayWorkV2 {
 
-  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV2 = {
+  def apply(work: IdentifiedWork, includes: V2WorksIncludes): DisplayWorkV2 = {
 
     DisplayWorkV2(
       id = work.canonicalId,
@@ -114,9 +114,7 @@ case object DisplayWorkV2 {
           Some(work.identifiers.map { DisplayIdentifierV2(_) })
         else None,
       workType = work.workType.map { DisplayWorkType(_) },
-      thumbnail =
-        if (includes.thumbnail)
-          work.thumbnail.map { DisplayLocationV2(_) } else None,
+      thumbnail = work.thumbnail.map { DisplayLocationV2(_) },
       items =
         if (includes.items)
           Some(work.items.map {
@@ -132,5 +130,5 @@ case object DisplayWorkV2 {
   }
 
   def apply(work: IdentifiedWork): DisplayWorkV2 =
-    DisplayWorkV2(work = work, includes = WorksIncludes())
+    DisplayWorkV2(work = work, includes = V2WorksIncludes())
 }

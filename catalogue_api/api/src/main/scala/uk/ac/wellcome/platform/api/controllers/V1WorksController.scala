@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.api.controllers
 
 import com.google.inject.{Inject, Singleton}
-import uk.ac.wellcome.display.models.ApiVersions
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
+import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes}
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.platform.api.models.ApiConfig
 import uk.ac.wellcome.platform.api.requests.{
@@ -18,12 +18,18 @@ class V1WorksController @Inject()(
   apiConfig: ApiConfig,
   elasticConfig: ElasticConfig,
   worksService: WorksService)(implicit ec: ExecutionContext)
-    extends WorksController[V1MultipleResultsRequest, V1SingleWorkRequest](
+    extends WorksController[
+      V1MultipleResultsRequest,
+      V1SingleWorkRequest,
+      V1WorksIncludes](
       apiConfig = apiConfig,
       indexName = elasticConfig.indexV1name,
       worksService = worksService
     ) {
   implicit protected val swagger = ApiV1Swagger
+  override def emptyWorksIncludes: V1WorksIncludes = V1WorksIncludes.apply()
+  override def recognisedIncludes: List[String] =
+    V1WorksIncludes.recognisedIncludes
 
   prefix(s"${apiConfig.pathPrefix}/${ApiVersions.v1.toString}") {
     setupResultListEndpoint(ApiVersions.v1, "/works", DisplayWorkV1.apply)

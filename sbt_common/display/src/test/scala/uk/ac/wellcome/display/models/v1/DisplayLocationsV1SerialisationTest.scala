@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -24,7 +24,7 @@ class DisplayLocationsV1SerialisationTest
       )
     )
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -54,7 +54,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -84,7 +84,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
 

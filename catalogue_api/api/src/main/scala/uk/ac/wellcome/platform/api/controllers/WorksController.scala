@@ -5,7 +5,7 @@ import com.twitter.finatra.http.Controller
 import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.StringProperty
 import io.swagger.models.{Operation, Swagger}
-import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
+import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
 import uk.ac.wellcome.platform.api.models.{
@@ -25,8 +25,9 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.reflect.runtime.universe.TypeTag
 
-abstract class WorksController[M <: MultipleResultsRequest,
-                               S <: SingleWorkRequest](
+abstract class WorksController[M <: MultipleResultsRequest[W],
+                               S <: SingleWorkRequest[W],
+                               W <: WorksIncludes](
   apiConfig: ApiConfig,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
@@ -34,25 +35,28 @@ abstract class WorksController[M <: MultipleResultsRequest,
     with SwaggerController {
 
   protected val includeParameterName: String
+  def emptyWorksIncludes: W
+  def recognisedIncludes: List[String]
+
   val includeSwaggerParam: QueryParameter = new QueryParameter()
     .name(includeParameterName)
     .description("A comma-separated list of extra fields to include")
     .required(false)
     .`type`("array")
     .collectionFormat("csv")
-    .items(new StringProperty()._enum(WorksIncludes.recognisedIncludes.asJava))
+    .items(new StringProperty()._enum(recognisedIncludes.asJava))
 
   protected def setupResultListEndpoint[T <: DisplayWork](
     version: ApiVersions.Value,
     endpointSuffix: String,
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
+    toDisplayWork: (IdentifiedWork, W) => T)(
     implicit evidence: TypeTag[DisplayResultList[T]],
     manifest: Manifest[M]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setupResultListSwaggerDocs[T](s"$endpointSuffix", swagger, doc)
     } { request: M =>
       val pageSize = request.pageSize.getOrElse(apiConfig.defaultPageSize)
-      val includes = request.include.getOrElse(WorksIncludes())
+      val includes = request.include.getOrElse(emptyWorksIncludes)
 
       for {
         resultList <- getWorkList(request, pageSize)
@@ -62,7 +66,7 @@ abstract class WorksController[M <: MultipleResultsRequest,
           pageSize = pageSize,
           includes = includes)
       } yield
-        ResultListResponse.create(
+        ResultListResponse.create[T, M, W](
           buildContextUri(apiConfig = apiConfig, version = version),
           displayResultList,
           request,
@@ -74,13 +78,12 @@ abstract class WorksController[M <: MultipleResultsRequest,
   protected def setupSingleWorkEndpoint[T <: DisplayWork](
     version: ApiVersions.Value,
     endpointSuffix: String,
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => T)(
-    implicit evidence: TypeTag[T],
-    manifest: Manifest[S]): Unit = {
+    toDisplayWork: (IdentifiedWork, W) => T)(implicit evidence: TypeTag[T],
+                                             manifest: Manifest[S]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>
-      val includes = request.include.getOrElse(WorksIncludes())
+      val includes = request.include.getOrElse(emptyWorksIncludes)
 
       val contextUri =
         buildContextUri(apiConfig = apiConfig, version = version)
@@ -122,8 +125,8 @@ abstract class WorksController[M <: MultipleResultsRequest,
 
   private def generateSingleWorkResponse[T <: DisplayWork](
     maybeWork: Option[IdentifiedBaseWork],
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => T,
-    includes: WorksIncludes,
+    toDisplayWork: (IdentifiedWork, W) => T,
+    includes: W,
     request: S,
     contextUri: String) =
     maybeWork match {

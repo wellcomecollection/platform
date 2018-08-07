@@ -14,7 +14,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V1WorksIncludes(items = true)
     )
     displayWork.items shouldBe Some(List())
   }
@@ -27,7 +27,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V1WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
     displayItem.id shouldBe item.canonicalId
@@ -40,7 +40,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(identifiers = true)
+      includes = V1WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
       List(DisplayIdentifierV1(work.sourceIdentifier)))
@@ -221,7 +221,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {
-      val displayWork = DisplayWorkV1(work, includes = WorksIncludes())
+      val displayWork = DisplayWorkV1(work, includes = V1WorksIncludes())
 
       it("the top-level Work") {
         displayWork.identifiers shouldBe None
@@ -229,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
       it("items") {
         val displayWork =
-          DisplayWorkV1(work, includes = WorksIncludes(items = true))
+          DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
@@ -237,7 +237,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
       val displayWork =
-        DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+        DisplayWorkV1(work, includes = V1WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
@@ -248,7 +248,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
         val displayWork =
           DisplayWorkV1(
             work,
-            includes = WorksIncludes(identifiers = true, items = true))
+            includes = V1WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe Some(
           List(DisplayIdentifierV1(work.itemsV1.head.sourceIdentifier)))
