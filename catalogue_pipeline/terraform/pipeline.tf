@@ -9,20 +9,20 @@ module "catalogue_pipeline" {
   id_minter_container_image   = "${local.id_minter_container_image}"
   ingestor_container_image    = "${local.ingestor_container_image}"
 
-  subnets                    = ["${local.private_subnets}"]
-  vpc_id                     = "${local.vpc_id}"
-  account_id                 = "${data.aws_caller_identity.current.account_id}"
-  vhs_miro_read_policy = "${module.vhs_sourcedata.read_policy}"
-  vhs_miro_bucket_name = "${module.vhs_sourcedata.bucket_name}"
+  subnets                   = ["${local.private_subnets}"]
+  vpc_id                    = "${local.vpc_id}"
+  account_id                = "${data.aws_caller_identity.current.account_id}"
+  vhs_miro_read_policy      = "${module.vhs_sourcedata.read_policy}"
+  vhs_miro_bucket_name      = "${module.vhs_sourcedata.bucket_name}"
   vhs_miro_table_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
 
-  vhs_sierra_read_policy = "${module.vhs_sierra.read_policy}"
-  vhs_sierra_bucket_name = "${module.vhs_sierra.bucket_name}"
+  vhs_sierra_read_policy      = "${module.vhs_sierra.read_policy}"
+  vhs_sierra_bucket_name      = "${module.vhs_sierra.bucket_name}"
   vhs_sierra_table_stream_arn = "${module.vhs_sierra.table_stream_arn}"
 
-  aws_region                 = "${var.aws_region}"
-  messages_bucket            = "${aws_s3_bucket.messages.id}"
-  infra_bucket               = "${var.infra_bucket}"
+  aws_region      = "${var.aws_region}"
+  messages_bucket = "${aws_s3_bucket.messages.id}"
+  infra_bucket    = "${var.infra_bucket}"
 
   index_v1 = "v1-2018-08-07-items-with-no-identifiers"
   index_v2 = "v2-2018-08-07-items-with-no-identifiers"
@@ -32,7 +32,7 @@ module "catalogue_pipeline" {
   identifiers_rds_cluster_port     = "${module.identifiers_delta_rds_cluster.port}"
   identifiers_rds_cluster_host     = "${module.identifiers_delta_rds_cluster.host}"
 
-  es_cluster_credentials          = "${var.es_cluster_credentials}"
-  dlq_alarm_arn                   = "${local.dlq_alarm_arn}"
-  lambda_error_alarm_arn          = "${local.lambda_error_alarm_arn}"
+  es_cluster_credentials = "${var.es_cluster_credentials}"
+  dlq_alarm_arn          = "${local.dlq_alarm_arn}"
+  lambda_error_alarm_arn = "${local.lambda_error_alarm_arn}"
 }
