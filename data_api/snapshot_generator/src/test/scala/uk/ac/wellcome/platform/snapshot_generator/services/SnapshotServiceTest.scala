@@ -12,18 +12,15 @@ import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import org.elasticsearch.client.ResponseException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.models.{ApiVersions, V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.display.models.{AllWorksIncludes, ApiVersions}
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.elasticsearch.test.fixtures.ElasticsearchFixtures
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.AkkaS3ClientModule
 import uk.ac.wellcome.platform.snapshot_generator.fixtures.AkkaS3
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.test.utils.GzipUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
@@ -125,7 +122,7 @@ class SnapshotServiceTest
           val contents = readGzipFile(downloadFile.getPath)
           val expectedContents = visibleWorks
             .map {
-              DisplayWorkV1(_, includes = AllWorksIncludes())
+              DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
               mapper.writeValueAsString(_)
@@ -173,7 +170,7 @@ class SnapshotServiceTest
           val contents = readGzipFile(downloadFile.getPath)
           val expectedContents = visibleWorks
             .map {
-              DisplayWorkV2(_, includes = AllWorksIncludes())
+              DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
             }
             .map {
               mapper.writeValueAsString(_)
@@ -222,7 +219,7 @@ class SnapshotServiceTest
           val contents = readGzipFile(downloadFile.getPath)
           val expectedContents = works
             .map {
-              DisplayWorkV1(_, includes = AllWorksIncludes())
+              DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
             }
             .map {
               mapper.writeValueAsString(_)

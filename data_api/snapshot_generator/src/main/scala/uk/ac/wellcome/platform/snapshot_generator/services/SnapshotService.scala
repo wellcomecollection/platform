@@ -12,18 +12,11 @@ import com.sksamuel.elastic4s.http.HttpClient
 import com.twitter.inject.Logging
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
-import uk.ac.wellcome.display.models.{ApiVersions, DisplayWork, WorksIncludes}
+import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.elasticsearch.ElasticConfig
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.platform.snapshot_generator.flow.{
-  DisplayWorkToJsonStringFlow,
-  IdentifiedWorkToVisibleDisplayWork,
-  StringToGzipFlow
-}
-import uk.ac.wellcome.platform.snapshot_generator.models.{
-  CompletedSnapshotJob,
-  SnapshotJob
-}
+import uk.ac.wellcome.platform.snapshot_generator.flow.{DisplayWorkToJsonStringFlow, IdentifiedWorkToVisibleDisplayWork, StringToGzipFlow}
+import uk.ac.wellcome.platform.snapshot_generator.models.{CompletedSnapshotJob, SnapshotJob}
 import uk.ac.wellcome.platform.snapshot_generator.source.ElasticsearchWorksSource
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -56,14 +49,14 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
           indexName = elasticConfig.indexV1name,
-          toDisplayWork = DisplayWorkV1.apply
+          toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll())
         )
       case ApiVersions.v2 =>
         runStream(
           publicBucketName = publicBucketName,
           publicObjectKey = publicObjectKey,
           indexName = elasticConfig.indexV2name,
-          toDisplayWork = DisplayWorkV2.apply
+          toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll())
         )
     }
 
@@ -84,7 +77,7 @@ class SnapshotService @Inject()(actorSystem: ActorSystem,
     publicBucketName: String,
     publicObjectKey: String,
     indexName: String,
-    toDisplayWork: (IdentifiedWork, WorksIncludes) => DisplayWork)
+    toDisplayWork: IdentifiedWork => DisplayWork)
     : Future[MultipartUploadResult] = {
 
     // This source outputs DisplayWorks in the elasticsearch index.
