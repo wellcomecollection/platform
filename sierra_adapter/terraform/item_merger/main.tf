@@ -25,13 +25,14 @@ module "sierra_merger_service" {
   memory = 2048
 
   env_vars = {
-    windows_queue_url = "${module.updates_queue.id}"
-    metrics_namespace = "sierra_${local.resource_type_singular}_merger"
-    dynamo_table_name = "${var.merged_dynamo_table_name}"
-    bucket_name       = "${var.bucket_name}"
+    windows_queue_url   = "${module.updates_queue.id}"
+    metrics_namespace   = "sierra_${local.resource_type_singular}_merger"
+    dynamo_table_name   = "${var.merged_dynamo_table_name}"
+    bucket_name         = "${var.bucket_name}"
+    sierra_items_bucket = "${var.sierra_items_bucket}"
   }
 
-  env_vars_length = 4
+  env_vars_length = 5
 
   aws_region = "${var.aws_region}"
   vpc_id     = "${var.vpc_id}"

@@ -92,6 +92,8 @@ module "items_merger" {
   namespace_id = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets      = ["${local.private_subnets}"]
 
+  sierra_items_bucket = "${moudle.items_to_dynamo.vhs_bucket_name}"
+
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
   interservice_security_group_id   = "${aws_security_group.interservice_security_group.id}"
 }
