@@ -15,12 +15,14 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
     title: Option[String] = Some(randomAlphanumeric(25)),
     lang: Option[SierraLanguage] = None,
     materialType: Option[SierraMaterialType] = None,
+    locations: Option[List[SierraLocation]] = None,
     varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
       title = title,
       lang = lang,
       materialType = materialType,
+      locations = locations,
       varFields = varFields
     )
 
