@@ -24,8 +24,8 @@ module "catalogue_pipeline" {
   messages_bucket            = "${aws_s3_bucket.messages.id}"
   infra_bucket               = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-03-items-with-no-identifiers"
-  index_v2 = "v2-2018-08-03-items-with-no-identifiers"
+  index_v1 = "v1-2018-08-07-items-with-no-identifiers"
+  index_v2 = "v2-2018-08-07-items-with-no-identifiers"
 
   identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"
