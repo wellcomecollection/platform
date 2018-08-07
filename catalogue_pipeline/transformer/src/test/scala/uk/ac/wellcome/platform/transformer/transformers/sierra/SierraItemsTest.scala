@@ -167,7 +167,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       )
 
       val result = transformer.getDigitalItems(
-        sourceIdentifier = createSierraSourceIdentifier,
+        sourceIdentifier = sourceIdentifier,
         sierraBibData = bibData)
 
       val expectedItems = List(
