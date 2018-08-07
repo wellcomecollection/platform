@@ -120,10 +120,11 @@ class ResultListResponseTest extends FunSpec with Matchers {
     multipleResultsRequest: V1MultipleResultsRequest = multipleResultsRequest,
     requestBaseUri: String = requestBaseUri
   ): ResultListResponse =
-    ResultListResponse.create[DisplayWorkV1, V1MultipleResultsRequest, V1WorksIncludes](
-      contextUri = contextUri,
-      displayResultList = displayResultList,
-      multipleResultsRequest = multipleResultsRequest,
-      requestBaseUri = requestBaseUri
-    )
+    ResultListResponse
+      .create[DisplayWorkV1, V1MultipleResultsRequest, V1WorksIncludes](
+        contextUri = contextUri,
+        displayResultList = displayResultList,
+        multipleResultsRequest = multipleResultsRequest,
+        requestBaseUri = requestBaseUri
+      )
 }

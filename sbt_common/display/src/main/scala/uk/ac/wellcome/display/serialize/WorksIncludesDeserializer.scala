@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
 import uk.ac.wellcome.display.models._
 
 object WorksIncludesDeserializer {
-  def apply[W <: WorksIncludes](queryParam: String, recognisedIncludes: List[String], workIncludes: List[String] => W): W = {
+  def apply[W <: WorksIncludes](queryParam: String,
+                                recognisedIncludes: List[String],
+                                workIncludes: List[String] => W): W = {
     val includesList = queryParam.split(",").toList
     val unrecognisedIncludes = includesList
       .filterNot(recognisedIncludes.contains)
@@ -26,14 +28,20 @@ object WorksIncludesDeserializer {
 class V1WorksIncludesDeserializer extends JsonDeserializer[V1WorksIncludes] {
   override def deserialize(p: JsonParser,
                            ctxt: DeserializationContext): V1WorksIncludes = {
-    WorksIncludesDeserializer(p.getText(), V1WorksIncludes.recognisedIncludes, V1WorksIncludes.apply)
+    WorksIncludesDeserializer(
+      p.getText(),
+      V1WorksIncludes.recognisedIncludes,
+      V1WorksIncludes.apply)
   }
 }
 
 class V2WorksIncludesDeserializer extends JsonDeserializer[V2WorksIncludes] {
   override def deserialize(p: JsonParser,
                            ctxt: DeserializationContext): V2WorksIncludes = {
-    WorksIncludesDeserializer(p.getText(), V2WorksIncludes.recognisedIncludes, V2WorksIncludes.apply)
+    WorksIncludesDeserializer(
+      p.getText(),
+      V2WorksIncludes.recognisedIncludes,
+      V2WorksIncludes.apply)
   }
 }
 

@@ -229,8 +229,7 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it(
-    "shows the thumbnail field if available") {
+  it("shows the thumbnail field if available") {
     val work = createIdentifiedWorkWith(
       thumbnail = Some(
         DigitalLocation(
@@ -239,8 +238,8 @@ class DisplayWorkV2SerialisationTest
           license = Some(License_CCBY)
         ))
     )
-    val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, V2WorksIncludes()))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWorkV2(work, V2WorksIncludes()))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",

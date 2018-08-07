@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.api.works.v2
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
 
-class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
+class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
     "includes a list of identifiers on a list endpoint if we pass ?include=identifiers") {
     withV2Api {
@@ -22,7 +22,8 @@ class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works?include=identifiers",
             andExpect = Status.Ok,
-            withJsonBody = s"""
+            withJsonBody =
+              s"""
                               |{
                               |  ${resultList(apiPrefix, totalResults = 2)},
                               |  "results": [
@@ -31,8 +32,8 @@ class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
                               |     "id": "${work0.canonicalId}",
                               |     "title": "${work0.title}",
                               |     "contributors": [ ],
-                              |     "identifiers": [ ${identifier(work0.sourceIdentifier)}, ${identifier(
-              identifier0)} ],
+                              |     "identifiers": [ ${identifier(
+                   work0.sourceIdentifier)}, ${identifier(identifier0)} ],
                               |     "subjects": [ ],
                               |     "genres": [ ],
                               |     "production": [ ]
@@ -42,8 +43,8 @@ class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
                               |     "id": "${work1.canonicalId}",
                               |     "title": "${work1.title}",
                               |     "contributors": [ ],
-                              |     "identifiers": [ ${identifier(work1.sourceIdentifier)}, ${identifier(
-              identifier1)} ],
+                              |     "identifiers": [ ${identifier(
+                   work1.sourceIdentifier)}, ${identifier(identifier1)} ],
                               |     "subjects": [ ],
                               |     "genres": [ ],
                               |     "production": [ ]
@@ -70,15 +71,16 @@ class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
           server.httpGet(
             path = s"/$apiPrefix/works/${work.canonicalId}?include=identifiers",
             andExpect = Status.Ok,
-            withJsonBody = s"""
+            withJsonBody =
+              s"""
                               |{
                               | "@context": "https://localhost:8888/$apiPrefix/context.json",
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
                               | "contributors": [ ],
-                              | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
-              otherIdentifier)} ],
+                              | "identifiers": [ ${identifier(
+                   work.sourceIdentifier)}, ${identifier(otherIdentifier)} ],
                               | "subjects": [ ],
                               | "genres": [ ],
                               | "production": [ ]
@@ -88,7 +90,6 @@ class ApiV2WorksIncludesTest  extends ApiV2WorksTestBase {
         }
     }
   }
-
 
   it("renders the items if the items include is present") {
     withV2Api {

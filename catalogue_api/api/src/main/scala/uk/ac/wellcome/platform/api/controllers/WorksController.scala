@@ -8,9 +8,17 @@ import io.swagger.models.{Operation, Swagger}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.api.ContextHelper.buildContextUri
-import uk.ac.wellcome.platform.api.models.{ApiConfig, DisplayError, DisplayResultList, Error}
+import uk.ac.wellcome.platform.api.models.{
+  ApiConfig,
+  DisplayError,
+  DisplayResultList,
+  Error
+}
 import uk.ac.wellcome.platform.api.requests._
-import uk.ac.wellcome.platform.api.responses.{ResultListResponse, ResultResponse}
+import uk.ac.wellcome.platform.api.responses.{
+  ResultListResponse,
+  ResultResponse
+}
 import uk.ac.wellcome.platform.api.services.WorksService
 
 import scala.collection.JavaConverters._
@@ -19,7 +27,7 @@ import scala.reflect.runtime.universe.TypeTag
 
 abstract class WorksController[M <: MultipleResultsRequest[W],
                                S <: SingleWorkRequest[W],
-W <: WorksIncludes](
+                               W <: WorksIncludes](
   apiConfig: ApiConfig,
   indexName: String,
   worksService: WorksService)(implicit ec: ExecutionContext)
@@ -70,9 +78,8 @@ W <: WorksIncludes](
   protected def setupSingleWorkEndpoint[T <: DisplayWork](
     version: ApiVersions.Value,
     endpointSuffix: String,
-    toDisplayWork: (IdentifiedWork, W) => T)(
-    implicit evidence: TypeTag[T],
-    manifest: Manifest[S]): Unit = {
+    toDisplayWork: (IdentifiedWork, W) => T)(implicit evidence: TypeTag[T],
+                                             manifest: Manifest[S]): Unit = {
     getWithDoc(s"$endpointSuffix") { doc =>
       setUpSingleWorkSwaggerDocs[T](swagger, doc)
     } { request: S =>

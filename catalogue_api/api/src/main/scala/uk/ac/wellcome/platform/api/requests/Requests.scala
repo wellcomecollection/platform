@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.api.requests
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.request.{QueryParam, RouteParam}
 import com.twitter.finatra.validation.{Max, Min}
-import uk.ac.wellcome.display.models.{V1WorksIncludes, V2WorksIncludes, WorksIncludes}
+import uk.ac.wellcome.display.models.{
+  V1WorksIncludes,
+  V2WorksIncludes,
+  WorksIncludes
+}
 
 sealed trait ApiRequest {
   val request: Request

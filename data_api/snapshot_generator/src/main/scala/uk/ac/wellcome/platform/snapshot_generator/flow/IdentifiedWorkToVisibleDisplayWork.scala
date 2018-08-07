@@ -7,8 +7,7 @@ import uk.ac.wellcome.models.work.internal.IdentifiedWork
 
 object IdentifiedWorkToVisibleDisplayWork {
   def apply[T <: DisplayWork](
-    toDisplayWork: IdentifiedWork => T)
-    : Flow[IdentifiedWork, T, NotUsed] =
+    toDisplayWork: IdentifiedWork => T): Flow[IdentifiedWork, T, NotUsed] =
     Flow[IdentifiedWork]
       .map { toDisplayWork(_) }
 }

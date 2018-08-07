@@ -22,7 +22,9 @@ case class ResultListResponse(
 )
 
 object ResultListResponse {
-  def create[T <: DisplayWork, M <: MultipleResultsRequest[W], W<: WorksIncludes](
+  def create[T <: DisplayWork,
+             M <: MultipleResultsRequest[W],
+             W <: WorksIncludes](
     contextUri: String,
     displayResultList: DisplayResultList[T],
     multipleResultsRequest: M,

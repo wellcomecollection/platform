@@ -18,9 +18,9 @@ case class V2WorksIncludes(
 class WorksIncludesParsingException(msg: String)
     extends JsonProcessingException(msg: String)
 
-object V1WorksIncludes{
+object V1WorksIncludes {
   val recognisedIncludes = List("identifiers", "thumbnail", "items")
-  def apply(includesList: List[String]):V1WorksIncludes = V1WorksIncludes(
+  def apply(includesList: List[String]): V1WorksIncludes = V1WorksIncludes(
     identifiers = includesList.contains("identifiers"),
     thumbnail = includesList.contains("thumbnail"),
     items = includesList.contains("items")
@@ -29,9 +29,9 @@ object V1WorksIncludes{
   def includeAll() = V1WorksIncludes(recognisedIncludes)
 }
 
-object V2WorksIncludes{
+object V2WorksIncludes {
   val recognisedIncludes = List("identifiers", "items")
-  def apply(includesList: List[String]):V2WorksIncludes = V2WorksIncludes(
+  def apply(includesList: List[String]): V2WorksIncludes = V2WorksIncludes(
     identifiers = includesList.contains("identifiers"),
     items = includesList.contains("items")
   )

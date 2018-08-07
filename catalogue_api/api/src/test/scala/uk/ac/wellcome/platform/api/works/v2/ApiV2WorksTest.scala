@@ -352,8 +352,7 @@ class ApiV2WorksTest extends ApiV2WorksTestBase {
     }
   }
 
-  it(
-    "shows the thumbnail field if available") {
+  it("shows the thumbnail field if available") {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
         val work = createIdentifiedWorkWith(

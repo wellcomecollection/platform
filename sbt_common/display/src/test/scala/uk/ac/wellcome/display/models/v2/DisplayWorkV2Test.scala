@@ -191,7 +191,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       production = List(productionEvent)
     )
 
-    val displayWork = DisplayWorkV2(work, includes = V2WorksIncludes.includeAll())
+    val displayWork =
+      DisplayWorkV2(work, includes = V2WorksIncludes.includeAll())
     displayWork.production shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
