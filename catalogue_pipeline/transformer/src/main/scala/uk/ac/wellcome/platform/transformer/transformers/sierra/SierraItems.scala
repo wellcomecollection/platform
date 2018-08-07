@@ -90,11 +90,19 @@ trait SierraItems extends Logging with SierraLocation {
   def getDigitalItems(
     sourceIdentifier: SourceIdentifier,
     sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
-    sierraBibData.materialType match {
-      case Some(SierraMaterialType("v", "E-books")) =>
-        List(getDigitalItem(sourceIdentifier))
-      case _ => List.empty
+
+    val hasEbookMaterialType =
+      sierraBibData.materialType.contains(SierraMaterialType("v", "E-books"))
+
+    val hasDlnkLocation = sierraBibData.locations match {
+      case Some(locations) => locations.map { _.code }.contains("dlnk")
+      case None => false
+    }
+
+    if (hasEbookMaterialType || hasDlnkLocation) {
+      List(getDigitalItem(sourceIdentifier))
+    } else {
+      List()
     }
   }
-
 }
