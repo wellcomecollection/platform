@@ -11,7 +11,17 @@ variable "dlq_alarm_arn" {}
 
 variable "account_id" {}
 
-variable "vhs_sourcedata_bucket_name" {}
+variable "vhs_miro_bucket_name" {}
+
+variable "vhs_miro_read_policy" {}
+
+variable "vhs_miro_table_stream_arn" {}
+
+variable "vhs_sierra_bucket_name" {}
+
+variable "vhs_sierra_read_policy" {}
+
+variable "vhs_sierra_table_stream_arn" {}
 
 variable "messages_bucket" {}
 
@@ -41,8 +51,6 @@ variable "es_cluster_credentials" {
   type = "map"
 }
 
-variable "vhs_sourcedata_read_policy" {}
-
 variable "transformer_container_image" {}
 
 variable "recorder_container_image" {}
@@ -54,8 +62,6 @@ variable "merger_container_image" {}
 variable "id_minter_container_image" {}
 
 variable "ingestor_container_image" {}
-
-variable "vhs_sourcedata_table_stream_arn" {}
 
 variable "index_v1" {}
 
