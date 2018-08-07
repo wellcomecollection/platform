@@ -5,7 +5,8 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
 import uk.ac.wellcome.platform.transformer.source.sierra.{
-  Language => SierraLanguage
+  Language => SierraLanguage,
+  Location => SierraLocation
 }
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -27,7 +28,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraItemDataWith(
     deleted: Boolean = false,
-    location: Option[SierraItemLocation] = None
+    location: Option[SierraLocation] = None
   ): SierraItemData =
     SierraItemData(
       deleted = deleted,

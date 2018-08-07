@@ -7,7 +7,9 @@ import uk.ac.wellcome.models.work.internal.{
   PhysicalLocation
 }
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.source.SierraItemLocation
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Location => SierraLocationField
+}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
@@ -20,7 +22,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
       val locationType = LocationType("sgmed")
       val label = "A museum of mermaids"
       val itemData = createSierraItemDataWith(
-        location = Some(SierraItemLocation(locationTypeCode, label))
+        location = Some(SierraLocationField(locationTypeCode, label))
       )
       val expectedLocation = PhysicalLocation(locationType, label)
 
@@ -30,7 +32,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
 
     it("returns None if the location field only contains empty strings") {
       val itemData = createSierraItemDataWith(
-        location = Some(SierraItemLocation("", ""))
+        location = Some(SierraLocationField("", ""))
       )
 
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
@@ -38,7 +40,7 @@ class SierraLocationTest extends FunSpec with Matchers with SierraDataUtil {
 
     it("returns None if the location field only contains the string 'none'") {
       val itemData = createSierraItemDataWith(
-        location = Some(SierraItemLocation("none", "none"))
+        location = Some(SierraLocationField("none", "none"))
       )
       transformer.getPhysicalLocation(itemData = itemData) shouldBe None
     }
