@@ -22,7 +22,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV1.apply)
+          toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll()))
 
         val works = createIdentifiedWorks(count = 3).toList
 
@@ -44,7 +44,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV2.apply)
+          toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll()))
 
         val works = createIdentifiedWorks(count = 3).toList
 
