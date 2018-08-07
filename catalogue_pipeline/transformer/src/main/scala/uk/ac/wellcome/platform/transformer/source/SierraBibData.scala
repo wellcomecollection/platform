@@ -6,6 +6,7 @@ import uk.ac.wellcome.platform.transformer.source.sierra.{
   Location => SierraLocation
 }
 
+// https://techdocs.iii.com/sierraapi/Content/zReference/objects/bibObjectDescription.htm
 case class SierraBibData(
   title: Option[String] = None,
   deleted: Boolean = false,
