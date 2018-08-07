@@ -66,7 +66,7 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  def getDigitalItem(
+  private def getDigitalItem(
     sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
     Unidentifiable(
       agent = Item(
