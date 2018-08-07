@@ -12,7 +12,7 @@ module "platform" {
 module "scala_json" {
   source = "./scala_library"
 
-  name       = "json"
+  name = "json"
 }
 
 module "scala_messaging" {

@@ -6,4 +6,4 @@ package uk.ac.wellcome.messaging.sqs
   * Instances of this exception are counted as a separate metric.
   */
 case class RecognisedFailureException(e: Throwable)
-  extends Exception(e.getMessage)
+    extends Exception(e.getMessage)

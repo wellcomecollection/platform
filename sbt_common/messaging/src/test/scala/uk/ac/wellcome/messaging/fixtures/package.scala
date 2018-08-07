@@ -23,7 +23,9 @@ package object fixtures extends Logging {
 
   private val noop = (x: Any) => ()
 
-  private[messaging] def fixture[L, R](create: => L, destroy: L => Unit = noop): Fixture[L, R] =
+  private[messaging] def fixture[L, R](
+    create: => L,
+    destroy: L => Unit = noop): Fixture[L, R] =
     (testWith: TestWith[L, R]) => {
       val loan = create
       logger.debug(s"created test resource=[$loan]")
