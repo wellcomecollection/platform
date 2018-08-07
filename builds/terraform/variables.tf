@@ -3,3 +3,6 @@ variable "aws_region" {
 }
 
 variable "github_api_token" {}
+
+variable "pypi_username" {}
+variable "pypi_password" {}
