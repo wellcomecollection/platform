@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
 import uk.ac.wellcome.platform.transformer.source.sierra.{
-  Location => SierraLocation
+  Location => SierraLocationField
 }
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -146,7 +146,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("ignores a digital item on a bib record without a 'dlnk' location") {
       val bibData = createSierraBibDataWith(
         locations = Some(List(
-          SierraLocation("digi", "Digitised Collections")
+          SierraLocationField("digi", "Digitised Collections")
         ))
       )
 
@@ -161,8 +161,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
         locations = Some(List(
-          SierraLocation("digi", "Digitised Collections"),
-          SierraLocation("dlnk", "Digitised content")
+          SierraLocationField("digi", "Digitised Collections"),
+          SierraLocationField("dlnk", "Digitised content")
         ))
       )
 
