@@ -88,7 +88,7 @@ jobs:
 
     # Because this isn't under active development, and we're really squeezed
     # for build VMs, we aren't testing this in CI right now.
-    - env: TASK=travistooling-test
+    # - env: TASK=travistooling-test
 
     - stage: sbt-common-test
       env: TASK=elasticsearch-test
@@ -163,10 +163,10 @@ jobs:
     # - env: TASK=loris-build
     # - env: TASK=cache_cleaner-build
 
-# stages:
-#   - quicktest
-#   - sbt-common-test
-#   - test
+stages:
+  - quicktest
+  - sbt-common-test
+  - test
 
 # This has a Slack API token for posting messages about build failures to
 # our team channel.  It was created by following the "Setup Instructions" at
