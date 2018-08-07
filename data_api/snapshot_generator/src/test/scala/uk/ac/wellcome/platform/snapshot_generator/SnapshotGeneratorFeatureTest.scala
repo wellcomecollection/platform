@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
@@ -114,18 +113,16 @@ class SnapshotGeneratorFeatureTest
 
   def withFixtures[R](
     testWith: TestWith[
-      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
+      (Queue, Topic, String, String, Bucket),
       R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
-              withServer(flags) { server =>
-                testWith(
-                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+              withServer(flags) { _ =>
+                testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
             }
           }
