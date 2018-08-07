@@ -33,7 +33,10 @@ class ServerTest
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
-            val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
+            val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(
+              indexNameV1,
+              indexNameV2,
+              itemType)
             withServer(flags) { server =>
               testWith(server)
             }
