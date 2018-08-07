@@ -48,7 +48,8 @@ class SierraBibMergerFeatureTest
               eventually {
                 assertStored(
                   transformable = expectedSierraTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -83,11 +84,13 @@ class SierraBibMergerFeatureTest
               eventually {
                 assertStored(
                   transformable = expectedTransformable1,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = expectedTransformable2,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -121,8 +124,7 @@ class SierraBibMergerFeatureTest
               storeInVHS(
                 transformable = oldTransformable,
                 hybridStore = hybridStore
-              )
-                .map { _ =>
+              ).map { _ =>
                   sendNotificationToSQS(queue = queue, message = newBibRecord)
                 }
 
@@ -132,7 +134,8 @@ class SierraBibMergerFeatureTest
               eventually {
                 assertStored(
                   transformable = expectedTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -166,8 +169,7 @@ class SierraBibMergerFeatureTest
               storeInVHS(
                 transformable = expectedTransformable,
                 hybridStore = hybridStore
-              )
-                .map { _ =>
+              ).map { _ =>
                   sendNotificationToSQS(queue = queue, message = oldBibRecord)
                 }
 
@@ -177,7 +179,8 @@ class SierraBibMergerFeatureTest
 
               assertStored(
                 transformable = expectedTransformable,
-                bucket = bucket, table = table
+                bucket = bucket,
+                table = table
               )
             }
           }
@@ -192,33 +195,32 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Unit](
-              bucket,
-              table) { hybridStore =>
-              val transformable = createSierraTransformableWith(
-                maybeBibRecord = None
-              )
-
-              val bibRecord =
-                createSierraBibRecordWith(id = transformable.sierraId)
-
-              storeInVHS(
-                transformable = transformable,
-                hybridStore = hybridStore
-              )
-                .map { _ =>
-                  sendNotificationToSQS(queue = queue, message = bibRecord)
-                }
-
-              val expectedTransformable =
-                SierraTransformable(bibRecord = bibRecord)
-
-              eventually {
-                assertStored(
-                  transformable = expectedTransformable,
-                  bucket = bucket, table = table
+            withTypeVHS[SierraTransformable, EmptyMetadata, Unit](bucket, table) {
+              hybridStore =>
+                val transformable = createSierraTransformableWith(
+                  maybeBibRecord = None
                 )
-              }
+
+                val bibRecord =
+                  createSierraBibRecordWith(id = transformable.sierraId)
+
+                storeInVHS(
+                  transformable = transformable,
+                  hybridStore = hybridStore
+                ).map { _ =>
+                    sendNotificationToSQS(queue = queue, message = bibRecord)
+                  }
+
+                val expectedTransformable =
+                  SierraTransformable(bibRecord = bibRecord)
+
+                eventually {
+                  assertStored(
+                    transformable = expectedTransformable,
+                    bucket = bucket,
+                    table = table
+                  )
+                }
             }
           }
         }

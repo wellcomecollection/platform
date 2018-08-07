@@ -61,7 +61,8 @@ class SierraItemMergerUpdaterServiceTest
 
               assertStored(
                 transformable = expectedSierraTransformable,
-                bucket = bucket, table = table
+                bucket = bucket,
+                table = table
               )
             }
           }
@@ -134,15 +135,18 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                 assertStored(
                   transformable = expectedNewSierraTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = expectedUpdatedSierraTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = newTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -190,7 +194,8 @@ class SierraItemMergerUpdaterServiceTest
 
                 assertStored(
                   transformable = expectedTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -255,11 +260,13 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
                 assertStored(
                   transformable = expectedTransformable1,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = expectedTransformable2,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -324,11 +331,13 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
                 assertStored(
                   transformable = expectedTransformable1,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = expectedTransformable2,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -394,11 +403,13 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(unlinkItemRecord)) { _ =>
                 assertStored(
                   transformable = expectedTransformable1,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
                 assertStored(
                   transformable = expectedTransformable2,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -441,7 +452,8 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(oldItemRecord)) { _ =>
                 assertStored(
                   transformable = transformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }
@@ -483,7 +495,8 @@ class SierraItemMergerUpdaterServiceTest
               whenReady(sierraUpdaterService.update(itemRecord)) { _ =>
                 assertStored(
                   transformable = expectedTransformable,
-                  bucket = bucket, table = table
+                  bucket = bucket,
+                  table = table
                 )
               }
             }

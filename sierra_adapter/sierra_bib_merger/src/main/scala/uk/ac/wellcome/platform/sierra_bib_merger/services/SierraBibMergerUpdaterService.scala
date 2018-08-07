@@ -21,8 +21,7 @@ class SierraBibMergerUpdaterService @Inject()(
 
     val sourceName = "sierra"
 
-    versionedHybridStore.updateRecord(
-      id = bibRecord.id.withoutCheckDigit)(
+    versionedHybridStore.updateRecord(id = bibRecord.id.withoutCheckDigit)(
       ifNotExisting = (SierraTransformable(bibRecord), EmptyMetadata()))(
       ifNotExisting = (existingSierraTransformable, existingMetadata) => {
         (

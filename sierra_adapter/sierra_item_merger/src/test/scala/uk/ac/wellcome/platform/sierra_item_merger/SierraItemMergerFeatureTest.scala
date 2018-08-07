@@ -62,7 +62,8 @@ class SierraItemMergerFeatureTest
                 eventually {
                   assertStored(
                     transformable = expectedSierraTransformable,
-                    bucket = vhsBucket, table = table
+                    bucket = vhsBucket,
+                    table = table
                   )
                 }
               }
@@ -123,11 +124,13 @@ class SierraItemMergerFeatureTest
 
                   assertStored(
                     transformable = expectedSierraTransformable1,
-                    bucket = vhsBucket, table = table
+                    bucket = vhsBucket,
+                    table = table
                   )
                   assertStored(
                     transformable = expectedSierraTransformable2,
-                    bucket = vhsBucket, table = table
+                    bucket = vhsBucket,
+                    table = table
                   )
                 }
               }
