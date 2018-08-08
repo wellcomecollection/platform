@@ -17,7 +17,7 @@ import uk.ac.wellcome.platform.transformer.transformers.{
   SierraTransformableTransformer
 }
 import uk.ac.wellcome.storage.s3.S3Config
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
+import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
@@ -29,8 +29,7 @@ class NotificationMessageReceiver @Inject()(
   messageWriter: MessageWriter[TransformedBaseWork],
   s3Client: AmazonS3,
   s3Config: S3Config)(
-  implicit miroTransformableStore: ObjectStore[MiroTransformable],
-  sierraTransformableStore: ObjectStore[SierraTransformable],
+  implicit transformableStore: ObjectStore[_ <: Transformable],
   ec: ExecutionContext
 ) extends Logging {
 
@@ -39,9 +38,7 @@ class NotificationMessageReceiver @Inject()(
 
     val futurePublishAttempt = for {
       hybridRecord <- Future.fromTry(fromJson[HybridRecord](message.Message))
-      sourceMetadata <- Future.fromTry(
-        fromJson[SourceMetadata](message.Message))
-      transformableRecord <- getTransformable(hybridRecord, sourceMetadata)
+      transformableRecord <- getTransformable(hybridRecord)
       work <- Future.fromTry(
         transformTransformable(transformableRecord, hybridRecord.version))
       publishResult <- publishMessage(work)
@@ -59,19 +56,13 @@ class NotificationMessageReceiver @Inject()(
 
   }
 
-  private def getTransformable(
-    hybridRecord: HybridRecord,
-    sourceMetadata: SourceMetadata
-  ) = {
+  private def getTransformable(hybridRecord: HybridRecord): Future[_ <: Transformable] = {
     val s3ObjectLocation = ObjectLocation(
       namespace = s3Config.bucketName,
       key = hybridRecord.s3key
     )
 
-    sourceMetadata.sourceName match {
-      case "miro"   => miroTransformableStore.get(s3ObjectLocation)
-      case "sierra" => sierraTransformableStore.get(s3ObjectLocation)
-    }
+    transformableStore.get(s3ObjectLocation)
   }
 
   private def transformTransformable(

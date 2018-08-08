@@ -6,9 +6,10 @@ import io.circe.{KeyDecoder, KeyEncoder}
 import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
-  SierraTransformable
+  SierraTransformable,
+  Transformable
 }
-import uk.ac.wellcome.platform.transformer.models.TransformerConfig
+import uk.ac.wellcome.platform.transformer.models.{TransformerConfig, TransformerSourceNames}
 import uk.ac.wellcome.platform.transformer.models.TransformerSourceNames._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
@@ -34,16 +35,6 @@ object TransformablesModule extends TwitterModule {
     TransformerConfig(sourceName = sourceName)
   }
 
-  @Provides
-  @Singleton
-  def provideMiroTransformableObjectStore(
-    injector: Injector): ObjectStore[MiroTransformable] = {
-    implicit val storageBackend = injector.instance[S3StorageBackend]
-    implicit val executionContext = injector.instance[ExecutionContext]
-
-    ObjectStore[MiroTransformable]
-  }
-
   implicit val keyDecoder: KeyDecoder[SierraItemNumber] =
     SierraTransformable.keyDecoder
   implicit val keyEncoder: KeyEncoder[SierraItemNumber] =
@@ -51,11 +42,13 @@ object TransformablesModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def provideSierraTransformableObjectStore(
-    injector: Injector): ObjectStore[SierraTransformable] = {
-    implicit val storageBackend = injector.instance[S3StorageBackend]
-    implicit val executionContext = injector.instance[ExecutionContext]
+  def providesObjectStore(injector: Injector, transformerConfig: TransformerConfig): ObjectStore[_ <: Transformable] = {
+    implicit val storageBackend: S3StorageBackend = injector.instance[S3StorageBackend]
+    implicit val executionContext: ExecutionContext = injector.instance[ExecutionContext]
 
-    ObjectStore[SierraTransformable]
+    transformerConfig.sourceName match {
+      case TransformerSourceNames.miro => ObjectStore[MiroTransformable]
+      case TransformerSourceNames.sierra => ObjectStore[SierraTransformable]
+    }
   }
 }
