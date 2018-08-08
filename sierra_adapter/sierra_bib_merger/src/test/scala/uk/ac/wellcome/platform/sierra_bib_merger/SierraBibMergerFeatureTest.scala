@@ -194,32 +194,33 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, SourceMetadata, Unit](bucket, table) {
-              hybridStore =>
-                val transformable = createSierraTransformableWith(
-                  maybeBibRecord = None
+            withTypeVHS[SierraTransformable, SourceMetadata, Unit](
+              bucket,
+              table) { hybridStore =>
+              val transformable = createSierraTransformableWith(
+                maybeBibRecord = None
+              )
+
+              val bibRecord =
+                createSierraBibRecordWith(id = transformable.sierraId)
+
+              storeInVHS(
+                transformable = transformable,
+                hybridStore = hybridStore
+              ).map { _ =>
+                sendNotificationToSQS(queue = queue, message = bibRecord)
+              }
+
+              val expectedTransformable =
+                SierraTransformable(bibRecord = bibRecord)
+
+              eventually {
+                assertStored(
+                  transformable = expectedTransformable,
+                  bucket = bucket,
+                  table = table
                 )
-
-                val bibRecord =
-                  createSierraBibRecordWith(id = transformable.sierraId)
-
-                storeInVHS(
-                  transformable = transformable,
-                  hybridStore = hybridStore
-                ).map { _ =>
-                  sendNotificationToSQS(queue = queue, message = bibRecord)
-                }
-
-                val expectedTransformable =
-                  SierraTransformable(bibRecord = bibRecord)
-
-                eventually {
-                  assertStored(
-                    transformable = expectedTransformable,
-                    bucket = bucket,
-                    table = table
-                  )
-                }
+              }
             }
           }
         }
