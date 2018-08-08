@@ -25,7 +25,7 @@ object TransformablesModule extends TwitterModule {
   override val modules = Seq(AkkaModule)
 
   private val sourceNameFlag = flag[String](
-    "transformer.sourceName", "Name of the transformer source")
+    "transformer.sourceName", help = "Name of the transformer source")
 
   @Provides
   @Singleton
