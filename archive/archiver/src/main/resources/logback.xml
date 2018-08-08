@@ -14,7 +14,7 @@
   -->
   <logger name="com.twitter.finatra.http.filters.AccessLoggingFilter" level="WARN"/>
 
-  <root level="${log_level:-DEBUG}">
+  <root level="${log_level:-INFO}">
     <appender-ref ref="STDOUT" />
   </root>
 

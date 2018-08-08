@@ -22,7 +22,6 @@ object BagDigestItemFlow extends Logging {
     val fileSplitterFlow
       : Flow[(ObjectLocation, ZipFile), Array[String], NotUsed] =
       FileExtractorFlow()
-        .map(byteString => byteString.concat(ByteString("\n")))
         .via(framingDelimiter)
         .map(_.utf8String)
         .filter(_.nonEmpty)

@@ -59,7 +59,6 @@ trait Archiver extends Logging {
     val downloadZipFlow = DownloadZipFlow()
     val verifiedBagUploaderFlow = VerifiedBagUploaderFlow(bagUploaderConfig)
 
-
     val workFlow = Flow[NotificationMessage]
       .log("notification")
       .via(downloadNotificationFlow)

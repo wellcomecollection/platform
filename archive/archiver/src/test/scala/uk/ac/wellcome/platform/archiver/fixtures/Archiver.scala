@@ -35,7 +35,7 @@ trait Archiver extends AkkaS3 with Messaging {
 
   def withFakeBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
     val bagName = randomAlphanumeric()
-    val (zipFile, fileName) = createBagItZip(bagName, 1, valid)
+    val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
 
     withBag(Paths.get(fileName), ingestBucket, queuePair) { bag =>
       testWith(bag)
@@ -57,10 +57,10 @@ trait Archiver extends AkkaS3 with Messaging {
   }
 
   def withArchiver[R](testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
-    withLocalSqsQueueAndDlq(queuePair => {
+    withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
-          withApp(ingestBucket, queuePair) { archiver =>
+          withApp(storageBucket, queuePair) { archiver =>
             testWith((ingestBucket, storageBucket, queuePair, archiver))
           }
         }

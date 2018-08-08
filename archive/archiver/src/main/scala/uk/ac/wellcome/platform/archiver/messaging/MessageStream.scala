@@ -18,6 +18,8 @@ import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 
+import scala.util.{Failure, Success, Try}
+
 
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
@@ -27,8 +29,6 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
 
   implicit val system = actorSystem
   implicit val dispatcher = system.dispatcher
-
-  system.registerOnTermination(sqsClient.shutdown())
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val ackFlow: Flow[(Message, MessageAction), AckResult, NotUsed] =
@@ -42,77 +42,48 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
 
     val metricName = s"${streamName}_ProcessMessage"
 
-    implicit val materializer = ActorMaterializer(
+    val stoppingMaterializer = ActorMaterializer(
       ActorMaterializerSettings(system)
-        .withSupervisionStrategy(decider(metricName)))
+        .withSupervisionStrategy(decider(metricName, Supervision.Stop)))
+
+    val resumingMaterializer = ActorMaterializer(
+      ActorMaterializerSettings(system)
+        .withSupervisionStrategy(decider(metricName, Supervision.Resume)))
 
     val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
-    val actionFlow = Flow[(Seq[T], Message)].map {
-      case (Seq(), m) =>
-        (m, MessageAction.Ignore)
+    val actionFlow = Flow[(Seq[Try[R]], Message)].map {
+      case (s, m) if s.collect({ case a: Failure[_] => a }).nonEmpty =>
+        metricsSender.countFailure(metricName)
+        (m, MessageAction.ChangeMessageVisibility(1))
       case (_, m) =>
         metricsSender.countSuccess(metricName)
         (m, MessageAction.Delete)
     }
 
-    //    val myFlow = Flow[T].flatMapConcat(t => {
-    //      val futureSeq = Source.fromFuture(
-    //        Source.single(t)
-    //          .map(o => {
-    //            throw new RuntimeException("BLUGBLUG")
-    //
-    //            o
-    //          })
-    //          .map(Success(_))
-    //          .recover {
-    //            case e: RuntimeException => Failure(e)
-    //          }
-    //          .toMat(Sink.seq)(Keep.right)
-    //          .run()
-    //      )
-    //
-    //      futureSeq
-    //    })
-
-    val myFlow: Flow[T, Seq[T], NotUsed] = Flow[T].flatMapConcat(t => {
+    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] = Flow[T].flatMapConcat(t => {
       Source.fromFuture(
         Source.single(t)
-          .map(o => {
-            throw new RuntimeException("BLUGBLUG")
-
-            o
-          })
+          .via(workFlow)
+          .map(Success(_))
+          .recover({ case e => Failure(e) })
           .toMat(Sink.seq)(Keep.right)
-          .run()
+          .run()(stoppingMaterializer)
       )
     })
 
-//    val capturedWorkFlow: Flow[T, Seq[R], NotUsed] = Flow[T].flatMapConcat(t => {
-//      Source.fromFuture(
-//        Source.single(t)
-//          .via(workFlow)
-//          .toMat(Sink.seq)(Keep.right)
-//          .run()
-//      )
-//    })
-
-    val messageMonitor = Flow[Message].map(msg => {
-      println(s"messageMonitor: $msg")
-    }).to(Sink.ignore)
-
-    source.alsoTo(messageMonitor).flatMapConcat(message => {
+    source.flatMapConcat(message => {
       Source.single(message)
         .log("processing message")
         .via(typeConversion)
         .log("message converted")
-        .via(myFlow)
+        .via(capturedWorkflow)
         .log("workflow completed")
         .map(r => (r, message))
         .via(actionFlow)
         .log("message action")
         .via(ackFlow)
         .log("message completed")
-    }).runWith(sink)
+    }).runWith(sink)(resumingMaterializer)
   }
 
   // Defines a "supervision strategy" -- this tells Akka how to react
@@ -121,11 +92,11 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   //
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
-  private def decider(metricName: String): Supervision.Decider = {
+  private def decider(metricName: String, strategy: Supervision.Directive): Supervision.Decider = {
     case e =>
       logException(e)
       metricsSender.countFailure(metricName)
-      Supervision.Resume
+      strategy
   }
 
   private def logException(exception: Throwable): Unit = {

@@ -1,25 +1,37 @@
 package uk.ac.wellcome.platform.archiver
 
+import java.nio.file.Paths
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
+// Test file boundaries
+// Test shutdown mid-stream does not succeed
+
 class ArchiverFeatureTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver
+    with MetricsSenderFixture
     with ExtendedPatience {
 
   it("continues after failure") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
-        withFakeBag(ingestBucket, queuePair, false) { invalidBag =>
+        withFakeBag(ingestBucket, queuePair) { validBag1 =>
           archiver.run()
-          withFakeBag(ingestBucket, queuePair, true) { validBag =>
-            eventually {
-              assertQueueHasSize(queuePair.queue, 0)
-              assertQueueHasSize(queuePair.dlq, 1)
+          withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
+            withFakeBag(ingestBucket, queuePair) { validBag2 =>
+              withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
+
+                eventually {
+
+                  assertQueuePairSizes(queuePair, 0, 2)
+                }
+              }
             }
           }
         }
@@ -32,9 +44,30 @@ class ArchiverFeatureTest
         withFakeBag(ingestBucket, queuePair) { invalidBag =>
           archiver.run()
           eventually {
-            assertQueueHasSize(queuePair.dlq, 0)
-            assertQueueHasSize(queuePair.queue, 0)
+
+            listKeysInBucket(storageBucket) should have size 27
+            assertQueuePairSizes(queuePair, 0, 0)
           }
+        }
+    }
+  }
+
+  it("downloads, uploads and verifies a known BagIt bag") {
+    withArchiver {
+      case (ingestBucket, storageBucket, queuePair, archiver) =>
+        withBag(Paths.get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"), ingestBucket, queuePair) { invalidBag =>
+          archiver.run()
+
+
+            while(true) {
+              Thread.sleep(10000)
+              println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
+            }
+//          eventually {
+//
+//            listKeysInBucket(storageBucket) should have size 2075
+//            assertQueuePairSizes(queuePair, 0, 0)
+//          }
         }
     }
   }
@@ -43,9 +76,9 @@ class ArchiverFeatureTest
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
         withFakeBag(ingestBucket, queuePair, false) { invalidBag =>
-          val running = archiver.run()
+          archiver.run()
           eventually {
-            println(running.isCompleted)
+
             assertQueuePairSizes(queuePair, 0, 1)
           }
         }

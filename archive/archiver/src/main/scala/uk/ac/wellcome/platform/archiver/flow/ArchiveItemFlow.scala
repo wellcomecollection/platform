@@ -21,7 +21,7 @@ object ArchiveItemFlow extends Logging {
 
     val uploadLocationFlow = Flow[MultipartUploadResult]
       .map {
-        case MultipartUploadResult(_, bucket, key, _) =>
+        case MultipartUploadResult(_, bucket, key, _, _) =>
           ObjectLocation(bucket, key)
       }
 
