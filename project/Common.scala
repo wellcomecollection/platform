@@ -22,7 +22,7 @@ object Common {
       "UTF-8",
       "-Xlint",
       "-Xverify",
-      "-Xfatal-warnings",
+      //"-Xfatal-warnings",
       "-feature",
       "-language:postfixOps"
     ),

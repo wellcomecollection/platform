@@ -2,15 +2,13 @@ package uk.ac.wellcome.platform.archiver.flow
 
 import java.util.zip.ZipFile
 
-import akka.{Done, NotUsed}
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Source}
+import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
-
-import scala.collection.immutable
 
 // TODO: Verify checksums in S3 are what you set them to
 object VerifiedBagUploaderFlow extends Logging {
@@ -18,13 +16,13 @@ object VerifiedBagUploaderFlow extends Logging {
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client
-  ): Flow[ZipFile, immutable.Seq[Done], NotUsed] = {
+  ): Flow[ZipFile, Done, NotUsed] = {
 
     val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] =
       DigestLocationFlow(config)
 
     Flow[ZipFile].flatMapConcat((zipFile) => {
-      Source.fromFuture(Source
+      Source
         .single(zipFile)
         .via(digestLocationFlow)
         .flatMapConcat(digestLocation => {
@@ -37,8 +35,8 @@ object VerifiedBagUploaderFlow extends Logging {
             .single(digestLocation)
             .via(verifiedDigestUploaderFlow)
 
-        }).runWith(Sink.seq)
-      )
+        })
     })
   }
+
 }

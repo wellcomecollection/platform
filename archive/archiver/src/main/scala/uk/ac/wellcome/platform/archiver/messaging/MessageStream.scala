@@ -2,11 +2,11 @@ package uk.ac.wellcome.platform.archiver.messaging
 
 import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.event.{Logging, LoggingAdapter}
+import akka.event.LoggingAdapter
 import akka.stream._
 import akka.stream.alpakka.sqs.MessageAction
 import akka.stream.alpakka.sqs.scaladsl.{AckResult, SqsAckFlow, SqsSource}
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import com.amazonaws.services.sqs.AmazonSQSAsync
 import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
@@ -14,10 +14,10 @@ import grizzled.slf4j.Logging
 import io.circe.Decoder
 import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
+
 
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
@@ -27,6 +27,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
 
   implicit val system = actorSystem
   implicit val dispatcher = system.dispatcher
+
+  system.registerOnTermination(sqsClient.shutdown())
 
   private val source = SqsSource(sqsConfig.queueUrl)(sqsClient)
   private val ackFlow: Flow[(Message, MessageAction), AckResult, NotUsed] =
@@ -45,30 +47,65 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
         .withSupervisionStrategy(decider(metricName)))
 
     val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
-    val actionFlow = Flow[(R, Message)].map {
+    val actionFlow = Flow[(Seq[T], Message)].map {
+      case (Seq(), m) =>
+        (m, MessageAction.Ignore)
       case (_, m) =>
         metricsSender.countSuccess(metricName)
         (m, MessageAction.Delete)
     }
 
-//    val myFlow = Flow[T].flatMapConcat(_ =>
-//      Source(1 to 4).map(i =>
-//        throw new RuntimeException("oh no!")
-//
-////    if(i < 2) {
-////          i
-////        } else {
-////          throw new RuntimeException("oh no!")
-////        }
-//      )
-//    )
+    //    val myFlow = Flow[T].flatMapConcat(t => {
+    //      val futureSeq = Source.fromFuture(
+    //        Source.single(t)
+    //          .map(o => {
+    //            throw new RuntimeException("BLUGBLUG")
+    //
+    //            o
+    //          })
+    //          .map(Success(_))
+    //          .recover {
+    //            case e: RuntimeException => Failure(e)
+    //          }
+    //          .toMat(Sink.seq)(Keep.right)
+    //          .run()
+    //      )
+    //
+    //      futureSeq
+    //    })
 
-    source.flatMapConcat(message => {
+    val myFlow: Flow[T, Seq[T], NotUsed] = Flow[T].flatMapConcat(t => {
+      Source.fromFuture(
+        Source.single(t)
+          .map(o => {
+            throw new RuntimeException("BLUGBLUG")
+
+            o
+          })
+          .toMat(Sink.seq)(Keep.right)
+          .run()
+      )
+    })
+
+//    val capturedWorkFlow: Flow[T, Seq[R], NotUsed] = Flow[T].flatMapConcat(t => {
+//      Source.fromFuture(
+//        Source.single(t)
+//          .via(workFlow)
+//          .toMat(Sink.seq)(Keep.right)
+//          .run()
+//      )
+//    })
+
+    val messageMonitor = Flow[Message].map(msg => {
+      println(s"messageMonitor: $msg")
+    }).to(Sink.ignore)
+
+    source.alsoTo(messageMonitor).flatMapConcat(message => {
       Source.single(message)
         .log("processing message")
         .via(typeConversion)
         .log("message converted")
-        .via(workFlow)
+        .via(myFlow)
         .log("workflow completed")
         .map(r => (r, message))
         .via(actionFlow)
@@ -85,15 +122,10 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
   private def decider(metricName: String): Supervision.Decider = {
-    case e @ (_: GracefulFailureException | _: JsonDecodingError) =>
-      logException(e)
-      metricsSender.countRecognisedFailure(metricName)
-      Supervision.resume
-    case e: Exception =>
+    case e =>
       logException(e)
       metricsSender.countFailure(metricName)
-      Supervision.resume
-    case _ => Supervision.Stop
+      Supervision.Resume
   }
 
   private def logException(exception: Throwable): Unit = {

@@ -43,10 +43,10 @@ class ArchiverFeatureTest
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
         withFakeBag(ingestBucket, queuePair, false) { invalidBag =>
-          archiver.run()
+          val running = archiver.run()
           eventually {
-            assertQueueHasSize(queuePair.dlq, 1)
-            assertQueueHasSize(queuePair.queue, 0)
+            println(running.isCompleted)
+            assertQueuePairSizes(queuePair, 0, 1)
           }
         }
     }

@@ -230,13 +230,26 @@ trait SQS extends Matchers with Logging {
     messages should not be empty
   }
 
+  def assertQueuePairSizes(queue: QueuePair, qSize: Int, dlqSize: Int) = {
+    waitVisibilityTimeoutExipiry()
+
+    val messagesDlq = getMessages(queue.dlq)
+    val messagesDlqSize = messagesDlq.size
+
+    val messagesQ = getMessages(queue.queue)
+    val messagesQSize = messagesQ.size
+
+    debug(s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
+
+    messagesQSize shouldBe qSize
+    messagesDlqSize shouldBe dlqSize
+  }
+
   def assertQueueHasSize(queue: Queue, size: Int) = {
     waitVisibilityTimeoutExipiry()
 
     val messages = getMessages(queue)
     val messagesSize = messages.size
-
-//    debug(s"q: ${queue.url}, ${messagesSize}")
 
     messagesSize shouldBe size
   }

@@ -53,12 +53,12 @@ trait Archiver extends Logging {
     implicit val s3Client = injector.getInstance(classOf[S3Client])
     implicit val actorSystem = injector.getInstance(classOf[ActorSystem])
     implicit val materializer = ActorMaterializer()
+    implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
     val downloadNotificationFlow = DownloadNotificationFlow()
     val downloadZipFlow = DownloadZipFlow()
     val verifiedBagUploaderFlow = VerifiedBagUploaderFlow(bagUploaderConfig)
 
-    implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
     val workFlow = Flow[NotificationMessage]
       .log("notification")
