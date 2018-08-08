@@ -17,12 +17,12 @@ class MergerManager @Inject()(
   def applyMerge(
     maybeWorkEntries: List[Option[RecorderWorkEntry]]): Seq[BaseWork] = {
     val workEntries = maybeWorkEntries.flatten
-    val works = workEntries
-      .map { _.work }
+    val works = workEntries.map { _.work }
+    val unidentifiedWorks = works
       .collect { case unidentifiedWork: UnidentifiedWork => unidentifiedWork }
 
-    if (works.size == maybeWorkEntries.size) {
-      mergerRules.merge(works)
+    if (unidentifiedWorks.size == maybeWorkEntries.size) {
+      mergerRules.merge(unidentifiedWorks)
     } else {
       works
     }
