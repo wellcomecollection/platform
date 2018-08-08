@@ -38,7 +38,6 @@ class MiroTransformerFeatureTest
                   MiroCollection = "foo",
                   data = buildJSONForWork(s""""image_title": "$title"""")
                 ),
-                sourceName = "miro",
                 s3Client = s3Client,
                 bucket = storageBucket
               )
@@ -110,7 +109,6 @@ class MiroTransformerFeatureTest
                       }
                     """
                   ),
-                  sourceName = "miro",
                   s3Client = s3Client,
                   bucket = storageBucket
                 )
@@ -139,7 +137,6 @@ class MiroTransformerFeatureTest
                       }
                     """
                   ),
-                  sourceName = "miro",
                   s3Client = s3Client,
                   bucket = storageBucket
                 )

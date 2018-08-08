@@ -24,7 +24,6 @@ trait TransformableMessageUtils extends IdentifiersUtil with SQS {
   }
 
   def hybridRecordNotificationMessage(message: String,
-                                      sourceName: String,
                                       version: Int = 1,
                                       s3Client: AmazonS3,
                                       bucket: Bucket): NotificationMessage = {
