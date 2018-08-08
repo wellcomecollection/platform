@@ -33,16 +33,14 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "id": "${work0.canonicalId}",
                               |     "title": "${work0.title}",
                               |     "identifiers": [ ${identifier(
-                   work0.sourceIdentifier)}, ${identifier(identifier0)} ],
-                              |     "production": [ ]
+                   work0.sourceIdentifier)}, ${identifier(identifier0)} ]
                               |   },
                               |   {
                               |     "type": "Work",
                               |     "id": "${work1.canonicalId}",
                               |     "title": "${work1.title}",
                               |     "identifiers": [ ${identifier(
-                   work1.sourceIdentifier)}, ${identifier(identifier1)} ],
-                              |     "production": [ ]
+                   work1.sourceIdentifier)}, ${identifier(identifier1)} ]
                               |   }
                               |  ]
                               |}
@@ -74,8 +72,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
                               | "identifiers": [ ${identifier(
-                   work.sourceIdentifier)}, ${identifier(otherIdentifier)} ],
-                              | "production": [ ]
+                   work.sourceIdentifier)}, ${identifier(otherIdentifier)} ]
                               |}
           """.stripMargin
           )
@@ -102,8 +99,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
-                              | "items": [ ${items(work.items)} ],
-                              | "production": [ ]
+                              | "items": [ ${items(work.items)} ]
                               |}
           """.stripMargin
           )
@@ -138,15 +134,13 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work0.canonicalId}",
                  |     "title": "${work0.title}",
-                 |     "subjects": [ ${subjects(subjects1)}],
-                 |     "production": [ ]
+                 |     "subjects": [ ${subjects(subjects1)}]
                  |   },
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
-                 |     "subjects": [ ${subjects(subjects2)}],
-                 |     "production": [ ]
+                 |     "subjects": [ ${subjects(subjects2)}]
                  |   }
                  |  ]
                  |}
@@ -177,8 +171,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
                  |     "title": "${work.title}",
-                 |     "subjects": [ ${subjects(subject)}],
-                 |     "production": [ ]
+                 |     "subjects": [ ${subjects(subject)}]
                  |   }
           """.stripMargin
           )
@@ -213,15 +206,13 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work0.canonicalId}",
                  |     "title": "${work0.title}",
-                 |     "genres": [ ${genres(genres1)}],
-                 |     "production": [ ]
+                 |     "genres": [ ${genres(genres1)}]
                  |   },
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
-                 |     "genres": [ ${genres(genres2)}],
-                 |     "production": [ ]
+                 |     "genres": [ ${genres(genres2)}]
                  |   }
                  |  ]
                  |}
@@ -252,8 +243,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
                  |     "title": "${work.title}",
-                 |     "genres": [ ${genres(genre)}],
-                 |     "production": [ ]
+                 |     "genres": [ ${genres(genre)}]
                  |   }
           """.stripMargin
           )
@@ -288,15 +278,13 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work0.canonicalId}",
                  |     "title": "${work0.title}",
-                 |     "contributors": [ ${contributors(contributors1)}],
-                 |     "production": [ ]
+                 |     "contributors": [ ${contributors(contributors1)}]
                  |   },
                  |   {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
-                 |     "contributors": [ ${contributors(contributors2)}],
-                 |     "production": [ ]
+                 |     "contributors": [ ${contributors(contributors2)}]
                  |   }
                  |  ]
                  |}
@@ -327,8 +315,79 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
                  |     "title": "${work.title}",
-                 |     "contributors": [ ${contributors(contributor)}],
-                 |     "production": [ ]
+                 |     "contributors": [ ${contributors(contributor)}]
+                 |   }
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of production events on a list endpoint if we pass ?include=production") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+
+        val productionEvents1 = List(ProductionEvent(List(Place("London")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None))
+        val productionEvents2 = List(ProductionEvent(List(Place("Madrid")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None))
+        val work0 = works(0).copy(production = productionEvents1)
+        val work1 = works(1).copy(production = productionEvents2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=production",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "production": [ ${production(productionEvents1)}]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "production": [ ${production(productionEvents2)}]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of production on a single work endpoint if we pass ?include=production") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+
+        val productionEvent = List(ProductionEvent(List(Place("London")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None))
+        val work = createIdentifiedWork.copy(production = productionEvent)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=production",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |     "type": "Work",
+                 |     "id": "${work.canonicalId}",
+                 |     "title": "${work.title}",
+                 |     "production": [ ${production(productionEvent)}]
                  |   }
           """.stripMargin
           )

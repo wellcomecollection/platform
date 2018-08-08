@@ -179,7 +179,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
   }
 
-  it("extracts production events from a work") {
+  it("extracts production events from a work with the production include") {
     val productionEvent = ProductionEvent(
       places = List(Place("London")),
       agents = List(Unidentifiable(Agent("Macmillan"))),
@@ -192,8 +192,8 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes.includeAll())
-    displayWork.production shouldBe List(
+      DisplayWorkV2(work, includes = V2WorksIncludes(production = true))
+    displayWork.production.get shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
 

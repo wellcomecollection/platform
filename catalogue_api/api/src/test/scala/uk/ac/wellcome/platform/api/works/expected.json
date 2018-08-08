@@ -1,0 +1,61 @@
+{
+
+  "@context": "https://localhost:8888/catalogue/v2/context.json",
+  "type": "ResultList",
+  "pageSize": 10,
+  "totalPages": 1,
+  "totalResults": 2
+,
+  "results": [
+    {
+      "type": "Work",
+      "id": "bs1noiprg8",
+      "title": "01wgyaboludmsqi0lnndrbhjcxu9g54sg81enhyh2qeel4frctspumxy09jdpfx3b4u1nkgfmrbcatrok06mn3uenftrdobinjj5",
+      "production": [
+        {
+          "dates": [{
+            "type": "Period",
+            "label": "1984"
+          }],
+          "agents": [{
+            "type": "Person",
+
+
+            "label": "Bumblebee"
+          }],
+          "places": [{
+            "type": "Place",
+            "label": "London"
+          }],
+          "type": "ProductionEvent"
+        }
+      ],
+      "production": [ ]
+    },
+    {
+      "type": "Work",
+      "id": "ltfo3pzzoy",
+      "title": "8q8auo2gvwlpieu4stgm8ha5fifui5tfiiefuscjdgnhmrk7hapo08wckhjzfbwuzd2mxtcvxltuexjxvmhmnyuvyph3b3j2zzf2",
+      "production": [
+        {
+          "dates": [{
+            "type": "Period",
+            "label": "1984"
+          }],
+          "agents": [{
+            "type": "Person",
+
+
+            "label": "Bumblebee"
+          }],
+          "places": [{
+            "type": "Place",
+            "label": "Madrid"
+          }],
+          "type": "ProductionEvent"
+        }
+      ],
+      "production": [ ]
+    }
+  ]
+}

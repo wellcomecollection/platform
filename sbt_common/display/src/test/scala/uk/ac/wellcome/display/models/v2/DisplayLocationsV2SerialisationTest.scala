@@ -30,8 +30,7 @@ class DisplayLocationsV2SerialisationTest
                             |  "type": "Work",
                             |  "id": "${work.canonicalId}",
                             |  "title": "${work.title}",
-                            |  "items": [ ${items(work.items)} ],
-                            |  "production": [ ]
+                            |  "items": [ ${items(work.items)} ]
                             |}""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -55,8 +54,7 @@ class DisplayLocationsV2SerialisationTest
                           |  "type": "Work",
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
-                          |  "items": [ ${items(work.items)} ],
-                          |  "production": [ ]
+                          |  "items": [ ${items(work.items)} ]
                           |}""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -81,8 +79,7 @@ class DisplayLocationsV2SerialisationTest
                           |  "type": "Work",
                           |  "id": "${work.canonicalId}",
                           |  "title": "${work.title}",
-                          |  "items": [ ${items(work.items)} ],
-                          |  "production": [ ]
+                          |  "items": [ ${items(work.items)} ]
                           |}""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)

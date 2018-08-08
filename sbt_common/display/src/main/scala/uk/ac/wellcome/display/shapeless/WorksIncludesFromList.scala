@@ -14,8 +14,10 @@ object WorksIncludesFromList {
   type Tag[T] = Symbol with Tagged[T]
   object isIncludedAttribute extends Poly1 {
     implicit def atTaggedSymbol[T](implicit witness: Witness.Aux[T]) = at[(Symbol with Tagged[T], List[String])]{case (t, includesList) =>
-      val attributeName: String = t.name
-      field[Tag[witness.T]](includesList.contains[String](attributeName))
+      val l: List[String] = includesList
+      val value: String = t.name
+      val bool: Boolean = l.contains[String](value)
+      field[Tag[witness.T]](bool)
     }
   }
 

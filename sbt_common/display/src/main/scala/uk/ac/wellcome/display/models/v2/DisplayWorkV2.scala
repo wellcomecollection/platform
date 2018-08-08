@@ -71,7 +71,7 @@ case class DisplayWorkV2(
   ) items: Option[List[DisplayItemV2]] = None,
   @ApiModelProperty(
     value = "Relates a work to its production events."
-  ) production: List[DisplayProductionEvent] = List(),
+  ) production: Option[List[DisplayProductionEvent]] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.DisplayLanguage",
     value = "Relates a work to its primary language."
@@ -125,9 +125,9 @@ case object DisplayWorkV2 {
             DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      production = work.production.map {
+      production = if(includes.production)Some(work.production.map {
         DisplayProductionEvent(_, includesIdentifiers = includes.identifiers)
-      },
+      }) else None,
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )

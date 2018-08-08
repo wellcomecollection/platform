@@ -16,7 +16,8 @@ case class V2WorksIncludes(
   items: Boolean = false,
   subjects: Boolean = false,
   genres: Boolean = false,
-  contributors: Boolean = false
+  contributors: Boolean = false,
+  production: Boolean = false
 ) extends WorksIncludes
 
 class WorksIncludesParsingException(msg: String)

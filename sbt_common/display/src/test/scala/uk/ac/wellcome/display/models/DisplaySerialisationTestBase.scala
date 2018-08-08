@@ -150,6 +150,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "label": "${p.label}"
     }"""
 
+  def place(p: Place) =
+    s"""{
+      "type": "Place",
+      "label": "${p.label}"
+    }"""
+
   def concept(concept: AbstractConcept) =
     s"""
     {
@@ -204,6 +210,19 @@ trait DisplaySerialisationTestBase { this: Suite =>
 
   def contributors(c: List[Contributor[Displayable[AbstractAgent]]]) =
     c.map(contributor).mkString(",")
+
+  def production(l: List[ProductionEvent[Displayable[AbstractAgent]]]) =
+    l.map(productionEvent).mkString(",")
+
+    def productionEvent(p: ProductionEvent[Displayable[AbstractAgent]]) =
+    s"""
+       |{
+       |  "dates": [${p.dates.map(period).mkString(",")}],
+       |  "agents": [${p.agents.map(identifiedOrUnidentifiable(_, abstractAgent)).mkString(",")}],
+       |  "places": [${p.places.map(place).mkString(",")}],
+       |  "type": "ProductionEvent"
+       |}
+     """.stripMargin
 
   def workType(w: WorkType) =
     s"""

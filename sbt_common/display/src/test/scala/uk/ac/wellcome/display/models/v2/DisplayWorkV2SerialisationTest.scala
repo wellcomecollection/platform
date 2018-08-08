@@ -31,8 +31,7 @@ class DisplayWorkV2SerialisationTest
        | "description": "${work.description.get}",
        | "workType" : ${workType(work.workType.get)},
        | "lettering": "${work.lettering.get}",
-       | "createdDate": ${period(work.createdDate.get)},
-       | "production": [ ]
+       | "createdDate": ${period(work.createdDate.get)}
        |}
           """.stripMargin
 
@@ -51,8 +50,7 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "items": [ ${items(work.items)} ],
-                          | "production": [ ]
+                          | "items": [ ${items(work.items)} ]
                           |}
           """.stripMargin
 
@@ -70,8 +68,7 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "items": [ ],
-                          | "production": [ ]
+                          | "items": [ ]
                           |}
           """.stripMargin
 
@@ -96,7 +93,6 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
                           |     "title": "${workWithCopyright.title}",
-                          |     "production": [ ],
                           |     "items": [
                           |       {
                           |         "id": "${item.canonicalId}",
@@ -133,8 +129,26 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title}",
                           |     "subjects": [ ${subjects(
-                            workWithSubjects.subjects)} ],
-                          |     "production": [ ]
+                            workWithSubjects.subjects)} ]
+                          |   }""".stripMargin
+
+    assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
+
+  it("includes production information in DisplayWorkV2 serialisation with the production include") {
+    val workWithProduction = createIdentifiedWorkWith(
+      production =  List(
+        ProductionEvent(List(Place("London")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None),
+        ProductionEvent(List(Place("Spain")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None)
+      ))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWorkV2(workWithProduction, includes = V2WorksIncludes(production = true)))
+    val expectedJson = s"""{
+                          |     "type": "Work",
+                          |     "id": "${workWithProduction.canonicalId}",
+                          |     "title": "${workWithProduction.title}",
+                          |     "production": [ ${production(
+                            workWithProduction.production)} ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -163,8 +177,7 @@ class DisplayWorkV2SerialisationTest
                                 | "workType" : ${workType(work.workType.get)},
                                 | "lettering": "${work.lettering.get}",
                                 | "createdDate": ${period(work.createdDate.get)},
-                                | "contributors": [ ${contributor(work.contributors.head)} ],
-                                | "production": [ ]
+                                | "contributors": [ ${contributor(work.contributors.head)} ]
                                 |}
           """.stripMargin
 
@@ -190,8 +203,7 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title}",
-                          |     "genres": [ ${genres(workWithSubjects.genres)} ],
-                          |     "production": [ ]
+                          |     "genres": [ ${genres(workWithSubjects.genres)} ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -210,8 +222,7 @@ class DisplayWorkV2SerialisationTest
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
                           | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
-                            otherIdentifier)} ],
-                          | "production": [ ]
+                            otherIdentifier)} ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -228,8 +239,7 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
-                          | "production": [ ]
+                          | "identifiers": [ ${identifier(work.sourceIdentifier)} ]
                           |}
           """.stripMargin
     assertJsonStringsAreEqual(actualJson, expectedJson)
@@ -251,7 +261,6 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.title}",
-                          |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }
           """.stripMargin
