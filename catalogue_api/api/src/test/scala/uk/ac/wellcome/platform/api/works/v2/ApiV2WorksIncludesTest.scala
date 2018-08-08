@@ -2,7 +2,7 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
-import uk.ac.wellcome.models.work.internal.{Concept, Genre, Subject, Unidentifiable}
+import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
@@ -32,7 +32,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "type": "Work",
                               |     "id": "${work0.canonicalId}",
                               |     "title": "${work0.title}",
-                              |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
                    work0.sourceIdentifier)}, ${identifier(identifier0)} ],
                               |     "production": [ ]
@@ -41,7 +40,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "type": "Work",
                               |     "id": "${work1.canonicalId}",
                               |     "title": "${work1.title}",
-                              |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
                    work1.sourceIdentifier)}, ${identifier(identifier1)} ],
                               |     "production": [ ]
@@ -75,7 +73,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
-                              | "contributors": [ ],
                               | "identifiers": [ ${identifier(
                    work.sourceIdentifier)}, ${identifier(otherIdentifier)} ],
                               | "production": [ ]
@@ -105,7 +102,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
-                              | "contributors": [ ],
                               | "items": [ ${items(work.items)} ],
                               | "production": [ ]
                               |}
@@ -142,7 +138,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work0.canonicalId}",
                  |     "title": "${work0.title}",
-                 |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subjects1)}],
                  |     "production": [ ]
                  |   },
@@ -150,7 +145,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
-                 |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subjects2)}],
                  |     "production": [ ]
                  |   }
@@ -183,7 +177,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
                  |     "title": "${work.title}",
-                 |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subject)}],
                  |     "production": [ ]
                  |   }
@@ -220,7 +213,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work0.canonicalId}",
                  |     "title": "${work0.title}",
-                 |     "contributors": [ ],
                  |     "genres": [ ${genres(genres1)}],
                  |     "production": [ ]
                  |   },
@@ -228,7 +220,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work1.canonicalId}",
                  |     "title": "${work1.title}",
-                 |     "contributors": [ ],
                  |     "genres": [ ${genres(genres2)}],
                  |     "production": [ ]
                  |   }
@@ -261,8 +252,82 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "type": "Work",
                  |     "id": "${work.canonicalId}",
                  |     "title": "${work.title}",
-                 |     "contributors": [ ],
                  |     "genres": [ ${genres(genre)}],
+                 |     "production": [ ]
+                 |   }
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of contributors on a list endpoint if we pass ?include=contributors") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+
+        val contributors1 = List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
+        val contributors2 = List(Contributor(Unidentifiable(Person("Fred Astair"))))
+        val work0 = works(0).copy(contributors = contributors1)
+        val work1 = works(1).copy(contributors = contributors2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=contributors",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "contributors": [ ${contributors(contributors1)}],
+                 |     "production": [ ]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "contributors": [ ${contributors(contributors2)}],
+                 |     "production": [ ]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of contributors on a single work endpoint if we pass ?include=contributors") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+
+        val contributor = List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
+        val work = createIdentifiedWork.copy(contributors = contributor)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=contributors",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |     "type": "Work",
+                 |     "id": "${work.canonicalId}",
+                 |     "title": "${work.title}",
+                 |     "contributors": [ ${contributors(contributor)}],
                  |     "production": [ ]
                  |   }
           """.stripMargin

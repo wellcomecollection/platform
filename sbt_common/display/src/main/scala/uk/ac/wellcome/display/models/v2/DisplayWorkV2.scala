@@ -47,7 +47,7 @@ case class DisplayWorkV2(
   @ApiModelProperty(
     value =
       "Relates a work to its author, compiler, editor, artist or other entity responsible for its coming into existence in the form that it has."
-  ) contributors: List[DisplayContributor] = List(),
+  ) contributors: Option[List[DisplayContributor]] = None,
   @ApiModelProperty(
     dataType = "List[uk.ac.wellcome.display.models.v2.DisplayIdentifierV2]",
     value =
@@ -100,9 +100,11 @@ case object DisplayWorkV2 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      contributors = work.contributors.map {
+      contributors =
+        if(includes.contributors) {
+        Some(work.contributors.map {
         DisplayContributor(_, includesIdentifiers = includes.identifiers)
-      },
+      })} else None,
       subjects = if(includes.subjects){
         Some(work.subjects.map {
         DisplaySubject(_, includesIdentifiers = includes.identifiers)})}

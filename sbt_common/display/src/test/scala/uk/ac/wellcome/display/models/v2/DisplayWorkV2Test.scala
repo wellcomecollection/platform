@@ -128,7 +128,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayLanguage.label shouldBe language.label
   }
 
-  it("extracts contributors from a Work") {
+  it("extracts contributors from a Work with the contributors include") {
     val canonicalId = createCanonicalId
     val sourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Person"
@@ -155,9 +155,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true))
+      DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, contributors = true))
 
-    displayWork.contributors shouldBe List(
+    displayWork.contributors.get shouldBe List(
       DisplayContributor(
         agent = DisplayPersonV2(
           id = Some(canonicalId),
@@ -294,8 +294,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("contributors") {
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true))
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe List(None, None, None)
       }
 
@@ -330,18 +332,17 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("contributors") {
-        // This is moderately verbose, but the Scala compiler got confused when
-        // I tried to combine the three map() calls into one.
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true, identifiers = true))
+
         val expectedIdentifiers = List(
           contributorAgentSourceIdentifier,
           contributorOrganisationSourceIdentifier,
           contributorPersonSourceIdentifier
-        ).map { DisplayIdentifierV2(_) }
-          .map { List(_) }
-          .map { Some(_) }
+        ).map { identifier => Some(List(DisplayIdentifierV2(identifier))) }
 
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe expectedIdentifiers
       }
 

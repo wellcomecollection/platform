@@ -18,10 +18,7 @@ class DisplayWorkV2SerialisationTest
         WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
       description = Some(randomAlphanumeric(100)),
       lettering = Some(randomAlphanumeric(100)),
-      createdDate = Some(Period("1901")),
-      contributors = List(
-        Contributor(Unidentifiable(Agent(randomAlphanumeric(25))))
-      )
+      createdDate = Some(Period("1901"))
     )
 
     val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work))
@@ -35,7 +32,6 @@ class DisplayWorkV2SerialisationTest
        | "workType" : ${workType(work.workType.get)},
        | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
-       | "contributors": [ ${contributor(work.contributors.head)} ],
        | "production": [ ]
        |}
           """.stripMargin
@@ -55,7 +51,6 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "contributors": [ ],
                           | "items": [ ${items(work.items)} ],
                           | "production": [ ]
                           |}
@@ -75,7 +70,6 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "contributors": [ ],
                           | "items": [ ],
                           | "production": [ ]
                           |}
@@ -102,7 +96,6 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
                           |     "title": "${workWithCopyright.title}",
-                          |     "contributors": [ ],
                           |     "production": [ ],
                           |     "items": [
                           |       {
@@ -139,13 +132,43 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title}",
-                          |     "contributors": [],
                           |     "subjects": [ ${subjects(
                             workWithSubjects.subjects)} ],
                           |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
+  }
+
+  it("includes the contributors in DisplayWorkV2 serialisation with the contribuotrs include") {
+    val work = createIdentifiedWorkWith(
+      workType = Some(
+        WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
+      description = Some(randomAlphanumeric(100)),
+      lettering = Some(randomAlphanumeric(100)),
+      createdDate = Some(Period("1901")),
+      contributors = List(
+        Contributor(Unidentifiable(Agent(randomAlphanumeric(25))))
+      )
+    )
+
+    val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true)))
+
+    val expectedJsonString = s"""
+                                |{
+                                | "type": "Work",
+                                | "id": "${work.canonicalId}",
+                                | "title": "${work.title}",
+                                | "description": "${work.description.get}",
+                                | "workType" : ${workType(work.workType.get)},
+                                | "lettering": "${work.lettering.get}",
+                                | "createdDate": ${period(work.createdDate.get)},
+                                | "contributors": [ ${contributor(work.contributors.head)} ],
+                                | "production": [ ]
+                                |}
+          """.stripMargin
+
+    assertJsonStringsAreEqual(actualJsonString, expectedJsonString)
   }
 
   it("includes genre information in DisplayWorkV2 serialisation with the genres include") {
@@ -167,7 +190,6 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
                           |     "title": "${workWithSubjects.title}",
-                          |     "contributors": [],
                           |     "genres": [ ${genres(workWithSubjects.genres)} ],
                           |     "production": [ ]
                           |   }""".stripMargin
@@ -187,7 +209,6 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
                           | "production": [ ]
@@ -207,7 +228,6 @@ class DisplayWorkV2SerialisationTest
                           | "type": "Work",
                           | "id": "${work.canonicalId}",
                           | "title": "${work.title}",
-                          | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
                           | "production": [ ]
                           |}
@@ -231,7 +251,6 @@ class DisplayWorkV2SerialisationTest
                           |     "type": "Work",
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.title}",
-                          |     "contributors": [ ],
                           |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }

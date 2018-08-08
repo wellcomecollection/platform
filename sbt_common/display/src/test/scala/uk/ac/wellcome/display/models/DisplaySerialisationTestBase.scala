@@ -9,9 +9,7 @@ import uk.ac.wellcome.models.work.internal._
 trait DisplaySerialisationTestBase { this: Suite =>
 
   def optionalString(fieldName: String, maybeStringValue: Option[String]) =
-    maybeStringValue match {
-      case None => ""
-      case Some(p) =>
+    maybeStringValue map {p =>
         s"""
            "$fieldName": "$p"
          """
@@ -126,8 +124,8 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def person(p: Person) = {
     s"""{
         "type": "Person",
-        ${optionalString("prefix", p.prefix)},
-        ${optionalString("numeration", p.numeration)},
+        ${optionalString("prefix", p.prefix).map(str =>  s"$str, ").getOrElse("")}
+        ${optionalString("numeration", p.numeration).map(str =>  s"$str, ").getOrElse("")}
         "label": "${p.label}"
       }"""
   }
@@ -203,6 +201,9 @@ trait DisplaySerialisationTestBase { this: Suite =>
        |  "type": "Contributor"
        |}
      """.stripMargin
+
+  def contributors(c: List[Contributor[Displayable[AbstractAgent]]]) =
+    c.map(contributor).mkString(",")
 
   def workType(w: WorkType) =
     s"""
