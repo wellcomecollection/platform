@@ -48,7 +48,7 @@ class SnapshotGeneratorFeatureTest
 
   it("completes a snapshot generation") {
     withFixtures {
-      case (queue, topic, indexNameV1, indexNameV2, publicBucket) =>
+      case (queue, topic, indexNameV1, _, publicBucket: Bucket) =>
         val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
@@ -64,7 +64,6 @@ class SnapshotGeneratorFeatureTest
         sendNotificationToSQS(queue = queue, message = snapshotJob)
 
         eventually {
-
           val downloadFile =
             File.createTempFile("snapshotGeneratorFeatureTest", ".txt.gz")
 
@@ -121,7 +120,7 @@ class SnapshotGeneratorFeatureTest
               val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(
                 indexNameV1,
                 indexNameV2,
-                itemType)
+                itemType) ++ s3ClientLocalFlags
               withServer(flags) { _ =>
                 testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
