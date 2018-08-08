@@ -6,21 +6,18 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{Assertion, FunSpec, Matchers}
+import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.json.exceptions.JsonDecodingError
-import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
-import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable, Transformable}
+import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
-import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
@@ -42,31 +39,6 @@ class NotificationMessageReceiverTest
     with SierraUtil
     with TransformableMessageUtils {
 
-  def withNotificationMessageReceiver[T <: Transformable, R](
-    topic: Topic,
-    bucket: Bucket,
-    maybeSnsClient: Option[AmazonSNS] = None
-  )(testWith: TestWith[NotificationMessageReceiver[T], R])(implicit objectStore: ObjectStore[T]) = {
-    val s3Config = S3Config(bucket.name)
-
-    val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
-
-    val messageWriter =
-      new MessageWriter[TransformedBaseWork](
-        messageConfig = messageConfig,
-        snsClient = maybeSnsClient.getOrElse(snsClient),
-        s3Client = s3Client
-      )
-
-    val recordReceiver = new NotificationMessageReceiver[T](
-      messageWriter = messageWriter,
-      s3Client = s3Client,
-      s3Config = S3Config(bucket.name)
-    )
-
-    testWith(recordReceiver)
-  }
-
   it("receives a message and sends it to SNS client") {
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
@@ -76,7 +48,7 @@ class NotificationMessageReceiverTest
             bucket = bucket
           )
 
-          withNotificationMessageReceiver[SierraTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
+          withSierraNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sqsMessage)
 
             whenReady(future) { _ =>
@@ -105,7 +77,7 @@ class NotificationMessageReceiverTest
             bucket = bucket
           )
 
-          withNotificationMessageReceiver[SierraTransformable, List[Assertion]](topic, bucket) { recordReceiver =>
+          withSierraNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(sierraMessage)
 
             whenReady(future) { _ =>
@@ -134,7 +106,7 @@ class NotificationMessageReceiverTest
               bucket = bucket
             )
 
-          withNotificationMessageReceiver[MiroTransformable, Assertion](topic, bucket) { recordReceiver =>
+          withMiroNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
 
             whenReady(future.failed) { x =>
@@ -162,7 +134,7 @@ class NotificationMessageReceiverTest
               bucket = bucket
             )
 
-          withNotificationMessageReceiver[MiroTransformable, Assertion](topic, bucket) { recordReceiver =>
+          withMiroNotificationMessageReceiver(topic, bucket) { recordReceiver =>
             val future =
               recordReceiver.receiveMessage(failingSqsMessage)
 
@@ -188,7 +160,7 @@ class NotificationMessageReceiverTest
             bucket = bucket
           )
 
-          withNotificationMessageReceiver[SierraTransformable, Assertion](
+          withSierraNotificationMessageReceiver(
             topic,
             bucket,
             Some(mockSnsClientFailPublishMessage)) { recordReceiver =>
@@ -202,6 +174,36 @@ class NotificationMessageReceiverTest
       }
     }
   }
+
+  private def withMiroNotificationMessageReceiver[R](
+    topic: Topic,
+    bucket: Bucket,
+    maybeSnsClient: Option[AmazonSNS] = None
+  )(testWith: TestWith[NotificationMessageReceiver[MiroTransformable], R]): R =
+    withMessageWriter[TransformedBaseWork, R](bucket, topic, maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
+      val recordReceiver = new NotificationMessageReceiver[MiroTransformable](
+        messageWriter = messageWriter,
+        s3Client = s3Client,
+        s3Config = S3Config(bucket.name)
+      )
+
+      testWith(recordReceiver)
+    }
+
+  private def withSierraNotificationMessageReceiver[R](
+    topic: Topic,
+    bucket: Bucket,
+    maybeSnsClient: Option[AmazonSNS] = None
+  )(testWith: TestWith[NotificationMessageReceiver[SierraTransformable], R]): R =
+    withMessageWriter[TransformedBaseWork, R](bucket, topic, maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
+      val recordReceiver = new NotificationMessageReceiver[SierraTransformable](
+        messageWriter = messageWriter,
+        s3Client = s3Client,
+        s3Config = S3Config(bucket.name)
+      )
+
+      testWith(recordReceiver)
+    }
 
   private def mockSnsClientFailPublishMessage = {
     val mockSNSClient = mock[AmazonSNS]
