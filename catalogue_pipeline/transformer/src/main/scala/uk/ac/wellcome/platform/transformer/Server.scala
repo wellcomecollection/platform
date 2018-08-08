@@ -31,6 +31,7 @@ class Server extends HttpServer {
     SQSClientModule,
     SQSConfigModule,
     SNSClientModule,
+    TransformerWorkerModule,
     ExecutionContextModule,
     TransformablesModule,
     S3ClientModule,
