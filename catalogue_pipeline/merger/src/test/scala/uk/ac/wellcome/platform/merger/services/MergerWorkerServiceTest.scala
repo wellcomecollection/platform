@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.merger.services
 
 import akka.actor.ActorSystem
 import org.mockito.Matchers.any
+import org.mockito.Mockito.{atLeastOnce, times, verify}
 import org.scalatest.FunSpec
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mockito.MockitoSugar
@@ -39,8 +40,6 @@ class MergerWorkerServiceTest
     with MockitoSugar {
   case class TestObject(something: String)
 
-  import org.mockito.Mockito._
-
   it(
     "reads matcher result messages, retrieves the works from vhs and sends them to sns") {
     withMergerWorkerServiceFixtures {
@@ -72,7 +71,7 @@ class MergerWorkerServiceTest
           recorderWorkEntry2.work,
           recorderWorkEntry3.work)
 
-          verify(metricsSender, times(1))
+          verify(metricsSender, atLeastOnce)
             .countSuccess(any[String])
         }
     }
