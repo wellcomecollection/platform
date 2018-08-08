@@ -16,13 +16,16 @@ import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformab
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.transformers.{MiroTransformableTransformer, SierraTransformableTransformer}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
+import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationMessageReceiverTest
@@ -185,6 +188,10 @@ class NotificationMessageReceiverTest
         messageWriter = messageWriter,
         s3Client = s3Client,
         s3Config = S3Config(bucket.name)
+      )(
+        transformableStore = ObjectStore[MiroTransformable],
+        transformableTransformer = new MiroTransformableTransformer,
+        ec = ExecutionContext.global
       )
 
       testWith(recordReceiver)
@@ -200,6 +207,10 @@ class NotificationMessageReceiverTest
         messageWriter = messageWriter,
         s3Client = s3Client,
         s3Config = S3Config(bucket.name)
+      )(
+        transformableStore = ObjectStore[SierraTransformable],
+        transformableTransformer = new SierraTransformableTransformer,
+        ec = ExecutionContext.global
       )
 
       testWith(recordReceiver)
