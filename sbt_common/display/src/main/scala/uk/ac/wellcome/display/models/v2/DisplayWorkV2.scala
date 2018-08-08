@@ -59,7 +59,7 @@ case class DisplayWorkV2(
   ) subjects: Option[List[DisplaySubject]] = None,
   @ApiModelProperty(
     value = "Relates a work to the genre that describes the work's content."
-  ) genres: List[DisplayGenre] = List(),
+  ) genres: Option[List[DisplayGenre]] = None,
   @ApiModelProperty(
     dataType = "uk.ac.wellcome.display.models.v2.DisplayLocationV2",
     value =
@@ -107,9 +107,10 @@ case object DisplayWorkV2 {
         Some(work.subjects.map {
         DisplaySubject(_, includesIdentifiers = includes.identifiers)})}
           else None,
-      genres = work.genres.map {
+      genres =  if(includes.genres){
+        Some(work.genres.map {
         DisplayGenre(_, includesIdentifiers = includes.identifiers)
-      },
+      })} else None,
       identifiers =
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifierV2(_) })

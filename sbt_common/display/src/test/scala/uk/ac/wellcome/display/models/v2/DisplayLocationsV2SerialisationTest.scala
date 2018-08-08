@@ -32,7 +32,6 @@ class DisplayLocationsV2SerialisationTest
                             |  "title": "${work.title}",
                             |  "contributors": [ ],
                             |  "items": [ ${items(work.items)} ],
-                            |  "genres": [ ],
                             |  "production": [ ]
                             |}""".stripMargin
 
@@ -59,7 +58,6 @@ class DisplayLocationsV2SerialisationTest
                           |  "title": "${work.title}",
                           |  "contributors": [ ],
                           |  "items": [ ${items(work.items)} ],
-                          |  "genres": [ ],
                           |  "production": [ ]
                           |}""".stripMargin
 
@@ -87,7 +85,6 @@ class DisplayLocationsV2SerialisationTest
                           |  "title": "${work.title}",
                           |  "contributors": [ ],
                           |  "items": [ ${items(work.items)} ],
-                          |  "genres": [ ],
                           |  "production": [ ]
                           |}""".stripMargin
 

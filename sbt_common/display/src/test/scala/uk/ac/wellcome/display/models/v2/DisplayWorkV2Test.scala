@@ -314,7 +314,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe None
+        val displayWork =
+        DisplayWorkV2(work, includes = V2WorksIncludes(genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe None
       }
     }
 
@@ -369,7 +371,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe Some(
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe Some(
           List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
     }

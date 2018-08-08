@@ -36,7 +36,6 @@ class DisplayWorkV2SerialisationTest
        | "lettering": "${work.lettering.get}",
        | "createdDate": ${period(work.createdDate.get)},
        | "contributors": [ ${contributor(work.contributors.head)} ],
-       | "genres": [ ],
        | "production": [ ]
        |}
           """.stripMargin
@@ -58,7 +57,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ${items(work.items)} ],
-                          | "genres": [ ],
                           | "production": [ ]
                           |}
           """.stripMargin
@@ -79,7 +77,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "items": [ ],
-                          | "genres": [ ],
                           | "production": [ ]
                           |}
           """.stripMargin
@@ -106,7 +103,6 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${workWithCopyright.canonicalId}",
                           |     "title": "${workWithCopyright.title}",
                           |     "contributors": [ ],
-                          |     "genres": [ ],
                           |     "production": [ ],
                           |     "items": [
                           |       {
@@ -146,14 +142,13 @@ class DisplayWorkV2SerialisationTest
                           |     "contributors": [],
                           |     "subjects": [ ${subjects(
                             workWithSubjects.subjects)} ],
-                          |     "genres": [ ],
                           |     "production": [ ]
                           |   }""".stripMargin
 
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("includes genre information in DisplayWorkV2 serialisation") {
+  it("includes genre information in DisplayWorkV2 serialisation with the genres include") {
     val workWithSubjects = createIdentifiedWorkWith(
       genres = List(
         Genre(
@@ -166,7 +161,7 @@ class DisplayWorkV2SerialisationTest
       )
     )
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects))
+      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects, includes = V2WorksIncludes(genres = true)))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",
@@ -195,7 +190,6 @@ class DisplayWorkV2SerialisationTest
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)}, ${identifier(
                             otherIdentifier)} ],
-                          | "genres": [ ],
                           | "production": [ ]
                           |}
           """.stripMargin
@@ -215,7 +209,6 @@ class DisplayWorkV2SerialisationTest
                           | "title": "${work.title}",
                           | "contributors": [ ],
                           | "identifiers": [ ${identifier(work.sourceIdentifier)} ],
-                          | "genres": [ ],
                           | "production": [ ]
                           |}
           """.stripMargin
@@ -239,7 +232,6 @@ class DisplayWorkV2SerialisationTest
                           |     "id": "${work.canonicalId}",
                           |     "title": "${work.title}",
                           |     "contributors": [ ],
-                          |     "genres": [ ],
                           |     "production": [ ],
                           |     "thumbnail": ${location(work.thumbnail.get)}
                           |   }

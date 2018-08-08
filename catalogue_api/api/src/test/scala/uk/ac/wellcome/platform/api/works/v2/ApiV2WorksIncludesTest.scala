@@ -35,7 +35,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
                    work0.sourceIdentifier)}, ${identifier(identifier0)} ],
-                              |     "genres": [ ],
                               |     "production": [ ]
                               |   },
                               |   {
@@ -45,7 +44,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
                    work1.sourceIdentifier)}, ${identifier(identifier1)} ],
-                              |     "genres": [ ],
                               |     "production": [ ]
                               |   }
                               |  ]
@@ -80,7 +78,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "contributors": [ ],
                               | "identifiers": [ ${identifier(
                    work.sourceIdentifier)}, ${identifier(otherIdentifier)} ],
-                              | "genres": [ ],
                               | "production": [ ]
                               |}
           """.stripMargin
@@ -110,7 +107,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "title": "${work.title}",
                               | "contributors": [ ],
                               | "items": [ ${items(work.items)} ],
-                              | "genres": [ ],
                               | "production": [ ]
                               |}
           """.stripMargin
@@ -148,7 +144,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work0.title}",
                  |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subjects1)}],
-                 |     "genres": [ ],
                  |     "production": [ ]
                  |   },
                  |   {
@@ -157,7 +152,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work1.title}",
                  |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subjects2)}],
-                 |     "genres": [ ],
                  |     "production": [ ]
                  |   }
                  |  ]
@@ -191,7 +185,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work.title}",
                  |     "contributors": [ ],
                  |     "subjects": [ ${subjects(subject)}],
-                 |     "genres": [ ],
                  |     "production": [ ]
                  |   }
           """.stripMargin
@@ -229,7 +222,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work0.title}",
                  |     "contributors": [ ],
                  |     "genres": [ ${genres(genres1)}],
-                 |     "subjects": [ ],
                  |     "production": [ ]
                  |   },
                  |   {
@@ -238,7 +230,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work1.title}",
                  |     "contributors": [ ],
                  |     "genres": [ ${genres(genres2)}],
-                 |     "subjects": [ ],
                  |     "production": [ ]
                  |   }
                  |  ]
@@ -272,7 +263,6 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                  |     "title": "${work.title}",
                  |     "contributors": [ ],
                  |     "genres": [ ${genres(genre)}],
-                 |     "subjects": [ ],
                  |     "production": [ ]
                  |   }
           """.stripMargin
