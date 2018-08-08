@@ -168,4 +168,36 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
     }
   }
 
+  it(
+    "includes a list of subjects on a single work endpoint if we pass ?include=subjects") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+
+        val subject = List(Subject("ornitology", List(Unidentifiable(Concept("ornitology")))))
+        val work = createIdentifiedWork.copy(subjects = subject)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=subjects",
+            andExpect = Status.Ok,
+            withJsonBody =
+              s"""
+                 |{
+                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |     "type": "Work",
+                 |     "id": "${work.canonicalId}",
+                 |     "title": "${work.title}",
+                 |     "contributors": [ ],
+                 |     "subjects": [ ${subjects(subject)}],
+                 |     "genres": [ ],
+                 |     "production": [ ]
+                 |   }
+          """.stripMargin
+          )
+        }
+    }
+  }
+
 }
