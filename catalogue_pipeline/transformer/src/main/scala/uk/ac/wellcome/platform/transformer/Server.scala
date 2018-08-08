@@ -35,6 +35,7 @@ class Server extends HttpServer {
     TransformablesModule,
     S3ClientModule,
     S3ConfigModule,
+    TransformedBaseWorkModule
   )
   override def configureHttp(router: HttpRouter) {
     router
