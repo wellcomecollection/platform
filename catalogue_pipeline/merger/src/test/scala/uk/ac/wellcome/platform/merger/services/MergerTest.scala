@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.merger.services
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.MergerTestUtils
-import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 
-class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
+class MergerTest extends FunSpec with MergerTestUtils {
 
   private val merger = new Merger()
 

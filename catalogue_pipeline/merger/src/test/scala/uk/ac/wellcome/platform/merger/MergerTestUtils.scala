@@ -53,6 +53,9 @@ trait MergerTestUtils
       storeInVHS(vhs = vhs, recorderWorkEntry = recorderWorkEntry)
     }
 
-  def createRecorderWorkEntryWith(version: Int) =
+  def createRecorderWorkEntryWith(version: Int): RecorderWorkEntry =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
+
+  def createRecorderWorkEntry: RecorderWorkEntry =
+    createRecorderWorkEntryWith(version = 1)
 }

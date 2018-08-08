@@ -7,8 +7,7 @@ import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
-import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{BaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.BaseWork
 import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.Set
@@ -18,7 +17,7 @@ class MergerWorkerService @Inject()(
   system: ActorSystem,
   sqsStream: SQSStream[NotificationMessage],
   playbackService: RecorderPlaybackService,
-  merger: Merger,
+  mergerManager: MergerManager,
   messageWriter: MessageWriter[BaseWork]
 )(implicit ec: ExecutionContext)
     extends Logging {
@@ -31,22 +30,10 @@ class MergerWorkerService @Inject()(
       workIdentifiers = getWorksIdentifiers(matcherResult).toList
       maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
         workIdentifiers)
-      works <- mergeIfAllWorksDefined(maybeWorkEntries)
+      works: Seq[BaseWork] = mergerManager.applyMerge(
+        maybeWorkEntries = maybeWorkEntries)
       _ <- sendWorks(works)
     } yield ()
-
-  private def mergeIfAllWorksDefined(
-    maybeWorkEntries: List[Option[RecorderWorkEntry]]) = Future {
-    val workEntries = maybeWorkEntries.flatten
-    val works = workEntries.map(_.work).collect {
-      case unidentifiedWork: UnidentifiedWork => unidentifiedWork
-    }
-    if (works.size == maybeWorkEntries.size) {
-      merger.merge(works)
-    } else {
-      workEntries.map(_.work)
-    }
-  }
 
   private def sendWorks(mergedWorks: Seq[BaseWork]) = {
     Future
