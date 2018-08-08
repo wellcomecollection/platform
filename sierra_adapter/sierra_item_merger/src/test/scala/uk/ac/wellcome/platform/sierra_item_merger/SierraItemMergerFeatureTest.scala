@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
@@ -38,7 +38,7 @@ class SierraItemMergerFeatureTest
             val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
               messagingBucket)
             withServer(flags) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+              withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
                 vhsBucket,
                 table) { hybridStore =>
                 val bibId = createSierraBibNumber
@@ -82,7 +82,7 @@ class SierraItemMergerFeatureTest
             val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
               messagingBucket)
             withServer(flags) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+              withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
                 vhsBucket,
                 table) { hybridStore =>
                 val bibId1 = createSierraBibNumber

@@ -13,7 +13,7 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.SourceMetadata
+import uk.ac.wellcome.storage.vhs.EmptyMetadata
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
@@ -62,7 +62,7 @@ class SierraBibMergerWorkerServiceTest
               sqsStream =>
                 withLocalDynamoDbTable { table =>
                   withLocalS3Bucket { storageBucket =>
-                    withTypeVHS[SierraTransformable, SourceMetadata, R](
+                    withTypeVHS[SierraTransformable, EmptyMetadata, R](
                       storageBucket,
                       table) { vhs =>
                       val mergerUpdaterService =
