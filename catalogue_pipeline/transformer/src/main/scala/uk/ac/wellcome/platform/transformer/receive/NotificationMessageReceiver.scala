@@ -50,7 +50,7 @@ class NotificationMessageReceiver[T <: Transformable] @Inject()(
 
   }
 
-  private def getTransformable(hybridRecord: HybridRecord): Future[_ <: Transformable] = {
+  private def getTransformable(hybridRecord: HybridRecord): Future[T] = {
     val s3ObjectLocation = ObjectLocation(
       namespace = s3Config.bucketName,
       key = hybridRecord.s3key
@@ -60,7 +60,7 @@ class NotificationMessageReceiver[T <: Transformable] @Inject()(
   }
 
   private def transformTransformable(
-    transformable: Transformable,
+    transformable: T,
     version: Int
   ): Try[TransformedBaseWork] =
     transformableTransformer.transform(transformable, version) map {
