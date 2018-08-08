@@ -133,7 +133,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
   )
 
-  val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies
+  val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
   val commonElasticsearchDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion

@@ -1,11 +1,13 @@
 package uk.ac.wellcome.display.models.v2
 
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import org.scalacheck.ScalacheckShapeless._
 
-class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
+class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with PropertyChecks{
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
@@ -195,6 +197,21 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       DisplayWorkV2(work, includes = V2WorksIncludes(production = true))
     displayWork.production.get shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
+  }
+
+  it("does not extract includes set to false") {
+    forAll { work: IdentifiedWork =>
+
+      val displayWork =
+        DisplayWorkV2(work, includes = V2WorksIncludes())
+
+      displayWork.production shouldNot be (defined)
+      displayWork.subjects shouldNot be (defined)
+      displayWork.genres shouldNot be (defined)
+      displayWork.contributors shouldNot be (defined)
+      displayWork.items shouldNot be (defined)
+      displayWork.identifiers shouldNot be (defined)
+    }
   }
 
   describe("uses the WorksIncludes.identifiers include") {
