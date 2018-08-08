@@ -48,7 +48,7 @@ class SnapshotGeneratorFeatureTest
 
   it("completes a snapshot generation") {
     withFixtures {
-      case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
+      case (queue, topic, indexNameV1, indexNameV2, publicBucket) =>
         val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
