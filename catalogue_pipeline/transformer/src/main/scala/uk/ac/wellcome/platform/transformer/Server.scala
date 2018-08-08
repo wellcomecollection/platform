@@ -18,7 +18,7 @@ import uk.ac.wellcome.finatra.messaging.{
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
 import uk.ac.wellcome.finatra.storage.{S3ClientModule, S3ConfigModule}
-import uk.ac.wellcome.platform.transformer.modules.{TransformerWorkerModule, _}
+import uk.ac.wellcome.platform.transformer.modules._
 
 object ServerMain extends Server
 
@@ -31,7 +31,6 @@ class Server extends HttpServer {
     SQSClientModule,
     SQSConfigModule,
     SNSClientModule,
-    TransformerWorkerModule,
     ExecutionContextModule,
     TransformablesModule,
     S3ClientModule,
