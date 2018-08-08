@@ -3,3 +3,4 @@
 -aws.s3.bucketName=${storage_bucket_name}
 -aws.message.writer.sns.topic.arn=${sns_arn}
 -aws.message.writer.s3.bucketName=${message_bucket_name}
+-transformer.sourceName=${source_name}

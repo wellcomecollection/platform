@@ -15,9 +15,10 @@ module "transformer" {
     metrics_namespace    = "${var.namespace}_${var.source_name}_transformer"
     storage_bucket_name  = "${var.vhs_bucket_name}"
     message_bucket_name  = "${var.messages_bucket}"
+    source_name          = "${var.source_name}"
   }
 
-  env_vars_length = 5
+  env_vars_length = 6
 
   container_image   = "${var.transformer_container_image}"
   source_queue_name = "${module.transformer_queue.name}"
