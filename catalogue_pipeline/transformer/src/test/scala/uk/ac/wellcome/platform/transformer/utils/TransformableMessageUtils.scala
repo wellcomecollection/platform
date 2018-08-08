@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.utils
 
-import com.amazonaws.services.s3.AmazonS3
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SQS
