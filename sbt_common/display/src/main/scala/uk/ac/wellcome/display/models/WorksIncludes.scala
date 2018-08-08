@@ -17,7 +17,6 @@ case class V2WorksIncludes(
   production: Boolean = false
 ) extends WorksIncludes
 
-
 object V1WorksIncludes {
   val recognisedIncludes = List("identifiers", "thumbnail", "items")
   def apply(includesList: List[String]): V1WorksIncludes = V1WorksIncludes(
@@ -30,7 +29,13 @@ object V1WorksIncludes {
 }
 
 object V2WorksIncludes {
-  val recognisedIncludes = List("identifiers", "items", "subjects", "genres", "contributors", "production")
+  val recognisedIncludes = List(
+    "identifiers",
+    "items",
+    "subjects",
+    "genres",
+    "contributors",
+    "production")
   def apply(includesList: List[String]): V2WorksIncludes = V2WorksIncludes(
     identifiers = includesList.contains("identifiers"),
     items = includesList.contains("items"),

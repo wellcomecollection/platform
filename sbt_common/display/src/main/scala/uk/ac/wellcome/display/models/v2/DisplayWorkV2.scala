@@ -100,19 +100,21 @@ case object DisplayWorkV2 {
       extent = work.extent,
       lettering = work.lettering,
       createdDate = work.createdDate.map { DisplayPeriod(_) },
-      contributors =
-        if(includes.contributors) {
+      contributors = if (includes.contributors) {
         Some(work.contributors.map {
-        DisplayContributor(_, includesIdentifiers = includes.identifiers)
-      })} else None,
-      subjects = if(includes.subjects){
+          DisplayContributor(_, includesIdentifiers = includes.identifiers)
+        })
+      } else None,
+      subjects = if (includes.subjects) {
         Some(work.subjects.map {
-        DisplaySubject(_, includesIdentifiers = includes.identifiers)})}
-          else None,
-      genres =  if(includes.genres){
+          DisplaySubject(_, includesIdentifiers = includes.identifiers)
+        })
+      } else None,
+      genres = if (includes.genres) {
         Some(work.genres.map {
-        DisplayGenre(_, includesIdentifiers = includes.identifiers)
-      })} else None,
+          DisplayGenre(_, includesIdentifiers = includes.identifiers)
+        })
+      } else None,
       identifiers =
         if (includes.identifiers)
           Some(work.identifiers.map { DisplayIdentifierV2(_) })
@@ -125,9 +127,11 @@ case object DisplayWorkV2 {
             DisplayItemV2(_, includesIdentifiers = includes.identifiers)
           })
         else None,
-      production = if(includes.production)Some(work.production.map {
-        DisplayProductionEvent(_, includesIdentifiers = includes.identifiers)
-      }) else None,
+      production =
+        if (includes.production) Some(work.production.map {
+          DisplayProductionEvent(_, includesIdentifiers = includes.identifiers)
+        })
+        else None,
       language = work.language.map { DisplayLanguage(_) },
       dimensions = work.dimensions
     )

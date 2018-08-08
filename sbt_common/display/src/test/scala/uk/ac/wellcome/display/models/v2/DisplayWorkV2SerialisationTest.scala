@@ -115,7 +115,8 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("includes subject information in DisplayWorkV2 serialisation with the subjects include") {
+  it(
+    "includes subject information in DisplayWorkV2 serialisation with the subjects include") {
     val workWithSubjects = createIdentifiedWorkWith(
       subjects = List(
         Subject("label", List(Unidentifiable(Concept("fish")))),
@@ -123,7 +124,10 @@ class DisplayWorkV2SerialisationTest
       )
     )
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects, includes = V2WorksIncludes(subjects = true)))
+      objectMapper.writeValueAsString(
+        DisplayWorkV2(
+          workWithSubjects,
+          includes = V2WorksIncludes(subjects = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithSubjects.canonicalId}",
@@ -135,14 +139,26 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("includes production information in DisplayWorkV2 serialisation with the production include") {
+  it(
+    "includes production information in DisplayWorkV2 serialisation with the production include") {
     val workWithProduction = createIdentifiedWorkWith(
-      production =  List(
-        ProductionEvent(List(Place("London")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None),
-        ProductionEvent(List(Place("Spain")), List(Unidentifiable(Person("Bumblebee"))), List(Period("1984")), None)
+      production = List(
+        ProductionEvent(
+          List(Place("London")),
+          List(Unidentifiable(Person("Bumblebee"))),
+          List(Period("1984")),
+          None),
+        ProductionEvent(
+          List(Place("Spain")),
+          List(Unidentifiable(Person("Bumblebee"))),
+          List(Period("1984")),
+          None)
       ))
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV2(workWithProduction, includes = V2WorksIncludes(production = true)))
+      objectMapper.writeValueAsString(
+        DisplayWorkV2(
+          workWithProduction,
+          includes = V2WorksIncludes(production = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithProduction.canonicalId}",
@@ -154,7 +170,8 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("includes the contributors in DisplayWorkV2 serialisation with the contribuotrs include") {
+  it(
+    "includes the contributors in DisplayWorkV2 serialisation with the contribuotrs include") {
     val work = createIdentifiedWorkWith(
       workType = Some(
         WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
@@ -166,7 +183,8 @@ class DisplayWorkV2SerialisationTest
       )
     )
 
-    val actualJsonString = objectMapper.writeValueAsString(DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true)))
+    val actualJsonString = objectMapper.writeValueAsString(
+      DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true)))
 
     val expectedJsonString = s"""
                                 |{
@@ -177,14 +195,16 @@ class DisplayWorkV2SerialisationTest
                                 | "workType" : ${workType(work.workType.get)},
                                 | "lettering": "${work.lettering.get}",
                                 | "createdDate": ${period(work.createdDate.get)},
-                                | "contributors": [ ${contributor(work.contributors.head)} ]
+                                | "contributors": [ ${contributor(
+                                  work.contributors.head)} ]
                                 |}
           """.stripMargin
 
     assertJsonStringsAreEqual(actualJsonString, expectedJsonString)
   }
 
-  it("includes genre information in DisplayWorkV2 serialisation with the genres include") {
+  it(
+    "includes genre information in DisplayWorkV2 serialisation with the genres include") {
     val workWithSubjects = createIdentifiedWorkWith(
       genres = List(
         Genre(
@@ -197,7 +217,10 @@ class DisplayWorkV2SerialisationTest
       )
     )
     val actualJson =
-      objectMapper.writeValueAsString(DisplayWorkV2(workWithSubjects, includes = V2WorksIncludes(genres = true)))
+      objectMapper.writeValueAsString(
+        DisplayWorkV2(
+          workWithSubjects,
+          includes = V2WorksIncludes(genres = true)))
     val expectedJson = s"""
                           |{
                           |     "type": "Work",

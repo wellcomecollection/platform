@@ -7,7 +7,11 @@ import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import org.scalacheck.ScalacheckShapeless._
 
-class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with PropertyChecks{
+class DisplayWorkV2Test
+    extends FunSpec
+    with Matchers
+    with WorksUtil
+    with PropertyChecks {
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
@@ -157,7 +161,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, contributors = true))
+      DisplayWorkV2(
+        work,
+        includes = V2WorksIncludes(identifiers = true, contributors = true))
 
     displayWork.contributors.get shouldBe List(
       DisplayContributor(
@@ -201,16 +207,15 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
 
   it("does not extract includes set to false") {
     forAll { work: IdentifiedWork =>
-
       val displayWork =
         DisplayWorkV2(work, includes = V2WorksIncludes())
 
-      displayWork.production shouldNot be (defined)
-      displayWork.subjects shouldNot be (defined)
-      displayWork.genres shouldNot be (defined)
-      displayWork.contributors shouldNot be (defined)
-      displayWork.items shouldNot be (defined)
-      displayWork.identifiers shouldNot be (defined)
+      displayWork.production shouldNot be(defined)
+      displayWork.subjects shouldNot be(defined)
+      displayWork.genres shouldNot be(defined)
+      displayWork.contributors shouldNot be(defined)
+      displayWork.items shouldNot be(defined)
+      displayWork.identifiers shouldNot be(defined)
     }
   }
 
@@ -334,7 +339,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
 
       it("genres") {
         val displayWork =
-        DisplayWorkV2(work, includes = V2WorksIncludes(genres = true))
+          DisplayWorkV2(work, includes = V2WorksIncludes(genres = true))
         displayWork.genres.get.head.concepts.head.identifiers shouldBe None
       }
     }
@@ -350,13 +355,17 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
 
       it("contributors") {
         val displayWork =
-          DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true, identifiers = true))
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(contributors = true, identifiers = true))
 
         val expectedIdentifiers = List(
           contributorAgentSourceIdentifier,
           contributorOrganisationSourceIdentifier,
           contributorPersonSourceIdentifier
-        ).map { identifier => Some(List(DisplayIdentifierV2(identifier))) }
+        ).map { identifier =>
+          Some(List(DisplayIdentifierV2(identifier)))
+        }
 
         val agents: List[DisplayAbstractAgentV2] =
           displayWork.contributors.get.map { _.agent }
@@ -375,7 +384,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
 
       it("subjects") {
         val displayWork =
-          DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, subjects = true))
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, subjects = true))
         val expectedIdentifiers = List(
           conceptSourceIdentifier,
           periodSourceIdentifier,
@@ -390,7 +401,9 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil with Proper
 
       it("genres") {
         val displayWork =
-          DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true, genres = true))
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, genres = true))
         displayWork.genres.get.head.concepts.head.identifiers shouldBe Some(
           List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
