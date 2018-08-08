@@ -167,12 +167,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
             withJsonBody =
               s"""
                  |{
-                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
-                 |     "type": "Work",
-                 |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title}",
-                 |     "subjects": [ ${subjects(subject)}]
-                 |   }
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "subjects": [ ${subjects(subject)}]
+                 |}
           """.stripMargin
           )
         }
@@ -239,12 +239,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
             withJsonBody =
               s"""
                  |{
-                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
-                 |     "type": "Work",
-                 |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title}",
-                 |     "genres": [ ${genres(genre)}]
-                 |   }
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "genres": [ ${genres(genre)}]
+                 |}
           """.stripMargin
           )
         }
@@ -383,12 +383,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
             withJsonBody =
               s"""
                  |{
-                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
-                 |     "type": "Work",
-                 |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title}",
-                 |     "production": [ ${production(productionEvent)}]
-                 |   }
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "production": [ ${production(productionEvent)}]
+                 |}
           """.stripMargin
           )
         }
