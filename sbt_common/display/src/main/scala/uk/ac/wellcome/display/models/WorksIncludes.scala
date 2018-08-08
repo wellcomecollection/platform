@@ -19,15 +19,26 @@ case class V2WorksIncludes(
 
 
 object V1WorksIncludes {
-  val recognisedIncludes = ToAttributes.toAttributes[V1WorksIncludes]
-  def apply(includesList: List[String]): V1WorksIncludes = WorksIncludesFromList.toWorksIncludes[V1WorksIncludes](includesList)
+  val recognisedIncludes = List("identifiers", "thumbnail", "items")
+  def apply(includesList: List[String]): V1WorksIncludes = V1WorksIncludes(
+    identifiers = includesList.contains("identifiers"),
+    thumbnail = includesList.contains("thumbnail"),
+    items = includesList.contains("items")
+  )
 
   def includeAll() = V1WorksIncludes(recognisedIncludes)
 }
 
 object V2WorksIncludes {
-  val recognisedIncludes = ToAttributes.toAttributes[V2WorksIncludes]
-  def apply(includesList: List[String]): V2WorksIncludes = WorksIncludesFromList.toWorksIncludes[V2WorksIncludes](includesList)
+  val recognisedIncludes = List("identifiers", "items", "subjects", "genres", "contributors", "production")
+  def apply(includesList: List[String]): V2WorksIncludes = V2WorksIncludes(
+    identifiers = includesList.contains("identifiers"),
+    items = includesList.contains("items"),
+    subjects = includesList.contains("subjects"),
+    genres = includesList.contains("genres"),
+    contributors = includesList.contains("contributors"),
+    production = includesList.contains("production")
+  )
 
   def includeAll() = V2WorksIncludes(recognisedIncludes)
 }
