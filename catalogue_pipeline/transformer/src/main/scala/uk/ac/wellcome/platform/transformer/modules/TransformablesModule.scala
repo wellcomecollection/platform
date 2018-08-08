@@ -14,6 +14,11 @@ import uk.ac.wellcome.platform.transformer.models.TransformerSourceNames._
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.s3.S3StorageBackend
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.transformers.{
+  MiroTransformableTransformer,
+  SierraTransformableTransformer,
+  TransformableTransformer
+}
 
 import scala.concurrent.ExecutionContext
 
@@ -51,4 +56,12 @@ object TransformablesModule extends TwitterModule {
       case TransformerSourceNames.sierra => ObjectStore[SierraTransformable]
     }
   }
+
+  @Provides
+  @Singleton
+  def providesTransformableTransformer(transformerConfig: TransformerConfig): TransformableTransformer[_ <: Transformable] = {
+    transformerConfig.sourceName match {
+      case TransformerSourceNames.miro   => new MiroTransformableTransformer
+      case TransformerSourceNames.sierra => new SierraTransformableTransformer
+    }
 }

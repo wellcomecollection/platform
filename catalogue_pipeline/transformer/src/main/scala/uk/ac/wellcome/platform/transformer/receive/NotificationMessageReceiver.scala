@@ -6,16 +6,9 @@ import com.twitter.inject.Logging
 import io.circe.ParsingFailure
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, PublishAttempt}
-import uk.ac.wellcome.models.transformable.{
-  MiroTransformable,
-  SierraTransformable,
-  Transformable
-}
+import uk.ac.wellcome.models.transformable.Transformable
 import uk.ac.wellcome.models.work.internal.TransformedBaseWork
-import uk.ac.wellcome.platform.transformer.transformers.{
-  MiroTransformableTransformer,
-  SierraTransformableTransformer
-}
+import uk.ac.wellcome.platform.transformer.transformers.TransformableTransformer
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.vhs.HybridRecord
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
@@ -25,11 +18,12 @@ import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class NotificationMessageReceiver @Inject()(
+class NotificationMessageReceiver[T <: Transformable] @Inject()(
   messageWriter: MessageWriter[TransformedBaseWork],
   s3Client: AmazonS3,
   s3Config: S3Config)(
-  implicit transformableStore: ObjectStore[_ <: Transformable],
+  implicit transformableStore: ObjectStore[T],
+  transformableTransformer: TransformableTransformer[T],
   ec: ExecutionContext
 ) extends Logging {
 
@@ -68,8 +62,7 @@ class NotificationMessageReceiver @Inject()(
   private def transformTransformable(
     transformable: Transformable,
     version: Int
-  ): Try[TransformedBaseWork] = {
-    val transformableTransformer = chooseTransformer(transformable)
+  ): Try[TransformedBaseWork] =
     transformableTransformer.transform(transformable, version) map {
       transformed =>
         debug(s"Transformed record to $transformed")
@@ -79,14 +72,6 @@ class NotificationMessageReceiver @Inject()(
         error("Failed to perform transform to unified item", e)
         throw e
     }
-  }
-
-  private def chooseTransformer(transformable: Transformable) = {
-    transformable match {
-      case _: MiroTransformable   => new MiroTransformableTransformer
-      case _: SierraTransformable => new SierraTransformableTransformer
-    }
-  }
 
   private def publishMessage(
     work: TransformedBaseWork): Future[PublishAttempt] =
