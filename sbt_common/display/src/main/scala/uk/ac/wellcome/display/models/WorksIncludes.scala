@@ -1,8 +1,5 @@
 package uk.ac.wellcome.display.models
 
-import com.fasterxml.jackson.core.JsonProcessingException
-import uk.ac.wellcome.display.shapeless.{ToAttributes, WorksIncludesFromList}
-
 trait WorksIncludes
 
 case class V1WorksIncludes(
@@ -20,8 +17,6 @@ case class V2WorksIncludes(
   production: Boolean = false
 ) extends WorksIncludes
 
-class WorksIncludesParsingException(msg: String)
-    extends JsonProcessingException(msg: String)
 
 object V1WorksIncludes {
   val recognisedIncludes = ToAttributes.toAttributes[V1WorksIncludes]
