@@ -6,11 +6,10 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.messaging.message.MessageWriter
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
-import uk.ac.wellcome.models.matcher.{MatcherResult, WorkIdentifier}
+import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
 import uk.ac.wellcome.models.work.internal.BaseWork
 import uk.ac.wellcome.json.JsonUtil._
 
-import scala.collection.Set
 import scala.concurrent.{ExecutionContext, Future}
 
 class MergerWorkerService @Inject()(
@@ -27,9 +26,15 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
-      workIdentifiers = getWorksIdentifiers(matcherResult).toList
+      _ <- Future.sequence(
+        matcherResult.works.map { applyMerge }
+      )
+    } yield ()
+
+  private def applyMerge(matchedIdentifiers: MatchedIdentifiers): Future[Unit] =
+    for {
       maybeWorkEntries <- playbackService.fetchAllRecorderWorkEntries(
-        workIdentifiers)
+        matchedIdentifiers.identifiers.toList)
       works: Seq[BaseWork] = mergerManager.applyMerge(
         maybeWorkEntries = maybeWorkEntries)
       _ <- sendWorks(works)
@@ -41,23 +46,6 @@ class MergerWorkerService @Inject()(
         mergedWorks.map(
           messageWriter.write(_, "merged-work")
         ))
-  }
-
-  // val r = MatcherResult(works = Set(
-  //     |   MatchedIdentifiers(identifiers = Set(WorkIdentifier("111", 1), WorkIdentifier("112", 1), WorkIdentifier("113", 1))),
-  //     |   MatchedIdentifiers(identifiers = Set(WorkIdentifier("211", 1), WorkIdentifier("212", 1)))
-  //     | )
-  //     |
-  //     | )
-
-  // getWorksIdentifiers(r)
-  //res0: Set[WorkIdentifier] = Set(WorkIdentifier(212,1), WorkIdentifier(211,1), WorkIdentifier(113,1), WorkIdentifier(111,1), WorkIdentifier(112,1))
-  private def getWorksIdentifiers(
-    matcherResult: MatcherResult): Set[WorkIdentifier] = {
-    for {
-      matchedIdentifiers <- matcherResult.works
-      workIdentifier <- matchedIdentifiers.identifiers
-    } yield workIdentifier
   }
 
   def stop(): Future[Terminated] = system.terminate()
