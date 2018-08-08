@@ -6,12 +6,13 @@ import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.sqs.SQSStream
 import uk.ac.wellcome.platform.transformer.receive.NotificationMessageReceiver
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.models.transformable.Transformable
 
 import scala.concurrent.Future
 
-class TransformerWorkerService @Inject()(
+class TransformerWorkerService[T <: Transformable] @Inject()(
   system: ActorSystem,
-  messageReceiver: NotificationMessageReceiver,
+  messageReceiver: NotificationMessageReceiver[T],
   sqsStream: SQSStream[NotificationMessage]
 ) {
 
