@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -256,11 +256,11 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
           )
         )
 
-        val caught = intercept[GracefulFailureException] {
+        val caught = intercept[TransformerException] {
           transformToProduction(varFields)
         }
 
-        caught.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
+        caught.e.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
       }
     }
 
@@ -510,7 +510,7 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
 
-    intercept[GracefulFailureException] {
+    intercept[TransformerException] {
       transformer.getProduction(bibData)
     }
   }

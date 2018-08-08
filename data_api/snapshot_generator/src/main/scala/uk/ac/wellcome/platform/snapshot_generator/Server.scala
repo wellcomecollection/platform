@@ -22,7 +22,6 @@ import uk.ac.wellcome.finatra.messaging.{
   SQSConfigModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
-import uk.ac.wellcome.finatra.storage.S3ConfigModule
 import uk.ac.wellcome.platform.snapshot_generator.finatra.modules.{
   AkkaS3ClientModule,
   SnapshotGeneratorWorkerModule
@@ -41,7 +40,6 @@ class Server extends HttpServer {
     SQSConfigModule,
     SNSClientModule,
     SNSConfigModule,
-    S3ConfigModule,
     AkkaS3ClientModule,
     ElasticClientModule,
     ElasticConfigModule,

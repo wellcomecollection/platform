@@ -242,7 +242,7 @@
    * 3. Populate platform "concepts" "label" with subfield "a" and type as "Concept" for "650", "Period" for "648"
    *    and "Place" for "651".
    * 4. When this concept has associated identifiers populate "identifiers" with value from subfield 0 and identity scheme
-   *    from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierType".
+   *    from second indicator (0=lcsh 2=mesh) or if indicator 7 do not include subject.
    * 5. For subfields v,x,y,z populate "concepts" in order with a "label" and type "Concept" for x subfield,
    *    "y" type as "Period", "v" as "Concept" and "z" as "Place".
    *
@@ -326,11 +326,11 @@
 
    /* Populate wwork:subjects people and organisations. Rules:
    * 
-   * 1. For all bibliographic records use "marcTag": "600", "610".
-   * 2. Populate platform "label" "600" concatenated with subfields "a", "c", "d" "e" for "600" type as "Subject" follow with dash and then x,y,v and z seperated by a dash. For "610" with sub-field "a", "b","c", "d" and "e" follow with x,y,v and z seperated by a dash.
-   * 3. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if indicator 7 look at subfield 2 and populate "identifierType". 
-   * 4. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes".
-   * 5. For 600 and 610 for subfields e,v,x,y,z populate "concepts" in order with a "label" and type as follows "e" subfield as type "ContributionRole", x subfield type as "Concept", "y" type as "Period", "v" as "Concept" and "z" as "Place".
+   * 1. For all bibliographic records use "marcTag": "600", "610". 
+   * 2. Populate platform "label" for "600" and "610" concatenated with subfields "a", "c", "d" "e"  type as "Subject". 
+   * 3. Populate platform "concepts" "label" with subfield "a" and type as "Person" for "600", "Organisation" for "610".
+   * 4. When this concept has associated identifiers populate "identifiers" with value form subfield 0 and identity scheme from second indicator (0=lcsh 2=mesh) or if second indicator 7 do not include subject. 
+   * 5. For "600" subfield "b" populates "numeration", "d" populate "dates" and subfield "c" populates "prefixes".
    *
    *
    *
@@ -418,9 +418,9 @@
    /* Populate wwork: production 260
    * 
    * 1. For bibliographic records where "260" is populated
-   * 2. Populate "places" from subfield "a" and type as "Place".
-   * 3. Populate "agents" from subfield "b" and type as "Agent"
-   * 4. Populate "dates" from subfield "c" and type as "Periods"
+   * 2. Populate "places" from subfield "a" and type as "Place". 
+   * 3. Populate "agents" from subfield "b" and type as "Agent". 
+   * 4. Populate "dates" from subfield "c" and type as "Periods" 
    * 5. If subfield "e" is populated then this goes to "places" and typed as "Place". Populate "function" with "Manufacture".
    * 6. If subfield "f" is populated then this goes to "agents" and types as "Agent". Populate "function" with "Manufacture".       
    * 7. If subfield "g" is populated then this goes to "dates" and types as "Period". Populate "function" with "Manufacture".
@@ -647,8 +647,8 @@
    *     { 
    *       "type": "Location",
    *       "locationType": {
-   *           "id" : "sicon" ,
-   *           "label" : "Iconographic Collection" , 
+   *           "id" : "closed-store" ,
+   *           "label" : "Closed Store" , 
    *           "type" : "LocationType" 
    *          } ,
    *       "label": "Closed Store Iconographic",
@@ -662,6 +662,9 @@
    *         "label": "Online access",
    *         "type": "AccessProcess"
    *       }
+   *       "accessRestriction": {
+   *         
+   }
    *     },
    *     {
    *       "type": "Location",

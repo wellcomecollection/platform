@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.snapshot_generator.flow
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.AllWorksIncludes
+import uk.ac.wellcome.display.models.{V1WorksIncludes, V2WorksIncludes}
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.display.models.v2.DisplayWorkV2
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -22,7 +22,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV1.apply)
+          toDisplayWork = DisplayWorkV1.apply(_, V1WorksIncludes.includeAll()))
 
         val works = createIdentifiedWorks(count = 3).toList
 
@@ -32,7 +32,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
         whenReady(eventualDisplayWorks) { displayWorks =>
           val expectedDisplayWorks = works.map {
-            DisplayWorkV1(_, includes = AllWorksIncludes())
+            DisplayWorkV1(_, includes = V1WorksIncludes.includeAll())
           }
           displayWorks shouldBe expectedDisplayWorks
         }
@@ -44,7 +44,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
     withActorSystem { actorSystem =>
       withMaterializer(actorSystem) { materializer =>
         val flow = IdentifiedWorkToVisibleDisplayWork(
-          toDisplayWork = DisplayWorkV2.apply)
+          toDisplayWork = DisplayWorkV2.apply(_, V2WorksIncludes.includeAll()))
 
         val works = createIdentifiedWorks(count = 3).toList
 
@@ -54,7 +54,7 @@ class IdentifiedWorkToVisibleDisplayWorkFlowTest
 
         whenReady(eventualDisplayWorks) { displayWorks =>
           val expectedDisplayWorks = works.map {
-            DisplayWorkV2(_, includes = AllWorksIncludes())
+            DisplayWorkV2(_, includes = V2WorksIncludes.includeAll())
           }
           displayWorks shouldBe expectedDisplayWorks
         }

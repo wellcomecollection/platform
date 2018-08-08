@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -12,7 +12,7 @@ class DisplayWorkV2SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises a DisplayWorkV2 correctly") {
+  it("serialises a DisplayWorkV2") {
     val work = createIdentifiedWorkWith(
       workType = Some(
         WorkType(id = randomAlphanumeric(5), label = randomAlphanumeric(10))),
@@ -51,7 +51,7 @@ class DisplayWorkV2SerialisationTest
     )
 
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(items = true)))
+      DisplayWorkV2(work, V2WorksIncludes(items = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -73,7 +73,7 @@ class DisplayWorkV2SerialisationTest
       items = List()
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(items = true)))
+      DisplayWorkV2(work, V2WorksIncludes(items = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -103,7 +103,7 @@ class DisplayWorkV2SerialisationTest
     )
 
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(workWithCopyright, WorksIncludes(items = true)))
+      DisplayWorkV2(workWithCopyright, V2WorksIncludes(items = true)))
     val expectedJson = s"""{
                           |     "type": "Work",
                           |     "id": "${workWithCopyright.canonicalId}",
@@ -191,7 +191,7 @@ class DisplayWorkV2SerialisationTest
       otherIdentifiers = List(otherIdentifier)
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(identifiers = true)))
+      DisplayWorkV2(work, V2WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -213,7 +213,7 @@ class DisplayWorkV2SerialisationTest
       otherIdentifiers = List()
     )
     val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(identifiers = true)))
+      DisplayWorkV2(work, V2WorksIncludes(identifiers = true)))
     val expectedJson = s"""
                           |{
                           | "type": "Work",
@@ -229,8 +229,7 @@ class DisplayWorkV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it(
-    "includes the thumbnail field if available and we use the thumbnail include") {
+  it("shows the thumbnail field if available") {
     val work = createIdentifiedWorkWith(
       thumbnail = Some(
         DigitalLocation(
@@ -239,8 +238,8 @@ class DisplayWorkV2SerialisationTest
           license = Some(License_CCBY)
         ))
     )
-    val actualJson = objectMapper.writeValueAsString(
-      DisplayWorkV2(work, WorksIncludes(thumbnail = true)))
+    val actualJson =
+      objectMapper.writeValueAsString(DisplayWorkV2(work, V2WorksIncludes()))
     val expectedJson = s"""
                           |   {
                           |     "type": "Work",

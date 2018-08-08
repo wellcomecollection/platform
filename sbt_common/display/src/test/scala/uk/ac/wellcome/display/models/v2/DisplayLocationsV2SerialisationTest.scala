@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v2
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V2WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -12,7 +12,7 @@ class DisplayLocationsV2SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises a physical location correctly") {
+  it("serialises a physical location") {
     val physicalLocation = PhysicalLocation(
       locationType = LocationType("sgmed"),
       label = "a stack of slick slimes"
@@ -22,7 +22,7 @@ class DisplayLocationsV2SerialisationTest
       items = List(createIdentifiedItem(locations = List(physicalLocation)))
     )
     val displayWork =
-      DisplayWorkV2(work, includes = WorksIncludes(items = true))
+      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -40,7 +40,7 @@ class DisplayLocationsV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location correctly") {
+  it("serialises a digital location") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image")
@@ -50,7 +50,7 @@ class DisplayLocationsV2SerialisationTest
       items = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
     val displayWork =
-      DisplayWorkV2(work, includes = WorksIncludes(items = true))
+      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -68,7 +68,7 @@ class DisplayLocationsV2SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location with a license correctly") {
+  it("serialises a digital location with a license") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image"),
@@ -79,7 +79,7 @@ class DisplayLocationsV2SerialisationTest
       items = List(createIdentifiedItem(locations = List(digitalLocation)))
     )
     val displayWork =
-      DisplayWorkV2(work, includes = WorksIncludes(items = true))
+      DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""

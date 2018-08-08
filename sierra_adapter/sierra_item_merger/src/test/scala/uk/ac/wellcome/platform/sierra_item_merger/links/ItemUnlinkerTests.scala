@@ -78,7 +78,7 @@ class ItemUnlinkerTests extends FunSpec with Matchers with SierraUtil {
     ItemUnlinker.unlinkItemRecord(sierraTransformable, outOfDateUnlinkedRecord) shouldBe sierraTransformable
   }
 
-  it("should only unlink item records with matching bib IDs") {
+  it("only unlinks item records with matching bib IDs") {
     val bibId = createSierraBibNumber
     val unrelatedBibId = createSierraBibNumber
 

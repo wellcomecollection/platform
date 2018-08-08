@@ -35,7 +35,6 @@ class SierraBibMergerWorkerServiceTest
 
   it(
     "throws a GracefulFailureException if the message on the queue does not represent a SierraRecord") {
-
     withWorkerServiceFixtures {
       case (metricsSender, QueuePair(queue, dlq), _) =>
         sendNotificationToSQS(

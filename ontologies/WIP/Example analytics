@@ -1,0 +1,123 @@
+{
+  "id": "",
+  "type": "Work",
+  "title": "Country health for you! : drink delicious 'Ovaltine' tonic food beverage",
+  "partOf": {
+    "id": "1u90d2u",
+    "type": "Work",
+    "title": "Drinks ephemera: Ovaltine & Horlicks"
+  },
+  "inCollection": {
+    "id": "j921s9j21",
+    "type": "Collection",
+    "title": "Labels and packaging collection"
+  },
+  "series": {
+    "id": "j921s9j21",
+    "type": "Work",
+    "workType": "Series",
+    "title": "Labels and packaging collection"
+  },
+  "positionInSeries" : "1" ,
+  "items": [
+    {
+      "id": "b28gh7z4n",
+      "type": "Item",
+      "identifiers": [
+        {
+          "value": "i11579328",
+          "type": "Identifier",
+          "indentifierType": {
+            "id": "sierra-system-number",
+            "label": "Sierra System Number",
+            "type": "IdentifierType"
+          }
+        }
+      ],
+      "boundIn": {
+        "id": "b28gh7z4v",
+        "type": "Item",
+        "works": {
+          "title": "Drinks ephemera: Ovaltine & Horlicks. Box 1",
+          "type": "Work",
+          "id": "r568ghk",
+          "workType": "Emphmera"
+        }
+      },
+      "boundWith": [
+        {
+          "id": "i28gh7z4v",
+          "type": "Item",
+          "works": [
+            {
+              "id": "b28gh7z4v",
+              "type": "Work",
+              "workType": "Emphmera",
+              "title": "Drinks ephemera: Ovaltine & Horlicks. Ad"
+            }
+          ]
+        }
+      ],
+      "containedIn": {
+        "id": "b28gh7z4v",
+        "type": "Item",
+        "works": {
+          "title": "Drinks ephemera: Ovaltine & Horlicks. Box 1",
+          "type": "Work",
+          "workType": "Emphmera",
+          "id": "r568ghk"
+        }
+      },
+      "containedWith": [
+        {
+          "id": "b28gh7z4v",
+          "type": "Item",
+          "works": {
+            "title": "Drinks ephemera: Ovaltine & Horlicks. Ad",
+            "type": "Work",
+            "workType": "Emphmera",
+            "id": "7ys2hm"
+          }
+        },
+        {
+          "id": "t78231hj",
+          "type": "Item",
+          "works": {
+            "title": "Drinks ephemera: Ovaltine & Horlicks. Flyer",
+            "type": "Work",
+            "workType": "Emphmera",
+            "id": "r568ghk"
+          }
+        }
+      ],
+      "locations": [
+        {
+          "type": "Location",
+          "locationType": {
+            "id": "closed-store",
+            "label": "Closed Store",
+            "type": "LocationType"
+          },
+          "label": "Closed Store Iconographic",
+          "shelfmark": "1L9N.1",
+          "accessStatus": {
+            "id": "open",
+            "type": "AccessStatus"
+          },
+          "accessProcess": {
+            "id": "online-access",
+            "label": "Online access",
+            "type": "AccessProcess"
+          },
+          "url": "https://iiif.wellcomecollection.org/image/V0006724.jpg/info.json",
+          "license": {
+            "type": "License",
+            "id": "cc-by",
+            "label": "Attribution 4.0 International (CC BY 4.0)",
+            "url": "http://creativecommons.org/licenses/by/4.0/"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.snapshot_generator
 import java.io.File
 
 import com.amazonaws.services.s3.model.GetObjectRequest
-import com.twitter.finatra.http.EmbeddedHttpServer
 import org.scalatest.concurrent.Eventually
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models.ApiVersions
@@ -47,9 +46,9 @@ class SnapshotGeneratorFeatureTest
 
   val itemType = "work"
 
-  it("completes a snapshot generation successfully") {
+  it("completes a snapshot generation") {
     withFixtures {
-      case (_, queue, topic, indexNameV1, indexNameV2, publicBucket) =>
+      case (queue, topic, indexNameV1, _, publicBucket: Bucket) =>
         val works = createIdentifiedWorks(count = 3)
 
         insertIntoElasticsearch(indexNameV1, itemType, works: _*)
@@ -65,7 +64,6 @@ class SnapshotGeneratorFeatureTest
         sendNotificationToSQS(queue = queue, message = snapshotJob)
 
         eventually {
-
           val downloadFile =
             File.createTempFile("snapshotGeneratorFeatureTest", ".txt.gz")
 
@@ -113,19 +111,18 @@ class SnapshotGeneratorFeatureTest
   }
 
   def withFixtures[R](
-    testWith: TestWith[
-      (EmbeddedHttpServer, Queue, Topic, String, String, Bucket),
-      R]) =
+    testWith: TestWith[(Queue, Topic, String, String, Bucket), R]) =
     withLocalSqsQueue { queue =>
       withLocalSnsTopic { topic =>
         withLocalElasticsearchIndex(itemType = itemType) { indexNameV1 =>
           withLocalElasticsearchIndex(itemType = itemType) { indexNameV2 =>
             withLocalS3Bucket { bucket =>
-              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ s3LocalFlags(
-                bucket) ++ esLocalFlags(indexNameV1, indexNameV2, itemType)
-              withServer(flags) { server =>
-                testWith(
-                  (server, queue, topic, indexNameV1, indexNameV2, bucket))
+              val flags = snsLocalFlags(topic) ++ sqsLocalFlags(queue) ++ esLocalFlags(
+                indexNameV1,
+                indexNameV2,
+                itemType) ++ s3ClientLocalFlags
+              withServer(flags) { _ =>
+                testWith((queue, topic, indexNameV1, indexNameV2, bucket))
               }
             }
           }

@@ -5,7 +5,7 @@ import uk.ac.wellcome.models.work.test.util.ItemsUtil
 
 class DisplayItemV1Test extends FunSpec with Matchers with ItemsUtil {
 
-  it("should read an Item as a DisplayItemV1 correctly") {
+  it("reads an Item as a DisplayItemV1") {
     val item = createIdentifiedItem()
 
     val displayItemV1 = DisplayItemV1(
@@ -21,7 +21,7 @@ class DisplayItemV1Test extends FunSpec with Matchers with ItemsUtil {
     displayItemV1.ontologyType shouldBe "Item"
   }
 
-  it("correctly parses an Item without any extra identifiers") {
+  it("parses an Item without any extra identifiers") {
     val item = createIdentifiedItem()
 
     val displayItemV1 = DisplayItemV1(
@@ -33,7 +33,7 @@ class DisplayItemV1Test extends FunSpec with Matchers with ItemsUtil {
       List(DisplayIdentifierV1(item.sourceIdentifier)))
   }
 
-  it("correctly parses an Item without any locations") {
+  it("parses an Item without any locations") {
     val item = createIdentifiedItem(locations = List())
 
     val displayItemV1 = DisplayItemV1(

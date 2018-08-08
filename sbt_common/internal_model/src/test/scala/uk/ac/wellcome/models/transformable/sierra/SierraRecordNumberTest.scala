@@ -18,11 +18,11 @@ class SierraRecordNumberTest extends FunSpec with Matchers {
   }
 
   describe("withoutCheckDigit") {
-    it("handles a bib example correctly") {
+    it("handles a bib example") {
       SierraBibNumber("1024364").withoutCheckDigit shouldBe "1024364"
     }
 
-    it("handles an item example correctly") {
+    it("handles an item example") {
       SierraItemNumber("1828888").withoutCheckDigit shouldBe "1828888"
     }
   }

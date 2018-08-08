@@ -69,7 +69,7 @@ class ReindexRequestCreatorWorkerTest
     }
   }
 
-  it("successfully completes a reindex") {
+  it("completes a reindex") {
     withLocalDynamoDbTable { table =>
       withLocalSnsTopic { topic =>
         withReindexWorkerService(topic) {

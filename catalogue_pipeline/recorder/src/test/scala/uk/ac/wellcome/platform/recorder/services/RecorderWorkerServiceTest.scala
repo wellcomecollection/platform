@@ -33,7 +33,7 @@ class RecorderWorkerServiceTest
     with ExtendedPatience
     with WorksUtil {
 
-  it("successfully records a UnidentifiedWork") {
+  it("records an UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
@@ -59,7 +59,7 @@ class RecorderWorkerServiceTest
     }
   }
 
-  it("stores UnidentifiedInvisibleWork successfully") {
+  it("stores UnidentifiedInvisibleWorks") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>

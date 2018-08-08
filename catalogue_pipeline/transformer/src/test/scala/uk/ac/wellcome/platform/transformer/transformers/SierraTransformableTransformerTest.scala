@@ -154,7 +154,7 @@ class SierraTransformableTransformerTest
   }
 
   it(
-    "should not perform a transformation without bibData, even if some itemData is present") {
+    "does not perform a transformation without bibData, even if some itemData is present") {
     assertTransformReturnsInvisibleWork(
       maybeBibRecord = None,
       itemRecords = List(createSierraItemRecord)

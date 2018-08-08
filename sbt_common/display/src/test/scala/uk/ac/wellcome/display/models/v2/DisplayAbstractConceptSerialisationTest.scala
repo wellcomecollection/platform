@@ -81,8 +81,7 @@ class DisplayAbstractConceptSerialisationTest
     )
   }
 
-  it(
-    "serialises AbstractDisplayConcepts constructed from AbstractConcepts correctly") {
+  it("serialises AbstractDisplayConcepts constructed from AbstractConcepts") {
     assertObjectMapsToJson(
       List[Displayable[AbstractConcept]](
         Unidentifiable(Concept("conceptLabel")),

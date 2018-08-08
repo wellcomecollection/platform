@@ -1,7 +1,7 @@
 package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.FunSpec
-import uk.ac.wellcome.display.models.WorksIncludes
+import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.test.util.JsonMapperTestUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
@@ -12,7 +12,7 @@ class DisplayLocationsV1SerialisationTest
     with JsonMapperTestUtil
     with WorksUtil {
 
-  it("serialises a physical location correctly") {
+  it("serialises a physical location") {
     val physicalLocation = PhysicalLocation(
       locationType = LocationType("sgmed"),
       label = "a stack of slick slimes"
@@ -24,7 +24,7 @@ class DisplayLocationsV1SerialisationTest
       )
     )
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -43,7 +43,7 @@ class DisplayLocationsV1SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location correctly") {
+  it("serialises a digital location") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image")
@@ -54,7 +54,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
     val expectedJson = s"""
@@ -72,7 +72,7 @@ class DisplayLocationsV1SerialisationTest
     assertJsonStringsAreEqual(actualJson, expectedJson)
   }
 
-  it("serialises a digital location with a license correctly") {
+  it("serialises a digital location with a license") {
     val digitalLocation = DigitalLocation(
       url = "https://wellcomelibrary.org/iiif/b22015085/manifest",
       locationType = LocationType("iiif-image"),
@@ -84,7 +84,7 @@ class DisplayLocationsV1SerialisationTest
     )
 
     val displayWork =
-      DisplayWorkV1(work, includes = WorksIncludes(items = true))
+      DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
 
     val actualJson = objectMapper.writeValueAsString(displayWork)
 

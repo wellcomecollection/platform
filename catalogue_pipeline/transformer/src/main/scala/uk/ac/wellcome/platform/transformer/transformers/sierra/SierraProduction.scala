@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{
   MarcSubfield,
   SierraBibData,
@@ -132,9 +132,9 @@ trait SierraProduction {
           case Some("2") => "Distribution"
           case Some("3") => "Manufacture"
           case other =>
-            throw GracefulFailureException(new RuntimeException(
+            throw TransformerException(
               s"Unrecognised second indicator for production function: [$other]"
-            ))
+            )
         }
 
         val productionFunction = Some(Concept(label = productionFunctionLabel))
@@ -191,10 +191,9 @@ trait SierraProduction {
     // Otherwise this is some sort of cataloguing error.  This is fairly
     // rare, so let it bubble on to a DLQ.
     else {
-      throw GracefulFailureException(
-        new RuntimeException(
-          "Record has both 260 and 264 fields; this is a cataloguing error."
-        ))
+      throw TransformerException(
+        "Record has both 260 and 264 fields; this is a cataloguing error."
+      )
     }
   }
 

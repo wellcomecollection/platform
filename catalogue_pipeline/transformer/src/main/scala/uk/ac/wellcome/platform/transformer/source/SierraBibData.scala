@@ -2,9 +2,11 @@ package uk.ac.wellcome.platform.transformer.source
 
 import uk.ac.wellcome.platform.transformer.source.sierra.{
   Country => SierraCountry,
-  Language => SierraLanguage
+  Language => SierraLanguage,
+  Location => SierraLocation
 }
 
+// https://techdocs.iii.com/sierraapi/Content/zReference/objects/bibObjectDescription.htm
 case class SierraBibData(
   title: Option[String] = None,
   deleted: Boolean = false,
@@ -12,6 +14,7 @@ case class SierraBibData(
   country: Option[SierraCountry] = None,
   lang: Option[SierraLanguage] = None,
   materialType: Option[SierraMaterialType] = None,
+  locations: Option[List[SierraLocation]] = None,
   fixedFields: Map[String, FixedField] = Map(),
   varFields: List[VarField] = List()
 )

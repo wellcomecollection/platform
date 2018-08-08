@@ -1,9 +1,12 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.SierraItemData
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Location => SierraLocationField
+}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
@@ -43,11 +46,11 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
         itemRecords = itemRecords
       )
 
-      val caught = intercept[GracefulFailureException] {
+      val caught = intercept[TransformerException] {
         transformer.extractItemData(transformable)
       }
 
-      caught.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
+      caught.e.getMessage shouldBe s"Unable to parse item data for $itemIdBad as JSON: <<$notAJsonString>>"
     }
   }
 
@@ -138,6 +141,45 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       )
 
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List.empty
+    }
+
+    it("ignores a digital item on a bib record without a 'dlnk' location") {
+      val bibData = createSierraBibDataWith(
+        locations = Some(List(
+          SierraLocationField("digi", "Digitised Collections")
+        ))
+      )
+
+      val result = transformer.getDigitalItems(
+        sourceIdentifier = createSierraSourceIdentifier,
+        sierraBibData = bibData)
+
+      result shouldBe List()
+    }
+
+    it("adds a digital item on a bib record with a 'dlnk' location") {
+      val sourceIdentifier = createSierraSourceIdentifier
+      val bibData = createSierraBibDataWith(
+        locations = Some(List(
+          SierraLocationField("digi", "Digitised Collections"),
+          SierraLocationField("dlnk", "Digitised content")
+        ))
+      )
+
+      val result = transformer.getDigitalItems(
+        sourceIdentifier = sourceIdentifier,
+        sierraBibData = bibData)
+
+      val expectedItems = List(
+        Unidentifiable(
+        agent = Item(
+        locations = List(DigitalLocation(
+          url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
+          license = None,
+          locationType = LocationType("iiif-presentation"))))
+      ))
+
+      result shouldBe expectedItems
     }
   }
 }

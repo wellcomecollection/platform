@@ -26,6 +26,7 @@ import uk.ac.wellcome.platform.merger.modules.{
 class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.merger Merger"
   override val modules = Seq(
+    MessageWriterConfigModule,
     MetricsSenderModule,
     AkkaModule,
     SQSClientModule,
@@ -36,7 +37,6 @@ class Server extends HttpServer {
     DynamoClientModule,
     S3ClientModule,
     SNSClientModule,
-    MessageConfigModule,
     RecorderWorkEntryModule,
     BaseWorkModule
   )
