@@ -66,7 +66,7 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  def getDigitalItem(
+  private def getDigitalItem(
     sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
     Unidentifiable(
       agent = Item(
@@ -75,14 +75,34 @@ trait SierraItems extends Logging with SierraLocation {
     )
   }
 
+  /** Add digital items to a work.
+    *
+    * We can add digital items if:
+    *   1) The bib record has material type "E-books"
+    *   2) There's a "dlnk" location in the "locations" field of the bib
+    *      record.
+    *
+    * Note: both of these fields are populated manually.  We can work out if
+    * a library record has a digitised version from the METS files -- when we
+    * have those in the pipeline, we can do away with this code.
+    *
+    */
   def getDigitalItems(
     sourceIdentifier: SourceIdentifier,
     sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
-    sierraBibData.materialType match {
-      case Some(SierraMaterialType("v", "E-books")) =>
-        List(getDigitalItem(sourceIdentifier))
-      case _ => List.empty
+
+    val hasEbookMaterialType =
+      sierraBibData.materialType.contains(SierraMaterialType("v", "E-books"))
+
+    val hasDlnkLocation = sierraBibData.locations match {
+      case Some(locations) => locations.map { _.code }.contains("dlnk")
+      case None            => false
+    }
+
+    if (hasEbookMaterialType || hasDlnkLocation) {
+      List(getDigitalItem(sourceIdentifier))
+    } else {
+      List()
     }
   }
-
 }
