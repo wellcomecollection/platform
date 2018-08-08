@@ -199,11 +199,11 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .map { genre(_) }
       .mkString(",")
 
-  def contributor(c: Contributor[Displayable[AbstractAgent]]) =
+  def contributor(contributors: Contributor[Displayable[AbstractAgent]]) =
     s"""
        |{
-       |  "agent": ${identifiedOrUnidentifiable(c.agent, abstractAgent)},
-       |  "roles": ${toJson(c.roles).get},
+       |  "agent": ${identifiedOrUnidentifiable(contributors.agent, abstractAgent)},
+       |  "roles": ${toJson(contributors.roles).get},
        |  "type": "Contributor"
        |}
      """.stripMargin
@@ -211,15 +211,15 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def contributors(c: List[Contributor[Displayable[AbstractAgent]]]) =
     c.map(contributor).mkString(",")
 
-  def production(l: List[ProductionEvent[Displayable[AbstractAgent]]]) =
-    l.map(productionEvent).mkString(",")
+  def production(production: List[ProductionEvent[Displayable[AbstractAgent]]]) =
+    production.map(productionEvent).mkString(",")
 
-    def productionEvent(p: ProductionEvent[Displayable[AbstractAgent]]) =
+    def productionEvent(event: ProductionEvent[Displayable[AbstractAgent]]) =
     s"""
        |{
-       |  "dates": [${p.dates.map(period).mkString(",")}],
-       |  "agents": [${p.agents.map(identifiedOrUnidentifiable(_, abstractAgent)).mkString(",")}],
-       |  "places": [${p.places.map(place).mkString(",")}],
+       |  "dates": [${event.dates.map(period).mkString(",")}],
+       |  "agents": [${event.agents.map(identifiedOrUnidentifiable(_, abstractAgent)).mkString(",")}],
+       |  "places": [${event.places.map(place).mkString(",")}],
        |  "type": "ProductionEvent"
        |}
      """.stripMargin

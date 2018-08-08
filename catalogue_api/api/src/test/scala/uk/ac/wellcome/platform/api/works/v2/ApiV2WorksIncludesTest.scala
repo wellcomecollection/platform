@@ -114,7 +114,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
 
-        val subjects1 = List(Subject("ornitology", List(Unidentifiable(Concept("ornitology")))))
+        val subjects1 = List(Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val subjects2 = List(Subject("flying cars", List(Unidentifiable(Concept("flying cars")))))
         val work0 = works(0).copy(subjects = subjects1)
         val work1 = works(1).copy(subjects = subjects2)
@@ -155,7 +155,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
 
-        val subject = List(Subject("ornitology", List(Unidentifiable(Concept("ornitology")))))
+        val subject = List(Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val work = createIdentifiedWork.copy(subjects = subject)
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
@@ -186,7 +186,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
         val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
 
 
-        val genres1 = List(Genre("ornitology", List(Unidentifiable(Concept("ornitology")))))
+        val genres1 = List(Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val genres2 = List(Genre("flying cars", List(Unidentifiable(Concept("flying cars")))))
         val work0 = works(0).copy(genres = genres1)
         val work1 = works(1).copy(genres = genres2)
@@ -227,7 +227,7 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
     withV2Api {
       case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
 
-        val genre = List(Genre("ornitology", List(Unidentifiable(Concept("ornitology")))))
+        val genre = List(Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
         val work = createIdentifiedWork.copy(genres = genre)
 
         insertIntoElasticsearch(indexNameV2, itemType, work)
@@ -311,12 +311,12 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
             withJsonBody =
               s"""
                  |{
-                 |"@context": "https://localhost:8888/$apiPrefix/context.json",
-                 |     "type": "Work",
-                 |     "id": "${work.canonicalId}",
-                 |     "title": "${work.title}",
-                 |     "contributors": [ ${contributors(contributor)}]
-                 |   }
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "contributors": [ ${contributors(contributor)}]
+                 |}
           """.stripMargin
           )
         }
