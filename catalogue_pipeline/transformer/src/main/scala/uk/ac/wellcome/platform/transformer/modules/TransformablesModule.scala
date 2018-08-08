@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.modules
 
-import akka.actor.{ActorSystem, Terminated}
 import com.google.inject.{Provides, Singleton}
 import com.twitter.inject.{Injector, TwitterModule}
 import io.circe.{KeyDecoder, KeyEncoder}
@@ -53,7 +52,7 @@ object TransformablesModule extends TwitterModule {
     implicit val executionContext: ExecutionContext = injector.instance[ExecutionContext]
 
     transformerConfig.sourceName match {
-      case TransformerSourceNames.miro => ObjectStore[MiroTransformable]
+      case TransformerSourceNames.miro   => ObjectStore[MiroTransformable]
       case TransformerSourceNames.sierra => ObjectStore[SierraTransformable]
     }
   }
@@ -66,19 +65,11 @@ object TransformablesModule extends TwitterModule {
       case TransformerSourceNames.sierra => new SierraTransformableTransformer
     }
 
-  def singletonStartup(injector: Injector, transformerConfig: TransformerConfig): Unit =
-    super.singletonStartup(injector)
-
-  def singletonShutdown(injector: Injector, transformerConfig: TransformerConfig): Future[Terminated] = {
-    info("Terminating SQS worker")
-
-    val system = injector.instance[ActorSystem]
-    val workerService = transformerConfig.sourceName match {
+  @Provides
+  @Singleton
+  def providesTransformableWorkerService(injector: Injector, transformerConfig: TransformerConfig): TransformerWorkerService[_ <: Transformable] =
+    transformerConfig.sourceName match {
       case TransformerSourceNames.miro   => injector.instance[TransformerWorkerService[MiroTransformable]]
       case TransformerSourceNames.sierra => injector.instance[TransformerWorkerService[SierraTransformable]]
     }
-
-    workerService.stop()
-    system.terminate()
-  }
 }
