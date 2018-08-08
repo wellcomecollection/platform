@@ -59,7 +59,7 @@ object TransformablesModule extends TwitterModule {
 
   @Provides
   @Singleton
-  def providesTransformableTransformer(transformerConfig: TransformerConfig): TransformableTransformer[_ <: Transformable] = {
+  def providesTransformableTransformer(transformerConfig: TransformerConfig): TransformableTransformer[_ <: Transformable] =
     transformerConfig.sourceName match {
       case TransformerSourceNames.miro   => new MiroTransformableTransformer
       case TransformerSourceNames.sierra => new SierraTransformableTransformer
