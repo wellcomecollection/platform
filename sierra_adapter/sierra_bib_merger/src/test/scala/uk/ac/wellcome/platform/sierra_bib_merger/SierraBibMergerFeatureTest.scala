@@ -8,7 +8,7 @@ import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
-import uk.ac.wellcome.storage.vhs.EmptyMetadata
+import uk.ac.wellcome.storage.vhs.SourceMetadata
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
@@ -34,7 +34,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val bibRecord = createSierraBibRecord
@@ -64,7 +64,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val record1 = createSierraBibRecord
@@ -105,7 +105,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val oldBibRecord = createSierraBibRecordWith(
@@ -150,7 +150,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
+            withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
               bucket,
               table) { hybridStore =>
               val newBibRecord = createSierraBibRecordWith(
@@ -194,7 +194,7 @@ class SierraBibMergerFeatureTest
         withLocalDynamoDbTable { table =>
           val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
           withServer(flags) { _ =>
-            withTypeVHS[SierraTransformable, EmptyMetadata, Unit](bucket, table) {
+            withTypeVHS[SierraTransformable, SourceMetadata, Unit](bucket, table) {
               hybridStore =>
                 val transformable = createSierraTransformableWith(
                   maybeBibRecord = None
