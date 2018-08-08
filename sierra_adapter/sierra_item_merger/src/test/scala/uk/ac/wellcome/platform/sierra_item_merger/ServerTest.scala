@@ -13,14 +13,17 @@ class ServerTest
 
   it("shows the healthcheck message") {
     withLocalSqsQueue { queue =>
-      withLocalS3Bucket { bucket =>
-        withLocalDynamoDbTable { table =>
-          val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(bucket, table)
-          withServer(flags) { server =>
-            server.httpGet(
-              path = "/management/healthcheck",
-              andExpect = Ok,
-              withJsonBody = """{"message": "ok"}""")
+      withLocalS3Bucket { itemsBucket =>
+        withLocalS3Bucket { vhsBucket =>
+          withLocalDynamoDbTable { table =>
+            val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
+              itemsBucket)
+            withServer(flags) { server =>
+              server.httpGet(
+                path = "/management/healthcheck",
+                andExpect = Ok,
+                withJsonBody = """{"message": "ok"}""")
+            }
           }
         }
       }
