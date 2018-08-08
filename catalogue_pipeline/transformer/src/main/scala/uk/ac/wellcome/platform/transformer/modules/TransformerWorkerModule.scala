@@ -16,7 +16,8 @@ object TransformerWorkerModule extends TwitterModule {
     info("Terminating SQS worker")
 
     val system = injector.instance[ActorSystem]
-    val workerService = injector.instance[TransformerWorkerService[_ <: Transformable]]
+    val workerService =
+      injector.instance[TransformerWorkerService[_ <: Transformable]]
 
     workerService.stop()
     system.terminate()

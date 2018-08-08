@@ -12,11 +12,20 @@ import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.models.transformable.{MiroTransformable, SierraTransformable}
+import uk.ac.wellcome.models.transformable.{
+  MiroTransformable,
+  SierraTransformable
+}
 import uk.ac.wellcome.models.transformable.SierraTransformable._
-import uk.ac.wellcome.models.work.internal.{TransformedBaseWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  TransformedBaseWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
-import uk.ac.wellcome.platform.transformer.transformers.{MiroTransformableTransformer, SierraTransformableTransformer}
+import uk.ac.wellcome.platform.transformer.transformers.{
+  MiroTransformableTransformer,
+  SierraTransformableTransformer
+}
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.ObjectStore
@@ -51,17 +60,18 @@ class NotificationMessageReceiverTest
             bucket = bucket
           )
 
-          withSierraNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(sqsMessage)
+          withSierraNotificationMessageReceiver(topic, bucket) {
+            recordReceiver =>
+              val future = recordReceiver.receiveMessage(sqsMessage)
 
-            whenReady(future) { _ =>
-              val works = getMessages[TransformedBaseWork](topic)
-              works.size should be >= 1
+              whenReady(future) { _ =>
+                val works = getMessages[TransformedBaseWork](topic)
+                works.size should be >= 1
 
-              works.map { work =>
-                work shouldBe a[UnidentifiedWork]
+                works.map { work =>
+                  work shouldBe a[UnidentifiedWork]
+                }
               }
-            }
           }
         }
       }
@@ -80,19 +90,21 @@ class NotificationMessageReceiverTest
             bucket = bucket
           )
 
-          withSierraNotificationMessageReceiver(topic, bucket) { recordReceiver =>
-            val future = recordReceiver.receiveMessage(sierraMessage)
+          withSierraNotificationMessageReceiver(topic, bucket) {
+            recordReceiver =>
+              val future = recordReceiver.receiveMessage(sierraMessage)
 
-            whenReady(future) { _ =>
-              val works = getMessages[TransformedBaseWork](topic)
-              works.size should be >= 1
+              whenReady(future) { _ =>
+                val works = getMessages[TransformedBaseWork](topic)
+                works.size should be >= 1
 
-              works.map { actualWork =>
-                actualWork shouldBe a[UnidentifiedWork]
-                val unidentifiedWork = actualWork.asInstanceOf[UnidentifiedWork]
-                unidentifiedWork.version shouldBe version
+                works.map { actualWork =>
+                  actualWork shouldBe a[UnidentifiedWork]
+                  val unidentifiedWork =
+                    actualWork.asInstanceOf[UnidentifiedWork]
+                  unidentifiedWork.version shouldBe version
+                }
               }
-            }
           }
         }
       }
@@ -183,7 +195,10 @@ class NotificationMessageReceiverTest
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
   )(testWith: TestWith[NotificationMessageReceiver[MiroTransformable], R]): R =
-    withMessageWriter[TransformedBaseWork, R](bucket, topic, maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
+    withMessageWriter[TransformedBaseWork, R](
+      bucket,
+      topic,
+      maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
       val recordReceiver = new NotificationMessageReceiver[MiroTransformable](
         messageWriter = messageWriter,
         s3Client = s3Client,
@@ -201,8 +216,12 @@ class NotificationMessageReceiverTest
     topic: Topic,
     bucket: Bucket,
     maybeSnsClient: Option[AmazonSNS] = None
-  )(testWith: TestWith[NotificationMessageReceiver[SierraTransformable], R]): R =
-    withMessageWriter[TransformedBaseWork, R](bucket, topic, maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
+  )(testWith: TestWith[NotificationMessageReceiver[SierraTransformable], R])
+    : R =
+    withMessageWriter[TransformedBaseWork, R](
+      bucket,
+      topic,
+      maybeSnsClient.getOrElse(snsClient)) { messageWriter =>
       val recordReceiver = new NotificationMessageReceiver[SierraTransformable](
         messageWriter = messageWriter,
         s3Client = s3Client,
