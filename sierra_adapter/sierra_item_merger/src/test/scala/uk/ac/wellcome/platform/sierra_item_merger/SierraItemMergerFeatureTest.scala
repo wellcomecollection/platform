@@ -11,9 +11,10 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.fixtures.{LocalVersionedHybridStore, S3}
-import uk.ac.wellcome.storage.vhs.{HybridRecord, SourceMetadata}
+import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.sierra_adapter.utils.SierraVHSUtil
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -26,7 +27,8 @@ class SierraItemMergerFeatureTest
     with SQS
     with S3
     with LocalVersionedHybridStore
-    with SierraUtil {
+    with SierraUtil
+    with SierraVHSUtil {
 
   it("stores an item from SQS") {
     withLocalSqsQueue { queue =>
@@ -36,7 +38,7 @@ class SierraItemMergerFeatureTest
             val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
               messagingBucket)
             withServer(flags) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+              withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
                 vhsBucket,
                 table) { hybridStore =>
                 val bibId = createSierraBibNumber
@@ -58,11 +60,11 @@ class SierraItemMergerFeatureTest
                 )
 
                 eventually {
-                  assertStored[SierraTransformable](
+                  assertStored(
+                    transformable = expectedSierraTransformable,
                     bucket = vhsBucket,
-                    table = table,
-                    id = expectedSierraTransformable.id,
-                    record = expectedSierraTransformable)
+                    table = table
+                  )
                 }
               }
             }
@@ -80,7 +82,7 @@ class SierraItemMergerFeatureTest
             val flags = sqsLocalFlags(queue) ++ vhsLocalFlags(vhsBucket, table) ++ s3LocalFlags(
               messagingBucket)
             withServer(flags) { _ =>
-              withTypeVHS[SierraTransformable, SourceMetadata, Assertion](
+              withTypeVHS[SierraTransformable, EmptyMetadata, Assertion](
                 vhsBucket,
                 table) { hybridStore =>
                 val bibId1 = createSierraBibNumber
@@ -120,16 +122,16 @@ class SierraItemMergerFeatureTest
                       itemRecords = List(itemRecord2)
                     )
 
-                  assertStored[SierraTransformable](
-                    vhsBucket,
-                    table,
-                    id = expectedSierraTransformable1.id,
-                    record = expectedSierraTransformable1)
-                  assertStored[SierraTransformable](
-                    vhsBucket,
-                    table,
-                    id = expectedSierraTransformable2.id,
-                    record = expectedSierraTransformable2)
+                  assertStored(
+                    transformable = expectedSierraTransformable1,
+                    bucket = vhsBucket,
+                    table = table
+                  )
+                  assertStored(
+                    transformable = expectedSierraTransformable2,
+                    bucket = vhsBucket,
+                    table = table
+                  )
                 }
               }
             }
