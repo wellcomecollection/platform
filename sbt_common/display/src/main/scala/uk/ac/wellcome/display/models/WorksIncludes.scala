@@ -1,6 +1,7 @@
 package uk.ac.wellcome.display.models
 
 import com.fasterxml.jackson.core.JsonProcessingException
+import uk.ac.wellcome.display.shapeless.{ToAttributes, WorksIncludesFromList}
 
 trait WorksIncludes
 
@@ -13,30 +14,23 @@ case class V1WorksIncludes(
 case class V2WorksIncludes(
   identifiers: Boolean = false,
   items: Boolean = false,
-  subjects: Boolean = false
+  subjects: Boolean = false,
+  genres: Boolean = false
 ) extends WorksIncludes
 
 class WorksIncludesParsingException(msg: String)
     extends JsonProcessingException(msg: String)
 
 object V1WorksIncludes {
-  val recognisedIncludes = List("identifiers", "thumbnail", "items")
-  def apply(includesList: List[String]): V1WorksIncludes = V1WorksIncludes(
-    identifiers = includesList.contains("identifiers"),
-    thumbnail = includesList.contains("thumbnail"),
-    items = includesList.contains("items")
-  )
+  val recognisedIncludes = ToAttributes.toAttributes[V1WorksIncludes]
+  def apply(includesList: List[String]): V1WorksIncludes = WorksIncludesFromList.toWorksIncludes[V1WorksIncludes](includesList)
 
   def includeAll() = V1WorksIncludes(recognisedIncludes)
 }
 
 object V2WorksIncludes {
-  val recognisedIncludes = List("identifiers", "subjects","items")
-  def apply(includesList: List[String]): V2WorksIncludes = V2WorksIncludes(
-    identifiers = includesList.contains("identifiers"),
-    subjects = includesList.contains("subjects"),
-    items = includesList.contains("items")
-  )
+  val recognisedIncludes = ToAttributes.toAttributes[V2WorksIncludes]
+  def apply(includesList: List[String]): V2WorksIncludes = WorksIncludesFromList.toWorksIncludes[V2WorksIncludes](includesList)
 
   def includeAll() = V2WorksIncludes(recognisedIncludes)
 }
