@@ -56,7 +56,6 @@ class SierraTransformerFeatureTest
             val sierraHybridRecordMessage =
               hybridRecordNotificationMessage(
                 message = toJson(sierraTransformable).get,
-                s3Client = s3Client,
                 bucket = storageBucket
               )
 

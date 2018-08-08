@@ -72,7 +72,6 @@ class NotificationMessageReceiverTest
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
             message = toJson(createSierraTransformable).get,
-            s3Client = s3Client,
             bucket = bucket
           )
 
@@ -102,7 +101,6 @@ class NotificationMessageReceiverTest
           val sierraMessage = hybridRecordNotificationMessage(
             message = toJson(createSierraTransformable).get,
             version = version,
-            s3Client = s3Client,
             bucket = bucket
           )
 
@@ -132,7 +130,6 @@ class NotificationMessageReceiverTest
           val invalidSqsMessage =
             hybridRecordNotificationMessage(
               message = "not a json string",
-              s3Client = s3Client,
               bucket = bucket
             )
 
@@ -161,7 +158,6 @@ class NotificationMessageReceiverTest
           val failingSqsMessage =
             hybridRecordNotificationMessage(
               message = toJson(miroTransformable).get,
-              s3Client = s3Client,
               bucket = bucket
             )
 
@@ -188,7 +184,6 @@ class NotificationMessageReceiverTest
         withLocalS3Bucket { bucket =>
           val message = hybridRecordNotificationMessage(
             message = toJson(sierraTransformable).get,
-            s3Client = s3Client,
             bucket = bucket
           )
 

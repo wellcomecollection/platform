@@ -38,7 +38,6 @@ class MiroTransformerFeatureTest
                   MiroCollection = "foo",
                   data = buildJSONForWork(s""""image_title": "$title"""")
                 ),
-                s3Client = s3Client,
                 bucket = storageBucket
               )
 
@@ -109,7 +108,6 @@ class MiroTransformerFeatureTest
                       }
                     """
                   ),
-                  s3Client = s3Client,
                   bucket = storageBucket
                 )
               val miroHybridRecordMessage2 =
@@ -137,7 +135,6 @@ class MiroTransformerFeatureTest
                       }
                     """
                   ),
-                  s3Client = s3Client,
                   bucket = storageBucket
                 )
 
