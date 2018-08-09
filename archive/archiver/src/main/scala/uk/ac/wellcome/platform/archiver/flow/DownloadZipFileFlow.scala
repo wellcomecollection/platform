@@ -30,10 +30,7 @@ object DownloadZipFileFlow extends Logging {
         val fileSink = FileIO.toPath(tmpFile.toPath)
 
         Source
-          .fromFuture(
-            downloadStream
-              .runWith(fileSink)
-          )
+          .fromFuture(downloadStream.runWith(fileSink))
           .map(_.status)
           .map {
             case Success(_) => new ZipFile(tmpFile)

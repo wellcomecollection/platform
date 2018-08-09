@@ -97,28 +97,10 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       .runWith(sink)(resumingMaterializer)
   }
 
-  // Defines a "supervision strategy" -- this tells Akka how to react
-  // if one of the elements fails.  We want to log the failing message,
-  // then drop it and carry on processing the next message.
-  //
-  // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
-  //
-  private def decider(metricName: String,
-                      strategy: Supervision.Directive): Supervision.Decider = {
+  private def decider(metricName: String, strategy: Supervision.Directive): Supervision.Decider = {
     case e =>
-      logException(e)
+      error("MessageStream failure encountered", e)
       metricsSender.countFailure(metricName)
       strategy
-  }
-
-  private def logException(exception: Throwable): Unit = {
-    exception match {
-      case exception: GracefulFailureException =>
-        warn(s"Graceful failure: ${exception.getMessage}")
-      case exception: DynamoNonFatalError =>
-        warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
-      case exception: Exception =>
-        error(s"Unrecognised failure while: ${exception.getMessage}", exception)
-    }
   }
 }

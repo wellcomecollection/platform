@@ -25,6 +25,7 @@ object UploadVerificationFlow extends Logging {
             s"${config.uploadPrefix}/${location.namespace}/${location.key}"
           val uploadSink =
             s3Client.multipartUpload(config.uploadNamespace, uploadKey)
+
           val uploadSource = Source.single((location, zipFile))
           val uploadResult =
             uploadSource.via(extract).via(verify).runWith(uploadSink)

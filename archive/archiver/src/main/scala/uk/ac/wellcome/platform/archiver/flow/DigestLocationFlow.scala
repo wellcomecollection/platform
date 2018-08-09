@@ -8,15 +8,13 @@ import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 object DigestLocationFlow {
-  def apply(
-    config: BagUploaderConfig): Flow[ZipFile, ObjectLocation, NotUsed] = {
+  def apply(config: BagUploaderConfig) = {
     val bagNameFlow: Flow[ZipFile, BagName, NotUsed] = BagNameFlow()
 
-    bagNameFlow
-      .mapConcat(bagName => {
-        config.digestNames.map(digestName => {
-          ObjectLocation(bagName.value, digestName)
-        })
+    bagNameFlow.mapConcat(bagName => {
+      config.digestNames.map(digestName => {
+        ObjectLocation(bagName.value, digestName)
       })
+    })
   }
 }
