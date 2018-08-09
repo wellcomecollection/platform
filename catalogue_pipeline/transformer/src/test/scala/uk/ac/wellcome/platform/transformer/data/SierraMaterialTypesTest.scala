@@ -13,20 +13,20 @@ class SierraMaterialTypesTest extends FunSpec with Matchers {
     val caught = intercept[TransformerException] {
       SierraMaterialTypes.fromCode("?")
     }
-    caught.getMessage shouldBe "Unrecognised work type code: ?"
+    caught.e.getMessage shouldBe "Unrecognised work type code: ?"
   }
 
   it("throws an exception if passed an empty string") {
     val caught = intercept[TransformerException] {
-      SierraMaterialTypes.fromCode("?")
+      SierraMaterialTypes.fromCode("")
     }
-    caught.getMessage shouldBe "Work type code is not a single character: <<>>"
+    caught.e.getMessage shouldBe "Work type code is not a single character: <<>>"
   }
 
   it("throws an exception if passed a code which is more than a single char") {
     val caught = intercept[TransformerException] {
       SierraMaterialTypes.fromCode("XXX")
     }
-    caught.getMessage shouldBe "Work type code is not a single character: <<XXX>>"
+    caught.e.getMessage shouldBe "Work type code is not a single character: <<XXX>>"
   }
 }

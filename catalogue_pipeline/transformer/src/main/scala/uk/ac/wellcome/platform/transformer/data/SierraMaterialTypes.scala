@@ -31,7 +31,7 @@ object SierraMaterialTypes {
     .map { row =>
       row(1).toList match {
         case List(char: Char) => Map(
-          char -> WorkType(id = row(1), label = row(2))
+          char -> WorkType(id = row(1), label = row(2).trim)
         )
         case _ => Map[Char, WorkType]()
       }
