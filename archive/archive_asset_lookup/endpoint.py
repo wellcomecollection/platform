@@ -5,7 +5,6 @@ import boto3
 import botocore
 import settings
 from boto3.dynamodb.conditions import Key
-from urllib.parse import urlparse
 
 
 def lambda_handler(event, context):
