@@ -12,11 +12,9 @@ import com.amazonaws.services.sqs.model.Message
 import com.google.inject.Inject
 import grizzled.slf4j.Logging
 import io.circe.Decoder
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 
 import scala.util.{Failure, Success, Try}
 

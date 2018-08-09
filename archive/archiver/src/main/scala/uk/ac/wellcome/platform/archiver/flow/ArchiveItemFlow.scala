@@ -27,7 +27,7 @@ object ArchiveItemFlow extends Logging {
           .via(uploadVerificationFlow)
           .log("upload verified")
           .map {
-            case MultipartUploadResult(_, bucket, key, _, _) =>
+            case MultipartUploadResult(_, bucket, key, _) =>
               ObjectLocation(bucket, key)
           }
           .log("upload location")
