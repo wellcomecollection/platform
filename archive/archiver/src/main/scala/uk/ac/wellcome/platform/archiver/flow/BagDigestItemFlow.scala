@@ -27,7 +27,7 @@ object BagDigestItemFlow extends Logging {
                 BagDigestItem(checksum, ObjectLocation(bag.value, key))
               case (default, bag) =>
                 throw MalformedBagDigestException(
-                  default.mkString(config.digestDelimiter),
+                  default.mkString(config.digestDelimiterRegexp),
                   bag)
             }
       }

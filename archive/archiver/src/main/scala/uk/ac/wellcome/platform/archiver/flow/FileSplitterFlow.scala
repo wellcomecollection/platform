@@ -16,6 +16,6 @@ object FileSplitterFlow {
       .via(framingDelimiter)
       .map(_.utf8String)
       .filter(_.nonEmpty)
-      .map(_.split(config.digestDelimiter).map(_.trim))
+      .map(_.split(config.digestDelimiterRegexp).map(_.trim))
   }
 }
