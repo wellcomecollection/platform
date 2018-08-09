@@ -12,7 +12,7 @@ object BagLocationFromNotificationFlow extends Logging {
     Flow[NotificationMessage]
       .log("notification message")
       .map((m: NotificationMessage) => fromJson[ObjectLocation](m.Message))
-      .map (_.get)
+      .map(_.get)
       .log("download location")
   }
 }
