@@ -5,11 +5,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
+import uk.ac.wellcome.platform.archiver.flow.UploadAndVerifyBagFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
-class VerifiedBagUploaderFlowTest
-  extends FunSpec
+class UploadAndVerifyBagFlowTest
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver {
@@ -29,7 +29,7 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig)
+        val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
 
         val (_, verification) =
           uploader.runWith(Source.single(zipFile), Sink.ignore)
@@ -51,14 +51,14 @@ class VerifiedBagUploaderFlowTest
         val bagName = randomAlphanumeric()
         val (zipFile, _) = createBagItZip(bagName, 1, false)
 
-        val uploader = VerifiedBagUploaderFlow(bagUploaderConfig)
+        val uploader = UploadAndVerifyBagFlow(bagUploaderConfig)
 
         val (_, verification) =
           uploader.runWith(Source.single(zipFile), Sink.ignore)
 
         whenReady(verification.failed) { e =>
           println(e)
-          // Do nothing
+        // Do nothing
         }
       }
     }

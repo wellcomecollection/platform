@@ -19,7 +19,8 @@ import scala.util.Random
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[Bag, R]) = {
+  def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
+    testWith: TestWith[Bag, R]) = {
     val bagName = randomAlphanumeric()
     val uploadKey = s"upload/path/$bagName.zip"
 
@@ -33,7 +34,9 @@ trait Archiver extends AkkaS3 with Messaging {
     testWith(Bag(bagName))
   }
 
-  def withFakeBag[R](ingestBucket: Bucket, queuePair: QueuePair, valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+  def withFakeBag[R](ingestBucket: Bucket,
+                     queuePair: QueuePair,
+                     valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
     val bagName = randomAlphanumeric()
     val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
 
@@ -42,7 +45,8 @@ trait Archiver extends AkkaS3 with Messaging {
     }
   }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(testWith: TestWith[ArchiverApp, R]) = {
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(
+    testWith: TestWith[ArchiverApp, R]) = {
     val archiver = new ArchiverApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
@@ -56,7 +60,8 @@ trait Archiver extends AkkaS3 with Messaging {
     testWith(archiver)
   }
 
-  def withArchiver[R](testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
+  def withArchiver[R](
+    testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalS3Bucket { ingestBucket =>
         withLocalS3Bucket { storageBucket =>
@@ -174,4 +179,3 @@ trait Archiver extends AkkaS3 with Messaging {
 case class FileEntry(name: String, contents: String)
 
 case class Bag(bagName: String)
-

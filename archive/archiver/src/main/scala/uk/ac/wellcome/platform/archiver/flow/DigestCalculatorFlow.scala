@@ -49,7 +49,7 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
 
             if (streamDigest != checksum) {
               debug(s"$streamDigest != $checksum FAILED!")
-              
+
               failStage(new RuntimeException(s"Checksum not matched!"))
             } else {
               completeStage()

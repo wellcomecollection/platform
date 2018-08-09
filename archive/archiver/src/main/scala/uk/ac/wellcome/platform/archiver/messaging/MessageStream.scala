@@ -20,12 +20,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 
 import scala.util.{Failure, Success, Try}
 
-
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
                                     sqsConfig: SQSConfig,
                                     metricsSender: MetricsSender)
-  extends Logging {
+    extends Logging {
 
   implicit val system = actorSystem
   implicit val dispatcher = system.dispatcher
@@ -50,40 +49,52 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName, Supervision.Resume)))
 
-    val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
+    val typeConversion = Flow[Message].map(m => {
+      val msg = fromJson[T](m.getBody).get
+      info(s"Message received: $msg")
+      msg
+    })
+
     val actionFlow = Flow[(Seq[Try[R]], Message)].map {
       case (s, m) if s.collect({ case a: Failure[_] => a }).nonEmpty =>
         metricsSender.countFailure(metricName)
+        warn(s"Failure during message processing: $m")
         (m, MessageAction.ChangeMessageVisibility(1))
       case (_, m) =>
         metricsSender.countSuccess(metricName)
+        info(s"Message processed successfully: $m")
         (m, MessageAction.Delete)
     }
 
-    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] = Flow[T].flatMapConcat(t => {
-      Source.fromFuture(
-        Source.single(t)
-          .via(workFlow)
-          .map(Success(_))
-          .recover({ case e => Failure(e) })
-          .toMat(Sink.seq)(Keep.right)
-          .run()(stoppingMaterializer)
-      )
-    })
+    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] =
+      Flow[T].flatMapConcat(t => {
+        Source.fromFuture(
+          Source
+            .single(t)
+            .via(workFlow)
+            .map(Success(_))
+            .recover({ case e => Failure(e) })
+            .toMat(Sink.seq)(Keep.right)
+            .run()(stoppingMaterializer)
+        )
+      })
 
-    source.flatMapConcat(message => {
-      Source.single(message)
-        .log("processing message")
-        .via(typeConversion)
-        .log("message converted")
-        .via(capturedWorkflow)
-        .log("workflow completed")
-        .map(r => (r, message))
-        .via(actionFlow)
-        .log("message action")
-        .via(ackFlow)
-        .log("message completed")
-    }).runWith(sink)(resumingMaterializer)
+    source
+      .flatMapConcat(message => {
+        Source
+          .single(message)
+          .log("processing message")
+          .via(typeConversion)
+          .log("message converted")
+          .via(capturedWorkflow)
+          .log("workflow completed")
+          .map(r => (r, message))
+          .via(actionFlow)
+          .log("message action")
+          .via(ackFlow)
+          .log("message completed")
+      })
+      .runWith(sink)(resumingMaterializer)
   }
 
   // Defines a "supervision strategy" -- this tells Akka how to react
@@ -92,7 +103,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   //
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
-  private def decider(metricName: String, strategy: Supervision.Directive): Supervision.Decider = {
+  private def decider(metricName: String,
+                      strategy: Supervision.Directive): Supervision.Decider = {
     case e =>
       logException(e)
       metricsSender.countFailure(metricName)
@@ -102,13 +114,11 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   private def logException(exception: Throwable): Unit = {
     exception match {
       case exception: GracefulFailureException =>
-        logger.warn(s"Graceful failure: ${exception.getMessage}")
+        warn(s"Graceful failure: ${exception.getMessage}")
       case exception: DynamoNonFatalError =>
-        logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
+        warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
-        logger.error(
-          s"Unrecognised failure while: ${exception.getMessage}",
-          exception)
+        error(s"Unrecognised failure while: ${exception.getMessage}", exception)
     }
   }
 }

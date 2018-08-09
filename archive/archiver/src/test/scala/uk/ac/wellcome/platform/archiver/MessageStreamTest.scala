@@ -23,7 +23,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.concurrent.duration._
 
 class MessageStreamTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
@@ -135,15 +135,15 @@ class MessageStreamTest
   }
 
   def withMessageStreamFixtures[R](
-                                    testWith: TestWith[(MessageStream[ExampleObject, Unit],
-                                      QueuePair,
-                                      ActorSystem,
-                                      MetricsSender),
-                                      R]
-                                  ) = {
+    testWith: TestWith[(MessageStream[ExampleObject, Unit],
+                        QueuePair,
+                        ActorSystem,
+                        MetricsSender),
+                       R]
+  ) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair@QueuePair(queue, _) =>
+        case queuePair @ QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
             val sqsConfig = SQSConfig(
               queueUrl = queue.url,

@@ -12,6 +12,6 @@ LAMBDAS     =
 
 TF_NAME     = archive
 TF_PATH     = $(STACK_ROOT)/terraform
-TF_IS_PUBLIC_FACING = true
+TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))

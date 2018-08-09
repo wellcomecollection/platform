@@ -8,18 +8,17 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archiver.flow.DownloadZipFlow
+import uk.ac.wellcome.platform.archiver.flow.DownloadZipFileFlow
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class DownloadZipFlowTest
-  extends FunSpec
+class DownloadZipFileFlowTest
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver {
-
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
@@ -30,7 +29,7 @@ class DownloadZipFlowTest
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
         implicit val _ = s3AkkaClient
 
-        val downloadZipFlow = DownloadZipFlow()(
+        val downloadZipFlow = DownloadZipFileFlow()(
           s3AkkaClient,
           materializer
         )

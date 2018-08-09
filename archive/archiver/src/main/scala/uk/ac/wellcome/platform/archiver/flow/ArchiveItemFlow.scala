@@ -21,7 +21,7 @@ object ArchiveItemFlow extends Logging {
 
     val uploadLocationFlow = Flow[MultipartUploadResult]
       .map {
-        case MultipartUploadResult(_, bucket, key, _, _) =>
+        case MultipartUploadResult(_, bucket, key, _) =>
           ObjectLocation(bucket, key)
       }
 
@@ -29,7 +29,8 @@ object ArchiveItemFlow extends Logging {
 
     Flow[(BagDigestItem, ZipFile)].flatMapConcat {
       case (bagDigestItem, zipFile) =>
-        Source.single((bagDigestItem, zipFile))
+        Source
+          .single((bagDigestItem, zipFile))
           .log("uploading and verifying")
           .via(uploadVerificationFlow)
           .log("upload verified")

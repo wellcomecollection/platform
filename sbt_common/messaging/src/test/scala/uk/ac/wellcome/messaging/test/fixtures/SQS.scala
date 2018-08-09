@@ -239,7 +239,8 @@ trait SQS extends Matchers with Logging {
     val messagesQ = getMessages(queue.queue)
     val messagesQSize = messagesQ.size
 
-    debug(s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
+    debug(
+      s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
 
     messagesQSize shouldBe qSize
     messagesDlqSize shouldBe dlqSize
