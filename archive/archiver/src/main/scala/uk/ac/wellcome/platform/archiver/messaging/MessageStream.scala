@@ -49,13 +49,20 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName, Supervision.Resume)))
 
-    val typeConversion = Flow[Message].map(m => fromJson[T](m.getBody).get)
+    val typeConversion = Flow[Message].map( m => {
+      val msg = fromJson[T](m.getBody).get
+      info(s"Message received: $msg")
+      msg
+    })
+
     val actionFlow = Flow[(Seq[Try[R]], Message)].map {
       case (s, m) if s.collect({ case a: Failure[_] => a }).nonEmpty =>
         metricsSender.countFailure(metricName)
+        warn(s"Failure during message processing: $m")
         (m, MessageAction.ChangeMessageVisibility(1))
       case (_, m) =>
         metricsSender.countSuccess(metricName)
+        info(s"Message processed successfully: $m")
         (m, MessageAction.Delete)
     }
 
@@ -107,11 +114,11 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   private def logException(exception: Throwable): Unit = {
     exception match {
       case exception: GracefulFailureException =>
-        logger.warn(s"Graceful failure: ${exception.getMessage}")
+        warn(s"Graceful failure: ${exception.getMessage}")
       case exception: DynamoNonFatalError =>
-        logger.warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
+        warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
-        logger.error(
+        error(
           s"Unrecognised failure while: ${exception.getMessage}",
           exception)
     }
