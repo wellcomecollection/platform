@@ -54,7 +54,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String) = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
-    marcVarFields.filterNot(identifierWithIndicatorSeven).map { varField =>
+    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
       val subfields = varField.subfields.filter { subfield =>
         List("a", "v", "x", "y", "z").contains(subfield.tag)
       }
@@ -73,8 +73,6 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       )
     }
   }
-
-  private def identifierWithIndicatorSeven(varField: VarField): Boolean = varField.indicator2.contains("7") && varField.subfields.exists(_.tag =="0")
 
   // Extract the primary concept, which comes from subfield $a.  This is the
   // only concept which might be identified.

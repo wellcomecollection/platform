@@ -316,7 +316,7 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     )))))
   }
 
-  it(s"Doesn't ignore a subject with second indicator 7 but no subfield 0") {
+  it(s"Ignores a subject with second indicator 7 but no subfield 0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
         VarField(
@@ -332,7 +332,7 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     )
 
     transformer
-      .getSubjects(bibData) shouldBe List(Subject("abolition", List(Unidentifiable(Concept("abolition")))))
+      .getSubjects(bibData) shouldBe List()
   }
 
   private val transformer = new SierraSubjects {}
