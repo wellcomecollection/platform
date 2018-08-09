@@ -309,11 +309,18 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     )
 
     transformer
-      .getSubjects(bibData) shouldBe List(Subject("abolition", List(Identifiable(Concept("abolition"), SourceIdentifier(
-      identifierType = IdentifierType("nlm-mesh"),
-      value = "mesh/456",
-      ontologyType = "Concept"
-    )))))
+      .getSubjects(bibData) shouldBe List(
+      Subject(
+        "abolition",
+        List(
+          Identifiable(
+            Concept("abolition"),
+            SourceIdentifier(
+              identifierType = IdentifierType("nlm-mesh"),
+              value = "mesh/456",
+              ontologyType = "Concept"
+            )))
+      ))
   }
 
   it("Ignores a subject with second indicator 7 but no subfield 0") {
