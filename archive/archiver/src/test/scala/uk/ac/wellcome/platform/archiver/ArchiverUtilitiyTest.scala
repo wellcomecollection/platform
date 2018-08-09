@@ -7,10 +7,10 @@ import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 
 @Ignore
 class ArchiverUtilitiyTest
-  extends FunSpec
-  with Matchers
-  with fixtures.Archiver
-  with MetricsSenderFixture {
+    extends FunSpec
+    with Matchers
+    with fixtures.Archiver
+    with MetricsSenderFixture {
 
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchiver {

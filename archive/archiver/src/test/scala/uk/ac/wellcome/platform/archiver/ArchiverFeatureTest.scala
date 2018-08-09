@@ -19,32 +19,31 @@ class ArchiverFeatureTest
   it("continues after failure") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
-      withFakeBag(ingestBucket, queuePair) { validBag1 =>
-        archiver.run()
-        withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
-          withFakeBag(ingestBucket, queuePair) { validBag2 =>
-            withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
-
-              eventually {
-                assertQueuePairSizes(queuePair, 0, 2)
+        withFakeBag(ingestBucket, queuePair) { validBag1 =>
+          archiver.run()
+          withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
+            withFakeBag(ingestBucket, queuePair) { validBag2 =>
+              withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
+                eventually {
+                  assertQueuePairSizes(queuePair, 0, 2)
+                }
               }
             }
           }
         }
-      }
     }
   }
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
-      withFakeBag(ingestBucket, queuePair) { invalidBag =>
-        archiver.run()
-        eventually {
-          listKeysInBucket(storageBucket) should have size 27
-          assertQueuePairSizes(queuePair, 0, 0)
+        withFakeBag(ingestBucket, queuePair) { invalidBag =>
+          archiver.run()
+          eventually {
+            listKeysInBucket(storageBucket) should have size 27
+            assertQueuePairSizes(queuePair, 0, 0)
+          }
         }
-      }
     }
   }
 
