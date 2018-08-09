@@ -11,32 +11,12 @@ resource "aws_dynamodb_table" "table" {
     type = "S"
   }
 
-  attribute {
-    name = "reindexShard"
-    type = "S"
-  }
-
-  attribute {
-    name = "reindexVersion"
-    type = "N"
-  }
-
-  global_secondary_index {
-    name            = "reindexTracker"
-    hash_key        = "reindexShard"
-    range_key       = "reindexVersion"
-    write_capacity  = 1
-    read_capacity   = 1
-    projection_type = "ALL"
-  }
-
   lifecycle {
     prevent_destroy = true
 
     ignore_changes = [
       "read_capacity",
       "write_capacity",
-      "global_secondary_index", # ignore all as Terraform doesn't currently allow ignoring specifically global_secondary_index.write_capacity and global_secondary_index.read_capacity
     ]
   }
 }
