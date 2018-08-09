@@ -14,7 +14,8 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     getSubjectsForMarcTag(bibData, "650") ++
       getSubjectsForMarcTag(bibData, "648") ++
       getSubjectsForMarcTag(bibData, "651") ++
-      getSubjectsForMarcTag(bibData, "600")
+      getSubjectsForMarcTag(bibData, "600")++
+      getSubjectsForMarcTag(bibData, "610")
   }
 
   // Populate wwork:subject
@@ -105,6 +106,11 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
         case "600" =>
           identifyPrimaryConcept(
             concept = Person(label = subfield.content),
+            varField = varField
+          )
+        case "610" =>
+          identifyPrimaryConcept(
+            concept = Organisation(label = subfield.content),
             varField = varField
           )
       }
