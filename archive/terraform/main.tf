@@ -1,13 +1,3 @@
-locals {
-  namespace                = "archive-storage"
-  dlq_alarm_arn            = "${data.terraform_remote_state.shared_infra.dlq_alarm_arn}"
-  vpc_id                   = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
-  private_subnets          = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
-  archive_bucket_name      = "wellcomecollection-assets-archive-storage"
-  ingest_bucket_name       = "wellcomecollection-assets-archive-ingest"
-  archiver_container_image = "${module.ecr_repository_archiver.repository_url}:${var.release_ids["archiver"]}"
-}
-
 resource "aws_ecs_cluster" "cluster" {
   name = "${local.namespace}"
 }
@@ -46,7 +36,7 @@ module "archiver_queue" {
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.archiver_topic.name}"]
 
-  visibility_timeout_seconds = 30
+  visibility_timeout_seconds = 43200
   max_receive_count          = 3
 
   alarm_topic_arn = "${local.dlq_alarm_arn}"
@@ -120,6 +110,7 @@ module "archiver" {
   vpc_id                           = "${local.vpc_id}"
   service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
+  max_capacity                     = 1
 
   env_vars = {
     queue_url      = "${module.archiver_queue.id}"

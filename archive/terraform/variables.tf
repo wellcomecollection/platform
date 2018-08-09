@@ -6,3 +6,7 @@ variable "release_ids" {
   description = "Release tags for platform apps"
   type        = "map"
 }
+
+variable "infra_bucket" {
+  default = "wellcomecollection-platform-infra"
+}

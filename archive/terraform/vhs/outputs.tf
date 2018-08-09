@@ -21,3 +21,4 @@ output "full_access_policy" {
 output "dynamodb_update_policy" {
   value = "${data.aws_iam_policy_document.dynamodb_update_policy.json}"
 }
+
