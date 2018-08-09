@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal.WorkType
+import uk.ac.wellcome.platform.transformer.data.SierraMaterialTypes
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 
 trait SierraWorkType {
@@ -22,6 +23,6 @@ trait SierraWorkType {
    */
   def getWorkType(bibData: SierraBibData): Option[WorkType] =
     bibData.materialType.map { t =>
-      WorkType(id = t.code, label = t.value)
+      SierraMaterialTypes.fromCode(t.code)
     }
 }
