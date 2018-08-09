@@ -281,7 +281,7 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
 
-  it(s"ignores subject with second indicator 7") {
+  it("ignores subject with second indicator 7") {
     val bibData = createSierraBibDataWith(
       varFields = List(
         VarField(
@@ -316,7 +316,7 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     )))))
   }
 
-  it(s"Ignores a subject with second indicator 7 but no subfield 0") {
+  it("Ignores a subject with second indicator 7 but no subfield 0") {
     val bibData = createSierraBibDataWith(
       varFields = List(
         VarField(
