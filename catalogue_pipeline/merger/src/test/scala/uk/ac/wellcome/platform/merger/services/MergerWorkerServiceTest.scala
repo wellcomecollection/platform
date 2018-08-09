@@ -14,7 +14,12 @@ import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
 import uk.ac.wellcome.models.matcher.{MatchedIdentifiers, MatcherResult}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
-import uk.ac.wellcome.models.work.internal.{BaseWork, IdentifiableRedirect, UnidentifiedRedirectedWork, UnidentifiedWork}
+import uk.ac.wellcome.models.work.internal.{
+  BaseWork,
+  IdentifiableRedirect,
+  UnidentifiedRedirectedWork,
+  UnidentifiedWork
+}
 import uk.ac.wellcome.monitoring.MetricsSender
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.merger.MergerTestUtils
@@ -197,15 +202,19 @@ class MergerWorkerServiceTest
     val digitalWork = createDigitalWork
 
     val recorderWorkEntries = List(physicalWork, digitalWork)
-      .map { w => RecorderWorkEntry(w.copy(version = 1)) }
+      .map { w =>
+        RecorderWorkEntry(w.copy(version = 1))
+      }
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
         storeInVHS(vhs, recorderWorkEntries)
 
-        val matcherResult = MatcherResult(Set(
-          MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries))
-        ))
+        val matcherResult = MatcherResult(
+          Set(
+            MatchedIdentifiers(
+              recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries))
+          ))
 
         sendNotificationToSQS(queue = queue, message = matcherResult)
 
@@ -225,7 +234,8 @@ class MergerWorkerServiceTest
 
           redirectedWorks should have size 1
           redirectedWorks.head.sourceIdentifier shouldBe digitalWork.sourceIdentifier
-          redirectedWorks.head.redirect shouldBe IdentifiableRedirect(physicalWork.sourceIdentifier)
+          redirectedWorks.head.redirect shouldBe IdentifiableRedirect(
+            physicalWork.sourceIdentifier)
 
           mergedWorks should have size 1
           mergedWorks.head.sourceIdentifier shouldBe physicalWork.sourceIdentifier
@@ -237,17 +247,24 @@ class MergerWorkerServiceTest
     val workPair1 = List(createPhysicalWork, createDigitalWork)
     val workPair2 = List(createPhysicalWork, createDigitalWork)
 
-    val recorderWorkEntries1 = workPair1.map { w => RecorderWorkEntry(w.copy(version = 1)) }
-    val recorderWorkEntries2 = workPair2.map { w => RecorderWorkEntry(w.copy(version = 1)) }
+    val recorderWorkEntries1 = workPair1.map { w =>
+      RecorderWorkEntry(w.copy(version = 1))
+    }
+    val recorderWorkEntries2 = workPair2.map { w =>
+      RecorderWorkEntry(w.copy(version = 1))
+    }
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
         storeInVHS(vhs, recorderWorkEntries1 ++ recorderWorkEntries2)
 
-        val matcherResult = MatcherResult(Set(
-          MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries1)),
-          MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries2))
-        ))
+        val matcherResult = MatcherResult(
+          Set(
+            MatchedIdentifiers(
+              recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries1)),
+            MatchedIdentifiers(
+              recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries2))
+          ))
 
         sendNotificationToSQS(queue = queue, message = matcherResult)
 

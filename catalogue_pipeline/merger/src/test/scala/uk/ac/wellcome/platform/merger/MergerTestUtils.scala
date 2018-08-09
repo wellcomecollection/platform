@@ -27,17 +27,19 @@ trait MergerTestUtils
         recorderWorkEntries =>
           MatchedIdentifiers(
             recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries)
-          )
+        )
       )
     )
 
-  def recorderWorkEntriesToWorkIdentifiers(workEntries: Seq[RecorderWorkEntry]): Set[WorkIdentifier] =
+  def recorderWorkEntriesToWorkIdentifiers(
+    workEntries: Seq[RecorderWorkEntry]): Set[WorkIdentifier] =
     recorderWorkEntriesToWorkIdentifiers(workEntries.toSet)
 
-  def recorderWorkEntriesToWorkIdentifiers(workEntries: Set[RecorderWorkEntry]): Set[WorkIdentifier] =
+  def recorderWorkEntriesToWorkIdentifiers(
+    workEntries: Set[RecorderWorkEntry]): Set[WorkIdentifier] =
     workEntries
-      .map {
-        workEntry => WorkIdentifier(
+      .map { workEntry =>
+        WorkIdentifier(
           identifier = workEntry.id,
           version = workEntry.work.version
         )
