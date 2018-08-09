@@ -46,7 +46,4 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraMaterialTypeWith(code: String): SierraMaterialType =
     SierraMaterialType(code = code)
-
-  def createSierraEbookMaterialType: SierraMaterialType =
-    createSierraMaterialTypeWith(code = "v")
 }
