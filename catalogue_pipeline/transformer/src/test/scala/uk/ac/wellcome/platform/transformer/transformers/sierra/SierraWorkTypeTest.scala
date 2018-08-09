@@ -10,15 +10,13 @@ class SierraWorkTypeTest extends FunSpec with Matchers with SierraDataUtil {
   val transformer = new SierraWorkType {}
 
   it("extracts WorkType from bib records") {
-    val workTypeId = "workTypeCode"
-    val sierraValue = "Sierra Material Type Label"
+    val workTypeId = "a"
+    val sierraValue = "Books"
 
     val bibData = createSierraBibDataWith(
       materialType = Some(
-        SierraMaterialType(
-          code = workTypeId,
-          value = sierraValue
-        ))
+        SierraMaterialType(code = workTypeId)
+      )
     )
 
     val expectedWorkType = WorkType(

@@ -136,8 +136,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("returns no DigitalItems if the work is not an eBook") {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
-        materialType =
-          Some(createSierraMaterialTypeWith(code = "x", value = "book"))
+        materialType = Some(createSierraMaterialTypeWith(code = "x"))
       )
 
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List.empty
