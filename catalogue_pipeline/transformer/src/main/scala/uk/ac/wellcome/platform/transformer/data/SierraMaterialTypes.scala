@@ -22,7 +22,7 @@ object SierraMaterialTypes {
   //    StudentDissertations,w,student-dissertations,Student dissertations
   //
   // We care about two parts: the single letter code, which is what we
-  // get back from the Sierra API, and the snake-case label.
+  // get back from the Sierra API, and the label.
   //
   // A couple of rows don't contain a single letter code -- we ignore them
   // for now.
@@ -31,7 +31,7 @@ object SierraMaterialTypes {
     .map { row =>
       row(1).toList match {
         case List(char: Char) => Map(
-          char -> WorkType(id = row(1), label = row(2).trim)
+          char -> WorkType(id = row(1), label = row(3).trim)
         )
         case _ => Map[Char, WorkType]()
       }
