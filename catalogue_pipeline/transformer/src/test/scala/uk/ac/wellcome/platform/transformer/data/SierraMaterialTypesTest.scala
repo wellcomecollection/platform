@@ -6,7 +6,9 @@ import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 
 class SierraMaterialTypesTest extends FunSpec with Matchers {
   it("looks up a WorkType by code") {
-    SierraMaterialTypes.fromCode("w") shouldBe WorkType(id = "w", label = "Student dissertations")
+    SierraMaterialTypes.fromCode("w") shouldBe WorkType(
+      id = "w",
+      label = "Student dissertations")
   }
 
   it("throws an exception if passed an unrecognised code") {

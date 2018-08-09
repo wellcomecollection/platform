@@ -30,9 +30,10 @@ object SierraMaterialTypes {
   private val workTypeMap: Map[Char, WorkType] = csvRows
     .map { row =>
       row(1).toList match {
-        case List(char: Char) => Map(
-          char -> WorkType(id = row(1), label = row(3).trim)
-        )
+        case List(char: Char) =>
+          Map(
+            char -> WorkType(id = row(1), label = row(3).trim)
+          )
         case _ => Map[Char, WorkType]()
       }
     }
@@ -42,13 +43,17 @@ object SierraMaterialTypes {
 
   def fromCode(code: String): WorkType = {
     code.toList match {
-      case List(c) => workTypeMap.get(c) match {
-        case Some(workType) => workType
-        case None => throw TransformerException(
-          new IllegalArgumentException(s"Unrecognised work type code: $c"))
-      }
-      case _ => throw TransformerException(
-        new IllegalArgumentException(s"Work type code is not a single character: <<$code>>"))
+      case List(c) =>
+        workTypeMap.get(c) match {
+          case Some(workType) => workType
+          case None =>
+            throw TransformerException(
+              new IllegalArgumentException(s"Unrecognised work type code: $c"))
+        }
+      case _ =>
+        throw TransformerException(
+          new IllegalArgumentException(
+            s"Work type code is not a single character: <<$code>>"))
     }
   }
 }
