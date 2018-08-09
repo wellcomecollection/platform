@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 object Main extends App with Archiver {
   override val injector: Injector = Guice.createInjector(
     new AppConfigModule(args),
+    ConfigModule,
     AkkaModule,
     AkkaS3ClientModule,
     CloudWatchClientModule,

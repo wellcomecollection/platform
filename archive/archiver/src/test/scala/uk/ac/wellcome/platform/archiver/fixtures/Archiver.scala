@@ -50,6 +50,7 @@ trait Archiver extends AkkaS3 with Messaging {
     val archiver = new ArchiverApp {
       val injector = Guice.createInjector(
         new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
+        ConfigModule,
         AkkaModule,
         AkkaS3ClientModule,
         CloudWatchClientModule,
