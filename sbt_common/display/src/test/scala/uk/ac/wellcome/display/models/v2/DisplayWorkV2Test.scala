@@ -1,11 +1,17 @@
 package uk.ac.wellcome.display.models.v2
 
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import org.scalacheck.ScalacheckShapeless._
 
-class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
+class DisplayWorkV2Test
+    extends FunSpec
+    with Matchers
+    with WorksUtil
+    with PropertyChecks {
 
   it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
@@ -128,7 +134,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayLanguage.label shouldBe language.label
   }
 
-  it("extracts contributors from a Work") {
+  it("extracts contributors from a Work with the contributors include") {
     val canonicalId = createCanonicalId
     val sourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Person"
@@ -155,9 +161,11 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true))
+      DisplayWorkV2(
+        work,
+        includes = V2WorksIncludes(identifiers = true, contributors = true))
 
-    displayWork.contributors shouldBe List(
+    displayWork.contributors.get shouldBe List(
       DisplayContributor(
         agent = DisplayPersonV2(
           id = Some(canonicalId),
@@ -179,7 +187,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
   }
 
-  it("extracts production events from a work") {
+  it("extracts production events from a work with the production include") {
     val productionEvent = ProductionEvent(
       places = List(Place("London")),
       agents = List(Unidentifiable(Agent("Macmillan"))),
@@ -192,9 +200,23 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = V2WorksIncludes.includeAll())
-    displayWork.production shouldBe List(
+      DisplayWorkV2(work, includes = V2WorksIncludes(production = true))
+    displayWork.production.get shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
+  }
+
+  it("does not extract includes set to false") {
+    forAll { work: IdentifiedWork =>
+      val displayWork =
+        DisplayWorkV2(work, includes = V2WorksIncludes())
+
+      displayWork.production shouldNot be(defined)
+      displayWork.subjects shouldNot be(defined)
+      displayWork.genres shouldNot be(defined)
+      displayWork.contributors shouldNot be(defined)
+      displayWork.items shouldNot be(defined)
+      displayWork.identifiers shouldNot be(defined)
+    }
   }
 
   describe("uses the WorksIncludes.identifiers include") {
@@ -294,8 +316,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("contributors") {
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true))
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe List(None, None, None)
       }
 
@@ -307,12 +331,16 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("subjects") {
-        val concepts = displayWork.subjects.head.concepts
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(subjects = true))
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe List(None, None, None)
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe None
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe None
       }
     }
 
@@ -326,18 +354,21 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("contributors") {
-        // This is moderately verbose, but the Scala compiler got confused when
-        // I tried to combine the three map() calls into one.
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(contributors = true, identifiers = true))
+
         val expectedIdentifiers = List(
           contributorAgentSourceIdentifier,
           contributorOrganisationSourceIdentifier,
           contributorPersonSourceIdentifier
-        ).map { DisplayIdentifierV2(_) }
-          .map { List(_) }
-          .map { Some(_) }
+        ).map { identifier =>
+          Some(List(DisplayIdentifierV2(identifier)))
+        }
 
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
@@ -352,6 +383,10 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("subjects") {
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, subjects = true))
         val expectedIdentifiers = List(
           conceptSourceIdentifier,
           periodSourceIdentifier,
@@ -360,12 +395,16 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           .map { List(_) }
           .map { Some(_) }
 
-        val concepts = displayWork.subjects.head.concepts
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe Some(
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe Some(
           List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
     }

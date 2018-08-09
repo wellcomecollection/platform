@@ -1,9 +1,12 @@
 package uk.ac.wellcome.display.serialize
 
-import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.{JsonParser, JsonProcessingException}
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer}
 import uk.ac.wellcome.display.models._
+
+class WorksIncludesParsingException(msg: String)
+    extends JsonProcessingException(msg: String)
 
 object WorksIncludesDeserializer {
   def apply[W <: WorksIncludes](queryParam: String,

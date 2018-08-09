@@ -92,6 +92,14 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .toString shouldBe "\"#/definitions/Concept\""
   }
 
+  it("shows the type of contributors") {
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+
+    tree
+      .at("/definitions/Work/properties/contributors/items/$ref")
+      .toString shouldBe "\"#/definitions/Contributor\""
+  }
+
   it("shows the correct Genre model for v2") {
     val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions/Genre").isObject shouldBe true

@@ -9,10 +9,8 @@ import uk.ac.wellcome.models.work.internal._
 trait DisplaySerialisationTestBase { this: Suite =>
 
   def optionalString(fieldName: String, maybeStringValue: Option[String]) =
-    maybeStringValue match {
-      case None => ""
-      case Some(p) =>
-        s"""
+    maybeStringValue map { p =>
+      s"""
            "$fieldName": "$p"
          """
     }
@@ -126,8 +124,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def person(p: Person) = {
     s"""{
         "type": "Person",
-        ${optionalString("prefix", p.prefix)},
-        ${optionalString("numeration", p.numeration)},
+        ${optionalString("prefix", p.prefix)
+      .map(str => s"$str, ")
+      .getOrElse("")}
+        ${optionalString("numeration", p.numeration)
+      .map(str => s"$str, ")
+      .getOrElse("")}
         "label": "${p.label}"
       }"""
   }
@@ -149,6 +151,12 @@ trait DisplaySerialisationTestBase { this: Suite =>
   def period(p: Period) =
     s"""{
       "type": "Period",
+      "label": "${p.label}"
+    }"""
+
+  def place(p: Place) =
+    s"""{
+      "type": "Place",
       "label": "${p.label}"
     }"""
 
@@ -195,12 +203,33 @@ trait DisplaySerialisationTestBase { this: Suite =>
       .map { genre(_) }
       .mkString(",")
 
-  def contributor(c: Contributor[Displayable[AbstractAgent]]) =
+  def contributor(contributors: Contributor[Displayable[AbstractAgent]]) =
     s"""
        |{
-       |  "agent": ${identifiedOrUnidentifiable(c.agent, abstractAgent)},
-       |  "roles": ${toJson(c.roles).get},
+       |  "agent": ${identifiedOrUnidentifiable(
+         contributors.agent,
+         abstractAgent)},
+       |  "roles": ${toJson(contributors.roles).get},
        |  "type": "Contributor"
+       |}
+     """.stripMargin
+
+  def contributors(c: List[Contributor[Displayable[AbstractAgent]]]) =
+    c.map(contributor).mkString(",")
+
+  def production(
+    production: List[ProductionEvent[Displayable[AbstractAgent]]]) =
+    production.map(productionEvent).mkString(",")
+
+  def productionEvent(event: ProductionEvent[Displayable[AbstractAgent]]) =
+    s"""
+       |{
+       |  "dates": [${event.dates.map(period).mkString(",")}],
+       |  "agents": [${event.agents
+         .map(identifiedOrUnidentifiable(_, abstractAgent))
+         .mkString(",")}],
+       |  "places": [${event.places.map(place).mkString(",")}],
+       |  "type": "ProductionEvent"
        |}
      """.stripMargin
 
