@@ -49,7 +49,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       ActorMaterializerSettings(system)
         .withSupervisionStrategy(decider(metricName, Supervision.Resume)))
 
-    val typeConversion = Flow[Message].map( m => {
+    val typeConversion = Flow[Message].map(m => {
       val msg = fromJson[T](m.getBody).get
       info(s"Message received: $msg")
       msg
@@ -118,9 +118,7 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       case exception: DynamoNonFatalError =>
         warn(s"Non-fatal DynamoDB error: ${exception.getMessage}")
       case exception: Exception =>
-        error(
-          s"Unrecognised failure while: ${exception.getMessage}",
-          exception)
+        error(s"Unrecognised failure while: ${exception.getMessage}", exception)
     }
   }
 }
