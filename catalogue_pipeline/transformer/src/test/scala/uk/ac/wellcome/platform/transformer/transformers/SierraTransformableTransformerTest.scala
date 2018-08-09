@@ -368,9 +368,8 @@ class SierraTransformableTransformerTest
 
   it("includes the work type, if present") {
     val id = createSierraBibNumber
-    val workTypeId = "xxx"
-    val workTypeValue =
-      "A parchment of penguin pemmican pierced playfully with pencils."
+    val workTypeId = "a"
+    val workTypeValue = "Books"
 
     val expectedWorkType = WorkType(
       id = workTypeId,
