@@ -18,7 +18,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
   // Populate wwork:subject
   //
-  // Use MARC field "650", "648" and "651".
+  // Use MARC field "650", "648" and "651" where the second indicator is not 7.
   //
   // Within these MARC tags, we have:
   //
