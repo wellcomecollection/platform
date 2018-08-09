@@ -8,7 +8,7 @@ SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
 ECS_TASKS   =
-LAMBDAS     = archive_asset_lookup
+LAMBDAS     = archive_asset_lookup archive_bag_request
 
 TF_NAME     = archive
 TF_PATH     = $(STACK_ROOT)/terraform
