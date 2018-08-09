@@ -80,7 +80,7 @@ trait MergerTestUtils
         createSourceIdentifierWith(identifierType = "miro-library-reference")),
       workType = Some(WorkType("v", "E-books")),
       items = List(
-        createIdentifiableItemWith(locations = List(createDigitalLocation)))
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
     )
   }
 
