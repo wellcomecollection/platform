@@ -69,10 +69,9 @@ trait MergerTestUtils
   def createRecorderWorkEntryWith(version: Int): RecorderWorkEntry =
     RecorderWorkEntry(createUnidentifiedWorkWith(version = version))
 
-<<<<<<< HEAD
   def createRecorderWorkEntry: RecorderWorkEntry =
     createRecorderWorkEntryWith(version = 1)
-=======
+
   def createDigitalWork: UnidentifiedWork = {
     createUnidentifiedWorkWith(
       sourceIdentifier =
@@ -95,5 +94,4 @@ trait MergerTestUtils
         createIdentifiableItemWith(locations = List(createPhysicalLocation)))
     )
   }
->>>>>>> I have a funky feeling there's a bug here!
 }
