@@ -614,6 +614,29 @@ class SierraTransformableTransformerTest
     )
   }
 
+  // This is based on a real failure -- our initial implementation of
+  // workType for Sierra was unable to find these workTypes.
+  //
+  it("finds the WorkType if the materialType field only contains a code") {
+    val id = createSierraBibNumber
+    val bibData =
+      s"""
+         |{
+         |  "id": "$id",
+         |  "title": "${randomAlphanumeric(50)}",
+         |  "materialType": {
+         |    "code": "k  "
+         |  }
+         |}
+       """.stripMargin
+
+    val work = transformDataToWork(id = id, data = bibData)
+    work shouldBe a[UnidentifiedWork]
+    work.asInstanceOf[UnidentifiedWork].workType shouldBe Some(
+      WorkType(id = "a", label = "books")
+    )
+  }
+
   private def transformDataToWork(id: SierraBibNumber,
                                   data: String): TransformedBaseWork = {
     val bibRecord = createSierraBibRecordWith(
