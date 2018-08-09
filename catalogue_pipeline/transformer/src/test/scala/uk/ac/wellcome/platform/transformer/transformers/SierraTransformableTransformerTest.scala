@@ -633,7 +633,7 @@ class SierraTransformableTransformerTest
     val work = transformDataToWork(id = id, data = bibData)
     work shouldBe a[UnidentifiedWork]
     work.asInstanceOf[UnidentifiedWork].workType shouldBe Some(
-      WorkType(id = "a", label = "books")
+      WorkType(id = "k", label = "Pictures")
     )
   }
 
