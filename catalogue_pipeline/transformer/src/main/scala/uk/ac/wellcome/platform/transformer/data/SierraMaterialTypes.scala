@@ -24,28 +24,31 @@ object SierraMaterialTypes {
   // We care about two parts: the single letter code, which is what we
   // get back from the Sierra API, and the snake-case label.
   //
+  // A couple of rows don't contain a single letter code -- we ignore them
+  // for now.
+  //
   private val workTypeMap: Map[Char, WorkType] = csvRows
     .map { row =>
-      Map(
-        Char(row(1)) -> WorkType(
-          id = row(1),
-          label = row(2)
+      row(1).toList match {
+        case List(char: Char) => Map(
+          char -> WorkType(id = row(1), label = row(2))
         )
-      )
+        case _ => Map[Char, WorkType]()
+      }
     }
     .fold(Map()) { (x, y) =>
       x ++ y
     }
 
   def fromCode(code: String): WorkType = {
-    code.asInstanceOf[Seq[Char]] match {
-      case Seq(c) => workTypeMap.get(c) match {
+    code.toList match {
+      case List(c) => workTypeMap.get(c) match {
         case Some(workType) => workType
         case None => throw TransformerException(
-          new IllegalArgumentException(s"Unrecognised work type code: $c")
+          new IllegalArgumentException(s"Unrecognised work type code: $c"))
       }
       case _ => throw TransformerException(
-        new IllegalArgumentException(s"Work type code is not a single character: $code")
+        new IllegalArgumentException(s"Work type code is not a single character: <<$code>>"))
     }
   }
 }
