@@ -17,7 +17,7 @@ object VerifiedDigestUploaderFlow {
   ): Flow[ObjectLocation, Done, NotUsed] = {
 
     val bagDigestItemFlow
-    : Flow[(ObjectLocation, BagName, ZipFile), BagDigestItem, NotUsed] =
+      : Flow[(ObjectLocation, BagName, ZipFile), BagDigestItem, NotUsed] =
       BagDigestItemFlow(config)
     val archiveItemFlow: Flow[(BagDigestItem, ZipFile), Done, NotUsed] =
       ArchiveItemFlow(config)

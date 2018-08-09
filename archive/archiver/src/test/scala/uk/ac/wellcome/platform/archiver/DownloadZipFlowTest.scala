@@ -15,11 +15,10 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class DownloadZipFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver {
-
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()

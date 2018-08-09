@@ -20,12 +20,11 @@ import uk.ac.wellcome.storage.dynamo.DynamoNonFatalError
 
 import scala.util.{Failure, Success, Try}
 
-
 class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
                                     sqsClient: AmazonSQSAsync,
                                     sqsConfig: SQSConfig,
                                     metricsSender: MetricsSender)
-  extends Logging {
+    extends Logging {
 
   implicit val system = actorSystem
   implicit val dispatcher = system.dispatcher
@@ -60,30 +59,35 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
         (m, MessageAction.Delete)
     }
 
-    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] = Flow[T].flatMapConcat(t => {
-      Source.fromFuture(
-        Source.single(t)
-          .via(workFlow)
-          .map(Success(_))
-          .recover({ case e => Failure(e) })
-          .toMat(Sink.seq)(Keep.right)
-          .run()(stoppingMaterializer)
-      )
-    })
+    val capturedWorkflow: Flow[T, Seq[Try[R]], NotUsed] =
+      Flow[T].flatMapConcat(t => {
+        Source.fromFuture(
+          Source
+            .single(t)
+            .via(workFlow)
+            .map(Success(_))
+            .recover({ case e => Failure(e) })
+            .toMat(Sink.seq)(Keep.right)
+            .run()(stoppingMaterializer)
+        )
+      })
 
-    source.flatMapConcat(message => {
-      Source.single(message)
-        .log("processing message")
-        .via(typeConversion)
-        .log("message converted")
-        .via(capturedWorkflow)
-        .log("workflow completed")
-        .map(r => (r, message))
-        .via(actionFlow)
-        .log("message action")
-        .via(ackFlow)
-        .log("message completed")
-    }).runWith(sink)(resumingMaterializer)
+    source
+      .flatMapConcat(message => {
+        Source
+          .single(message)
+          .log("processing message")
+          .via(typeConversion)
+          .log("message converted")
+          .via(capturedWorkflow)
+          .log("workflow completed")
+          .map(r => (r, message))
+          .via(actionFlow)
+          .log("message action")
+          .via(ackFlow)
+          .log("message completed")
+      })
+      .runWith(sink)(resumingMaterializer)
   }
 
   // Defines a "supervision strategy" -- this tells Akka how to react
@@ -92,7 +96,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
   //
   // https://doc.akka.io/docs/akka/2.5.6/scala/stream/stream-error.html#supervision-strategies
   //
-  private def decider(metricName: String, strategy: Supervision.Directive): Supervision.Decider = {
+  private def decider(metricName: String,
+                      strategy: Supervision.Directive): Supervision.Decider = {
     case e =>
       logException(e)
       metricsSender.countFailure(metricName)

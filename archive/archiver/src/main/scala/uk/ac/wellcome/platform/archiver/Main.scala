@@ -9,7 +9,11 @@ import com.google.inject.{Guice, Injector}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archiver.flow.{DownloadNotificationFlow, DownloadZipFlow, VerifiedBagUploaderFlow}
+import uk.ac.wellcome.platform.archiver.flow.{
+  DownloadNotificationFlow,
+  DownloadZipFlow,
+  VerifiedBagUploaderFlow
+}
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.platform.archiver.modules._

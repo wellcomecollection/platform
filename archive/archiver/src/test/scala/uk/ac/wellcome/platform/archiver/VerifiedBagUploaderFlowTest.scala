@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archiver.flow.VerifiedBagUploaderFlow
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
 class VerifiedBagUploaderFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver {
@@ -58,7 +58,7 @@ class VerifiedBagUploaderFlowTest
 
         whenReady(verification.failed) { e =>
           println(e)
-          // Do nothing
+        // Do nothing
         }
       }
     }

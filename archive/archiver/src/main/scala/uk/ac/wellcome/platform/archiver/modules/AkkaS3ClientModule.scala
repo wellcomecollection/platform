@@ -4,12 +4,16 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
-import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  AWSCredentialsProvider,
+  AWSStaticCredentialsProvider,
+  BasicAWSCredentials,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.models.S3ClientConfig
-
 
 object AkkaS3ClientModule extends AbstractModule with Logging {
   def akkaS3Settings(credentialsProvider: AWSCredentialsProvider,
@@ -21,7 +25,8 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
       credentialsProvider = credentialsProvider,
       s3RegionProvider = regionProvider,
       pathStyleAccess = true,
-      endpointUrl = endpointUrl)
+      endpointUrl = endpointUrl
+    )
 
   @Singleton
   @Provides

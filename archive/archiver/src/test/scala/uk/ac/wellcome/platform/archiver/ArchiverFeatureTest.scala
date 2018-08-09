@@ -11,7 +11,7 @@ import uk.ac.wellcome.storage.utils.ExtendedPatience
 // Test shutdown mid-stream does not succeed
 
 class ArchiverFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver
@@ -26,7 +26,6 @@ class ArchiverFeatureTest
           withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
             withFakeBag(ingestBucket, queuePair) { validBag2 =>
               withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
-
                 eventually {
 
                   assertQueuePairSizes(queuePair, 0, 2)
@@ -55,14 +54,17 @@ class ArchiverFeatureTest
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, archiver) =>
-        withBag(Paths.get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"), ingestBucket, queuePair) { invalidBag =>
+        withBag(
+          Paths
+            .get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"),
+          ingestBucket,
+          queuePair) { invalidBag =>
           archiver.run()
 
-
-            while(true) {
-              Thread.sleep(10000)
-              println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
-            }
+          while (true) {
+            Thread.sleep(10000)
+            println(s"Uploaded: ${listKeysInBucket(storageBucket).size}")
+          }
 //          eventually {
 //
 //            listKeysInBucket(storageBucket) should have size 2075

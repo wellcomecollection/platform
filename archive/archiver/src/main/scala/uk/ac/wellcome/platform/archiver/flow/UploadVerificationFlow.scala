@@ -29,7 +29,8 @@ object UploadVerificationFlow extends Logging {
           val uploadResult =
             uploadSource.via(extract).via(verify).runWith(uploadSink)
 
-          Source.fromFuture(uploadResult)
+          Source
+            .fromFuture(uploadResult)
             .log("upload result")
       }
   }
