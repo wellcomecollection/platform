@@ -18,6 +18,7 @@ import docopt
 import boto3
 import json
 
+
 def archive_bag_messages(bags, bucket):
     """
     Generates bag archive messages.
@@ -28,6 +29,7 @@ def archive_bag_messages(bags, bucket):
             'key': bag
         }
 
+
 def build_topic_arn(topic_name):
     """Given a topic name, return the topic ARN."""
     # https://stackoverflow.com/a/37723278/1558022
@@ -35,6 +37,7 @@ def build_topic_arn(topic_name):
     account_id = sts_client.get_caller_identity().get('Account')
 
     return f'arn:aws:sns:eu-west-1:{account_id}:{topic_name}'
+
 
 def publish_messages(topic_arn, messages):
     """Publish a sequence of messages to an SNS topic."""
@@ -69,6 +72,7 @@ def main():
         topic_arn=topic_arn,
         messages=messages
     )
+
 
 if __name__ == '__main__':
     try:
