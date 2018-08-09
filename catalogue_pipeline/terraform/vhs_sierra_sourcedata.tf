@@ -1,6 +1,6 @@
 module "vhs_sierra" {
   source = "./vhs"
+  name   = "sourcedata-sierra"
 
-  name                     = "sierra"
   table_write_max_capacity = 750
 }
