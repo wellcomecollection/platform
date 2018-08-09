@@ -201,36 +201,34 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        val future = storeInVHS(vhs, recorderWorkEntries)
+        storeInVHS(vhs, recorderWorkEntries)
 
         val matcherResult = MatcherResult(Set(
           MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries))
         ))
 
-        whenReady(future) { _ =>
-          sendNotificationToSQS(queue = queue, message = matcherResult)
+        sendNotificationToSQS(queue = queue, message = matcherResult)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueEmpty(dlq)
 
-            val worksSent = getMessages[BaseWork](topic).distinct
-            worksSent should have size 2
+          val worksSent = getMessages[BaseWork](topic).distinct
+          worksSent should have size 2
 
-            val redirectedWorks = worksSent.collect {
-              case work: UnidentifiedRedirectedWork => work
-            }
-            val mergedWorks = worksSent.collect {
-              case work: UnidentifiedWork => work
-            }
-
-            redirectedWorks should have size 1
-            redirectedWorks.head.sourceIdentifier shouldBe digitalWork.sourceIdentifier
-            redirectedWorks.head.redirect shouldBe IdentifiableRedirect(physicalWork.sourceIdentifier)
-
-            mergedWorks should have size 1
-            mergedWorks.head.sourceIdentifier shouldBe physicalWork.sourceIdentifier
+          val redirectedWorks = worksSent.collect {
+            case work: UnidentifiedRedirectedWork => work
           }
+          val mergedWorks = worksSent.collect {
+            case work: UnidentifiedWork => work
+          }
+
+          redirectedWorks should have size 1
+          redirectedWorks.head.sourceIdentifier shouldBe digitalWork.sourceIdentifier
+          redirectedWorks.head.redirect shouldBe IdentifiableRedirect(physicalWork.sourceIdentifier)
+
+          mergedWorks should have size 1
+          mergedWorks.head.sourceIdentifier shouldBe physicalWork.sourceIdentifier
         }
     }
   }
@@ -244,33 +242,31 @@ class MergerWorkerServiceTest
 
     withMergerWorkerServiceFixtures {
       case (vhs, QueuePair(queue, dlq), topic, metricsSender) =>
-        val future = storeInVHS(vhs, recorderWorkEntries1 ++ recorderWorkEntries2)
+        storeInVHS(vhs, recorderWorkEntries1 ++ recorderWorkEntries2)
 
         val matcherResult = MatcherResult(Set(
           MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries1)),
           MatchedIdentifiers(recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries2))
         ))
 
-        whenReady(future) { _ =>
-          sendNotificationToSQS(queue = queue, message = matcherResult)
+        sendNotificationToSQS(queue = queue, message = matcherResult)
 
-          eventually {
-            assertQueueEmpty(queue)
-            assertQueueEmpty(dlq)
+        eventually {
+          assertQueueEmpty(queue)
+          assertQueueEmpty(dlq)
 
-            val worksSent = getMessages[BaseWork](topic).distinct
-            worksSent should have size 4
+          val worksSent = getMessages[BaseWork](topic).distinct
+          worksSent should have size 4
 
-            val redirectedWorks = worksSent.collect {
-              case work: UnidentifiedRedirectedWork => work
-            }
-            val mergedWorks = worksSent.collect {
-              case work: UnidentifiedWork => work
-            }
-
-            redirectedWorks should have size 2
-            mergedWorks should have size 2
+          val redirectedWorks = worksSent.collect {
+            case work: UnidentifiedRedirectedWork => work
           }
+          val mergedWorks = worksSent.collect {
+            case work: UnidentifiedWork => work
+          }
+
+          redirectedWorks should have size 2
+          mergedWorks should have size 2
         }
     }
   }
