@@ -11,7 +11,7 @@ import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 // TODO: Verify checksums in S3 are what you set them to
-object VerifiedBagUploaderFlow extends Logging {
+object UploadAndVerifyBagFlow extends Logging {
   def apply(config: BagUploaderConfig)(
     implicit
     materializer: ActorMaterializer,
@@ -21,7 +21,7 @@ object VerifiedBagUploaderFlow extends Logging {
     val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] =
       DigestLocationFlow(config)
 
-    Flow[ZipFile].flatMapConcat((zipFile) => {
+    Flow[ZipFile].flatMapConcat(zipFile => {
       Source
         .single(zipFile)
         .via(digestLocationFlow)

@@ -12,7 +12,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.util.{Failure, Success}
 
-object DownloadZipFlow extends Logging {
+object DownloadZipFileFlow extends Logging {
   def apply()(
     implicit s3Client: S3Client,
     materializer: ActorMaterializer): Flow[ObjectLocation, ZipFile, NotUsed] = {
