@@ -11,6 +11,21 @@ resource "aws_iam_role_policy" "archive_asset_lookup_dynamo_permission" {
         "dynamodb:Query"
       ],
       "Resource": "${data.aws_dynamodb_table.storage_manifest.arn}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:HeadObject",
+        "s3:GetObject"
+      ],
+      "Resource": "${data.aws_s3_bucket.storage_manifests.arn}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "${data.aws_s3_bucket.storage_manifests.arn}"
     }
   ]
 }
