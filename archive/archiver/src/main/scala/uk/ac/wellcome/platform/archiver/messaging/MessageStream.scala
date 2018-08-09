@@ -97,7 +97,8 @@ class MessageStream[T, R] @Inject()(actorSystem: ActorSystem,
       .runWith(sink)(resumingMaterializer)
   }
 
-  private def decider(metricName: String, strategy: Supervision.Directive): Supervision.Decider = {
+  private def decider(metricName: String,
+                      strategy: Supervision.Directive): Supervision.Decider = {
     case e =>
       error("MessageStream failure encountered", e)
       metricsSender.countFailure(metricName)

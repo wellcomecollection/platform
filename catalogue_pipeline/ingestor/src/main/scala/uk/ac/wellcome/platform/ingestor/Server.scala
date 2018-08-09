@@ -16,7 +16,6 @@ import uk.ac.wellcome.finatra.elasticsearch.{
 }
 import uk.ac.wellcome.finatra.messaging.{
   MessageReaderConfigModule,
-  MessageWriterConfigModule,
   SQSClientModule
 }
 import uk.ac.wellcome.finatra.monitoring.MetricsSenderModule
@@ -29,7 +28,6 @@ class Server extends HttpServer {
   override val name = "uk.ac.wellcome.platform.ingestor Ingestor"
   override val modules = Seq(
     MessageReaderConfigModule,
-    MessageWriterConfigModule,
     MetricsSenderModule,
     SQSClientModule,
     S3ClientModule,

@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.api.works.v2
 
 import com.twitter.finagle.http.Status
 import com.twitter.finatra.http.EmbeddedHttpServer
+import uk.ac.wellcome.models.work.internal._
 
 class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
   it(
@@ -31,23 +32,15 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               |     "type": "Work",
                               |     "id": "${work0.canonicalId}",
                               |     "title": "${work0.title}",
-                              |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
-                   work0.sourceIdentifier)}, ${identifier(identifier0)} ],
-                              |     "subjects": [ ],
-                              |     "genres": [ ],
-                              |     "production": [ ]
+                   work0.sourceIdentifier)}, ${identifier(identifier0)} ]
                               |   },
                               |   {
                               |     "type": "Work",
                               |     "id": "${work1.canonicalId}",
                               |     "title": "${work1.title}",
-                              |     "contributors": [ ],
                               |     "identifiers": [ ${identifier(
-                   work1.sourceIdentifier)}, ${identifier(identifier1)} ],
-                              |     "subjects": [ ],
-                              |     "genres": [ ],
-                              |     "production": [ ]
+                   work1.sourceIdentifier)}, ${identifier(identifier1)} ]
                               |   }
                               |  ]
                               |}
@@ -78,12 +71,8 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
-                              | "contributors": [ ],
                               | "identifiers": [ ${identifier(
-                   work.sourceIdentifier)}, ${identifier(otherIdentifier)} ],
-                              | "subjects": [ ],
-                              | "genres": [ ],
-                              | "production": [ ]
+                   work.sourceIdentifier)}, ${identifier(otherIdentifier)} ]
                               |}
           """.stripMargin
           )
@@ -110,12 +99,303 @@ class ApiV2WorksIncludesTest extends ApiV2WorksTestBase {
                               | "type": "Work",
                               | "id": "${work.canonicalId}",
                               | "title": "${work.title}",
-                              | "contributors": [ ],
-                              | "items": [ ${items(work.items)} ],
-                              | "subjects": [ ],
-                              | "genres": [ ],
-                              | "production": [ ]
+                              | "items": [ ${items(work.items)} ]
                               |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of subjects on a list endpoint if we pass ?include=subjects") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+        val subjects1 = List(
+          Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
+        val subjects2 = List(
+          Subject("flying cars", List(Unidentifiable(Concept("flying cars")))))
+        val work0 = works(0).copy(subjects = subjects1)
+        val work1 = works(1).copy(subjects = subjects2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=subjects",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "subjects": [ ${subjects(subjects1)}]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "subjects": [ ${subjects(subjects2)}]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of subjects on a single work endpoint if we pass ?include=subjects") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val subject = List(
+          Subject("ornithology", List(Unidentifiable(Concept("ornithology")))))
+        val work = createIdentifiedWork.copy(subjects = subject)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=subjects",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "subjects": [ ${subjects(subject)}]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it("includes a list of genres on a list endpoint if we pass ?include=genres") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+        val genres1 = List(
+          Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
+        val genres2 = List(
+          Genre("flying cars", List(Unidentifiable(Concept("flying cars")))))
+        val work0 = works(0).copy(genres = genres1)
+        val work1 = works(1).copy(genres = genres2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=genres",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "genres": [ ${genres(genres1)}]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "genres": [ ${genres(genres2)}]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of genres on a single work endpoint if we pass ?include=genres") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val genre = List(
+          Genre("ornithology", List(Unidentifiable(Concept("ornithology")))))
+        val work = createIdentifiedWork.copy(genres = genre)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=genres",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "genres": [ ${genres(genre)}]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of contributors on a list endpoint if we pass ?include=contributors") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+        val contributors1 =
+          List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
+        val contributors2 =
+          List(Contributor(Unidentifiable(Person("Fred Astair"))))
+        val work0 = works(0).copy(contributors = contributors1)
+        val work1 = works(1).copy(contributors = contributors2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=contributors",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "contributors": [ ${contributors(contributors1)}]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "contributors": [ ${contributors(contributors2)}]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of contributors on a single work endpoint if we pass ?include=contributors") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val contributor =
+          List(Contributor(Unidentifiable(Person("Ginger Rogers"))))
+        val work = createIdentifiedWork.copy(contributors = contributor)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=contributors",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "contributors": [ ${contributors(contributor)}]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of production events on a list endpoint if we pass ?include=production") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val works = createIdentifiedWorks(count = 2).sortBy { _.canonicalId }
+
+        val productionEvents1 = List(
+          ProductionEvent(
+            List(Place("London")),
+            List(Unidentifiable(Person("Bumblebee"))),
+            List(Period("1984")),
+            None))
+        val productionEvents2 = List(
+          ProductionEvent(
+            List(Place("Madrid")),
+            List(Unidentifiable(Person("Bumblebee"))),
+            List(Period("1984")),
+            None))
+        val work0 = works(0).copy(production = productionEvents1)
+        val work1 = works(1).copy(production = productionEvents2)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work0, work1)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works?include=production",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  ${resultList(apiPrefix, totalResults = 2)},
+                 |  "results": [
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work0.canonicalId}",
+                 |     "title": "${work0.title}",
+                 |     "production": [ ${production(productionEvents1)}]
+                 |   },
+                 |   {
+                 |     "type": "Work",
+                 |     "id": "${work1.canonicalId}",
+                 |     "title": "${work1.title}",
+                 |     "production": [ ${production(productionEvents2)}]
+                 |   }
+                 |  ]
+                 |}
+          """.stripMargin
+          )
+        }
+    }
+  }
+
+  it(
+    "includes a list of production on a single work endpoint if we pass ?include=production") {
+    withV2Api {
+      case (apiPrefix, _, indexNameV2, itemType, server: EmbeddedHttpServer) =>
+        val productionEvent = List(
+          ProductionEvent(
+            List(Place("London")),
+            List(Unidentifiable(Person("Bumblebee"))),
+            List(Period("1984")),
+            None))
+        val work = createIdentifiedWork.copy(production = productionEvent)
+
+        insertIntoElasticsearch(indexNameV2, itemType, work)
+
+        eventually {
+          server.httpGet(
+            path = s"/$apiPrefix/works/${work.canonicalId}?include=production",
+            andExpect = Status.Ok,
+            withJsonBody = s"""
+                 |{
+                 |  "@context": "https://localhost:8888/$apiPrefix/context.json",
+                 |  "type": "Work",
+                 |  "id": "${work.canonicalId}",
+                 |  "title": "${work.title}",
+                 |  "production": [ ${production(productionEvent)}]
+                 |}
           """.stripMargin
           )
         }

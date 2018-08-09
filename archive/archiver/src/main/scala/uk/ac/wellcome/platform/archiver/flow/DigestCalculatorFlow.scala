@@ -8,7 +8,7 @@ import akka.util.ByteString
 import grizzled.slf4j.Logging
 
 class DigestCalculatorFlow(algorithm: String, checksum: String)
-  extends GraphStage[FlowShape[ByteString, ByteString]]
+    extends GraphStage[FlowShape[ByteString, ByteString]]
     with Logging {
 
   val in = Inlet[ByteString]("DigestCalculator.in")
@@ -24,34 +24,37 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
         override def onPull(): Unit = pull(in)
       })
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          val chunk = grab(in)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            val chunk = grab(in)
 
-          digest.update(chunk.toArray)
-          push(out, chunk)
-        }
+            digest.update(chunk.toArray)
+            push(out, chunk)
+          }
 
-        override def onUpstreamFinish(): Unit = {
-          val streamDigest = ByteString(digest.digest())
-            .map(0xFF & _)
-            .map {
-              "%02x".format(_)
+          override def onUpstreamFinish(): Unit = {
+            val streamDigest = ByteString(digest.digest())
+              .map(0xFF & _)
+              .map {
+                "%02x".format(_)
+              }
+              .foldLeft("") {
+                _ + _
+              }
+              .mkString
+
+            digest.reset()
+
+            if (streamDigest != checksum) {
+              failStage(new RuntimeException(s"Checksum not matched!"))
+            } else {
+              completeStage()
             }
-            .foldLeft("") {
-              _ + _
-            }
-            .mkString
-
-          digest.reset()
-
-          if (streamDigest != checksum) {
-            failStage(new RuntimeException(s"Checksum not matched!"))
-          } else {
-            completeStage()
           }
         }
-      })
+      )
     }
 }
 

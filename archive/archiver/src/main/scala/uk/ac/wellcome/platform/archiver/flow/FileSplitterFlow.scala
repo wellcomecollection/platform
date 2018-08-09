@@ -4,7 +4,6 @@ import akka.stream.scaladsl.Framing
 import akka.util.ByteString
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 
-
 object FileSplitterFlow {
   def apply(config: BagUploaderConfig) = {
     val framingDelimiter = Framing.delimiter(

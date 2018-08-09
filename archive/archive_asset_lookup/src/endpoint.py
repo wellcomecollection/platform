@@ -11,6 +11,8 @@ def main(event, context):
 
     # setup logging and AWS clients
     logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
     dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
     s3 = boto3.resource('s3', region_name=settings.REGION)
 
