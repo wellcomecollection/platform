@@ -1,10 +1,7 @@
 package uk.ac.wellcome.display.serialize
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.display.models.{
-  V1WorksIncludes,
-  WorksIncludesParsingException
-}
+import uk.ac.wellcome.display.models.V1WorksIncludes
 
 class WorksIncludesDeserializerTest extends FunSpec with Matchers {
 

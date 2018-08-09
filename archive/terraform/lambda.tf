@@ -23,6 +23,8 @@ module "lambda_archive_asset_lookup" {
   }
 
   alarm_topic_arn = "${local.lambda_error_alarm_arn}"
+
+  alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
   s3_key          = "lambdas/archive/archive_asset_lookup.zip"
 
