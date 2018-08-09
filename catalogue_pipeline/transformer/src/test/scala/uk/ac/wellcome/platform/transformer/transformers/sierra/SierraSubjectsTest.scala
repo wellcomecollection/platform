@@ -15,7 +15,7 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     val bibData = createSierraBibDataWith(varFields = List())
     assertExtractsSubjects(bibData, List())
   }
-
+describe("Subjects from 650, 648 and 651 tags"){
   it("returns subjects for tag 650 with only subfield a") {
     val expectedSubjects =
       List(
@@ -271,7 +271,9 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
 
     val actualSourceIdentifiers = transformer
       .getSubjects(bibData)
-      .map { _.concepts.head }
+      .map {
+        _.concepts.head
+      }
       .map {
         case Identifiable(_: Concept, sourceIdentifier, _, _) =>
           sourceIdentifier
@@ -341,7 +343,22 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     transformer
       .getSubjects(bibData) shouldBe List()
   }
+}
 
+  describe("tag 600 and 610 subjects") {
+    it("returns subjects for tag 600 with only subfield a") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "A Content")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+          label = "A Content",
+          concepts = List(Unidentifiable(Person(label = "A Content")))))
+
+    }
+  }
   private val transformer = new SierraSubjects {}
 
   private def assertExtractsSubjects(

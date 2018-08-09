@@ -73,7 +73,7 @@ trait SierraConcepts extends MarcUtils {
     val maybeSourceIdentifier = SierraConceptIdentifier.maybeFindIdentifier(
       varField = varField,
       identifierSubfieldContent = identifierSubfieldContent,
-      ontologyType = concept.ontologyType
+      ontologyType = concept.getClass.getSimpleName
     )
 
     maybeSourceIdentifier match {
