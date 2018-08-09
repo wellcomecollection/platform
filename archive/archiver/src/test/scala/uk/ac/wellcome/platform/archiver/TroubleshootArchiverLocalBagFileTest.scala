@@ -6,11 +6,12 @@ import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 
 @Ignore
-class ArchiverUtilitiyTest
-    extends FunSpec
-    with Matchers
-    with fixtures.Archiver
-    with MetricsSenderFixture {
+// Useful test to troubleshoot running the archiver using a local bagfile
+class TroubleshootArchiverLocalBagFileTest
+  extends FunSpec
+  with Matchers
+  with fixtures.Archiver
+  with MetricsSenderFixture {
 
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchiver {
