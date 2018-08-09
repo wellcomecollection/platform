@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
@@ -10,15 +10,6 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
 
   it("returns an empty list if neither 260 nor 264 are present") {
     transformToProduction(varFields = List()) shouldBe List()
-  }
-
-  it("throws an error if both 260 and 264 are present") {
-    transformVarFieldsAndAssertIsError(
-      varFields = List(
-        VarField(marcTag = Some("260"), fieldTag = "a"),
-        VarField(marcTag = Some("264"), fieldTag = "a")
-      )
-    )
   }
 
   // Examples are taken from the MARC spec for field 260.
@@ -265,11 +256,11 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
           )
         )
 
-        val caught = intercept[GracefulFailureException] {
+        val caught = intercept[TransformerException] {
           transformToProduction(varFields)
         }
 
-        caught.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
+        caught.e.getMessage shouldBe "Unrecognised second indicator for production function: [Some(x)]"
       }
     }
 
@@ -383,6 +374,98 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
     }
   }
 
+  describe("Both MARC field 260 and 264") {
+    it("throws an error if both 260 and 264 are present") {
+      transformVarFieldsAndAssertIsError(
+        varFields = List(
+          VarField(
+            marcTag = Some("260"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "Paris")
+            )
+          ),
+          VarField(
+            marcTag = Some("264"),
+            fieldTag = "p",
+            subfields = List(
+              MarcSubfield(tag = "a", content = "London")
+            )
+          )
+        )
+      )
+    }
+
+    it(
+      "uses field 260 if field 264 only contains a copyright statement in subfield c") {
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "San Francisco"),
+            MarcSubfield(tag = "b", content = "Morgan Kaufmann Publishers"),
+            MarcSubfield(tag = "c", content = "2004")
+          )
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = List(
+            MarcSubfield(tag = "c", content = "©2004")
+          )
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("San Francisco")),
+          agents = List(
+            Unidentifiable(Agent("Morgan Kaufmann Publishers"))
+          ),
+          dates = List(Period("2004")),
+          function = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+
+    it("returns correctly if 260 and 264 contain the same subfields") {
+      val subfields = List(
+        MarcSubfield(tag = "a", content = "London"),
+        MarcSubfield(tag = "b", content = "Wellcome Trust"),
+        MarcSubfield(tag = "c", content = "1992")
+      )
+
+      val varFields = List(
+        VarField(
+          marcTag = Some("260"),
+          fieldTag = "p",
+          subfields = subfields
+        ),
+        VarField(
+          marcTag = Some("264"),
+          fieldTag = "p",
+          subfields = subfields
+        )
+      )
+
+      val expectedProductions = List(
+        ProductionEvent(
+          places = List(Place("London")),
+          agents = List(
+            Unidentifiable(Agent("Wellcome Trust"))
+          ),
+          dates = List(Period("1992")),
+          function = None
+        )
+      )
+
+      transformToProduction(varFields) shouldBe expectedProductions
+    }
+  }
+
   // Test helpers
 
   private def transform260ToProduction(subfields: List[MarcSubfield]) = {
@@ -427,7 +510,7 @@ class SierraProductionTest extends FunSpec with Matchers with SierraDataUtil {
   private def transformVarFieldsAndAssertIsError(varFields: List[VarField]) = {
     val bibData = createSierraBibDataWith(varFields = varFields)
 
-    intercept[GracefulFailureException] {
+    intercept[TransformerException] {
       transformer.getProduction(bibData)
     }
   }

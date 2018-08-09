@@ -15,6 +15,7 @@ import uk.ac.wellcome.finatra.controllers.ManagementController
 import uk.ac.wellcome.finatra.storage.{
   DynamoClientModule,
   S3ClientModule,
+  S3ConfigModule,
   VHSConfigModule
 }
 import uk.ac.wellcome.platform.sierra_item_merger.modules.SierraItemMergerModule
@@ -32,6 +33,7 @@ class Server extends HttpServer {
     MetricsSenderModule,
     SQSConfigModule,
     SQSClientModule,
+    S3ConfigModule,
     S3ClientModule,
     AkkaModule,
     SierraItemMergerModule,

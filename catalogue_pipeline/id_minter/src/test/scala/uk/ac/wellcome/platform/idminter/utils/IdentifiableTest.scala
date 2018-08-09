@@ -13,7 +13,7 @@ class IdentifiableTest extends FunSpec with Matchers {
     }
   }
 
-  it("should never generate an identifier that starts with a number") {
+  it("never generates an identifier that starts with a number") {
     (1 to 100).map { _ =>
       Identifiable.generate should not(startWith regex "[0-9]")
     }

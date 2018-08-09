@@ -47,6 +47,32 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
       .toString shouldBe "\"array\""
   }
 
+  it("shows the includes request parameter model for v1") {
+    val tree = readTree(s"/catalogue/${ApiVersions.v1.toString}/swagger.json")
+    tree.at("/definitions/Work").isObject shouldBe true
+    val parameters = tree
+      .at("/paths")
+      .findPath(s"/catalogue/${ApiVersions.v1.toString}/works")
+      .at("/get/parameters")
+      .asScala
+      .map(_.findPath("name").asText())
+    parameters should contain("includes")
+    parameters should not contain "include"
+  }
+
+  it("shows the include request parameter model for v2") {
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+    tree.at("/definitions/Work").isObject shouldBe true
+    val parameters = tree
+      .at("/paths")
+      .findPath(s"/catalogue/${ApiVersions.v2.toString}/works")
+      .at("/get/parameters")
+      .asScala
+      .map(_.findPath("name").asText())
+    parameters should contain("include")
+    parameters should not contain "includes"
+  }
+
   it("shows the correct Work model for v2") {
     val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
     tree.at("/definitions/Work").isObject shouldBe true
@@ -64,6 +90,14 @@ class ApiSwaggerTest extends FunSpec with Matchers with fixtures.Server {
     tree
       .at("/definitions/Subject/properties/concepts/items/$ref")
       .toString shouldBe "\"#/definitions/Concept\""
+  }
+
+  it("shows the type of contributors") {
+    val tree = readTree(s"/catalogue/${ApiVersions.v2.toString}/swagger.json")
+
+    tree
+      .at("/definitions/Work/properties/contributors/items/$ref")
+      .toString shouldBe "\"#/definitions/Contributor\""
   }
 
   it("shows the correct Genre model for v2") {

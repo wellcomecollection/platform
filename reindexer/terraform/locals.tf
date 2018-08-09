@@ -1,8 +1,12 @@
 locals {
-  vhs_full_access_policy     = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_full_access_policy}"
-  vhs_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_dynamodb_update_policy}"
-  vhs_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_name}"
-  vhs_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_stream_arn}"
+  vhs_sourcedata_full_access_policy     = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_full_access_policy}"
+  vhs_sourcedata_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_dynamodb_update_policy}"
+  vhs_sourcedata_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_name}"
+  vhs_sourcedata_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_stream_arn}"
+
+  vhs_sierra_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_table_name}"
+  vhs_sierra_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_table_stream_arn}"
+  vhs_sierra_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_dynamodb_update_policy}"
 
   vpc_id          = "${data.terraform_remote_state.shared_infra.catalogue_vpc_id}"
   private_subnets = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"

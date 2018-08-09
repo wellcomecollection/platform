@@ -9,8 +9,6 @@ object SierraItemRecordMerger {
     if (existingRecord.modifiedDate.isBefore(updatedRecord.modifiedDate)) {
 
       updatedRecord.copy(
-        // We always carry across the version from the existing record.
-        version = existingRecord.version,
         // Let's suppose we have
         //
         //    oldRecord = (linked = {1, 2, 3}, unlinked = {4, 5})
@@ -37,11 +35,11 @@ object SierraItemRecordMerger {
     }
   }
 
-  private def addList(x: List[String], y: List[String]): List[String] = {
+  private def addList[T](x: List[T], y: List[T]): List[T] = {
     (x.toSet ++ y.toSet).toList
   }
 
-  private def subList(x: List[String], y: List[String]): List[String] = {
+  private def subList[T](x: List[T], y: List[T]): List[T] = {
     (x.toSet -- y.toSet).toList
   }
 }

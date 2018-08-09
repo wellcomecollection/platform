@@ -11,7 +11,7 @@ import uk.ac.wellcome.models.work.internal.{
 class DisplayLocationV1Test extends FunSpec with Matchers {
 
   describe("DisplayDigitalLocationV1") {
-    it("should read a DigitalLocation as a DisplayDigitalLocationV1 correctly") {
+    it("reads a DigitalLocation as a DisplayDigitalLocationV1") {
       val thumbnailUrl = "https://iiif.example.org/V0000001/default.jpg"
       val locationType = LocationType("thumbnail-image")
 
@@ -32,7 +32,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
       displayDigitalLocation.ontologyType shouldBe "DigitalLocation"
     }
 
-    it("should read the credit field from a Location correctly") {
+    it("reads the credit field from a Location") {
       val location = DigitalLocation(
         locationType = LocationType("thumbnail-image"),
         url = "",
@@ -49,7 +49,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
   }
 
   describe("DisplayPhysicalLocationV1") {
-    it("should create a DisplayPhysicalLocationV1 from a PhysicalLocation") {
+    it("creates a DisplayPhysicalLocationV1 from a PhysicalLocation") {
       val locationType = LocationType("sgmed")
       val locationLabel = "The collection of cold cauldrons"
       val physicalLocation =
@@ -64,7 +64,7 @@ class DisplayLocationV1Test extends FunSpec with Matchers {
   }
 
   describe("DisplayDigitalLocationV1") {
-    it("should create a DisplayDigitalLocationV1 from a DigitalLocation") {
+    it("creates a DisplayDigitalLocationV1 from a DigitalLocation") {
       val locationType = LocationType("iiif-image")
       val url = "https://wellcomelibrary.org/iiif/b2201508/manifest"
 

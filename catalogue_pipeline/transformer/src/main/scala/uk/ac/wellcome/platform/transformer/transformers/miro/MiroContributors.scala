@@ -1,8 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal.{Agent, Contributor, Unidentifiable}
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.MiroTransformableData
 
 trait MiroContributors extends MiroContributorCodes {
@@ -35,9 +35,9 @@ trait MiroContributors extends MiroContributorCodes {
           case Some("Wellcome Collection") => None
           case Some(s)                     => Some(s)
           case None =>
-            throw GracefulFailureException(new RuntimeException(
+            throw TransformerException(
               s"Unable to look up contributor credit line for ${miroData.sourceCode} on ${miroId}"
-            ))
+            )
         }
       case None => None
     }

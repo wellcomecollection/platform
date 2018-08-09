@@ -2,55 +2,47 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.transformable.SierraTransformable
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
+import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{
   SierraBibData,
   SierraItemData,
   SierraMaterialType
 }
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 
 import scala.util.{Failure, Success}
 
 trait SierraItems extends Logging with SierraLocation {
-  def extractItemData(
-    sierraTransformable: SierraTransformable): Map[String, SierraItemData] =
-    sierraTransformable.itemData
+  def extractItemData(sierraTransformable: SierraTransformable)
+    : Map[SierraItemNumber, SierraItemData] =
+    sierraTransformable.itemRecords
       .map { case (id, itemRecord) => (id, itemRecord.data) }
       .map {
         case (id, jsonString) =>
           fromJson[SierraItemData](jsonString) match {
-            case Success(data) => Some(id -> data)
-            case Failure(e) => {
-              error(s"Failed to parse item!", e)
-              None
-            }
+            case Success(data) => id -> data
+            case Failure(_) =>
+              throw TransformerException(
+                s"Unable to parse item data for $id as JSON: <<$jsonString>>")
           }
       }
-      .flatten
-      .toMap
 
-  def transformItemData(itemId: String,
+  def transformItemData(itemId: SierraItemNumber,
                         itemData: SierraItemData): Identifiable[Item] = {
     debug(s"Attempting to transform $itemId")
     Identifiable(
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Item",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraId = itemId,
-          recordType = SierraRecordTypes.items
-        )
+        value = itemId.withCheckDigit
       ),
       otherIdentifiers = List(
         SourceIdentifier(
           identifierType = IdentifierType("sierra-identifier"),
           ontologyType = "Item",
-          value = itemId
+          value = itemId.withoutCheckDigit
         )
       ),
       agent = Item(
@@ -63,10 +55,10 @@ trait SierraItems extends Logging with SierraLocation {
     sierraTransformable: SierraTransformable): List[Identifiable[Item]] =
     extractItemData(sierraTransformable)
       .filterNot {
-        case (_: String, itemData: SierraItemData) => itemData.deleted
+        case (_: SierraItemNumber, itemData: SierraItemData) => itemData.deleted
       }
       .map {
-        case (itemId: String, itemData: SierraItemData) =>
+        case (itemId: SierraItemNumber, itemData: SierraItemData) =>
           transformItemData(
             itemId = itemId,
             itemData = itemData
@@ -74,23 +66,43 @@ trait SierraItems extends Logging with SierraLocation {
       }
       .toList
 
-  def getDigitalItem(sourceIdentifier: SourceIdentifier): Identifiable[Item] = {
-    Identifiable(
-      sourceIdentifier = sourceIdentifier,
+  private def getDigitalItem(
+    sourceIdentifier: SourceIdentifier): Unidentifiable[Item] = {
+    Unidentifiable(
       agent = Item(
         locations = List(getDigitalLocation(sourceIdentifier.value))
       )
     )
   }
 
+  /** Add digital items to a work.
+    *
+    * We can add digital items if:
+    *   1) The bib record has material type "E-books"
+    *   2) There's a "dlnk" location in the "locations" field of the bib
+    *      record.
+    *
+    * Note: both of these fields are populated manually.  We can work out if
+    * a library record has a digitised version from the METS files -- when we
+    * have those in the pipeline, we can do away with this code.
+    *
+    */
   def getDigitalItems(
     sourceIdentifier: SourceIdentifier,
-    sierraBibData: SierraBibData): List[Identifiable[Item]] = {
-    sierraBibData.materialType match {
-      case Some(SierraMaterialType("v", "E-books")) =>
-        List(getDigitalItem(sourceIdentifier))
-      case _ => List.empty
+    sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
+
+    val hasEbookMaterialType =
+      sierraBibData.materialType.contains(SierraMaterialType("v", "E-books"))
+
+    val hasDlnkLocation = sierraBibData.locations match {
+      case Some(locations) => locations.map { _.code }.contains("dlnk")
+      case None            => false
+    }
+
+    if (hasEbookMaterialType || hasDlnkLocation) {
+      List(getDigitalItem(sourceIdentifier))
+    } else {
+      List()
     }
   }
-
 }

@@ -1,12 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.models.work.internal.{
-  Concept,
-  Identifiable,
-  IdentifierType,
-  SourceIdentifier
-}
+import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
 
 class SierraConceptsTest extends FunSpec with Matchers {
@@ -81,25 +76,27 @@ class SierraConceptsTest extends FunSpec with Matchers {
     )
   }
 
-  it("puts extra instances of subfield 0 into the otherIdentifiers field") {
-    val caught = intercept[RuntimeException] {
-      transformer.identifyPrimaryConcept[Concept](
-        concept = Concept(label = "Hitchhiking horses hurry home"),
-        varField = VarField(
-          fieldTag = "p",
-          marcTag = "655",
-          indicator1 = "",
-          indicator2 = "0",
-          subfields = List(
-            MarcSubfield(tag = "a", content = "hitchhiking"),
-            MarcSubfield(tag = "0", content = "u/xxx"),
-            MarcSubfield(tag = "0", content = "u/yyy")
-          )
+  it("ignores multiple instances of subfield 0 im the otherIdentifiers") {
+    val concept = Concept(label = "Hitchhiking horses hurry home")
+
+    val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](
+      concept = concept,
+      varField = VarField(
+        fieldTag = "p",
+        marcTag = "655",
+        indicator1 = "",
+        indicator2 = "0",
+        subfields = List(
+          MarcSubfield(tag = "a", content = "hitchhiking"),
+          MarcSubfield(tag = "0", content = "u/xxx"),
+          MarcSubfield(tag = "0", content = "u/yyy")
         )
       )
-    }
+    )
 
-    caught.getMessage shouldEqual "Too many identifiers fields: List(MarcSubfield(0,u/xxx), MarcSubfield(0,u/yyy))"
+    maybeIdentifiedConcept shouldBe Unidentifiable(
+      concept
+    )
   }
 
   val transformer = new SierraConcepts {}

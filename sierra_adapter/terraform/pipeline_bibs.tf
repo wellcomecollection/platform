@@ -46,7 +46,7 @@ module "bibs_reader" {
 }
 
 module "bibs_merger" {
-  source = "merger"
+  source = "bib_merger"
 
   resource_type = "bibs"
 

@@ -2,8 +2,20 @@ import sbt._
 
 object WellcomeDependencies {
   private lazy val versions = new {
+    val json = "1.0.0"
+    val monitoring = "1.1.0"
     val storage = "1.5.0"
   }
+
+  val jsonLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "json_2.12" % versions.json,
+    "uk.ac.wellcome" % "json_2.12" % versions.json % "test" classifier "tests"
+  )
+
+  val monitoringLibrary: Seq[ModuleID] = Seq(
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring,
+    "uk.ac.wellcome" % "monitoring_2.12" % versions.monitoring % "test" classifier "tests"
+  )
 
   val storageLibrary: Seq[ModuleID] = Seq(
     "uk.ac.wellcome" % "storage_2.12" % versions.storage,
@@ -121,7 +133,7 @@ object Dependencies {
     "com.typesafe.akka" %% "akka-stream" % versions.akka % "test"
   )
 
-  val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies
+  val commonDisplayDependencies = swaggerDependencies ++ guiceDependencies ++ scalacheckDependencies
 
   val commonElasticsearchDependencies = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion
@@ -133,19 +145,17 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
     "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
     "io.circe" %% "circe-yaml" % "0.8.0"
-  ) ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
+  ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
   val finatraAkkaDependencies = akkaDependencies ++ finatraDependencies ++ guiceDependencies
 
-  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
+  val finatraMonitoringDependencies = finatraDependencies ++ WellcomeDependencies.monitoringLibrary
 
-  val commonMonitoringDependencies = Seq(
-    "com.amazonaws" % "aws-java-sdk-cloudwatch" % versions.aws
-  ) ++ akkaDependencies ++ guiceDependencies
+  val finatraStorageDependencies = finatraDependencies ++ WellcomeDependencies.storageLibrary
 
   val internalModelDependencies = dynamoDependencies ++ Seq(
     "com.github.tototoshi" %% "scala-csv" % versions.scalaCsv
-  )
+  ) ++ WellcomeDependencies.jsonLibrary
 
   // Application specific dependency groups
   val idminterDependencies = Seq(

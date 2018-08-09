@@ -8,13 +8,13 @@ class MiroTransformableTransformerCopyrightTest
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should have no credit line if there's not enough information") {
+  it("has no credit line if there's not enough information") {
     transformRecordAndCheckCredit(
       data = s""""image_title": "An image without any copyright?""""
     )
   }
 
-  it("should use the image_credit_line field if present") {
+  it("uses the image_credit_line field if present") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "A tumultuous transformation of trees",
@@ -24,7 +24,7 @@ class MiroTransformableTransformerCopyrightTest
     )
   }
 
-  it("should use the image_credit_line in preference to image_source_code") {
+  it("uses the image_credit_line in preference to image_source_code") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "A tumultuous transformation of trees",
@@ -35,7 +35,7 @@ class MiroTransformableTransformerCopyrightTest
     )
   }
 
-  it("should use image_source_code if image_credit_line is empty") {
+  it("uses image_source_code if image_credit_line is empty") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "A tumultuous transformation of trees",
@@ -46,7 +46,7 @@ class MiroTransformableTransformerCopyrightTest
     )
   }
 
-  it("should use the uppercased version of the source_code if necessary") {
+  it("uses the uppercased version of the source_code if necessary") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "A loud and leafy lime",
@@ -56,7 +56,7 @@ class MiroTransformableTransformerCopyrightTest
     )
   }
 
-  it("should tidy up the credit line if necessary") {
+  it("tidies up the credit line if necessary") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "Outside an odorous oak",
@@ -66,7 +66,7 @@ class MiroTransformableTransformerCopyrightTest
     )
   }
 
-  it("should correctly handle special characters in the contributor map") {
+  it("handles special characters in the contributor map") {
     transformRecordAndCheckCredit(
       data = s"""
         "image_title": "A fanciful flurry of firs",
@@ -82,7 +82,7 @@ class MiroTransformableTransformerCopyrightTest
     expectedCredit: Option[String] = None
   ) = {
     val transformedWork = transformWork(data = data)
-    val location = transformedWork.items.head.agent.locations.head
+    val location = transformedWork.itemsV1.head.agent.locations.head
     location shouldBe a[DigitalLocation]
     location.asInstanceOf[DigitalLocation].credit shouldBe expectedCredit
   }

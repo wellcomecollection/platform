@@ -10,19 +10,19 @@ object BibMerger {
     */
   def mergeBibRecord(sierraTransformable: SierraTransformable,
                      sierraBibRecord: SierraBibRecord): SierraTransformable = {
-    if (sierraBibRecord.id != sierraTransformable.sourceId) {
+    if (sierraBibRecord.id != sierraTransformable.sierraId) {
       throw new RuntimeException(
-        s"Non-matching bib ids ${sierraBibRecord.id} != ${sierraTransformable.sourceId}")
+        s"Non-matching bib ids ${sierraBibRecord.id} != ${sierraTransformable.sierraId}")
     }
 
-    val isNewerData = sierraTransformable.maybeBibData match {
+    val isNewerData = sierraTransformable.maybeBibRecord match {
       case Some(bibData) =>
         sierraBibRecord.modifiedDate.isAfter(bibData.modifiedDate)
       case None => true
     }
 
     if (isNewerData) {
-      sierraTransformable.copy(maybeBibData = Some(sierraBibRecord))
+      sierraTransformable.copy(maybeBibRecord = Some(sierraBibRecord))
     } else {
       sierraTransformable
     }

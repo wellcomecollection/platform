@@ -177,7 +177,7 @@ class WorkGraphStoreTest
     }
   }
 
-  it("throws a GracefulFailureException if workGraphStore fails to put") {
+  it("throws a RuntimeException if workGraphStore fails to put") {
     val mockWorkNodeDao = mock[WorkNodeDao]
     val expectedException = new RuntimeException("FAILED")
     when(mockWorkNodeDao.put(any[WorkNode]))

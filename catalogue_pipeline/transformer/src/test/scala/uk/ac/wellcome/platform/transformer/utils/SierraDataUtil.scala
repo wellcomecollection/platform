@@ -4,23 +4,25 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemRecord
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.test.util.IdentifiersUtil
 import uk.ac.wellcome.platform.transformer.source._
-
 import uk.ac.wellcome.platform.transformer.source.sierra.{
-  Language => SierraLanguage
+  Language => SierraLanguage,
+  Location => SierraLocation
 }
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
   def createSierraBibDataWith(
     title: Option[String] = Some(randomAlphanumeric(25)),
     lang: Option[SierraLanguage] = None,
     materialType: Option[SierraMaterialType] = None,
+    locations: Option[List[SierraLocation]] = None,
     varFields: List[VarField] = List()
   ): SierraBibData =
     SierraBibData(
       title = title,
       lang = lang,
       materialType = materialType,
+      locations = locations,
       varFields = varFields
     )
 
@@ -28,7 +30,7 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraItemDataWith(
     deleted: Boolean = false,
-    location: Option[SierraItemLocation] = None
+    location: Option[SierraLocation] = None
   ): SierraItemData =
     SierraItemData(
       deleted = deleted,
@@ -37,17 +39,15 @@ trait SierraDataUtil extends IdentifiersUtil with SierraUtil {
 
   def createSierraItemData: SierraItemData = createSierraItemDataWith()
 
-  def createSierraItemRecordWith(id: String,
-                                 data: SierraItemData): SierraItemRecord =
+  def createSierraItemRecordWith(data: SierraItemData): SierraItemRecord =
     createSierraItemRecordWith(
-      id = id,
       data = toJson(data).get
     )
 
-  def createSierraMaterialTypeWith(code: String = randomAlphanumeric(1),
-                                   value: String = randomAlphanumeric(5)) = {
+  def createSierraMaterialTypeWith(
+    code: String = randomAlphanumeric(1),
+    value: String = randomAlphanumeric(5)): SierraMaterialType =
     SierraMaterialType(code, value)
-  }
 
   def createSierraMaterialType: SierraMaterialType =
     createSierraMaterialTypeWith()

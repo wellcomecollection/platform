@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.transformer.transformers
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.transformable.SierraTransformable
 import uk.ac.wellcome.models.transformable.sierra.{
+  SierraBibNumber,
   SierraBibRecord,
   SierraItemRecord
 }
@@ -10,7 +11,7 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, VarField}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 class SierraTransformableTransformerTest
     extends FunSpec
@@ -20,49 +21,52 @@ class SierraTransformableTransformerTest
     with WorksUtil {
   val transformer = new SierraTransformableTransformer
 
-  it("performs a transformation on a work with items") {
+  it("performs a transformation on a work with physical items") {
+    val itemRecords = List(
+      createSierraItemRecord,
+      createSierraItemRecord
+    )
+
     val sierraTransformable = createSierraTransformableWith(
       maybeBibRecord = Some(createSierraBibRecord),
-      itemRecords = List(
-        createSierraItemRecordWith(id = "5151515"),
-        createSierraItemRecordWith(id = "5252525")
-      )
+      itemRecords = itemRecords
     )
+
+    val expectedIdentifiers = itemRecords.map { record =>
+      SourceIdentifier(
+        identifierType = IdentifierType("sierra-system-number"),
+        ontologyType = "Item",
+        value = record.id.withCheckDigit
+      )
+    }
 
     val work = transformToWork(sierraTransformable)
 
-    val sourceIdentifier1 =
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        "i51515155")
-    val sourceIdentifier2 =
-      SourceIdentifier(
-        identifierType = IdentifierType("sierra-system-number"),
-        ontologyType = "Item",
-        "i52525259")
-
     work shouldBe a[UnidentifiedWork]
 
-    work.asInstanceOf[UnidentifiedWork].items.map { _.sourceIdentifier } shouldBe List(
-      sourceIdentifier1,
-      sourceIdentifier2
-    )
+    val actualIdentifiers = work
+      .asInstanceOf[UnidentifiedWork]
+      .items
+      .map { _.asInstanceOf[Identifiable[Item]].sourceIdentifier }
+
+    actualIdentifiers should contain theSameElementsAs expectedIdentifiers
   }
 
   it("extracts information from items") {
-    val bibId = createSierraRecordNumberString
-    val itemId = "6363636"
+    val bibId = createSierraBibNumber
+    val itemId = createSierraItemNumber
     val locationType = LocationType("sgmed")
     val locationLabel = "A museum of mermaids"
     val itemData =
-      s"""{
-          |"id": "$itemId",
-          |"location": {
-          |   "code": "${locationType.id}",
-          |   "name": "$locationLabel"
-          | }
-          |}""".stripMargin
+      s"""
+         |{
+         |  "id": "$itemId",
+         |  "location": {
+         |    "code": "${locationType.id}",
+         |    "name": "$locationLabel"
+         |  }
+         |}
+         |""".stripMargin
 
     val itemRecord = createSierraItemRecordWith(
       id = itemId,
@@ -73,7 +77,7 @@ class SierraTransformableTransformerTest
     val bibRecord = createSierraBibRecordWith(id = bibId)
 
     val transformable = createSierraTransformableWith(
-      sourceId = bibId,
+      sierraId = bibId,
       maybeBibRecord = Some(bibRecord),
       itemRecords = List(itemRecord)
     )
@@ -86,14 +90,14 @@ class SierraTransformableTransformerTest
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Item",
-      value = "i63636360"
+      value = itemId.withCheckDigit
     )
 
     val expectedOtherIdentifiers = List(
       SourceIdentifier(
         identifierType = IdentifierType("sierra-identifier"),
         ontologyType = "Item",
-        value = itemId
+        value = itemId.withoutCheckDigit
       )
     )
 
@@ -105,6 +109,44 @@ class SierraTransformableTransformerTest
     )
   }
 
+  it("puts an empty list in the itemsV1 field") {
+    val bibId = createSierraBibNumber
+    val itemId = createSierraItemNumber
+    val locationType = LocationType("sgmed")
+    val locationLabel = "A museum of mermaids"
+    val itemData =
+      s"""
+         |{
+         |  "id": "$itemId",
+         |  "location": {
+         |    "code": "${locationType.id}",
+         |    "name": "$locationLabel"
+         |  }
+         |}
+         |""".stripMargin
+
+    val itemRecord = createSierraItemRecordWith(
+      id = itemId,
+      data = itemData,
+      bibIds = List(bibId)
+    )
+
+    val bibRecord = createSierraBibRecordWith(id = bibId)
+
+    val transformable = createSierraTransformableWith(
+      sierraId = bibId,
+      maybeBibRecord = Some(bibRecord),
+      itemRecords = List(itemRecord)
+    )
+
+    val work = transformToWork(transformable)
+    work shouldBe a[UnidentifiedWork]
+    val unidentifiedWork = work.asInstanceOf[UnidentifiedWork]
+    unidentifiedWork.items should have size 1
+
+    unidentifiedWork.itemsV1 shouldBe Nil
+  }
+
   it("returns an InvisibleWork if there isn't any bib data") {
     assertTransformReturnsInvisibleWork(
       maybeBibRecord = None
@@ -112,7 +154,7 @@ class SierraTransformableTransformerTest
   }
 
   it(
-    "should not perform a transformation without bibData, even if some itemData is present") {
+    "does not perform a transformation without bibData, even if some itemData is present") {
     assertTransformReturnsInvisibleWork(
       maybeBibRecord = None,
       itemRecords = List(createSierraItemRecord)
@@ -120,7 +162,7 @@ class SierraTransformableTransformerTest
   }
 
   it("performs a transformation on a work using all varfields") {
-    val id = "0606060"
+    val id = createSierraBibNumber
     val title = "Hi Diddle Dee Dee"
     val lettering = "An actor's life for me"
 
@@ -182,12 +224,12 @@ class SierraTransformableTransformerTest
     val sourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Work",
-      value = "b06060602"
+      value = id.withCheckDigit
     )
     val sierraIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-identifier"),
       ontologyType = "Work",
-      value = id
+      value = id.withoutCheckDigit
     )
 
     val work = transformDataToWork(id = id, data = data)
@@ -210,7 +252,7 @@ class SierraTransformableTransformerTest
   }
 
   it("makes deleted works invisible") {
-    val id = "1789871"
+    val id = createSierraBibNumber
     val title = "Hi Diddle Dee Dee"
     val data =
       s"""
@@ -227,7 +269,7 @@ class SierraTransformableTransformerTest
   }
 
   it("makes suppressed works invisible") {
-    val id = "0001000"
+    val id = createSierraBibNumber
     val title = "Hi Diddle Dee Dee"
     val data =
       s"""
@@ -246,7 +288,7 @@ class SierraTransformableTransformerTest
   it("transforms bib records that don't have a title") {
     // This example is taken from a failure observed in the transformer,
     // based on real records from Sierra.
-    val id = "2524736"
+    val id = createSierraBibNumber
     val data =
       s"""
          |{
@@ -265,7 +307,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes the physical description, if present") {
-    val id = "7000007"
+    val id = createSierraBibNumber
     val physicalDescription = "A dusty depiction of dodos"
 
     val data =
@@ -295,7 +337,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes the extent, if present") {
-    val id = "8000008"
+    val id = createSierraBibNumber
     val extent = "Purple pages"
 
     val data =
@@ -325,7 +367,7 @@ class SierraTransformableTransformerTest
   }
 
   it("includes the work type, if present") {
-    val id = "6547529"
+    val id = createSierraBibNumber
     val workTypeId = "xxx"
     val workTypeValue =
       "A parchment of penguin pemmican pierced playfully with pencils."
@@ -353,13 +395,13 @@ class SierraTransformableTransformerTest
   }
 
   it("uses the full Sierra system number as the source identifier") {
-    val id = "9000009"
+    val id = createSierraBibNumber
     val data = s"""{"id": "$id", "title": "A title"}"""
 
     val expectedSourceIdentifier = SourceIdentifier(
       identifierType = IdentifierType("sierra-system-number"),
       ontologyType = "Work",
-      value = "b90000092"
+      value = id.withCheckDigit
     )
 
     val work = transformDataToWork(id = id, data = data)
@@ -367,7 +409,7 @@ class SierraTransformableTransformerTest
   }
 
   it("uses the lang for the language field") {
-    val id = "1020201"
+    val id = createSierraBibNumber
     val data =
       s"""{
          |  "id": "$id",
@@ -388,7 +430,7 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts contributor information if present") {
-    val id = "8008008"
+    val id = createSierraBibNumber
     val name = "Rincewind"
 
     val data =
@@ -421,7 +463,7 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts dimensions if present") {
-    val id = "9009009"
+    val id = createSierraBibNumber
     val dimensions = "24cm"
 
     val data =
@@ -451,7 +493,7 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts subjects if present") {
-    val id = "9009009"
+    val id = createSierraBibNumber
     val content = "A content"
 
     val data =
@@ -482,7 +524,7 @@ class SierraTransformableTransformerTest
   }
 
   it("adds production events if possible") {
-    val id = "9876789"
+    val id = createSierraBibNumber
     val placeLabel = "London"
 
     val data =
@@ -519,7 +561,7 @@ class SierraTransformableTransformerTest
   }
 
   it("extracts merge candidates from 776 subfield $$w") {
-    val id = "9876789"
+    val id = createSierraBibNumber
     val mergeCandidateBibNumber = "b21414440"
     val data =
       s"""
@@ -553,7 +595,7 @@ class SierraTransformableTransformerTest
   }
 
   it("returns an InvisibleWork if bibData has no title") {
-    val id = createSierraRecordNumberString
+    val id = createSierraBibNumber
     val bibData =
       s"""
         |{
@@ -572,7 +614,7 @@ class SierraTransformableTransformerTest
     )
   }
 
-  private def transformDataToWork(id: String,
+  private def transformDataToWork(id: SierraBibNumber,
                                   data: String): TransformedBaseWork = {
     val bibRecord = createSierraBibRecordWith(
       id = id,
@@ -589,8 +631,10 @@ class SierraTransformableTransformerTest
   private def assertTransformReturnsInvisibleWork(
     maybeBibRecord: Option[SierraBibRecord],
     itemRecords: List[SierraItemRecord] = List()) = {
+    val id = createSierraBibNumber
+
     val sierraTransformable = createSierraTransformableWith(
-      sourceId = "0102010",
+      sierraId = id,
       maybeBibRecord = maybeBibRecord,
       itemRecords = itemRecords
     )
@@ -602,17 +646,17 @@ class SierraTransformableTransformerTest
       sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = "b01020109"
+        value = id.withCheckDigit
       ),
       version = 1
     )
   }
 
   private def transformDataToUnidentifiedWork(
-    id: String,
+    id: SierraBibNumber,
     data: String): UnidentifiedWork = {
 
-    val work = transformDataToWork(id, data)
+    val work = transformDataToWork(id = id, data = data)
     work shouldBe a[UnidentifiedWork]
     work.asInstanceOf[UnidentifiedWork]
   }

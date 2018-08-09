@@ -28,11 +28,11 @@ class ApiV2RedirectsTest extends ApiV2WorksTestBase {
         insertIntoElasticsearch(indexNameV2, itemType, redirectedWork)
         server.httpGet(
           path =
-            s"/$apiPrefix/works/${redirectedWork.canonicalId}?includes=identifiers",
+            s"/$apiPrefix/works/${redirectedWork.canonicalId}?include=identifiers",
           andExpect = Status.Found,
           withBody = "",
           withLocation =
-            s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}?includes=identifiers"
+            s"/$apiPrefix/works/${redirectedWork.redirect.canonicalId}?include=identifiers"
         )
     }
   }

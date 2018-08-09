@@ -8,8 +8,9 @@ import org.scalatest.{Assertion, FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.{ExtendedPatience, JsonTestUtil}
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.test.utils.ExtendedPatience
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.utils.JsonAssertions
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
@@ -20,7 +21,7 @@ class IdEmbedderTests
     with Matchers
     with MockitoSugar
     with Akka
-    with JsonTestUtil
+    with JsonAssertions
     with ExtendedPatience
     with WorksUtil {
 
@@ -158,7 +159,7 @@ class IdEmbedderTests
     }
   }
 
-  it("adds canonicalIds to all items") {
+  it("adds canonicalIds to all identifiable items") {
     val identifier = createSourceIdentifierWith(
       ontologyType = "Item"
     )
@@ -168,10 +169,7 @@ class IdEmbedderTests
       agent = Item(locations = List())
     )
 
-    val originalItem2 = Identifiable(
-      sourceIdentifier = createSourceIdentifierWith(
-        ontologyType = "Item"
-      ),
+    val originalItem2 = Unidentifiable(
       agent = Item(locations = List())
     )
 
@@ -181,7 +179,6 @@ class IdEmbedderTests
     )
 
     val newItemCanonicalId1 = "item1-canonical-id"
-    val newItemCanonicalId2 = "item2-canonical-id"
 
     withIdEmbedder {
       case (identifierGenerator, idEmbedder) =>
@@ -199,28 +196,19 @@ class IdEmbedderTests
           newCanonicalId = newItemCanonicalId1
         )
 
-        setUpIdentifierGeneratorMock(
-          mockIdentifierGenerator = identifierGenerator,
-          sourceIdentifier = originalItem2.sourceIdentifier,
-          ontologyType = originalItem2.agent.ontologyType,
-          newCanonicalId = newItemCanonicalId2
-        )
-
         val eventualWork = idEmbedder.embedId(
           parse(
             toJson(originalWork).get
           ).right.get
         )
 
-        val expectedItem1 = createItem(
+        val expectedItem1: Displayable[Item] = createIdentifiedItem(
           sourceIdentifier = originalItem1.sourceIdentifier,
           canonicalId = newItemCanonicalId1,
           locations = originalItem1.agent.locations
         )
 
-        val expectedItem2 = createItem(
-          sourceIdentifier = originalItem2.sourceIdentifier,
-          canonicalId = newItemCanonicalId2,
+        val expectedItem2: Displayable[Item] = createUnidentifiableItemWith(
           locations = originalItem2.agent.locations
         )
 

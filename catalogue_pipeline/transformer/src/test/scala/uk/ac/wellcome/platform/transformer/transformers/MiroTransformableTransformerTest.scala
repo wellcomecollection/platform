@@ -10,7 +10,7 @@ class MiroTransformableTransformerTest
     with Matchers
     with MiroTransformableWrapper {
 
-  it("should pass through the Miro identifier") {
+  it("passes through the Miro identifier") {
     val MiroID = "M0000005_test"
     val work = transformWork(
       data = """"image_title": "A picture of a passing porpoise"""",
@@ -37,7 +37,7 @@ class MiroTransformableTransformerTest
     }
   }
 
-  describe("non-MPL references should be passed through as identifiers") {
+  describe("non-MPL references are passed through as identifiers") {
     it("no references") {
       transformRecordAndCheckMiroLibraryReferences(
         data = """
@@ -101,12 +101,12 @@ class MiroTransformableTransformerTest
     }
   }
 
-  it("should have no description if no image_image_desc field is present") {
+  it("has no description if no image_image_desc field is present") {
     val work = transformWork(data = s""""image_title": "A line of lions"""")
     work.description shouldBe None
   }
 
-  it("should pass through the value of the description field") {
+  it("passes through the value of the description field") {
     val description = "A new novel about northern narwhals in November"
     val work = transformWork(
       data = s"""
@@ -118,7 +118,7 @@ class MiroTransformableTransformerTest
   }
 
   describe("Wellcome Images Awards metadata") {
-    it("should do nothing for non-WIA metadata") {
+    it("does nothing for non-WIA metadata") {
       val description = "Spotting sea snakes on sandbanks."
       val work = transformWork(
         data = s"""
@@ -131,7 +131,7 @@ class MiroTransformableTransformerTest
       work.description shouldBe Some(description)
     }
 
-    it("should add WIA metadata if present") {
+    it("adds WIA metadata if present") {
       val description = "Purple penguins play with paint."
       val work = transformWork(
         data = s"""
@@ -145,7 +145,7 @@ class MiroTransformableTransformerTest
         description + " Biomedical Image Awards 2001.")
     }
 
-    it("should only include WIA metadata") {
+    it("only includes WIA metadata") {
       val description = "Giraffes can be grazing, galloping or graceful."
       val work = transformWork(
         data = s"""
@@ -159,7 +159,7 @@ class MiroTransformableTransformerTest
         description + " Biomedical Image Awards 2002.")
     }
 
-    it("should combine multiple WIA metadata fields if necessary") {
+    it("combines multiple WIA metadata fields if necessary") {
       val description = "Amazed and awe-inspired by an adversarial aardvark."
       val work = transformWork(
         data = s"""
@@ -174,7 +174,7 @@ class MiroTransformableTransformerTest
     }
   }
 
-  it("should pass through the value of the creation date on V records") {
+  it("passes through the value of the creation date on V records") {
     val date = "1820-1848"
     val work = transformWork(
       data = s"""
@@ -187,7 +187,7 @@ class MiroTransformableTransformerTest
     work.createdDate shouldBe Some(Period(date))
   }
 
-  it("should not pass through the value of the creation date on non-V records") {
+  it("does not pass through the value of the creation date on non-V records") {
     val date = "1820-1848"
     val work = transformWork(
       data = s"""
@@ -199,7 +199,7 @@ class MiroTransformableTransformerTest
     work.createdDate shouldBe None
   }
 
-  it("should pass through the lettering field if available") {
+  it("passes through the lettering field if available") {
     val lettering = "A lifelong lament for lemurs"
     val work = transformWork(
       data = s"""
@@ -210,7 +210,7 @@ class MiroTransformableTransformerTest
     work.lettering shouldBe Some(lettering)
   }
 
-  it("should correct HTML-encoded entities in the input JSON") {
+  it("corrects HTML-encoded entities in the input JSON") {
     val work = transformWork(
       data = s"""
         "image_title": "A caf&#233; for cats",
@@ -237,6 +237,7 @@ class MiroTransformableTransformerTest
 
   it("returns an InvisibleWork for images from contributor GUS") {
     assertTransformReturnsInvisibleWork(
+      miroId = "B0009891",
       data = buildJSONForWork("""
         "image_source_code": "GUS"
       """)
@@ -270,12 +271,39 @@ class MiroTransformableTransformerTest
       credit = Some("Ezra Feilden"),
       locationType = LocationType("iiif-image")
     )
-    work.items.head.agent.locations shouldBe List(expectedDigitalLocation)
+    work.itemsV1.head.agent.locations shouldBe List(expectedDigitalLocation)
   }
 
-  private def assertTransformReturnsInvisibleWork(data: String) = {
+  it("extracts both identifiable and unidentifiable items") {
+    val work = transformWork(
+      MiroID = "B0011308"
+    )
+
+    val expectedLocation = DigitalLocation(
+      "https://iiif.wellcomecollection.org/image/B0011308.jpg/info.json",
+      LocationType("iiif-image"),
+      Some(License_CCBY),
+      None)
+    work.itemsV1 shouldBe List(
+      Identifiable(
+        Item(List(expectedLocation)),
+        SourceIdentifier(
+          IdentifierType("miro-image-number"),
+          "Item",
+          "B0011308")))
+    work.items shouldBe List(Unidentifiable(Item(List(expectedLocation))))
+  }
+
+  it("sets the WorkType as 'Digital images'") {
+    val work = transformWork()
+    work.workType.isDefined shouldBe true
+    work.workType.get.label shouldBe "Digital images"
+  }
+
+  private def assertTransformReturnsInvisibleWork(miroId: String = "G0000001",
+                                                  data: String) = {
     val miroTransformable = MiroTransformable(
-      sourceId = "G0000001",
+      sourceId = miroId,
       MiroCollection = "TestCollection",
       data = data
     )

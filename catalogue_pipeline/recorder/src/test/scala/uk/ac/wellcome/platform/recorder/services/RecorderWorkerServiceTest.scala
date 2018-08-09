@@ -9,14 +9,14 @@ import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SQS}
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.LocalVersionedHybridStore
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, HybridRecord}
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -33,7 +33,7 @@ class RecorderWorkerServiceTest
     with ExtendedPatience
     with WorksUtil {
 
-  it("successfully records a UnidentifiedWork") {
+  it("records an UnidentifiedWork") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>
@@ -59,7 +59,7 @@ class RecorderWorkerServiceTest
     }
   }
 
-  it("stores UnidentifiedInvisibleWork successfully") {
+  it("stores UnidentifiedInvisibleWorks") {
     withLocalDynamoDbTable { table =>
       withLocalS3Bucket { storageBucket =>
         withLocalS3Bucket { messagesBucket =>

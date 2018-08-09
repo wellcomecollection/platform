@@ -5,6 +5,7 @@ import java.time.Instant
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB
 import com.gu.scanamo.{DynamoFormat, Scanamo}
 import com.twitter.finatra.http.EmbeddedHttpServer
+import org.apache.commons.codec.digest.DigestUtils
 import uk.ac.wellcome.messaging.sns.NotificationMessage
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.Queue
@@ -17,7 +18,7 @@ import uk.ac.wellcome.models.work.internal.{
 }
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.matcher.Server
 import uk.ac.wellcome.platform.matcher.locking.{
   DynamoLockingService,
@@ -37,7 +38,6 @@ import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.hashing.MurmurHash3
 
 trait MatcherFixtures
     extends Akka
@@ -199,9 +199,7 @@ trait MatcherFixtures
     )
 
   def ciHash(str: String): String = {
-    MurmurHash3
-      .stringHash(str, MurmurHash3.stringSeed)
-      .toHexString
+    DigestUtils.sha256Hex(str)
   }
 
   def aRowLock(id: String, contextId: String) = {

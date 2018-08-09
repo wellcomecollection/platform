@@ -3,9 +3,8 @@ package uk.ac.wellcome.platform.merger.services
 import org.scalatest.FunSpec
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.merger.MergerTestUtils
-import uk.ac.wellcome.platform.merger.fixtures.MergerFixtures
 
-class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
+class MergerTest extends FunSpec with MergerTestUtils {
 
   private val merger = new Merger()
 
@@ -44,9 +43,16 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
 
     val actualMergedWork = actualMergedWorks.head
 
-    val expectedItems = List(
-      physicalWork.items.head.copy(agent = physicalWork.items.head.agent.copy(
-        locations = physicalWork.items.head.agent.locations ++ digitalWork.items.head.agent.locations)))
+    val physicalItem = physicalWork.items.head.asInstanceOf[Identifiable[Item]]
+    val digitalItem = digitalWork.items.head
+
+    val expectedLocations = physicalItem.agent.locations ++ digitalItem.agent.locations
+
+    val expectedItem = physicalItem.copy(
+      agent = physicalItem.agent.copy(locations = expectedLocations))
+
+    val expectedItems = List(expectedItem)
+
     actualMergedWork shouldBe physicalWork.copy(
       otherIdentifiers = physicalWork.otherIdentifiers ++ digitalWork.identifiers,
       items = expectedItems)
@@ -71,10 +77,9 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
   it("does not merge a physical work with a digital work having multiple items") {
     val works = List(
       createPhysicalWork,
-      createDigitalWork.copy(
-        items = List(
-          createIdentifiableItemWith(locations = List(createDigitalLocation)),
-          createIdentifiableItemWith(locations = List(createDigitalLocation))))
+      createDigitalWork.copy(items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)),
+        createUnidentifiableItemWith(locations = List(createDigitalLocation))))
     )
 
     assertDoesNotMerge(works)
@@ -88,7 +93,7 @@ class MergerTest extends FunSpec with MergerTestUtils with MergerFixtures {
         createSourceIdentifierWith(identifierType = "miro-library-reference")),
       workType = Some(WorkType("v", "E-books")),
       items = List(
-        createIdentifiableItemWith(locations = List(createDigitalLocation)))
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
     )
   }
 

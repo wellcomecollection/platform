@@ -7,27 +7,29 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.exceptions.GracefulFailureException
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.json.exceptions.JsonDecodingError
 import uk.ac.wellcome.messaging.message.{MessageWriter, MessageWriterConfig}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS, SQS}
+import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 import uk.ac.wellcome.models.transformable.{
   MiroTransformable,
   SierraTransformable
 }
+import uk.ac.wellcome.models.transformable.SierraTransformable._
 import uk.ac.wellcome.models.work.internal.{
   TransformedBaseWork,
   UnidentifiedWork
 }
-import uk.ac.wellcome.storage.s3.{S3Config, S3StorageBackend}
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.platform.transformer.utils.TransformableMessageUtils
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -42,6 +44,7 @@ class NotificationMessageReceiverTest
     with ExtendedPatience
     with MockitoSugar
     with ScalaFutures
+    with SierraUtil
     with TransformableMessageUtils {
 
   def withNotificationMessageReceiver[R](
@@ -52,9 +55,6 @@ class NotificationMessageReceiverTest
     val s3Config = S3Config(bucket.name)
 
     val messageConfig = MessageWriterConfig(SNSConfig(topic.arn), s3Config)
-
-    // Required for MessageWriter
-    implicit val storageBackend = new S3StorageBackend(s3Client)
 
     val messageWriter =
       new MessageWriter[TransformedBaseWork](
@@ -73,16 +73,12 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and sends it to SNS client") {
-
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sqsMessage = hybridRecordNotificationMessage(
-            message = createValidSierraTransformableJsonWith(
-              title = "A calming breeze on the sea"
-            ),
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
-            version = 1,
             s3Client = s3Client,
             bucket = bucket
           )
@@ -105,14 +101,13 @@ class NotificationMessageReceiverTest
   }
 
   it("receives a message and adds the version to the transformed work") {
-    val title = "A pot of possums"
     val version = 5
 
     withLocalSnsTopic { topic =>
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val sierraMessage = hybridRecordNotificationMessage(
-            message = createValidSierraTransformableJsonWith(title = title),
+            message = toJson(createSierraTransformable).get,
             sourceName = "sierra",
             version = version,
             s3Client = s3Client,
@@ -146,7 +141,6 @@ class NotificationMessageReceiverTest
             hybridRecordNotificationMessage(
               message = "not a json string",
               sourceName = "miro",
-              version = 1,
               s3Client = s3Client,
               bucket = bucket
             )
@@ -155,7 +149,7 @@ class NotificationMessageReceiverTest
             val future = recordReceiver.receiveMessage(invalidSqsMessage)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[GracefulFailureException]
+              x shouldBe a[TransformerException]
             }
           }
         }
@@ -186,7 +180,7 @@ class NotificationMessageReceiverTest
               recordReceiver.receiveMessage(failingSqsMessage)
 
             whenReady(future.failed) { x =>
-              x shouldBe a[GracefulFailureException]
+              x shouldBe a[JsonDecodingError]
             }
           }
         }
@@ -203,9 +197,8 @@ class NotificationMessageReceiverTest
       withLocalSqsQueue { _ =>
         withLocalS3Bucket { bucket =>
           val message = hybridRecordNotificationMessage(
-            message = JsonUtil.toJson(sierraTransformable).get,
+            message = toJson(sierraTransformable).get,
             sourceName = "sierra",
-            version = 1,
             s3Client = s3Client,
             bucket = bucket
           )

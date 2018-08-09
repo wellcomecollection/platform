@@ -2,9 +2,10 @@ package uk.ac.wellcome.platform.api.responses
 
 import com.twitter.finagle.http.{Method, Request}
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.display.models.V1WorksIncludes
 import uk.ac.wellcome.display.models.v1.DisplayWorkV1
 import uk.ac.wellcome.platform.api.models.DisplayResultList
-import uk.ac.wellcome.platform.api.requests.MultipleResultsRequest
+import uk.ac.wellcome.platform.api.requests.V1MultipleResultsRequest
 
 class ResultListResponseTest extends FunSpec with Matchers {
   val contextUri = "https://example.org/context.json"
@@ -20,7 +21,7 @@ class ResultListResponseTest extends FunSpec with Matchers {
     results = List()
   )
 
-  val multipleResultsRequest = MultipleResultsRequest(
+  val multipleResultsRequest = V1MultipleResultsRequest(
     page = 1,
     pageSize = Some(displayResultList.pageSize),
     includes = None,
@@ -116,13 +117,14 @@ class ResultListResponseTest extends FunSpec with Matchers {
   private def getResponse(
     contextUri: String = contextUri,
     displayResultList: DisplayResultList[DisplayWorkV1],
-    multipleResultsRequest: MultipleResultsRequest = multipleResultsRequest,
+    multipleResultsRequest: V1MultipleResultsRequest = multipleResultsRequest,
     requestBaseUri: String = requestBaseUri
   ): ResultListResponse =
-    ResultListResponse.create(
-      contextUri = contextUri,
-      displayResultList = displayResultList,
-      multipleResultsRequest = multipleResultsRequest,
-      requestBaseUri = requestBaseUri
-    )
+    ResultListResponse
+      .create[DisplayWorkV1, V1MultipleResultsRequest, V1WorksIncludes](
+        contextUri = contextUri,
+        displayResultList = displayResultList,
+        multipleResultsRequest = multipleResultsRequest,
+        requestBaseUri = requestBaseUri
+      )
 }

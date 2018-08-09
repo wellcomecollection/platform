@@ -1,8 +1,8 @@
 package uk.ac.wellcome.models.transformable.sierra
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
-import uk.ac.wellcome.utils.JsonUtil._
 
 import java.time.Instant
 
@@ -18,7 +18,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
 
   it("creates a SierraItemRecord from valid item JSON") {
     val itemId = createSierraRecordNumberString
-    val bibId = createSierraRecordNumberString
+    val bibId = createSierraBibNumber
     val data = s"""
        |{
        |  "id": "$itemId",
@@ -32,7 +32,7 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
       modifiedDate = Instant.now
     )
 
-    result.id shouldBe itemId
+    result.id shouldBe SierraItemNumber(itemId)
     result.data shouldBe data
     result.bibIds shouldBe List(bibId)
   }
@@ -78,6 +78,6 @@ class SierraItemRecordTest extends FunSpec with Matchers with SierraUtil {
       )
     }
 
-    caught.getMessage shouldBe s"Error parsing bibIds from JSON <<$data>> (uk.ac.wellcome.exceptions.GracefulFailureException: $expectedMessage)"
+    caught.getMessage shouldBe s"Error parsing bibIds from JSON <<$data>> (uk.ac.wellcome.json.exceptions.JsonDecodingError: $expectedMessage)"
   }
 }

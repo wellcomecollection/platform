@@ -11,7 +11,7 @@ class DisplayGenreV2SerialisationTest
     with JsonMapperTestUtil
     with IdentifiersUtil {
 
-  it("serialises a DisplayGenre constructed from a Genre correctly") {
+  it("serialises a DisplayGenre constructed from a Genre") {
     val concept0 = Unidentifiable(Concept("conceptLabel"))
     val concept1 = Unidentifiable(Place("placeLabel"))
     val concept2 = Identified(

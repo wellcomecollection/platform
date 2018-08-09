@@ -16,17 +16,24 @@ trait MiroTransformableWrapper
     with TransformableTestBase[MiroTransformable] { this: Suite =>
 
   val transformer = new MiroTransformableTransformer
-  def buildJSONForWork(extraData: String): String =
-    s"""{
-        "image_cleared": "Y",
-        "image_copyright_cleared": "Y",
-        "image_tech_file_size": ["1000000"],
-        "image_use_restrictions": "CC-BY",
+  def buildJSONForWork(extraData: String): String = {
+    val baseData =
+      """
+        |"image_cleared": "Y",
+        |        "image_copyright_cleared": "Y",
+        |        "image_tech_file_size": ["1000000"],
+        |        "image_use_restrictions": "CC-BY"
+      """.stripMargin
+
+    if (extraData.isEmpty) s"""{$baseData}"""
+    else s"""{
+        $baseData,
         $extraData
       }"""
+  }
 
   def transformWork(
-    data: String,
+    data: String = "",
     MiroID: String = "M0000001",
     MiroCollection: String = "TestCollection"
   ): UnidentifiedWork = {

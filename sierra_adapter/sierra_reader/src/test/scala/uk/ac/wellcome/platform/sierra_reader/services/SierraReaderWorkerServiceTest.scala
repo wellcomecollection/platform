@@ -5,9 +5,8 @@ import org.scalatest.Matchers
 import uk.ac.wellcome.test.utils.ExtendedPatience
 import org.scalatest.FunSpec
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.utils.JsonUtil._
-import uk.ac.wellcome.exceptions.GracefulFailureException
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.json.JsonUtil._
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.sierra_reader.modules.WindowManager
 import uk.ac.wellcome.storage.s3.S3Config
 import uk.ac.wellcome.storage.fixtures.S3
@@ -20,6 +19,7 @@ import uk.ac.wellcome.models.transformable.sierra.{
   SierraBibRecord,
   SierraItemRecord
 }
+import uk.ac.wellcome.platform.sierra_reader.exceptions.SierraReaderException
 import uk.ac.wellcome.platform.sierra_reader.models.{
   ReaderConfig,
   SierraConfig,
@@ -154,34 +154,11 @@ class SierraReaderWorkerServiceTest
     }
   }
 
-  // This test isn't actually testing the correct behaviour (see issue 2422:
-  // https://github.com/wellcometrust/platform/issues/2422); it's due to be
-  // replaced when we fix this behaviour.
-  ignore("resumes a window if it finds an in-progress set of records") {
+  it("resumes a window if it finds an in-progress set of records") {
     withSierraReaderWorkerService(
       fields = "updatedDate,deleted,deletedDate,bibIds,fixedFields,varFields",
       resourceType = SierraResourceTypes.items
     ) { fixtures =>
-      val prefix = "records_items/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z"
-
-      // First we pre-populate S3 with files as if they'd come from a prior run of the reader.
-      s3Client.putObject(fixtures.bucket.name, s"$prefix/0000.json", "[]")
-      s3Client.putObject(
-        fixtures.bucket.name,
-        s"$prefix/0001.json",
-        """
-          |[
-          |  {
-          |    "id": "i1794165",
-          |    "modifiedDate": "2013-12-10T17:16:35Z",
-          |    "data": "{}",
-          |    "bibIds": [],
-          |  }
-          |]
-        """.stripMargin
-      )
-
-      // Then we trigger the reader, and we expect it to fill in the rest.
       val body =
         """
           |{
@@ -190,25 +167,38 @@ class SierraReaderWorkerServiceTest
           |}
         """.stripMargin
 
+      // Do a complete run of the reader -- this gives us a set of JSON files
+      // to compare to.
       sendNotificationToSQS(queue = fixtures.queue, body = body)
 
-      val pageNames = List("0000.json", "0001.json", "0002.json", "0003.json")
-        .map { label =>
-          s"$prefix/$label"
-        } ++ List(
-        "windows_items_complete/2013-12-10T17-16-35Z__2013-12-13T21-34-35Z")
+      eventually {
+        assertQueueEmpty(queue = fixtures.queue)
+
+        // There are 157 item records in the Sierra wiremock, so we expect
+        // 5 files -- the four JSON files, and a window marker.
+        listKeysInBucket(bucket = fixtures.bucket) should have size 5
+      }
+
+      val expectedContents = getAllObjectContents(bucket = fixtures.bucket)
+
+      // Now, let's delete every key in the bucket _except_ the first --
+      // which we'll use to restart the window.
+      listKeysInBucket(bucket = fixtures.bucket)
+        .filterNot { _.endsWith("0000.json") }
+        .foreach { key =>
+          s3Client.deleteObject(fixtures.bucket.name, key)
+        }
 
       eventually {
-        // There are 157 item records in the Sierra wiremock so we expect 4 files
-        listKeysInBucket(bucket = fixtures.bucket) shouldBe pageNames
+        listKeysInBucket(bucket = fixtures.bucket) should have size 1
+      }
 
-        // These two files were pre-populated -- we check the reader hasn't overwritten these
-        getItemRecordsFromS3(fixtures.bucket, pageNames(0)) should have size 0
-        getItemRecordsFromS3(fixtures.bucket, pageNames(1)) should have size 1
+      // Now, send a second message to the reader, and we'll see if it completes
+      // the window successfully.
+      sendNotificationToSQS(queue = fixtures.queue, body = body)
 
-        // We check the reader has filled these in correctly
-        getItemRecordsFromS3(fixtures.bucket, pageNames(2)) should have size 50
-        getItemRecordsFromS3(fixtures.bucket, pageNames(3)) should have size 7
+      eventually {
+        getAllObjectContents(bucket = fixtures.bucket) shouldBe expectedContents
       }
     }
   }
@@ -222,7 +212,7 @@ class SierraReaderWorkerServiceTest
     getObjectFromS3[List[SierraItemRecord]](bucket, key)
 
   it(
-    "returns a GracefulFailureException if it receives a message that doesn't contain start or end values") {
+    "returns a SierraReaderException if it receives a message that doesn't contain start or end values") {
     withSierraReaderWorkerService(fields = "") { fixtures =>
       val body =
         """
@@ -234,15 +224,14 @@ class SierraReaderWorkerServiceTest
       val notificationMessage = createNotificationMessageWith(body = body)
       whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
         ex =>
-          ex shouldBe a[GracefulFailureException]
+          ex shouldBe a[SierraReaderException]
       }
 
     }
 
   }
 
-  it(
-    "does not return a GracefulFailureException if it cannot reach the Sierra API") {
+  it("doesn't return a SierraReaderException if it cannot reach the Sierra API") {
     withSierraReaderWorkerService(fields = "", apiUrl = "http://localhost:5050") {
       fixtures =>
         val body =
@@ -257,7 +246,7 @@ class SierraReaderWorkerServiceTest
 
         whenReady(fixtures.worker.processMessage(notificationMessage).failed) {
           ex =>
-            ex shouldNot be(a[GracefulFailureException])
+            ex shouldNot be(a[SierraReaderException])
         }
     }
   }

@@ -8,7 +8,7 @@ resource "aws_alb_listener_rule" "path_rule" {
 
   condition {
     field  = "path-pattern"
-    values = ["/${var.namespace}"]
+    values = ["/${var.namespace}/*"]
   }
 }
 
@@ -44,7 +44,7 @@ module "service" {
   subnets = "${var.subnets}"
 
   namespace_id     = "${var.service_discovery_namespace}"
-  healthcheck_path = "/${var.namespace}/index.html"
+  healthcheck_path = "${var.health_check_path}"
 
   launch_type = "FARGATE"
 }

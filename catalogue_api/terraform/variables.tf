@@ -46,27 +46,27 @@ variable "es_cluster_credentials" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "romulus"
+  default     = "remus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = "3e731d10c993c7a2bce109835439dbb0b1b7f467"
+  default     = ""
 }
 
-variable "pinned_romulus_api_nginx" {
+variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = "4d0b58c7cd5feefbe77637f7fcda0d93b645e11b"
+  default     = ""
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = ""
+  default     = "5059b5265ca88ecc28b79b4b909ad7dd7d0d5245"
 }
 
-variable "pinned_remus_api_nginx" {
+variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = ""
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "es_config_romulus" {
@@ -74,8 +74,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v1 = "v1-2018-07-30-merging"
+    index_v2 = "v2-2018-07-30-merging"
     doc_type = "work"
   }
 }
@@ -85,8 +85,8 @@ variable "es_config_remus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v1 = "v1-2018-07-30-merging"
+    index_v2 = "v2-2018-07-30-merging"
     doc_type = "work"
   }
 }

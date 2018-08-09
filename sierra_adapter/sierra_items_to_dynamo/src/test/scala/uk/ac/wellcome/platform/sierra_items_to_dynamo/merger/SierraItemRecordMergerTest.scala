@@ -6,7 +6,7 @@ import uk.ac.wellcome.models.transformable.sierra.test.utils.SierraUtil
 class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
 
   it("combines the bibIds in the final result") {
-    val bibIds = createSierraRecordNumberStrings(count = 5)
+    val bibIds = createSierraBibNumbers(count = 5)
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
       bibIds = bibIds.slice(0, 3)
@@ -26,7 +26,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("records unlinked bibIds") {
-    val bibIds = createSierraRecordNumberStrings(count = 5)
+    val bibIds = createSierraBibNumbers(count = 5)
 
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
@@ -47,7 +47,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("preserves existing unlinked bibIds") {
-    val bibIds = createSierraRecordNumberStrings(count = 5)
+    val bibIds = createSierraBibNumbers(count = 5)
 
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
@@ -69,7 +69,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
 
   it("does not duplicate unlinked bibIds") {
     // This would be an unusual scenario to arise, but check we handle it anyway!
-    val bibIds = createSierraRecordNumberStrings(count = 3)
+    val bibIds = createSierraBibNumbers(count = 3)
 
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
@@ -91,7 +91,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("removes an unlinked bibId if it appears on a new record") {
-    val bibIds = createSierraRecordNumberStrings(count = 3)
+    val bibIds = createSierraBibNumbers(count = 3)
 
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = olderDate,
@@ -113,7 +113,7 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
   }
 
   it("returns the existing record unchanged if the update has an older date") {
-    val bibIds = createSierraRecordNumberStrings(count = 5)
+    val bibIds = createSierraBibNumbers(count = 5)
 
     val existingRecord = createSierraItemRecordWith(
       modifiedDate = newerDate,
@@ -129,20 +129,5 @@ class SierraItemRecordMergerTest extends FunSpec with Matchers with SierraUtil {
       SierraItemRecordMerger.mergeItems(existingRecord, updatedRecord)
 
     mergedRecord shouldBe existingRecord
-  }
-
-  it("carries across the version from the existing record") {
-    val existingRecord = createSierraItemRecordWith(
-      modifiedDate = olderDate,
-      version = 10
-    )
-    val updatedRecord = createSierraItemRecordWith(
-      modifiedDate = newerDate,
-      version = 2
-    )
-
-    val mergedRecord =
-      SierraItemRecordMerger.mergeItems(existingRecord, updatedRecord)
-    mergedRecord.version shouldBe existingRecord.version
   }
 }

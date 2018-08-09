@@ -1,45 +1,77 @@
 package uk.ac.wellcome.display.models.v2
 
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
+import org.scalacheck.ScalacheckShapeless._
 
-class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
+class DisplayWorkV2Test
+    extends FunSpec
+    with Matchers
+    with WorksUtil
+    with PropertyChecks {
 
-  it("correctly parses a Work without any items") {
+  it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
       items = List()
     )
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V2WorksIncludes(items = true)
     )
     displayWork.items shouldBe Some(List())
   }
 
-  it("correctly parses items on a work") {
+  it("parses identified items on a work") {
+    val items = createIdentifiedItems(count = 1)
     val work = createIdentifiedWorkWith(
-      items = createItems(count = 1)
+      items = items
     )
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V2WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
-    displayItem.id shouldBe work.items.head.canonicalId
+    displayItem.id shouldBe Some(items.head.canonicalId)
   }
 
-  it("correctly parses a work without any extra identifiers") {
+  it("parses unidentified items on a work") {
+    val item = createUnidentifiableItemWith()
+    val location = item.agent.locations.head.asInstanceOf[DigitalLocation]
+    val work = createIdentifiedWorkWith(
+      items = List(item)
+    )
+
+    val displayWork = DisplayWorkV2(
+      work = work,
+      includes = V2WorksIncludes(items = true)
+    )
+
+    val displayItem = displayWork.items.get.head
+    displayItem shouldBe DisplayItemV2(
+      id = None,
+      identifiers = None,
+      locations = List(
+        DisplayDigitalLocationV2(
+          DisplayLocationType(location.locationType),
+          url = location.url,
+          credit = location.credit,
+          license = location.license.map { DisplayLicenseV2.apply }))
+    )
+  }
+
+  it("parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
 
     val displayWork = DisplayWorkV2(
       work = work,
-      includes = WorksIncludes(identifiers = true)
+      includes = V2WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
       List(DisplayIdentifierV2(work.sourceIdentifier)))
@@ -102,7 +134,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     displayLanguage.label shouldBe language.label
   }
 
-  it("extracts contributors from a Work") {
+  it("extracts contributors from a Work with the contributors include") {
     val canonicalId = createCanonicalId
     val sourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Person"
@@ -129,9 +161,11 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     val displayWork =
-      DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+      DisplayWorkV2(
+        work,
+        includes = V2WorksIncludes(identifiers = true, contributors = true))
 
-    displayWork.contributors shouldBe List(
+    displayWork.contributors.get shouldBe List(
       DisplayContributor(
         agent = DisplayPersonV2(
           id = Some(canonicalId),
@@ -153,7 +187,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
   }
 
-  it("extracts production events from a work") {
+  it("extracts production events from a work with the production include") {
     val productionEvent = ProductionEvent(
       places = List(Place("London")),
       agents = List(Unidentifiable(Agent("Macmillan"))),
@@ -165,12 +199,27 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       production = List(productionEvent)
     )
 
-    val displayWork = DisplayWorkV2(work, includes = AllWorksIncludes())
-    displayWork.production shouldBe List(
+    val displayWork =
+      DisplayWorkV2(work, includes = V2WorksIncludes(production = true))
+    displayWork.production.get shouldBe List(
       DisplayProductionEvent(productionEvent, includesIdentifiers = false))
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
+  it("does not extract includes set to false") {
+    forAll { work: IdentifiedWork =>
+      val displayWork =
+        DisplayWorkV2(work, includes = V2WorksIncludes())
+
+      displayWork.production shouldNot be(defined)
+      displayWork.subjects shouldNot be(defined)
+      displayWork.genres shouldNot be(defined)
+      displayWork.contributors shouldNot be(defined)
+      displayWork.items shouldNot be(defined)
+      displayWork.identifiers shouldNot be(defined)
+    }
+  }
+
+  describe("uses the WorksIncludes.identifiers include") {
     val contributorAgentSourceIdentifier = createSourceIdentifierWith(
       ontologyType = "Agent"
     )
@@ -222,7 +271,7 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           roles = List()
         )
       ),
-      items = createItems(count = 1),
+      items = createIdentifiedItems(count = 1),
       subjects = List(
         Subject(
           label = "Beryllium-Boron Bonding",
@@ -260,38 +309,44 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {
-      val displayWork = DisplayWorkV2(work, includes = WorksIncludes())
+      val displayWork = DisplayWorkV2(work, includes = V2WorksIncludes())
 
       it("the top-level Work") {
         displayWork.identifiers shouldBe None
       }
 
       it("contributors") {
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(contributors = true))
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe List(None, None, None)
       }
 
       it("items") {
         val displayWork =
-          DisplayWorkV2(work, includes = WorksIncludes(items = true))
+          DisplayWorkV2(work, includes = V2WorksIncludes(items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
 
       it("subjects") {
-        val concepts = displayWork.subjects.head.concepts
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(subjects = true))
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe List(None, None, None)
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe None
+        val displayWork =
+          DisplayWorkV2(work, includes = V2WorksIncludes(genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe None
       }
     }
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
       val displayWork =
-        DisplayWorkV2(work, includes = WorksIncludes(identifiers = true))
+        DisplayWorkV2(work, includes = V2WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
@@ -299,31 +354,39 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
       }
 
       it("contributors") {
-        // This is moderately verbose, but the Scala compiler got confused when
-        // I tried to combine the three map() calls into one.
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(contributors = true, identifiers = true))
+
         val expectedIdentifiers = List(
           contributorAgentSourceIdentifier,
           contributorOrganisationSourceIdentifier,
           contributorPersonSourceIdentifier
-        ).map { DisplayIdentifierV2(_) }
-          .map { List(_) }
-          .map { Some(_) }
+        ).map { identifier =>
+          Some(List(DisplayIdentifierV2(identifier)))
+        }
 
         val agents: List[DisplayAbstractAgentV2] =
-          displayWork.contributors.map { _.agent }
+          displayWork.contributors.get.map { _.agent }
         agents.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
       it("items") {
         val displayWork = DisplayWorkV2(
           work,
-          includes = WorksIncludes(identifiers = true, items = true))
+          includes = V2WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV2 = displayWork.items.get.head
+        val identifiedItem = work.items.head.asInstanceOf[Identified[Item]]
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV2(work.items.head.sourceIdentifier)))
+          List(DisplayIdentifierV2(identifiedItem.sourceIdentifier)))
       }
 
       it("subjects") {
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, subjects = true))
         val expectedIdentifiers = List(
           conceptSourceIdentifier,
           periodSourceIdentifier,
@@ -332,12 +395,16 @@ class DisplayWorkV2Test extends FunSpec with Matchers with WorksUtil {
           .map { List(_) }
           .map { Some(_) }
 
-        val concepts = displayWork.subjects.head.concepts
+        val concepts = displayWork.subjects.get.head.concepts
         concepts.map { _.identifiers } shouldBe expectedIdentifiers
       }
 
       it("genres") {
-        displayWork.genres.head.concepts.head.identifiers shouldBe Some(
+        val displayWork =
+          DisplayWorkV2(
+            work,
+            includes = V2WorksIncludes(identifiers = true, genres = true))
+        displayWork.genres.get.head.concepts.head.identifiers shouldBe Some(
           List(DisplayIdentifierV2(conceptSourceIdentifier)))
       }
     }

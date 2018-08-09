@@ -2,46 +2,45 @@ package uk.ac.wellcome.display.models.v1
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 
 class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
-  it("correctly parses a Work without any items") {
+  it("parses a Work without any items") {
     val work = createIdentifiedWorkWith(
       items = List()
     )
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V1WorksIncludes(items = true)
     )
     displayWork.items shouldBe Some(List())
   }
 
-  it("correctly parses items on a work") {
-    val item = createItem(locations = List())
+  it("parses items on a work") {
+    val item = createIdentifiedItem(locations = List())
     val work = createIdentifiedWorkWith(
-      items = List(item)
+      itemsV1 = List(item)
     )
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(items = true)
+      includes = V1WorksIncludes(items = true)
     )
     val displayItem = displayWork.items.get.head
     displayItem.id shouldBe item.canonicalId
   }
 
-  it("correctly parses a work without any extra identifiers") {
+  it("parses a work without any extra identifiers") {
     val work = createIdentifiedWorkWith(
       otherIdentifiers = List()
     )
 
     val displayWork = DisplayWorkV1(
       work = work,
-      includes = WorksIncludes(identifiers = true)
+      includes = V1WorksIncludes(identifiers = true)
     )
     displayWork.identifiers shouldBe Some(
       List(DisplayIdentifierV1(work.sourceIdentifier)))
@@ -209,20 +208,20 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
       )
     )
 
-    val caught = intercept[GracefulFailureException] {
+    val caught = intercept[IllegalArgumentException] {
       DisplayWorkV1(work)
     }
 
     caught.getMessage shouldBe s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
   }
 
-  describe("correctly uses the WorksIncludes.identifiers include") {
+  describe("uses the WorksIncludes.identifiers include") {
     val work = createIdentifiedWorkWith(
-      items = createItems(count = 1)
+      itemsV1 = createIdentifiedItems(count = 1)
     )
 
     describe("omits identifiers if WorksIncludes.identifiers is false") {
-      val displayWork = DisplayWorkV1(work, includes = WorksIncludes())
+      val displayWork = DisplayWorkV1(work, includes = V1WorksIncludes())
 
       it("the top-level Work") {
         displayWork.identifiers shouldBe None
@@ -230,7 +229,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
       it("items") {
         val displayWork =
-          DisplayWorkV1(work, includes = WorksIncludes(items = true))
+          DisplayWorkV1(work, includes = V1WorksIncludes(items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe None
       }
@@ -238,7 +237,7 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
 
     describe("includes identifiers if WorksIncludes.identifiers is true") {
       val displayWork =
-        DisplayWorkV1(work, includes = WorksIncludes(identifiers = true))
+        DisplayWorkV1(work, includes = V1WorksIncludes(identifiers = true))
 
       it("on the top-level Work") {
         displayWork.identifiers shouldBe Some(
@@ -249,10 +248,10 @@ class DisplayWorkV1Test extends FunSpec with Matchers with WorksUtil {
         val displayWork =
           DisplayWorkV1(
             work,
-            includes = WorksIncludes(identifiers = true, items = true))
+            includes = V1WorksIncludes(identifiers = true, items = true))
         val item: DisplayItemV1 = displayWork.items.get.head
         item.identifiers shouldBe Some(
-          List(DisplayIdentifierV1(work.items.head.sourceIdentifier)))
+          List(DisplayIdentifierV1(work.itemsV1.head.sourceIdentifier)))
       }
     }
   }

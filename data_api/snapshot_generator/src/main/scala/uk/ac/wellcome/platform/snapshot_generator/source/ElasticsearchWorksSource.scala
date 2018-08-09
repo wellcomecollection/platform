@@ -9,7 +9,7 @@ import com.sksamuel.elastic4s.http.search.SearchHit
 import com.sksamuel.elastic4s.streams.ReactiveElastic._
 import com.twitter.inject.Logging
 import uk.ac.wellcome.models.work.internal.IdentifiedWork
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 object ElasticsearchWorksSource extends Logging {
   def apply(elasticClient: HttpClient, indexName: String, itemType: String)(

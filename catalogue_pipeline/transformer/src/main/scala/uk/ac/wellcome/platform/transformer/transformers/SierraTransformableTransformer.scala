@@ -1,14 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers
 
-import uk.ac.wellcome.models.transformable.sierra.{
-  SierraRecordNumbers,
-  SierraRecordTypes
-}
 import uk.ac.wellcome.models.transformable.{SierraTransformable, Transformable}
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.SierraBibData
 import uk.ac.wellcome.platform.transformer.transformers.sierra._
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.util.{Success, Try}
 
@@ -34,17 +30,14 @@ class SierraTransformableTransformer
   override def transformForType
     : PartialFunction[(Transformable, Int), Try[TransformedBaseWork]] = {
     case (sierraTransformable: SierraTransformable, version: Int) =>
-      val sierraId = sierraTransformable.sourceId
+      val bibId = sierraTransformable.sierraId
       val sourceIdentifier = SourceIdentifier(
         identifierType = IdentifierType("sierra-system-number"),
         ontologyType = "Work",
-        value = SierraRecordNumbers.addCheckDigit(
-          sierraId = sierraId,
-          recordType = SierraRecordTypes.bibs
-        )
+        value = bibId.withCheckDigit
       )
 
-      sierraTransformable.maybeBibData
+      sierraTransformable.maybeBibRecord
         .map { bibRecord =>
           debug(s"Attempting to transform ${bibRecord.id}")
 
@@ -53,7 +46,7 @@ class SierraTransformableTransformer
               if (!(sierraBibData.deleted || sierraBibData.suppressed)) {
                 UnidentifiedWork(
                   sourceIdentifier = sourceIdentifier,
-                  otherIdentifiers = getOtherIdentifiers(sierraId),
+                  otherIdentifiers = getOtherIdentifiers(bibId),
                   mergeCandidates = getMergeCandidates(sierraBibData),
                   title = getTitle(sierraBibData),
                   workType = getWorkType(sierraBibData),
@@ -74,6 +67,7 @@ class SierraTransformableTransformer
                       getDigitalItems(
                         sourceIdentifier.copy(ontologyType = "Item"),
                         sierraBibData),
+                  itemsV1 = List(),
                   version = version
                 )
               } else {
@@ -84,7 +78,7 @@ class SierraTransformableTransformer
             }
             .recover {
               case e: ShouldNotTransformException =>
-                info(s"Should not transform $sierraId: ${e.getMessage}")
+                info(s"Should not transform $bibId: ${e.getMessage}")
                 UnidentifiedInvisibleWork(
                   sourceIdentifier = sourceIdentifier,
                   version = version
@@ -96,7 +90,7 @@ class SierraTransformableTransformer
         // the item data so far, we don't have enough to build a Work to show
         // in the API, so we return an InvisibleWork.
         .getOrElse {
-          debug(s"No bib data for ${sierraTransformable.sourceId}, so skipping")
+          debug(s"No bib data for ${sierraTransformable.sierraId}, so skipping")
           Success(
             UnidentifiedInvisibleWork(
               sourceIdentifier = sourceIdentifier,

@@ -3,7 +3,6 @@ package uk.ac.wellcome.display.models.v1
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.swagger.annotations.{ApiModel, ApiModelProperty}
 import uk.ac.wellcome.display.models._
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal.{
   AbstractAgent,
   Contributor,
@@ -103,7 +102,7 @@ case class DisplayWorkV1(
 }
 
 case object DisplayWorkV1 {
-  def apply(work: IdentifiedWork, includes: WorksIncludes): DisplayWorkV1 = {
+  def apply(work: IdentifiedWork, includes: V1WorksIncludes): DisplayWorkV1 = {
 
     // The "production" field on work contains information that should go
     // into the publisher-specific fields.
@@ -112,10 +111,9 @@ case object DisplayWorkV1 {
     // data, which never populates the production field -- so rather than
     // writing and testing code to tease it out, just error here instead.
     if (work.production != Nil) {
-      throw GracefulFailureException(
-        new RuntimeException(
-          s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
-        ))
+      throw new IllegalArgumentException(
+        s"IdentifiedWork ${work.canonicalId} has production fields set, cannot be converted to a V1 DisplayWork"
+      )
     }
 
     DisplayWorkV1(
@@ -146,7 +144,7 @@ case object DisplayWorkV1 {
           work.thumbnail.map { DisplayLocationV1(_) } else None,
       items =
         if (includes.items)
-          Some(work.items.map {
+          Some(work.itemsV1.map {
             DisplayItemV1(_, includesIdentifiers = includes.identifiers)
           })
         else None,
@@ -159,5 +157,5 @@ case object DisplayWorkV1 {
   }
 
   def apply(work: IdentifiedWork): DisplayWorkV1 =
-    DisplayWorkV1(work = work, includes = WorksIncludes())
+    DisplayWorkV1(work = work, includes = V1WorksIncludes())
 }

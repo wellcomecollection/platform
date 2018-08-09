@@ -7,13 +7,13 @@ object ItemUnlinker {
 
   def unlinkItemRecord(sierraTransformable: SierraTransformable,
                        itemRecord: SierraItemRecord): SierraTransformable = {
-    if (!itemRecord.unlinkedBibIds.contains(sierraTransformable.sourceId)) {
+    if (!itemRecord.unlinkedBibIds.contains(sierraTransformable.sierraId)) {
       throw new RuntimeException(
         s"Non-matching bib id ${sierraTransformable.sourceId} in item unlink bibs ${itemRecord.unlinkedBibIds}")
     }
 
-    val itemData: Map[String, SierraItemRecord] =
-      sierraTransformable.itemData
+    val itemRecords =
+      sierraTransformable.itemRecords
         .filterNot {
           case (id, currentItemRecord) => {
             val matchesCurrentItemRecord = id == itemRecord.id
@@ -26,6 +26,6 @@ object ItemUnlinker {
           }
         }
 
-    sierraTransformable.copy(itemData = itemData)
+    sierraTransformable.copy(itemRecords = itemRecords)
   }
 }

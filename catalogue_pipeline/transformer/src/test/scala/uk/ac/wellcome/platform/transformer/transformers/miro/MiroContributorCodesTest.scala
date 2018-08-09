@@ -1,6 +1,7 @@
 package uk.ac.wellcome.platform.transformer.transformers.miro
 
 import org.scalatest.{FunSpec, Matchers}
+import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 
 class MiroContributorCodesTest extends FunSpec with Matchers {
   it("looks up a contributor code in the general map") {
@@ -23,5 +24,17 @@ class MiroContributorCodesTest extends FunSpec with Matchers {
     transformer.lookupContributorCode(miroId = "XXX", code = "XXX") shouldBe None
   }
 
-  val transformer = new MiroContributorCodes {}
+  it("rejects some images from contributor code GUS") {
+    val caught = intercept[ShouldNotTransformException] {
+      transformer.lookupContributorCode(miroId = "B0009891", code = "GUS")
+    }
+    caught.getMessage shouldBe s"Image B0009891 from contributor GUS should not be sent to the pipeline"
+  }
+
+  it("allows images from contributor code GUS which aren't on the ban list") {
+    transformer.lookupContributorCode(miroId = "B0009889", code = "GUS") shouldBe Some(
+      "Karen Gustafson")
+  }
+
+  val transformer: MiroContributorCodes = new MiroContributorCodes {}
 }

@@ -1,10 +1,10 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.exceptions.GracefulFailureException
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  SierraItemData,
-  SierraItemLocation
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
+import uk.ac.wellcome.platform.transformer.source.SierraItemData
+import uk.ac.wellcome.platform.transformer.source.sierra.{
+  Location => SierraLocationField
 }
 
 trait SierraLocation {
@@ -14,10 +14,10 @@ trait SierraLocation {
       // the JSON, but the code and name are both empty strings or "none".
       // We can't do anything useful with this, so don't return a location.
       // TODO: Find out if we can populate location from other fields.
-      case Some(SierraItemLocation("", ""))         => None
-      case Some(SierraItemLocation("none", "none")) => None
+      case Some(SierraLocationField("", ""))         => None
+      case Some(SierraLocationField("none", "none")) => None
 
-      case Some(loc: SierraItemLocation) =>
+      case Some(loc: SierraLocationField) =>
         Some(
           PhysicalLocation(
             locationType = LocationType(loc.code),
@@ -36,9 +36,8 @@ trait SierraLocation {
         locationType = LocationType("iiif-presentation")
       )
     } else {
-      throw GracefulFailureException(
-        new RuntimeException(
-          "id required by DigitalLocation has not been provided"))
+      throw TransformerException(
+        "id required by DigitalLocation has not been provided")
     }
   }
 }

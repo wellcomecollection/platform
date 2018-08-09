@@ -3,8 +3,12 @@ package uk.ac.wellcome.platform.merger.services
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.models.work.internal._
 
-class Merger extends Logging {
-  def merge(works: Seq[UnidentifiedWork]) = {
+trait MergerRules {
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork]
+}
+
+class Merger extends Logging with MergerRules {
+  def merge(works: Seq[UnidentifiedWork]): Seq[BaseWork] = {
     mergePhysicalDigitalPair(works)
       .getOrElse(works)
   }
@@ -34,7 +38,9 @@ class Merger extends Logging {
   private def mergeAndRedirectWork(physicalWork: UnidentifiedWork,
                                    digitalWork: UnidentifiedWork) = {
     (physicalWork.items, digitalWork.items) match {
-      case (List(physicalItem), List(digitalItem)) =>
+      case (
+          List(physicalItem: Identifiable[Item]),
+          List(digitalItem: Unidentifiable[Item])) =>
         info(
           s"Merging ${describeWorkPair(physicalWork, digitalWork)} work pair.")
         Some(
@@ -53,8 +59,9 @@ class Merger extends Logging {
     }
   }
 
-  private def mergePhysicalAndDigitalItems(physicalItem: Identifiable[Item],
-                                           digitalItem: Identifiable[Item]) = {
+  private def mergePhysicalAndDigitalItems(
+    physicalItem: Identifiable[Item],
+    digitalItem: Unidentifiable[Item]) = {
     List(physicalItem.copy(agent = physicalItem.agent.copy(
       locations = physicalItem.agent.locations ++ digitalItem.agent.locations)))
   }

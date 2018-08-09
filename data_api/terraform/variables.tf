@@ -27,8 +27,12 @@ variable "es_config_snapshot" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-17-catalogue-pipeline-with-fargate"
-    index_v2 = "v2-2018-07-17-catalogue-pipeline-with-fargate"
+    index_v1 = "v1-2018-07-30-merging"
+    index_v2 = "v2-2018-07-30-merging"
     doc_type = "work"
   }
+}
+
+variable "namespace" {
+  default = "data_api"
 }

@@ -3,17 +3,16 @@ package uk.ac.wellcome.messaging.sqs
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import akka.stream.scaladsl.Flow
-import org.mockito.Matchers.endsWith
 import org.mockito.Mockito.{never, times, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SQS.{Queue, QueuePair}
 import uk.ac.wellcome.monitoring.MetricsSender
-import uk.ac.wellcome.monitoring.test.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
 import uk.ac.wellcome.test.utils.ExtendedPatience
-import uk.ac.wellcome.utils.JsonUtil._
+import uk.ac.wellcome.json.JsonUtil._
 
 import scala.concurrent.Future
 
@@ -65,7 +64,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(1))
-            .incrementCount("test-stream_ProcessMessage_success")
+            .countSuccess("test-stream_ProcessMessage")
         }
     }
   }
@@ -83,7 +82,9 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, never())
-            .incrementCount(endsWith("_failure"))
+            .countFailure("test-stream_ProcessMessage")
+          verify(metricsSender, times(3))
+            .countRecognisedFailure("test-stream_ProcessMessage")
           received shouldBe empty
 
           assertQueueEmpty(queue)
@@ -109,7 +110,7 @@ class SQSStreamTest
 
         eventually {
           verify(metricsSender, times(3))
-            .incrementCount(metricName = "test-stream_ProcessMessage_failure")
+            .countFailure(metricName = "test-stream_ProcessMessage")
           assertQueueEmpty(queue)
           assertQueueHasSize(dlq, size = 1)
         }
@@ -165,7 +166,7 @@ class SQSStreamTest
             assertQueueEmpty(dlq)
 
             verify(metricsSender, times(2))
-              .incrementCount("test-stream_ProcessMessage_success")
+              .countSuccess("test-stream_ProcessMessage")
           }
       }
     }
@@ -186,7 +187,7 @@ class SQSStreamTest
             assertQueueHasSize(dlq, 1)
 
             verify(metricsSender, times(3))
-              .incrementCount("test-stream_ProcessMessage_failure")
+              .countFailure("test-stream_ProcessMessage")
           }
       }
     }
