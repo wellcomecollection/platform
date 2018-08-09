@@ -26,9 +26,7 @@ class MergerWorkerService @Inject()(
   private def processMessage(message: NotificationMessage): Future[Unit] =
     for {
       matcherResult <- Future.fromTry(fromJson[MatcherResult](message.Message))
-      _ <- Future.sequence(
-        matcherResult.works.map { applyMerge }
-      )
+      _ <- Future.sequence(matcherResult.works.map { applyMerge })
     } yield ()
 
   private def applyMerge(matchedIdentifiers: MatchedIdentifiers): Future[Unit] =
