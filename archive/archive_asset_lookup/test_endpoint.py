@@ -13,8 +13,11 @@ class TestLambda(unittest.TestCase):
 
         identifier = 'b12345678x'
 
+        bucket_name = '{}{}'.format(settings.VHS_PREFIX, settings.VHS_NAME)
+        table_name = settings.VHS_NAME
+
         s3 = boto3.resource('s3')
-        bucket = s3.Bucket(settings.BUCKET_NAME)
+        bucket = s3.Bucket(bucket_name)
         bucket.create()
         bucket.put_object(
             Key=identifier,
@@ -23,7 +26,7 @@ class TestLambda(unittest.TestCase):
 
         dynamodb_client = boto3.client('dynamodb', region_name=settings.AWS_REGION)
         dynamodb_client.create_table(
-            TableName=settings.TABLE_NAME,
+            TableName=table_name,
             KeySchema=[
                 {
                     'AttributeName': 'id',
@@ -36,7 +39,7 @@ class TestLambda(unittest.TestCase):
                     'AttributeType': 'S'
                 },
                 {
-                    'AttributeName': 's3',
+                    'AttributeName': 's3key',
                     'AttributeType': 'S'
                 }
             ],
@@ -47,13 +50,13 @@ class TestLambda(unittest.TestCase):
         )
 
         dynamodb_client.put_item(
-            TableName=settings.TABLE_NAME,
+            TableName=table_name,
             Item={
                 'id': {
                     'S': identifier
                 },
-                's3': {
-                    'S': 's3://{}/{}'.format(settings.BUCKET_NAME, identifier)
+                's3key': {
+                    'S': identifier
                 }
             }
         )

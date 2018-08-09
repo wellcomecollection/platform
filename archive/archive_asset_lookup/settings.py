@@ -1,5 +1,5 @@
 import os
 
-TABLE_NAME = os.getenv(key='TABLE_NAME', default='test-table')
-BUCKET_NAME = os.getenv(key='BUCKET_NAME', default='test-bucket')
+VHS_NAME = os.getenv(key='VHS_NAME', default='archive-registrar-storage-manifests')
+VHS_PREFIX = os.getenv(key='VHS_PREFIX', default='wellcomecollection-vhs-')
 AWS_REGION = os.getenv(key='AWS_REGION', default='eu-west-1')

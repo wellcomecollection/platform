@@ -26,7 +26,9 @@ def lambda_handler(event, context):
 
     # query our asset lookup table and get a response
 
-    table = dynamodb.Table(settings.TABLE_NAME)
+    table_name = settings.VHS_NAME
+
+    table = dynamodb.Table(table_name)
 
     response = table.query(
         KeyConditionExpression=Key('id').eq(identifier)
@@ -59,9 +61,10 @@ def lambda_handler(event, context):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
-    parsed_s3_url = urlparse(data['s3'])
-    storage_manifest_bucket = parsed_s3_url.netloc
-    storage_manifest_key = parsed_s3_url.path.lstrip('/')
+    storage_manifest_bucket = '{}{}'.format(
+        settings.VHS_PREFIX, settings.VHS_NAME
+    )
+    storage_manifest_key = data['s3key']
 
     # attempt to download the content pointed to by the table into the file
     try:
@@ -96,4 +99,4 @@ def data_items_populated(data_items):
 
 
 def data_is_valid(data):
-    return 's3' in data
+    return 's3key' in data
