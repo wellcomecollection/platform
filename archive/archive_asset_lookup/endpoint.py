@@ -17,32 +17,32 @@ def lambda_handler(event, context):
 
     logger.info('got event{}'.format(event))
 
-    # validate event - check if we have an identifier
+    # validate event - check if we have an id
     if not event_is_valid(event):
         logger.info('invalid event')
         return "invalid request"
 
-    identifier = event["identifier"]
+    identifier = event["id"]
 
     # query our asset lookup table and get a response
 
     table = dynamodb.Table(settings.TABLE_NAME)
 
     response = table.query(
-        KeyConditionExpression=Key('identifier').eq(identifier)
+        KeyConditionExpression=Key('id').eq(identifier)
     )
 
     data_items = response['Items']
 
     # validate if we have any items in our response
     if not data_items_populated(data_items):
-        logger.info('no data for identifier')
-        return "no data for identifier"
+        logger.info('no data for id')
+        return "no data for id"
 
     # we are just expecting to use a single row
     if len(data_items) > 1:
-        logger.info('multiple results for identifier')
-        return "multiple results for identifier"
+        logger.info('multiple results for id')
+        return "multiple results for id"
 
     # should just have a single item
     data = data_items[0]
@@ -88,7 +88,7 @@ def lambda_handler(event, context):
 
 
 def event_is_valid(event):
-    return 'identifier' in event
+    return 'id' in event
 
 
 def data_items_populated(data_items):

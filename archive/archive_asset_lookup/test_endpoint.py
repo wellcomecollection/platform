@@ -26,13 +26,13 @@ class TestLambda(unittest.TestCase):
             TableName=settings.TABLE_NAME,
             KeySchema=[
                 {
-                    'AttributeName': 'identifier',
+                    'AttributeName': 'id',
                     'KeyType': 'HASH'
                 }
             ],
             AttributeDefinitions=[
                 {
-                    'AttributeName': 'identifier',
+                    'AttributeName': 'id',
                     'AttributeType': 'S'
                 },
                 {
@@ -49,7 +49,7 @@ class TestLambda(unittest.TestCase):
         dynamodb_client.put_item(
             TableName=settings.TABLE_NAME,
             Item={
-                'identifier': {
+                'id': {
                     'S': identifier
                 },
                 's3': {
@@ -59,7 +59,7 @@ class TestLambda(unittest.TestCase):
         )
 
         event = {
-            "identifier": identifier
+            "id": identifier
         }
 
         result = lambda_handler(event, None)
