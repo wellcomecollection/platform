@@ -13,8 +13,12 @@ class TestLambda(unittest.TestCase):
 
         identifier = 'b12345678x'
 
-        bucket_name = '{}{}'.format(settings.VHS_PREFIX, settings.VHS_NAME)
-        table_name = settings.VHS_NAME
+        bucket_name = '{}{}'.format(
+            settings.VHS_BUCKET_PREFIX, settings.VHS_NAME
+        )
+        table_name = '{}{}'.format(
+            settings.VHS_TABLE_PREFIX, settings.VHS_NAME
+        )
 
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(bucket_name)

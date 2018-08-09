@@ -26,7 +26,12 @@ def lambda_handler(event, context):
 
     # query our asset lookup table and get a response
 
-    table_name = settings.VHS_NAME
+    bucket_name = '{}{}'.format(
+        settings.VHS_BUCKET_PREFIX, settings.VHS_NAME
+    )
+    table_name = '{}{}'.format(
+        settings.VHS_TABLE_PREFIX, settings.VHS_NAME
+    )
 
     table = dynamodb.Table(table_name)
 
@@ -61,14 +66,11 @@ def lambda_handler(event, context):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
-    storage_manifest_bucket = '{}{}'.format(
-        settings.VHS_PREFIX, settings.VHS_NAME
-    )
     storage_manifest_key = data['s3key']
 
     # attempt to download the content pointed to by the table into the file
     try:
-        s3.Bucket(storage_manifest_bucket) \
+        s3.Bucket(bucket_name) \
             .download_file(storage_manifest_key, temp_file.name)
     except botocore.exceptions.ClientError as e:
         # check for 404 or something worse
