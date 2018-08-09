@@ -28,7 +28,7 @@ resource "aws_api_gateway_integration" "lambda" {
 }
 
 resource "aws_api_gateway_method" "proxy_root" {
-  rest_api_id   = "${aws_api_gateway_rest_api.lambda_root.id}"
+  rest_api_id   = "${aws_api_gateway_rest_api.archive_asset_lookup.id}"
   resource_id   = "${aws_api_gateway_rest_api.archive_asset_lookup.root_resource_id}"
   http_method   = "ANY"
   authorization = "NONE"
@@ -50,7 +50,7 @@ resource "aws_api_gateway_deployment" "test" {
     "aws_api_gateway_integration.lambda_root",
   ]
 
-  rest_api_id = "${aws_api_gateway_rest_api.lambda_root.id}"
+  rest_api_id = "${aws_api_gateway_rest_api.archive_asset_lookup.id}"
   stage_name  = "prod"
 
   # keep this bit around as might require it for terraform to update the deployment
