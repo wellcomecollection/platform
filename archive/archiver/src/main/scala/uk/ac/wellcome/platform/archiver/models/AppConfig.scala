@@ -12,7 +12,6 @@ case class AppConfig(
   sqsConfig: SQSConfig,
   snsClientConfig: SnsClientConfig,
   snsConfig: SNSConfig,
-
   metricsConfig: MetricsConfig
 )
 
@@ -31,11 +30,11 @@ case class SQSClientConfig(
 )
 
 case class SnsClientConfig(
-                            accessKey: Option[String],
-                            secretKey: Option[String],
-                            endpoint: Option[String],
-                            region: String
-                          )
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)
 
 case class CloudwatchClientConfig(
   endpoint: Option[String],
@@ -48,4 +47,3 @@ case class BagUploaderConfig(
   digestDelimiterRegexp: String = " +",
   digestNames: List[String] =
     List("tagmanifest-sha256.txt", "manifest-sha256.txt"))
-

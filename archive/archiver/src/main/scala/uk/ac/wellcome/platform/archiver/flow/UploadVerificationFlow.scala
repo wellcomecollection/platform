@@ -13,12 +13,13 @@ object UploadVerificationFlow extends Logging {
   def apply()(
     implicit s3Client: S3Client,
     materializer: ActorMaterializer
-  ): Flow[(BagLocation, BagDigestItem, ZipFile), MultipartUploadResult, NotUsed] = {
+  ): Flow[(BagLocation, BagDigestItem, ZipFile),
+          MultipartUploadResult,
+          NotUsed] = {
 
     Flow[(BagLocation, BagDigestItem, ZipFile)]
       .flatMapConcat {
         case (bagLocation, BagDigestItem(checksum, itemLocation), zipFile) =>
-
           val extract = FileExtractorFlow()
           val verify = DigestCalculatorFlow("SHA-256", checksum)
 
@@ -29,7 +30,8 @@ object UploadVerificationFlow extends Logging {
           )
 
           val uploadResult =
-            Source.single((itemLocation, zipFile))
+            Source
+              .single((itemLocation, zipFile))
               .via(extract)
               .via(verify)
               .runWith(uploadSink)
@@ -41,9 +43,9 @@ object UploadVerificationFlow extends Logging {
   }
 
   private def createUploadLocation(
-                                    bagLocation: BagLocation,
-                                    itemLocation: ObjectLocation
-                                  ) =
+    bagLocation: BagLocation,
+    itemLocation: ObjectLocation
+  ) =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
@@ -54,9 +56,8 @@ object UploadVerificationFlow extends Logging {
     )
 }
 
-
 case class BagLocation(
-                        storageNamespace: String,
-                        storagePath: String,
-                        bagName: BagName
-                      )
+  storageNamespace: String,
+  storagePath: String,
+  bagName: BagName
+)

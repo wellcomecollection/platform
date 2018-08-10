@@ -12,7 +12,6 @@ object DownloadVerificationFlow extends Logging {
       .log("download to verify")
       .flatMapConcat({
         case (uploadLocation, checksum) =>
-
           val verify = DigestCalculatorFlow("SHA-256", checksum)
 
           val (s3Source, _) = s3Client

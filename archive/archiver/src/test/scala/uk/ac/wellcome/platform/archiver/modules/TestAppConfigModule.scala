@@ -8,7 +8,9 @@ import uk.ac.wellcome.platform.archiver.models._
 
 import scala.concurrent.duration._
 
-class TestAppConfigModule(queueUrl: String, bucketName: String, topicArn: String)
+class TestAppConfigModule(queueUrl: String,
+                          bucketName: String,
+                          topicArn: String)
     extends AbstractModule {
 
   @Provides

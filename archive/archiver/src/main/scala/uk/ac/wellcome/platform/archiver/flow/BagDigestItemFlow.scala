@@ -30,12 +30,11 @@ object BagDigestItemFlow extends Logging {
       }
       .log("bag digest item")
 
-
   private def createBagDigestItems(
-                                    fileChunk: String,
-                                    bagName: BagName,
-                                    delimiter: String
-                                  ) = {
+    fileChunk: String,
+    bagName: BagName,
+    delimiter: String
+  ) = {
     val splitChunk = fileChunk.split(delimiter).map(_.trim)
 
     splitChunk match {
@@ -56,5 +55,5 @@ object BagDigestItemFlow extends Logging {
 case class BagDigestItem(checksum: String, location: ObjectLocation)
 
 case class MalformedBagDigestException(line: String, bagName: BagName)
-  extends RuntimeException(
-    s"Malformed bag digest line: $line in ${bagName.value}")
+    extends RuntimeException(
+      s"Malformed bag digest line: $line in ${bagName.value}")

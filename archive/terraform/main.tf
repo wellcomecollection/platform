@@ -60,7 +60,6 @@ module "registrar_queue" {
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
-
 # Archive bucket
 
 # TODO: Add proper lifecycyle policy to prevent deletion and move to assets?

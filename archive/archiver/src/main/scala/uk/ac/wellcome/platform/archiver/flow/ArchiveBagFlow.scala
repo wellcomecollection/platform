@@ -10,7 +10,9 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveBagFlow {
 
-  def apply(zipFile: ZipFile, bagLocation: BagLocation, config: BagUploaderConfig)(
+  def apply(zipFile: ZipFile,
+            bagLocation: BagLocation,
+            config: BagUploaderConfig)(
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client
@@ -31,7 +33,9 @@ object ArchiveBagFlow {
   }
 
   private def digestNames(bagName: BagName, digestNames: List[String]) =
-    digestNames.map(digestName => {
-      ObjectLocation(bagName.value, digestName)
-    }).toIterator
+    digestNames
+      .map(digestName => {
+        ObjectLocation(bagName.value, digestName)
+      })
+      .toIterator
 }

@@ -26,19 +26,19 @@ object UploadAndVerifyBagFlow extends Logging {
         .single(zipFile)
         .mapConcat(bagNames)
         .map(bagName => (bagName, createBagLocation(bagName, config)))
-        .flatMapConcat { case (bagName, bagLocation) =>
-
-          Source.fromFuture(
-            ArchiveBagFlow(zipFile, bagLocation, config)
-              .map(Success(_))
-              .recover({ case e => Failure(e) })
-              .toMat(Sink.seq)(Keep.right)
-              .run()
-              .map {
-                case s if s.collect({ case a: Failure[_] => a }).nonEmpty =>
-                  throw new RuntimeException("Failed!")
-                case s => bagLocation
-              })
+        .flatMapConcat {
+          case (bagName, bagLocation) =>
+            Source.fromFuture(
+              ArchiveBagFlow(zipFile, bagLocation, config)
+                .map(Success(_))
+                .recover({ case e => Failure(e) })
+                .toMat(Sink.seq)(Keep.right)
+                .run()
+                .map {
+                  case s if s.collect({ case a: Failure[_] => a }).nonEmpty =>
+                    throw new RuntimeException("Failed!")
+                  case s => bagLocation
+                })
 
         }
     })

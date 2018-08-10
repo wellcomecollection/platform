@@ -9,7 +9,10 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.NotificationMessage
-import uk.ac.wellcome.platform.archiver.flow.{DownloadZipFileFlow, UploadAndVerifyBagFlow}
+import uk.ac.wellcome.platform.archiver.flow.{
+  DownloadZipFileFlow,
+  UploadAndVerifyBagFlow
+}
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
@@ -49,9 +52,10 @@ trait Archiver extends Logging {
   private def getObjectLocation(message: NotificationMessage) = {
     fromJson[ObjectLocation](message.Message) match {
       case Success(location) => location
-      case Failure(e) => throw new RuntimeException(
-        s"Failed to get object location from notification: ${e.getMessage}"
-      )
+      case Failure(e) =>
+        throw new RuntimeException(
+          s"Failed to get object location from notification: ${e.getMessage}"
+        )
     }
   }
 }

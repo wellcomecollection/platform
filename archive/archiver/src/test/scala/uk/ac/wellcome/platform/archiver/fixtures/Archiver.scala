@@ -51,7 +51,10 @@ trait Archiver extends AkkaS3 with Messaging {
     testWith: TestWith[ArchiverApp, R]) = {
     val archiver = new ArchiverApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(queuePair.queue.url, storageBucket.name, topicArn.arn),
+        new TestAppConfigModule(
+          queuePair.queue.url,
+          storageBucket.name,
+          topicArn.arn),
         ConfigModule,
         AkkaModule,
         AkkaS3ClientModule,
@@ -69,7 +72,8 @@ trait Archiver extends AkkaS3 with Messaging {
         withLocalS3Bucket { ingestBucket =>
           withLocalS3Bucket { storageBucket =>
             withApp(storageBucket, queuePair, snsTopic) { archiver =>
-              testWith((ingestBucket, storageBucket, queuePair, snsTopic, archiver))
+              testWith(
+                (ingestBucket, storageBucket, queuePair, snsTopic, archiver))
             }
           }
         }
