@@ -21,8 +21,8 @@ import uk.ac.wellcome.models.work.internal.TransformedBaseWork
 class MatcherFeatureTest
     extends FunSpec
     with Matchers
-    with IntegrationPatience
     with Eventually
+    with IntegrationPatience
     with MatcherFixtures
     with WorksUtil {
 

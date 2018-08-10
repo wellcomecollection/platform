@@ -15,10 +15,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RecorderFeatureTest
     extends FunSpec
     with Matchers
-    with IntegrationPatience
     with fixtures.Server
     with LocalVersionedHybridStore
     with Messaging
+    with IntegrationPatience
     with WorksUtil {
 
   it("receives a transformed Work, and saves it to the VHS") {

@@ -18,12 +18,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class SierraItemMergerUpdaterServiceTest
     extends FunSpec
-    with IntegrationPatience
     with ScalaFutures
     with LocalVersionedHybridStore
     with SQS
     with SierraVHSUtil
-    with SierraUtil {
+    with SierraUtil
+    with IntegrationPatience {
 
   def withSierraUpdaterService(
     hybridStore: VersionedHybridStore[SierraTransformable,
