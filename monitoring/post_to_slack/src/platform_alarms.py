@@ -22,9 +22,9 @@ def guess_cloudwatch_log_group(alarm_name):
     if alarm_name.startswith('catalogue-api-remus'):
         return 'ecs/catalogue-api-remus'
 
-    if alarm_name.startswith('lambda-'):
+    if alarm_name.startswith('lambda-') and alarm_name.endswith('-errors'):
         # e.g. lambda-ecs_ec2_instance_tagger-errors
-        lambda_name = alarm_name.split('-')[1]
+        lambda_name = alarm_name[len('lambda-'):-len('-errors')]
         return f'/aws/lambda/{lambda_name}'
 
     raise ValueError(
