@@ -68,4 +68,4 @@ def main(event, _ctxt=None, dynamodb_client=None):
             if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
                 raise
             else:
-                print(f'Adding shard for id: {id} failed with ConditionalCheckFailedException')
+                print(f'Adding shard for id: {row["id"]} failed with ConditionalCheckFailedException')
