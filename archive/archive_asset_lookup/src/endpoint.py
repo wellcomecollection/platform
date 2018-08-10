@@ -7,12 +7,14 @@ import settings
 from boto3.dynamodb.conditions import Key
 
 
-def lambda_handler(event, context):
+def main(event, context):
 
     # setup logging and AWS clients
     logger = logging.getLogger()
-    dynamodb = boto3.resource('dynamodb', region_name=settings.AWS_REGION)
-    s3 = boto3.resource('s3', region_name=settings.AWS_REGION)
+    logger.setLevel(logging.INFO)
+
+    dynamodb = boto3.resource('dynamodb', region_name=settings.REGION)
+    s3 = boto3.resource('s3', region_name=settings.REGION)
 
     logger.info('got event{}'.format(event))
 
@@ -25,12 +27,9 @@ def lambda_handler(event, context):
 
     # query our asset lookup table and get a response
 
-    bucket_name = '{}{}'.format(
-        settings.VHS_BUCKET_PREFIX, settings.VHS_NAME
-    )
-    table_name = '{}{}'.format(
-        settings.VHS_TABLE_PREFIX, settings.VHS_NAME
-    )
+    bucket_name = settings.BUCKET_NAME
+
+    table_name = settings.TABLE_NAME
 
     table = dynamodb.Table(table_name)
 

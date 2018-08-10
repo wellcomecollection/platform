@@ -3,7 +3,7 @@ include $(ROOT)/functions.Makefile
 
 STACK_ROOT 	= archive
 
-SBT_APPS    =
+SBT_APPS    = archiver
 SBT_DOCKER_LIBRARIES =
 SBT_NO_DOCKER_LIBRARIES =
 
@@ -12,6 +12,6 @@ LAMBDAS     = archive_asset_lookup
 
 TF_NAME     = archive
 TF_PATH     = $(STACK_ROOT)/terraform
-TF_IS_PUBLIC_FACING = true
+TF_IS_PUBLIC_FACING = false
 
 $(val $(call stack_setup))

@@ -1,11 +1,12 @@
-variable "aws_region" {}
+variable "aws_region" {
+  default = "eu-west-1"
+}
 
-variable "name" {}
+variable "release_ids" {
+  description = "Release tags for platform apps"
+  type        = "map"
+}
 
-variable "lambda_error_alarm_arn" {}
-
-variable "infra_bucket" {}
-
-variable "storage_manifest_bucket" {}
-
-variable "storage_manifest_dynamo_table_name" {}
+variable "infra_bucket" {
+  default = "wellcomecollection-platform-infra"
+}

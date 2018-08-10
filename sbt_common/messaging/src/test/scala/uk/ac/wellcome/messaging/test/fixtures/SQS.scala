@@ -3,6 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import akka.actor.ActorSystem
 import com.amazonaws.services.sqs._
 import com.amazonaws.services.sqs.model._
+import grizzled.slf4j.Logging
 import io.circe.Encoder
 import org.scalatest.Matchers
 import uk.ac.wellcome.messaging.sns.NotificationMessage
@@ -25,7 +26,7 @@ object SQS {
 
 }
 
-trait SQS extends Matchers {
+trait SQS extends Matchers with Logging {
 
   import SQS._
 
@@ -229,12 +230,29 @@ trait SQS extends Matchers {
     messages should not be empty
   }
 
+  def assertQueuePairSizes(queue: QueuePair, qSize: Int, dlqSize: Int) = {
+    waitVisibilityTimeoutExipiry()
+
+    val messagesDlq = getMessages(queue.dlq)
+    val messagesDlqSize = messagesDlq.size
+
+    val messagesQ = getMessages(queue.queue)
+    val messagesQSize = messagesQ.size
+
+    debug(
+      s"\ndlq: ${queue.dlq.url}, ${messagesDlqSize}\nqueue: ${queue.queue.url}, ${messagesQSize}")
+
+    messagesQSize shouldBe qSize
+    messagesDlqSize shouldBe dlqSize
+  }
+
   def assertQueueHasSize(queue: Queue, size: Int) = {
     waitVisibilityTimeoutExipiry()
 
     val messages = getMessages(queue)
+    val messagesSize = messages.size
 
-    messages should have size size
+    messagesSize shouldBe size
   }
 
   def waitVisibilityTimeoutExipiry() = {
@@ -244,7 +262,7 @@ trait SQS extends Matchers {
     Thread.sleep(1500)
   }
 
-  private def getMessages(queue: Queue) = {
+  def getMessages(queue: Queue) = {
     val messages = sqsClient
       .receiveMessage(
         new ReceiveMessageRequest(queue.url)

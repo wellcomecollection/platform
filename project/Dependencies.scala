@@ -27,7 +27,7 @@ object Dependencies {
 
   lazy val versions = new {
     val akka = "2.5.9"
-    val akkaStreamAlpakkaS3 = "0.17"
+    val akkaStreamAlpakka = "0.20"
     val aws = "1.11.95"
     val apacheLogging = "2.8.2"
     val finatra = "18.4.0"
@@ -143,7 +143,7 @@ object Dependencies {
     "com.amazonaws" % "aws-java-sdk-sns" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-sqs" % versions.aws,
     "com.amazonaws" % "aws-java-sdk-s3" % versions.aws,
-    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakkaS3,
+    "com.lightbend.akka" %% "akka-stream-alpakka-sqs" % versions.akkaStreamAlpakka,
     "io.circe" %% "circe-yaml" % "0.8.0"
   ) ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary ++ WellcomeDependencies.storageLibrary ++ akkaDependencies ++ guiceDependencies ++ testDependencies
 
@@ -167,11 +167,17 @@ object Dependencies {
   )
 
   val snapshotGeneratorDependencies = Seq(
-    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakkaS3
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka
   )
 
   val sierraReaderDependencies: Seq[ModuleID] = Seq(
     "io.circe" %% "circe-optics" % versions.circeVersion,
     "uk.ac.wellcome" %% "sierra-streams-source" % versions.sierraStreamsSourceVersion
   )
+
+  val archiverDependencies = Seq(
+    "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
+    "org.rogach" %% "scallop" % "3.1.3"
+  ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
+
 }

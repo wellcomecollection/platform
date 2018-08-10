@@ -1,7 +1,7 @@
 import unittest
 import boto3
 from moto import mock_dynamodb2, mock_s3
-from endpoint import lambda_handler
+from endpoint import main
 import settings
 
 
@@ -13,12 +13,9 @@ class TestLambda(unittest.TestCase):
 
         identifier = 'b12345678x'
 
-        bucket_name = '{}{}'.format(
-            settings.VHS_BUCKET_PREFIX, settings.VHS_NAME
-        )
-        table_name = '{}{}'.format(
-            settings.VHS_TABLE_PREFIX, settings.VHS_NAME
-        )
+        bucket_name = settings.BUCKET_NAME
+
+        table_name = settings.TABLE_NAME
 
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(bucket_name)
@@ -28,7 +25,7 @@ class TestLambda(unittest.TestCase):
             Body='storage manifest content'
         )
 
-        dynamodb_client = boto3.client('dynamodb', region_name=settings.AWS_REGION)
+        dynamodb_client = boto3.client('dynamodb', region_name=settings.REGION)
         dynamodb_client.create_table(
             TableName=table_name,
             KeySchema=[
@@ -69,7 +66,7 @@ class TestLambda(unittest.TestCase):
             "id": identifier
         }
 
-        result = lambda_handler(event, None)
+        result = main(event, None)
 
         self.assertEqual(result, "storage manifest content")
 
