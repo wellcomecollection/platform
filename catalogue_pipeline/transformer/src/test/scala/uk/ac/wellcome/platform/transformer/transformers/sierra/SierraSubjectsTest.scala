@@ -372,19 +372,18 @@ describe("Subjects from 650, 648 and 651 tags"){
 
     }
 
-    ignore("returns subjects for tag 650 with only subfields a and v") {
+    it("returns subjects for tag 650 with only subfields a and c") {
       val sierraBibData = bibData(
         "600",
         List(
-          MarcSubfield(tag = "a", content = "A Content"),
-          MarcSubfield(tag = "v", content = "V Content")
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "c", content = "Sir")
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-          label = "A Content - V Content",
+          label = "Sir David Attenborough",
           concepts = List(
-            Unidentifiable(Concept(label = "A Content")),
-            Unidentifiable(Concept(label = "V Content")))))
+            Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir"))))))
     }
   }
   private val transformer = new SierraSubjects {}

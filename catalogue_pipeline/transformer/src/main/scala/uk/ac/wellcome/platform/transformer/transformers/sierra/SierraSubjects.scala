@@ -9,15 +9,6 @@ import uk.ac.wellcome.platform.transformer.source.{
 
 trait SierraSubjects extends MarcUtils with SierraConcepts {
 
-  def getSubjects(bibData: SierraBibData)
-    : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
-    getSubjectsForMarcTag(bibData, "650") ++
-      getSubjectsForMarcTag(bibData, "648") ++
-      getSubjectsForMarcTag(bibData, "651") ++
-      getSubjectsForMarcTag(bibData, "600")++
-      getSubjectsForMarcTag(bibData, "610")
-  }
-
   // Populate wwork:subject
   //
   // Use MARC field "650", "648" and "651" where the second indicator is not 7.
@@ -53,7 +44,16 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   //      Note that only concepts from subfield $a are identified; everything
   //      else is unidentified.
   //
-  private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String) = {
+  def getSubjects(bibData: SierraBibData)
+    : List[Subject[MaybeDisplayable[AbstractConcept]]] = {
+    getSubjectswithAbstractConcepts(bibData, "650") ++
+      getSubjectswithAbstractConcepts(bibData, "648") ++
+      getSubjectswithAbstractConcepts(bibData, "651") ++
+      getSubjectsWithAbstractAgents(bibData, "600")++
+      getSubjectsWithAbstractAgents(bibData, "610")
+  }
+
+  private def getSubjectswithAbstractConcepts(bibData: SierraBibData, marcTag: String) = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
@@ -62,15 +62,13 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     // which causes duplicated subjects to appear in the API.
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = varField.subfields.filter { subfield =>
-        List("a", "v", "x", "y", "z").contains(subfield.tag)
-      }
+      val subfields = filterSubfields(varField, List("a", "v", "x", "y", "z"))
       val (primarySubfields, subdivisionSubfields) = subfields.partition {
         _.tag == "a"
       }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getAbstractConceptPrimaryConcept(
         primarySubfields,
         varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
@@ -81,9 +79,45 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     }
   }
 
-  // Extract the primary concept, which comes from subfield $a.  This is the
-  // only concept which might be identified.
-  private def getPrimaryConcept(
+  private def getSubjectsWithAbstractAgents(bibData: SierraBibData, marcTag: String) = {
+    val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
+
+    // Second indicator 7 means that the subject authority is something other
+    // than library of congress or mesh. Some MARC records have duplicated subjects
+    // when the same subject has more than one authority (for example mesh and FAST),
+    // which causes duplicated subjects to appear in the API.
+    // So let's filter anything that is from another authority for now.
+    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
+      val subfields = filterSubfields(varField, List("a", "c"))
+      val (primarySubfields, subdivisionSubfields) = subfields.partition {
+        _.tag == "a"
+      }
+      val label = getAbstractAgentLabel(subfields)
+      val primaryConcept = getAbstractAgentPrimaryConcept(
+        primarySubfields,
+        subdivisionSubfields,
+        varField = varField)
+
+      Subject(
+        label = label,
+        concepts = primaryConcept
+      )
+    }
+  }
+
+  private def getAbstractAgentLabel(subfields: List[MarcSubfield]) = {
+    val name = subfields.find(_.tag == "a").map(_.content).toList
+    val prefixes = subfields.find(_.tag == "c").map(_.content).toList
+    (prefixes ++ name).mkString(" ")
+  }
+
+  private def filterSubfields(varField: VarField, subfields: List[String]) = {
+    varField.subfields.filter { subfield =>
+      subfields.contains(subfield.tag)
+    }
+  }
+
+  private def getAbstractConceptPrimaryConcept(
     primarySubfields: List[MarcSubfield],
     varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
@@ -103,9 +137,25 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
             concept = Place(label = subfield.content),
             varField = varField
           )
+      }
+
+    }
+  }
+
+  private def getAbstractAgentPrimaryConcept(
+    primarySubfields: List[MarcSubfield],
+    secondarySubfields: List[MarcSubfield],
+    varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
+    primarySubfields.map { subfield =>
+      varField.marcTag.get match {
         case "600" =>
+          val prefixes = secondarySubfields.collect {
+            case MarcSubfield("c", content) => content
+          }
+          val prefixString =
+            if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
           identifyPrimaryConcept(
-            concept = Person(label = subfield.content),
+            concept = Person(label = subfield.content, prefix = prefixString),
             varField = varField
           )
         case "610" =>
@@ -114,7 +164,6 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
             varField = varField
           )
       }
-
     }
   }
 }
