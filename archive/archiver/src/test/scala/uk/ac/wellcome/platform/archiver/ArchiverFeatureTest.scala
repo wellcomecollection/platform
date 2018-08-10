@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archiver
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archiver.flow.{BagLocation, BagName}
+import uk.ac.wellcome.platform.archiver.flow.BagLocation
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
 // TODO: Test file boundaries
@@ -17,24 +17,6 @@ class ArchiverFeatureTest
     with MetricsSenderFixture
     with ExtendedPatience {
 
-  it("continues after failure") {
-    withArchiver {
-      case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
-        withFakeBag(ingestBucket, queuePair) { validBag1 =>
-          archiver.run()
-          withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
-            withFakeBag(ingestBucket, queuePair) { validBag2 =>
-              withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
-                eventually {
-                  assertQueuePairSizes(queuePair, 0, 2)
-                }
-              }
-            }
-          }
-        }
-    }
-  }
-
   it("downloads, uploads and verifies a BagIt bag") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
@@ -43,8 +25,7 @@ class ArchiverFeatureTest
           eventually {
             listKeysInBucket(storageBucket) should have size 27
             assertQueuePairSizes(queuePair, 0, 0)
-            listMessagesReceivedFromSNS(topic) should contain only
-              BagLocation(storageBucket.name, "archive", validBag)
+            assertSnsReceivesOnly(BagLocation(storageBucket.name, "archive", validBag), topic)
           }
         }
     }
@@ -59,6 +40,24 @@ class ArchiverFeatureTest
 
             assertQueuePairSizes(queuePair, 0, 1)
 
+          }
+        }
+    }
+  }
+
+  it("continues after failure") {
+    withArchiver {
+      case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
+        withFakeBag(ingestBucket, queuePair) { validBag1 =>
+          archiver.run()
+          withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
+            withFakeBag(ingestBucket, queuePair) { validBag2 =>
+              withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
+                eventually {
+                  assertQueuePairSizes(queuePair, 0, 2)
+                }
+              }
+            }
           }
         }
     }

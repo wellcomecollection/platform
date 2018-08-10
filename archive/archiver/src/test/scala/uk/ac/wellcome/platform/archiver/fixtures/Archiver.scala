@@ -7,7 +7,7 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archiver.flow.BagName
@@ -59,7 +59,8 @@ trait Archiver extends AkkaS3 with Messaging {
         AkkaModule,
         AkkaS3ClientModule,
         CloudWatchClientModule,
-        SQSClientModule
+        SQSClientModule,
+        SNSAsyncClientModule
       )
     }
     testWith(archiver)
@@ -182,6 +183,14 @@ trait Archiver extends AkkaS3 with Messaging {
         bagItFile)
     createZip(allFiles.toList)
   }
+
+  // TODO: move to lib
+  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic) = {
+    val actualMessages = listMessagesReceivedFromSNS(topic)
+    debug(s"SNS $topic received $actualMessages")
+    actualMessages should contain only expectedMessage
+  }
+
 }
 
 case class FileEntry(name: String, contents: String)

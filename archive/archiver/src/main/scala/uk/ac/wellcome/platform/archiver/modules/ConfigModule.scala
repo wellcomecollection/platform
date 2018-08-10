@@ -25,6 +25,10 @@ object ConfigModule extends AbstractModule {
     appConfig.snsConfig
 
   @Provides
+  def providesSNSClientConfig(appConfig: AppConfig) =
+    appConfig.snsClientConfig
+
+  @Provides
   def providesMetricsConfig(appConfig: AppConfig) =
     appConfig.metricsConfig
 

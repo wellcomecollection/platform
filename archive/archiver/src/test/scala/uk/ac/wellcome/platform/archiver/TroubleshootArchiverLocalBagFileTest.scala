@@ -15,7 +15,7 @@ class TroubleshootArchiverLocalBagFileTest
 
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchiver {
-      case (ingestBucket, storageBucket, queuePair, archiver) =>
+      case (ingestBucket, storageBucket, queuePair, _, archiver) =>
         withBag(
           Paths
             .get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"),
