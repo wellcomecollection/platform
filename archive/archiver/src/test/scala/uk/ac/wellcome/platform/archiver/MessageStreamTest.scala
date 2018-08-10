@@ -36,9 +36,6 @@ class MessageStreamTest
       case (messageStream, QueuePair(queue, dlq), actorSystem, metricsSender) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
-        val numberOfMessages = 1
-
-        val exampleObjects = sendExampleObjects(queue, numberOfMessages)
         val received = new ConcurrentLinkedQueue[ExampleObject]()
 
         val exampleFlow = Flow[ExampleObject].map(o => {
@@ -164,7 +161,7 @@ class MessageStreamTest
     }
   }
 
-  private def sendExampleObjects(queue: Queue, count: Int = 1) = {
+  private def sendExampleObjects(queue: Queue, count: Int) = {
     (1 to count)
       .map(i => ExampleObject(s"Example value $i"))
       .map(o => {

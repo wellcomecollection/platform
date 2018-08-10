@@ -18,6 +18,7 @@ object UploadVerificationFlow extends Logging {
     Flow[(BagDigestItem, ZipFile)]
       .flatMapConcat {
         case (BagDigestItem(checksum, location), zipFile) =>
+
           val extract = FileExtractorFlow()
           val verify = DigestCalculatorFlow("SHA-256", checksum)
 
@@ -26,9 +27,11 @@ object UploadVerificationFlow extends Logging {
           val uploadSink =
             s3Client.multipartUpload(config.uploadNamespace, uploadKey)
 
-          val uploadSource = Source.single((location, zipFile))
           val uploadResult =
-            uploadSource.via(extract).via(verify).runWith(uploadSink)
+            Source.single((location, zipFile))
+              .via(extract)
+              .via(verify)
+              .runWith(uploadSink)
 
           Source
             .fromFuture(uploadResult)

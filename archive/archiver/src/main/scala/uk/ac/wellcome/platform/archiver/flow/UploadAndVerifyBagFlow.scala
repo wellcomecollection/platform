@@ -11,31 +11,55 @@ import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 // TODO: Verify checksums in S3 are what you set them to
-object UploadAndVerifyBagFlow extends Logging {
+object  UploadAndVerifyBagFlow extends Logging {
   def apply(config: BagUploaderConfig)(
     implicit
     materializer: ActorMaterializer,
     s3Client: S3Client
   ): Flow[ZipFile, Done, NotUsed] = {
 
-    val digestLocationFlow: Flow[ZipFile, ObjectLocation, NotUsed] =
-      DigestLocationFlow(config)
-
     Flow[ZipFile].flatMapConcat(zipFile => {
       Source
         .single(zipFile)
-        .via(digestLocationFlow)
+        .mapConcat(bagNames)
+        .mapConcat(digestNames(_,config.digestNames))
         .flatMapConcat(digestLocation => {
 
           val bagName = BagName(digestLocation.namespace)
-          val verifiedDigestUploaderFlow =
-            VerifiedDigestUploaderFlow(zipFile, bagName, config)
+
+          val bagDigestItemFlow = BagDigestItemFlow(config)
+          val archiveItemFlow = ArchiveItemFlow(config)
 
           Source
             .single(digestLocation)
-            .via(verifiedDigestUploaderFlow)
-
+            .log("digest location")
+            .map(location => (location, bagName, zipFile))
+            .via(bagDigestItemFlow)
+            .log("bag digest item")
+            .map(bagDigestItem => (bagDigestItem, zipFile))
+            .via(archiveItemFlow)
         })
     })
   }
+
+  private def digestNames(bagName: BagName, digestNames: List[String]) =
+    digestNames.map(digestName => {
+      ObjectLocation(bagName.value, digestName)
+    })
+
+  private def bagNames(zipFile: ZipFile) = {
+    val entries = zipFile.entries()
+
+    Stream
+      .continually(entries.nextElement)
+      .map(_.getName.split("/"))
+      .filter(_.length > 1)
+      .flatMap(_.headOption)
+      .takeWhile(_ => entries.hasMoreElements)
+      .toSet
+      .filterNot(_.startsWith("_"))
+      .map(BagName)
+  }
 }
+
+case class BagName(value: String)

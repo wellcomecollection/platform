@@ -28,11 +28,9 @@ object ArchiveItemFlow extends Logging {
           .log("upload verified")
           .map {
             case MultipartUploadResult(_, bucket, key, _, _) =>
-              ObjectLocation(bucket, key)
+              (ObjectLocation(bucket, key), bagDigestItem.checksum)
           }
           .log("upload location")
-          .map(objectLocation => (objectLocation, bagDigestItem.checksum))
-          .log("downloading to complete verification")
           .via(downloadVerification)
           .log("download verified")
     }
