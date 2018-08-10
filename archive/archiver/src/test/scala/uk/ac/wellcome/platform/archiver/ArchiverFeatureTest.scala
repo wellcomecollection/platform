@@ -25,7 +25,9 @@ class ArchiverFeatureTest
           eventually {
             listKeysInBucket(storageBucket) should have size 27
             assertQueuePairSizes(queuePair, 0, 0)
-            assertSnsReceivesOnly(BagLocation(storageBucket.name, "archive", validBag), topic)
+            assertSnsReceivesOnly(
+              BagLocation(storageBucket.name, "archive", validBag),
+              topic)
           }
         }
     }
