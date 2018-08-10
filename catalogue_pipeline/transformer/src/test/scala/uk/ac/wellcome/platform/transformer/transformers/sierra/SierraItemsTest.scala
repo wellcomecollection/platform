@@ -115,25 +115,24 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
       transformer.getPhysicalItems(transformable) should have size 1
     }
 
-    it("creates an DigitalLocation within items for an e-book record") {
-      val sourceIdentifier = createSierraSourceIdentifier
+    // Note: the following two tests are for historical reasons -- an old
+    // version of this code used "v"/"e-book" as the distinction for whether
+    // we would add a digital item.
+    //
+    // The current rule (2018-08-09) is to use the presence of the 'dlnk'
+    // location, but I left a modified version of these tests in place to
+    // check the old code wasn't left lying around!
 
+    it("does not create any items for an e-book record without the 'dlnk' location") {
+      val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
-        materialType = Some(createSierraEbookMaterialType)
+        materialType = Some(createSierraMaterialTypeWith(code = "v"))
       )
 
-      val expectedItems = List(
-        Unidentifiable(
-          agent = Item(
-            locations = List(DigitalLocation(
-              url = s"https://wellcomelibrary.org/iiif/${sourceIdentifier.value}/manifest",
-              license = None,
-              locationType = LocationType("iiif-presentation"))))
-        ))
-      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe expectedItems
+      transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List()
     }
 
-    it("returns no DigitalItems if the work is not an eBook") {
+    it("does not create any items for a non e-book record without the 'dlnk' location") {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
         materialType = Some(createSierraMaterialTypeWith(code = "x"))

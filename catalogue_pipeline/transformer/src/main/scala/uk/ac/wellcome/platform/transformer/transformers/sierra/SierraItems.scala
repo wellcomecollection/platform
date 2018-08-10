@@ -6,8 +6,7 @@ import uk.ac.wellcome.models.transformable.sierra.SierraItemNumber
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{
   SierraBibData,
-  SierraItemData,
-  SierraMaterialType
+  SierraItemData
 }
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
@@ -77,29 +76,25 @@ trait SierraItems extends Logging with SierraLocation {
 
   /** Add digital items to a work.
     *
-    * We can add digital items if:
-    *   1) The bib record has material type "E-books"
-    *   2) There's a "dlnk" location in the "locations" field of the bib
-    *      record.
+    * We can add digital items if there's a "dlnk" location in the
+    * "locations" field of the bib record.  This is manually added by
+    * Branwen when a record has been digitised, and is about to appear
+    * on the website.
     *
-    * Note: both of these fields are populated manually.  We can work out if
-    * a library record has a digitised version from the METS files -- when we
-    * have those in the pipeline, we can do away with this code.
+    * Note: We can work out if a library record has a digitised version
+    * from the METS files -- when we have those in the pipeline, we can do
+    * away with this code.
     *
     */
   def getDigitalItems(
     sourceIdentifier: SourceIdentifier,
     sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
-
-    val hasEbookMaterialType =
-      sierraBibData.materialType.contains(SierraMaterialType(code = "v"))
-
     val hasDlnkLocation = sierraBibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")
       case None            => false
     }
 
-    if (hasEbookMaterialType || hasDlnkLocation) {
+    if (hasDlnkLocation) {
       List(getDigitalItem(sourceIdentifier))
     } else {
       List()
