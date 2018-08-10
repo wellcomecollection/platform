@@ -2,4 +2,4 @@
 
 
 def test_passes():
-    assert True == True
+    assert "pass" == "pass"
