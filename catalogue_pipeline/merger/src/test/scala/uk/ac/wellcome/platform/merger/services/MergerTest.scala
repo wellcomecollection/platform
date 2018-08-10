@@ -85,29 +85,6 @@ class MergerTest extends FunSpec with MergerTestUtils {
     assertDoesNotMerge(works)
   }
 
-  private def createDigitalWork = {
-    createUnidentifiedWorkWith(
-      sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "miro-image-number"),
-      otherIdentifiers = List(
-        createSourceIdentifierWith(identifierType = "miro-library-reference")),
-      workType = Some(WorkType("v", "E-books")),
-      items = List(
-        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
-    )
-  }
-
-  private def createPhysicalWork = {
-    createUnidentifiedWorkWith(
-      sourceIdentifier =
-        createSourceIdentifierWith(identifierType = "sierra-system-number"),
-      otherIdentifiers =
-        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
-      items = List(
-        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
-    )
-  }
-
   private def assertDoesNotMerge(works: List[UnidentifiedWork]) = {
     merger.merge(works) should contain theSameElementsAs works
   }

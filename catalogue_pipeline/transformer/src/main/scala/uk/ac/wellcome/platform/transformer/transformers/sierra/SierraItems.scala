@@ -92,7 +92,7 @@ trait SierraItems extends Logging with SierraLocation {
     sierraBibData: SierraBibData): List[Unidentifiable[Item]] = {
 
     val hasEbookMaterialType =
-      sierraBibData.materialType.contains(SierraMaterialType("v", "E-books"))
+      sierraBibData.materialType.contains(SierraMaterialType(code = "v"))
 
     val hasDlnkLocation = sierraBibData.locations match {
       case Some(locations) => locations.map { _.code }.contains("dlnk")

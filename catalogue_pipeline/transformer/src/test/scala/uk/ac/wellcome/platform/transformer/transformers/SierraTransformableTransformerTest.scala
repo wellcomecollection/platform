@@ -368,9 +368,8 @@ class SierraTransformableTransformerTest
 
   it("includes the work type, if present") {
     val id = createSierraBibNumber
-    val workTypeId = "xxx"
-    val workTypeValue =
-      "A parchment of penguin pemmican pierced playfully with pencils."
+    val workTypeId = "a"
+    val workTypeValue = "Books"
 
     val expectedWorkType = WorkType(
       id = workTypeId,
@@ -611,6 +610,29 @@ class SierraTransformableTransformerTest
 
     assertTransformReturnsInvisibleWork(
       maybeBibRecord = Some(bibRecord)
+    )
+  }
+
+  // This is based on a real failure -- our initial implementation of
+  // workType for Sierra was unable to find these workTypes.
+  //
+  it("finds the WorkType if the materialType field only contains a code") {
+    val id = createSierraBibNumber
+    val bibData =
+      s"""
+         |{
+         |  "id": "$id",
+         |  "title": "${randomAlphanumeric(50)}",
+         |  "materialType": {
+         |    "code": "k  "
+         |  }
+         |}
+       """.stripMargin
+
+    val work = transformDataToWork(id = id, data = bibData)
+    work shouldBe a[UnidentifiedWork]
+    work.asInstanceOf[UnidentifiedWork].workType shouldBe Some(
+      WorkType(id = "k", label = "Pictures")
     )
   }
 
