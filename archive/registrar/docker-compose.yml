@@ -1,0 +1,18 @@
+sns:
+  image: wellcome/fake-sns
+  ports:
+    - "9292:9292"
+sqs:
+  image: s12v/elasticmq
+  ports:
+    - "9324:9324"
+    - "4789:9324"
+s3:
+  image: scality/s3server:mem-latest
+  ports:
+    - "33333:8000"
+localstack:
+  image: localstack/localstack
+  ports:
+    - "4567-4583:4567-4583"
+    - "8080:8080"

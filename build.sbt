@@ -183,6 +183,11 @@ lazy val archiver = doServiceSetup(project, "archive/archiver")
   .dependsOn(messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.archiverDependencies)
 
+lazy val registrar = doServiceSetup(project, "archive/registrar")
+  .dependsOn(common % "compile->compile;test->test")
+  .dependsOn(messaging % "compile->compile;test->test")
+  .settings(libraryDependencies ++= Dependencies.registrarDependencies)
+
 lazy val root = (project in file("."))
   .aggregate(
     common,
@@ -218,5 +223,6 @@ lazy val root = (project in file("."))
     sierra_item_merger,
     snapshot_generator,
 
-    archiver
+    archiver,
+    registrar
   )
