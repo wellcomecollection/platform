@@ -5,7 +5,7 @@ import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.config.ArgsConfigurator
 
 class AppConfigModule(val args: Array[String])
-  extends AbstractModule
+    extends AbstractModule
     with Logging {
   debug(s"Application config loaded from args: ${args.toList}")
 
