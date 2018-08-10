@@ -8,7 +8,9 @@ import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 import com.google.inject.Guice
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archiver.flow.BagName
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
 import uk.ac.wellcome.storage.ObjectLocation
@@ -20,7 +22,7 @@ import scala.util.Random
 trait Archiver extends AkkaS3 with Messaging {
 
   def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
-    testWith: TestWith[Bag, R]) = {
+    testWith: TestWith[BagName, R]) = {
     val bagName = randomAlphanumeric()
     val uploadKey = s"upload/path/$bagName.zip"
 
@@ -31,12 +33,12 @@ trait Archiver extends AkkaS3 with Messaging {
 
     info(s"Creating bag $bagName")
 
-    testWith(Bag(bagName))
+    testWith(BagName(bagName))
   }
 
   def withFakeBag[R](ingestBucket: Bucket,
                      queuePair: QueuePair,
-                     valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
+                     valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
     val bagName = randomAlphanumeric()
     val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
 
@@ -45,11 +47,11 @@ trait Archiver extends AkkaS3 with Messaging {
     }
   }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
     testWith: TestWith[ArchiverApp, R]) = {
     val archiver = new ArchiverApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
+        new TestAppConfigModule(queuePair.queue.url, storageBucket.name, topicArn.arn),
         ConfigModule,
         AkkaModule,
         AkkaS3ClientModule,
@@ -57,17 +59,18 @@ trait Archiver extends AkkaS3 with Messaging {
         SQSClientModule
       )
     }
-
     testWith(archiver)
   }
 
   def withArchiver[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalS3Bucket { ingestBucket =>
-        withLocalS3Bucket { storageBucket =>
-          withApp(storageBucket, queuePair) { archiver =>
-            testWith((ingestBucket, storageBucket, queuePair, archiver))
+      withLocalSnsTopic { snsTopic =>
+        withLocalS3Bucket { ingestBucket =>
+          withLocalS3Bucket { storageBucket =>
+            withApp(storageBucket, queuePair, snsTopic) { archiver =>
+              testWith((ingestBucket, storageBucket, queuePair, snsTopic, archiver))
+            }
           }
         }
       }
@@ -178,5 +181,3 @@ trait Archiver extends AkkaS3 with Messaging {
 }
 
 case class FileEntry(name: String, contents: String)
-
-case class Bag(bagName: String)

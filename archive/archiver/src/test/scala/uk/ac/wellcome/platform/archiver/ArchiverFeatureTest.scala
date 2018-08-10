@@ -3,6 +3,7 @@ package uk.ac.wellcome.platform.archiver
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archiver.flow.{BagLocation, BagName}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
 // TODO: Test file boundaries
@@ -18,7 +19,7 @@ class ArchiverFeatureTest
 
   it("continues after failure") {
     withArchiver {
-      case (ingestBucket, storageBucket, queuePair, archiver) =>
+      case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
         withFakeBag(ingestBucket, queuePair) { validBag1 =>
           archiver.run()
           withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
@@ -36,12 +37,14 @@ class ArchiverFeatureTest
 
   it("downloads, uploads and verifies a BagIt bag") {
     withArchiver {
-      case (ingestBucket, storageBucket, queuePair, archiver) =>
-        withFakeBag(ingestBucket, queuePair) { invalidBag =>
+      case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
+        withFakeBag(ingestBucket, queuePair) { validBag =>
           archiver.run()
           eventually {
             listKeysInBucket(storageBucket) should have size 27
             assertQueuePairSizes(queuePair, 0, 0)
+            listMessagesReceivedFromSNS(topic) should contain only
+              BagLocation(storageBucket.name, "archive", validBag)
           }
         }
     }
@@ -49,7 +52,7 @@ class ArchiverFeatureTest
 
   it("fails when ingesting an invalid bag") {
     withArchiver {
-      case (ingestBucket, storageBucket, queuePair, archiver) =>
+      case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
         withFakeBag(ingestBucket, queuePair, false) { invalidBag =>
           archiver.run()
           eventually {

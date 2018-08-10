@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archiver.models
 
+import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
 
@@ -9,6 +10,9 @@ case class AppConfig(
   cloudwatchClientConfig: CloudwatchClientConfig,
   sqsClientConfig: SQSClientConfig,
   sqsConfig: SQSConfig,
+  snsClientConfig: SnsClientConfig,
+  snsConfig: SNSConfig,
+
   metricsConfig: MetricsConfig
 )
 
@@ -25,6 +29,13 @@ case class SQSClientConfig(
   endpoint: Option[String],
   region: String
 )
+
+case class SnsClientConfig(
+                            accessKey: Option[String],
+                            secretKey: Option[String],
+                            endpoint: Option[String],
+                            region: String
+                          )
 
 case class CloudwatchClientConfig(
   endpoint: Option[String],

@@ -14,6 +14,7 @@ import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 trait Archiver extends Logging {
@@ -27,6 +28,8 @@ trait Archiver extends Logging {
     implicit val s3Client: S3Client = injector.getInstance(classOf[S3Client])
     implicit val actorSystem: ActorSystem =
       injector.getInstance(classOf[ActorSystem])
+    implicit val executionContext: ExecutionContext =
+      actorSystem.dispatcher
     implicit val materializer: ActorMaterializer = ActorMaterializer()
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
