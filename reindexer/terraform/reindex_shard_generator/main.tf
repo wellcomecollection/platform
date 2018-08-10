@@ -9,7 +9,7 @@ module "shard_generator_lambda" {
 
   description = "Generate reindexShards for items in the ${var.vhs_table_name} table"
 
-  timeout = 60
+  timeout = 300
 
   environment_variables = {
     TABLE_NAME = "${var.vhs_table_name}"
