@@ -5,7 +5,6 @@ import java.util.zip.ZipFile
 import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 object BagDigestItemFlow extends Logging {
@@ -16,7 +15,7 @@ object BagDigestItemFlow extends Logging {
     allowTruncation = true
   )
 
-  def apply(config: BagUploaderConfig) =
+  def apply(digestDelimiter: String) =
     Flow[(ObjectLocation, BagName, ZipFile)]
       .log("digest location")
       .flatMapConcat {
@@ -27,7 +26,7 @@ object BagDigestItemFlow extends Logging {
             .via(framingDelimiter)
             .map(_.utf8String)
             .filter(_.nonEmpty)
-            .map(createBagDigestItems(_, bagName, config.digestDelimiterRegexp))
+            .map(createBagDigestItems(_, bagName, digestDelimiter))
       }
       .log("bag digest item")
 

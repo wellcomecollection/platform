@@ -7,22 +7,21 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Source}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveItemFlow extends Logging {
-  def apply(config: BagUploaderConfig)(
+  def apply()(
     implicit s3Client: S3Client,
     materializer: ActorMaterializer
-  ): Flow[(BagDigestItem, ZipFile), Done, NotUsed] = {
+  ): Flow[(BagLocation, BagDigestItem, ZipFile), Done, NotUsed] = {
 
-    val uploadVerificationFlow = UploadVerificationFlow(config)
+    val uploadVerificationFlow = UploadVerificationFlow()
     val downloadVerification = DownloadVerificationFlow()
 
-    Flow[(BagDigestItem, ZipFile)].flatMapConcat {
-      case (bagDigestItem, zipFile) =>
+    Flow[(BagLocation, BagDigestItem, ZipFile)].flatMapConcat {
+      case (bagLocation, bagDigestItem, zipFile) =>
         Source
-          .single((bagDigestItem, zipFile))
+          .single((bagLocation, bagDigestItem, zipFile))
           .log("uploading and verifying")
           .via(uploadVerificationFlow)
           .log("upload verified")

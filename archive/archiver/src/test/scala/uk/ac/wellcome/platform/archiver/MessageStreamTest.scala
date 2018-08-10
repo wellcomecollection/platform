@@ -23,7 +23,7 @@ import uk.ac.wellcome.test.fixtures.TestWith
 import scala.concurrent.duration._
 
 class MessageStreamTest
-    extends FunSpec
+  extends FunSpec
     with Matchers
     with ScalaFutures
     with Messaging
@@ -31,12 +31,14 @@ class MessageStreamTest
     with ExtendedPatience
     with AkkaS3 {
 
+
   it("does not delete failing messages") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, QueuePair(queue, dlq), actorSystem, metricsSender) =>
+      case (messageStream, queuePair, actorSystem, metricsSender) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
         val received = new ConcurrentLinkedQueue[ExampleObject]()
+        val _ = sendExampleObjects(queuePair.queue, 1)
 
         val exampleFlow = Flow[ExampleObject].map(o => {
           throw new RuntimeException("failed")
@@ -51,8 +53,7 @@ class MessageStreamTest
         eventually {
           received shouldBe empty
 
-          assertQueueEmpty(queue)
-          assertQueueHasSize(dlq, 1)
+          assertQueuePairSizes(queuePair, 0, 1)
 
           verify(metricsSender, never)
             .countSuccess(endsWith("_ProcessMessage"))
@@ -132,15 +133,15 @@ class MessageStreamTest
   }
 
   def withMessageStreamFixtures[R](
-    testWith: TestWith[(MessageStream[ExampleObject, Unit],
-                        QueuePair,
-                        ActorSystem,
-                        MetricsSender),
-                       R]
-  ) = {
+                                    testWith: TestWith[(MessageStream[ExampleObject, Unit],
+                                      QueuePair,
+                                      ActorSystem,
+                                      MetricsSender),
+                                      R]
+                                  ) = {
     withActorSystem { actorSystem =>
       withLocalSqsQueueAndDlq {
-        case queuePair @ QueuePair(queue, _) =>
+        case queuePair@QueuePair(queue, _) =>
           withMockMetricSender { metricsSender =>
             val sqsConfig = SQSConfig(
               queueUrl = queue.url,

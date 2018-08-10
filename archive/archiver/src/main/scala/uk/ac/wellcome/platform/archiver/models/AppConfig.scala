@@ -37,3 +37,4 @@ case class BagUploaderConfig(
   digestDelimiterRegexp: String = " +",
   digestNames: List[String] =
     List("tagmanifest-sha256.txt", "manifest-sha256.txt"))
+

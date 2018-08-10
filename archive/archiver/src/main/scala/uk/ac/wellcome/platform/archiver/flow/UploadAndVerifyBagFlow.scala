@@ -26,20 +26,29 @@ object  UploadAndVerifyBagFlow extends Logging {
         .flatMapConcat(digestLocation => {
 
           val bagName = BagName(digestLocation.namespace)
+          val bagLocation = createBagLocation(bagName, config)
 
-          val bagDigestItemFlow = BagDigestItemFlow(config)
-          val archiveItemFlow = ArchiveItemFlow(config)
+          val bagDigestItemFlow = BagDigestItemFlow(config.digestDelimiterRegexp)
+          val archiveItemFlow = ArchiveItemFlow()
 
           Source
             .single(digestLocation)
             .log("digest location")
-            .map(location => (location, bagName, zipFile))
+            .map((_, bagName, zipFile))
             .via(bagDigestItemFlow)
             .log("bag digest item")
-            .map(bagDigestItem => (bagDigestItem, zipFile))
+            .map((bagLocation, _, zipFile))
             .via(archiveItemFlow)
         })
     })
+  }
+
+  private def createBagLocation(bagName: BagName, config: BagUploaderConfig) = {
+    BagLocation(
+      storageNamespace = config.uploadNamespace,
+      storagePath = config.uploadPrefix,
+      bagName = bagName
+    )
   }
 
   private def digestNames(bagName: BagName, digestNames: List[String]) =
