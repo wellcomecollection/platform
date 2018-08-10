@@ -6,12 +6,11 @@ import akka.stream.scaladsl.{Sink, Source}
 import io.circe.Json
 import io.circe.parser._
 import org.scalatest.compatible.Assertion
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, Matchers}
 import uk.ac.wellcome.storage.fixtures.S3
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.{Akka, TestWith}
-import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.Future
 
@@ -22,7 +21,7 @@ class SequentialS3SinkTest
     with Akka
     with BeforeAndAfterAll
     with ScalaFutures
-    with ExtendedPatience {
+    with IntegrationPatience {
 
   private def withSink(actorSystem: ActorSystem,
                        bucket: Bucket,
