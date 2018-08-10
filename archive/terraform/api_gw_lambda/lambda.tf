@@ -1,26 +1,23 @@
 resource "aws_lambda_permission" "archive_asset_lookup_apigw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
-  function_name = "${module.lambda_archive_asset_lookup.function_name}"
+  function_name = "${module.lambda.function_name}"
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_deployment.test.execution_arn}/*/*"
 }
 
-module "lambda_archive_asset_lookup" {
+module "lambda" {
   source = "git::https://github.com/wellcometrust/terraform.git//lambda?ref=v11.5.0"
 
-  name        = "archive_asset_lookup_${var.name}"
-  module_name = "archive_asset_lookup"
-  description = "Serve requests for storage manifests"
-  timeout     = 60
-  memory_size = 1024
+  name        = "${var.name}"
+  module_name = "${var.name}"
+  description = "${var.description}"
 
-  environment_variables = {
-    TABLE_NAME  = "${data.aws_dynamodb_table.storage_manifest.name}"
-    BUCKET_NAME = "${data.aws_s3_bucket.storage_manifests.bucket}"
-    AWS_REGION  = "${var.aws_region}"
-  }
+  timeout     = "${var.timeout}"
+  memory_size = "${var.memory_size}"
+
+  environment_variables = "${var.environment_variables}"
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
   s3_bucket       = "${var.infra_bucket}"
