@@ -18,7 +18,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
   // Populate wwork:subject
   //
-  // Use MARC field "650", "648" and "651".
+  // Use MARC field "650", "648" and "651" where the second indicator is not 7.
   //
   // Within these MARC tags, we have:
   //
@@ -54,7 +54,12 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String) = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
-    marcVarFields.map { varField =>
+    // Second indicator 7 means that the subject authority is something other
+    // than library of congress or mesh. Some MARC records have duplicated subjects
+    // when the same subject has more than one authority (for example mesh and FAST),
+    // which causes duplicated subjects to appear in the API.
+    // So let's filter anything that is from another authority for now.
+    marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
       val subfields = varField.subfields.filter { subfield =>
         List("a", "v", "x", "y", "z").contains(subfield.tag)
       }
