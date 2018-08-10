@@ -4,6 +4,7 @@ locals {
   vhs_sourcedata_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_name}"
   vhs_sourcedata_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sourcedata_table_stream_arn}"
 
+  vhs_sierra_full_access_policy     = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_full_access_policy}"
   vhs_sierra_table_name             = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_table_name}"
   vhs_sierra_table_stream_arn       = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_table_stream_arn}"
   vhs_sierra_dynamodb_update_policy = "${data.terraform_remote_state.catalogue_pipeline.vhs_sierra_dynamodb_update_policy}"
