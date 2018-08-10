@@ -116,8 +116,8 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     // Note: the following two tests are for historical reasons -- an old
-    // version of this code used "e-book" as the distinction for whether we
-    // would add a digital item.
+    // version of this code used "v"/"e-book" as the distinction for whether
+    // we would add a digital item.
     //
     // The current rule (2018-08-09) is to use the presence of the 'dlnk'
     // location, but I left a modified version of these tests in place to
@@ -126,8 +126,7 @@ class SierraItemsTest extends FunSpec with Matchers with SierraDataUtil {
     it("does not create any items for an e-book record without the 'dlnk' location") {
       val sourceIdentifier = createSierraSourceIdentifier
       val bibData = createSierraBibDataWith(
-        materialType =
-          Some(createSierraMaterialTypeWith(code = "v", value = "E-books"))
+        materialType = Some(createSierraMaterialTypeWith(code = "v"))
       )
 
       transformer.getDigitalItems(sourceIdentifier, bibData) shouldBe List()
