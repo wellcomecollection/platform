@@ -46,19 +46,6 @@ def guess_cloudwatch_search_terms(alarm_name):
     return []
 
 
-def should_be_sent_to_main_channel(alarm_name):
-    """Should this alarm be sent to the main channel?"""
-    # Alarms for the API or Loris always go the main channel.
-    if any(p in alarm_name for p in ['catalogue-api-remus', 'catalogue-api-romulus', 'loris']):
-        return True
-
-    if alarm_name.endswith('_dlq_not_empty'):
-        return True
-
-    # Otherwise default to False, because we don't know what this alarm is.
-    return False
-
-
 def is_critical_error(alarm_name):
     """Is this a critical error (True) or just a warning (False)?"""
     # Alarms for the API or Loris are always critical.

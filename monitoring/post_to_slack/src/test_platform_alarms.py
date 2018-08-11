@@ -8,7 +8,6 @@ from platform_alarms import (
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
-    should_be_sent_to_main_channel,
     simplify_message
 )
 
@@ -50,23 +49,6 @@ def test_unrecognised_log_group_name_is_valueerror(bad_alarm_name):
 ])
 def test_guess_cloudwatch_search_terms(alarm_name, expected_search_terms):
     assert guess_cloudwatch_search_terms(alarm_name) == expected_search_terms
-
-
-@pytest.mark.parametrize('alarm_name, should_send_to_main', [
-    ('catalogue-api-romulus-alb-target-400-errors', True),
-    ('catalogue-api-remus-alb-target-500-errors', True),
-    ('loris-alb-not-enough-healthy-hosts', True),
-    ('id_minter-alb-unhealthy-hosts', False),
-    ('ingestor-alb-unhealthy-hosts', False),
-    ('transformer-alb-not-enough-healthy-hosts', False),
-    ('grafana-alb-target-500-errors', False),
-    ('IngestorWorkerService_TerminalFailure', False),
-    ('sierra_items_windows_dlq_not_empty', True),
-    ('lambda-post_to_slack-errors', False),
-    ('unknown-alarm-type', False),
-])
-def test_should_be_sent_to_main_channel(alarm_name, should_send_to_main):
-    assert should_be_sent_to_main_channel(alarm_name) == should_send_to_main
 
 
 @pytest.mark.parametrize('alarm_name, expected_is_critical_error', [
