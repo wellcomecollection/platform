@@ -25,6 +25,7 @@ class Alarm:
     ('catalogue-api-remus-alb-target-500-errors', 'ecs/catalogue-api-remus'),
     ('lambda-ecs_ec2_instance_tagger-errors', '/aws/lambda/ecs_ec2_instance_tagger'),
     ('lambda-post_to_slack-errors', '/aws/lambda/post_to_slack'),
+    ('lambda-reindex_shard_generator_vhs-sourcedata-sierra-errors', '/aws/lambda/reindex_shard_generator_vhs-sourcedata-sierra'),
 ])
 def test_guess_cloudwatch_log_group(alarm_name, expected_log_group_name):
     assert guess_cloudwatch_log_group(alarm_name) == expected_log_group_name
