@@ -45,8 +45,10 @@ class TestAppConfigModule(queueUrl: String,
       flushInterval = 60 seconds
     )
     val bagUploaderConfig = BagUploaderConfig(
-      uploadNamespace = bucketName
+      uploadConfig = UploadConfig(bucketName),
+      bagItConfig = BagItConfig()
     )
+
     AppConfig(
       s3ClientConfig,
       bagUploaderConfig,

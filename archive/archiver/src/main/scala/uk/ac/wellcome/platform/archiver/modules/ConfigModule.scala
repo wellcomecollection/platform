@@ -35,4 +35,5 @@ object ConfigModule extends AbstractModule {
   @Provides
   def providesBagUploaderConfig(appConfig: AppConfig) =
     appConfig.bagUploaderConfig
+
 }

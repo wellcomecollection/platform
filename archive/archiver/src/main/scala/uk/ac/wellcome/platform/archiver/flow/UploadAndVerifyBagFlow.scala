@@ -7,7 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archiver.models.{BagUploaderConfig, UploadConfig}
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -25,26 +25,38 @@ object UploadAndVerifyBagFlow extends Logging {
       Source
         .single(zipFile)
         .mapConcat(bagNames)
-        .map(bagName => (bagName, createBagLocation(bagName, config)))
-        .flatMapConcat {
-          case (bagName, bagLocation) =>
-            Source.fromFuture(
-              ArchiveBagFlow(zipFile, bagLocation, config)
-                .map(Success(_))
-                .recover({ case e => Failure(e) })
-                .toMat(Sink.seq)(Keep.right)
-                .run()
-                .map {
-                  case s if s.collect({ case a: Failure[_] => a }).nonEmpty =>
-                    throw new RuntimeException("Failed!")
-                  case s => bagLocation
-                })
-
+        .map(bagName =>
+          (bagName, createBagLocation(bagName, config.uploadConfig))
+        )
+        .map { case (bagName, bagLocation) =>
+          materializeArchiveBagFlow(zipFile, bagLocation, config)
         }
+        .flatMapConcat(Source.fromFuture)
     })
   }
 
-  private def createBagLocation(bagName: BagName, config: BagUploaderConfig) = {
+  private def materializeArchiveBagFlow(
+                                         zipFile: ZipFile,
+                                         bagLocation: BagLocation,
+                                         config: BagUploaderConfig
+                                       )(
+                                         implicit
+                                         materializer: ActorMaterializer,
+                                         s3Client: S3Client,
+                                         executionContext: ExecutionContext
+                                       ) =
+    ArchiveBagFlow(zipFile, bagLocation, config.bagItConfig)
+      .map(Success(_))
+      .recover({ case e => Failure(e) })
+      .toMat(Sink.seq)(Keep.right)
+      .run()
+      .map {
+        case s if s.collect({ case a: Failure[_] => a }).nonEmpty =>
+          throw new RuntimeException("Failed!")
+        case s => bagLocation
+      }
+
+  private def createBagLocation(bagName: BagName, config: UploadConfig) = {
     BagLocation(
       storageNamespace = config.uploadNamespace,
       storagePath = config.uploadPrefix,

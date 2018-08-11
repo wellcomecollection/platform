@@ -5,18 +5,18 @@ import java.util.zip.ZipFile
 import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.Source
-import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
+import uk.ac.wellcome.platform.archiver.models.BagItConfig
 import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveBagFlow {
 
   def apply(zipFile: ZipFile,
             bagLocation: BagLocation,
-            config: BagUploaderConfig)(
-    implicit
-    materializer: ActorMaterializer,
-    s3Client: S3Client
-  ) = {
+            config: BagItConfig)(
+             implicit
+             materializer: ActorMaterializer,
+             s3Client: S3Client
+           ) = {
 
     val bagDigestItemFlow = BagDigestItemFlow(config.digestDelimiterRegexp)
     val archiveItemFlow = ArchiveItemFlow()

@@ -45,9 +45,13 @@ class ArgsConfigurator(arguments: Seq[String]) extends ScallopConf(arguments) {
   verify()
 
   val bagUploaderConfig = BagUploaderConfig(
-    uploadNamespace = uploadNamespace(),
-    uploadPrefix = uploadPrefix(),
-    digestDelimiterRegexp = digestDelimiterRegexp()
+    uploadConfig = UploadConfig(
+      uploadNamespace = uploadNamespace(),
+      uploadPrefix = uploadPrefix()
+    ),
+    bagItConfig = BagItConfig(
+      digestDelimiterRegexp = digestDelimiterRegexp()
+    )
   )
 
   val s3ClientConfig = S3ClientConfig(

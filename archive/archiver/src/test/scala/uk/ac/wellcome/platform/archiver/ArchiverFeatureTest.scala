@@ -3,7 +3,7 @@ package uk.ac.wellcome.platform.archiver
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archiver.flow.BagLocation
+import uk.ac.wellcome.platform.archiver.flow.{BagArchiveCompleteNotification, BagLocation}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
 // TODO: Test file boundaries
@@ -25,9 +25,13 @@ class ArchiverFeatureTest
           eventually {
             listKeysInBucket(storageBucket) should have size 27
             assertQueuePairSizes(queuePair, 0, 0)
+
             assertSnsReceivesOnly(
-              BagLocation(storageBucket.name, "archive", validBag),
-              topic)
+              BagArchiveCompleteNotification(
+                BagLocation(storageBucket.name, "archive", validBag)
+              ),
+              topic
+            )
           }
         }
     }
@@ -64,5 +68,4 @@ class ArchiverFeatureTest
         }
     }
   }
-
 }
