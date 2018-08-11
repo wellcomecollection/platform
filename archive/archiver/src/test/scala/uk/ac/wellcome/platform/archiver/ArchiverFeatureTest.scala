@@ -3,7 +3,10 @@ package uk.ac.wellcome.platform.archiver
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archiver.flow.{BagArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archiver.flow.{
+  BagArchiveCompleteNotification,
+  BagLocation
+}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
 // TODO: Test file boundaries

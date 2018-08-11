@@ -10,13 +10,11 @@ import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveBagFlow {
 
-  def apply(zipFile: ZipFile,
-            bagLocation: BagLocation,
-            config: BagItConfig)(
-             implicit
-             materializer: ActorMaterializer,
-             s3Client: S3Client
-           ) = {
+  def apply(zipFile: ZipFile, bagLocation: BagLocation, config: BagItConfig)(
+    implicit
+    materializer: ActorMaterializer,
+    s3Client: S3Client
+  ) = {
 
     val bagDigestItemFlow = BagDigestItemFlow(config.digestDelimiterRegexp)
     val archiveItemFlow = ArchiveItemFlow()

@@ -10,7 +10,11 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archiver.flow.{BagArchiveCompleteFlow, DownloadZipFileFlow, UploadAndVerifyBagFlow}
+import uk.ac.wellcome.platform.archiver.flow.{
+  BagArchiveCompleteFlow,
+  DownloadZipFileFlow,
+  UploadAndVerifyBagFlow
+}
 import uk.ac.wellcome.platform.archiver.messaging.MessageStream
 import uk.ac.wellcome.platform.archiver.models.BagUploaderConfig
 import uk.ac.wellcome.storage.ObjectLocation
@@ -22,15 +26,19 @@ trait Archiver extends Logging {
   val injector: Injector
 
   def run() = {
-    val messageStream = injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
+    val messageStream =
+      injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
     val bagUploaderConfig = injector.getInstance(classOf[BagUploaderConfig])
 
     implicit val s3Client: S3Client = injector.getInstance(classOf[S3Client])
-    implicit val snsClient: AmazonSNSAsync = injector.getInstance(classOf[AmazonSNSAsync])
-    implicit val actorSystem: ActorSystem = injector.getInstance(classOf[ActorSystem])
+    implicit val snsClient: AmazonSNSAsync =
+      injector.getInstance(classOf[AmazonSNSAsync])
+    implicit val actorSystem: ActorSystem =
+      injector.getInstance(classOf[ActorSystem])
     implicit val executionContext: ExecutionContext = actorSystem.dispatcher
     implicit val materializer: ActorMaterializer = ActorMaterializer()
-    implicit val adapter: LoggingAdapter = Logging(actorSystem.eventStream, "customLogger")
+    implicit val adapter: LoggingAdapter =
+      Logging(actorSystem.eventStream, "customLogger")
 
     val snsConfig = injector.getInstance(classOf[SNSConfig])
 
@@ -58,4 +66,3 @@ trait Archiver extends Logging {
     }
   }
 }
-

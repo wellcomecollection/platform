@@ -26,25 +26,25 @@ object UploadAndVerifyBagFlow extends Logging {
         .single(zipFile)
         .mapConcat(bagNames)
         .map(bagName =>
-          (bagName, createBagLocation(bagName, config.uploadConfig))
-        )
-        .map { case (bagName, bagLocation) =>
-          materializeArchiveBagFlow(zipFile, bagLocation, config)
+          (bagName, createBagLocation(bagName, config.uploadConfig)))
+        .map {
+          case (bagName, bagLocation) =>
+            materializeArchiveBagFlow(zipFile, bagLocation, config)
         }
         .flatMapConcat(Source.fromFuture)
     })
   }
 
   private def materializeArchiveBagFlow(
-                                         zipFile: ZipFile,
-                                         bagLocation: BagLocation,
-                                         config: BagUploaderConfig
-                                       )(
-                                         implicit
-                                         materializer: ActorMaterializer,
-                                         s3Client: S3Client,
-                                         executionContext: ExecutionContext
-                                       ) =
+    zipFile: ZipFile,
+    bagLocation: BagLocation,
+    config: BagUploaderConfig
+  )(
+    implicit
+    materializer: ActorMaterializer,
+    s3Client: S3Client,
+    executionContext: ExecutionContext
+  ) =
     ArchiveBagFlow(zipFile, bagLocation, config.bagItConfig)
       .map(Success(_))
       .recover({ case e => Failure(e) })
