@@ -9,4 +9,12 @@ locals {
   merger_container_image      = "${module.ecr_repository_merger.repository_url}:${var.release_ids["merger"]}"
   id_minter_container_image   = "${module.ecr_repository_id_minter.repository_url}:${var.release_ids["id_minter"]}"
   ingestor_container_image    = "${module.ecr_repository_ingestor.repository_url}:${var.release_ids["ingestor"]}"
+
+  vhs_sierra_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_read_policy}"
+  vhs_sierra_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_bucket_name}"
+  vhs_sierra_table_stream_arn = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sierra_table_stream_arn}"
+
+  vhs_sourcedata_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_read_policy}"
+  vhs_sourcedata_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_bucket_name}"
+  vhs_sourcedata_table_stream_arn = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_table_stream_arn}"
 }
