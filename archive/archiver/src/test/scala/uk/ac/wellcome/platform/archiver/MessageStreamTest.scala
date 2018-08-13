@@ -33,13 +33,11 @@ class MessageStreamTest
 
   it("does not delete failing messages") {
     withMessageStreamFixtures[Unit] {
-      case (messageStream, QueuePair(queue, dlq), actorSystem, metricsSender) =>
+      case (messageStream, queuePair, actorSystem, metricsSender) =>
         implicit val adapter = Logging(actorSystem.eventStream, "customLogger")
 
-        val numberOfMessages = 1
-
-        val exampleObjects = sendExampleObjects(queue, numberOfMessages)
         val received = new ConcurrentLinkedQueue[ExampleObject]()
+        val _ = sendExampleObjects(queuePair.queue, 1)
 
         val exampleFlow = Flow[ExampleObject].map(o => {
           throw new RuntimeException("failed")
@@ -54,8 +52,7 @@ class MessageStreamTest
         eventually {
           received shouldBe empty
 
-          assertQueueEmpty(queue)
-          assertQueueHasSize(dlq, 1)
+          assertQueuePairSizes(queuePair, 0, 1)
 
           verify(metricsSender, never)
             .countSuccess(endsWith("_ProcessMessage"))
@@ -164,7 +161,7 @@ class MessageStreamTest
     }
   }
 
-  private def sendExampleObjects(queue: Queue, count: Int = 1) = {
+  private def sendExampleObjects(queue: Queue, count: Int) = {
     (1 to count)
       .map(i => ExampleObject(s"Example value $i"))
       .map(o => {

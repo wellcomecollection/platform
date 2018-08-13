@@ -2,6 +2,7 @@ package uk.ac.wellcome.platform.archiver.modules
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
+import akka.stream.alpakka.s3.impl.ListBucketVersion2
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
 import com.amazonaws.auth.{
@@ -25,7 +26,8 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
       credentialsProvider = credentialsProvider,
       s3RegionProvider = regionProvider,
       pathStyleAccess = true,
-      endpointUrl = endpointUrl
+      endpointUrl = endpointUrl,
+      listBucketApiVersion = ListBucketVersion2
     )
 
   @Singleton

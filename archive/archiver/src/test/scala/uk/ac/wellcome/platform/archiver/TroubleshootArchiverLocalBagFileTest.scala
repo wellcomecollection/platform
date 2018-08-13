@@ -1,9 +1,10 @@
 package uk.ac.wellcome.platform.archiver
 
-import java.nio.file.Paths
+import java.io.File
 
 import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archiver.flow.BagName
 
 @Ignore
 // Useful test to troubleshoot running the archiver using a local bagfile
@@ -15,10 +16,15 @@ class TroubleshootArchiverLocalBagFileTest
 
   it("downloads, uploads and verifies a known BagIt bag") {
     withArchiver {
-      case (ingestBucket, storageBucket, queuePair, archiver) =>
-        withBag(
-          Paths
-            .get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"),
+      case (ingestBucket, storageBucket, queuePair, _, archiver) =>
+        sendBag(
+          BagName(randomAlphanumeric()),
+          new File(
+            List(
+              System.getProperty("user.home"),
+              "Desktop",
+              "b24923333-b.zip"
+            ).mkString("/")),
           ingestBucket,
           queuePair) { invalidBag =>
           archiver.run()

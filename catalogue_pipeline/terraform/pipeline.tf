@@ -9,23 +9,24 @@ module "catalogue_pipeline" {
   id_minter_container_image   = "${local.id_minter_container_image}"
   ingestor_container_image    = "${local.ingestor_container_image}"
 
-  subnets                   = ["${local.private_subnets}"]
-  vpc_id                    = "${local.vpc_id}"
-  account_id                = "${data.aws_caller_identity.current.account_id}"
-  vhs_miro_read_policy      = "${module.vhs_sourcedata.read_policy}"
-  vhs_miro_bucket_name      = "${module.vhs_sourcedata.bucket_name}"
-  vhs_miro_table_stream_arn = "${module.vhs_sourcedata.table_stream_arn}"
+  subnets    = ["${local.private_subnets}"]
+  vpc_id     = "${local.vpc_id}"
+  account_id = "${data.aws_caller_identity.current.account_id}"
 
-  vhs_sierra_read_policy      = "${module.vhs_sierra.read_policy}"
-  vhs_sierra_bucket_name      = "${module.vhs_sierra.bucket_name}"
-  vhs_sierra_table_stream_arn = "${module.vhs_sierra.table_stream_arn}"
+  vhs_miro_read_policy      = "${local.vhs_sourcedata_read_policy}"
+  vhs_miro_bucket_name      = "${local.vhs_sourcedata_bucket_name}"
+  vhs_miro_table_stream_arn = "${local.vhs_sourcedata_table_stream_arn}"
+
+  vhs_sierra_read_policy      = "${local.vhs_sierra_read_policy}"
+  vhs_sierra_bucket_name      = "${local.vhs_sierra_bucket_name}"
+  vhs_sierra_table_stream_arn = "${local.vhs_sierra_table_stream_arn}"
 
   aws_region      = "${var.aws_region}"
   messages_bucket = "${aws_s3_bucket.messages.id}"
   infra_bucket    = "${var.infra_bucket}"
 
-  index_v1 = "v1-2018-08-09-new-sierra-harvest"
-  index_v2 = "v2-2018-08-09-new-sierra-harvest"
+  index_v1 = "v1-2018-08-10-sierra-reharvest-take-2"
+  index_v2 = "v2-2018-08-10-sierra-reharvest-take-2"
 
   identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"

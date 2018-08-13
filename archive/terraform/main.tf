@@ -132,14 +132,17 @@ module "archiver" {
   vpc_id                           = "${local.vpc_id}"
   service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
-  max_capacity                     = 1
+
+  min_capacity = 1
+  max_capacity = 1
 
   env_vars = {
     queue_url      = "${module.archiver_queue.id}"
     archive_bucket = "${aws_s3_bucket.archive_storage.id}"
+    topic_arn      = "${module.registrar_topic.arn}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   container_image   = "${local.archiver_container_image}"
   source_queue_name = "${module.archiver_queue.name}"
@@ -175,4 +178,28 @@ module "registrar" {
   container_image   = "${local.registrar_container_image}"
   source_queue_name = "${module.registrar_queue.name}"
   source_queue_arn  = "${module.registrar_queue.arn}"
+}
+
+resource "aws_iam_role_policy" "archiver_task_sns" {
+  role   = "${module.archiver.task_role_name}"
+  policy = "${module.registrar_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "archiver_task_sqs" {
+  role   = "${module.archiver.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_queue.json}"
+}
+
+data "aws_iam_policy_document" "read_from_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.archiver_queue.arn}",
+    ]
+  }
 }

@@ -14,6 +14,7 @@ object Main extends App with Archiver {
     AkkaS3ClientModule,
     CloudWatchClientModule,
     SQSClientModule,
+    SNSAsyncClientModule,
     MessageStreamModule
   )
 

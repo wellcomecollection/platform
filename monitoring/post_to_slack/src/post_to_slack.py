@@ -22,7 +22,6 @@ from platform_alarms import (
     guess_cloudwatch_log_group,
     guess_cloudwatch_search_terms,
     is_critical_error,
-    should_be_sent_to_main_channel,
     simplify_message
 )
 
@@ -204,18 +203,12 @@ def prepare_slack_payload(alarm, bitly_access_token, sess=None):
 @log_on_error
 def main(event, _ctxt=None):
     bitly_access_token = os.environ['BITLY_ACCESS_TOKEN']
-    slack_critical_hook = os.environ['CRITICAL_SLACK_WEBHOOK']
-    slack_noncritical_hook = os.environ['NONCRITICAL_SLACK_WEBHOOK']
+    webhook_url = os.environ['CRITICAL_SLACK_WEBHOOK']
 
     alarm = Alarm(event['Records'][0]['Sns']['Message'])
     slack_data = prepare_slack_payload(alarm, bitly_access_token)
 
     print('Sending message %s' % json.dumps(slack_data))
-
-    if should_be_sent_to_main_channel(alarm_name=alarm.name):
-        webhook_url = slack_critical_hook
-    else:
-        webhook_url = slack_noncritical_hook
 
     response = requests.post(
         webhook_url,

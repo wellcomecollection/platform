@@ -281,6 +281,67 @@ class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
     expectedSourceIdentifiers shouldBe actualSourceIdentifiers
   }
 
+  it("ignores subject with second indicator 7") {
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          indicator2 = "7",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "absence"),
+            MarcSubfield(tag = "0", content = "lcsh/123")
+          )
+        ),
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          // MESH heading
+          indicator2 = "2",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "abolition"),
+            MarcSubfield(tag = "0", content = "mesh/456")
+          )
+        )
+      )
+    )
+
+    transformer
+      .getSubjects(bibData) shouldBe List(
+      Subject(
+        "abolition",
+        List(
+          Identifiable(
+            Concept("abolition"),
+            SourceIdentifier(
+              identifierType = IdentifierType("nlm-mesh"),
+              value = "mesh/456",
+              ontologyType = "Concept"
+            )))
+      ))
+  }
+
+  it("Ignores a subject with second indicator 7 but no subfield 0") {
+    val bibData = createSierraBibDataWith(
+      varFields = List(
+        VarField(
+          fieldTag = "p",
+          marcTag = "650",
+          indicator1 = "",
+          indicator2 = "7",
+          subfields = List(
+            MarcSubfield(tag = "a", content = "abolition")
+          )
+        )
+      )
+    )
+
+    transformer
+      .getSubjects(bibData) shouldBe List()
+  }
+
   private val transformer = new SierraSubjects {}
 
   private def assertExtractsSubjects(

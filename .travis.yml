@@ -58,6 +58,8 @@ cache:
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
 
+    - archive/archiver/target
+
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
 before_cache:
@@ -153,6 +155,9 @@ jobs:
     - env: TASK=sierra_items_to_dynamo-test
     - env: TASK=sierra_bib_merger-test
     - env: TASK=sierra_item_merger-test
+
+    # Archive
+    - env: TASK=archiver-test
 
     # (not under active development)
 

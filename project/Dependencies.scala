@@ -177,11 +177,13 @@ object Dependencies {
 
   val archiverDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
+    "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "org.rogach" %% "scallop" % "3.1.3"
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 
   val registrarDependencies = Seq(
     "com.lightbend.akka" %% "akka-stream-alpakka-s3" % versions.akkaStreamAlpakka,
+    "com.lightbend.akka" %% "akka-stream-alpakka-sns" % versions.akkaStreamAlpakka,
     "org.rogach" %% "scallop" % "3.1.3"
   ) ++ akkaDependencies ++ WellcomeDependencies.storageLibrary ++ WellcomeDependencies.jsonLibrary ++ WellcomeDependencies.monitoringLibrary
 

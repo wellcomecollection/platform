@@ -45,6 +45,11 @@ from reindex_shard_config import get_number_of_shards  # noqa
 
 TOPIC_NAME = 'reindex_jobs'
 
+DYNAMO_CONFIGS = {
+    'miro': {'table': 'SourceData', 'maybeIndex': 'reindexTracker'},
+    'sierra': {'table': 'vhs-sourcedata-sierra', 'maybeIndex': 'reindexTracker'}
+}
+
 
 def all_shard_ids(source_name):
     """
@@ -58,14 +63,15 @@ def all_shard_ids(source_name):
         yield f'{source_name}/{shard_index}'
 
 
-def all_messages(shard_ids, desired_version):
+def all_messages(shard_ids, desired_version, source_name):
     """
     Generates all the messages to be sent to SNS.
     """
     for s_id in shard_ids:
         yield {
             'shardId': s_id,
-            'desiredVersion': desired_version
+            'desiredVersion': desired_version,
+            'dynamoConfig': DYNAMO_CONFIGS[source_name]
         }
 
 
@@ -149,7 +155,8 @@ def main():
     shard_ids = all_shard_ids(source_name=source_name)
     messages = all_messages(
         shard_ids=shard_ids,
-        desired_version=desired_version
+        desired_version=desired_version,
+        source_name=source_name
     )
 
     topic_arn = build_topic_arn(topic_name=TOPIC_NAME)

@@ -8,6 +8,7 @@ import uk.ac.wellcome.models.matcher.{
   WorkIdentifier
 }
 import uk.ac.wellcome.models.recorder.internal.RecorderWorkEntry
+import uk.ac.wellcome.models.work.internal.{UnidentifiedWork, WorkType}
 import uk.ac.wellcome.models.work.test.util.WorksUtil
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
@@ -25,10 +26,24 @@ trait MergerTestUtils
       matchedEntries.map(
         recorderWorkEntries =>
           MatchedIdentifiers(
-            recorderWorkEntries.map(workEntry =>
-              WorkIdentifier(
-                identifier = workEntry.id,
-                version = workEntry.work.version)))))
+            recorderWorkEntriesToWorkIdentifiers(recorderWorkEntries)
+        )
+      )
+    )
+
+  def recorderWorkEntriesToWorkIdentifiers(
+    workEntries: Seq[RecorderWorkEntry]): Set[WorkIdentifier] =
+    recorderWorkEntriesToWorkIdentifiers(workEntries.toSet)
+
+  def recorderWorkEntriesToWorkIdentifiers(
+    workEntries: Set[RecorderWorkEntry]): Set[WorkIdentifier] =
+    workEntries
+      .map { workEntry =>
+        WorkIdentifier(
+          identifier = workEntry.id,
+          version = workEntry.work.version
+        )
+      }
 
   def storeInVHS(vhs: VersionedHybridStore[RecorderWorkEntry,
                                            EmptyMetadata,
@@ -58,4 +73,27 @@ trait MergerTestUtils
 
   def createRecorderWorkEntry: RecorderWorkEntry =
     createRecorderWorkEntryWith(version = 1)
+
+  def createDigitalWork: UnidentifiedWork = {
+    createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "miro-image-number"),
+      otherIdentifiers = List(
+        createSourceIdentifierWith(identifierType = "miro-library-reference")),
+      workType = Some(WorkType("v", "E-books")),
+      items = List(
+        createUnidentifiableItemWith(locations = List(createDigitalLocation)))
+    )
+  }
+
+  def createPhysicalWork: UnidentifiedWork = {
+    createUnidentifiedWorkWith(
+      sourceIdentifier =
+        createSourceIdentifierWith(identifierType = "sierra-system-number"),
+      otherIdentifiers =
+        List(createSourceIdentifierWith(identifierType = "sierra-identifier")),
+      items = List(
+        createIdentifiableItemWith(locations = List(createPhysicalLocation)))
+    )
+  }
 }

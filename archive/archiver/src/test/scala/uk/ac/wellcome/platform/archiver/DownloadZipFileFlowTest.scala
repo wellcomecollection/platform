@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.archiver
 
-import java.io.File
 import java.util.zip.ZipFile
 
 import akka.actor.ActorSystem
@@ -27,30 +26,32 @@ class DownloadZipFileFlowTest
 
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        implicit val _ = s3AkkaClient
+        withBag() {
+          case (bagName, zipFile, file) =>
+            implicit val _ = s3AkkaClient
 
-        val downloadZipFlow = DownloadZipFileFlow()(
-          s3AkkaClient,
-          materializer
-        )
+            val downloadZipFlow = DownloadZipFileFlow()(
+              s3AkkaClient,
+              materializer
+            )
 
-        val fileName = randomAlphanumeric()
-        val bagName = randomAlphanumeric()
-        val (zipFile, _) = createBagItZip(bagName, 1)
+            val uploadKey = bagName.toString
 
-        val file = new File(zipFile.getName)
-        s3Client.putObject(storageBucket.name, fileName, file)
+            s3Client.putObject(storageBucket.name, uploadKey, file)
 
-        val objectLocation = ObjectLocation(storageBucket.name, fileName)
+            val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
 
-        val download: Future[ZipFile] =
-          downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
+            val download: Future[ZipFile] =
+              downloadZipFlow
+                .runWith(Source.single(objectLocation), Sink.head)
+                ._2
 
-        whenReady(download) { downloadedZipFile =>
-          zipFile.entries.asScala.toList
-            .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
-            .map(_.toString)
-          zipFile.size shouldEqual downloadedZipFile.size
+            whenReady(download) { downloadedZipFile =>
+              zipFile.entries.asScala.toList
+                .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
+                .map(_.toString)
+              zipFile.size shouldEqual downloadedZipFile.size
+            }
         }
       }
     }

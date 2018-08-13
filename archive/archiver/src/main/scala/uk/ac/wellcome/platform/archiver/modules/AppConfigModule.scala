@@ -3,7 +3,6 @@ package uk.ac.wellcome.platform.archiver.modules
 import com.google.inject.{AbstractModule, Provides}
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.platform.archiver.config.ArgsConfigurator
-import uk.ac.wellcome.platform.archiver.models.AppConfig
 
 class AppConfigModule(val args: Array[String])
     extends AbstractModule
