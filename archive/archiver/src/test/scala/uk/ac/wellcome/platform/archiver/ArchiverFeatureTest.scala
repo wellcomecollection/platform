@@ -3,11 +3,10 @@ package uk.ac.wellcome.platform.archiver
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archiver.flow.{
-  BagArchiveCompleteNotification,
-  BagLocation
-}
+import uk.ac.wellcome.platform.archiver.flow.{BagArchiveCompleteNotification, BagLocation}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
+
+import uk.ac.wellcome.json.JsonUtil._
 
 // TODO: Test file boundaries
 // TODO: Test shutdown mid-stream does not succeed
@@ -27,6 +26,7 @@ class ArchiverFeatureTest
           archiver.run()
           eventually {
             listKeysInBucket(storageBucket) should have size 27
+
             assertQueuePairSizes(queuePair, 0, 0)
 
             assertSnsReceivesOnly(

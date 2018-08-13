@@ -6,10 +6,11 @@ import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
+import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archiver.flow.BagName
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
@@ -17,7 +18,7 @@ import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.util.Random
+import scala.util.{Random, Success}
 
 trait Archiver extends AkkaS3 with Messaging {
 
@@ -185,12 +186,19 @@ trait Archiver extends AkkaS3 with Messaging {
   }
 
   // TODO: move to lib
-  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic) = {
-    val actualMessages = listMessagesReceivedFromSNS(topic)
-    debug(s"SNS $topic received $actualMessages")
-    actualMessages should contain only expectedMessage
-  }
+  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
+    val triedReceiptsT = listNotifications[T](topic)
 
+    debug(s"SNS $topic received $triedReceiptsT")
+    triedReceiptsT should have size 1
+
+    val maybeT = triedReceiptsT collectFirst {
+      case Success(t) => t
+    }
+
+    maybeT should not be empty
+    maybeT.get shouldBe expectedMessage
+  }
 }
 
 case class FileEntry(name: String, contents: String)

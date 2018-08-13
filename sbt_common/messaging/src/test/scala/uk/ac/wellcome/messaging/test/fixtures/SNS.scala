@@ -1,14 +1,15 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns.AmazonSNS
-import io.circe.{yaml, Decoder, Json, ParsingFailure}
+import io.circe.generic.extras.JsonKey
+import io.circe.{Decoder, Json, ParsingFailure, yaml}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
+import scala.util.{Random, Try}
 
 object SNS {
 
@@ -88,8 +89,8 @@ trait SNS {
   // For some reason, Circe struggles to decode MessageInfo if you use @JsonKey
   // to annotate the fields, and I don't care enough to work out why right now.
   implicit val messageInfoDecoder: Decoder[MessageInfo] =
-    Decoder.forProduct4(":id", ":message", ":subject", ":topic_arn")(
-      MessageInfo.apply)
+  Decoder.forProduct4(":id", ":message", ":subject", ":topic_arn")(
+    MessageInfo.apply)
 
   def listMessagesReceivedFromSNS(topic: Topic): Seq[MessageInfo] = {
     /*
@@ -120,23 +121,61 @@ trait SNS {
       .get
 
     snsResponse.messages
-      .filter { _.topicArn == topic.arn }
+      .filter {
+        _.topicArn == topic.arn
+      }
   }
+
+
+  def listNotifications[T](topic: Topic)(implicit decoderT: Decoder[T]): Seq[Try[T]] = {
+    val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
+    val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
+
+    json
+      .right
+      .flatMap(_.as[SNSNotificationResponse])
+      .right
+      .map(notificationResponse => {
+        notificationResponse.messages
+          .filter {
+            _.topicArn == topic.arn
+          }
+          .map(message => {
+            fromJson[T](message.message)
+          })
+      }) match {
+      case Left(e) => throw (e)
+      case Right(t) => t
+    }
+  }
+
 }
 
+case class SNSNotificationMessage(
+                                   @JsonKey(":id") id: String,
+                                   @JsonKey(":subject") subject: Option[String],
+                                   @JsonKey(":message") message: String,
+                                   @JsonKey(":topic_arn") topicArn: String
+                                 )
+
+case class SNSNotificationResponse(
+                                    topics: List[TopicInfo],
+                                    messages: List[SNSNotificationMessage]
+                                  )
+
 case class SNSResponse(
-  topics: List[TopicInfo],
-  messages: List[MessageInfo] = Nil
-)
+                        topics: List[TopicInfo],
+                        messages: List[MessageInfo] = Nil
+                      )
 
 case class TopicInfo(
-  arn: String,
-  name: String
-)
+                      arn: String,
+                      name: String
+                    )
 
 case class MessageInfo(
-  messageId: String,
-  message: String,
-  subject: String,
-  topicArn: String
-)
+                        messageId: String,
+                        message: String,
+                        subject: String,
+                        topicArn: String
+                      )
