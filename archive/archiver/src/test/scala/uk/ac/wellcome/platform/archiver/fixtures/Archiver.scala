@@ -21,8 +21,10 @@ import scala.util.{Random, Success}
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def sendBag[R](bagName: BagName, file: File, ingestBucket: Bucket, queuePair: QueuePair)(
-    testWith: TestWith[BagName, R]) = {
+  def sendBag[R](bagName: BagName,
+                 file: File,
+                 ingestBucket: Bucket,
+                 queuePair: QueuePair)(testWith: TestWith[BagName, R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, file)
@@ -37,17 +39,18 @@ trait Archiver extends AkkaS3 with Messaging {
                      queuePair: QueuePair,
                      valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
 
-    withBag(12, valid) { case (bagName, _, file) =>
-      val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+    withBag(12, valid) {
+      case (bagName, _, file) =>
+        val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
 
-      sendBag(bagName, file, ingestBucket, queuePair) { bag =>
-        testWith(bag)
-      }
+        sendBag(bagName, file, ingestBucket, queuePair) { bag =>
+          testWith(bag)
+        }
     }
   }
 
-  def withBag[R](dataFileCount: Int = 1,
-                 valid: Boolean = true)(testWith: TestWith[(BagName, ZipFile, File), R]) = {
+  def withBag[R](dataFileCount: Int = 1, valid: Boolean = true)(
+    testWith: TestWith[(BagName, ZipFile, File), R]) = {
     val bagName = BagName(randomAlphanumeric())
 
     info(s"Creating bag $bagName")
@@ -79,7 +82,7 @@ trait Archiver extends AkkaS3 with Messaging {
   }
 
   def withArchiver[R](
-                       testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { ingestBucket =>
@@ -198,7 +201,8 @@ trait Archiver extends AkkaS3 with Messaging {
   }
 
   // TODO: move to lib
-  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
+  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
     assertSnsReceives(Set(expectedMessage), topic)
   }
 
@@ -206,7 +210,8 @@ trait Archiver extends AkkaS3 with Messaging {
     notificationCount(topic) shouldBe 0
   }
 
-  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
+  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
     val triedReceiptsT = listNotifications[T](topic)
 
     debug(s"SNS $topic received $triedReceiptsT")
@@ -219,7 +224,6 @@ trait Archiver extends AkkaS3 with Messaging {
     maybeT should not be empty
     maybeT shouldBe expectedMessage
   }
-
 
 }
 

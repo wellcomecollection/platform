@@ -9,7 +9,7 @@ import uk.ac.wellcome.platform.archiver.flow.BagName
 @Ignore
 // Useful test to troubleshoot running the archiver using a local bagfile
 class TroubleshootArchiverLocalBagFileTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with fixtures.Archiver
     with MetricsSenderFixture {
@@ -19,11 +19,12 @@ class TroubleshootArchiverLocalBagFileTest
       case (ingestBucket, storageBucket, queuePair, _, archiver) =>
         sendBag(
           BagName(randomAlphanumeric()),
-          new File(List(
-            System.getProperty("user.home"),
-            "Desktop",
-            "b24923333-b.zip"
-          ).mkString("/")),
+          new File(
+            List(
+              System.getProperty("user.home"),
+              "Desktop",
+              "b24923333-b.zip"
+            ).mkString("/")),
           ingestBucket,
           queuePair) { invalidBag =>
           archiver.run()

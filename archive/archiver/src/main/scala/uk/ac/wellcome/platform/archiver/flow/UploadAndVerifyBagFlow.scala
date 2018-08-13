@@ -52,7 +52,7 @@ object UploadAndVerifyBagFlow extends Logging {
       .run()
       .map(_.collect { case Failure(e) => e })
       .collect {
-        case failureList if failureList.nonEmpty  => {
+        case failureList if failureList.nonEmpty => {
           throw new FailedArchivingException(bagLocation.bagName, failureList)
         }
         case _ => bagLocation
@@ -82,10 +82,9 @@ object UploadAndVerifyBagFlow extends Logging {
 }
 
 case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
-  extends RuntimeException(
-    s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
-  ) {
-}
+    extends RuntimeException(
+      s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
+    ) {}
 
 case class BagName(value: String) {
   override def toString: String = value

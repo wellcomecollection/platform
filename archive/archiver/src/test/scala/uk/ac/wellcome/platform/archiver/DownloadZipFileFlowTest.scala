@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class DownloadZipFileFlowTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver {
@@ -26,30 +26,32 @@ class DownloadZipFileFlowTest
 
     withLocalS3Bucket { storageBucket =>
       withS3AkkaClient(system, materializer) { s3AkkaClient =>
-        withBag() { case (bagName, zipFile, file) =>
+        withBag() {
+          case (bagName, zipFile, file) =>
+            implicit val _ = s3AkkaClient
 
-          implicit val _ = s3AkkaClient
+            val downloadZipFlow = DownloadZipFileFlow()(
+              s3AkkaClient,
+              materializer
+            )
 
-          val downloadZipFlow = DownloadZipFileFlow()(
-            s3AkkaClient,
-            materializer
-          )
+            val uploadKey = bagName.toString
 
-          val uploadKey = bagName.toString
+            s3Client.putObject(storageBucket.name, uploadKey, file)
 
-          s3Client.putObject(storageBucket.name, uploadKey, file)
+            val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
 
-          val objectLocation = ObjectLocation(storageBucket.name, uploadKey)
+            val download: Future[ZipFile] =
+              downloadZipFlow
+                .runWith(Source.single(objectLocation), Sink.head)
+                ._2
 
-          val download: Future[ZipFile] =
-            downloadZipFlow.runWith(Source.single(objectLocation), Sink.head)._2
-
-          whenReady(download) { downloadedZipFile =>
-            zipFile.entries.asScala.toList
-              .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
-              .map(_.toString)
-            zipFile.size shouldEqual downloadedZipFile.size
-          }
+            whenReady(download) { downloadedZipFile =>
+              zipFile.entries.asScala.toList
+                .map(_.toString) should contain theSameElementsAs downloadedZipFile.entries.asScala.toList
+                .map(_.toString)
+              zipFile.size shouldEqual downloadedZipFile.size
+            }
         }
       }
     }

@@ -4,14 +4,17 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archiver.flow.{BagArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archiver.flow.{
+  BagArchiveCompleteNotification,
+  BagLocation
+}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
 // TODO: Test file boundaries
 // TODO: Test shutdown mid-stream does not succeed
 
 class ArchiverFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with fixtures.Archiver
@@ -65,13 +68,17 @@ class ArchiverFeatureTest
 
                   assertQueuePairSizes(queuePair, 0, 2)
 
-                  assertSnsReceives(Set(
-                    BagArchiveCompleteNotification(
-                      BagLocation(storageBucket.name, "archive", validBag1)
+                  assertSnsReceives(
+                    Set(
+                      BagArchiveCompleteNotification(
+                        BagLocation(storageBucket.name, "archive", validBag1)
+                      ),
+                      BagArchiveCompleteNotification(
+                        BagLocation(storageBucket.name, "archive", validBag2)
+                      )
                     ),
-                    BagArchiveCompleteNotification(
-                      BagLocation(storageBucket.name, "archive", validBag2)
-                    )), topic)
+                    topic
+                  )
 
                 }
               }

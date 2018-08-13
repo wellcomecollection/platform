@@ -58,8 +58,7 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
     }
 }
 
-case class BadChecksum()
-  extends RuntimeException("Checksum not matched!")
+case class BadChecksum() extends RuntimeException("Checksum not matched!")
 
 object DigestCalculatorFlow {
   def apply(algorithm: String, checksum: String) =
