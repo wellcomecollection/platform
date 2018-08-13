@@ -15,8 +15,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class NotificationSenderTest
     extends FunSpec
     with Matchers
-    with IntegrationPatience
     with ReindexFixtures
+    with IntegrationPatience
     with ScalaFutures
     with SNS {
   it("sends ReindexRequests for the provided IDs") {

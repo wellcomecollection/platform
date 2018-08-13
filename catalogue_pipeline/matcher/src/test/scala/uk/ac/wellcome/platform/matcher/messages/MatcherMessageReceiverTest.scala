@@ -23,9 +23,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class MatcherMessageReceiverTest
     extends FunSpec
     with Matchers
-    with IntegrationPatience
     with MatcherFixtures
-    with Eventually {
+    with Eventually
+    with IntegrationPatience {
 
   private val aIdentifier = aSierraSourceIdentifier("A")
   private val bIdentifier = aSierraSourceIdentifier("B")
