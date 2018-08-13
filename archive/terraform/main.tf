@@ -159,7 +159,7 @@ data "aws_iam_policy_document" "read_from_queue" {
     actions = [
       "sqs:DeleteMessage",
       "sqs:ReceiveMessage",
-      "sqs:ChangeMessageVisibility"
+      "sqs:ChangeMessageVisibility",
     ]
 
     resources = [
