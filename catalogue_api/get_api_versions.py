@@ -180,7 +180,10 @@ if __name__ == '__main__':
 
     print('\n---\n')
 
-    check_staging_api()
+    if '--force' in sys.argv:
+        print('Skipping check of staging/prod API...')
+    else:
+        check_staging_api()
 
     print('\n---\n')
 
