@@ -25,7 +25,7 @@ module "task" {
   app_memory = "${var.app_memory}"
 
   app_env_vars = {
-    api_host    = "${var.host_name}"
+    api_host    = "api.wellcomecollection.org"
     es_host     = "${data.template_file.es_cluster_host.rendered}"
     es_port     = "${var.es_cluster_credentials["port"]}"
     es_username = "${var.es_cluster_credentials["username"]}"

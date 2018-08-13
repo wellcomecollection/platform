@@ -46,27 +46,27 @@ variable "es_cluster_credentials" {
 
 variable "production_api" {
   description = "Which version of the API is production? (romulus | remus)"
-  default     = "remus"
+  default     = "romulus"
 }
 
 variable "pinned_romulus_api" {
   description = "Which version of the API image to pin romulus to, if any"
-  default     = ""
+  default     = "304a9db0d4db377b953b040386a8cafa9d912d9f"
 }
 
 variable "pinned_romulus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin romulus to, if any"
-  default     = ""
+  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
 }
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "5059b5265ca88ecc28b79b4b909ad7dd7d0d5245"
+  default     = ""
 }
 
 variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  default     = ""
 }
 
 variable "es_config_romulus" {
@@ -74,8 +74,8 @@ variable "es_config_romulus" {
   type        = "map"
 
   default = {
-    index_v1 = "v1-2018-07-30-merging"
-    index_v2 = "v2-2018-07-30-merging"
+    index_v1 = "v1-2018-08-10-sierra-reharvest-take-2"
+    index_v2 = "v2-2018-08-10-sierra-reharvest-take-2"
     doc_type = "work"
   }
 }
