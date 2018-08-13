@@ -16,6 +16,7 @@ class NotificationSenderTest
     extends FunSpec
     with Matchers
     with ReindexFixtures
+    with IntegrationPatience
     with ScalaFutures
     with IntegrationPatience
     with SNS {
