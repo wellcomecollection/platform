@@ -1,4 +1,4 @@
 module "vhs_recorder" {
-  source = "../vhs"
+  source = "../../../catalogue_pipeline_data/terraform/vhs"
   name   = "${replace(var.namespace, "_", "-")}-Recorder"
 }

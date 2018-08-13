@@ -299,15 +299,15 @@ $(1)-terraform-apply:
 #
 $(1)-terraform-import:
 	$(ROOT)/docker_run.py --aws -- \
-		--volume $(ROOT):/data \
-		--workdir /data/$(2) \
-		hashicorp/terraform:0.11.3 import $(filter-out $(1)-terraform-import,$(MAKECMDGOALS))
+		--volume $(ROOT):$(ROOT) \
+		--workdir $(ROOT)/$(2) \
+		hashicorp/terraform:0.11.7 import $(filter-out $(1)-terraform-import,$(MAKECMDGOALS))
 
 $(1)-terraform-state-rm:
 	$(ROOT)/docker_run.py --aws -- \
-		--volume $(ROOT):/data \
-		--workdir /data/$(2) \
-		hashicorp/terraform:0.11.3 state rm $(filter-out $(1)-terraform-state-rm,$(MAKECMDGOALS))
+		--volume $(ROOT):$(ROOT) \
+		--workdir $(ROOT)/$(2) \
+		hashicorp/terraform:0.11.7 state rm $(filter-out $(1)-terraform-state-rm,$(MAKECMDGOALS))
 
 endef
 
