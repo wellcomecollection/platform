@@ -61,12 +61,12 @@ variable "pinned_romulus_api_nginx-delta" {
 
 variable "pinned_remus_api" {
   description = "Which version of the API image to pin remus to, if any"
-  default     = "5059b5265ca88ecc28b79b4b909ad7dd7d0d5245"
+  default     = ""
 }
 
 variable "pinned_remus_api_nginx-delta" {
   description = "Which version of the nginx API image to pin remus to, if any"
-  default     = "3dd8a423123e1d175dd44520fcf03435a5fc92c8"
+  default     = ""
 }
 
 variable "es_config_romulus" {
