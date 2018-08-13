@@ -42,8 +42,8 @@ def get_ecs_api_info(name):
 
     ecs = boto3.client('ecs')
     resp = ecs.describe_services(
-        cluster='api_cluster',
-        services=[f'api_{name}_v1']
+        cluster='catalogue-api',
+        services=[f'catalogue-api-{name}']
     )
     assert len(resp['services']) == 1, resp
     task_definition = resp['services'][0]['taskDefinition']
@@ -66,7 +66,7 @@ def get_ecs_api_info(name):
     return ApiConfiguration(
         name=name,
         api=data['api'],
-        nginx=data['nginx_api']
+        nginx=data['nginx_api-delta']
     )
 
 
