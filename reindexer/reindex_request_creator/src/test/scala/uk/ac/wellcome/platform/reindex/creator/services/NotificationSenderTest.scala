@@ -1,7 +1,7 @@
 r eppackage uk.ac.wellcome.platform.reindex.creator.services
 
 import com.amazonaws.services.sns.model.AmazonSNSException
-import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.messaging.test.fixtures.SNS
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
@@ -16,7 +16,6 @@ class NotificationSenderTest
     extends FunSpec
     with Matchers
     with ReindexFixtures
-    with IntegrationPatience
     with ScalaFutures
     with IntegrationPatience
     with SNS {
