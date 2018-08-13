@@ -144,7 +144,26 @@ module "archiver" {
   source_queue_arn  = "${module.archiver_queue.arn}"
 }
 
-resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
+resource "aws_iam_role_policy" "archiver_task_sns" {
   role   = "${module.archiver.task_role_name}"
   policy = "${module.registrar_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "archiver_task_sqs" {
+  role   = "${module.archiver.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_queue.json}"
+}
+
+data "aws_iam_policy_document" "read_from_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility"
+    ]
+
+    resources = [
+      "${module.archiver_queue.arn}",
+    ]
+  }
 }

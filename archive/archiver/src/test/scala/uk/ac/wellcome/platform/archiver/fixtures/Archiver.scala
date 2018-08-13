@@ -1,7 +1,6 @@
 package uk.ac.wellcome.platform.archiver.fixtures
 
 import java.io.{File, FileOutputStream}
-import java.nio.file.{Path, Paths}
 import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
@@ -22,30 +21,42 @@ import scala.util.{Random, Success}
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def withBag[R](bagName: BagName, path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
+  def sendBag[R](bagName: BagName, file: File, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[BagName, R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
-    s3Client.putObject(ingestBucket.name, uploadKey, path.toFile)
+    s3Client.putObject(ingestBucket.name, uploadKey, file)
 
     val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
     sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
 
-    info(s"Creating bag $bagName")
-
     testWith(bagName)
   }
 
-  def withFakeBag[R](ingestBucket: Bucket,
+  def sendFakeBag[R](ingestBucket: Bucket,
                      queuePair: QueuePair,
                      valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
+
+    withBag(12, valid) { case (bagName, _, file) =>
+      val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+
+      sendBag(bagName, file, ingestBucket, queuePair) { bag =>
+        testWith(bag)
+      }
+    }
+  }
+
+  def withBag[R](dataFileCount: Int = 1,
+                 valid: Boolean = true)(testWith: TestWith[(BagName, ZipFile, File), R]) = {
     val bagName = BagName(randomAlphanumeric())
 
-    val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+    info(s"Creating bag $bagName")
 
-    withBag(bagName, Paths.get(fileName), ingestBucket, queuePair) { bag =>
-      testWith(bag)
-    }
+    val (zipFile, file) = createBagItZip(bagName, dataFileCount, valid)
+
+    testWith((bagName, zipFile, file))
+
+    file.delete()
   }
 
   def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
@@ -100,8 +111,8 @@ trait Archiver extends AkkaS3 with Messaging {
       }
 
   def createZip(files: List[FileEntry]) = {
-    val zipFileName = File.createTempFile("archiver-test", ".zip").getName
-    val zipFileOutputStream = new FileOutputStream(zipFileName)
+    val file = File.createTempFile("archiver-test", ".zip")
+    val zipFileOutputStream = new FileOutputStream(file)
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
     files.foreach {
       case FileEntry(name, contents) =>
@@ -111,8 +122,9 @@ trait Archiver extends AkkaS3 with Messaging {
         zipOutputStream.closeEntry()
     }
     zipOutputStream.close()
-    val zipFile = new ZipFile(zipFileName)
-    (zipFile, zipFileName)
+    val zipFile = new ZipFile(file)
+
+    (zipFile, file)
   }
 
   def createBagItZip(bagName: BagName,

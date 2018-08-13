@@ -21,7 +21,7 @@ class ArchiverFeatureTest
   it("downloads, uploads and verifies a BagIt bag") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
-        withFakeBag(ingestBucket, queuePair) { validBag =>
+        sendFakeBag(ingestBucket, queuePair) { validBag =>
           archiver.run()
           eventually {
             listKeysInBucket(storageBucket) should have size 27
@@ -42,7 +42,7 @@ class ArchiverFeatureTest
   it("fails when ingesting an invalid bag") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
-        withFakeBag(ingestBucket, queuePair, false) { invalidBag =>
+        sendFakeBag(ingestBucket, queuePair, false) { invalidBag =>
           archiver.run()
           eventually {
 
@@ -56,11 +56,11 @@ class ArchiverFeatureTest
   it("continues after failure") {
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, topic, archiver) =>
-        withFakeBag(ingestBucket, queuePair) { validBag1 =>
+        sendFakeBag(ingestBucket, queuePair) { validBag1 =>
           archiver.run()
-          withFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
-            withFakeBag(ingestBucket, queuePair) { validBag2 =>
-              withFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
+          sendFakeBag(ingestBucket, queuePair, false) { invalidBag1 =>
+            sendFakeBag(ingestBucket, queuePair) { validBag2 =>
+              sendFakeBag(ingestBucket, queuePair, false) { invalidBag2 =>
                 eventually {
 
                   assertQueuePairSizes(queuePair, 0, 2)
