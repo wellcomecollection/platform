@@ -146,7 +146,7 @@ variable "pinned_romulus_api" {{
   default     = "{romulus_api.api}"
 }}
 
-variable "pinned_romulus_api_nginx" {{
+variable "pinned_romulus_api_nginx-delta" {{
   description = "Which version of the nginx API image to pin romulus to, if any"
   default     = "{romulus_api.nginx}"
 }}
@@ -156,7 +156,7 @@ variable "pinned_remus_api" {{
   default     = "{remus_api.api}"
 }}
 
-variable "pinned_remus_api_nginx" {{
+variable "pinned_remus_api_nginx-delta" {{
   description = "Which version of the nginx API image to pin remus to, if any"
   default     = "{remus_api.nginx}"
 }}\033[0m
