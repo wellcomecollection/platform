@@ -25,7 +25,7 @@ variable "rds_username" {
 }
 
 variable "rds_password" {
-  description = "Password7 for the RDS database"
+  description = "Password for the RDS database"
 }
 
 variable "es_cluster_credentials" {
