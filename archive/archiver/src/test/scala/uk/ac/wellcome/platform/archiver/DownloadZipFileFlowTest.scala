@@ -8,7 +8,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archiver.flow.DownloadZipFileFlow
+import uk.ac.wellcome.platform.archiver.flow.{BagName, DownloadZipFileFlow}
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.collection.JavaConverters._
@@ -35,7 +35,7 @@ class DownloadZipFileFlowTest
         )
 
         val fileName = randomAlphanumeric()
-        val bagName = randomAlphanumeric()
+        val bagName = BagName(randomAlphanumeric())
         val (zipFile, _) = createBagItZip(bagName, 1)
 
         val file = new File(zipFile.getName)

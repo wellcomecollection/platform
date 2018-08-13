@@ -22,9 +22,8 @@ import scala.util.{Random, Success}
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
+  def withBag[R](bagName: BagName, path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
     testWith: TestWith[BagName, R]) = {
-    val bagName = randomAlphanumeric()
     val uploadKey = s"upload/path/$bagName.zip"
 
     s3Client.putObject(ingestBucket.name, uploadKey, path.toFile)
@@ -34,16 +33,17 @@ trait Archiver extends AkkaS3 with Messaging {
 
     info(s"Creating bag $bagName")
 
-    testWith(BagName(bagName))
+    testWith(bagName)
   }
 
   def withFakeBag[R](ingestBucket: Bucket,
                      queuePair: QueuePair,
                      valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
-    val bagName = randomAlphanumeric()
+    val bagName = BagName(randomAlphanumeric())
+
     val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
 
-    withBag(Paths.get(fileName), ingestBucket, queuePair) { bag =>
+    withBag(bagName, Paths.get(fileName), ingestBucket, queuePair) { bag =>
       testWith(bag)
     }
   }
@@ -115,7 +115,7 @@ trait Archiver extends AkkaS3 with Messaging {
     (zipFile, zipFileName)
   }
 
-  def createBagItZip(bagName: String,
+  def createBagItZip(bagName: BagName,
                      dataFileCount: Int = 1,
                      valid: Boolean = true) = {
     // Create data files

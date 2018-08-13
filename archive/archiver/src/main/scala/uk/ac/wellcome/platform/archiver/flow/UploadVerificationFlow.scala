@@ -50,7 +50,7 @@ object UploadVerificationFlow extends Logging {
       bagLocation.storageNamespace,
       List(
         bagLocation.storagePath,
-        bagLocation.bagName,
+        bagLocation.bagName.value,
         itemLocation.key
       ).mkString("/")
     )

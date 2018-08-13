@@ -4,6 +4,7 @@ import java.nio.file.Paths
 
 import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
+import uk.ac.wellcome.platform.archiver.flow.BagName
 
 @Ignore
 // Useful test to troubleshoot running the archiver using a local bagfile
@@ -17,6 +18,7 @@ class TroubleshootArchiverLocalBagFileTest
     withArchiver {
       case (ingestBucket, storageBucket, queuePair, _, archiver) =>
         withBag(
+          BagName(randomAlphanumeric()),
           Paths
             .get(System.getProperty("user.home"), "Desktop", "b24923333-b.zip"),
           ingestBucket,

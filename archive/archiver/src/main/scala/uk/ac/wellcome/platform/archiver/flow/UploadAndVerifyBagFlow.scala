@@ -79,4 +79,6 @@ object UploadAndVerifyBagFlow extends Logging {
   }
 }
 
-case class BagName(value: String)
+case class BagName(value: String) {
+  override def toString: String = value
+}
