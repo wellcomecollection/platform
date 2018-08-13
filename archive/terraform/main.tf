@@ -52,7 +52,7 @@ module "registrar_queue" {
   queue_name  = "${local.namespace}_registrar_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.archiver_topic.name}"]
+  topic_names = ["${module.registrar_topic.name}"]
 
   visibility_timeout_seconds = 300
   max_receive_count          = 3
@@ -142,4 +142,9 @@ module "archiver" {
   container_image   = "${local.archiver_container_image}"
   source_queue_name = "${module.archiver_queue.name}"
   source_queue_arn  = "${module.archiver_queue.arn}"
+}
+
+resource "aws_iam_role_policy" "ecs_id_minter_task_sns" {
+  role   = "${module.archiver.task_role_name}"
+  policy = "${module.registrar_topic.publish_policy}"
 }
