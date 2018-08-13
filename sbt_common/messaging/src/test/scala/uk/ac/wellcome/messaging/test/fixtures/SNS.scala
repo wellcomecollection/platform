@@ -126,29 +126,39 @@ trait SNS {
       }
   }
 
-
-  def listNotifications[T](topic: Topic)(implicit decoderT: Decoder[T]): Seq[Try[T]] = {
+  private def getMessages(topic: Topic) = {
     val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
-    val json: Either[ParsingFailure, Json] = yaml.parser.parse(string)
+    val json = yaml.parser.parse(string)
 
     json
       .right
       .flatMap(_.as[SNSNotificationResponse])
       .right
-      .map(notificationResponse => {
-        notificationResponse.messages
-          .filter {
-            _.topicArn == topic.arn
-          }
-          .map(message => {
-            fromJson[T](message.message)
-          })
-      }) match {
+      .map {
+        _.messages.filter(_.topicArn == topic.arn)
+      }
+  }
+
+  def notificationCount(topic: Topic): Int = {
+    val messages = getMessages(topic)
+
+    messages match {
+      case Left(e) => throw (e)
+      case Right(t) => t.size
+    }
+  }
+
+  def listNotifications[T](topic: Topic)(implicit decoderT: Decoder[T]): Seq[Try[T]] = {
+    val messages = getMessages(topic)
+
+    val eitherT = messages.right
+      .map(_.map(m => fromJson[T](m.message)))
+
+    eitherT match {
       case Left(e) => throw (e)
       case Right(t) => t
     }
   }
-
 }
 
 case class SNSNotificationMessage(

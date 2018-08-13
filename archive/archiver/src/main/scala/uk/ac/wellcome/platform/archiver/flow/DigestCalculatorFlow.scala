@@ -48,7 +48,7 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
             digest.reset()
 
             if (streamDigest != checksum) {
-              failStage(new RuntimeException(s"Checksum not matched!"))
+              failStage(throw BadChecksum())
             } else {
               completeStage()
             }
@@ -57,6 +57,9 @@ class DigestCalculatorFlow(algorithm: String, checksum: String)
       )
     }
 }
+
+case class BadChecksum()
+  extends RuntimeException("Checksum not matched!")
 
 object DigestCalculatorFlow {
   def apply(algorithm: String, checksum: String) =

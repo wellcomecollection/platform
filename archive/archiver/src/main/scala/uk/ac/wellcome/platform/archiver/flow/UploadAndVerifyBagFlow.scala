@@ -50,10 +50,12 @@ object UploadAndVerifyBagFlow extends Logging {
       .recover({ case e => Failure(e) })
       .toMat(Sink.seq)(Keep.right)
       .run()
-      .map {
-        case s if s.collect({ case a: Failure[_] => a }).nonEmpty =>
-          throw new RuntimeException("Failed!")
-        case s => bagLocation
+      .map(_.collect { case Failure(e) => e })
+      .collect {
+        case failureList if failureList.nonEmpty  => {
+          throw new FailedArchivingException(bagLocation.bagName, failureList)
+        }
+        case _ => bagLocation
       }
 
   private def createBagLocation(bagName: BagName, config: UploadConfig) = {
@@ -77,6 +79,12 @@ object UploadAndVerifyBagFlow extends Logging {
       .filterNot(_.startsWith("_"))
       .map(BagName)
   }
+}
+
+case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
+  extends RuntimeException(
+    s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
+  ) {
 }
 
 case class BagName(value: String) {

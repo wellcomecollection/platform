@@ -5,7 +5,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archiver.flow.{BagName, UploadAndVerifyBagFlow}
+import uk.ac.wellcome.platform.archiver.flow.{BadChecksum, BagName, FailedArchivingException, UploadAndVerifyBagFlow}
 import uk.ac.wellcome.platform.archiver.models.{BagItConfig, BagUploaderConfig, UploadConfig}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 
@@ -19,8 +19,6 @@ class UploadAndVerifyBagFlowTest
 
   implicit val system = ActorSystem("test")
   implicit val materializer = ActorMaterializer()
-  //    SupervisedMaterializer.create(
-  //    "archiver", mock[MetricsSender])(system)
 
   def createBagUploaderConfig(bucket: Bucket) =
     BagUploaderConfig(
@@ -45,7 +43,7 @@ class UploadAndVerifyBagFlowTest
           uploader.runWith(Source.single(zipFile), Sink.ignore)
 
         whenReady(verification) { _ =>
-          // Do nothing
+          listKeysInBucket(storageBucket) should have size 5
         }
       }
     }
@@ -65,9 +63,9 @@ class UploadAndVerifyBagFlowTest
         val (_, verification) =
           uploader.runWith(Source.single(zipFile), Sink.ignore)
 
-        whenReady(verification.failed) { e =>
-          println(e)
-        // Do nothing
+        whenReady(verification.failed) { actualException =>
+          val expectedException = FailedArchivingException(bagName, Seq(BadChecksum()))
+          actualException shouldBe expectedException
         }
       }
     }

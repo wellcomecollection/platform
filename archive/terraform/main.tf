@@ -31,7 +31,7 @@ module "archiver_topic" {
 
 module "archiver_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${local.namespace}_queue"
+  queue_name  = "${local.namespace}_archiver_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.archiver_topic.name}"]
@@ -49,7 +49,7 @@ module "registrar_topic" {
 
 module "registrar_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${local.namespace}_queue"
+  queue_name  = "${local.namespace}_registrar_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.archiver_topic.name}"]
@@ -128,15 +128,16 @@ module "archiver" {
   vpc_id                           = "${local.vpc_id}"
   service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
+  min_capacity                     = 1
   max_capacity                     = 1
 
   env_vars = {
     queue_url      = "${module.archiver_queue.id}"
     archive_bucket = "${aws_s3_bucket.archive_storage.id}"
-    topic_arn      = "${module.registrar_topic}"
+    topic_arn      = "${module.registrar_topic.arn}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 3
 
   container_image   = "${local.archiver_container_image}"
   source_queue_name = "${module.archiver_queue.name}"

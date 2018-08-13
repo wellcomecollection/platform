@@ -68,7 +68,7 @@ trait Archiver extends AkkaS3 with Messaging {
   }
 
   def withArchiver[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
+                       testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { ingestBucket =>
@@ -187,18 +187,28 @@ trait Archiver extends AkkaS3 with Messaging {
 
   // TODO: move to lib
   def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
+    assertSnsReceives(Set(expectedMessage), topic)
+  }
+
+  def assertSnsReceivesNothing(topic: SNS.Topic) = {
+    notificationCount(topic) shouldBe 0
+  }
+
+  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(implicit decoderT: Decoder[T]) = {
     val triedReceiptsT = listNotifications[T](topic)
 
     debug(s"SNS $topic received $triedReceiptsT")
-    triedReceiptsT should have size 1
+    triedReceiptsT should have size expectedMessage.size
 
-    val maybeT = triedReceiptsT collectFirst {
+    val maybeT = (triedReceiptsT collect {
       case Success(t) => t
-    }
+    }).toSet
 
     maybeT should not be empty
-    maybeT.get shouldBe expectedMessage
+    maybeT shouldBe expectedMessage
   }
+
+
 }
 
 case class FileEntry(name: String, contents: String)
