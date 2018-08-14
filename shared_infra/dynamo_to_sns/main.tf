@@ -3,8 +3,8 @@ module "lambda_dynamo_to_sns" {
 
   name        = "dynamo_to_sns_${var.name}"
   module_name = "dynamo_to_sns"
-  description = "Push new images form DynamoDB updates to SNS"
-  timeout     = 60
+  description = "Push new images from DynamoDB updates to SNS"
+  timeout     = 300
   memory_size = 1024
 
   environment_variables = {
