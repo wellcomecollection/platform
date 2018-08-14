@@ -1,7 +1,7 @@
 module "recorder" {
   source = "service"
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"
@@ -27,7 +27,7 @@ module "recorder" {
 
 module "matcher" {
   source                           = "service"
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"
@@ -55,7 +55,7 @@ module "matcher" {
 
 module "merger" {
   source                           = "service"
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"
@@ -83,7 +83,7 @@ module "merger" {
 module "id_minter" {
   source = "service"
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"
@@ -115,7 +115,7 @@ module "id_minter" {
   // two values in a way that their product doesn't exceed 45
   max_capacity = 5
 
-  security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
+  security_group_ids = ["${var.rds_access_security_group_id}"]
 }
 
 data "template_file" "es_cluster_host_ingestor" {
@@ -130,7 +130,7 @@ data "template_file" "es_cluster_host_ingestor" {
 module "ingestor" {
   source = "service"
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   cluster_name                     = "${aws_ecs_cluster.cluster.name}"
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${var.subnets}"

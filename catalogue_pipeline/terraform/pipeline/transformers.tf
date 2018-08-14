@@ -13,7 +13,7 @@ module "miro_transformer" {
   messages_bucket = "${var.messages_bucket}"
 
   transformer_container_image      = "${var.transformer_container_image}"
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   subnets                          = "${var.subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"
@@ -49,7 +49,7 @@ module "sierra_transformer" {
   messages_bucket = "${var.messages_bucket}"
 
   transformer_container_image      = "${var.transformer_container_image}"
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
+  service_egress_security_group_id = "${var.service_egress_security_group_id}"
   subnets                          = "${var.subnets}"
 
   cluster_name = "${aws_ecs_cluster.cluster.name}"

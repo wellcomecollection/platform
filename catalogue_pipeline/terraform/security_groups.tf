@@ -1,7 +1,7 @@
 resource "aws_security_group" "service_egress_security_group" {
-  name        = "${var.namespace}_service_egress_security_group"
+  name        = "pipeline_service_egress_security_group"
   description = "Allow traffic between services"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${local.vpc_id}"
 
   egress {
     from_port   = 0
@@ -11,14 +11,14 @@ resource "aws_security_group" "service_egress_security_group" {
   }
 
   tags {
-    Name = "${var.namespace}-egress"
+    Name = "pipeline-egress"
   }
 }
 
 resource "aws_security_group" "rds_access_security_group" {
-  name        = "${var.namespace}_rds_access_security_group"
+  name        = "pipeline_rds_access_security_group"
   description = "Allow traffic to rds database"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "${local.vpc_id}"
 
   ingress {
     from_port = 0
@@ -28,6 +28,6 @@ resource "aws_security_group" "rds_access_security_group" {
   }
 
   tags {
-    Name = "${var.namespace}-rds-access"
+    Name = "pipeline-rds-access"
   }
 }
