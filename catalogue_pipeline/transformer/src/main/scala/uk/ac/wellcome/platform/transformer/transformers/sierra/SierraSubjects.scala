@@ -45,8 +45,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     getSubjectswithAbstractConcepts(bibData, "650") ++
       getSubjectswithAbstractConcepts(bibData, "648") ++
       getSubjectswithAbstractConcepts(bibData, "651") ++
-      getSubjectsWithAbstractAgents(bibData, "600")++
-      getSubjectsWithAbstractAgents(bibData, "610")
+      getSubjectsWithPerson(bibData, "600")
   }
 
   private def getSubjectswithAbstractConcepts(bibData: SierraBibData, marcTag: String) = {
@@ -75,7 +74,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     }
   }
 
-  private def getSubjectsWithAbstractAgents(bibData: SierraBibData, marcTag: String) = {
+  private def getSubjectsWithPerson(bibData: SierraBibData, marcTag: String) = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
@@ -85,20 +84,23 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
       val subfields = filterSubfields(varField, List("a", "b", "c", "e"))
-      val (primarySubfields, secondarySubfields) = subfields.partition {
-        _.tag == "a"
-      }
 
-      val label = getLabel(primarySubfields, secondarySubfields)
-      val primaryConcept = varField.marcTag.get match {
-        case "600" => List(getPerson(subfields))
-        case "610" => List(getOrganisation(subfields))
-      }
+      val person = getPerson(subfields)
+      val roles = getRoles(subfields)
+      val label = getPersonSubjectLabel(person.agent, roles)
+      val primaryConcept = List(person)
       Subject(
         label = label,
         concepts = primaryConcept
       )
     }
+  }
+
+  private def getPersonSubjectLabel(person: Person, roles: List[String]) = {
+    val name = Some(person.label)
+    val prefix = person.prefix.toList
+    val numeration = person.numeration.toList
+    (List((prefix ++ name ++ numeration).mkString(" ")) ++ roles).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -131,4 +133,6 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
 
     }
   }
+
+  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
 }
