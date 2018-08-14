@@ -5,21 +5,11 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Sink, Source}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
-import uk.ac.wellcome.platform.archive.archivist.flow.{
-  BadChecksum,
-  BagName,
-  FailedArchivingException,
-  UploadAndVerifyBagFlow
-}
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagItConfig,
-  BagUploaderConfig,
-  UploadConfig
-}
+import uk.ac.wellcome.platform.archive.archivist.flow.{BadChecksum, FailedArchivingException, UploadAndVerifyBagFlow}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagItConfig, BagUploaderConfig, UploadConfig}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.common.models.BagName
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

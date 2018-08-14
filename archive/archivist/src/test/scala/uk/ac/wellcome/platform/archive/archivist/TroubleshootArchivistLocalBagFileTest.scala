@@ -4,10 +4,8 @@ import java.io.File
 
 import org.scalatest.{FunSpec, Ignore, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.flow.BagName
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{
-  Archivist => ArchivistFixture
-}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.common.models.BagName
 @Ignore
 // Useful test to troubleshoot running the archivist using a local bagfile
 class TroubleshootArchivistLocalBagFileTest

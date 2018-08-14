@@ -7,10 +7,8 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{
-  BagUploaderConfig,
-  UploadConfig
-}
+import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, UploadConfig}
+import uk.ac.wellcome.platform.archive.common.models.{BagLocation, BagName}
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -88,7 +86,3 @@ case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
     extends RuntimeException(
       s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
     ) {}
-
-case class BagName(value: String) {
-  override def toString: String = value
-}

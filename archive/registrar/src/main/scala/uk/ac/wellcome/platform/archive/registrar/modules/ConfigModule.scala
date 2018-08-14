@@ -32,4 +32,8 @@ object ConfigModule extends AbstractModule {
   def providesSNSClientConfig(appConfig: RegistrarConfig) =
     appConfig.snsClientConfig
 
+  @Provides
+  def providesHybridStoreConfig(appConfig: RegistrarConfig) =
+    appConfig.hybridStoreConfig
+
 }

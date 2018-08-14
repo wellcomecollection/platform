@@ -7,6 +7,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Source}
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.models.BagLocation
 import uk.ac.wellcome.storage.ObjectLocation
 
 object UploadVerificationFlow extends Logging {
@@ -14,8 +15,8 @@ object UploadVerificationFlow extends Logging {
     implicit s3Client: S3Client,
     materializer: ActorMaterializer
   ): Flow[(BagLocation, BagDigestItem, ZipFile),
-          MultipartUploadResult,
-          NotUsed] = {
+    MultipartUploadResult,
+    NotUsed] = {
 
     Flow[(BagLocation, BagDigestItem, ZipFile)]
       .flatMapConcat {
@@ -43,9 +44,9 @@ object UploadVerificationFlow extends Logging {
   }
 
   private def createUploadLocation(
-    bagLocation: BagLocation,
-    itemLocation: ObjectLocation
-  ) =
+                                    bagLocation: BagLocation,
+                                    itemLocation: ObjectLocation
+                                  ) =
     ObjectLocation(
       bagLocation.storageNamespace,
       List(
@@ -55,9 +56,3 @@ object UploadVerificationFlow extends Logging {
       ).mkString("/")
     )
 }
-
-case class BagLocation(
-  storageNamespace: String,
-  storagePath: String,
-  bagName: BagName
-)

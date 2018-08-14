@@ -1,40 +1,37 @@
 package uk.ac.wellcome.platform.archive.registrar.models
 
-import java.net.URL
 import java.time.Instant
-
-import uk.ac.wellcome.storage.ObjectLocation
 
 // Value classes
 
-class ChecksumAlgorithm(val underlying: String) extends AnyVal
+case class ChecksumAlgorithm(val value: String)
 
-class BagId(val underlying: String) extends AnyVal
+case class BagId(val value: String)
 
-class BagDescription(val underlying: String) extends AnyVal
+case class BagDescription(val value: String)
 
-class BagVersion(val underlying: Int) extends AnyVal
+case class BagVersion(val value: Int)
 
-class Checksum(val underlying: String) extends AnyVal
+case class Checksum(val value: String)
 
-class BagFilePath(val underlying: String) extends AnyVal
+case class BagFilePath(val value: String)
 
-class BagSourceId(val underlying: String) extends AnyVal
+case class BagSourceId(val value: String)
 
 // StorageManifest
 
 case class StorageManifest(
-  id: BagId,
-  source: SourceIdentifier,
-  identifiers: List[SourceIdentifier],
-  manifest: Manifest,
-  tagManifest: TagManifest,
-  locations: List[Location],
-  description: Option[BagDescription],
-  createdDate: Instant,
-  lastModifiedDate: Instant,
-  version: BagVersion
-)
+                            id: BagId,
+                            source: SourceIdentifier,
+                            identifiers: List[SourceIdentifier],
+                            manifest: FileManifest,
+                            tagManifest: TagManifest,
+                            locations: List[Location],
+                            description: Option[BagDescription] = None,
+                            createdDate: Instant = Instant.now(),
+                            lastModifiedDate: Instant = Instant.now(),
+                            version: BagVersion = BagVersion(1)
+                          )
 
 // Manifest
 
@@ -44,25 +41,25 @@ sealed trait Manifest {
 }
 
 case class FileManifest(
-  checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile]
-)
+                         checksumAlgorithm: ChecksumAlgorithm,
+                         files: List[BagDigestFile]
+                       )
 
 case class TagManifest(
-  checksumAlgorithm: ChecksumAlgorithm,
-  files: List[BagDigestFile]
-)
+                        checksumAlgorithm: ChecksumAlgorithm,
+                        files: List[BagDigestFile]
+                      )
 
 // Identifier
 
 case class SourceIdentifier(identifierType: IdentifierType,
-                            ontologyType: String,
+                            ontologyType: String = "Identifier",
                             value: String)
 
 case class IdentifierType(
-  id: String,
-  label: String,
-)
+                           id: String,
+                           label: String,
+                         )
 
 // Location
 
@@ -71,41 +68,20 @@ sealed trait Location {
 }
 
 case class DigitalLocation(
-  url: String,
-  locationType: LocationType,
-  ontologyType: String = "DigitalLocation"
-) extends Location
-
-case class PhysicalLocation(
-  locationType: LocationType,
-  label: String,
-  ontologyType: String = "PhysicalLocation"
-) extends Location
+                            url: String,
+                            locationType: LocationType,
+                            ontologyType: String = "DigitalLocation"
+                          ) extends Location
 
 case class LocationType(
-  id: String,
-  label: String,
-  ontologyType: String = "LocationType"
-)
+                         id: String,
+                         label: String,
+                         ontologyType: String = "LocationType"
+                       )
 
 // Bag digest file
 
 case class BagDigestFile(
-  checksum: Checksum,
-  path: BagFilePath
-)
-
-// -----
-
-case class ArchiveRequestInfo(
-  requesterId: String,
-  requestedAt: Instant,
-  callback: Callback
-)
-
-case class ArchiveRequestNotification(
-  ingestLocation: ObjectLocation,
-  requestInfo: ArchiveRequestInfo
-)
-
-case class Callback(url: URL)
+                          checksum: Checksum,
+                          path: BagFilePath
+                        )

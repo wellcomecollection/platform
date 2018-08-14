@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.messaging
+package uk.ac.wellcome.platform.archive.common
 
 import akka.NotUsed
 import akka.actor.ActorSystem

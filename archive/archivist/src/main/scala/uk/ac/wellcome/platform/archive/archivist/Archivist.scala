@@ -10,13 +10,9 @@ import com.google.inject.Injector
 import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
-import uk.ac.wellcome.platform.archive.archivist.flow.{
-  BagArchiveCompleteFlow,
-  DownloadZipFileFlow,
-  UploadAndVerifyBagFlow
-}
+import uk.ac.wellcome.platform.archive.archivist.flow.{BagArchiveCompleteFlow, DownloadZipFileFlow, UploadAndVerifyBagFlow}
 import uk.ac.wellcome.platform.archive.archivist.models.BagUploaderConfig
-import uk.ac.wellcome.platform.archive.common.messaging.MessageStream
+import uk.ac.wellcome.platform.archive.common.MessageStream
 import uk.ac.wellcome.storage.ObjectLocation
 
 import scala.concurrent.ExecutionContext
