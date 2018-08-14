@@ -1,4 +1,0 @@
---sqs-queue-url=${queue_url}
---topic-arn=${topic_arn}
---upload-namespace=${archive_bucket}
---metrics-namespace=archiver
