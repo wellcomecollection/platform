@@ -2,11 +2,8 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
@@ -372,7 +369,7 @@ describe("Subjects from 650, 648 and 651 tags"){
 
     }
 
-    it("returns subjects for tag 650 with only subfields a and c") {
+    it("returns subjects for tag 600 with only subfields a and c") {
       val sierraBibData = bibData(
         "600",
         List(
@@ -386,7 +383,7 @@ describe("Subjects from 650, 648 and 651 tags"){
             Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir"))))))
     }
 
-    it("returns subjects for tag 650 with only subfields a and multiple c") {
+    it("returns subjects for tag 600 with only subfields a and multiple c") {
       val sierraBibData = bibData(
         "600",
         List(
@@ -401,7 +398,7 @@ describe("Subjects from 650, 648 and 651 tags"){
             Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir Doctor"))))))
     }
 
-    it("returns subjects for tag 650 with only subfields a and b") {
+    it("returns subjects for tag 600 with only subfields a and b") {
       val sierraBibData = bibData(
         "600",
         List(
@@ -415,7 +412,7 @@ describe("Subjects from 650, 648 and 651 tags"){
           Unidentifiable(Person(label = "David Attenborough", numeration = Some("II"))))))
     }
 
-    it("returns subjects for tag 650 with subfields a and e") {
+    it("returns subjects for tag 600 with subfields a and e") {
       val sierraBibData = bibData(
         "600",
         List(
@@ -429,7 +426,8 @@ describe("Subjects from 650, 648 and 651 tags"){
           Unidentifiable(Person(label = "David Attenborough")))))
     }
 
-    it("returns subjects for tag 650 with subfields a and d") {
+    // TODO: re-enable once we're sure how dates should be rendered
+    ignore("returns subjects for tag 600 with subfields a and d") {
       val sierraBibData = bibData(
         "600",
         List(
@@ -440,7 +438,35 @@ describe("Subjects from 650, 648 and 651 tags"){
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
         label = "David Attenborough",
         concepts = List(
-          Unidentifiable(Person(label = "David Attenborough", dates = Some("1800's"))))))
+          Unidentifiable(Person(label = "David Attenborough")))))
+    }
+
+    it("returns subjects for tag 600 with subfields a and multiple e") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "e", content = "author"),
+          MarcSubfield(tag = "e", content = "editor")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "David Attenborough, author, editor",
+        concepts = List(
+          Unidentifiable(Person(label = "David Attenborough")))))
+    }
+
+    // This test case shouldn't be possible but we've seen cataloguing errors
+    // elsewhere. For now, we error in those cases so that we are able
+    // to flag cataloguing errors, so error here as well for consistency
+    it("errors transforming a subject 600 if subfield a is missing") {
+      val sierraBibData = bibData(
+        "600",
+        List())
+
+      intercept[ShouldNotTransformException] {
+        transformer.getSubjects(sierraBibData)
+      }
     }
   }
   private val transformer = new SierraSubjects {}

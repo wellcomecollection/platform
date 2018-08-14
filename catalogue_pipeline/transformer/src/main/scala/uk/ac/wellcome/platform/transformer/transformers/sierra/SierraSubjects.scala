@@ -110,10 +110,9 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     }
     val prefix: Option[String] = getPrefix(secondarySubfields)
     val numeration: Option[String] = getNumeration(secondarySubfields)
-    val dates: Option[String] = getDates(secondarySubfields)
     primarySubfields match {
-      case List(MarcSubfield(_, name)) =>Person(label = name, prefix = prefix, numeration = numeration, dates = dates)
-      case _ => throw new ShouldNotTransformException("jhgdfjh")
+      case List(MarcSubfield(_, name)) =>Person(label = name, prefix = prefix, numeration = numeration)
+      case _ => throw new ShouldNotTransformException("Subject doesn't have subfield $a!")
     }
 
   }
@@ -122,8 +121,8 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     val name = subfields.find(_.tag == "a").map(_.content).toList
     val prefix = getPrefix(subfields).toList
     val numeration = getNumeration(subfields).toList
-    val role = getRole(subfields).toList
-    (List((prefix ++ name ++ numeration).mkString(" ")) ++ role).mkString(", ")
+    val roles = getRoles(subfields)
+    (List((prefix ++ name ++ numeration).mkString(" ")) ++ roles).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -188,6 +187,5 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   }
 
   private def getNumeration(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "b").map(_.content)
-  private def getRole(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "e").map(_.content)
-  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
+  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
 }
