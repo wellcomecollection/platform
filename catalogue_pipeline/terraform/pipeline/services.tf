@@ -115,7 +115,7 @@ module "id_minter" {
   // two values in a way that their product doesn't exceed 45
   max_capacity = 5
 
-  security_group_ids = ["${aws_security_group.rds_access_security_group.id}"]
+  security_group_ids = ["${var.rds_access_security_group_id}"]
 }
 
 data "template_file" "es_cluster_host_ingestor" {
