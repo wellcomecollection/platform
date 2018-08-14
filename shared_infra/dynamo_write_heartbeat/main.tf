@@ -4,7 +4,7 @@ module "lambda_dynamo_write_heartbeat" {
   name        = "${var.name}"
   module_name = "dynamo_write_heartbeat"
   description = "Keep DynamoDB capacity scaling by sending heartbeat writes"
-  timeout     = 5
+  timeout     = 30
   memory_size = 128
 
   environment_variables = {
