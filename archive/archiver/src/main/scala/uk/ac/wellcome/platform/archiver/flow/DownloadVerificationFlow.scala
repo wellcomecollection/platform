@@ -13,12 +13,15 @@ object DownloadVerificationFlow extends Logging {
       .flatMapConcat({
         case (uploadLocation, checksum) =>
           val verify = DigestCalculatorFlow("SHA-256", checksum)
+
+          val (s3Source, _) = s3Client
+            .download(uploadLocation.namespace, uploadLocation.key)
+
           Source.fromFuture(
-            s3Client
-              .download(uploadLocation.namespace, uploadLocation.key)
-              ._1
+            s3Source
               .via(verify)
-              .runWith(Sink.ignore))
+              .runWith(Sink.ignore)
+          )
       })
       .log("download verified")
 

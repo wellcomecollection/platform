@@ -1,73 +1,96 @@
 package uk.ac.wellcome.platform.archiver.fixtures
 
 import java.io.{File, FileOutputStream}
-import java.nio.file.{Path, Paths}
 import java.security.MessageDigest
 import java.util.zip.{ZipEntry, ZipFile, ZipOutputStream}
 
 import com.google.inject.Guice
+import io.circe.Decoder
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.messaging.test.fixtures.Messaging
+import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
+import uk.ac.wellcome.platform.archiver.flow.BagName
 import uk.ac.wellcome.platform.archiver.modules._
 import uk.ac.wellcome.platform.archiver.{Archiver => ArchiverApp}
 import uk.ac.wellcome.storage.ObjectLocation
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import scala.util.Random
+import scala.util.{Random, Success}
 
 trait Archiver extends AkkaS3 with Messaging {
 
-  def withBag[R](path: Path, ingestBucket: Bucket, queuePair: QueuePair)(
-    testWith: TestWith[Bag, R]) = {
-    val bagName = randomAlphanumeric()
+  def sendBag[R](bagName: BagName,
+                 file: File,
+                 ingestBucket: Bucket,
+                 queuePair: QueuePair)(testWith: TestWith[BagName, R]) = {
     val uploadKey = s"upload/path/$bagName.zip"
 
-    s3Client.putObject(ingestBucket.name, uploadKey, path.toFile)
+    s3Client.putObject(ingestBucket.name, uploadKey, file)
 
     val uploadObjectLocation = ObjectLocation(ingestBucket.name, uploadKey)
     sendNotificationToSQS(queuePair.queue, uploadObjectLocation)
 
-    info(s"Creating bag $bagName")
-
-    testWith(Bag(bagName))
+    testWith(bagName)
   }
 
-  def withFakeBag[R](ingestBucket: Bucket,
+  def sendFakeBag[R](ingestBucket: Bucket,
                      queuePair: QueuePair,
-                     valid: Boolean = true)(testWith: TestWith[Bag, R]) = {
-    val bagName = randomAlphanumeric()
-    val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+                     valid: Boolean = true)(testWith: TestWith[BagName, R]) = {
 
-    withBag(Paths.get(fileName), ingestBucket, queuePair) { bag =>
-      testWith(bag)
+    withBag(12, valid) {
+      case (bagName, _, file) =>
+        val (zipFile, fileName) = createBagItZip(bagName, 12, valid)
+
+        sendBag(bagName, file, ingestBucket, queuePair) { bag =>
+          testWith(bag)
+        }
     }
   }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair)(
+  def withBag[R](dataFileCount: Int = 1, valid: Boolean = true)(
+    testWith: TestWith[(BagName, ZipFile, File), R]) = {
+    val bagName = BagName(randomAlphanumeric())
+
+    info(s"Creating bag $bagName")
+
+    val (zipFile, file) = createBagItZip(bagName, dataFileCount, valid)
+
+    testWith((bagName, zipFile, file))
+
+    file.delete()
+  }
+
+  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
     testWith: TestWith[ArchiverApp, R]) = {
     val archiver = new ArchiverApp {
       val injector = Guice.createInjector(
-        new TestAppConfigModule(queuePair.queue.url, storageBucket.name),
+        new TestAppConfigModule(
+          queuePair.queue.url,
+          storageBucket.name,
+          topicArn.arn),
         ConfigModule,
         AkkaModule,
         AkkaS3ClientModule,
         CloudWatchClientModule,
-        SQSClientModule
+        SQSClientModule,
+        SNSAsyncClientModule
       )
     }
-
     testWith(archiver)
   }
 
   def withArchiver[R](
-    testWith: TestWith[(Bucket, Bucket, QueuePair, ArchiverApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchiverApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
-      withLocalS3Bucket { ingestBucket =>
-        withLocalS3Bucket { storageBucket =>
-          withApp(storageBucket, queuePair) { archiver =>
-            testWith((ingestBucket, storageBucket, queuePair, archiver))
+      withLocalSnsTopic { snsTopic =>
+        withLocalS3Bucket { ingestBucket =>
+          withLocalS3Bucket { storageBucket =>
+            withApp(storageBucket, queuePair, snsTopic) { archiver =>
+              testWith(
+                (ingestBucket, storageBucket, queuePair, snsTopic, archiver))
+            }
           }
         }
       }
@@ -91,8 +114,8 @@ trait Archiver extends AkkaS3 with Messaging {
       }
 
   def createZip(files: List[FileEntry]) = {
-    val zipFileName = File.createTempFile("archiver-test", ".zip").getName
-    val zipFileOutputStream = new FileOutputStream(zipFileName)
+    val file = File.createTempFile("archiver-test", ".zip")
+    val zipFileOutputStream = new FileOutputStream(file)
     val zipOutputStream = new ZipOutputStream(zipFileOutputStream)
     files.foreach {
       case FileEntry(name, contents) =>
@@ -102,11 +125,12 @@ trait Archiver extends AkkaS3 with Messaging {
         zipOutputStream.closeEntry()
     }
     zipOutputStream.close()
-    val zipFile = new ZipFile(zipFileName)
-    (zipFile, zipFileName)
+    val zipFile = new ZipFile(file)
+
+    (zipFile, file)
   }
 
-  def createBagItZip(bagName: String,
+  def createBagItZip(bagName: BagName,
                      dataFileCount: Int = 1,
                      valid: Boolean = true) = {
     // Create data files
@@ -175,8 +199,32 @@ trait Archiver extends AkkaS3 with Messaging {
         bagItFile)
     createZip(allFiles.toList)
   }
+
+  // TODO: move to lib
+  def assertSnsReceivesOnly[T](expectedMessage: T, topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
+    assertSnsReceives(Set(expectedMessage), topic)
+  }
+
+  def assertSnsReceivesNothing(topic: SNS.Topic) = {
+    notificationCount(topic) shouldBe 0
+  }
+
+  def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(
+    implicit decoderT: Decoder[T]) = {
+    val triedReceiptsT = listNotifications[T](topic).toSet
+
+    debug(s"SNS $topic received $triedReceiptsT")
+    triedReceiptsT should have size expectedMessage.size
+
+    val maybeT = triedReceiptsT collect {
+      case Success(t) => t
+    }
+
+    maybeT should not be empty
+    maybeT shouldBe expectedMessage
+  }
+
 }
 
 case class FileEntry(name: String, contents: String)
-
-case class Bag(bagName: String)

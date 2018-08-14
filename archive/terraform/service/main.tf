@@ -32,6 +32,7 @@ module "service" {
 
   launch_type = "FARGATE"
 
+  min_capacity = "${var.min_capacity}"
   max_capacity = "${var.max_capacity}"
 }
 

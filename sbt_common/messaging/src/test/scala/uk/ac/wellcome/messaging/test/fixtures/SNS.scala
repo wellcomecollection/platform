@@ -1,14 +1,15 @@
 package uk.ac.wellcome.messaging.test.fixtures
 
 import com.amazonaws.services.sns.AmazonSNS
+import io.circe.generic.extras.JsonKey
 import io.circe.{yaml, Decoder, Json, ParsingFailure}
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}
 import uk.ac.wellcome.test.fixtures._
-import uk.ac.wellcome.json.JsonUtil._
 
 import scala.collection.immutable.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Random
+import scala.util.{Random, Try}
 
 object SNS {
 
@@ -120,9 +121,57 @@ trait SNS {
       .get
 
     snsResponse.messages
-      .filter { _.topicArn == topic.arn }
+      .filter {
+        _.topicArn == topic.arn
+      }
+  }
+
+  private def getMessages(topic: Topic) = {
+    val string = scala.io.Source.fromURL(localSNSEndpointUrl).mkString
+    val json = yaml.parser.parse(string)
+
+    json.right
+      .flatMap(_.as[SNSNotificationResponse])
+      .right
+      .map {
+        _.messages.filter(_.topicArn == topic.arn)
+      }
+  }
+
+  def notificationCount(topic: Topic): Int = {
+    val messages = getMessages(topic)
+
+    messages match {
+      case Left(e)  => throw (e)
+      case Right(t) => t.size
+    }
+  }
+
+  def listNotifications[T](topic: Topic)(
+    implicit decoderT: Decoder[T]): Seq[Try[T]] = {
+    val messages = getMessages(topic)
+
+    val eitherT = messages.right
+      .map(_.map(m => fromJson[T](m.message)))
+
+    eitherT match {
+      case Left(e)  => throw (e)
+      case Right(t) => t
+    }
   }
 }
+
+case class SNSNotificationMessage(
+  @JsonKey(":id") id: String,
+  @JsonKey(":subject") subject: Option[String],
+  @JsonKey(":message") message: String,
+  @JsonKey(":topic_arn") topicArn: String
+)
+
+case class SNSNotificationResponse(
+  topics: List[TopicInfo],
+  messages: List[SNSNotificationMessage]
+)
 
 case class SNSResponse(
   topics: List[TopicInfo],
