@@ -178,15 +178,16 @@ lazy val snapshot_generator = doServiceSetup(project, "data_api/snapshot_generat
   .dependsOn(finatra_messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.snapshotGeneratorDependencies)
 
-lazy val archiver = doServiceSetup(project, "archive/archiver")
+lazy val archive_common = doServiceSetup(project, "archive/common")
   .dependsOn(common % "compile->compile;test->test")
   .dependsOn(messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.archiverDependencies)
+  .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
+
+lazy val archiver = doServiceSetup(project, "archive/archiver")
+  .dependsOn(archive_common % "compile->compile;test->test")
 
 lazy val registrar = doServiceSetup(project, "archive/registrar")
-  .dependsOn(common % "compile->compile;test->test")
-  .dependsOn(messaging % "compile->compile;test->test")
-  .settings(libraryDependencies ++= Dependencies.registrarDependencies)
+  .dependsOn(archive_common % "compile->compile;test->test")
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -223,6 +224,7 @@ lazy val root = (project in file("."))
     sierra_item_merger,
     snapshot_generator,
 
+    archive_common,
     archiver,
     registrar
   )
