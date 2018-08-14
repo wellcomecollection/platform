@@ -183,7 +183,7 @@ lazy val archive_common = doServiceSetup(project, "archive/common")
   .dependsOn(messaging % "compile->compile;test->test")
   .settings(libraryDependencies ++= Dependencies.archiveCommonDependencies)
 
-lazy val archiver = doServiceSetup(project, "archive/archiver")
+lazy val archivist = doServiceSetup(project, "archive/archivist")
   .dependsOn(archive_common % "compile->compile;test->test")
 
 lazy val registrar = doServiceSetup(project, "archive/registrar")
@@ -225,6 +225,6 @@ lazy val root = (project in file("."))
     snapshot_generator,
 
     archive_common,
-    archiver,
+    archivist,
     registrar
   )

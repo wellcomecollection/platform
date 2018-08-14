@@ -58,7 +58,10 @@ cache:
     - sierra_adapter/sierra_bib_merger/target
     - sierra_adapter/sierra_item_merger/target
 
-    - archive/archiver/target
+    - archive/commmon/target
+    - archive/archivist/target
+    - archive/registrar/target
+
 
 # Based on instructions from
 # https://www.scala-sbt.org/1.0/docs/Travis-CI-with-sbt.html#Caching
@@ -157,7 +160,10 @@ jobs:
     - env: TASK=sierra_item_merger-test
 
     # Archive
-    - env: TASK=archiver-test
+    - env: TASK=archivist-test
+    - env: TASK=registrar-test
+    - env: TASK=archivist-test
+
 
     # (not under active development)
 

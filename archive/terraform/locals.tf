@@ -6,6 +6,6 @@ locals {
   private_subnets           = "${data.terraform_remote_state.shared_infra.catalogue_private_subnets}"
   archive_bucket_name       = "wellcomecollection-assets-archive-storage"
   ingest_bucket_name        = "wellcomecollection-assets-archive-ingest"
-  archiver_container_image  = "${module.ecr_repository_archiver.repository_url}:${var.release_ids["archiver"]}"
+  archivist_container_image  = "${module.ecr_repository_archivist.repository_url}:${var.release_ids["archivist"]}"
   registrar_container_image = "${module.ecr_repository_registrar.repository_url}:${var.release_ids["registrar"]}"
 }

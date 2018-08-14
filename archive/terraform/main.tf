@@ -24,19 +24,19 @@ resource "aws_security_group" "service_egress_security_group" {
   }
 }
 
-# Messaging - archiver
+# Messaging - archivist
 
-module "archiver_topic" {
+module "archivist_topic" {
   source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
-  name   = "${local.namespace}_archiver"
+  name   = "${local.namespace}_archivist"
 }
 
-module "archiver_queue" {
+module "archivist_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
-  queue_name  = "${local.namespace}_archiver_queue"
+  queue_name  = "${local.namespace}_archivist_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
-  topic_names = ["${module.archiver_topic.name}"]
+  topic_names = ["${module.archivist_topic.name}"]
 
   visibility_timeout_seconds = 43200
   max_receive_count          = 3
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "archive_upload" {
 }
 
 resource "aws_iam_role_policy" "archive_archive_upload_bucket" {
-  role   = "${module.archiver.task_role_name}"
+  role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_upload.json}"
 }
 
@@ -111,18 +111,18 @@ data "aws_iam_policy_document" "archive_ingest" {
 }
 
 resource "aws_iam_role_policy" "archive_archive_ingest_bucket" {
-  role   = "${module.archiver.task_role_name}"
+  role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.archive_ingest.json}"
 }
 
-# Service - archiver
+# Service - archivist
 
-module "ecr_repository_archiver" {
+module "ecr_repository_archivist" {
   source = "git::https://github.com/wellcometrust/terraform.git//ecr?ref=v1.0.0"
-  name   = "archiver"
+  name   = "archivist"
 }
 
-module "archiver" {
+module "archivist" {
   source = "service"
 
   service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
@@ -137,16 +137,16 @@ module "archiver" {
   max_capacity                     = 1
 
   env_vars = {
-    queue_url      = "${module.archiver_queue.id}"
+    queue_url      = "${module.archivist_queue.id}"
     archive_bucket = "${aws_s3_bucket.archive_storage.id}"
     topic_arn      = "${module.registrar_topic.arn}"
   }
 
   env_vars_length = 3
 
-  container_image   = "${local.archiver_container_image}"
-  source_queue_name = "${module.archiver_queue.name}"
-  source_queue_arn  = "${module.archiver_queue.arn}"
+  container_image   = "${local.archivist_container_image}"
+  source_queue_name = "${module.archivist_queue.name}"
+  source_queue_arn  = "${module.archivist_queue.arn}"
 }
 
 # Service - registrar
@@ -180,13 +180,13 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
-resource "aws_iam_role_policy" "archiver_task_sns" {
-  role   = "${module.archiver.task_role_name}"
+resource "aws_iam_role_policy" "archivist_task_sns" {
+  role   = "${module.archivist.task_role_name}"
   policy = "${module.registrar_topic.publish_policy}"
 }
 
-resource "aws_iam_role_policy" "archiver_task_sqs" {
-  role   = "${module.archiver.task_role_name}"
+resource "aws_iam_role_policy" "archivist_task_sqs" {
+  role   = "${module.archivist.task_role_name}"
   policy = "${data.aws_iam_policy_document.read_from_queue.json}"
 }
 
@@ -199,7 +199,7 @@ data "aws_iam_policy_document" "read_from_queue" {
     ]
 
     resources = [
-      "${module.archiver_queue.arn}",
+      "${module.archivist_queue.arn}",
     ]
   }
 }
