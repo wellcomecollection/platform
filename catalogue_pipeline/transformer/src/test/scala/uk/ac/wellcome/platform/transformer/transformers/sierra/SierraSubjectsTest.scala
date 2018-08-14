@@ -385,6 +385,63 @@ describe("Subjects from 650, 648 and 651 tags"){
           concepts = List(
             Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir"))))))
     }
+
+    it("returns subjects for tag 650 with only subfields a and multiple c") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "c", content = "Sir"),
+          MarcSubfield(tag = "c", content = "Doctor")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+          label = "Sir Doctor David Attenborough",
+          concepts = List(
+            Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir Doctor"))))))
+    }
+
+    it("returns subjects for tag 650 with only subfields a and b") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "b", content = "II")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "David Attenborough II",
+        concepts = List(
+          Unidentifiable(Person(label = "David Attenborough", numeration = Some("II"))))))
+    }
+
+    it("returns subjects for tag 650 with subfields a and e") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "e", content = "author")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "David Attenborough, author",
+        concepts = List(
+          Unidentifiable(Person(label = "David Attenborough")))))
+    }
+
+    it("returns subjects for tag 650 with subfields a and d") {
+      val sierraBibData = bibData(
+        "600",
+        List(
+          MarcSubfield(tag = "a", content = "David Attenborough"),
+          MarcSubfield(tag = "d", content = "1800's")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "David Attenborough",
+        concepts = List(
+          Unidentifiable(Person(label = "David Attenborough", dates = Some("1800's"))))))
+    }
   }
   private val transformer = new SierraSubjects {}
 

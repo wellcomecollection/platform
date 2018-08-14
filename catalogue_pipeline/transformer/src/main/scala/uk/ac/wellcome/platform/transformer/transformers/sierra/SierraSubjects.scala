@@ -1,11 +1,8 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
-import uk.ac.wellcome.platform.transformer.source.{
-  MarcSubfield,
-  SierraBibData,
-  VarField
-}
+import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
+import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 
 trait SierraSubjects extends MarcUtils with SierraConcepts {
 
@@ -88,14 +85,16 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     // which causes duplicated subjects to appear in the API.
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = filterSubfields(varField, List("a", "c"))
-      val (primarySubfields, subdivisionSubfields) = subfields.partition {
+      val subfields = varField.subfields
+      val (primarySubfields, secondarySubfields) = subfields.partition {
         _.tag == "a"
       }
+      val person = getPerson(subfields)
       val label = getAbstractAgentLabel(subfields)
       val primaryConcept = getAbstractAgentPrimaryConcept(
+        person,
         primarySubfields,
-        subdivisionSubfields,
+        secondarySubfields,
         varField = varField)
 
       Subject(
@@ -105,10 +104,26 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     }
   }
 
+  private def getPerson(subfields: List[MarcSubfield]) = {
+    val (primarySubfields, secondarySubfields) = subfields.partition {
+      _.tag == "a"
+    }
+    val prefix: Option[String] = getPrefix(secondarySubfields)
+    val numeration: Option[String] = getNumeration(secondarySubfields)
+    val dates: Option[String] = getDates(secondarySubfields)
+    primarySubfields match {
+      case List(MarcSubfield(_, name)) =>Person(label = name, prefix = prefix, numeration = numeration, dates = dates)
+      case _ => throw new ShouldNotTransformException("jhgdfjh")
+    }
+
+  }
+
   private def getAbstractAgentLabel(subfields: List[MarcSubfield]) = {
     val name = subfields.find(_.tag == "a").map(_.content).toList
-    val prefixes = subfields.find(_.tag == "c").map(_.content).toList
-    (prefixes ++ name).mkString(" ")
+    val prefix = getPrefix(subfields).toList
+    val numeration = getNumeration(subfields).toList
+    val role = getRole(subfields).toList
+    (List((prefix ++ name ++ numeration).mkString(" ")) ++ role).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -143,19 +158,15 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   }
 
   private def getAbstractAgentPrimaryConcept(
+                                            person:Person,
     primarySubfields: List[MarcSubfield],
     secondarySubfields: List[MarcSubfield],
     varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
       varField.marcTag.get match {
         case "600" =>
-          val prefixes = secondarySubfields.collect {
-            case MarcSubfield("c", content) => content
-          }
-          val prefixString =
-            if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
           identifyPrimaryConcept(
-            concept = Person(label = subfield.content, prefix = prefixString),
+            concept = person,
             varField = varField
           )
         case "610" =>
@@ -166,4 +177,17 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       }
     }
   }
+
+  private def getPrefix(secondarySubfields: List[MarcSubfield]) = {
+    val prefixes = secondarySubfields.collect {
+      case MarcSubfield("c", content) => content
+    }
+    val prefixString =
+      if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
+    prefixString
+  }
+
+  private def getNumeration(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "b").map(_.content)
+  private def getRole(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "e").map(_.content)
+  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
 }

@@ -28,5 +28,6 @@ case class Organisation(
 
 case class Person(label: String,
                   prefix: Option[String] = None,
-                  numeration: Option[String] = None)
+                  numeration: Option[String] = None,
+                  dates: Option[String] = None)
     extends AbstractAgent
