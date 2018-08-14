@@ -7,7 +7,10 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.archivist.models.{BagUploaderConfig, UploadConfig}
+import uk.ac.wellcome.platform.archive.archivist.models.{
+  BagUploaderConfig,
+  UploadConfig
+}
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -36,15 +39,15 @@ object UploadAndVerifyBagFlow extends Logging {
   }
 
   private def materializeArchiveBagFlow(
-                                         zipFile: ZipFile,
-                                         bagLocation: BagLocation,
-                                         config: BagUploaderConfig
-                                       )(
-                                         implicit
-                                         materializer: ActorMaterializer,
-                                         s3Client: S3Client,
-                                         executionContext: ExecutionContext
-                                       ) =
+    zipFile: ZipFile,
+    bagLocation: BagLocation,
+    config: BagUploaderConfig
+  )(
+    implicit
+    materializer: ActorMaterializer,
+    s3Client: S3Client,
+    executionContext: ExecutionContext
+  ) =
     ArchiveBagFlow(zipFile, bagLocation, config.bagItConfig)
       .map(Success(_))
       .recover({ case e => Failure(e) })
@@ -82,9 +85,9 @@ object UploadAndVerifyBagFlow extends Logging {
 }
 
 case class FailedArchivingException(bagName: BagName, e: Seq[Throwable])
-  extends RuntimeException(
-    s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
-  ) {}
+    extends RuntimeException(
+      s"Failed archiving: $bagName:\n${e.map(_.getMessage).mkString}"
+    ) {}
 
 case class BagName(value: String) {
   override def toString: String = value

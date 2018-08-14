@@ -16,6 +16,6 @@ object CloudWatchClientModule extends AbstractModule {
 }
 
 case class CloudwatchClientConfig(
-                                   endpoint: Option[String],
-                                   region: String
-                                 )
+  endpoint: Option[String],
+  region: String
+)

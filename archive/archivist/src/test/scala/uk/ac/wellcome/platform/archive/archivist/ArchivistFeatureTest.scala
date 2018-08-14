@@ -3,10 +3,15 @@ package uk.ac.wellcome.platform.archive.archivist
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.archivist.flow.{BagArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archive.archivist.flow.{
+  BagArchiveCompleteNotification,
+  BagLocation
+}
 import uk.ac.wellcome.storage.utils.ExtendedPatience
 
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{ Archivist => ArchivistFixture }
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 
 import uk.ac.wellcome.json.JsonUtil._
 
@@ -71,10 +76,12 @@ class ArchivistFeatureTest
                   assertSnsReceives(
                     Set(
                       BagArchiveCompleteNotification(
-                        flow.BagLocation(storageBucket.name, "archive", validBag1)
+                        flow
+                          .BagLocation(storageBucket.name, "archive", validBag1)
                       ),
                       BagArchiveCompleteNotification(
-                        flow.BagLocation(storageBucket.name, "archive", validBag2)
+                        flow
+                          .BagLocation(storageBucket.name, "archive", validBag2)
                       )
                     ),
                     topic

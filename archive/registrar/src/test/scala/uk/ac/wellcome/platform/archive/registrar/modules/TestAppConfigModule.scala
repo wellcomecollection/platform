@@ -4,14 +4,20 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules.{CloudwatchClientConfig, S3ClientConfig, SQSClientConfig, SnsClientConfig}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  CloudwatchClientConfig,
+  S3ClientConfig,
+  SQSClientConfig,
+  SnsClientConfig
+}
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
 
 import scala.concurrent.duration._
 
-
-class TestAppConfigModule(queueUrl: String, bucketName: String, topicArn: String)
-  extends AbstractModule {
+class TestAppConfigModule(queueUrl: String,
+                          bucketName: String,
+                          topicArn: String)
+    extends AbstractModule {
   @Provides
   def providesAppConfig = {
     val s3ClientConfig = S3ClientConfig(

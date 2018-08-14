@@ -28,8 +28,8 @@ object SQSClientModule extends AbstractModule {
 }
 
 case class SQSClientConfig(
-                            accessKey: Option[String],
-                            secretKey: Option[String],
-                            endpoint: Option[String],
-                            region: String
-                          )
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)

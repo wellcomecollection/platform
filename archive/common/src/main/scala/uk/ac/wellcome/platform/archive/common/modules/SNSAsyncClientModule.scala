@@ -33,8 +33,8 @@ object SNSAsyncClientModule extends AbstractModule {
 }
 
 case class SnsClientConfig(
-                            accessKey: Option[String],
-                            secretKey: Option[String],
-                            endpoint: Option[String],
-                            region: String
-                          )
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)

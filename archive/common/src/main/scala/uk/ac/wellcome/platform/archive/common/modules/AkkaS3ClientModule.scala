@@ -5,7 +5,12 @@ import akka.stream.ActorMaterializer
 import akka.stream.alpakka.s3.impl.ListBucketVersion2
 import akka.stream.alpakka.s3.scaladsl.S3Client
 import akka.stream.alpakka.s3.{MemoryBufferType, S3Settings}
-import com.amazonaws.auth.{AWSCredentialsProvider, AWSStaticCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  AWSCredentialsProvider,
+  AWSStaticCredentialsProvider,
+  BasicAWSCredentials,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.regions.AwsRegionProvider
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import grizzled.slf4j.Logging
@@ -68,8 +73,8 @@ object AkkaS3ClientModule extends AbstractModule with Logging {
 }
 
 case class S3ClientConfig(
-                           accessKey: Option[String],
-                           secretKey: Option[String],
-                           endpoint: Option[String],
-                           region: String
-                         )
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)

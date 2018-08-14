@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.archive.archivist
 
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.archivist.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  AppConfigModule,
+  ConfigModule
+}
 import uk.ac.wellcome.platform.archive.common.modules._
 
 import scala.concurrent.Await

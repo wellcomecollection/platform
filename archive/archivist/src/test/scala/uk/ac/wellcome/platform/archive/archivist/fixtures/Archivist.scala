@@ -11,7 +11,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.messaging.test.fixtures.{Messaging, SNS}
 import uk.ac.wellcome.platform.archive.archivist.flow.BagName
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.common.messaging.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation

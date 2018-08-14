@@ -13,7 +13,9 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 
 class DownloadZipFileFlowTest
     extends FunSpec

@@ -6,7 +6,10 @@ import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.messaging.fixtures.AkkaS3
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
@@ -33,7 +36,7 @@ trait Registrar extends AkkaS3 with Messaging {
   }
 
   def withRegistrar[R](
-                        testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, RegistrarApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, RegistrarApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { ingestBucket =>

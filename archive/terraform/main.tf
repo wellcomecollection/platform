@@ -133,8 +133,8 @@ module "archivist" {
   service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
 
-  min_capacity                     = 1
-  max_capacity                     = 1
+  min_capacity = 1
+  max_capacity = 1
 
   env_vars = {
     queue_url      = "${module.archivist_queue.id}"

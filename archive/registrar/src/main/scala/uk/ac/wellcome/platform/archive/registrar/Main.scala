@@ -1,7 +1,10 @@
 package uk.ac.wellcome.platform.archive.registrar
 
 import com.google.inject.{Guice, Injector}
-import uk.ac.wellcome.platform.archive.registrar.modules.{AppConfigModule, ConfigModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{
+  AppConfigModule,
+  ConfigModule
+}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._

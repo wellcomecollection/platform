@@ -5,21 +5,22 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{ Registrar => RegistrarFixture }
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  Registrar => RegistrarFixture
+}
 
 class RegistrarFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
     with ExtendedPatience
-    with RegistrarFixture  {
+    with RegistrarFixture {
 
   it("runs") {
     withRegistrar {
-      case (_,_,_,_,registrar) =>
+      case (_, _, _, _, registrar) =>
         registrar.run()
-
 
     }
   }
