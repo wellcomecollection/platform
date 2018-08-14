@@ -2,8 +2,8 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.models.work.internal._
+import uk.ac.wellcome.platform.transformer.exceptions.TransformerException
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 import uk.ac.wellcome.platform.transformer.utils.SierraDataUtil
 
 class SierraSubjectsTest extends FunSpec with Matchers with SierraDataUtil {
@@ -464,7 +464,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         "600",
         List())
 
-      intercept[ShouldNotTransformException] {
+      intercept[TransformerException] {
         transformer.getSubjects(sierraBibData)
       }
     }

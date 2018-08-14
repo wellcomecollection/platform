@@ -2,9 +2,8 @@ package uk.ac.wellcome.platform.transformer.transformers.sierra
 
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData, VarField}
-import uk.ac.wellcome.platform.transformer.transformers.ShouldNotTransformException
 
-trait SierraSubjects extends MarcUtils with SierraConcepts {
+trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
 
   // Populate wwork:subject
   //
@@ -89,32 +88,17 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       val (primarySubfields, secondarySubfields) = subfields.partition {
         _.tag == "a"
       }
-      val person = getPerson(subfields)
-      val label = getLabel(primarySubfields, secondarySubfields)
-      val primaryConcept = getAbstractAgentPrimaryConcept(
-        person,
-        primarySubfields,
-        secondarySubfields,
-        varField = varField)
 
+      val label = getLabel(primarySubfields, secondarySubfields)
+      val primaryConcept = varField.marcTag.get match {
+        case "600" => List(getPerson(subfields))
+        case "610" => List(getOrganisation(subfields))
+      }
       Subject(
         label = label,
         concepts = primaryConcept
       )
     }
-  }
-
-  private def getPerson(subfields: List[MarcSubfield]) = {
-    val (primarySubfields, secondarySubfields) = subfields.partition {
-      _.tag == "a"
-    }
-    val prefix: Option[String] = getPrefix(secondarySubfields)
-    val numeration: Option[String] = getNumeration(secondarySubfields)
-    primarySubfields match {
-      case List(MarcSubfield(_, name)) =>Person(label = name, prefix = prefix, numeration = numeration)
-      case _ => throw new ShouldNotTransformException("Subject doesn't have subfield $a!")
-    }
-
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -147,36 +131,4 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
 
     }
   }
-
-  private def getAbstractAgentPrimaryConcept(
-                                            person:Person,
-    primarySubfields: List[MarcSubfield],
-    secondarySubfields: List[MarcSubfield],
-    varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
-    primarySubfields.map { subfield =>
-      varField.marcTag.get match {
-        case "600" =>
-          identifyPrimaryConcept(
-            concept = person,
-            varField = varField
-          )
-        case "610" =>
-          identifyPrimaryConcept(
-            concept = Organisation(label = subfield.content),
-            varField = varField
-          )
-      }
-    }
-  }
-
-  private def getPrefix(secondarySubfields: List[MarcSubfield]) = {
-    val prefixes = secondarySubfields.collect {
-      case MarcSubfield("c", content) => content
-    }
-    val prefixString =
-      if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
-    prefixString
-  }
-
-  private def getNumeration(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "b").map(_.content)
 }
