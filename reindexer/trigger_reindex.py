@@ -171,22 +171,27 @@ def main():
     # scale up correctly, which slows down the reindexer.
     max_capacity = get_dynamodb_max_table_capacity(table_name='SourceData')
     print(f'Setting SourceData table capacity to {max_capacity}')
+
+    dynamo_config = DYNAMO_CONFIGS[source_name]
+
+    table_name = dynamo_config['table']
+    gsi_name = dynamo_config['maybeIndex']
+
     set_dynamodb_table_capacity(
-        table_name='SourceData',
+        table_name=table_name,
         desired_capacity=max_capacity
     )
 
-    for gsi_name in ('reindexTracker',):
-        max_capacity = get_dynamodb_max_gsi_capacity(
-            table_name='SourceData',
-            gsi_name=gsi_name
-        )
-        print(f'Setting SourceData GSI {gsi_name} capacity to {max_capacity}')
-        set_dynamodb_gsi_capacity(
-            table_name='SourceData',
-            gsi_name=gsi_name,
-            desired_capacity=max_capacity
-        )
+    max_capacity = get_dynamodb_max_gsi_capacity(
+        table_name=table_name,
+        gsi_name=gsi_name
+    )
+    print(f'Setting {table_name} GSI {gsi_name} capacity to {max_capacity}')
+    set_dynamodb_gsi_capacity(
+        table_name=table_name,
+        gsi_name=gsi_name,
+        desired_capacity=max_capacity
+    )
 
 
 if __name__ == '__main__':
