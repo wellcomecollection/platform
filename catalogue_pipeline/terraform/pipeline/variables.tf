@@ -67,5 +67,4 @@ variable "index_v1" {}
 
 variable "index_v2" {}
 
-variable "service_egress_security_group_id" {}
 variable "rds_access_security_group_id" {}

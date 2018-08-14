@@ -28,8 +28,7 @@ module "catalogue_pipeline" {
   index_v1 = "v1-2018-08-10-sierra-reharvest-take-2"
   index_v2 = "v2-2018-08-10-sierra-reharvest-take-2"
 
-  service_egress_security_group_id = "${aws_security_group.service_egress_security_group.id}"
-  rds_access_security_group_id     = "${aws_security_group.rds_access_security_group.id}"
+  rds_access_security_group_id = "${aws_security_group.rds_access_security_group.id}"
 
   identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
   identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"
