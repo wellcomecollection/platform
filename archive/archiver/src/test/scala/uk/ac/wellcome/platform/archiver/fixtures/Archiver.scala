@@ -212,14 +212,14 @@ trait Archiver extends AkkaS3 with Messaging {
 
   def assertSnsReceives[T](expectedMessage: Set[T], topic: SNS.Topic)(
     implicit decoderT: Decoder[T]) = {
-    val triedReceiptsT = listNotifications[T](topic)
+    val triedReceiptsT = listNotifications[T](topic).toSet
 
     debug(s"SNS $topic received $triedReceiptsT")
     triedReceiptsT should have size expectedMessage.size
 
-    val maybeT = (triedReceiptsT collect {
+    val maybeT = triedReceiptsT collect {
       case Success(t) => t
-    }).toSet
+    }
 
     maybeT should not be empty
     maybeT shouldBe expectedMessage
