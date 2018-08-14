@@ -85,12 +85,12 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
     // which causes duplicated subjects to appear in the API.
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = varField.subfields
+      val subfields = filterSubfields(varField, List("a", "b", "c", "e"))
       val (primarySubfields, secondarySubfields) = subfields.partition {
         _.tag == "a"
       }
       val person = getPerson(subfields)
-      val label = getAbstractAgentLabel(subfields)
+      val label = getLabel(primarySubfields, secondarySubfields)
       val primaryConcept = getAbstractAgentPrimaryConcept(
         person,
         primarySubfields,
@@ -115,14 +115,6 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
       case _ => throw new ShouldNotTransformException("Subject doesn't have subfield $a!")
     }
 
-  }
-
-  private def getAbstractAgentLabel(subfields: List[MarcSubfield]) = {
-    val name = subfields.find(_.tag == "a").map(_.content).toList
-    val prefix = getPrefix(subfields).toList
-    val numeration = getNumeration(subfields).toList
-    val roles = getRoles(subfields)
-    (List((prefix ++ name ++ numeration).mkString(" ")) ++ roles).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -187,5 +179,4 @@ trait SierraSubjects extends MarcUtils with SierraConcepts {
   }
 
   private def getNumeration(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "b").map(_.content)
-  private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
 }

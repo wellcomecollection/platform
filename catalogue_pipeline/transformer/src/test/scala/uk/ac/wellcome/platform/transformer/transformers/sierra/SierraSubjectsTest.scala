@@ -378,7 +378,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-          label = "Sir David Attenborough",
+          label = "David Attenborough - Sir",
           concepts = List(
             Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir"))))))
     }
@@ -393,7 +393,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-          label = "Sir Doctor David Attenborough",
+          label = "David Attenborough - Sir - Doctor",
           concepts = List(
             Unidentifiable(Person(label = "David Attenborough", prefix = Some("Sir Doctor"))))))
     }
@@ -407,7 +407,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-        label = "David Attenborough II",
+        label = "David Attenborough - II",
         concepts = List(
           Unidentifiable(Person(label = "David Attenborough", numeration = Some("II"))))))
     }
@@ -421,7 +421,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-        label = "David Attenborough, author",
+        label = "David Attenborough - author",
         concepts = List(
           Unidentifiable(Person(label = "David Attenborough")))))
     }
@@ -451,7 +451,7 @@ describe("Subjects from 650, 648 and 651 tags"){
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-        label = "David Attenborough, author, editor",
+        label = "David Attenborough - author - editor",
         concepts = List(
           Unidentifiable(Person(label = "David Attenborough")))))
     }
@@ -467,6 +467,22 @@ describe("Subjects from 650, 648 and 651 tags"){
       intercept[ShouldNotTransformException] {
         transformer.getSubjects(sierraBibData)
       }
+    }
+
+    it("returns subjects for tag 610 and subfields a,b,c,e") {
+      val sierraBibData = bibData(
+        "610",
+        List(
+          MarcSubfield(tag = "a", content = "United States"),
+          MarcSubfield(tag = "b", content = "Supreme court"),
+          MarcSubfield(tag = "c", content = "Washington"),
+          MarcSubfield(tag = "e", content = "sponsor")
+        ))
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "United States - Supreme court - Washington - sponsor",
+        concepts = List(
+          Unidentifiable(Organisation(label = "United States")))))
     }
   }
   private val transformer = new SierraSubjects {}
