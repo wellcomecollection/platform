@@ -17,4 +17,11 @@ locals {
   vhs_sourcedata_read_policy      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_read_policy}"
   vhs_sourcedata_bucket_name      = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_bucket_name}"
   vhs_sourcedata_table_stream_arn = "${data.terraform_remote_state.catalogue_pipeline_data.vhs_sourcedata_table_stream_arn}"
+
+  identifiers_rds_cluster_password = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_password}"
+  identifiers_rds_cluster_username = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_username}"
+  identifiers_rds_cluster_port     = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_port}"
+  identifiers_rds_cluster_host     = "${data.terraform_remote_state.catalogue_pipeline_data.identifiers_rds_cluster_host}"
+
+  rds_access_security_group_id = "${data.terraform_remote_state.catalogue_pipeline_data.rds_access_security_group_id}"
 }
