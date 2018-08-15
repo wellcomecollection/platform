@@ -8,7 +8,7 @@ module "identifiers_delta_rds_cluster" {
   vpc_id             = "${local.vpc_id}"
   admin_cidr_ingress = "${var.admin_cidr_ingress}"
 
-  db_access_security_group = ["${module.catalogue_pipeline.rds_access_security_group_id}"]
+  db_access_security_group = ["${aws_security_group.rds_access_security_group.id}"]
 
   vpc_security_group_ids = []
 }

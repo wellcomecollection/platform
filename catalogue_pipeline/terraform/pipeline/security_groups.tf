@@ -14,20 +14,3 @@ resource "aws_security_group" "service_egress_security_group" {
     Name = "${var.namespace}-egress"
   }
 }
-
-resource "aws_security_group" "rds_access_security_group" {
-  name        = "${var.namespace}_rds_access_security_group"
-  description = "Allow traffic to rds database"
-  vpc_id      = "${var.vpc_id}"
-
-  ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
-    self      = true
-  }
-
-  tags {
-    Name = "${var.namespace}-rds-access"
-  }
-}

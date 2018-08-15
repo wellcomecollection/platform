@@ -66,3 +66,5 @@ variable "ingestor_container_image" {}
 variable "index_v1" {}
 
 variable "index_v2" {}
+
+variable "rds_access_security_group_id" {}

@@ -28,10 +28,12 @@ module "catalogue_pipeline" {
   index_v1 = "v1-2018-08-10-sierra-reharvest-take-2"
   index_v2 = "v2-2018-08-10-sierra-reharvest-take-2"
 
-  identifiers_rds_cluster_password = "${module.identifiers_delta_rds_cluster.password}"
-  identifiers_rds_cluster_username = "${module.identifiers_delta_rds_cluster.username}"
-  identifiers_rds_cluster_port     = "${module.identifiers_delta_rds_cluster.port}"
-  identifiers_rds_cluster_host     = "${module.identifiers_delta_rds_cluster.host}"
+  rds_access_security_group_id = "${local.rds_access_security_group_id}"
+
+  identifiers_rds_cluster_password = "${local.identifiers_rds_cluster_password}"
+  identifiers_rds_cluster_username = "${local.identifiers_rds_cluster_username}"
+  identifiers_rds_cluster_port     = "${local.identifiers_rds_cluster_port}"
+  identifiers_rds_cluster_host     = "${local.identifiers_rds_cluster_host}"
 
   es_cluster_credentials = "${var.es_cluster_credentials}"
   dlq_alarm_arn          = "${local.dlq_alarm_arn}"
