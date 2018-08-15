@@ -6,13 +6,12 @@ import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.modules.{AppConfigModule, ConfigModule, VHSModule}
 
 object Main extends WellcomeApp[RegistrarWorker, Done] with RegistrarModules {
-  val appConfigModule = new AppConfigModule(args)
-
+  lazy val appConfigModule = new AppConfigModule(args)
   lazy val worker = injector.getInstance(classOf[RegistrarWorker])
 }
 
 trait RegistrarModules {
-  val configuredModules = List(
+  lazy val configuredModules = List(
     ConfigModule,
     VHSModule,
     AkkaModule,
