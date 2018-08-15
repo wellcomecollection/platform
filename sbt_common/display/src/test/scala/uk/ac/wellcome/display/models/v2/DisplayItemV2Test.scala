@@ -36,7 +36,7 @@ class DisplayItemV2Test extends FunSpec with Matchers with ItemsUtil {
 
   it("parses an unidentified Item without any locations") {
     val item = createUnidentifiableItemWith(
-      locations = null
+      locations = List()
     )
 
     val displayItemV2 = DisplayItemV2(
