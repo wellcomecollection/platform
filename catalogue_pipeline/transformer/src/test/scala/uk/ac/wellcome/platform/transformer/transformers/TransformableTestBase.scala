@@ -17,7 +17,8 @@ trait TransformableTestBase[T <: Transformable] extends Matchers {
 
     if (triedWork.isFailure) {
       triedWork.failed.get.printStackTrace()
-      println(triedWork.failed.get.asInstanceOf[TransformerException].e.getMessage)
+      println(
+        triedWork.failed.get.asInstanceOf[TransformerException].e.getMessage)
     }
 
     triedWork.isSuccess shouldBe true
