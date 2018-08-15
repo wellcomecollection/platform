@@ -188,6 +188,11 @@ class DisplayAbstractAgentV2Test
 
     val unidentifiedAgent = Unidentifiable(organisation)
 
+    val ambiguouslyIdentifiedOrganisation = AmbiguouslyIdentified(
+      organisation,
+      identifiers = otherIdentifiers
+    )
+
     val identifiedAgent = Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
@@ -210,6 +215,24 @@ class DisplayAbstractAgentV2Test
     it(
       "converts an Unidentifiable Organisation to a DisplayOrganisationV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(unidentifiedAgent, includesIdentifiers = false) shouldBe expectedUnidentifiedOrganisation
+    }
+
+    it("converts an AmbiguouslyIdentified Organisation to a DisplayOrganisationV2 (includesIdentifiers = true)") {
+      val expectedOrganisation = DisplayOrganisationV2(
+        id = None,
+        identifiers = Some(otherIdentifiers.map { DisplayIdentifierV2(_) }),
+        label = label
+      )
+
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedOrganisation,
+        includesIdentifiers = true) shouldBe expectedOrganisation
+    }
+
+    it("converts an AmbiguouslyIdentified Organisation to a DisplayOrganisationV2 (includesIdentifiers = false)") {
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedOrganisation,
+        includesIdentifiers = false) shouldBe expectedUnidentifiedOrganisation
     }
 
     it(
