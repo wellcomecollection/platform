@@ -99,13 +99,13 @@ class DisplayAbstractAgentV2Test extends FunSpec with Matchers with IdentifiersU
         includesIdentifiers = true) shouldBe expectedUnidentifiedPerson
     }
 
-    it("converts an Unidentifiable Agent to a DisplayPersonV2 (includesIdentifiers = false)") {
+    it("converts an Unidentifiable Person to a DisplayPersonV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(
         unidentifiedPerson,
         includesIdentifiers = false) shouldBe expectedUnidentifiedPerson
     }
 
-    it("converts an Identified Agent to a DisplayPersonV2 (includesIdentifiers = true)") {
+    it("converts an Identified Person to a DisplayPersonV2 (includesIdentifiers = true)") {
       val expectedPerson = DisplayPersonV2(
         id = Some(canonicalId),
         identifiers = Some((List(sourceIdentifier) ++ otherIdentifiers).map { DisplayIdentifierV2(_) }),
@@ -119,7 +119,7 @@ class DisplayAbstractAgentV2Test extends FunSpec with Matchers with IdentifiersU
         includesIdentifiers = true) shouldBe expectedPerson
     }
 
-    it("converts an Identified Agent to a DisplayPersonV2 (includesIdentifiers = false)") {
+    it("converts an Identified Person to a DisplayPersonV2 (includesIdentifiers = false)") {
       val expectedPerson = DisplayPersonV2(
         id = Some(canonicalId),
         identifiers = None,
