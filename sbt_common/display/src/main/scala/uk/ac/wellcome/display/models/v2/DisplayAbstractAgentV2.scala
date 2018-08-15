@@ -35,6 +35,12 @@ case object DisplayAbstractAgentV2 {
           identifiers = None,
           label = a.label
         )
+      case AmbiguouslyIdentified(a: Agent, identifiers: List[SourceIdentifier]) =>
+        DisplayAgentV2(
+          id = None,
+          identifiers = if (includesIdentifiers) Some(identifiers.map { DisplayIdentifierV2(_) }) else None,
+          label = a.label
+        )
       case Identified(
           agent: Agent,
           canonicalId,

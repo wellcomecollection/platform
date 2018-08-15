@@ -21,6 +21,11 @@ class DisplayAbstractAgentV2Test
 
     val unidentifiedAgent = Unidentifiable(agent)
 
+    val ambiguouslyIdentifiedAgent = AmbiguouslyIdentified(
+      agent,
+      identifiers = otherIdentifiers
+    )
+
     val identifiedAgent = Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
@@ -42,6 +47,24 @@ class DisplayAbstractAgentV2Test
     it(
       "converts an Unidentifiable Agent to a DisplayAgentV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(unidentifiedAgent, includesIdentifiers = false) shouldBe expectedUnidentifiedAgent
+    }
+
+    it("converts an AmbiguouslyIdentified Agent to a DisplayAgentV2 (includesIdentifiers = true)") {
+      val expectedAgent = DisplayAgentV2(
+        id = None,
+        identifiers = Some(otherIdentifiers.map { DisplayIdentifierV2(_) }),
+        label = label
+      )
+
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedAgent,
+        includesIdentifiers = true) shouldBe expectedAgent
+    }
+
+    it("converts an AmbiguouslyIdentified Agent to a DisplayAgentV2 (includesIdentifiers = false)") {
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedAgent,
+        includesIdentifiers = false) shouldBe expectedUnidentifiedAgent
     }
 
     it(
