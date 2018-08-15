@@ -3,7 +3,11 @@ package uk.ac.wellcome.platform.archive.registrar
 import akka.Done
 import uk.ac.wellcome.platform.archive.common.app.WellcomeApp
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{AppConfigModule, ConfigModule, VHSModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{
+  AppConfigModule,
+  ConfigModule,
+  VHSModule
+}
 
 object Main extends WellcomeApp[RegistrarWorker, Done] with RegistrarModules {
   lazy val appConfigModule = new AppConfigModule(args)
@@ -23,4 +27,3 @@ trait RegistrarModules {
     MessageStreamModule
   )
 }
-

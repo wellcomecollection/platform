@@ -4,9 +4,14 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.storage.utils.ExtendedPatience
-import uk.ac.wellcome.platform.archive.archivist.fixtures.{Archivist => ArchivistFixture}
+import uk.ac.wellcome.platform.archive.archivist.fixtures.{
+  Archivist => ArchivistFixture
+}
 import uk.ac.wellcome.json.JsonUtil._
-import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagArchiveCompleteNotification,
+  BagLocation
+}
 
 // TODO: Test file boundaries
 // TODO: Test shutdown mid-stream does not succeed

@@ -21,17 +21,17 @@ case class BagSourceId(val value: String)
 // StorageManifest
 
 case class StorageManifest(
-                            id: BagId,
-                            source: SourceIdentifier,
-                            identifiers: List[SourceIdentifier],
-                            manifest: FileManifest,
-                            tagManifest: TagManifest,
-                            locations: List[Location],
-                            description: Option[BagDescription] = None,
-                            createdDate: Instant = Instant.ofEpochMilli(0),
-                            lastModifiedDate: Instant = Instant.ofEpochMilli(0),
-                            version: BagVersion = BagVersion(1)
-                          )
+  id: BagId,
+  source: SourceIdentifier,
+  identifiers: List[SourceIdentifier],
+  manifest: FileManifest,
+  tagManifest: TagManifest,
+  locations: List[Location],
+  description: Option[BagDescription] = None,
+  createdDate: Instant = Instant.ofEpochMilli(0),
+  lastModifiedDate: Instant = Instant.ofEpochMilli(0),
+  version: BagVersion = BagVersion(1)
+)
 
 // Manifest
 
@@ -41,14 +41,14 @@ sealed trait Manifest {
 }
 
 case class FileManifest(
-                         checksumAlgorithm: ChecksumAlgorithm,
-                         files: List[BagDigestFile]
-                       )
+  checksumAlgorithm: ChecksumAlgorithm,
+  files: List[BagDigestFile]
+)
 
 case class TagManifest(
-                        checksumAlgorithm: ChecksumAlgorithm,
-                        files: List[BagDigestFile]
-                      )
+  checksumAlgorithm: ChecksumAlgorithm,
+  files: List[BagDigestFile]
+)
 
 // Identifier
 
@@ -57,9 +57,9 @@ case class SourceIdentifier(identifierType: IdentifierType,
                             value: String)
 
 case class IdentifierType(
-                           id: String,
-                           label: String,
-                         )
+  id: String,
+  label: String,
+)
 
 // Location
 
@@ -68,20 +68,20 @@ sealed trait Location {
 }
 
 case class DigitalLocation(
-                            url: String,
-                            locationType: LocationType,
-                            ontologyType: String = "DigitalLocation"
-                          ) extends Location
+  url: String,
+  locationType: LocationType,
+  ontologyType: String = "DigitalLocation"
+) extends Location
 
 case class LocationType(
-                         id: String,
-                         label: String,
-                         ontologyType: String = "LocationType"
-                       )
+  id: String,
+  label: String,
+  ontologyType: String = "LocationType"
+)
 
 // Bag digest file
 
 case class BagDigestFile(
-                          checksum: Checksum,
-                          path: BagFilePath
-                        )
+  checksum: Checksum,
+  path: BagFilePath
+)

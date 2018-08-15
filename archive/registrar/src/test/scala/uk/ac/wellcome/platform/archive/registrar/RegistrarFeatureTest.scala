@@ -6,14 +6,20 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
-import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
-import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
+import uk.ac.wellcome.platform.archive.registrar.fixtures.{
+  Registrar => RegistrarFixture
+}
+import uk.ac.wellcome.platform.archive.registrar.models.{
+  BagRegistrationCompleteNotification,
+  StorageManifest,
+  StorageManifestFactory
+}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RegistrarFeatureTest
-  extends FunSpec
+    extends FunSpec
     with Matchers
     with ScalaFutures
     with MetricsSenderFixture
@@ -25,28 +31,35 @@ class RegistrarFeatureTest
 
   it("registers an archived BagIt bag from S3") {
     withRegistrar {
-      case (storageBucket, queuePair, topic, registrar, hybridBucket, hybridTable) =>
+      case (
+          storageBucket,
+          queuePair,
+          topic,
+          registrar,
+          hybridBucket,
+          hybridTable) =>
         withBagNotification(queuePair, storageBucket) { bagLocation =>
           registrar.run()
 
           implicit val _ = s3Client
 
-          whenReady(StorageManifestFactory.create(bagLocation)) { storageManifest =>
-            debug(s"Created StorageManifest: $storageManifest")
+          whenReady(StorageManifestFactory.create(bagLocation)) {
+            storageManifest =>
+              debug(s"Created StorageManifest: $storageManifest")
 
-            eventually {
-              assertSnsReceivesOnly(
-                BagRegistrationCompleteNotification(storageManifest),
-                topic
-              )
+              eventually {
+                assertSnsReceivesOnly(
+                  BagRegistrationCompleteNotification(storageManifest),
+                  topic
+                )
 
-              assertStored[StorageManifest](
-                hybridBucket,
-                hybridTable,
-                storageManifest.id.value,
-                storageManifest
-              )
-            }
+                assertStored[StorageManifest](
+                  hybridBucket,
+                  hybridTable,
+                  storageManifest.id.value,
+                  storageManifest
+                )
+              }
           }
         }
     }

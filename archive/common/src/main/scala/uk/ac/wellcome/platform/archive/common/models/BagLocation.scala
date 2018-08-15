@@ -1,7 +1,7 @@
 package uk.ac.wellcome.platform.archive.common.models
 
 case class BagLocation(
-                        storageNamespace: String,
-                        storagePath: String,
-                        bagName: BagName
-                      )
+  storageNamespace: String,
+  storagePath: String,
+  bagName: BagName
+)

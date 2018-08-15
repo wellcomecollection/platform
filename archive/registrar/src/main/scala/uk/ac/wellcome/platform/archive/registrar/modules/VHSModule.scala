@@ -2,7 +2,10 @@ package uk.ac.wellcome.platform.archive.registrar.modules
 
 import akka.actor.ActorSystem
 import com.google.inject.{AbstractModule, Provides}
-import uk.ac.wellcome.platform.archive.common.modules.{DynamoClientConfig, S3ClientConfig}
+import uk.ac.wellcome.platform.archive.common.modules.{
+  DynamoClientConfig,
+  S3ClientConfig
+}
 import uk.ac.wellcome.platform.archive.registrar.models.StorageManifest
 import uk.ac.wellcome.storage.ObjectStore
 import uk.ac.wellcome.storage.dynamo.DynamoConfig
@@ -22,7 +25,8 @@ object VHSModule extends AbstractModule {
   }
 
   @Provides
-  def providesS3StorageBackend(actorSystem: ActorSystem, hybridStoreConfig: HybridStoreConfig) = {
+  def providesS3StorageBackend(actorSystem: ActorSystem,
+                               hybridStoreConfig: HybridStoreConfig) = {
     val s3Client = S3ClientFactory.create(
       region = hybridStoreConfig.s3ClientConfig.region,
       endpoint = hybridStoreConfig.s3ClientConfig.endpoint.getOrElse(""),
@@ -34,7 +38,8 @@ object VHSModule extends AbstractModule {
   }
 
   @Provides
-  def providesStorageManifestObjectStore(s3StorageBackend: S3StorageBackend, actorSystem: ActorSystem) = {
+  def providesStorageManifestObjectStore(s3StorageBackend: S3StorageBackend,
+                                         actorSystem: ActorSystem) = {
     implicit val executionContext = actorSystem.dispatcher
     implicit val storageBackend = s3StorageBackend
 
@@ -43,9 +48,9 @@ object VHSModule extends AbstractModule {
 }
 
 case class HybridStoreConfig(
-                              dynamoClientConfig: DynamoClientConfig,
-                              s3ClientConfig: S3ClientConfig,
-                              dynamoConfig: DynamoConfig,
-                              s3Config: S3Config,
-                              s3GlobalPrefix: String
-                            )
+  dynamoClientConfig: DynamoClientConfig,
+  s3ClientConfig: S3ClientConfig,
+  dynamoConfig: DynamoConfig,
+  s3Config: S3Config,
+  s3GlobalPrefix: String
+)

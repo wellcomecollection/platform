@@ -10,7 +10,9 @@ import uk.ac.wellcome.storage.ObjectLocation
 import scala.concurrent.ExecutionContext
 
 object StorageManifestFactory {
-  def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3, materializer: Materializer, executionContext: ExecutionContext) = {
+  def create(bagLocation: BagLocation)(implicit s3Client: AmazonS3,
+                                       materializer: Materializer,
+                                       executionContext: ExecutionContext) = {
 
     val algorithm = "sha256"
 
@@ -35,8 +37,9 @@ object StorageManifestFactory {
     }
 
     def createBagDigestFiles(digestLines: Seq[(String, String)]) = {
-      digestLines.map { case (checksum, path) =>
-        BagDigestFile(Checksum(checksum), BagFilePath(path))
+      digestLines.map {
+        case (checksum, path) =>
+          BagDigestFile(Checksum(checksum), BagFilePath(path))
       }
     }
 
@@ -66,13 +69,14 @@ object StorageManifestFactory {
         ChecksumAlgorithm(algorithm),
         createBagDigestFiles(tagManifestTuples).toList
       )
-    } yield StorageManifest(
-      id = BagId(bagLocation.bagName.value),
-      source = sourceIdentifier,
-      identifiers = List(sourceIdentifier),
-      manifest = fileManifest,
-      tagManifest = tagManifest,
-      locations = List(location)
-    )
+    } yield
+      StorageManifest(
+        id = BagId(bagLocation.bagName.value),
+        source = sourceIdentifier,
+        identifiers = List(sourceIdentifier),
+        manifest = fileManifest,
+        tagManifest = tagManifest,
+        locations = List(location)
+      )
   }
 }

@@ -8,9 +8,16 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.archivist.modules.{ConfigModule, TestAppConfigModule}
+import uk.ac.wellcome.platform.archive.archivist.modules.{
+  ConfigModule,
+  TestAppConfigModule
+}
 import uk.ac.wellcome.platform.archive.archivist.{Archivist => ArchivistApp}
-import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  AkkaS3,
+  BagIt,
+  FileEntry
+}
 import uk.ac.wellcome.platform.archive.common.models.BagName
 import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.storage.ObjectLocation
@@ -80,7 +87,7 @@ trait Archivist extends AkkaS3 with Messaging with BagIt {
   }
 
   def withArchivist[R](
-                        testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp), R]) = {
+    testWith: TestWith[(Bucket, Bucket, QueuePair, Topic, ArchivistApp), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { ingestBucket =>

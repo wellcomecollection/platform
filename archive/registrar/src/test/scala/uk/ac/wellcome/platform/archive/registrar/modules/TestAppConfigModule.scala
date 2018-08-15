@@ -16,8 +16,7 @@ class TestAppConfigModule(queueUrl: String,
                           topicArn: String,
                           hybridStoreTableName: String,
                           hybridStoreBucketName: String,
-                          hybridStoreGlobalPrefix: String
-                         )
+                          hybridStoreGlobalPrefix: String)
     extends AbstractModule {
   @Provides
   def providesAppConfig = {
@@ -66,7 +65,6 @@ class TestAppConfigModule(queueUrl: String,
         bucketName = hybridStoreBucketName
       ),
       s3GlobalPrefix = hybridStoreGlobalPrefix
-
     )
 
     RegistrarConfig(

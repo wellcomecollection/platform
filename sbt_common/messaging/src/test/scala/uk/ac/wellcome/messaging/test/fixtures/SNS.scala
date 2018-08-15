@@ -3,7 +3,7 @@ package uk.ac.wellcome.messaging.test.fixtures
 import com.amazonaws.services.sns.AmazonSNS
 import grizzled.slf4j.Logging
 import io.circe.generic.extras.JsonKey
-import io.circe.{Decoder, Json, ParsingFailure, yaml}
+import io.circe.{yaml, Decoder, Json, ParsingFailure}
 import org.scalatest.Matchers
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{SNSClientFactory, SNSConfig, SNSWriter}

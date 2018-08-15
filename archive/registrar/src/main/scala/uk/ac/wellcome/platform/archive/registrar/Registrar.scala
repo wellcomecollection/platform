@@ -23,13 +23,15 @@ import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VersionedHybridStore}
 import scala.util.{Failure, Success}
 
 class RegistrarWorker @Inject()(
-                                 snsClient: AmazonSNSAsync,
-                                 snsConfig: SNSConfig,
-                                 s3ClientConfig: S3ClientConfig,
-                                 messageStream: MessageStream[NotificationMessage, Object],
-                                 dataStore: VersionedHybridStore[StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]],
-                                 actorSystem: ActorSystem
-                               ) extends Worker[Done] {
+  snsClient: AmazonSNSAsync,
+  snsConfig: SNSConfig,
+  s3ClientConfig: S3ClientConfig,
+  messageStream: MessageStream[NotificationMessage, Object],
+  dataStore: VersionedHybridStore[StorageManifest,
+                                  EmptyMetadata,
+                                  ObjectStore[StorageManifest]],
+  actorSystem: ActorSystem
+) extends Worker[Done] {
 
   def run() = {
 
@@ -55,8 +57,7 @@ class RegistrarWorker @Inject()(
       .flatMapConcat(notification =>
         Source.fromFuture(
           StorageManifestFactory.create(notification.bagLocation)
-        )
-      )
+      ))
       .map(storageManifest => {
         dataStore.updateRecord(storageManifest.id.value)(
           ifNotExisting = (storageManifest, EmptyMetadata())
@@ -71,7 +72,7 @@ class RegistrarWorker @Inject()(
       .map(toJson(_))
       .map {
         case Success(json) => json
-        case Failure(e) => throw e
+        case Failure(e)    => throw e
       }
       .log("notification serialised")
       .via(SnsPublisher.flow(snsConfig.topicArn))
@@ -80,7 +81,8 @@ class RegistrarWorker @Inject()(
     messageStream.run("registrar", workFlow)
   }
 
-  private def getBagArchiveCompleteNotification(message: NotificationMessage) = {
+  private def getBagArchiveCompleteNotification(
+    message: NotificationMessage) = {
     fromJson[BagArchiveCompleteNotification](message.Message) match {
       case Success(location) => location
       case Failure(e) =>

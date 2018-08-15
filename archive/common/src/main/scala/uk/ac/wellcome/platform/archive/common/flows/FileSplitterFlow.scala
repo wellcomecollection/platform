@@ -10,24 +10,25 @@ object FileSplitterFlow {
     allowTruncation = true
   )
 
-  def apply(delimiter: String) = Flow[ByteString]
-    .via(framingDelimiter)
-    .map(_.utf8String)
-    .filter(_.nonEmpty)
-    .map(createTuple(_, delimiter))
+  def apply(delimiter: String) =
+    Flow[ByteString]
+      .via(framingDelimiter)
+      .map(_.utf8String)
+      .filter(_.nonEmpty)
+      .map(createTuple(_, delimiter))
 
   private def createTuple(fileChunk: String, delimiter: String) = {
     val splitChunk = fileChunk.split(delimiter).map(_.trim)
 
     splitChunk match {
       case Array(key: String, value: String) => (key, value)
-      case _ => throw MalformedLineException(
-        splitChunk.mkString(delimiter)
-      )
+      case _ =>
+        throw MalformedLineException(
+          splitChunk.mkString(delimiter)
+        )
     }
   }
 }
 
 case class MalformedLineException(line: String)
-  extends RuntimeException(
-    s"Malformed bag digest line: $line")
+    extends RuntimeException(s"Malformed bag digest line: $line")

@@ -8,7 +8,8 @@ object DynamoClientModule extends AbstractModule {
 
   @Singleton
   @Provides
-  def providesDynamoClient(dynamoClientConfig: DynamoClientConfig): AmazonDynamoDB =
+  def providesDynamoClient(
+    dynamoClientConfig: DynamoClientConfig): AmazonDynamoDB =
     DynamoClientFactory.create(
       region = dynamoClientConfig.region,
       endpoint = dynamoClientConfig.endpoint.getOrElse(""),
@@ -18,8 +19,8 @@ object DynamoClientModule extends AbstractModule {
 }
 
 case class DynamoClientConfig(
-                               accessKey: Option[String],
-                               secretKey: Option[String],
-                               endpoint: Option[String],
-                               region: String
-                             )
+  accessKey: Option[String],
+  secretKey: Option[String],
+  endpoint: Option[String],
+  region: String
+)
