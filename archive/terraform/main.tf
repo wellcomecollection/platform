@@ -148,7 +148,7 @@ module "archivist" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}"
+  service_name                     = "${local.namespace}_archivist"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -182,7 +182,7 @@ module "registrar" {
   namespace_id                     = "${aws_service_discovery_private_dns_namespace.namespace.id}"
   subnets                          = "${local.private_subnets}"
   vpc_id                           = "${local.vpc_id}"
-  service_name                     = "${local.namespace}"
+  service_name                     = "${local.namespace}_registrar"
   aws_region                       = "${var.aws_region}"
 
   min_capacity = 1
@@ -203,6 +203,16 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
+resource "aws_iam_role_policy" "registrar_task_sns" {
+  role   = "${module.registrar.task_role_name}"
+  policy = "${module.registrar_completed_topic.publish_policy}"
+}
+
+resource "aws_iam_role_policy" "registrar_task_sqs" {
+  role   = "${module.registrar.task_role_name}"
+  policy = "${data.aws_iam_policy_document.read_from_registrar_queue.json}"
+}
+
 resource "aws_iam_role_policy" "archivist_task_sns" {
   role   = "${module.archivist.task_role_name}"
   policy = "${module.registrar_topic.publish_policy}"
@@ -210,10 +220,10 @@ resource "aws_iam_role_policy" "archivist_task_sns" {
 
 resource "aws_iam_role_policy" "archivist_task_sqs" {
   role   = "${module.archivist.task_role_name}"
-  policy = "${data.aws_iam_policy_document.read_from_queue.json}"
+  policy = "${data.aws_iam_policy_document.read_from_archivist_queue.json}"
 }
 
-data "aws_iam_policy_document" "read_from_queue" {
+data "aws_iam_policy_document" "read_from_archivist_queue" {
   statement {
     actions = [
       "sqs:DeleteMessage",
@@ -223,6 +233,20 @@ data "aws_iam_policy_document" "read_from_queue" {
 
     resources = [
       "${module.archivist_queue.arn}",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "read_from_registrar_queue" {
+  statement {
+    actions = [
+      "sqs:DeleteMessage",
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility",
+    ]
+
+    resources = [
+      "${module.registrar_queue.arn}",
     ]
   }
 }

@@ -7,7 +7,7 @@ import akka.stream.alpakka.s3.scaladsl.{MultipartUploadResult, S3Client}
 import akka.stream.scaladsl.{Flow, Source}
 import akka.{Done, NotUsed}
 import grizzled.slf4j.Logging
-import uk.ac.wellcome.platform.archive.common.models.BagLocation
+import uk.ac.wellcome.platform.archive.common.models.{BagDigestItem, BagLocation}
 import uk.ac.wellcome.storage.ObjectLocation
 
 object ArchiveItemFlow extends Logging {
