@@ -7,7 +7,8 @@ import uk.ac.wellcome.platform.archive.registrar.modules.{AppConfigModule, Confi
 
 object Main extends WellcomeApp[RegistrarWorker, Done] with RegistrarModules {
   val appConfigModule = new AppConfigModule(args)
-  val worker = injector.getInstance(classOf[RegistrarWorker])
+
+  lazy val worker = injector.getInstance(classOf[RegistrarWorker])
 }
 
 trait RegistrarModules {
