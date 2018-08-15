@@ -21,6 +21,11 @@ class DisplayAbstractAgentV2Test
 
     val unidentifiedAgent = Unidentifiable(agent)
 
+    val ambiguouslyIdentifiedAgent = AmbiguouslyIdentified(
+      agent,
+      identifiers = otherIdentifiers
+    )
+
     val identifiedAgent = Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
@@ -42,6 +47,24 @@ class DisplayAbstractAgentV2Test
     it(
       "converts an Unidentifiable Agent to a DisplayAgentV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(unidentifiedAgent, includesIdentifiers = false) shouldBe expectedUnidentifiedAgent
+    }
+
+    it("converts an AmbiguouslyIdentified Agent to a DisplayAgentV2 (includesIdentifiers = true)") {
+      val expectedAgent = DisplayAgentV2(
+        id = None,
+        identifiers = Some(otherIdentifiers.map { DisplayIdentifierV2(_) }),
+        label = label
+      )
+
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedAgent,
+        includesIdentifiers = true) shouldBe expectedAgent
+    }
+
+    it("converts an AmbiguouslyIdentified Agent to a DisplayAgentV2 (includesIdentifiers = false)") {
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedAgent,
+        includesIdentifiers = false) shouldBe expectedUnidentifiedAgent
     }
 
     it(
@@ -81,6 +104,11 @@ class DisplayAbstractAgentV2Test
 
     val unidentifiedPerson = Unidentifiable(person)
 
+    val ambiguouslyIdentifiedPerson = AmbiguouslyIdentified(
+      person,
+      identifiers = otherIdentifiers
+    )
+
     val identifiedAgent = Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
@@ -104,6 +132,26 @@ class DisplayAbstractAgentV2Test
     it(
       "converts an Unidentifiable Person to a DisplayPersonV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(unidentifiedPerson, includesIdentifiers = false) shouldBe expectedUnidentifiedPerson
+    }
+
+    it("converts an AmbiguouslyIdentified Person to a DisplayPersonV2 (includesIdentifiers = true)") {
+      val expectedAgent = DisplayPersonV2(
+        id = None,
+        identifiers = Some(otherIdentifiers.map { DisplayIdentifierV2(_) }),
+        label = label,
+        prefix = Some(prefix),
+        numeration = Some(numeration)
+      )
+
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedPerson,
+        includesIdentifiers = true) shouldBe expectedAgent
+    }
+
+    it("converts an AmbiguouslyIdentified Person to a DisplayPersonV2 (includesIdentifiers = false)") {
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedPerson,
+        includesIdentifiers = false) shouldBe expectedUnidentifiedPerson
     }
 
     it(
@@ -140,6 +188,11 @@ class DisplayAbstractAgentV2Test
 
     val unidentifiedAgent = Unidentifiable(organisation)
 
+    val ambiguouslyIdentifiedOrganisation = AmbiguouslyIdentified(
+      organisation,
+      identifiers = otherIdentifiers
+    )
+
     val identifiedAgent = Identified(
       canonicalId = canonicalId,
       sourceIdentifier = sourceIdentifier,
@@ -162,6 +215,24 @@ class DisplayAbstractAgentV2Test
     it(
       "converts an Unidentifiable Organisation to a DisplayOrganisationV2 (includesIdentifiers = false)") {
       DisplayAbstractAgentV2(unidentifiedAgent, includesIdentifiers = false) shouldBe expectedUnidentifiedOrganisation
+    }
+
+    it("converts an AmbiguouslyIdentified Organisation to a DisplayOrganisationV2 (includesIdentifiers = true)") {
+      val expectedOrganisation = DisplayOrganisationV2(
+        id = None,
+        identifiers = Some(otherIdentifiers.map { DisplayIdentifierV2(_) }),
+        label = label
+      )
+
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedOrganisation,
+        includesIdentifiers = true) shouldBe expectedOrganisation
+    }
+
+    it("converts an AmbiguouslyIdentified Organisation to a DisplayOrganisationV2 (includesIdentifiers = false)") {
+      DisplayAbstractAgentV2(
+        ambiguouslyIdentifiedOrganisation,
+        includesIdentifiers = false) shouldBe expectedUnidentifiedOrganisation
     }
 
     it(

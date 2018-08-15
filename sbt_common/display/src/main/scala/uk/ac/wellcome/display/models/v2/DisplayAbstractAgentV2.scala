@@ -35,6 +35,12 @@ case object DisplayAbstractAgentV2 {
           identifiers = None,
           label = a.label
         )
+      case AmbiguouslyIdentified(a: Agent, identifiers: List[SourceIdentifier]) =>
+        DisplayAgentV2(
+          id = None,
+          identifiers = if (includesIdentifiers) Some(identifiers.map { DisplayIdentifierV2(_) }) else None,
+          label = a.label
+        )
       case Identified(
           agent: Agent,
           canonicalId,
@@ -74,6 +80,14 @@ case object DisplayAbstractAgentV2 {
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
+      case AmbiguouslyIdentified(p: Person, identifiers: List[SourceIdentifier]) =>
+        DisplayPersonV2(
+          id = None,
+          identifiers = if (includesIdentifiers) Some(identifiers.map { DisplayIdentifierV2(_) }) else None,
+          label = p.label,
+          prefix = p.prefix,
+          numeration = p.numeration
+        )
       case Identified(
           org: Organisation,
           canonicalId,
@@ -90,7 +104,17 @@ case object DisplayAbstractAgentV2 {
           label = org.label
         )
       case Unidentifiable(o: Organisation) =>
-        DisplayOrganisationV2(id = None, identifiers = None, label = o.label)
+        DisplayOrganisationV2(
+          id = None,
+          identifiers = None,
+          label = o.label
+        )
+      case AmbiguouslyIdentified(o: Organisation, identifiers: List[SourceIdentifier]) =>
+        DisplayOrganisationV2(
+          id = None,
+          identifiers = if (includesIdentifiers) Some(identifiers.map { DisplayIdentifierV2(_) }) else None,
+          label = o.label
+        )
     }
 }
 

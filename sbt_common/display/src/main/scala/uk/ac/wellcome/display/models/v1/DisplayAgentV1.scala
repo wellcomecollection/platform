@@ -32,7 +32,7 @@ case object DisplayAgentV1 {
       // Rather than writing and testing code to tease out the identified
       // bits here, error out -- the nature of the Miro data means we
       // should never hit this in practice.
-      case Identified(_, _, _, _) =>
+      case _ =>
         throw new IllegalArgumentException(
           s"Unexpectedly asked to convert identified agent $displayableAgent to DisplayAgentV1"
         )
