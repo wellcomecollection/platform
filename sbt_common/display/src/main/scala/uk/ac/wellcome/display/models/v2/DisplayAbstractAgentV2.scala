@@ -80,6 +80,14 @@ case object DisplayAbstractAgentV2 {
           label = p.label,
           prefix = p.prefix,
           numeration = p.numeration)
+      case AmbiguouslyIdentified(p: Person, identifiers: List[SourceIdentifier]) =>
+        DisplayPersonV2(
+          id = None,
+          identifiers = if (includesIdentifiers) Some(identifiers.map { DisplayIdentifierV2(_) }) else None,
+          label = p.label,
+          prefix = p.prefix,
+          numeration = p.numeration
+        )
       case Identified(
           org: Organisation,
           canonicalId,
