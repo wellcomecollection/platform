@@ -37,13 +37,17 @@ object DisplayItemV2 {
             if (includesIdentifiers)
               Some(identifiedItem.identifiers.map { DisplayIdentifierV2(_) })
             else None,
-          locations = identifiedItem.agent.locations.map { DisplayLocationV2(_) }
+          locations = identifiedItem.agent.locations.map {
+            DisplayLocationV2(_)
+          }
         )
       case unidentifiableItem: Unidentifiable[Item] =>
         DisplayItemV2(
           id = None,
           identifiers = None,
-          locations = unidentifiableItem.agent.locations.map { DisplayLocationV2(_) }
+          locations = unidentifiableItem.agent.locations.map {
+            DisplayLocationV2(_)
+          }
         )
     }
 
