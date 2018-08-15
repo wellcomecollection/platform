@@ -5,16 +5,17 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
+import uk.ac.wellcome.platform.archive.common.app.InjectedModules
 import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation, BagName}
 import uk.ac.wellcome.platform.archive.registrar._
 import uk.ac.wellcome.platform.archive.registrar.modules.TestAppConfigModule
-import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-trait Registrar extends AkkaS3 with Messaging with BagIt with LocalDynamoDb {
+trait Registrar extends AkkaS3 with Messaging with LocalVersionedHybridStore with BagIt with LocalDynamoDb {
 
   def sendNotification(bagLocation: BagLocation, queuePair: QueuePair) =
     sendNotificationToSQS(
@@ -85,13 +86,14 @@ trait Registrar extends AkkaS3 with Messaging with BagIt with LocalDynamoDb {
       )
 
       val worker = injector.getInstance(classOf[RegistrarWorker])
+
     }
 
     testWith((new RegistrarTestApp()).worker)
   }
 
   def withRegistrar[R](
-                        testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarWorker), R]) = {
+                        testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarWorker, Bucket, Table), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { storageBucket =>
@@ -99,7 +101,7 @@ trait Registrar extends AkkaS3 with Messaging with BagIt with LocalDynamoDb {
             withLocalDynamoDbTable { hybridDynamoTable =>
               withApp(storageBucket, hybridStoreBucket, hybridDynamoTable, queuePair, snsTopic) { registrar =>
                 testWith(
-                  (storageBucket, queuePair, snsTopic, registrar)
+                  (storageBucket, queuePair, snsTopic, registrar, hybridStoreBucket, hybridDynamoTable)
                 )
               }
             }

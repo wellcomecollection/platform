@@ -7,6 +7,7 @@ import org.scalatest.{FunSpec, Matchers}
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.monitoring.fixtures.MetricsSenderFixture
 import uk.ac.wellcome.platform.archive.registrar.fixtures.{Registrar => RegistrarFixture}
+import uk.ac.wellcome.platform.archive.registrar.models.{BagRegistrationCompleteNotification, StorageManifest, StorageManifestFactory}
 import uk.ac.wellcome.test.utils.ExtendedPatience
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,7 +25,7 @@ class RegistrarFeatureTest
 
   it("registers an archived BagIt bag from S3") {
     withRegistrar {
-      case (storageBucket, queuePair, topic, registrar) =>
+      case (storageBucket, queuePair, topic, registrar, hybridBucket, hybridTable) =>
         withBagNotification(queuePair, storageBucket) { bagLocation =>
           registrar.run()
 
@@ -38,14 +39,16 @@ class RegistrarFeatureTest
                 BagRegistrationCompleteNotification(storageManifest),
                 topic
               )
+
+              assertStored[StorageManifest](
+                hybridBucket,
+                hybridTable,
+                storageManifest.id.value,
+                storageManifest
+              )
             }
           }
         }
     }
   }
-
-  case class MalformedLineException(line: String)
-    extends RuntimeException(
-      s"Malformed bag digest line: $line")
-
 }

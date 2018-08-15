@@ -64,6 +64,24 @@ module "registrar_queue" {
   alarm_topic_arn = "${local.dlq_alarm_arn}"
 }
 
+module "registrar_completed_topic" {
+  source = "git::https://github.com/wellcometrust/terraform-modules.git//sns?ref=v1.0.0"
+  name   = "${local.namespace}_registrar_completed"
+}
+
+module "registrar_completed_queue" {
+  source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v9.1.0"
+  queue_name  = "${local.namespace}_registrar_completed_queue"
+  aws_region  = "${var.aws_region}"
+  account_id  = "${data.aws_caller_identity.current.account_id}"
+  topic_names = ["${module.registrar_completed_topic.name}"]
+
+  visibility_timeout_seconds = 43200
+  max_receive_count          = 3
+
+  alarm_topic_arn = "${local.dlq_alarm_arn}"
+}
+
 # Archive bucket
 
 # TODO: Add proper lifecycyle policy to prevent deletion and move to assets?
@@ -166,14 +184,19 @@ module "registrar" {
   vpc_id                           = "${local.vpc_id}"
   service_name                     = "${local.namespace}"
   aws_region                       = "${var.aws_region}"
-  max_capacity                     = 1
+
+  min_capacity = 1
+  max_capacity = 1
 
   env_vars = {
-    queue_url      = "${module.registrar_queue.id}"
-    archive_bucket = "${aws_s3_bucket.archive_storage.id}"
+    queue_url       = "${module.registrar_queue.id}"
+    archive_bucket  = "${aws_s3_bucket.archive_storage.id}"
+    topic_arn       = "${module.registrar_completed_topic.arn}"
+    vhs_bucket_name = "${module.vhs_archive_manifest.bucket_name}"
+    vhs_table_name  = "${module.vhs_archive_manifest.table_name}"
   }
 
-  env_vars_length = 2
+  env_vars_length = 5
 
   container_image   = "${local.registrar_container_image}"
   source_queue_name = "${module.registrar_queue.name}"

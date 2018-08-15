@@ -28,8 +28,8 @@ case class StorageManifest(
                             tagManifest: TagManifest,
                             locations: List[Location],
                             description: Option[BagDescription] = None,
-                            createdDate: Instant = Instant.now(),
-                            lastModifiedDate: Instant = Instant.now(),
+                            createdDate: Instant = Instant.ofEpochMilli(0),
+                            lastModifiedDate: Instant = Instant.ofEpochMilli(0),
                             version: BagVersion = BagVersion(1)
                           )
 
