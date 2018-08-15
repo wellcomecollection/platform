@@ -1,5 +1,6 @@
 package uk.ac.wellcome.platform.archive.registrar
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.{Logging, LoggingAdapter}
 import akka.stream.alpakka.sns.scaladsl.SnsPublisher
@@ -8,15 +9,14 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.sns.AmazonSNSAsync
-import com.google.inject.{AbstractModule, Injector, Provides}
-import grizzled.slf4j.Logging
+import com.google.inject._
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.sns.{NotificationMessage, SNSConfig}
 import uk.ac.wellcome.platform.archive.common.MessageStream
 import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation}
 import uk.ac.wellcome.platform.archive.common.modules.S3ClientConfig
 import uk.ac.wellcome.platform.archive.registrar.models._
-import uk.ac.wellcome.storage.dynamo.{DynamoClientFactory, _}
+import uk.ac.wellcome.storage.dynamo._
 import uk.ac.wellcome.storage.s3.{S3ClientFactory, S3StorageBackend}
 import uk.ac.wellcome.storage.vhs.{EmptyMetadata, VHSConfig, VersionedHybridStore}
 import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
@@ -24,30 +24,19 @@ import uk.ac.wellcome.storage.{ObjectLocation, ObjectStore}
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-
-trait Registrar extends Logging {
-  val injector: Injector
+class RegistrarWorker @Inject()(
+                                 snsClient: AmazonSNSAsync,
+                                 snsConfig: SNSConfig,
+                                 s3ClientConfig: S3ClientConfig,
+                                 messageStream: MessageStream[NotificationMessage, Object],
+                                 dataStore: VersionedHybridStore[StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]],
+                                 actorSystem: ActorSystem
+                               ) extends Worker[Done] {
 
   def run() = {
-    val messageStream =
-      injector.getInstance(classOf[MessageStream[NotificationMessage, Object]])
 
-    val snsConfig = injector.getInstance(classOf[SNSConfig])
-    val s3ClientConfig = injector.getInstance(classOf[S3ClientConfig])
-    implicit val snsClient: AmazonSNSAsync =
-      injector.getInstance(classOf[AmazonSNSAsync])
-    val dataStore =
-      injector.getInstance(
-        classOf[
-          VersionedHybridStore[
-            StorageManifest,
-            EmptyMetadata,
-            ObjectStore[StorageManifest]
-            ]
-          ])
-
-    implicit val actorSystem: ActorSystem =
-      injector.getInstance(classOf[ActorSystem])
+    implicit val client = snsClient
+    implicit val system = actorSystem
     implicit val adapter: LoggingAdapter =
       Logging(actorSystem.eventStream, "customLogger")
     implicit val materializer = ActorMaterializer()
@@ -102,6 +91,7 @@ trait Registrar extends Logging {
           s"Failed to get object location from notification: ${e.getMessage}"
         )
     }
+
   }
 }
 
@@ -206,38 +196,31 @@ case class BagRegistrationCompleteNotification(storageManifest: StorageManifest)
 
 object VHSModule extends AbstractModule {
   @Provides
-  def providesHybridStore(hybridStoreConfig: HybridStoreConfig, actorSystem: ActorSystem):
-  VersionedHybridStore[StorageManifest, EmptyMetadata, ObjectStore[StorageManifest]] = {
+  def providesVHSConfig(hybridStoreConfig: HybridStoreConfig) = {
+    VHSConfig(
+      dynamoConfig = hybridStoreConfig.dynamoConfig,
+      s3Config = hybridStoreConfig.s3Config,
+      globalS3Prefix = hybridStoreConfig.s3GlobalPrefix
+    )
+  }
 
+  @Provides
+  def providesS3StorageBackend(actorSystem: ActorSystem, hybridStoreConfig: HybridStoreConfig) = {
     val s3Client = S3ClientFactory.create(
       region = hybridStoreConfig.s3ClientConfig.region,
       endpoint = hybridStoreConfig.s3ClientConfig.endpoint.getOrElse(""),
       accessKey = hybridStoreConfig.s3ClientConfig.accessKey.getOrElse(""),
       secretKey = hybridStoreConfig.s3ClientConfig.secretKey.getOrElse("")
     )
-
-    val dynamoClient = DynamoClientFactory.create(
-      region = hybridStoreConfig.dynamoClientConfig.region,
-      endpoint = hybridStoreConfig.dynamoClientConfig.endpoint.getOrElse(""),
-      accessKey = hybridStoreConfig.dynamoClientConfig.accessKey.getOrElse(""),
-      secretKey = hybridStoreConfig.dynamoClientConfig.secretKey.getOrElse("")
-    )
-
     implicit val executionContext = actorSystem.dispatcher
-    implicit val storageBackend = new S3StorageBackend(s3Client)
+    new S3StorageBackend(s3Client)(executionContext)
+  }
 
-    val vhsConfig = VHSConfig(
-      dynamoConfig = hybridStoreConfig.dynamoConfig,
-      s3Config = hybridStoreConfig.s3Config,
-      globalS3Prefix = hybridStoreConfig.s3GlobalPrefix
-    )
+  @Provides
+  def providesStorageManifestObjectStore(s3StorageBackend: S3StorageBackend, actorSystem: ActorSystem) = {
+    implicit val executionContext = actorSystem.dispatcher
+    implicit val storageBackend = s3StorageBackend
 
-    val objectStore = ObjectStore[StorageManifest]
-
-    new VersionedHybridStore[
-      StorageManifest,
-      EmptyMetadata,
-      ObjectStore[StorageManifest]
-      ](vhsConfig, objectStore, dynamoClient)
+    ObjectStore[StorageManifest]
   }
 }

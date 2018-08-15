@@ -1,20 +1,20 @@
 package uk.ac.wellcome.platform.archive.registrar.fixtures
 
-import com.google.inject.Guice
+import com.amazonaws.services.dynamodbv2.model._
+import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
 import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
 import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation, BagName}
-import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule}
-import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
+import uk.ac.wellcome.platform.archive.registrar._
+import uk.ac.wellcome.platform.archive.registrar.modules.TestAppConfigModule
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb
+import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
 import uk.ac.wellcome.test.fixtures.TestWith
 
-import uk.ac.wellcome.json.JsonUtil._
-
-trait Registrar extends AkkaS3 with Messaging with BagIt {
+trait Registrar extends AkkaS3 with Messaging with BagIt with LocalDynamoDb {
 
   def sendNotification(bagLocation: BagLocation, queuePair: QueuePair) =
     sendNotificationToSQS(
@@ -50,33 +50,59 @@ trait Registrar extends AkkaS3 with Messaging with BagIt {
     testWith(bagLocation)
   }
 
-  def withApp[R](storageBucket: Bucket, queuePair: QueuePair, topicArn: Topic)(
-    testWith: TestWith[RegistrarApp, R]) = {
-    val registrar = new RegistrarApp {
-      val injector = Guice.createInjector(
-        new TestAppConfigModule(
-          queuePair.queue.url,
-          storageBucket.name,
-          topicArn.arn),
-        ConfigModule,
-        AkkaModule,
-        AkkaS3ClientModule,
-        CloudWatchClientModule,
-        SQSClientModule,
-        SNSAsyncClientModule
+  override def createTable(table: Table) = {
+    dynamoDbClient.createTable(
+      new CreateTableRequest()
+        .withTableName(table.name)
+        .withKeySchema(
+          new KeySchemaElement()
+            .withAttributeName("id")
+            .withKeyType(KeyType.HASH))
+        .withAttributeDefinitions(
+          new AttributeDefinition()
+            .withAttributeName("id")
+            .withAttributeType("S")
+        )
+        .withProvisionedThroughput(new ProvisionedThroughput()
+          .withReadCapacityUnits(1L)
+          .withWriteCapacityUnits(1L))
+    )
+
+    table
+  }
+
+  def withApp[R](storageBucket: Bucket, hybridStoreBucket: Bucket, hybridStoreTable: Table, queuePair: QueuePair, topicArn: Topic)(
+    testWith: TestWith[RegistrarWorker, R]) = {
+
+    class RegistrarTestApp extends InjectedModules with RegistrarModules {
+      val appConfigModule = new TestAppConfigModule(
+        queuePair.queue.url,
+        storageBucket.name,
+        topicArn.arn,
+        hybridStoreTable.name,
+        hybridStoreBucket.name,
+        "archive"
       )
+
+      val worker = injector.getInstance(classOf[RegistrarWorker])
     }
-    testWith(registrar)
+
+    testWith((new RegistrarTestApp()).worker)
   }
 
   def withRegistrar[R](
-                        testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp), R]) = {
+                        testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarWorker), R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic { snsTopic =>
         withLocalS3Bucket { storageBucket =>
-          withApp(storageBucket, queuePair, snsTopic) { registrar =>
-            testWith(
-              (storageBucket, queuePair, snsTopic, registrar))
+          withLocalS3Bucket { hybridStoreBucket =>
+            withLocalDynamoDbTable { hybridDynamoTable =>
+              withApp(storageBucket, hybridStoreBucket, hybridDynamoTable, queuePair, snsTopic) { registrar =>
+                testWith(
+                  (storageBucket, queuePair, snsTopic, registrar)
+                )
+              }
+            }
           }
         }
       }
