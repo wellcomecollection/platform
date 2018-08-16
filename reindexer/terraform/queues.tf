@@ -1,6 +1,6 @@
-module "reindexer_queue" {
+module "reindex_request_creator_queue" {
   source      = "git::https://github.com/wellcometrust/terraform-modules.git//sqs?ref=v10.2.3"
-  queue_name  = "reindexer_queue"
+  queue_name  = "reindex_request_creator_queue"
   aws_region  = "${var.aws_region}"
   account_id  = "${data.aws_caller_identity.current.account_id}"
   topic_names = ["${module.reindex_jobs_topic.name}"]

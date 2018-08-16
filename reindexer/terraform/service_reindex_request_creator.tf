@@ -3,8 +3,8 @@ module "reindex_request_creator" {
   service_name = "reindex_request_creator"
 
   task_desired_count = "0"
-  source_queue_name  = "${module.reindexer_queue.name}"
-  source_queue_arn   = "${module.reindexer_queue.arn}"
+  source_queue_name  = "${module.reindex_request_creator_queue.name}"
+  source_queue_arn   = "${module.reindex_request_creator_queue.arn}"
 
   container_image    = "${local.reindex_request_creator_container_image}"
   security_group_ids = ["${aws_security_group.service_egress_security_group.id}"]
@@ -13,7 +13,7 @@ module "reindex_request_creator" {
   memory = 2048
 
   env_vars = {
-    reindex_jobs_queue_id      = "${module.reindexer_queue.id}"
+    reindex_jobs_queue_id      = "${module.reindex_request_creator_queue.id}"
     reindex_requests_topic_arn = "${module.reindex_requests_topic.arn}"
     metrics_namespace          = "reindex_request_creator"
   }
