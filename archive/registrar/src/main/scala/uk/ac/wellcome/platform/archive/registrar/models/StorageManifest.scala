@@ -1,25 +1,22 @@
 package uk.ac.wellcome.platform.archive.registrar.models
 
-import java.net.URL
 import java.time.Instant
-
-import uk.ac.wellcome.storage.ObjectLocation
 
 // Value classes
 
-class ChecksumAlgorithm(val underlying: String) extends AnyVal
+case class ChecksumAlgorithm(val value: String)
 
-class BagId(val underlying: String) extends AnyVal
+case class BagId(val value: String)
 
-class BagDescription(val underlying: String) extends AnyVal
+case class BagDescription(val value: String)
 
-class BagVersion(val underlying: Int) extends AnyVal
+case class BagVersion(val value: Int)
 
-class Checksum(val underlying: String) extends AnyVal
+case class Checksum(val value: String)
 
-class BagFilePath(val underlying: String) extends AnyVal
+case class BagFilePath(val value: String)
 
-class BagSourceId(val underlying: String) extends AnyVal
+case class BagSourceId(val value: String)
 
 // StorageManifest
 
@@ -27,13 +24,13 @@ case class StorageManifest(
   id: BagId,
   source: SourceIdentifier,
   identifiers: List[SourceIdentifier],
-  manifest: Manifest,
+  manifest: FileManifest,
   tagManifest: TagManifest,
   locations: List[Location],
-  description: Option[BagDescription],
-  createdDate: Instant,
-  lastModifiedDate: Instant,
-  version: BagVersion
+  description: Option[BagDescription] = None,
+  createdDate: Instant = Instant.ofEpochMilli(0),
+  lastModifiedDate: Instant = Instant.ofEpochMilli(0),
+  version: BagVersion = BagVersion(1)
 )
 
 // Manifest
@@ -56,7 +53,7 @@ case class TagManifest(
 // Identifier
 
 case class SourceIdentifier(identifierType: IdentifierType,
-                            ontologyType: String,
+                            ontologyType: String = "Identifier",
                             value: String)
 
 case class IdentifierType(
@@ -76,12 +73,6 @@ case class DigitalLocation(
   ontologyType: String = "DigitalLocation"
 ) extends Location
 
-case class PhysicalLocation(
-  locationType: LocationType,
-  label: String,
-  ontologyType: String = "PhysicalLocation"
-) extends Location
-
 case class LocationType(
   id: String,
   label: String,
@@ -94,18 +85,3 @@ case class BagDigestFile(
   checksum: Checksum,
   path: BagFilePath
 )
-
-// -----
-
-case class ArchiveRequestInfo(
-  requesterId: String,
-  requestedAt: Instant,
-  callback: Callback
-)
-
-case class ArchiveRequestNotification(
-  ingestLocation: ObjectLocation,
-  requestInfo: ArchiveRequestInfo
-)
-
-case class Callback(url: URL)

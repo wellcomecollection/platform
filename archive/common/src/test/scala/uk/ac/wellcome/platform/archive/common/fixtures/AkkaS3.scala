@@ -1,4 +1,4 @@
-package uk.ac.wellcome.platform.archive.common.messaging.fixtures
+package uk.ac.wellcome.platform.archive.common.fixtures
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer

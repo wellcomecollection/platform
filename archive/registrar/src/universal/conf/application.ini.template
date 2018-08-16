@@ -2,3 +2,5 @@
 --topic-arn=${topic_arn}
 --upload-namespace=${archive_bucket}
 --metrics-namespace=registrar
+--hybrid-dynamo-table-name=${vhs_table_name}
+--hybrid-s3-bucket-name=${vhs_bucket_name}

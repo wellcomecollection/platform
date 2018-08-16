@@ -5,6 +5,7 @@ import java.util.zip.ZipFile
 import akka.stream.scaladsl.{Flow, Framing, Source}
 import akka.util.ByteString
 import grizzled.slf4j.Logging
+import uk.ac.wellcome.platform.archive.common.models.{BagDigestItem, BagName}
 import uk.ac.wellcome.storage.ObjectLocation
 
 object BagDigestItemFlow extends Logging {
@@ -51,8 +52,6 @@ object BagDigestItemFlow extends Logging {
     }
   }
 }
-
-case class BagDigestItem(checksum: String, location: ObjectLocation)
 
 case class MalformedBagDigestException(line: String, bagName: BagName)
     extends RuntimeException(

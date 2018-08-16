@@ -4,19 +4,19 @@ import com.google.inject.{AbstractModule, Provides}
 import uk.ac.wellcome.messaging.sns.SNSConfig
 import uk.ac.wellcome.messaging.sqs.SQSConfig
 import uk.ac.wellcome.monitoring.MetricsConfig
-import uk.ac.wellcome.platform.archive.common.modules.{
-  CloudwatchClientConfig,
-  S3ClientConfig,
-  SQSClientConfig,
-  SnsClientConfig
-}
+import uk.ac.wellcome.platform.archive.common.modules._
 import uk.ac.wellcome.platform.archive.registrar.models.RegistrarConfig
+import uk.ac.wellcome.storage.dynamo.DynamoConfig
+import uk.ac.wellcome.storage.s3.S3Config
 
 import scala.concurrent.duration._
 
 class TestAppConfigModule(queueUrl: String,
                           bucketName: String,
-                          topicArn: String)
+                          topicArn: String,
+                          hybridStoreTableName: String,
+                          hybridStoreBucketName: String,
+                          hybridStoreGlobalPrefix: String)
     extends AbstractModule {
   @Provides
   def providesAppConfig = {
@@ -49,6 +49,24 @@ class TestAppConfigModule(queueUrl: String,
     )
     val snsConfig = SNSConfig(topicArn)
 
+    val hybridStoreConfig = HybridStoreConfig(
+      dynamoClientConfig = DynamoClientConfig(
+        accessKey = Some("access"),
+        secretKey = Some("secret"),
+        region = "localhost",
+        endpoint = Some("http://localhost:45678")
+      ),
+      s3ClientConfig = s3ClientConfig,
+      dynamoConfig = DynamoConfig(
+        table = hybridStoreTableName,
+        maybeIndex = None
+      ),
+      s3Config = S3Config(
+        bucketName = hybridStoreBucketName
+      ),
+      s3GlobalPrefix = hybridStoreGlobalPrefix
+    )
+
     RegistrarConfig(
       s3ClientConfig,
       cloudwatchClientConfig,
@@ -56,6 +74,7 @@ class TestAppConfigModule(queueUrl: String,
       sqsConfig,
       snsClientConfig,
       snsConfig,
+      hybridStoreConfig,
       metricsConfig
     )
   }
