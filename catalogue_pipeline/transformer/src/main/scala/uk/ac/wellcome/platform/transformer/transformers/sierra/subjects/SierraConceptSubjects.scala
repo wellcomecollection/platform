@@ -42,9 +42,9 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
   //      else is unidentified.
   //
   def getSubjectswithAbstractConcepts(bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
-    getSubjectswithAbstractConcepts(bibData, "650") ++ getSubjectswithAbstractConcepts(bibData, "648") ++ getSubjectswithAbstractConcepts(bibData, "651")
+    getSubjectsForMarcTag(bibData, "650") ++ getSubjectsForMarcTag(bibData, "648") ++ getSubjectsForMarcTag(bibData, "651")
 
-  private def getSubjectswithAbstractConcepts(bibData: SierraBibData, marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
+  private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
 
     // Second indicator 7 means that the subject authority is something other
@@ -59,7 +59,7 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
       }
 
       val label = getLabel(primarySubfields, subdivisionSubfields)
-      val concepts: List[MaybeDisplayable[AbstractConcept]] = getAbstractConceptPrimaryConcept(
+      val concepts: List[MaybeDisplayable[AbstractConcept]] = getPrimaryConcept(
         primarySubfields,
         varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
@@ -76,7 +76,7 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
     }
   }
 
-  private def getAbstractConceptPrimaryConcept(
+  private def getPrimaryConcept(
                                                 primarySubfields: List[MarcSubfield],
                                                 varField: VarField): List[MaybeDisplayable[AbstractConcept]] = {
     primarySubfields.map { subfield =>
