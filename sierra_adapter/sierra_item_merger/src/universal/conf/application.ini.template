@@ -1,3 +1,4 @@
+-aws.sqs.parallelism=${sqs_parallelism}
 -aws.sqs.queue.url=${windows_queue_url}
 -aws.metrics.namespace=${metrics_namespace}
 -aws.vhs.s3.bucketName=${bucket_name}
