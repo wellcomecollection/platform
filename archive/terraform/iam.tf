@@ -45,6 +45,7 @@ data "aws_iam_policy_document" "archive_get" {
     ]
 
     resources = [
+      "arn:aws:s3:::${local.archive_bucket_name}",
       "arn:aws:s3:::${local.archive_bucket_name}/*",
     ]
   }
@@ -67,6 +68,7 @@ data "aws_iam_policy_document" "ingest_get" {
   statement {
     actions = [
       "s3:GetObject*",
+      "s3:ListBucket",
     ]
 
     resources = [
