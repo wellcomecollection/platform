@@ -37,12 +37,12 @@ We will build a storage service based on Amazon S3 and DynamoDB.
 
 ### Ingest
 
-We'll need to consider integrations with other services such as:
+We'll need to integrate with other services such as:
 
 - [Archivematica](https://www.archivematica.org/en/) - for born-digital workflow
 - [Goobi](https://www.intranda.com/en/digiverso/goobi/goobi-overview/) - for digitisation workflow
 
-These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket.
+These services will need to provide accessions in the BagIt bag format, gzip-compressed and uploaded to an S3 bucket. They should then call an ingest API and provide a callback URL that will be notified when the ingest has succeeded or failed.
 
 ### Storage
 
@@ -77,7 +77,7 @@ Access copies may be in the same format as the archival copy, or a derivative fo
 
 #### Storage manifest
 
-The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We may provide an API on top of storage manifests in the future, as part of an authenticated storage API.
+The storage manifest provides a pointer to the stored accession and enough other metadata to provide a consumer with a comprehensive view of the contents of the accession. It is defined using types from a new Storage ontology and serialised using JSON-LD. We will use this to provide resources that describe stored bags, as part of the authenticated storage API.
 
 The manifest does not contain metadata from the METS files within a bag, it is purely a storage level index. It will contain data from the `bag-info.txt` file and information about where the assets have been stored. METS files will be separately ingested in the catalogue and reporting pipelines.
 
@@ -93,6 +93,45 @@ This event stream can be used to trigger downstream tasks, for example:
 The Versioned Hybrid Store also includes the ability to "reindex" the entire data store. This triggers an update event for every item in the data store, allowing you to re-run a downstream pipeline.
 
 ## Examples
+
+### Ingest
+
+Request:
+
+```http
+POST /bags
+Content-Type: application/json
+
+{
+  "type": "Ingest",
+  "ingestType": {
+    "id": "digitised",
+    "type": "IngestType"
+  },
+  "location": {
+    "type": "DigitalLocation",
+    "locationType": {
+      "id": "aws-s3-standard",
+      "type": "LocationType"
+    },
+    "url": "s3://source-bucket/source-path/source-bag.zip"
+  },
+  "callback": {
+    "type": "DigitalLocation",
+    "locationType": {
+      "id": "callback-url",
+      "type": "LocationType"
+    },
+    "url": "https://workflow.wellcomecollection.org/callback?id=b1234567"
+  }
+}
+```
+
+Response:
+
+```http
+202 ACCEPTED
+```
 
 ### Digitised content
 
@@ -143,7 +182,7 @@ b22036593/
 
 The existing METS structure should be change to reflect the following. The main change is removing data from Preservica and replacing it with PREMIS object metadata.
 
-```
+```xml
 <?xml version='1.0' encoding='utf-8'?>
 <mets:mets xmlns:dv="http://dfg-viewer.de/" xmlns:mets="http://www.loc.gov/METS/" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:premis="http://www.loc.gov/premis/v3" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-5.xsd http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/standards/premis/ http://www.loc.gov/standards/premis/v2/premis-v2-0.xsd http://www.loc.gov/standards/mix/ http://www.loc.gov/standards/mix/mix.xsd">
   <mets:metsHdr CREATEDATE="2016-01-06T07:36:48">
@@ -209,9 +248,17 @@ The existing METS structure should be change to reflect the following. The main 
 </mets:mets>
 ```
 
-#### Storage manifest
+#### API
 
+Request:
+
+```http
+GET /bags/xx-xx-xx-xx
 ```
+
+Response:
+
+```json
 {
   "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
   "type": "Bag",
@@ -292,7 +339,7 @@ The existing METS structure should be change to reflect the following. The main 
       }
     ]
   },
-  locations: [
+  "locations": [
     {
       "type": "DigitalLocation",
       "locationType": {
@@ -364,9 +411,17 @@ GC253_1046-a2870a2d-5111-403f-b092-45c569ef9476/
 
 The METS file will be as provided out of the box by Archivematica.
 
-#### Storage manifest
+#### API
 
+Request:
+
+```http
+GET /bags/yy-yy-yy-yy
 ```
+
+Response:
+
+```json
 {
   "@context": "https://api.wellcomecollection.org/storage/v1/context.json",
   "type": "Bag",
@@ -442,7 +497,7 @@ The METS file will be as provided out of the box by Archivematica.
       }
     ]
   },
-  locations: [
+  "locations": [
     {
       "type": "DigitalLocation",
       "locationType": {
