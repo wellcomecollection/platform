@@ -6,20 +6,15 @@ resource "aws_api_gateway_rest_api" "archive_asset_lookup" {
   name = "archive_asset_lookup"
   description = "API"
   body = "${data.template_file.archive_api_swagger.rendered}"
-}
-
-resource "aws_iam_role_policy" "archive_asset_apigw" {
-  role = "${module.lambda_archive_asset_lookup.role_name}"
-  policy = <<EOF
+  policy = << POLICY
 {
   "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
+      "Principal": "*",
       "Action": "execute-api:Invoke",
-      "Resource": [
-        "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.archive_asset_lookup.id}/*/*/*"
-      ],
+      "Resource": "*",
       "Condition": {
         "IpAddress": {
           "aws:SourceIp": [
@@ -31,7 +26,7 @@ resource "aws_iam_role_policy" "archive_asset_apigw" {
     }
   ]
 }
-  EOF
+  POLICY
 }
 
 //resource "aws_api_gateway_resource" "proxy" {

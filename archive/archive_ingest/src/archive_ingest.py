@@ -5,6 +5,7 @@ Receives a message to ingest a bag giving the URL and publishes the archive even
 
 import os
 
+import boto3
 import daiquiri
 import json
 from urllib.parse import urlparse
@@ -40,12 +41,12 @@ def main(event, _ctx=None, sns_client=None):
     bagURL = event['bagURL']
 
     message = json.dumps(archive_bag_message(bagURL))
-    logger.debug(message)
+    logger.debug(f"sns-message: {message}")
 
     topic_arn = os.environ['INGEST_TOPIC_ARN']
     topic_name = topic_arn.split(":")[-1]
 
-    # sns_client = sns_client or boto3.client('sns')
+    sns_client = sns_client or boto3.client('sns')
 
     publish_sns_message(
             sns_client=sns_client,
@@ -53,3 +54,4 @@ def main(event, _ctx=None, sns_client=None):
             message=message,
             subject=f'source: archive_ingest ({topic_name})'
     )
+    logger.debug(f"published: {message} to {topic_arn}")
