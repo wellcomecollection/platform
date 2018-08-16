@@ -409,7 +409,8 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it(
-      "fails the transform if there are multiple distinct identifiers in subfield $$0") {
+      "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
+      val name = "Darren the Dill"
       val varFields = List(
         VarField(
           fieldTag = "p",
@@ -417,14 +418,22 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
           indicator1 = "",
           indicator2 = "",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Darren the Dill"),
+            MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = "lcsh9069541"),
             MarcSubfield(tag = "0", content = "lcsh3384149")
           )
         )
       )
 
-      assertTransformFails(varFields = varFields)
+      val expectedContributors = List(
+        Contributor(
+          agent = Unidentifiable(Person(label = name))
+        )
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
     }
   }
 
@@ -626,7 +635,8 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
     }
 
     it(
-      "fails the transform if there are multiple distinct identifiers in subfield $$0") {
+      "does not identify the contributor if there are multiple distinct identifiers in subfield $$0") {
+      val name = "Luke the lime"
       val varFields = List(
         VarField(
           fieldTag = "p",
@@ -634,14 +644,22 @@ class SierraContributorsTest extends FunSpec with Matchers with SierraDataUtil {
           indicator1 = "",
           indicator2 = "",
           subfields = List(
-            MarcSubfield(tag = "a", content = "Luke the lime"),
+            MarcSubfield(tag = "a", content = name),
             MarcSubfield(tag = "0", content = "lcsh3349285"),
             MarcSubfield(tag = "0", content = "lcsh9059917")
           )
         )
       )
 
-      assertTransformFails(varFields = varFields)
+      val expectedContributors = List(
+        Contributor(
+          agent = Unidentifiable(Organisation(label = name))
+        )
+      )
+
+      transformAndCheckContributors(
+        varFields = varFields,
+        expectedContributors = expectedContributors)
     }
   }
 
