@@ -6,7 +6,10 @@ module "lambda_update_service_list" {
 
   name        = "update_service_list"
   description = "Publish ECS service status summary to S3"
-  timeout     = 60
+
+  # We've seen timeouts at 60 seconds on these Lambdas, so set the max
+  # timeout to make a timeout as unlikely as possible.
+  timeout     = 300
 
   environment_variables = {
     BUCKET_NAME     = "${var.dashboard_bucket}"
@@ -16,7 +19,7 @@ module "lambda_update_service_list" {
 
   alarm_topic_arn = "${var.lambda_error_alarm_arn}"
 
-  log_retention_in_days = 30
+  log_retention_in_days = 14
 }
 
 module "trigger_update_service_list" {
