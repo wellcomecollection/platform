@@ -413,19 +413,18 @@ describe("Subjects from 650, 648 and 651 tags"){
           Unidentifiable(Person(label = "David Attenborough")))))
     }
 
-    // TODO: re-enable once we're sure how dates should be rendered
-    ignore("returns subjects for tag 600 with subfields a and d") {
+    it("returns subjects for tag 600 with subfields a and d") {
       val sierraBibData = bibData(
         "600",
         List(
-          MarcSubfield(tag = "a", content = "David Attenborough"),
-          MarcSubfield(tag = "d", content = "1800's")
+          MarcSubfield(tag = "a", content = "Rita Levi Montalcini"),
+          MarcSubfield(tag = "d", content = "22 April 1909 – 30 December 2012")
         ))
 
       transformer.getSubjects(sierraBibData) shouldBe List(Subject(
-        label = "David Attenborough",
+        label = "Rita Levi Montalcini, 22 April 1909 – 30 December 2012",
         concepts = List(
-          Unidentifiable(Person(label = "David Attenborough")))))
+          Unidentifiable(Person(label = "Rita Levi Montalcini")))))
     }
 
     it("returns subjects for tag 600 with subfields a and multiple e") {

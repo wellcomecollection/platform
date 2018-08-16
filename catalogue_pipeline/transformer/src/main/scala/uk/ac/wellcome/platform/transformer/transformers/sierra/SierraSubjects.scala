@@ -86,7 +86,7 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
       val subfields = varField.subfields
 
       val person = getPerson(subfields)
-      val label = getPersonSubjectLabel(person, getRoles(subfields))
+      val label = getPersonSubjectLabel(person, getRoles(subfields), getDates(subfields))
       Subject(
         label = label,
         concepts = List(identifyPerson(person, varField))
@@ -94,9 +94,9 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     }
   }
 
-  private def getPersonSubjectLabel(person: Person, roles: List[String]) = {
+  private def getPersonSubjectLabel(person: Person, roles: List[String], dates: Option[String]) = {
     val spaceSeparated = (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
-    (List(spaceSeparated) ++ roles).mkString(", ")
+    (List(spaceSeparated) ++ dates ++ roles).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -138,4 +138,5 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
   }
 
   private def getRoles(secondarySubfields: List[MarcSubfield]) = secondarySubfields.collect{case MarcSubfield("e", role) => role}
+  private def getDates(secondarySubfields: List[MarcSubfield]) = secondarySubfields.find(_.tag == "d").map(_.content)
 }
