@@ -29,7 +29,6 @@ module "lambda_archive_asset_lookup" {
   log_retention_in_days = 30
 }
 
-
 resource "aws_lambda_permission" "archive_ingest_apigw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
