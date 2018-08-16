@@ -76,7 +76,7 @@ class SierraConceptsTest extends FunSpec with Matchers {
     )
   }
 
-  it("ignores multiple instances of subfield 0 im the otherIdentifiers") {
+  it("ignores multiple instances of subfield 0 in the otherIdentifiers") {
     val concept = Concept(label = "Hitchhiking horses hurry home")
 
     val maybeIdentifiedConcept = transformer.identifyPrimaryConcept[Concept](

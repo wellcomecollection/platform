@@ -165,8 +165,10 @@ trait SierraContributors extends MarcUtils {
       case MarcSubfield("0", content) => content.replaceAll("[.,\\s]", "")
     }
 
+    // If we get exactly one value, we can use it to identify the record.
+    // Some records have multiple instances of subfield $0 (it's a repeatable
+    // field in the MARC spec).
     codes.distinct match {
-      case Nil => Unidentifiable(agent)
       case Seq(code) => {
         val sourceIdentifier = SourceIdentifier(
           identifierType = IdentifierType("lc-names"),
@@ -178,9 +180,7 @@ trait SierraContributors extends MarcUtils {
           sourceIdentifier = sourceIdentifier
         )
       }
-      case _ =>
-        throw TransformerException(
-          s"Multiple identifiers in subfield $$0: $codes")
+      case _ => Unidentifiable(agent)
     }
   }
 }
