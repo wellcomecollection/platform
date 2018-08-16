@@ -16,10 +16,10 @@ trait SierraPersonSubjects extends MarcUtils with SierraAgents {
   //  - subfield $c populates the person prefixes
   //
   // The label is constructed concatenating subfields $a, $b, $c, $d, $e,
-  // where $d and $e represent the persons dates and roles respectively
+  // where $d and $e represent the person's dates and roles respectively
   //
   // The person can be identified if there is an identifier in subfield $0 and the second indicator is "0".
-  // If second indicator is "2" we don't expose the identifier for now
+  // If second indicator is anything other than 0, we don't expose the identifier for now
   //
   def getSubjectsWithPerson(bibData: SierraBibData): List[Subject[MaybeDisplayable[Person]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = "600")

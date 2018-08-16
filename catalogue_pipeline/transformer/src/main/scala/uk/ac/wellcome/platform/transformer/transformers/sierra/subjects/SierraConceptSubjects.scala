@@ -42,7 +42,9 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
   //      else is unidentified.
   //
   def getSubjectswithAbstractConcepts(bibData: SierraBibData): List[Subject[MaybeDisplayable[AbstractConcept]]] =
-    getSubjectsForMarcTag(bibData, "650") ++ getSubjectsForMarcTag(bibData, "648") ++ getSubjectsForMarcTag(bibData, "651")
+    getSubjectsForMarcTag(bibData, "650") ++
+      getSubjectsForMarcTag(bibData, "648") ++
+      getSubjectsForMarcTag(bibData, "651")
 
   private def getSubjectsForMarcTag(bibData: SierraBibData, marcTag: String): List[Subject[MaybeDisplayable[AbstractConcept]]] = {
     val marcVarFields = getMatchingVarFields(bibData, marcTag = marcTag)
