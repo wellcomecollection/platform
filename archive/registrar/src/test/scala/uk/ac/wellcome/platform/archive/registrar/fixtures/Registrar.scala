@@ -7,13 +7,28 @@ import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
-import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation, BagName}
+import uk.ac.wellcome.platform.archive.common.fixtures.{
+  AkkaS3,
+  BagIt,
+  FileEntry
+}
+import uk.ac.wellcome.platform.archive.common.models.{
+  BagArchiveCompleteNotification,
+  BagLocation,
+  BagName
+}
 import uk.ac.wellcome.platform.archive.common.modules._
-import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
+import uk.ac.wellcome.platform.archive.registrar.modules.{
+  ConfigModule,
+  TestAppConfigModule,
+  VHSModule
+}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
-import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
+import uk.ac.wellcome.storage.fixtures.{
+  LocalDynamoDb,
+  LocalVersionedHybridStore
+}
 import uk.ac.wellcome.test.fixtures.TestWith
 import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
@@ -118,14 +133,12 @@ trait Registrar
 
     }
 
-
     testWith((new TestApp()).app)
   }
 
   def withRegistrar[R](
-    testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
-      R]) = {
+    testWith: TestWith[(Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
+                       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
         snsTopic =>
