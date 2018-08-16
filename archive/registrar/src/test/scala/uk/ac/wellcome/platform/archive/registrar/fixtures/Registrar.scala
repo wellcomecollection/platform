@@ -1,30 +1,21 @@
 package uk.ac.wellcome.platform.archive.registrar.fixtures
 
 import com.amazonaws.services.dynamodbv2.model._
+import com.google.inject.{Guice, Injector}
+import grizzled.slf4j.Logging
 import uk.ac.wellcome.json.JsonUtil._
 import uk.ac.wellcome.messaging.test.fixtures.Messaging
 import uk.ac.wellcome.messaging.test.fixtures.SNS.Topic
 import uk.ac.wellcome.messaging.test.fixtures.SQS.QueuePair
-import uk.ac.wellcome.platform.archive.common.app.InjectedModules
-import uk.ac.wellcome.platform.archive.common.fixtures.{
-  AkkaS3,
-  BagIt,
-  FileEntry
-}
-import uk.ac.wellcome.platform.archive.common.models.{
-  BagArchiveCompleteNotification,
-  BagLocation,
-  BagName
-}
-import uk.ac.wellcome.platform.archive.registrar._
-import uk.ac.wellcome.platform.archive.registrar.modules.TestAppConfigModule
-import uk.ac.wellcome.storage.fixtures.{
-  LocalDynamoDb,
-  LocalVersionedHybridStore
-}
+import uk.ac.wellcome.platform.archive.common.fixtures.{AkkaS3, BagIt, FileEntry}
+import uk.ac.wellcome.platform.archive.common.models.{BagArchiveCompleteNotification, BagLocation, BagName}
+import uk.ac.wellcome.platform.archive.common.modules._
+import uk.ac.wellcome.platform.archive.registrar.modules.{ConfigModule, TestAppConfigModule, VHSModule}
 import uk.ac.wellcome.storage.fixtures.LocalDynamoDb.Table
 import uk.ac.wellcome.storage.fixtures.S3.Bucket
+import uk.ac.wellcome.storage.fixtures.{LocalDynamoDb, LocalVersionedHybridStore}
 import uk.ac.wellcome.test.fixtures.TestWith
+import uk.ac.wellcome.platform.archive.registrar.{Registrar => RegistrarApp}
 
 trait Registrar
     extends AkkaS3
@@ -97,9 +88,10 @@ trait Registrar
                  hybridStoreBucket: Bucket,
                  hybridStoreTable: Table,
                  queuePair: QueuePair,
-                 topicArn: Topic)(testWith: TestWith[RegistrarWorker, R]) = {
+                 topicArn: Topic)(testWith: TestWith[RegistrarApp, R]) = {
 
-    class RegistrarTestApp extends InjectedModules with RegistrarModules {
+    class TestApp extends Logging {
+
       val appConfigModule = new TestAppConfigModule(
         queuePair.queue.url,
         storageBucket.name,
@@ -109,16 +101,30 @@ trait Registrar
         "archive"
       )
 
-      val worker = injector.getInstance(classOf[RegistrarWorker])
+      val injector: Injector = Guice.createInjector(
+        appConfigModule,
+        ConfigModule,
+        VHSModule,
+        AkkaModule,
+        AkkaS3ClientModule,
+        CloudWatchClientModule,
+        SQSClientModule,
+        SNSAsyncClientModule,
+        DynamoClientModule,
+        MessageStreamModule
+      )
+
+      val app = injector.getInstance(classOf[RegistrarApp])
 
     }
 
-    testWith((new RegistrarTestApp()).worker)
+
+    testWith((new TestApp()).app)
   }
 
   def withRegistrar[R](
     testWith: TestWith[
-      (Bucket, QueuePair, Topic, RegistrarWorker, Bucket, Table),
+      (Bucket, QueuePair, Topic, RegistrarApp, Bucket, Table),
       R]) = {
     withLocalSqsQueueAndDlqAndTimeout(15)(queuePair => {
       withLocalSnsTopic {
