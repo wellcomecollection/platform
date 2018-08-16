@@ -203,6 +203,11 @@ module "registrar" {
   source_queue_arn  = "${module.registrar_queue.arn}"
 }
 
+resource "aws_iam_role_policy" "registrar_task_vhs" {
+  role   = "${module.registrar.task_role_name}"
+  policy = "${module.vhs_archive_manifest.full_access_policy}"
+}
+
 resource "aws_iam_role_policy" "registrar_task_sns" {
   role   = "${module.registrar.task_role_name}"
   policy = "${module.registrar_completed_topic.publish_policy}"
