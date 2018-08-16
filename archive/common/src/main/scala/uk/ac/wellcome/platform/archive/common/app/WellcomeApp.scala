@@ -1,10 +1,10 @@
 package uk.ac.wellcome.platform.archive.common.app
 
-import com.google.inject.{AbstractModule, Guice, Injector}
+import com.google.inject.{AbstractModule, Injector}
 import grizzled.slf4j.Logging
-import scala.collection.JavaConverters._
-import scala.concurrent.{Await, Future}
+
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 trait WellcomeApp[W <: Worker[R], R] extends App with InjectedModules {
   val worker: W
@@ -25,8 +25,8 @@ trait InjectedModules extends Logging {
   val configuredModules: List[AbstractModule]
   val appConfigModule: AbstractModule
 
-  lazy val modules: List[AbstractModule] = appConfigModule :: configuredModules
-  lazy val injector: Injector = Guice.createInjector(modules.asJava)
+  val modules: List[AbstractModule] = appConfigModule :: configuredModules
+  val injector: Injector
 }
 
 trait Worker[T <: Any] {
