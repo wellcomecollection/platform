@@ -35,30 +35,19 @@ object DisplayItemV2 {
           id = Some(identifiedItem.canonicalId),
           identifiers =
             if (includesIdentifiers)
-              // If there aren't any identifiers on the item JSON, Jackson puts a
-              // nil here.  Wrapping it in an Option casts it into a None or Some
-              // as appropriate, and avoids throwing a NullPointerError when
-              // we map over the value.
-              Option[List[SourceIdentifier]](identifiedItem.identifiers) match {
-                case Some(identifiers) =>
-                  Some(identifiers.map(DisplayIdentifierV2(_)))
-                case None => Some(List())
-              } else None,
-          locations = // Same as with identifiers
-            Option[List[Location]](identifiedItem.agent.locations) match {
-              case Some(locations) => locations.map(DisplayLocationV2(_))
-              case None            => List()
-            }
+              Some(identifiedItem.identifiers.map { DisplayIdentifierV2(_) })
+            else None,
+          locations = identifiedItem.agent.locations.map {
+            DisplayLocationV2(_)
+          }
         )
-      case unidientifiableItem: Unidentifiable[Item] =>
+      case unidentifiableItem: Unidentifiable[Item] =>
         DisplayItemV2(
           id = None,
           identifiers = None,
-          locations =
-            Option[List[Location]](unidientifiableItem.agent.locations) match {
-              case Some(locations) => locations.map(DisplayLocationV2(_))
-              case None            => List()
-            }
+          locations = unidentifiableItem.agent.locations.map {
+            DisplayLocationV2(_)
+          }
         )
     }
 
