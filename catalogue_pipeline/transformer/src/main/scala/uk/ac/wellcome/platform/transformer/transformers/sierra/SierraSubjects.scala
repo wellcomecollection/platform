@@ -83,24 +83,20 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
     // which causes duplicated subjects to appear in the API.
     // So let's filter anything that is from another authority for now.
     marcVarFields.filterNot(_.indicator2.contains("7")).map { varField =>
-      val subfields = filterSubfields(varField, List("a", "b", "c", "e"))
+      val subfields = varField.subfields
 
       val person = getPerson(subfields)
-      val roles = getRoles(subfields)
-      val label = getPersonSubjectLabel(person.agent, roles)
-      val primaryConcept = List(person)
+      val label = getPersonSubjectLabel(person, getRoles(subfields))
       Subject(
         label = label,
-        concepts = primaryConcept
+        concepts = List(identifyPerson(person, varField))
       )
     }
   }
 
   private def getPersonSubjectLabel(person: Person, roles: List[String]) = {
-    val name = Some(person.label)
-    val prefix = person.prefix.toList
-    val numeration = person.numeration.toList
-    (List((prefix ++ name ++ numeration).mkString(" ")) ++ roles).mkString(", ")
+    val spaceSeparated = (person.prefix ++ List(person.label) ++ person.numeration).mkString(" ")
+    (List(spaceSeparated) ++ roles).mkString(", ")
   }
 
   private def filterSubfields(varField: VarField, subfields: List[String]) = {
@@ -131,6 +127,13 @@ trait SierraSubjects extends MarcUtils with SierraConcepts with SierraAgents{
           )
       }
 
+    }
+  }
+
+  private def identifyPerson(person: Person, varfield: VarField): MaybeDisplayable[Person] = {
+    varfield.indicator2 match {
+      case Some("0") => identify(varfield.subfields, person, "Person")
+      case _ => Unidentifiable(person)
     }
   }
 

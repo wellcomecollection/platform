@@ -455,6 +455,54 @@ describe("Subjects from 650, 648 and 651 tags"){
         transformer.getSubjects(sierraBibData)
       }
     }
+
+    it("creates an identifiable subject with library of congress heading if there is a subfield 0 and the second indicator is 0"){
+      val name = "Gerry the Garlic"
+      val lcshCode = "lcsh7212"
+
+      val sierraBibData = createSierraBibDataWith(
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "600",
+            indicator1 = "",
+            indicator2 = "0",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "0", content = lcshCode)
+            )
+          )
+        )
+      )
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "Gerry the Garlic",
+        concepts = List(
+          Identifiable(Person(label = "Gerry the Garlic"), sourceIdentifier = SourceIdentifier(IdentifierType("lc-names"), "Person", lcshCode)))))
+    }
+
+    it("creates an unidentifiable person concept if second indicator is not 0"){
+      val name = "Gerry the Garlic"
+      val sierraBibData = createSierraBibDataWith(
+        varFields = List(
+          VarField(
+            fieldTag = "p",
+            marcTag = "600",
+            indicator1 = "",
+            indicator2 = "2",
+            subfields = List(
+              MarcSubfield(tag = "a", content = name),
+              MarcSubfield(tag = "0", content = "mesh/456")
+            )
+          )
+        )
+      )
+
+      transformer.getSubjects(sierraBibData) shouldBe List(Subject(
+        label = "Gerry the Garlic",
+        concepts = List(
+          Unidentifiable(Person(label = "Gerry the Garlic")))))
+    }
   }
   private val transformer = new SierraSubjects {}
 

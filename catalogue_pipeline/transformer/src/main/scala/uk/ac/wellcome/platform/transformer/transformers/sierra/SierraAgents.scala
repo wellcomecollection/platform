@@ -23,25 +23,16 @@ trait SierraAgents {
     val prefixString =
       if (prefixes.isEmpty) None else Some(prefixes.mkString(" "))
 
-    identify[Person](
-      subfields = subfields,
-      agent = Person(
+    Person(
         label = label,
         prefix = prefixString,
         numeration = numeration
-      ),
-      ontologyType = "Person"
-    )
+      )
   }
 
   def getOrganisation(subfields: List[MarcSubfield]) = {
     val label = getLabel(subfields)
-
-    identify[Organisation](
-      subfields = subfields,
-      agent = Organisation(label = label),
-      ontologyType = "Organisation"
-    )
+    Organisation(label = label)
   }
 
   /* Given an agent and the associated MARC subfields, look for instances of subfield $0,
@@ -50,7 +41,7 @@ trait SierraAgents {
    * This methods them (if present) and wraps the agent in Unidentifiable or Identifiable
    * as appropriate.
    */
-  private def identify[T](subfields: List[MarcSubfield],
+  def identify[T](subfields: List[MarcSubfield],
                           agent: T,
                           ontologyType: String): MaybeDisplayable[T] = {
 

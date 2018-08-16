@@ -1,6 +1,5 @@
 package uk.ac.wellcome.platform.transformer.transformers.sierra
 
-import uk.ac.wellcome.models.work.internal
 import uk.ac.wellcome.models.work.internal._
 import uk.ac.wellcome.platform.transformer.source.{MarcSubfield, SierraBibData}
 
@@ -53,10 +52,10 @@ trait SierraContributors extends MarcUtils with SierraAgents {
 
     persons.map { subfields =>
       val roles = getContributionRoles(subfields)
-      val agent: MaybeDisplayable[Person] = getPerson(subfields)
+      val agent = getPerson(subfields)
 
-      internal.Contributor[MaybeDisplayable[Person]](
-        agent = agent,
+      Contributor(
+        agent = identify(subfields, agent, "Person"),
         roles = roles
       )
     }
@@ -76,10 +75,10 @@ trait SierraContributors extends MarcUtils with SierraAgents {
 
     organisations.map { subfields =>
       val roles = getContributionRoles(subfields)
-      val agent: MaybeDisplayable[Organisation] = getOrganisation(subfields)
+      val agent = getOrganisation(subfields)
 
-      internal.Contributor[MaybeDisplayable[Organisation]](
-        agent = agent,
+      Contributor(
+        agent = identify(subfields, agent, "Organisation"),
         roles = roles
       )
     }
