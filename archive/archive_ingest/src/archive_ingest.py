@@ -7,7 +7,6 @@ import os
 
 import boto3
 import daiquiri
-import json
 from urllib.parse import urlparse
 
 from wellcome_aws_utils.sns_utils import publish_sns_message
@@ -38,9 +37,9 @@ def archive_bag_message(bagURL):
 def main(event, _ctx=None, sns_client=None):
     logger.info(f"received {event}")
 
-    bagURL = event['bagURL']
+    bagUrl = event['bagURL']
 
-    message = json.dumps(archive_bag_message(bagURL))
+    message = archive_bag_message(bagUrl)
     logger.debug(f"sns-message: {message}")
 
     topic_arn = os.environ['INGEST_TOPIC_ARN']
