@@ -160,13 +160,24 @@ trait DisplaySerialisationTestBase { this: Suite =>
       "label": "${p.label}"
     }"""
 
-  def concept(concept: AbstractConcept) =
+  def ontologyType(concept: AbstractConcept) =
+    concept match {
+    case _:Concept => "Concept"
+    case _:Place => "Place"
+    case _:Period => "Period"
+    case _:Agent => "Agent"
+    case _:Organisation => "Organisation"
+    case _:Person => "Person"
+  }
+
+  def concept(concept: AbstractConcept) ={
     s"""
     {
-      "type": "${concept.ontologyType}",
+      "type": "${ontologyType(concept)}",
       "label": "${concept.label}"
     }
     """
+  }
 
   def concepts(concepts: List[Displayable[AbstractConcept]]) =
     concepts

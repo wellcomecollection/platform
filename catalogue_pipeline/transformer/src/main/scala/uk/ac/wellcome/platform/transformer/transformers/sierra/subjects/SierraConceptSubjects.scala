@@ -63,7 +63,7 @@ trait SierraConceptSubjects extends MarcUtils with SierraConcepts{
         primarySubfields,
         varField = varField) ++ getSubdivisions(subdivisionSubfields)
 
-      Subject[MaybeDisplayable[AbstractConcept]](
+      Subject(
         label = label,
         concepts = concepts
       )

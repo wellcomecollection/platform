@@ -4,14 +4,16 @@ sealed trait AbstractConcept {
   val label: String
 }
 
+sealed trait Bah extends AbstractConcept
+
 case class Concept(label: String)
-  extends AbstractConcept
+  extends Bah
 
 case class Period(label: String)
-  extends AbstractConcept
+  extends Bah
 
 case class Place(label: String)
-  extends AbstractConcept
+  extends Bah
 
 
 sealed trait AbstractAgent extends AbstractConcept {
